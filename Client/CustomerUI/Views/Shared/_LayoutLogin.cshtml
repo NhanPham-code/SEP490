@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a asp-controller="Home" asp-action="Index">
+                        <h1 class="font-['Pacifico'] custom-logo text-primary">logo</h1>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a asp-controller="Home" asp-action="Index"
+                       data-readdy="true"
+                       class="flex items-center space-x-2 text-gray-600 hover:text-primary transition-colors">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <i class="ri-arrow-left-line"></i>
+                        </div>
+                        <span>Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>
