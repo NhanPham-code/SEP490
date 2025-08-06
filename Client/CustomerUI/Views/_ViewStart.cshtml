@@ -1,5 +1,5 @@
 ﻿@{
-
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
     var ua = Context.Request.Headers["User-Agent"].ToString();
     Console.WriteLine($"User-Agent: {ua}");
     if (ua.Contains("Mobile"))
@@ -9,5 +9,9 @@
     else
     {
         Layout = "_LayoutDesktop";
+    }
+    if (action == "Login" || action == "Register")
+    {
+        Layout = "_LayoutLogin";
     }
 }

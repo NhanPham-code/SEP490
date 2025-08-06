@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -11,24 +10,20 @@
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-
-    <!-- Custom Media Query CSS -->
-    <style>
-        /* Mặc định mobile: ẩn desktop-nav, hiện mobile-nav */
-
-
-
-
-    </style>
 </head>
 <body class="bg-white text-gray-900">
     <!-- Header -->
-    <header class="desktop-nav bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
                 <div class="flex items-center">
-                    <h1 class="font-['Pacifico'] text-2xl text-primary">logo</h1>
+                    <a asp-controller="Home" asp-action="Index">
+                        <h1 class="font-['Pacifico'] custom-logo text-primary">logo</h1>
+                    </a>
                 </div>
+
+                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Home</a>
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
@@ -36,17 +31,35 @@
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">About</a>
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Contact</a>
                 </nav>
-                <div class="flex items-center space-x-4">
-                    
-                    <a asp-controller="Login" asp-action="Login" data-readdy="true">
-                        <button class="bg-primary text-white px-6 py-2 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Sign In</button>
+
+                <!-- Desktop Sign In Button -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a asp-controller="Login" asp-action="Login">
+                        <button class="bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">
+                            Sign In
+                        </button>
                     </a>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="menu-toggle" class="md:hidden text-gray-700 text-2xl focus:outline-none">
+                    <i class="ri-menu-line"></i>
+                </button>
             </div>
         </div>
     </header>
 
-
+    <!-- Mobile Dropdown Menu -->
+    <nav id="mobile-menu" class="md:hidden hidden bg-white shadow-sm px-4 py-3 space-y-3">
+        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Home</a>
+        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Sports</a>
+        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">About</a>
+        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Contact</a>
+        <a asp-controller="Login" asp-action="Login">
+            <button class="w-full bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-600 transition-colors">Sign In</button>
+        </a>
+    </nav>
 
     <!-- Main content -->
     <main role="main" class="pb-12 max-w-7xl mx-auto px-4">
@@ -111,7 +124,17 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @RenderSection("Scripts", required: false)
 
+    <!-- Mobile menu toggle script -->
+    <script>
+        const toggleBtn = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        toggleBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
