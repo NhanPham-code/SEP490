@@ -1,0 +1,117 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CustomerUI</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="description" content="Book your favorite sports stadiums with ease and flexibility." />
+
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- Custom Media Query CSS -->
+    <style>
+        /* Mặc định mobile: ẩn desktop-nav, hiện mobile-nav */
+
+
+
+
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Header -->
+    <header class="desktop-nav bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="font-['Pacifico'] text-2xl text-primary">logo</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Sports</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">About</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Contact</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    
+                    <a asp-controller="Login" asp-action="Login" data-readdy="true">
+                        <button class="bg-primary text-white px-6 py-2 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Sign In</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+
+    <!-- Main content -->
+    <main role="main" class="pb-12 max-w-7xl mx-auto px-4">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo & social -->
+                <div>
+                    <h3 class="font-['Pacifico'] text-2xl text-primary mb-4">logo</h3>
+                    <p class="text-gray-400 mb-4">Your premier destination for booking sports stadiums and facilities across the city.</p>
+                    <div class="flex space-x-4">
+                        <button class="w-10 h-10 bg-gray-800 rounded-lg hover:bg-gray-700"><i class="ri-facebook-fill"></i></button>
+                        <button class="w-10 h-10 bg-gray-800 rounded-lg hover:bg-gray-700"><i class="ri-twitter-fill"></i></button>
+                        <button class="w-10 h-10 bg-gray-800 rounded-lg hover:bg-gray-700"><i class="ri-instagram-fill"></i></button>
+                    </div>
+                </div>
+
+                <!-- Quick links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a asp-controller="Stadiums" asp-action="Index" class="text-gray-400 hover:text-white">Find Stadiums</a></li>
+                        <li><a asp-controller="Sports" asp-action="Index" class="text-gray-400 hover:text-white">Sports Categories</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+                        <li><a asp-controller="Home" asp-action="About" class="text-gray-400 hover:text-white">About Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Booking Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe to get updates on new stadiums and special offers.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                        <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-600">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2025 Stadium Booking Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

@@ -1,3 +1,13 @@
 ﻿@{
-    Layout = "_Layout";
+
+    var ua = Context.Request.Headers["User-Agent"].ToString();
+    Console.WriteLine($"User-Agent: {ua}");
+    if (ua.Contains("Mobile"))
+    {
+        Layout = "_LayoutMobile";
+    }
+    else
+    {
+        Layout = "_LayoutDesktop";
+    }
 }

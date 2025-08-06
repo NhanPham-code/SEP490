@@ -1,0 +1,621 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    @{
+            Layout = "_LayoutLogin";
+    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Stadium Booking Platform</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#3b82f6",
+                secondary: "#10b981",
+              },
+              borderRadius: {
+                none: "0px",
+                sm: "4px",
+                DEFAULT: "8px",
+                md: "12px",
+                lg: "16px",
+                xl: "20px",
+                "2xl": "24px",
+                "3xl": "32px",
+                full: "9999px",
+                button: "8px",
+              },
+            },
+          },
+        };
+    </script>
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+
+        .password-toggle {
+            cursor: pointer;
+        }
+
+        .error-message {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+            .error-message.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        .social-button {
+            transition: all 0.2s ease;
+        }
+
+            .social-button:hover {
+                transform: translateY(-1px);
+            }
+
+        .form-input {
+            transition: all 0.2s ease;
+        }
+
+            .form-input:focus {
+                transform: translateY(-1px);
+            }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak {
+            background-color: #ef4444;
+            width: 25%;
+        }
+
+        .strength-fair {
+            background-color: #f59e0b;
+            width: 50%;
+        }
+
+        .strength-good {
+            background-color: #10b981;
+            width: 75%;
+        }
+
+        .strength-strong {
+            background-color: #059669;
+            width: 100%;
+        }
+
+        .tab-button {
+            position: relative;
+        }
+
+            .tab-button.active {
+                background-color: white;
+            }
+
+                .tab-button.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -1px;
+                    left: 0;
+                    right: 0;
+                    height: 2px;
+                    background-color: #3b82f6;
+                }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <main class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex justify-center mb-8">
+                    <div class="inline-flex rounded-full p-1 bg-gray-100">
+                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 active" data-tab="signin">Sign In</button>
+                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200" data-tab="signup">Sign Up</button>
+                    </div>
+                </div>
+                <div id="signin-form" class="tab-content">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+                        <p class="text-gray-600">Sign in to access your account</p>
+                    </div>
+                    <form id="login-form" class="space-y-6">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <div class="relative">
+                                <input type="email" id="login-email" name="login-email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your email"><div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-mail-line text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <div class="relative">
+                                <input type="password" id="login-password" name="login-password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your password">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-lock-line text-gray-400"></i>
+                                </div>
+                                <button type="button" id="login-password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-eye-line text-gray-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="sr-only" id="remember-me">
+                                <div class="w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center">
+                                    <i class="ri-check-line text-primary text-xs hidden"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                            </label>
+                            <a href="#" class="text-sm text-primary hover:text-blue-600">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
+                            <span>Sign In</span>
+                        </button>
+                    </form>
+                </div>
+                <div id="signup-form" class="tab-content hidden">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                        <p class="text-gray-600">Join our platform to book your favorite stadiums</p>
+                    </div>
+                    <div id="form-error" class="error-message bg-red-50 border border-red-200 rounded-lg p-4 mb-6 hidden">
+                        <div class="flex items-center">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-error-warning-line text-red-500"></i>
+                            </div>
+                            <p class="text-red-700 text-sm" id="error-text"></p>
+                        </div>
+                    </div>
+                    <form id="signup-form" class="space-y-6">
+                        <div>
+                            <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <div class="relative">
+                                <input type="text" id="fullname" name="fullname" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your full name">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-user-line text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div id="fullname-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <div class="relative">
+                                <input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your email">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-mail-line text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div id="email-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Create a password">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-lock-line text-gray-400"></i>
+                                </div>
+                                <button type="button" id="password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-eye-line text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs text-gray-500">Password strength</span>
+                                    <span id="strength-text" class="text-xs text-gray-500"></span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-1">
+                                    <div id="strength-bar" class="password-strength bg-gray-200"></div>
+                                </div>
+                            </div>
+                            <div id="password-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <div class="relative">
+                                <input type="password" id="confirm-password" name="confirm-password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Confirm your password">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-lock-line text-gray-400"></i>
+                                </div>
+                                <button type="button" id="confirm-password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-eye-line text-gray-400"></i>
+                                </button>
+                            </div>
+                            <div id="confirm-password-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+                        <div class="flex items-start">
+                            <label class="flex items-start cursor-pointer">
+                                <input type="checkbox" id="terms" name="terms" required class="sr-only">
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center mr-3 mt-0.5 transition-colors">
+                                    <i class="ri-check-line text-primary text-sm hidden"></i>
+                                </div>
+                                <span class="text-sm text-gray-700 leading-5">
+                                    I agree to the
+                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Terms of Service</a>
+                                    and
+                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Privacy Policy</a>
+                                </span>
+                            </label>
+                        </div>
+                        <div id="terms-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        <button type="submit" id="signup-btn" class="w-full bg-primary text-white py-3 px-4 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
+                            <span id="signup-text">Create Account</span>
+                            <div id="signup-spinner" class="loading-spinner w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2 hidden"></div>
+                        </button>
+                        <div class="relative my-6">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-4 bg-white text-gray-500">or continue with</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <button type="button" class="social-button w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-button !rounded-button hover:bg-gray-50 transition-all whitespace-nowrap">
+                                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                    <i class="ri-google-fill text-red-500"></i>
+                                </div>
+                                <span class="text-gray-700 font-medium">Sign up with Google</span>
+                            </button>
+                            <button type="button" class="social-button w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-button !rounded-button hover:bg-gray-50 transition-all whitespace-nowrap">
+                                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                    <i class="ri-facebook-fill text-blue-600"></i>
+                                </div>
+                                <span class="text-gray-700 font-medium">Sign up with Facebook</span>
+                            </button>
+                        </div>
+                        <div class="text-center pt-4">
+                            <p class="text-gray-600">
+                                Already have an account?
+                                <a href="https://readdy.ai/home/6e478e59-67a3-479d-b717-11cb821df867/1e671e07-9379-42a1-892f-d1ea2862e449" data-readdy="true" class="text-primary hover:text-blue-600 font-semibold transition-colors">Sign In</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm text-gray-500">
+                        By creating an account, you agree to our
+                        <a href="#" class="text-primary hover:text-blue-600 transition-colors">Terms of Service</a>
+                        and
+                        <a href="#" class="text-primary hover:text-blue-600 transition-colors">Privacy Policy</a>
+                    </p>
+                </div>
+            </div>
+    </main>
+    <footer class="bg-white border-t border-gray-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Stadium Booking Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script id="password-toggle-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const passwordInput = document.getElementById("password");
+          const passwordToggle = document.getElementById("password-toggle");
+          const confirmPasswordInput = document.getElementById("confirm-password");
+          const confirmPasswordToggle = document.getElementById(
+            "confirm-password-toggle",
+          );
+          function setupPasswordToggle(input, toggle) {
+            const toggleIcon = toggle.querySelector("i");
+            toggle.addEventListener("click", function () {
+              if (input.type === "password") {
+                input.type = "text";
+                toggleIcon.className = "ri-eye-off-line text-gray-400";
+              } else {
+                input.type = "password";
+                toggleIcon.className = "ri-eye-line text-gray-400";
+              }
+            });
+          }
+          setupPasswordToggle(passwordInput, passwordToggle);
+          setupPasswordToggle(confirmPasswordInput, confirmPasswordToggle);
+        });
+    </script>
+    <script id="password-strength-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const passwordInput = document.getElementById("password");
+          const strengthBar = document.getElementById("strength-bar");
+          const strengthText = document.getElementById("strength-text");
+          function checkPasswordStrength(password) {
+            let score = 0;
+            let feedback = "";
+            if (password.length >= 8) score++;
+            if (password.match(/[a-z]/)) score++;
+            if (password.match(/[A-Z]/)) score++;
+            if (password.match(/[0-9]/)) score++;
+            if (password.match(/[^a-zA-Z0-9]/)) score++;
+            strengthBar.className = "password-strength";
+            if (password.length === 0) {
+              strengthBar.classList.add("bg-gray-200");
+              strengthText.textContent = "";
+            } else if (score <= 2) {
+              strengthBar.classList.add("strength-weak");
+              strengthText.textContent = "Weak";
+              feedback = "weak";
+            } else if (score === 3) {
+              strengthBar.classList.add("strength-fair");
+              strengthText.textContent = "Fair";
+              feedback = "fair";
+            } else if (score === 4) {
+              strengthBar.classList.add("strength-good");
+              strengthText.textContent = "Good";
+              feedback = "good";
+            } else {
+              strengthBar.classList.add("strength-strong");
+              strengthText.textContent = "Strong";
+              feedback = "strong";
+            }
+            return feedback;
+          }
+          passwordInput.addEventListener("input", function () {
+            checkPasswordStrength(this.value);
+          });
+        });
+    </script>
+    <script id="checkbox-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const checkbox = document.getElementById("terms");
+          const checkIcon = checkbox.parentElement.querySelector("i");
+          const checkboxDiv = checkbox.parentElement.querySelector("div");
+          checkbox.addEventListener("change", function () {
+            if (this.checked) {
+              checkIcon.classList.remove("hidden");
+              checkboxDiv.classList.add("border-primary", "bg-primary");
+              checkboxDiv.classList.remove("border-gray-300");
+            } else {
+              checkIcon.classList.add("hidden");
+              checkboxDiv.classList.remove("border-primary", "bg-primary");
+              checkboxDiv.classList.add("border-gray-300");
+            }
+          });
+          checkbox.parentElement.addEventListener("click", function (e) {
+            if (e.target !== checkbox && !e.target.closest("a")) {
+              checkbox.click();
+            }
+          });
+        });
+    </script>
+    <script id="form-validation-handler">
+
+          function validatePassword(password) {
+            return password.length >= 8;
+          }
+          fullnameInput.addEventListener("blur", function () {
+            if (this.value && this.value.trim().length < 2) {
+              showError(this, "Full name must be at least 2 characters");
+            } else {
+              hideError(this);
+            }
+          });
+          emailInput.addEventListener("blur", function () {
+            if (this.value && !validateEmail(this.value)) {
+              showError(this, "Please enter a valid email address");
+            } else {
+              hideError(this);
+            }
+          });
+          passwordInput.addEventListener("blur", function () {
+            if (this.value && !validatePassword(this.value)) {
+              showError(this, "Password must be at least 8 characters");
+            } else {
+              hideError(this);
+            }
+          });
+          confirmPasswordInput.addEventListener("blur", function () {
+            if (this.value && this.value !== passwordInput.value) {
+              showError(this, "Passwords do not match");
+            } else {
+              hideError(this);
+            }
+          });
+          [fullnameInput, emailInput, passwordInput, confirmPasswordInput].forEach(
+            (input) => {
+              input.addEventListener("input", function () {
+                if (this.classList.contains("border-red-500")) {
+                  hideError(this);
+                }
+                hideFormError();
+              });
+            },
+          );
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            let hasError = false;
+            hideFormError();
+            if (!fullnameInput.value.trim()) {
+              showError(fullnameInput, "Full name is required");
+              hasError = true;
+            } else if (fullnameInput.value.trim().length < 2) {
+              showError(fullnameInput, "Full name must be at least 2 characters");
+              hasError = true;
+            }
+            if (!emailInput.value) {
+              showError(emailInput, "Email is required");
+              hasError = true;
+            } else if (!validateEmail(emailInput.value)) {
+              showError(emailInput, "Please enter a valid email address");
+              hasError = true;
+            }
+            if (!passwordInput.value) {
+              showError(passwordInput, "Password is required");
+              hasError = true;
+            } else if (!validatePassword(passwordInput.value)) {
+              showError(passwordInput, "Password must be at least 8 characters");
+              hasError = true;
+            }
+            if (!confirmPasswordInput.value) {
+              showError(confirmPasswordInput, "Please confirm your password");
+              hasError = true;
+            } else if (confirmPasswordInput.value !== passwordInput.value) {
+              showError(confirmPasswordInput, "Passwords do not match");
+              hasError = true;
+            }
+            if (!termsCheckbox.checked) {
+              const termsError = document.getElementById("terms-error");
+              termsError.textContent = "You must agree to the Terms of Service";
+              termsError.classList.remove("hidden");
+              termsError.classList.add("show");
+              hasError = true;
+            } else {
+              const termsError = document.getElementById("terms-error");
+              termsError.classList.add("hidden");
+              termsError.classList.remove("show");
+            }
+            if (hasError) return;
+            signupBtn.disabled = true;
+            signupText.textContent = "Creating Account...";
+            signupSpinner.classList.remove("hidden");
+            setTimeout(() => {
+              const existingEmails = ["admin@example.com", "test@example.com"];
+              if (existingEmails.includes(emailInput.value.toLowerCase())) {
+                showFormError(
+                  "An account with this email already exists. Please use a different email or sign in.",
+                );
+                signupBtn.disabled = false;
+                signupText.textContent = "Create Account";
+                signupSpinner.classList.add("hidden");
+              } else {
+                alert(
+                  "Account created successfully! You can now sign in with your credentials.",
+                );
+                window.location.href =
+                  "https://readdy.ai/home/6e478e59-67a3-479d-b717-11cb821df867/1e671e07-9379-42a1-892f-d1ea2862e449";
+              }
+            }, 2000);
+          });
+        });
+    </script>
+    <script id="tab-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabButtons = document.querySelectorAll(".tab-button");
+          const tabContents = document.querySelectorAll(".tab-content");
+          function switchTab(tabId) {
+            tabButtons.forEach((button) => {
+              if (button.dataset.tab === tabId) {
+                button.classList.add(
+                  "active",
+                  "bg-white",
+                  "text-gray-900",
+                  "shadow-sm",
+                );
+                button.classList.remove("text-gray-500", "hover:text-gray-700");
+              } else {
+                button.classList.remove(
+                  "active",
+                  "bg-white",
+                  "text-gray-900",
+                  "shadow-sm",
+                );
+                button.classList.add("text-gray-500", "hover:text-gray-700");
+              }
+            });
+            tabContents.forEach((content) => {
+              if (content.id.includes(tabId)) {
+                content.classList.remove("hidden");
+              } else {
+                content.classList.add("hidden");
+              }
+            });
+          }
+          tabButtons.forEach((button) => {
+            button.addEventListener("click", () => switchTab(button.dataset.tab));
+          });
+        });
+    </script>
+    <script id="login-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const loginForm = document.getElementById("login-form");
+          const loginPasswordInput = document.getElementById("login-password");
+          const loginPasswordToggle = document.getElementById("login-password-toggle");
+          const rememberMeCheckbox = document.getElementById("remember-me");
+          const rememberMeIcon = rememberMeCheckbox.parentElement.querySelector("i");
+          const rememberMeDiv = rememberMeCheckbox.parentElement.querySelector("div");
+          setupPasswordToggle(loginPasswordInput, loginPasswordToggle);
+          rememberMeCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+              rememberMeIcon.classList.remove("hidden");
+              rememberMeDiv.classList.add("border-primary", "bg-primary");
+              rememberMeDiv.classList.remove("border-gray-300");
+            } else {
+              rememberMeIcon.classList.add("hidden");
+              rememberMeDiv.classList.remove("border-primary", "bg-primary");
+              rememberMeDiv.classList.add("border-gray-300");
+            }
+          });
+          loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = loginPasswordInput.value;
+            if (!email || !password) {
+              showFormError("Please fill in all fields");
+              return;
+            }
+            const loginButton = this.querySelector('button[type="submit"]');
+            const loginText = loginButton.querySelector("span");
+            loginButton.disabled = true;
+            loginText.textContent = "Signing In...";
+            setTimeout(() => {
+              if (email === "demo@example.com" && password === "password123") {
+                window.location.href = "/dashboard";
+              } else {
+                showFormError("Invalid email or password");
+                loginButton.disabled = false;
+                loginText.textContent = "Sign In";
+              }
+            }, 1500);
+          });
+        });
+    </script>
+    <script id="social-auth-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const socialButtons = document.querySelectorAll(".social-button");
+          socialButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              const provider = this.textContent.includes("Google")
+                ? "Google"
+                : "Facebook";
+              const action =
+                document.querySelector(".tab-button.active").dataset.tab === "signin"
+                  ? "sign in"
+                  : "sign up";
+              const message = `${provider} ${action} would be implemented here.`;
+              const notification = document.createElement("div");
+              notification.className =
+                "fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-[-100%]";
+              notification.textContent = message;
+              document.body.appendChild(notification);
+              setTimeout(() => {
+                notification.style.transform = "translateY(0)";
+              }, 100);
+              setTimeout(() => {
+                notification.style.transform = "translateY(-100%)";
+                setTimeout(() => notification.remove(), 300);
+              }, 3000);
+            });
+          });
+        });
+    </script>
+</body>
+</html>
