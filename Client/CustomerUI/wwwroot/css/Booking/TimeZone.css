@@ -1,0 +1,287 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.booking-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+    .header h1 {
+        color: #2d3748;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+
+.section {
+    margin-bottom: 35px;
+}
+
+.section-title {
+    color: #2d3748;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 2px;
+        margin-right: 12px;
+    }
+
+.date-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: #2d3748;
+}
+
+    .date-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+.time-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.time-slot {
+    padding: 14px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+    .time-slot::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .time-slot:hover::before {
+        left: 100%;
+    }
+
+    .time-slot.ready {
+        background: linear-gradient(45deg, #48bb78, #38a169);
+        color: white;
+        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+    }
+
+        .time-slot.ready:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.6);
+        }
+
+    .time-slot.selected {
+        background: linear-gradient(45deg, #4299e1, #3182ce);
+        color: white;
+        box-shadow: 0 4px 15px rgba(66, 153, 225, 0.4);
+        border-color: #2b6cb0;
+    }
+
+    .time-slot.out-of-court {
+        background: linear-gradient(45deg, #ed8936, #dd6b20);
+        color: white;
+        cursor: not-allowed;
+        box-shadow: 0 4px 15px rgba(237, 137, 54, 0.4);
+    }
+
+    .time-slot.blocked {
+        background: linear-gradient(45deg, #e53e3e, #c53030);
+        color: white;
+        cursor: not-allowed;
+        box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4);
+    }
+
+.status-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(247, 250, 252, 0.8);
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    .legend-dot.ready {
+        background: linear-gradient(45deg, #48bb78, #38a169);
+    }
+
+    .legend-dot.selected {
+        background: linear-gradient(45deg, #4299e1, #3182ce);
+    }
+
+    .legend-dot.out-of-court {
+        background: linear-gradient(45deg, #ed8936, #dd6b20);
+    }
+
+    .legend-dot.blocked {
+        background: linear-gradient(45deg, #e53e3e, #c53030);
+    }
+
+.selection-info {
+    background: linear-gradient(135deg, #e6fffa, #b2f5ea);
+    border: 2px solid #4fd1c7;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+    .selection-info h3 {
+        color: #234e52;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+.selected-times {
+    color: #2c7a7b;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.next-button {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+    .next-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .next-button:hover::before {
+        left: 100%;
+    }
+
+    .next-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .next-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+        .next-button:disabled:hover {
+            box-shadow: none;
+        }
+
+@media (max-width: 640px) {
+    .booking-container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .time-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+    }
+
+    .time-slot {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+    }
+
+    .status-legend {
+        gap: 15px;
+    }
+
+    .legend-item {
+        font-size: 0.8rem;
+    }
+}

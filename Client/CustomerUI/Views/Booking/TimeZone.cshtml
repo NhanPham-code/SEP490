@@ -1,0 +1,228 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stadium Court Booking</title>
+    <link rel="stylesheet" href="~/css/Booking/TimeZone.css" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="booking-container">
+        <div class="header">
+            <h1>🏟️ Court Booking</h1>
+            <p>Select your preferred date and time slots</p>
+        </div>
+
+        <div class="section">
+            <h3 class="section-title">Select Date</h3>
+            <input type="date" class="date-input" id="dateInput">
+        </div>
+
+        <div class="section">
+            <h3 class="section-title">Choose Time Slots</h3>
+            <div class="time-grid" id="timeGrid"></div>
+        </div>
+
+        <div class="status-legend">
+            <div class="legend-item">
+                <div class="legend-dot ready"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot selected"></div>
+                <span>Your Choice</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot out-of-court"></div>
+                <span>Out of Court</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot blocked"></div>
+                <span>Blocked</span>
+            </div>
+        </div>
+
+        <div class="selection-info" id="selectionInfo" style="display: none;">
+            <h3>Selected Time Slots</h3>
+            <div class="selected-times" id="selectedTimes"></div>
+        </div>
+
+        <button class="next-button" id="nextButton" disabled>
+            Next Step →
+        </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const selectedSlots = [];
+            const maxSelections = 2;
+
+            // Set current date as default
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            $('#dateInput').val(formattedDate);
+
+            // Generate time slots from 5:00 to 22:00
+            function generateTimeSlots() {
+                const timeGrid = $('#timeGrid');
+                timeGrid.empty();
+
+                for (let hour = 5; hour <= 22; hour++) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:00`;
+                    const timeSlot = $(`
+                                <div class="time-slot ready" data-time="${timeString}">
+                                    ${timeString}
+                                </div>
+                            `);
+
+                    // Randomly set some slots as out-of-court or blocked for demo
+                    const random = Math.random();
+                    if (random < 0.1) {
+                        timeSlot.removeClass('ready').addClass('out-of-court');
+                    } else if (random < 0.15) {
+                        timeSlot.removeClass('ready').addClass('blocked');
+                    }
+
+                    timeGrid.append(timeSlot);
+                }
+            }
+
+            // Function to get hour from time string
+            function getHourFromTime(timeString) {
+                return parseInt(timeString.split(':')[0]);
+            }
+
+            // Function to update range selection
+            function updateRangeSelection() {
+                // Clear all previous selections
+                $('.time-slot').each(function () {
+                    const slot = $(this);
+                    if (slot.hasClass('selected')) {
+                        if (slot.hasClass('out-of-court') || slot.hasClass('blocked')) {
+                            // Keep the original state for non-available slots
+                            slot.removeClass('selected');
+                        } else {
+                            slot.removeClass('selected').addClass('ready');
+                        }
+                    }
+                });
+
+                if (selectedSlots.length === 2) {
+                    const startHour = getHourFromTime(selectedSlots[0]);
+                    const endHour = getHourFromTime(selectedSlots[1]);
+                    const minHour = Math.min(startHour, endHour);
+                    const maxHour = Math.max(startHour, endHour);
+
+                    // Select all slots in range
+                    for (let hour = minHour; hour <= maxHour; hour++) {
+                        const timeString = `${hour.toString().padStart(2, '0')}:00`;
+                        const slot = $(`.time-slot[data-time="${timeString}"]`);
+
+                        // Only select if it's ready or already selected
+                        if (slot.hasClass('ready') || slot.hasClass('selected')) {
+                            slot.removeClass('ready').addClass('selected');
+                        }
+                    }
+                }
+            }
+
+            // Handle time slot selection
+            $(document).on('click', '.time-slot', function () {
+                const timeSlot = $(this);
+                const time = timeSlot.data('time');
+
+                // Only allow clicking on ready or selected slots
+                if (!timeSlot.hasClass('ready') && !timeSlot.hasClass('selected')) {
+                    return;
+                }
+
+                if (timeSlot.hasClass('selected') && selectedSlots.includes(time)) {
+                    // Deselect - remove from selectedSlots
+                    const index = selectedSlots.indexOf(time);
+                    if (index > -1) {
+                        selectedSlots.splice(index, 1);
+                    }
+                } else if (selectedSlots.length < maxSelections) {
+                    // Add new selection
+                    selectedSlots.push(time);
+                } else {
+                    // Replace first selection with new one
+                    selectedSlots.shift(); // Remove first element
+                    selectedSlots.push(time); // Add new selection
+                }
+
+                updateRangeSelection();
+                updateSelectionDisplay();
+                updateNextButton();
+            });
+
+            // Update selection display
+            function updateSelectionDisplay() {
+                const selectionInfo = $('#selectionInfo');
+                const selectedTimes = $('#selectedTimes');
+
+                if (selectedSlots.length > 0) {
+                    if (selectedSlots.length === 2) {
+                        const startHour = getHourFromTime(selectedSlots[0]);
+                        const endHour = getHourFromTime(selectedSlots[1]);
+                        const minTime = selectedSlots[startHour <= endHour ? 0 : 1];
+                        const maxTime = selectedSlots[startHour <= endHour ? 1 : 0];
+                        selectedTimes.text(`${minTime} - ${maxTime}`);
+                    } else {
+                        selectedTimes.text(selectedSlots[0]);
+                    }
+                    selectionInfo.show();
+                } else {
+                    selectionInfo.hide();
+                }
+            }
+
+            // Update next button state
+            function updateNextButton() {
+                const nextButton = $('#nextButton');
+                if (selectedSlots.length > 0) {
+                    nextButton.prop('disabled', false);
+                } else {
+                    nextButton.prop('disabled', true);
+                }
+            }
+
+            // Handle date change
+            $('#dateInput').on('change', function () {
+                // Reset selections when date changes
+                selectedSlots.length = 0;
+                updateSelectionDisplay();
+                updateNextButton();
+                generateTimeSlots();
+            });
+
+            // Handle next button click
+            $('#nextButton').on('click', function () {
+                if (selectedSlots.length > 0) {
+                    const selectedDate = $('#dateInput').val();
+                    let timeRange = '';
+                    if (selectedSlots.length === 2) {
+                        const startHour = getHourFromTime(selectedSlots[0]);
+                        const endHour = getHourFromTime(selectedSlots[1]);
+                        const minTime = selectedSlots[startHour <= endHour ? 0 : 1];
+                        const maxTime = selectedSlots[startHour <= endHour ? 1 : 0];
+                        timeRange = `${minTime} - ${maxTime}`;
+                    } else {
+                        timeRange = selectedSlots[0];
+                    }
+                    alert(`Booking Details:\nDate: ${selectedDate}\nTime Range: ${timeRange}\n\nProceeding to next step...`);
+                }
+            });
+
+            // Initialize time slots
+            generateTimeSlots();
+        });
+    </script>
+</body>
+</html>
