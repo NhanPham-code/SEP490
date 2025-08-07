@@ -61,5 +61,12 @@ namespace BookingAPI.Repository
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public IQueryable<Booking> GetAllBookingsAsQueryable()
+        {
+            return _context.Bookings
+                .Include(b => b.BookingDetails)
+                .AsQueryable();
+        }
     }
 }

@@ -78,5 +78,11 @@ namespace BookingAPI.Services
         {
             return await _bookingRepository.BookingExistsAsync(id);
         }
+
+        // OData get all bookings queryable
+        public IQueryable<Booking> GetAllBookingsAsQueryable()
+        {
+            return _bookingRepository.GetAllBookingsAsQueryable();
+        }
     }
 }

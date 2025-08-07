@@ -11,5 +11,6 @@ namespace BookingAPI.Repository.Interface
         Task<bool> DeleteBookingAsync(int id);
         Task<bool> BookingExistsAsync(int id);
         Task<bool> SaveChangesAsync();
+        IQueryable<Booking> GetAllBookingsAsQueryable();
     }
 }

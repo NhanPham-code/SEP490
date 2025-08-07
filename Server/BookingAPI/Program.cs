@@ -5,11 +5,33 @@ using BookingAPI.Services.Interface;
 using BookingAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using BookingAPI.Profiles;
+using BookingAPI.Models;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure OData EDM Model
+static Microsoft.OData.Edm.IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EntitySet<Booking>("Bookings");
+    builder.EntitySet<BookingDetail>("BookingDetails");
+    return builder.GetEdmModel();
+}
 
+// Add services to the container.
+builder.Services.AddControllers()
+    .AddOData(options => options
+        .Select()
+        .Filter()
+        .OrderBy()
+        .Expand()
+        .Count()
+        .SetMaxTop(100)
+        .AddRouteComponents("odata", GetEdmModel()));
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 

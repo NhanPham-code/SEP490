@@ -1,4 +1,5 @@
 ﻿using BookingAPI.DTOs;
+using BookingAPI.Models;
 
 namespace BookingAPI.Services.Interface
 {
@@ -10,5 +11,6 @@ namespace BookingAPI.Services.Interface
         Task<BookingUpdateDto?> UpdateBookingAsync(int id, BookingUpdateDto bookingUpdateDto);
         Task<bool> DeleteBookingAsync(int id);
         Task<bool> BookingExistsAsync(int id);
+        IQueryable<Booking> GetAllBookingsAsQueryable();
     }
 }
