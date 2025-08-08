@@ -1,8 +1,528 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="en">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stadium Booking Platform</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16">
+
+    </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#3b82f6",
+                secondary: "#10b981",
+              },
+              borderRadius: {
+                none: "0px",
+                sm: "4px",
+                DEFAULT: "8px",
+                md: "12px",
+                lg: "16px",
+                xl: "20px",
+                "2xl": "24px",
+                "3xl": "32px",
+                full: "9999px",
+                button: "8px",
+              },
+            },
+          },
+        };
+    </script>
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+        }
+
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .mobile-menu.open {
+                transform: translateX(0);
+            }
+
+        .search-expanded {
+            width: 100%;
+            opacity: 1;
+        }
+
+        .filter-sheet {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .filter-sheet.open {
+                transform: translateY(0);
+            }
+
+        .stadium-card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+            .stadium-card:hover {
+                transform: translateY(-2px);
+            }
+
+
+    </style>
+</head>
+<body class="bg-white">
+    
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="mobile-nav fixed inset-0 bg-black bg-opacity-50 z-40 hidden">
+        <div id="mobile-menu" class="mobile-menu fixed left-0 top-0 h-full w-80 bg-white z-50">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-['Pacifico'] text-xl text-primary">logo</h2>
+                    <button id="close-mobile-menu" class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+                <nav class="space-y-6">
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">Home</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">Sports</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">My Bookings</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">Profile</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">About</a>
+                    <a href="#" class="block text-lg text-gray-700 hover:text-primary transition-colors">Contact</a>
+                </nav>
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <a href="https://readdy.ai/home/6e478e59-67a3-479d-b717-11cb821df867/1e671e07-9379-42a1-892f-d1ea2862e449" data-readdy="true">
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Sign In</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Section -->
+    <section class="hero-bg relative overflow-hidden">
+        <div class="absolute inset-0" style="background-image: url('https://readdy.ai/api/search-image?query=Modern%20sports%20stadium%20aerial%20view%20with%20green%20field%20and%20empty%20seats%2C%20bright%20daylight%2C%20professional%20sports%20venue%20with%20clear%20blue%20sky%2C%20architectural%20photography%20style%2C%20clean%20composition%20with%20stadium%20as%20main%20focus%2C%20vibrant%20green%20grass%20field%20contrasting%20with%20white%20and%20blue%20stadium%20structure%2C%20contemporary%20design&width=1920&height=800&seq=hero-stadium&orientation=landscape'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-transparent"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+            <div class="w-full">
+                <div class="max-w-2xl">
+                    <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">Book Your Perfect Stadium</h1>
+                    <p class="text-xl text-gray-600 mb-8">Find and book premium sports venues for your games, events, and training sessions across the city.</p>
+                    <!-- Desktop Booking Widget -->
+                    <div class="desktop-nav bg-white rounded-2xl shadow-xl p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                <div class="relative">
+                                    <input type="text" placeholder="Enter city or area" class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                        <i class="ri-map-pin-line text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <div class="relative">
+                                    <input type="date" class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                        <i class="ri-calendar-line text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sport</label>
+                                <div class="relative">
+                                    <select class="w-full px-4 py-3 pl-12 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none">
+                                        <option>Football</option>
+                                        <option>Basketball</option>
+                                        <option>Tennis</option>
+                                        <option>Cricket</option>
+                                    </select>
+                                    <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                        <i class="ri-football-line text-gray-400"></i>
+                                    </div>
+                                    <div class="absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-end">
+                                <button class="w-full bg-primary text-white py-3 px-6 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Search Stadiums</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mobile Booking Widget -->
+                   
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Featured Promotions (Mobile Swipeable) -->
+    <section class="mobile-nav py-8 px-4">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Featured Deals</h2>
+        <div class="flex overflow-x-auto space-x-4 pb-4" style="scrollbar-width: none; -ms-overflow-style: none;">
+            <div class="flex-none w-80 bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-white">
+                <h3 class="text-lg font-bold mb-2">Weekend Special</h3>
+                <p class="text-sm opacity-90 mb-3">Get 30% off on weekend bookings</p>
+                <button class="bg-white text-primary px-4 py-2 rounded-button !rounded-button text-sm font-semibold whitespace-nowrap">Book Now</button>
+            </div>
+            <div class="flex-none w-80 bg-gradient-to-r from-secondary to-primary rounded-xl p-6 text-white">
+                <h3 class="text-lg font-bold mb-2">Group Discount</h3>
+                <p class="text-sm opacity-90 mb-3">Book for 5+ hours and save 25%</p>
+                <button class="bg-white text-secondary px-4 py-2 rounded-button !rounded-button text-sm font-semibold whitespace-nowrap">Learn More</button>
+            </div>
+        </div>
+    </section>
+    <!-- Stadium Listings -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+                <!-- Title -->
+                <h2 class="text-3xl font-bold text-gray-900">Popular Stadiums</h2>
+
+                <!-- Filter & Sort -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                    <!-- Filter Button -->
+                    <button class="bg-gray-100 px-4 py-2 rounded-button flex items-center justify-center sm:justify-start space-x-2 whitespace-nowrap w-full sm:w-auto">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-filter-line"></i>
+                        </div>
+                        <span>Filters</span>
+                    </button>
+
+                    <!-- Sort Dropdown -->
+                    <select class="px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8 w-full sm:w-auto">
+                        <option>Sort by Price</option>
+                        <option>Sort by Rating</option>
+                        <option>Sort by Distance</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Desktop Grid -->
+            <div class="desktop-nav grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Professional%20football%20stadium%20with%20green%20grass%20field%20and%20modern%20architecture%2C%20bright%20daylight%2C%20empty%20stadium%20with%20clear%20blue%20sky%2C%20sports%20venue%20photography%2C%20vibrant%20colors%2C%20high%20quality%20image%20with%20stadium%20seating%20and%20goal%20posts%20visible&width=400&height=300&seq=stadium1&orientation=landscape" alt="Central Sports Complex" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$45/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Central Sports Complex</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            Downtown District
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-half-fill"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.8 (124 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Modern%20basketball%20court%20indoor%20arena%20with%20wooden%20floor%20and%20professional%20lighting%2C%20sports%20facility%20interior%2C%20bright%20clean%20environment%2C%20basketball%20hoops%20and%20court%20markings%20visible%2C%20contemporary%20sports%20venue%20design&width=400&height=300&seq=stadium2&orientation=landscape" alt="Elite Basketball Arena" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$35/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Elite Basketball Arena</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            Sports District
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">5.0 (89 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Professional%20tennis%20court%20with%20red%20clay%20surface%2C%20outdoor%20tennis%20facility%20with%20net%20and%20court%20lines%2C%20bright%20daylight%2C%20sports%20venue%20photography%2C%20clean%20modern%20tennis%20facility%20with%20surrounding%20fence%20and%20seating%20area&width=400&height=300&seq=stadium3&orientation=landscape" alt="Premium Tennis Courts" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$25/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Premium Tennis Courts</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            Garden Heights
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.6 (67 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Cricket%20stadium%20with%20green%20pitch%20and%20wickets%2C%20professional%20cricket%20ground%20with%20pavilion%20and%20seating%2C%20bright%20daylight%2C%20sports%20venue%20photography%2C%20oval%20shaped%20cricket%20field%20with%20boundary%20rope%20and%20modern%20facilities&width=400&height=300&seq=stadium4&orientation=landscape" alt="Metropolitan Cricket Ground" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$55/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Metropolitan Cricket Ground</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            Central Park Area
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-half-fill"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.7 (156 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Indoor%20swimming%20pool%20facility%20with%20clear%20blue%20water%20and%20modern%20architecture%2C%20professional%20aquatic%20center%20with%20lane%20markers%2C%20bright%20lighting%2C%20sports%20facility%20photography%2C%20clean%20pool%20environment%20with%20starting%20blocks&width=400&height=300&seq=stadium5&orientation=landscape" alt="Aquatic Sports Center" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$30/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Aquatic Sports Center</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            Riverside District
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.9 (203 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+                <div class="stadium-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="relative h-48">
+                        <img src="https://readdy.ai/api/search-image?query=Multi-purpose%20sports%20complex%20with%20multiple%20courts%20and%20fields%2C%20modern%20sports%20facility%20exterior%2C%20bright%20daylight%2C%20comprehensive%20sports%20venue%20with%20various%20playing%20surfaces%20and%20modern%20architecture&width=400&height=300&seq=stadium6&orientation=landscape" alt="Unity Sports Complex" class="w-full h-full object-cover object-top">
+                        <div class="absolute top-4 right-4 bg-white px-2 py-1 rounded-lg text-sm font-semibold text-primary">$40/hr</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Unity Sports Complex</h3>
+                        <p class="text-gray-600 mb-3 flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            University District
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.5 (98 reviews)</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary text-white py-3 rounded-button !rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+    <!-- Features Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Our Platform?</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Experience the easiest way to book premium sports facilities with our comprehensive platform.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-search-line text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Easy Search</h3>
+                    <p class="text-gray-600">Find the perfect stadium for your sport with our advanced search and filter options.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-calendar-check-line text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Instant Booking</h3>
+                    <p class="text-gray-600">Book your preferred time slots instantly with our real-time availability system.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ri-shield-check-line text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Secure Payment</h3>
+                    <p class="text-gray-600">Pay securely with multiple payment options and get instant booking confirmation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script id="mobile-menu-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+          const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+          const mobileMenu = document.getElementById("mobile-menu");
+          const closeMobileMenu = document.getElementById("close-mobile-menu");
+          function openMobileMenu() {
+            mobileMenuOverlay.classList.remove("hidden");
+            setTimeout(() => {
+              mobileMenu.classList.add("open");
+            }, 10);
+          }
+          function closeMobileMenuHandler() {
+            mobileMenu.classList.remove("open");
+            setTimeout(() => {
+              mobileMenuOverlay.classList.add("hidden");
+            }, 300);
+          }
+          mobileMenuBtn.addEventListener("click", openMobileMenu);
+          closeMobileMenu.addEventListener("click", closeMobileMenuHandler);
+          mobileMenuOverlay.addEventListener("click", function (e) {
+            if (e.target === mobileMenuOverlay) {
+              closeMobileMenuHandler();
+            }
+          });
+        });
+    </script>
+    <script id="mobile-search-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const mobileSearchBtn = document.getElementById("mobile-search-btn");
+          const mobileSearch = document.getElementById("mobile-search");
+          mobileSearchBtn.addEventListener("click", function () {
+            mobileSearch.classList.toggle("hidden");
+            if (!mobileSearch.classList.contains("hidden")) {
+              const input = mobileSearch.querySelector("input");
+              setTimeout(() => input.focus(), 100);
+            }
+          });
+        });
+    </script>
+    <script id="filter-sheet-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const filterBtn = document.getElementById("filter-btn");
+          const filterOverlay = document.getElementById("filter-overlay");
+          const filterSheet = document.getElementById("filter-sheet");
+          const closeFilter = document.getElementById("close-filter");
+          if (filterBtn) {
+            function openFilterSheet() {
+              filterOverlay.classList.remove("hidden");
+              setTimeout(() => {
+                filterSheet.classList.add("open");
+              }, 10);
+            }
+            function closeFilterSheet() {
+              filterSheet.classList.remove("open");
+              setTimeout(() => {
+                filterOverlay.classList.add("hidden");
+              }, 300);
+            }
+            filterBtn.addEventListener("click", openFilterSheet);
+            closeFilter.addEventListener("click", closeFilterSheet);
+            filterOverlay.addEventListener("click", function (e) {
+              if (e.target === filterOverlay) {
+                closeFilterSheet();
+              }
+            });
+          }
+        });
+    </script>
+    <script id="checkbox-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const checkboxes = document.querySelectorAll('label input[type="checkbox"]');
+          checkboxes.forEach((checkbox) => {
+            const checkIcon = checkbox.parentElement.querySelector("i");
+            const checkboxDiv = checkbox.parentElement.querySelector("div");
+            checkbox.addEventListener("change", function () {
+              if (this.checked) {
+                checkIcon.classList.remove("hidden");
+                checkboxDiv.classList.add("border-primary", "bg-primary");
+                checkboxDiv.classList.remove("border-gray-300");
+              } else {
+                checkIcon.classList.add("hidden");
+                checkboxDiv.classList.remove("border-primary", "bg-primary");
+                checkboxDiv.classList.add("border-gray-300");
+              }
+            });
+            checkbox.parentElement.addEventListener("click", function (e) {
+              if (e.target !== checkbox) {
+                checkbox.click();
+              }
+            });
+          });
+        });
+    </script>
+    <script id="bottom-nav-handler">
+        document.addEventListener("DOMContentLoaded", function () {
+          const navButtons = document.querySelectorAll("nav button");
+          navButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              navButtons.forEach((btn) => {
+                btn.classList.remove("text-primary");
+                btn.classList.add("text-gray-400");
+              });
+              this.classList.remove("text-gray-400");
+              this.classList.add("text-primary");
+            });
+          });
+        });
+    </script>
+</body>
+</html>
