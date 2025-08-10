@@ -12,16 +12,15 @@ namespace UserAPI.Service
 {
     public class UserService : IUserService
     {
-
-        private static readonly int EXP_TIME_OF_REFRESH_TOKEN = 7;
-
+        private readonly IConfiguration _config;
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IMapper _mapper;
-        private TokenService _tokenService;
+        private ITokenService _tokenService;
 
-        public UserService(IUserRepository userRepository,  IMapper mapper, TokenService tokenService, IRefreshTokenRepository refreshTokenRepository)
+        public UserService(IConfiguration config, IUserRepository userRepository,  IMapper mapper, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository)
         {
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _tokenService = tokenService;
@@ -103,7 +102,7 @@ namespace UserAPI.Service
             {
                 Token = refreshToken,
                 UserId = user.UserId,
-                ExpiryDate = DateTime.UtcNow.AddDays(EXP_TIME_OF_REFRESH_TOKEN),
+                ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpiresDays"]!)),
                 CreatedDate = DateTime.UtcNow
             };
             await _refreshTokenRepository.CreateRefreshTokenAsync(refreshTokenEntity);
@@ -114,7 +113,10 @@ namespace UserAPI.Service
                 Message = "Login successful.",
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                FullName = user.FullName
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                FullName = user.FullName, 
+                AvatarUrl = user.AvatarUrl,
+                FaceImageUrl = user.FaceImageUrl
             };
         }
 
@@ -170,17 +172,20 @@ namespace UserAPI.Service
             // Giúp chống việc lạm dụng token cũ (mỗi Refresh Token chỉ được dùng 1 lần)
             savedToken.Token = newRefreshToken;
             savedToken.CreatedDate = DateTime.UtcNow;
-            savedToken.ExpiryDate = DateTime.UtcNow.AddDays(EXP_TIME_OF_REFRESH_TOKEN);
+            savedToken.ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpiresDays"]!));
             await _refreshTokenRepository.UpdateRefreshTokenAsync(savedToken);
 
             // 5. Trả về token mới
             return new LoginResponseDTO
             {
                 IsValid = true,
-                Message = "Token refreshed successfully.",
+                Message = "Login successful.",
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                FullName = user.FullName
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                FullName = user.FullName,
+                AvatarUrl = user.AvatarUrl,
+                FaceImageUrl = user.FaceImageUrl
             };
         }
 

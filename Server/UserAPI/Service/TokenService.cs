@@ -5,10 +5,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserAPI.Model;
+using UserAPI.Service.Interface;
 
 namespace UserAPI.Service
 {
-    public class TokenService
+    public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;
 
@@ -35,7 +36,7 @@ namespace UserAPI.Service
                 issuer: jwtConfig["Issuer"],
                 audience: jwtConfig["Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtConfig["ExpiresInMinutes"]!)),
+                expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtConfig["AccessTokenExpiresMinutes"]!)),
                 signingCredentials: creds
             );
 

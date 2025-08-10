@@ -1,0 +1,113 @@
+﻿@using CustomerUI.Models
+@{
+    ViewData["Title"] = "Verify Account";
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger text-center mt-3">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#3b82f6",
+                    secondary: "#10b981",
+                },
+                borderRadius: {
+                    none: "0px",
+                    sm: "4px",
+                    DEFAULT: "8px",
+                    md: "12px",
+                    lg: "16px",
+                    xl: "20px",
+                    "2xl": "24px",
+                    "3xl": "32px",
+                    full: "9999px",
+                    button: "8px",
+                },
+            },
+        },
+    };
+</script>
+<style>
+    :where([class^="ri-"])::before {
+        content: "\f3c2";
+    }
+
+    .hero-bg {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    }
+
+    .mobile-menu {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+    .search-expanded {
+        width: 100%;
+        opacity: 1;
+    }
+
+    .filter-sheet {
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .filter-sheet.open {
+            transform: translateY(0);
+        }
+
+    .stadium-card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .stadium-card:hover {
+            transform: translateY(-2px);
+        }
+
+</style>
+
+<div class="flex items-center justify-center min-h-screen bg-gray-50">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Verify your account</h2>
+        <p class="text-center text-gray-500 mb-8">We've sent a 6-digit code to <span class="font-medium text-primary">@ViewBag.Email</span></p>
+
+        <form asp-action="Verify" asp-controller="Common" method="post">
+            <input type="hidden" name="email" value="@ViewBag.Email" />
+            <div class="space-y-6">
+                <div>
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+                    <div class="relative">
+                        <input type="text" id="code" name="code" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg text-center tracking-widest" maxlength="6" pattern="[0-9]{6}" placeholder="------">
+                    </div>
+                    @* This line displays validation errors *@
+                    @if (ViewData.ModelState.ContainsKey("Code"))
+                    {
+                        <div class="text-red-600 text-sm mt-2">
+                            @ViewData.ModelState["Code"].Errors.FirstOrDefault()?.ErrorMessage
+                        </div>
+                    }
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold">
+                    Verify Account
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-6">
+            <p class="text-gray-600">
+                Didn't receive the code?
+                <a asp-controller="Common" asp-action="ResendCode" class="text-primary hover:text-blue-600 transition-colors font-semibold">Resend Code</a>
+            </p>
+        </div>
+    </div>
+</div>

@@ -102,7 +102,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 // Inject Services
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<ITokenService,TokenService>();
 
 // Inject AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

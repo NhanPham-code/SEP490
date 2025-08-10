@@ -12,9 +12,9 @@ namespace UserAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
-        public UsersController(IUserService userService, TokenService tokenService)
+        public UsersController(IUserService userService, ITokenService tokenService)
         {
             _userService = userService;
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
@@ -72,7 +72,7 @@ namespace UserAPI.Controllers
         /// <summary>
         /// api/Users/logout
         /// </summary>
-        [HttpDelete("logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request)
         {
             // 1. Kiểm tra Access Token và Refresh Token không rỗng
@@ -146,6 +146,21 @@ namespace UserAPI.Controllers
             }
 
             return Ok(user);
+        }
+
+        /// <summary>
+        /// api/Users/checkEmailExits
+        /// </summary>
+        [HttpPost("checkEmailExits")]
+        public async Task<IActionResult> CheckEmailExists([FromBody] string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest(new { message = "Email cannot be empty." });
+            }
+
+            var exists = await _userService.IsEmailExistsAsync(email);
+            return Ok(exists);
         }
 
     }

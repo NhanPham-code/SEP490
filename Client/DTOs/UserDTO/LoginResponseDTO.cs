@@ -1,4 +1,4 @@
-﻿namespace UserAPI.DTOs
+﻿namespace DTOs.UserDTO
 {
     public class LoginResponseDTO
     {
