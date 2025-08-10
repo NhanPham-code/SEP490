@@ -1,0 +1,78 @@
+﻿@using CustomerUI.Models
+@{
+    ViewData["Title"] = "Tải Lên Ảnh";
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger text-center mt-3">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#3b82f6",
+                    secondary: "#10b981",
+                },
+                borderRadius: {
+                    none: "0px",
+                    sm: "4px",
+                    DEFAULT: "8px",
+                    md: "12px",
+                    lg: "16px",
+                    xl: "20px",
+                    "2xl": "24px",
+                    "3xl": "32px",
+                    full: "9999px",
+                    button: "8px",
+                },
+            },
+        },
+    };
+</script>
+
+<div class="flex items-center justify-center min-h-screen bg-gray-50">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Hoàn tất đăng ký</h2>
+        <p class="text-center text-gray-500 mb-8">Bạn đã xác thực thành công. Vui lòng tải lên ảnh để hoàn tất hồ sơ.</p>
+
+        <form asp-action="CompleteRegistration" asp-controller="Common" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <input type="hidden" name="email" value="@ViewBag.Email" />
+
+            <div class="space-y-6">
+                <div class="form-group">
+                    <label for="avatar" class="block text-sm font-medium text-gray-700 mb-2">Ảnh đại diện (Avatar)</label>
+                    <div class="relative">
+                        <input type="file" id="avatar" name="avatar" required
+                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 transition-colors" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="faceImage" class="block text-sm font-medium text-gray-700 mb-2">Ảnh khuôn mặt (Face Image)</label>
+                    <div class="relative">
+                        <input type="file" id="faceImage" name="faceImage" required
+                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 transition-colors" />
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold">
+                    Hoàn tất
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

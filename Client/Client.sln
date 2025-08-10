@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomerUI", "CustomerUI\CustomerUI.csproj", "{EF0D1F54-EEE5-4AC1-9C92-A134598CD8D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerUI", "CustomerUI\CustomerUI.csproj", "{EF0D1F54-EEE5-4AC1-9C92-A134598CD8D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StadiumManagerUI", "StadiumManagerUI\StadiumManagerUI.csproj", "{919D72B0-CB7B-41B3-BFA6-74B741E99029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StadiumManagerUI", "StadiumManagerUI\StadiumManagerUI.csproj", "{919D72B0-CB7B-41B3-BFA6-74B741E99029}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminUI", "AdminUI\AdminUI.csproj", "{5E22D886-BDB2-401E-B07A-C1869F964D08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminUI", "AdminUI\AdminUI.csproj", "{5E22D886-BDB2-401E-B07A-C1869F964D08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{6B49F9DC-85DB-40FD-801C-77A345BEC828}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "DTOs\DTOs.csproj", "{E967965D-5E52-4BE8-B945-257B6ABCEE2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{5E22D886-BDB2-401E-B07A-C1869F964D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E22D886-BDB2-401E-B07A-C1869F964D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E22D886-BDB2-401E-B07A-C1869F964D08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B49F9DC-85DB-40FD-801C-77A345BEC828}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B49F9DC-85DB-40FD-801C-77A345BEC828}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B49F9DC-85DB-40FD-801C-77A345BEC828}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B49F9DC-85DB-40FD-801C-77A345BEC828}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
