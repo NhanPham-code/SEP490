@@ -8,9 +8,138 @@
     <meta name="description" content="Book your favorite sports stadiums with ease and flexibility." />
 
     <!-- Styles -->
+    
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#3b82f6', // Màu xanh chính
+              light: '#60a5fa',   // Biến thể sáng hơn
+              dark: '#1d4ed8',    // Biến thể tối hơn
+              muted: 'rgba(59, 130, 246, 0.5)', // Màu mờ cho các hiệu ứng nền
+            },
+            secondary: {
+              DEFAULT: '#10b981', // Màu xanh lá chính
+              light: '#34d399',   // Biến thể sáng hơn
+              dark: '#047857',    // Biến thể tối hơn
+              muted: 'rgba(16, 185, 129, 0.5)', // Màu mờ
+            },
+            neutral: {
+              100: '#f9fafb',     // Màu sáng cho nền
+              200: '#e5e7eb',     // Màu xám nhạt
+              800: '#1f2937',     // Màu xám đậm cho chữ
+              900: '#111827',     // Màu tối cho nền
+            },
+          },
+          borderRadius: {
+            none: '0px',
+            sm: '4px',
+            DEFAULT: '8px',  // Giá trị mặc định được giữ
+            md: '12px',
+            lg: '16px',
+            xl: '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            full: '9999px',
+            button: '8px',   // Giữ nguyên cho nút
+            card: '12px',    // Thêm bán kính cho thẻ
+          },
+          boxShadow: {
+            'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05)', // Bóng nhẹ
+            'card': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', // Bóng cho thẻ
+            'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', // Bóng khi hover
+          },
+          transitionProperty: {
+            'height': 'height', // Hỗ trợ animation cho chiều cao
+            'spacing': 'margin, padding', // Hỗ trợ animation cho margin/padding
+          },
+          transitionDuration: {
+            '400': '400ms', // Thêm thời gian chuyển đổi mượt hơn
+          },
+          transitionTimingFunction: {
+            'ease-in-out-smooth': 'cubic-bezier(0.4, 0, 0.2, 1)', // Hàm thời gian mượt
+          },
+        },
+      },
+    };
+</script>
+<style>
+    /* Icon font consistency */
+    :where([class^="ri-"])::before {
+        content: "\f3c2";
+        font-family: 'remixicon'; /* Đảm bảo sử dụng đúng font icon */
+        font-style: normal;
+        font-weight: normal;
+        display: inline-block;
+    }
+
+    /* Hero background with enhanced gradient */
+    .hero-bg {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(16, 185, 129, 0.15) 100% );
+        backdrop-filter: blur(4px); /* Thêm hiệu ứng mờ nhẹ */
+    }
+
+    /* Mobile menu with smooth slide-in */
+    .mobile-menu {
+        transform: translateX(-100%);
+        transition: transform 0.4s ease-in-out-smooth; /* Sử dụng timing function mượt hơn */
+        background-color: theme('colors.neutral.900'); /* Nền tối cho menu */
+        box-shadow: theme('boxShadow.soft'); /* Thêm bóng nhẹ */
+    }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+    /* Search bar animation */
+    .search-expanded {
+        width: 100%;
+        opacity: 1;
+        transition: width 0.4s ease-in-out-smooth, opacity 0.4s ease-in-out-smooth; /* Thêm hiệu ứng mượt */
+        background-color: theme('colors.neutral.100'); /* Nền sáng */
+        border-radius: theme('borderRadius.sm'); /* Bo góc nhẹ */
+    }
+
+    /* Filter sheet animation */
+    .filter-sheet {
+        transform: translateY(100%);
+        transition: transform 0.4s ease-in-out-smooth; /* Tăng thời gian cho mượt mà */
+        background-color: theme('colors.neutral.100'); /* Nền sáng */
+        box-shadow: theme('boxShadow.card'); /* Bóng cho sheet */
+    }
+
+        .filter-sheet.open {
+            transform: translateY(0);
+        }
+
+    /* Stadium card with hover effect */
+    .stadium-card {
+        transition: transform 0.3s ease-in-out-smooth, box-shadow 0.3s ease-in-out-smooth; /* Hiệu ứng mượt hơn */
+        border-radius: theme('borderRadius.card'); /* Sử dụng bán kính card */
+        background-color: theme('colors.neutral.100'); /* Nền sáng cho thẻ */
+        box-shadow: theme('boxShadow.card'); /* Bóng mặc định */
+    }
+
+        .stadium-card:hover {
+            transform: translateY(-4px); /* Tăng độ nâng khi hover */
+            box-shadow: theme('boxShadow.hover'); /* Bóng mạnh hơn khi hover */
+        }
+
+    /* Smooth global transitions */
+    *, *::before, *::after {
+        transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Hiệu ứng mượt cho màu */
+    }
+</style>
 <body class="bg-white text-gray-900">
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
@@ -26,7 +155,8 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Home</a>
-                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+                    <a asp-controller="FindTeam" asp-action="SearchStadium" class="text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+                    <a asp-controller="FindTeam" asp-action="FindTeam" class="text-gray-700 hover:text-primary transition-colors">Tìm Nhóm Chơi</a>
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Sports</a>
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">About</a>
                     <a href="#" class="text-gray-700 hover:text-primary transition-colors">Contact</a>
@@ -34,8 +164,23 @@
 
                 <!-- Desktop Sign In Button -->
                 <div class="hidden md:flex items-center space-x-4">
+
+
+                    <div class="relative">
+                        <input type="text" placeholder="Search stadiums..." class="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <button class="absolute left-3 top-2.5 w-5 h-5 flex items-center justify-center">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </button>
+                    </div>
+                    
                     @if (Context.Session.GetString("FullName") != null)
                     {
+                        <a asp-controller="" class="p-2 bg-gradient">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+                                <i class="ri-mail-fill text-blue-600 text-2xl"></i>
+                            </div>
+
+                        </a>
                         <div class="relative">
                             <!-- Avatar -->
                             <img id="avatar-btn" src="@Context.Session.GetString("AvatarUrl")"
@@ -56,6 +201,7 @@
                     }
                     else
                     {
+                        
                         <a asp-controller="Common" asp-action="Login">
                             <button class="bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap">
                                 Sign In
@@ -76,13 +222,19 @@
     <!-- Mobile Dropdown Menu -->
     <nav id="mobile-menu" class="md:hidden hidden bg-white shadow-sm px-4 py-3 space-y-3">
         <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Home</a>
-        <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
+        <a asp-controller="Home" asp-action="SearchStadium" class="block text-gray-700 hover:text-primary transition-colors">Find Stadiums</a>
         <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Sports</a>
         <a href="#" class="block text-gray-700 hover:text-primary transition-colors">About</a>
         <a href="#" class="block text-gray-700 hover:text-primary transition-colors">Contact</a>
-
+        
         @if (Context.Session.GetString("FullName") != null)
         {
+            <a asp-controller="" class="p-2 bg-gradient">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+                    <i class="ri-mail-fill text-blue-600 text-2xl"></i>
+                </div>
+
+            </a>
             <div class="flex items-center space-x-3">
                 <img src="@Context.Session.GetString("AvatarUrl")"
                      alt="Avatar"
@@ -94,14 +246,14 @@
         }
         else
         {
+            
             <a asp-controller="Common" asp-action="Login">
                 <button class="w-full bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-600 transition-colors">Sign In</button>
             </a>
         }
     </nav>
-
     <!-- Main content -->
-    <main role="main" class="pb-12 max-w-7xl mx-auto px-4">
+    <main >
         @RenderBody()
     </main>
 
@@ -158,12 +310,11 @@
             </div>
         </div>
     </footer>
-
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    @RenderSection("Scripts", required: false)
     <!-- Mobile menu toggle script -->
     <script>
         const toggleBtn = document.getElementById('menu-toggle');
@@ -191,6 +342,6 @@
         }
     </script>
 
-    @RenderSection("Scripts", required: false)
+
 </body>
 </html>
