@@ -5,6 +5,71 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
 </head>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#3b82f6",
+            secondary: "#10b981",
+          },
+          borderRadius: {
+            none: "0px",
+            sm: "4px",
+            DEFAULT: "8px",
+            md: "12px",
+            lg: "16px",
+            xl: "20px",
+            "2xl": "24px",
+            "3xl": "32px",
+            full: "9999px",
+            button: "8px",
+          },
+        },
+      },
+    };
+</script>
+<style>
+    :where([class^="ri-"])::before {
+        content: "\f3c2";
+    }
+
+    .hero-bg {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    }
+
+    .mobile-menu {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+    .search-expanded {
+        width: 100%;
+        opacity: 1;
+    }
+
+    .filter-sheet {
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .filter-sheet.open {
+            transform: translateY(0);
+        }
+
+    .stadium-card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .stadium-card:hover {
+            transform: translateY(-2px);
+        }
+
+</style>
 <body>
     <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
