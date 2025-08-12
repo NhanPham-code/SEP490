@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stadium Booking Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+    
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Hero Section -->
+    <section class="relative h-80 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=Modern%20sports%20stadium%20complex%20aerial%20view%20with%20multiple%20fields%2C%20green%20grass%2C%20stadium%20lights%2C%20parking%20areas%2C%20clear%20blue%20sky%20background%2C%20professional%20sports%20facilities%2C%20vibrant%20and%20energetic%20atmosphere%2C%20high-quality%20architectural%20photography%2C%20clean%20and%20inspiring%20sports%20venue%20complex&amp;width=1200&amp;height=320&amp;seq=hero002&amp;orientation=landscape')">
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+            <div class="w-full text-center text-white">
+                <h1 class="text-4xl font-bold mb-4 md:text-5xl">Discover Premium Stadiums</h1>
+                <p class="text-lg mb-6 max-w-2xl mx-auto md:text-xl">Browse our extensive collection of world-class sports facilities. Find the perfect venue for your next game, training session, or event.</p>
+                <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <button class="bg-primary text-white px-6 py-3 rounded-button font-semibold hover:bg-blue-600 transition-colors">Explore Stadiums</button>
+                    <button class="bg-white text-gray-900 px-6 py-3 rounded-button font-semibold hover:bg-gray-100 transition-colors">How It Works</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Filter Sidebar -->
+            <aside class="w-full lg:w-80 bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold">Filter Results</h3>
+                    <button class="text-sm text-primary hover:text-blue-600">Clear All</button>
+                </div>
+
+                <!-- Sport Type -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Sport Type</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox" checked>
+                            <span class="text-sm">Football</span>
+                            <span class="text-xs text-gray-500 ml-auto">(45)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Basketball</span>
+                            <span class="text-xs text-gray-500 ml-auto">(32)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Tennis</span>
+                            <span class="text-xs text-gray-500 ml-auto">(28)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Cricket</span>
+                            <span class="text-xs text-gray-500 ml-auto">(19)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Baseball</span>
+                            <span class="text-xs text-gray-500 ml-auto">(15)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Multi-Sport</span>
+                            <span class="text-xs text-gray-500 ml-auto">(22)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Select Date</h4>
+                    <input type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+                </div>
+
+                <!-- Time Slots -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Available Time</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">06:00</button>
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">08:00</button>
+                        <button class="time-slot selected p-2 text-sm border border-gray-300 rounded text-center">10:00</button>
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">12:00</button>
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">14:00</button>
+                        <button class="time-slot unavailable p-2 text-sm border border-gray-300 rounded text-center">16:00</button>
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">18:00</button>
+                        <button class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">20:00</button>
+                    </div>
+                </div>
+
+                <!-- Price Range -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Price Range</h4>
+                    <div class="px-2">
+                        <input type="range" min="0" max="500" value="250" class="w-full mb-2 accent-primary">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>$0</span>
+                            <span class="font-medium">$250/hour</span>
+                            <span>$500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facilities -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Facilities</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Parking</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Changing Rooms</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Equipment Rental</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Floodlights</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Refreshments</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox">
+                            <span class="text-sm">Wi-Fi</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="mb-6">
+                    <h4 class="font-medium mb-3">Location</h4>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-map-pin-line text-gray-400"></i>
+                        </div>
+                        <input type="text" placeholder="Enter location" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+                    </div>
+                </div>
+
+                <button class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-blue-600 transition-colors">Apply Filters</button>
+            </aside>
+
+            <!-- Find Players Section -->
+            <main class="flex-1">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold">Find Players</h2>
+                        <button id="create-post" class="bg-primary text-white px-4 py-2 rounded-button text-sm font-semibold hover:bg-blue-600 transition-colors">Create Post</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Player Card 1 -->
+                        <div class="stadium-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">JD</div>
+                                <div>
+                                    <h3 class="font-medium">John Davis</h3>
+                                    <p class="text-sm text-gray-600">Intermediate Level</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-basketball-line mr-2"></i>
+                                    <span>Basketball</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-calendar-line mr-2"></i>
+                                    <span>Aug 12, 2025 - 18:00</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-map-pin-line mr-2"></i>
+                                    <span>Victory Court</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Looking for 3 players for a friendly basketball game. All skill levels welcome!</p>
+                            <button class="w-full bg-primary text-white px-4 py-2 rounded-button text-sm font-semibold hover:bg-blue-600 transition-colors">Join Game</button>
+                        </div>
+
+                        <!-- Player Card 2 -->
+                        <div class="stadium-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">SE</div>
+                                <div>
+                                    <h3 class="font-medium">Sarah Evans</h3>
+                                    <p class="text-sm text-gray-600">Advanced Level</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-football-line mr-2"></i>
+                                    <span>Football</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-calendar-line mr-2"></i>
+                                    <span>Aug 15, 2025 - 16:00</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-map-pin-line mr-2"></i>
+                                    <span>Champions Arena</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Need 2 experienced players for competitive football match. Regular team practice.</p>
+                            <button class="w-full bg-primary text-white px-4 py-2 rounded-button text-sm font-semibold hover:bg-blue-600 transition-colors">Join Game</button>
+                        </div>
+
+                        <!-- Player Card 3 -->
+                        <div class="stadium-card bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">RK</div>
+                                <div>
+                                    <h3 class="font-medium">Ryan Kim</h3>
+                                    <p class="text-sm text-gray-600">Beginner Level</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-tennis-line mr-2"></i>
+                                    <span>Tennis</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-calendar-line mr-2"></i>
+                                    <span>Aug 11, 2025 - 09:00</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="ri-map-pin-line mr-2"></i>
+                                    <span>Grand Slam Courts</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Looking for a tennis partner to practice and improve together. Beginners welcome!</p>
+                            <button class="w-full bg-primary text-white px-4 py-2 rounded-button text-sm font-semibold hover:bg-blue-600 transition-colors">Join Game</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
