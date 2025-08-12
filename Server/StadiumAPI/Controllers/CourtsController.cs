@@ -16,7 +16,7 @@ namespace StadiumAPI.Controllers
         /// GET: api/courts/{stadiumId}
         /// 
 
-        [HttpGet("api/courtsByStadiumId/{stadiumId}")]
+        [HttpGet("api/courtsByStadiumId")]
         public async Task<IActionResult> GetAllCourts(int stadiumId)
         {
             if (stadiumId <= 0)
@@ -29,7 +29,7 @@ namespace StadiumAPI.Controllers
         /// GET: api/courts/{id}
         /// 
 
-        [HttpGet("api/courtsById/{id}")]
+        [HttpGet("api/courtsById")]
         public async Task<IActionResult> GetCourtById(int id)
         {
             if (id <= 0)
@@ -61,7 +61,7 @@ namespace StadiumAPI.Controllers
         /// PUT: api/courts/{id}
         /// 
 
-        [HttpPut("api/courts/{id}")]
+        [HttpPut("api/courts")]
         public async Task<IActionResult> UpdateCourt(int id, [FromBody] UpdateCourtDTO updateCourtDTO)
         {
             if (updateCourtDTO == null || id <= 0)
@@ -79,7 +79,7 @@ namespace StadiumAPI.Controllers
         /// DELETE: api/courts/{id}
         ///     
 
-        [HttpDelete("api/courts/{id}")]
+        [HttpDelete("api/courts")]
         public async Task<IActionResult> DeleteCourt(int id)
         {
             if (id <= 0)

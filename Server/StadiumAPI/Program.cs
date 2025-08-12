@@ -17,6 +17,7 @@ var odataBuilder = new ODataConventionModelBuilder();
 // odata
 odataBuilder.EntitySet<ReadStadiumDTO>("Stadiums")
     .EntityType.HasKey(s => s.Id);
+odataBuilder.EntityType<ReadStadiumDTO>();
 
 builder.Services.AddControllers().AddOData(options => options
 .AddRouteComponents("odata", odataBuilder.GetEdmModel()).Select().Filter().OrderBy().Expand().Count().SetMaxTop(100));

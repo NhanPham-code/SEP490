@@ -30,7 +30,6 @@ namespace StadiumAPI.Models
 
         public bool IsApproved { get; set; } = false;
 
-        [ForeignKey("CreatedByUser")]
         public int CreatedBy { get; set; }
 
         public int CreatedByUser { get; set; } // Navigation property
