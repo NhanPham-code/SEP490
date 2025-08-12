@@ -3,10 +3,10 @@
     ViewData["Title"] = "Verify Account";
 }
 
-@if (ViewBag.ErrorMessage != null)
+@if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger text-center mt-3">
-        @ViewBag.ErrorMessage
+        @TempData["ErrorMessage"]
     </div>
 }
 
