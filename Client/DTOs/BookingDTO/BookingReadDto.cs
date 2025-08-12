@@ -6,8 +6,8 @@
         public int UserId { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
         public decimal? TotalPrice { get; set; }
         public string? Note { get; set; }
         public DateTime CreatedAt { get; set; }

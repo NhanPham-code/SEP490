@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<DiscountDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DiscountConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(DiscountProfile)); // Sửa nếu tên profile khác
