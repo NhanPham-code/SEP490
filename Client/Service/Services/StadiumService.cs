@@ -4,6 +4,7 @@ using Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,17 +14,26 @@ namespace Service.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ITokenService _tokenService;
-     
+        private string token = string.Empty;
+
 
         public StadiumService(HttpClient httpClient, ITokenService tokenService)
         {
             _httpClient = httpClient;
             _tokenService = tokenService;
+            token = _tokenService.GetAccessTokenFromCookie();
         }
 
-        private string token = string.Empty;
+        public void AddBearerAccessToken()
+        {
+            
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
         public Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto)
         {
+
             throw new NotImplementedException();
         }
 
