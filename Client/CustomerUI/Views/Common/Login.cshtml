@@ -134,8 +134,8 @@
     </style>
 </head>
 @{
-    var ErrorMessage = ViewData["ErrorMessage"] as string;
-    var RegisterRequestDTO = ViewData["RegisterRequestDTO"] as DTOs.UserDTO.RegisterRequestDTO;
+    var ErrorMessage = TempData["ErrorMessage"] as string;
+    var RegisterRequestDTO = TempData["RegisterRequestDTO"] as DTOs.UserDTO.RegisterRequestDTO;
 }
 
 @if (ErrorMessage != null)
