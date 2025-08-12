@@ -32,9 +32,13 @@ builder.Services.AddHttpClient<GatewayHttpClient>(client =>
     client.BaseAddress = new Uri("https://localhost:7136/");
 });
 
+// IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 // Dependency Injection
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
