@@ -1,4 +1,4 @@
-﻿namespace FindTeamAPI.DTOs
+﻿namespace DTOs.FindTeamDTO
 {
     public class ReadTeamPostDTO
     {

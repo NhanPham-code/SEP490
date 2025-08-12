@@ -6,7 +6,7 @@ namespace FindTeamAPI.DTOs
     {
         public int Id { get; set; } // Unique identifier for the team post
         [Required(ErrorMessage = "Name is required.")]
-        public string Name { get; set; } = string.Empty; // Name of the team
+        public string Title { get; set; } = string.Empty; // Name of the team
         public string Location { get; set; } = string.Empty; // Location of the team
         public string Sport { get; set; } = string.Empty; // Sport type of the team
         [Required(ErrorMessage = "MaxPlayers is required.")]

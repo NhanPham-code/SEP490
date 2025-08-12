@@ -3,7 +3,7 @@
     public class TeamPost
     {
         public int Id { get; set; } // Unique identifier for the team post
-        public string Name { get; set; } = string.Empty; // Name of the team
+        public string Title { get; set; } = string.Empty; // Name of the team
         public string Location { get; set; } = string.Empty; // Location of the team
         public string Sport { get; set; } = string.Empty; // Sport type of the team
         public int MaxPlayers { get; set; } // Maximum number of players allowed in the team
