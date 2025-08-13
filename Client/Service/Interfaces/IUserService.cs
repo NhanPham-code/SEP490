@@ -15,5 +15,9 @@ namespace Service.Interfaces
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
         Task<LoginResponseDTO> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO);
         Task<bool> IsEmailExistsAsync(string email);
+        Task<string> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken);
+        Task<string> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
+        Task<string> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
+        Task<ReadUserDTO?> GetUserByIdAsync(string userId, string accessToken);
     }
 }

@@ -27,6 +27,138 @@ namespace UserAPI.Service
             _refreshTokenRepository = refreshTokenRepository;
         }
 
+        public async Task<ReadUserDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO)
+        {
+            var user = await _userRepository.GetUserByIdAsync(updateUserProfileDTO.UserId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            // Cập nhật thông tin người dùng
+            user.FullName = updateUserProfileDTO.FullName;
+            user.Email = updateUserProfileDTO.Email;
+            user.Address = updateUserProfileDTO.Address;
+            user.PhoneNumber = updateUserProfileDTO.PhoneNumber;
+
+            // Cập nhật thông tin vào DB
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            if (updatedUser == null)
+            {
+                throw new InvalidOperationException("Failed to update user profile.");
+            }
+
+            // Chuyển đổi sang ReadUserDTO
+            return _mapper.Map<ReadUserDTO>(updatedUser);
+        }
+
+        public async Task<ReadUserDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO)
+        {
+            var user = await _userRepository.GetUserByIdAsync(updateAvatarDTO.UserId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            // Nếu không có avatar mới, giữ nguyên avatar cũ
+            if (updateAvatarDTO.Avatar == null || updateAvatarDTO.Avatar.Length == 0)
+            {
+                return _mapper.Map<ReadUserDTO>(user);
+            }
+
+            // Lưu file avatar vào thư mục uploads/avatars
+            // Xóa file hình cũ nếu có
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+            Directory.CreateDirectory(uploadFolder); // Tạo thư mục nếu chưa tồn tại
+            if (updateAvatarDTO.Avatar != null && updateAvatarDTO.Avatar.Length > 0)
+            {
+                // Xóa file avatar cũ nếu có
+                if (!string.IsNullOrEmpty(user.AvatarUrl))
+                {
+                    string oldAvatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarUrl.TrimStart('/'));
+                    if (File.Exists(oldAvatarPath))
+                    {
+                        File.Delete(oldAvatarPath);
+                    }
+                }
+
+                // Lưu file avatar mới
+                string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(updateAvatarDTO.Avatar.FileName)}";
+                string avatarPath = Path.Combine(uploadFolder, avatarFileName);
+
+                using (var stream = new FileStream(avatarPath, FileMode.Create))
+                {
+                    await updateAvatarDTO.Avatar.CopyToAsync(stream);
+                }
+
+                // Cập nhật URL avatar trong user
+                user.AvatarUrl = $"/uploads/avatars/{avatarFileName}";
+            }
+
+
+            // Cập nhật thông tin vào DB
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            if (updatedUser == null)
+            {
+                throw new InvalidOperationException("Failed to update avatar.");
+            }
+            // Chuyển đổi sang ReadUserDTO
+            return _mapper.Map<ReadUserDTO>(updatedUser);
+        }
+
+        public async Task<ReadUserDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO)
+        {
+            var user = await _userRepository.GetUserByIdAsync(updateFaceImageDTO.UserId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            // Nếu không có face image mới, giữ nguyên face image cũ
+            if (updateFaceImageDTO.FaceImage == null || updateFaceImageDTO.FaceImage.Length == 0)
+            {
+                return _mapper.Map<ReadUserDTO>(user);
+            }
+
+            // Lưu file face image vào thư mục uploads/faces
+            // Xóa file hình cũ nếu có
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "faces");
+            Directory.CreateDirectory(uploadFolder); // Tạo thư mục nếu chưa tồn tại
+            if (updateFaceImageDTO.FaceImage != null && updateFaceImageDTO.FaceImage.Length > 0)
+            {
+                // Xóa file face image cũ nếu có
+                if (!string.IsNullOrEmpty(user.FaceImageUrl))
+                {
+                    string oldFaceImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.FaceImageUrl.TrimStart('/'));
+                    if (File.Exists(oldFaceImagePath))
+                    {
+                        File.Delete(oldFaceImagePath);
+                    }
+                }
+
+                // Lưu file face image mới
+                string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(updateFaceImageDTO.FaceImage.FileName)}";
+                string facePath = Path.Combine(uploadFolder, faceFileName);
+
+                using (var stream = new FileStream(facePath, FileMode.Create))
+                {
+                    await updateFaceImageDTO.FaceImage.CopyToAsync(stream);
+                }
+
+                // Cập nhật URL face image trong user
+                user.FaceImageUrl = $"/uploads/faces/{faceFileName}";
+            }
+
+            // Cập nhật thông tin vào DB
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            if (updatedUser == null)
+            {
+                throw new InvalidOperationException("Failed to update face image.");
+            }
+            // Chuyển đổi sang ReadUserDTO
+            return _mapper.Map<ReadUserDTO>(updatedUser);
+        }
+
         private bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
         {
             using var hmac = new HMACSHA512(storedSalt);
@@ -114,6 +246,7 @@ namespace UserAPI.Service
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                UserId = user.UserId,
                 FullName = user.FullName, 
                 AvatarUrl = user.AvatarUrl,
                 FaceImageUrl = user.FaceImageUrl
@@ -255,6 +388,9 @@ namespace UserAPI.Service
                     await registerDto.Avatar.CopyToAsync(stream);
                 }
                 avatarUrl = $"/uploads/avatars/{avatarFileName}";
+            } else
+            {
+                avatarUrl = "/uploads/avatars/default-avatar.png"; // Default avatar if not provided
             }
 
             if (registerDto.FaceImage != null && registerDto.FaceImage.Length > 0)
@@ -267,6 +403,9 @@ namespace UserAPI.Service
                     await registerDto.FaceImage.CopyToAsync(stream);
                 }
                 faceImageUrl = $"/uploads/faces/{faceFileName}";
+            } else
+            {
+                faceImageUrl = null;
             }
 
             // 4. Tạo entity User
@@ -309,16 +448,6 @@ namespace UserAPI.Service
         }
 
         public Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ReadUserDTO> CreateUserAsync(RegisterRequestDTO createUserDTO)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ReadUserDTO> UpdateUserAsync(UpdateUserProfileDTO updateUserProfileDTO)
         {
             throw new NotImplementedException();
         }

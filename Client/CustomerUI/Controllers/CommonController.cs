@@ -50,6 +50,7 @@ namespace CustomerUI.Controllers
                 ? $"{BASE_URL}{response.FaceImageUrl}"
                 : "";
 
+            HttpContext.Session.SetString("UserId", response.UserId.ToString());
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
             HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
@@ -146,7 +147,7 @@ namespace CustomerUI.Controllers
                 Password = password,
                 Address = address,
                 PhoneNumber = phoneNumber,
-                Role = "Customer" // Giả định vai trò là "Customer"
+                Role = ROLE_DEFAULT // Giả định vai trò là "Customer"
             };
 
             // Thực hiện server-side validation thủ công trên DTO mới
@@ -282,7 +283,7 @@ namespace CustomerUI.Controllers
             if (!isRegistered)
             {
                 ViewBag.ErrorMessage = "Đăng ký không thành công. Vui lòng thử lại.";
-                return View("Verify");
+                return View("Login");
             }
 
             // Xóa dữ liệu tạm sau khi đăng ký thành công
@@ -302,6 +303,7 @@ namespace CustomerUI.Controllers
                 return View("Verify");
             }
 
+            // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
             SaveTokenCookiesAndUserInfo(loginResponse);
 
             return RedirectToAction("Index", "Home");
@@ -376,6 +378,99 @@ namespace CustomerUI.Controllers
                 : "";
 
             return View(userProfile);
+        }
+
+        // update profile
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(UpdateUserProfileDTO updateUserProfileDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update user profile
+            try
+            {
+                var resultJson = await _userService.UpdateUserProfileAsync(updateUserProfileDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // update avatar
+        [HttpPost]
+        public async Task<IActionResult> UpdateAvatar(UpdateAvatarDTO updateAvatarDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update avatar
+            try
+            {
+                var resultJson = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // update face image
+        [HttpPost]
+        public async Task<IActionResult> UpdateFaceImage(UpdateFaceImageDTO updateFaceImageDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update face image
+            try
+            {
+                var resultJson = await _userService.UpdateFaceImageAsync(updateFaceImageDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
         }
     }
 }

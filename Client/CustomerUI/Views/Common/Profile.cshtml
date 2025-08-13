@@ -4,106 +4,108 @@
     ViewData["Title"] = "User Profile";
 }
 
-<style>
-    /* Enhanced Tailwind config with modern design tokens */
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#3b82f6",
-                    secondary: "#10b981",
-                    accent: "#8b5cf6",
-                    dark: "#1f2937"
-                },
-                borderRadius: {
-                    none: "0px",
-                    sm: "4px",
-                    DEFAULT: "8px",
-                    md: "12px",
-                    lg: "16px",
-                    xl: "20px",
-                    "2xl": "24px",
-                    "3xl": "32px",
-                    full: "9999px",
-                    button: "12px",
-                },
-                animation: {
-                    'fade-in': 'fadeIn 0.5s ease-in-out',
-                    'slide-up': 'slideUp 0.6s ease-out',
-                    'float': 'float 3s ease-in-out infinite',
-                }
-            }
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .btn-gradient {
+            background: linear-gradient(90deg,#3b82f6 0%,#8b5cf6 100%);
+            color: #fff;
+            font-weight: 600;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.10);
+            transition: all 0.2s;
+            min-height: 44px;
+            min-width: 120px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
         }
-    };
-
-    /* Custom animations */
-    @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @@keyframes slideUp {
-        from { transform: translateY(30px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    @@keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-
-    /* Modern gradient backgrounds */
-    .gradient-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    }
-
-    .gradient-secondary {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    }
-
-    .gradient-accent {
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    }
-
-    .glass-effect {
-        backdrop-filter: blur(16px) saturate(180%);
-        background-color: rgba(255, 255, 255, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.125);
-    }
-
-    .profile-card {
-        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-        box-shadow: 
-            0 20px 25px -5px rgba(0, 0, 0, 0.1),
-            0 10px 10px -5px rgba(0, 0, 0, 0.04),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .info-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .info-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .avatar-glow {
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 0 20px rgba(59, 130, 246, 0.3);
-    }
-
-    /* Mobile-first responsive design */
-    @@media (max-width: 768px) {
-        .mobile-center {
-            text-align: center;
+        .btn-gradient:hover {
+            background: linear-gradient(90deg,#2563eb 0%,#8b5cf6 100%);
+            box-shadow: 0 8px 32px rgba(59,130,246,0.15);
+            transform: translateY(-2px) scale(1.04);
         }
-        
-        .mobile-full {
-            width: 100%;
+        .btn-cancel {
+            background: #fff;
+            color: #8b5cf6;
+            border: 2px solid #8b5cf6;
+            border-radius: 12px;
+            font-weight: 600;
+            min-height: 44px;
+            min-width: 120px;
+            transition: all 0.2s;
         }
-    }
-</style>
+        .btn-cancel:hover {
+            background: #f3e8ff;
+            color: #7c3aed;
+            border-color: #7c3aed;
+        }
+        .avatar-glow {
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.1), 0 0 20px rgba(59,130,246,0.3);
+        }
+        .avatar-edit-btn, .face-edit-btn {
+            background: rgba(59,130,246,0.93);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .avatar-edit-btn:hover, .face-edit-btn:hover {
+            background: #9333ea;
+        }
+        .modal-bg {
+            background: rgba(0,0,0,0.5);
+        }
+        .image-row {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+        .avatar-container, .face-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            min-width: 140px;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar-container img, .face-container img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 1.5rem;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.09);
+        }
+        .avatar-container img {
+            border-radius: 50%;
+        }
+        .face-container img {
+            border-radius: 1.5rem;
+        }
+        @@media (max-width: 600px) {
+            .image-row { gap: 1rem; }
+            .avatar-container, .face-container { width: 100px; height: 100px; min-width: 100px; min-height: 100px; }
+            .avatar-container img, .face-container img { width: 90px; height: 90px; }
+        }
+    </style>
+}
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -113,145 +115,265 @@
     </div>
 }
 
-<!-- Background with subtle pattern -->
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 relative overflow-hidden">
-    <!-- Decorative background elements -->
-    <div class="absolute top-0 left-0 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-    <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
-    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 4s;"></div>
-
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4 py-8">
-        <div class="profile-card w-full max-w-5xl rounded-3xl p-6 md:p-10 animate-slide-up">
-            <!-- Header Section -->
-            <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
-                <!-- Avatar Section -->
-                <div class="flex-shrink-0 relative group">
-                    <div class="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 relative">
-                        @if (!string.IsNullOrEmpty(Model.AvatarUrl))
-                        {
-                            <img src="@Model.AvatarUrl" alt="User Avatar" 
-                                 class="rounded-full w-full h-full object-cover border-4 border-white shadow-2xl avatar-glow group-hover:scale-105 transition-transform duration-300">
-                        }
-                        else
-                        {
-                            <div class="rounded-full w-full h-full gradient-secondary flex items-center justify-center text-white text-5xl md:text-6xl font-bold border-4 border-white shadow-2xl avatar-glow group-hover:scale-105 transition-transform duration-300">
-                                @Model.FullName.FirstOrDefault()
-                            </div>
-                        }
-                        <!-- Status indicator -->
-                        <div class="absolute bottom-2 right-2 w-8 h-8 @(Model.IsActive ? "bg-green-500" : "bg-red-500") rounded-full border-4 border-white shadow-lg flex items-center justify-center">
-                            <i class="@(Model.IsActive ? "ri-check-line" : "ri-close-line") text-white text-sm"></i>
-                        </div>
+        <div class="profile-card w-full max-w-3xl rounded-3xl p-6 md:p-10 animate-slide-up">
+            <div class="image-row">
+                <div class="avatar-container group" id="avatarClick">
+                    <img src="@Model.AvatarUrl" alt="Avatar" class="avatar-glow" />
+                    <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
+                        <i class="ri-camera-line text-xl"></i>
                     </div>
                 </div>
-
-                <!-- Profile Info Section -->
-                <div class="flex-1 w-full mobile-center lg:text-left">
-                    <div class="mb-6">
-                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
-                            @Model.FullName
-                        </h1>
-                        <p class="text-lg md:text-xl text-gray-600 font-medium">@Model.Role</p>
-                    </div>
-
-                    <!-- Info Cards Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                        <!-- Email Card -->
-                        <div class="info-card bg-white rounded-2xl p-4 lg:p-6 shadow-sm">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="ri-mail-line text-white text-xl"></i>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Email</p>
-                                    <p class="text-base lg:text-lg font-semibold text-gray-900 truncate">@Model.Email</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
-                        {
-                            <!-- Phone Card -->
-                            <div class="info-card bg-white rounded-2xl p-4 lg:p-6 shadow-sm">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 gradient-secondary rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <i class="ri-phone-line text-white text-xl"></i>
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Phone</p>
-                                        <p class="text-base lg:text-lg font-semibold text-gray-900 truncate">@Model.PhoneNumber</p>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        @if (!string.IsNullOrEmpty(Model.Address))
-                        {
-                            <!-- Address Card -->
-                            <div class="info-card bg-white rounded-2xl p-4 lg:p-6 shadow-sm sm:col-span-2">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 gradient-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <i class="ri-map-pin-line text-white text-xl"></i>
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Address</p>
-                                        <p class="text-base lg:text-lg font-semibold text-gray-900">@Model.Address</p>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        <!-- Status Card -->
-                        <div class="info-card bg-white rounded-2xl p-4 lg:p-6 shadow-sm @(string.IsNullOrEmpty(Model.Address) ? "sm:col-span-2" : "")">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 @(Model.IsActive ? "bg-green-500" : "bg-red-500") rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="@(Model.IsActive ? "ri-check-line" : "ri-close-line") text-white text-xl"></i>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Status</p>
-                                    <p class="text-base lg:text-lg font-semibold @(Model.IsActive ? "text-green-600" : "text-red-600")">
-                                        @(Model.IsActive ? "Active" : "Inactive")
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="face-container group" id="faceImageClick">
+                    <img src="@Model.FaceImageUrl" alt="FaceImage" />
+                    <div class="face-edit-btn" title="Đổi ảnh khuôn mặt">
+                        <i class="ri-camera-line text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            @if (!string.IsNullOrEmpty(Model.FaceImageUrl))
-            {
-                <!-- Face Image Section -->
-                <div class="mt-12 pt-8 border-t border-gray-200">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Face Recognition Image</h3>
-                    <div class="flex justify-center">
-                        <div class="relative group">
-                            <img src="@Model.FaceImageUrl" alt="User Face" 
-                                 class="rounded-2xl shadow-lg max-h-72 object-cover border-4 border-white group-hover:scale-105 transition-transform duration-300">
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <form id="profileForm" method="post" action="#" class="space-y-6" autocomplete="off">
+                <input type="hidden" id="userIdInput" value="@Model.UserId" />
+                <div id="profileFields">
+                    <div id="profileReadMode">
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="text-sm text-gray-500">Họ và tên</label>
+                                <div class="font-semibold text-gray-800">@Model.FullName</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Email</label>
+                                <div class="font-semibold text-gray-800">@Model.Email</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Số điện thoại</label>
+                                <div class="font-semibold text-gray-800">@Model.PhoneNumber</div>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Địa chỉ</label>
+                                <div class="font-semibold text-gray-800">@Model.Address</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="profileEditMode" class="hidden">
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="text-sm text-gray-500">Họ và tên</label>
+                                <input type="text" name="FullName" id="fullnameInput"
+                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.FullName" />
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Email</label>
+                                <input type="email" name="Email" id="emailInput"
+                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.Email" />
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Số điện thoại</label>
+                                <input type="text" name="PhoneNumber" id="phoneInput"
+                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.PhoneNumber" />
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Địa chỉ</label>
+                                <input type="text" name="Address" id="addressInput"
+                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.Address" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            }
-
-            <!-- Action Buttons -->
-            <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-                <a asp-action="EditProfile" 
-                   class="mobile-full sm:w-auto gradient-primary text-white py-4 px-8 rounded-button hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold text-center flex items-center justify-center gap-3">
-                    <i class="ri-edit-line text-xl"></i>
-                    <span>Edit Profile</span>
-                </a>
-                <a asp-action="ChangePassword" 
-                   class="mobile-full sm:w-auto bg-white text-gray-700 py-4 px-8 rounded-button hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold text-center border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-3">
-                    <i class="ri-lock-line text-xl"></i>
-                    <span>Change Password</span>
-                </a>
-            </div>
+                <div class="flex gap-4 justify-center mt-8">
+                    <button type="button" id="editBtn" class="btn-gradient">
+                        <i class="ri-edit-line text-lg"></i>
+                        <span>Sửa thông tin</span>
+                    </button>
+                    <button type="submit" id="saveBtn" class="btn-gradient hidden">
+                        <i class="ri-save-3-line text-lg"></i>
+                        <span>Lưu</span>
+                    </button>
+                    <button type="button" id="cancelBtn" class="btn-cancel hidden">
+                        <i class="ri-close-line text-lg"></i>
+                        <span>Huỷ</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+<!-- Modal Avatar Upload -->
+<div id="avatarModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl p-8 shadow-lg w-full max-w-md relative">
+        <button type="button" onclick="closeModal('avatarModal')" class="btn-cancel absolute top-4 right-4" title="Đóng">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+        <h2 class="text-xl font-bold mb-4">Cập nhật ảnh đại diện</h2>
+        <form id="avatarForm" enctype="multipart/form-data" method="post" action="#">
+            <input type="file" id="avatarUpload" name="avatar" accept="image/*" class="mb-4 block w-full" />
+            <img id="avatarPreviewModal" src="" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+            <button type="submit" class="w-full btn-gradient mt-2">
+                <i class="ri-upload-cloud-2-line text-lg"></i>
+                <span>Lưu ảnh mới</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Face Image Upload -->
+<div id="faceModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl p-8 shadow-lg w-full max-w-md relative">
+        <button type="button" onclick="closeModal('faceModal')" class="btn-cancel absolute top-4 right-4" title="Đóng">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+        <h2 class="text-xl font-bold mb-4">Cập nhật ảnh khuôn mặt</h2>
+        <form id="faceForm" enctype="multipart/form-data" method="post" action="#">
+            <input type="file" id="faceUpload" name="faceImage" accept="image/*" class="mb-4 block w-full" />
+            <img id="facePreviewModal" src="" class="w-32 h-32 object-cover rounded-2xl mx-auto mb-4" />
+            <button type="submit" class="w-full btn-gradient mt-2">
+                <i class="ri-upload-cloud-line text-lg"></i>
+                <span>Lưu ảnh mới</span>
+            </button>
+        </form>
+    </div>
+</div>
+
 @section Scripts {
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Lưu lại dữ liệu ban đầu để khi cancel thì set lại
+        const originalData = {
+            fullname: document.getElementById("fullnameInput").value,
+            email: document.getElementById("emailInput").value,
+            phone: document.getElementById("phoneInput").value,
+            address: document.getElementById("addressInput").value,
+            userId: document.getElementById("userIdInput")?.value // hidden input chứa userid
+        };
+
+        const editBtn = document.getElementById("editBtn");
+        const saveBtn = document.getElementById("saveBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const profileReadMode = document.getElementById("profileReadMode");
+        const profileEditMode = document.getElementById("profileEditMode");
+        const profileForm = document.getElementById("profileForm");
+        let editMode = false;
+
+        // Edit mode toggle
+        editBtn.addEventListener("click", function () {
+            editMode = true;
+            profileReadMode.classList.add("hidden");
+            profileEditMode.classList.remove("hidden");
+            editBtn.classList.add("hidden");
+            saveBtn.classList.remove("hidden");
+            cancelBtn.classList.remove("hidden");
+        });
+        cancelBtn.addEventListener("click", function () {
+            editMode = false;
+            profileReadMode.classList.remove("hidden");
+            profileEditMode.classList.add("hidden");
+            editBtn.classList.remove("hidden");
+            saveBtn.classList.add("hidden");
+            cancelBtn.classList.add("hidden");
+            document.getElementById("fullnameInput").value = originalData.fullname;
+            document.getElementById("emailInput").value = originalData.email;
+            document.getElementById("phoneInput").value = originalData.phone;
+            document.getElementById("addressInput").value = originalData.address;
+        });
+
+        // AJAX update profile
+        profileForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (!editMode) return false;
+
+            // Chuẩn bị dữ liệu cho controller
+            const dto = {
+                userId: originalData.userId,
+                fullname: document.getElementById("fullnameInput").value,
+                email: document.getElementById("emailInput").value,
+                address: document.getElementById("addressInput").value,
+                phoneNumber: document.getElementById("phoneInput").value
+            };
+
+            $.ajax({
+                url: '/Common/UpdateProfile',
+                type: 'POST',
+                data: dto,
+                success: function (data) {
+                    if (data && data.message) {
+                        alert(data.message);
+                    } else {
+                        alert("Cập nhật thành công!");
+                    }
+                    location.reload();
+                },
+                error: function (xhr) {
+                    var res = xhr.responseJSON;
+                    alert(res && res.message ? res.message : 'Có lỗi xảy ra!');
+                }
+            });
+        });
+
+        // Modal avatar
+        document.getElementById('avatarClick').addEventListener('click', function () {
+            document.getElementById('avatarModal').classList.remove('hidden');
+        });
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        // Avatar preview + AJAX
+        document.getElementById('avatarUpload').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) document.getElementById('avatarPreviewModal').src = URL.createObjectURL(file);
+        });
+        document.getElementById('avatarForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('userId', originalData.userId);
+            formData.append('avatar', document.getElementById('avatarUpload').files[0]);
+            $.ajax({
+                url: '/Common/UpdateAvatar',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    closeModal('avatarModal');
+                    alert("Cập nhật avatar thành công!");
+                    location.reload();
+                },
+                error: function (xhr) {
+                    var res = xhr.responseJSON;
+                    alert(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật avatar!');
+                }
+            });
+        });
+
+        // Modal face image
+        document.getElementById('faceImageClick').addEventListener('click', function () {
+            document.getElementById('faceModal').classList.remove('hidden');
+        });
+        document.getElementById('faceUpload').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) document.getElementById('facePreviewModal').src = URL.createObjectURL(file);
+        });
+        document.getElementById('faceForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('userId', originalData.userId);
+            formData.append('faceImage', document.getElementById('faceUpload').files[0]);
+            $.ajax({
+                url: '/Common/UpdateFaceImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    closeModal('faceModal');
+                    alert("Cập nhật ảnh khuôn mặt thành công!");
+                    location.reload();
+                },
+                error: function (xhr) {
+                    var res = xhr.responseJSON;
+                    alert(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật ảnh khuôn mặt!');
+                }
+            });
+        });
+    </script>
 }
