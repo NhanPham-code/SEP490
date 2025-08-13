@@ -41,37 +41,100 @@
         <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Hoàn tất đăng ký</h2>
         <p class="text-center text-gray-500 mb-8">Bạn đã xác thực thành công. Vui lòng tải lên ảnh để hoàn tất hồ sơ.</p>
 
-        <form asp-action="CompleteRegistration" asp-controller="Common" method="post" enctype="multipart/form-data">
+        <form asp-action="CompleteRegistration" asp-controller="Common" method="post" enctype="multipart/form-data" class="space-y-6">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
-
             <input type="hidden" name="email" value="@ViewBag.Email" />
 
-            <div class="space-y-6">
-                <div class="form-group">
-                    <label for="avatar" class="block text-sm font-medium text-gray-700 mb-2">Ảnh đại diện (Avatar)</label>
-                    <div class="relative">
-                        <input type="file" id="avatar" name="avatar" required
-                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 transition-colors" />
+            <!-- Avatar Upload -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh đại diện (Avatar)</label>
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <img id="avatarPreview" src="https://ui-avatars.com/api/?name=Avatar&background=random&size=128" alt="Avatar Preview"
+                             class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 transition-shadow duration-300 group-hover:shadow-lg" />
+                        <button type="button" id="removeAvatar" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hidden group-hover:block" title="Xóa ảnh">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" required
+                               class="hidden" />
+                        <label for="avatar" class="cursor-pointer inline-block px-4 py-2 bg-primary text-white rounded-button font-semibold hover:bg-blue-600 transition-colors">
+                            Chọn ảnh
+                        </label>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="faceImage" class="block text-sm font-medium text-gray-700 mb-2">Ảnh khuôn mặt (Face Image)</label>
-                    <div class="relative">
-                        <input type="file" id="faceImage" name="faceImage" required
-                               class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 transition-colors" />
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold">
-                    Hoàn tất
-                </button>
             </div>
+            <!-- Face Image Upload -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh khuôn mặt (Face Image)</label>
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <img id="faceImagePreview" src="https://placehold.co/128x128?text=Face" alt="Face Preview"
+                             class="w-24 h-24 rounded-xl object-cover border-2 border-gray-300 transition-shadow duration-300 group-hover:shadow-lg" />
+                        <button type="button" id="removeFaceImage" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hidden group-hover:block" title="Xóa ảnh">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div>
+                        <input type="file" id="faceImage" name="faceImage" accept="image/*" required
+                               class="hidden" />
+                        <label for="faceImage" class="cursor-pointer inline-block px-4 py-2 bg-primary text-white rounded-button font-semibold hover:bg-blue-600 transition-colors">
+                            Chọn ảnh
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold mt-4">
+                Hoàn tất
+            </button>
         </form>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        // Avatar preview
+        const avatarInput = document.getElementById('avatar');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const removeAvatarBtn = document.getElementById('removeAvatar');
+
+        avatarInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                avatarPreview.src = URL.createObjectURL(file);
+                removeAvatarBtn.classList.remove('hidden');
+            }
+        });
+        removeAvatarBtn.addEventListener('click', function () {
+            avatarInput.value = '';
+            avatarPreview.src = "https://ui-avatars.com/api/?name=Avatar&background=random&size=128";
+            removeAvatarBtn.classList.add('hidden');
+        });
+
+        // Face Image preview
+        const faceInput = document.getElementById('faceImage');
+        const facePreview = document.getElementById('faceImagePreview');
+        const removeFaceBtn = document.getElementById('removeFaceImage');
+
+        faceInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                facePreview.src = URL.createObjectURL(file);
+                removeFaceBtn.classList.remove('hidden');
+            }
+        });
+        removeFaceBtn.addEventListener('click', function () {
+            faceInput.value = '';
+            facePreview.src = "https://placehold.co/128x128?text=Face";
+            removeFaceBtn.classList.add('hidden');
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
