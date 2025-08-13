@@ -1,23 +1,35 @@
 using CustomerUI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CustomerUI.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IStadiumService _stadiumService;
 
-        public HomeController(ILogger<HomeController> logger)
+
+        public HomeController(ILogger<HomeController> logger, IStadiumService stadiumService)
         {
             _logger = logger;
+
+            _stadiumService = stadiumService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
+        public async Task<IActionResult> Stadiums()
+        {
+            var stadium = await _stadiumService.GetAllStadiumsAsync();
+
+            return Content(stadium, "application/json");
+        }
 
         public IActionResult Privacy()
         {

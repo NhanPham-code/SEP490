@@ -10,6 +10,5 @@ namespace StadiumAPI.Service.Interface
         Task<ReadCourtDTO> CreateCourtAsync(CreateCourtDTO createCourtDTO);
         Task<ReadCourtDTO> UpdateCourtAsync(int id, UpdateCourtDTO updateCourtDTO);
         Task<bool> DeleteCourtAsync(int id);
-        //IQueryable<Courts> GetAllOdataCourts(int stadiumId);
     }
 }

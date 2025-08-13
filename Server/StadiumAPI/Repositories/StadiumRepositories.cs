@@ -56,7 +56,7 @@ namespace StadiumAPI.Repositories
         }
         public IQueryable<Stadiums> GetOdataStadiums()
         {
-            return _context.Stadiums.AsQueryable();
+            return _context.Stadiums.Include(c => c.Courts).Include(i => i.StadiumImages).AsQueryable();
 
         }
     }

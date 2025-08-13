@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.OData;
+﻿using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using StadiumAPI.Data;
 using StadiumAPI.DTOs;
@@ -13,15 +14,49 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var odataBuilder = new ODataConventionModelBuilder();
-// odata
-odataBuilder.EntitySet<ReadStadiumDTO>("Stadiums")
-    .EntityType.HasKey(s => s.Id);
-odataBuilder.EntityType<ReadStadiumDTO>();
+IEdmModel GetEdmModel()
+{
+    var odataBuilder = new ODataConventionModelBuilder();
 
-builder.Services.AddControllers().AddOData(options => options
-.AddRouteComponents("odata", odataBuilder.GetEdmModel()).Select().Filter().OrderBy().Expand().Count().SetMaxTop(100));
-odataBuilder.EntitySet<Stadiums>("OdataStadium");
+    // Đăng ký EntitySet cho Stadiums
+    var stadium = odataBuilder.EntitySet<Stadiums>("Stadiums");
+    stadium.EntityType.HasKey(s => s.Id);
+    stadium.HasManyBinding(s => s.Courts, "Courts");
+    stadium.HasManyBinding(s => s.StadiumImages, "StadiumImages");
+
+    // Đăng ký EntitySet cho Courts
+    var court = odataBuilder.EntitySet<Courts>("Courts");
+    court.EntityType.HasKey(c => c.Id);
+    court.HasRequiredBinding(c => c.Stadium, "Stadiums"); // Quan hệ n-1 với Stadiums
+
+    // Đăng ký EntitySet cho StadiumImages
+    var stadiumImage = odataBuilder.EntitySet<StadiumImages>("StadiumImages");
+    stadiumImage.EntityType.HasKey(si => si.Id);
+    stadiumImage.HasOptionalBinding(si => si.Stadium, "Stadiums"); // Quan hệ n-1 với Stadiums
+
+    // Rất quan trọng: Đăng ký ReadUserDTO là một EntityType hoặc ComplexType
+    // Việc này giúp OData hiểu cấu trúc của DTO cho các phép chiếu và metadata.
+    // Nếu ReadUserDTO có một thuộc tính đóng vai trò là key (ví dụ UserId),
+    // bạn có thể đăng ký nó là EntityType. Nếu không, là ComplexType.
+
+    odataBuilder.EntityType<ReadStadiumDTO>(); // <--- Thêm dòng này
+
+    return odataBuilder.GetEdmModel();
+}
+
+// 2. Add OData services
+builder.Services.AddControllers().AddOData(options =>
+{
+    // Đăng ký route components cho ODataUsersController
+    // Tiền tố "odata" phải khớp với [Route("odata/[controller]")] của ODataUsersController
+    options.AddRouteComponents("odata", GetEdmModel()) // route: /odata/ODataUsers
+        .Select()
+        .Filter()
+        .OrderBy()
+        .Expand()
+        .Count()
+        .SetMaxTop(100);
+});
 
 
 builder.Services.AddDbContext<StadiumDbContext>(options =>

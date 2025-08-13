@@ -1,10 +1,12 @@
 ﻿using DTOs.StadiumDTO;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Service.BaseService;
 using Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,9 +19,9 @@ namespace Service.Services
         private string token = string.Empty;
 
 
-        public StadiumService(HttpClient httpClient, ITokenService tokenService)
+        public StadiumService(GatewayHttpClient httpClient, ITokenService tokenService)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient.Client;
             _tokenService = tokenService;
             token = _tokenService.GetAccessTokenFromCookie();
         }
@@ -31,25 +33,32 @@ namespace Service.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto)
+        public async Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto)
         {
-
-            throw new NotImplementedException();
+            var response = await _httpClient.PostAsJsonAsync("/addStadium", stadiumDto);
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadFromJsonAsync<ReadStadiumDTO>();
         }
 
-        public Task<bool> DeleteStadiumAsync(int id)
+        public async Task<bool> DeleteStadiumAsync(int id)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.DeleteAsync($"/deleteStadium?id={id}");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadAsStringAsync() == "true";
         }
 
-        public Task<IEnumerable<ReadStadiumDTO>> GetAllStadiumsAsync()
+        public async Task<string> GetAllStadiumsAsync()
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync("/odata/Stadium");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadAsStringAsync();
         }
 
-        public Task<ReadStadiumDTO> GetStadiumByIdAsync(int id)
+        public async Task<ReadStadiumDTO> GetStadiumByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync($"/getByIdStadium?id={id}");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadFromJsonAsync<ReadStadiumDTO>();
         }
 
         public Task<string> SearchStadiumAsync(string searchTerm)

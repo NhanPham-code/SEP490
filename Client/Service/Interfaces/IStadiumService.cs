@@ -9,7 +9,7 @@ namespace Service.Interfaces
 {
     public interface IStadiumService
     {
-        Task<IEnumerable<ReadStadiumDTO>> GetAllStadiumsAsync();
+        Task<string> GetAllStadiumsAsync();
         Task<ReadStadiumDTO> GetStadiumByIdAsync(int id);
         Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto);
         Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto);

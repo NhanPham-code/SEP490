@@ -22,6 +22,77 @@ namespace StadiumAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("StadiumAPI.DTOs.ReadCourtDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("PricePerHour")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("SportType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StadiumsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StadiumsId");
+
+                    b.ToTable("ReadCourtDTO");
+                });
+
+            modelBuilder.Entity("StadiumAPI.DTOs.ReadStadiumImageDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StadiumsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StadiumsId");
+
+                    b.ToTable("ReadStadiumImageDTO");
+                });
+
             modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +127,8 @@ namespace StadiumAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StadiumId");
 
                     b.ToTable("Courts", (string)null);
 
@@ -169,6 +242,8 @@ namespace StadiumAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StadiumId");
 
                     b.ToTable("StadiumImages", (string)null);
 
@@ -357,6 +432,49 @@ namespace StadiumAPI.Migrations
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 11, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("StadiumAPI.DTOs.ReadCourtDTO", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", null)
+                        .WithMany("Courts")
+                        .HasForeignKey("StadiumsId");
+                });
+
+            modelBuilder.Entity("StadiumAPI.DTOs.ReadStadiumImageDTO", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", null)
+                        .WithMany("StadiumImages")
+                        .HasForeignKey("StadiumsId");
+                });
+
+            modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", "Stadium")
+                        .WithMany()
+                        .HasForeignKey("StadiumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stadium");
+                });
+
+            modelBuilder.Entity("StadiumAPI.Models.StadiumImages", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", "Stadium")
+                        .WithMany()
+                        .HasForeignKey("StadiumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stadium");
+                });
+
+            modelBuilder.Entity("StadiumAPI.Models.Stadiums", b =>
+                {
+                    b.Navigation("Courts");
+
+                    b.Navigation("StadiumImages");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using StadiumAPI.DTOs;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StadiumAPI.Models
@@ -37,5 +38,8 @@ namespace StadiumAPI.Models
         public DateTime CreatedAt { get; set; } 
 
         public DateTime UpdatedAt { get; set; }
+
+        public virtual ICollection<Courts> Courts { get; set; } // Sử dụng Courts thay vì ReadCourtDTO
+        public virtual ICollection<StadiumImages> StadiumImages { get; set; }
     }
 }

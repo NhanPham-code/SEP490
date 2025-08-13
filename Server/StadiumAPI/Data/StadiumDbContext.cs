@@ -111,22 +111,22 @@ namespace StadiumAPI.Data
             // ===== COURTS =====
             modelBuilder.Entity<Courts>().HasData(
                 // Stadium 1 - Bóng đá
-                new Courts { Id = 1, StadiumId = 1, Name = "Sân Số 1", SportType = "Bóng đá", PricePerHour = 300000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 2, StadiumId = 1, Name = "Sân Số 2", SportType = "Bóng đá", PricePerHour = 350000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 1, StadiumId = 1, Name = "Sân Số 1", SportType = "Bóng đá", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 2, StadiumId = 1, Name = "Sân Số 2", SportType = "Bóng đá", PricePerHour = 350000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
 
                 // Stadium 2 - Cầu lông
-                new Courts { Id = 3, StadiumId = 2, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 80000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 4, StadiumId = 2, Name = "Sân B", SportType = "Cầu lông", PricePerHour = 90000, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 3, StadiumId = 2, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 4, StadiumId = 2, Name = "Sân B", SportType = "Cầu lông", PricePerHour = 90000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
 
                 // Stadium 3 - Bóng rổ
-                new Courts { Id = 5, StadiumId = 3, Name = "Sân Rổ 1", SportType = "Bóng rổ", PricePerHour = 120000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 5, StadiumId = 3, Name = "Sân Rổ 1", SportType = "Bóng rổ", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
 
                 // Stadium 4 - Tennis
-                new Courts { Id = 6, StadiumId = 4, Name = "Tennis 1", SportType = "Tennis", PricePerHour = 200000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 7, StadiumId = 4, Name = "Tennis 2", SportType = "Tennis", PricePerHour = 220000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 6, StadiumId = 4, Name = "Tennis 1", SportType = "Tennis", PricePerHour = 200000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 7, StadiumId = 4, Name = "Tennis 2", SportType = "Tennis", PricePerHour = 220000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
 
                 // Stadium 5 - Bóng chuyền
-                new Courts { Id = 8, StadiumId = 5, Name = "Sân Chuyền 1", SportType = "Bóng chuyền", PricePerHour = 100000, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+                new Courts { Id = 8, StadiumId = 5, Name = "Sân Chuyền 1", SportType = "Bóng chuyền", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
             );
 
             // ===== IMAGES =====
@@ -148,6 +148,7 @@ namespace StadiumAPI.Data
                 // Stadium 5
                 new StadiumImages { Id = 7, StadiumId = 5, ImageUrl = "https://example.com/sanchuyen-cantho-1.jpg", UploadedAt = fixedDate }
             );
+
         }
 
     }
