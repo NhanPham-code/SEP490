@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace BookingAPI.Controllers
 {
-    [Route("odata/Bookings")]
+    [Route("odata/bookings")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class BookingsControllerOData : ODataController
