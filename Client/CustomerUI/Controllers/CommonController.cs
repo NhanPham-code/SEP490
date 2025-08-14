@@ -23,13 +23,37 @@ namespace CustomerUI.Controllers
     public class CommonController : Controller
     {
         private static readonly string ROLE_DEFAULT = "Customer";
+        private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly ITokenService _tokenService;
 
-        public CommonController(IUserService userService, IEmailService emailService)
+        public CommonController(IUserService userService, IEmailService emailService, ITokenService tokenService)
         {
             _userService = userService;
             _emailService = emailService;
+            _tokenService = tokenService;
+        }
+
+        // Xử lý lưu token và thông tin người dùng vào cookie và session
+        private void SaveTokenCookiesAndUserInfo(LoginResponseDTO response)
+        {
+            // Lưu token vào cookie (HttpOnly để bảo mật)
+            _tokenService.SaveTokens(response);
+
+            // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
+            var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
+                ? $"{BASE_URL}{response.AvatarUrl}"
+                : "/images/default-avatar.png";
+
+            var faceFullUrl = !string.IsNullOrEmpty(response.FaceImageUrl)
+                ? $"{BASE_URL}{response.FaceImageUrl}"
+                : "";
+
+            HttpContext.Session.SetString("UserId", response.UserId.ToString());
+            HttpContext.Session.SetString("FullName", response.FullName ?? "User");
+            HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
+            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
         public IActionResult Login()
@@ -63,7 +87,7 @@ namespace CustomerUI.Controllers
                     return View();
                 }
 
-                // Lưu token vào cookie (HttpOnly để bảo mật)
+                // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
                 SaveTokenCookiesAndUserInfo(response);
 
                 return RedirectToAction("Index", "Home");
@@ -111,43 +135,6 @@ namespace CustomerUI.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // Xử lý lưu token và thông tin người dùng vào cookie và session
-        private void SaveTokenCookiesAndUserInfo(LoginResponseDTO response)
-        {
-            var baseUrl = "https://localhost:7136"; // URL của UserAPI hoặc Gateway của bạn
-
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = response.AccessTokenExpiresAt
-            };
-            Response.Cookies.Append("AccessToken", response.AccessToken!, cookieOptions);
-
-            var refreshOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
-            };
-            Response.Cookies.Append("RefreshToken", response.RefreshToken!, refreshOptions);
-
-            // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
-            var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
-                ? $"{baseUrl}{response.AvatarUrl}"
-                : "/images/default-avatar.png";
-
-            var faceFullUrl = !string.IsNullOrEmpty(response.FaceImageUrl)
-                ? $"{baseUrl}{response.FaceImageUrl}"
-                : "";
-
-            HttpContext.Session.SetString("FullName", response.FullName ?? "User");
-            HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
-            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
-        }
-
         // Action xử lý đăng ký người dùng mới
         [HttpPost]
         public async Task<IActionResult> Register(string fullname, string email, string password, string address, string phoneNumber)
@@ -160,23 +147,23 @@ namespace CustomerUI.Controllers
                 Password = password,
                 Address = address,
                 PhoneNumber = phoneNumber,
-                Role = "Customer" // Giả định vai trò là "Customer"
+                Role = ROLE_DEFAULT // Giả định vai trò là "Customer"
             };
 
             // Thực hiện server-side validation thủ công trên DTO mới
             if (!TryValidateModel(registerRequestDTO))
             {
                 // Trả về view với lỗi nếu validation thất bại
-                ViewData["ErrorMessage"] = "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại.";
-                ViewData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
+                TempData["ErrorMessage"] = "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại.";
+                TempData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
                 return View("Login"); // Giả định form đăng ký ở trang Login
             }
 
             // 1. Kiểm tra xem email đã tồn tại chưa
             if (await _userService.IsEmailExistsAsync(registerRequestDTO.Email))
             {
-                ViewData["ErrorMessage"] = "Email này đã tồn tại. ";
-                ViewData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
+                TempData["ErrorMessage"] = "Email này đã tồn tại. ";
+                TempData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
                 return View("Login"); // Giả định form đăng ký ở trang Login
             }
 
@@ -223,8 +210,8 @@ namespace CustomerUI.Controllers
             // Kiểm tra dữ liệu session và mã xác thực
             if (tempRegisterData == null || tempRegisterData.VerificationCode != code)
             {
-                ViewBag.ErrorMessage = "Mã xác thực không đúng. Vui lòng thử lại.";
-                ViewBag.Email = email; // Gán lại email để hiển thị
+                TempData["ErrorMessage"] = "Mã xác thực không đúng. Vui lòng thử lại.";
+                TempData["Email"] = email; // Gán lại email để hiển thị
                 return View();
             }
 
@@ -296,7 +283,7 @@ namespace CustomerUI.Controllers
             if (!isRegistered)
             {
                 ViewBag.ErrorMessage = "Đăng ký không thành công. Vui lòng thử lại.";
-                return View("Verify");
+                return View("Login");
             }
 
             // Xóa dữ liệu tạm sau khi đăng ký thành công
@@ -316,9 +303,174 @@ namespace CustomerUI.Controllers
                 return View("Verify");
             }
 
+            // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
             SaveTokenCookiesAndUserInfo(loginResponse);
 
             return RedirectToAction("Index", "Home");
+        }
+
+        // lấy profile của người dùng
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            // 1. Get tokens from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            var refreshToken = _tokenService.GetRefreshTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Access Token is missing.";
+                return RedirectToAction("Login");
+            }
+
+            // 3. Initial service call
+            var userProfile = await _userService.GetProfileAsync(accessToken);
+
+            // 4. If first attempt fails, attempt to refresh token
+            if (userProfile == null)
+            {
+                if (!string.IsNullOrEmpty(refreshToken))
+                {
+                    try
+                    {
+                        // Call the refresh token service
+                        var newTokens = await _userService.RefreshTokenAsync(new RefreshTokenRequestDTO
+                        {
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        });
+
+                        // Save the new tokens
+                        _tokenService.SaveTokens(newTokens);
+
+                        // Retry the profile request with the new access token
+                        userProfile = await _userService.GetProfileAsync(newTokens.AccessToken);
+
+                        if (userProfile == null)
+                        {
+                            // Redirect if retry also fails
+                            TempData["ErrorMessage"] = "Failed to retrieve user profile after token refresh.";
+                            return RedirectToAction("Login");
+                        }
+                    }
+                    catch (HttpRequestException)
+                    {
+                        // Redirect on refresh failure
+                        TempData["ErrorMessage"] = "Session has expired. Please log in again.";
+                        return RedirectToAction("Login");
+                    }
+                }
+                else
+                {
+                    // Redirect if no refresh token is available
+                    TempData["ErrorMessage"] = "Session has expired. Please log in again.";
+                    return RedirectToAction("Login");
+                }
+            }
+
+            userProfile.AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
+                ? $"{BASE_URL}{userProfile.AvatarUrl}"
+                : "/images/default-avatar.png";
+
+            userProfile.FaceImageUrl = !string.IsNullOrEmpty(userProfile.FaceImageUrl)
+                ? $"{BASE_URL}{userProfile.FaceImageUrl}"
+                : "";
+
+            return View(userProfile);
+        }
+
+        // update profile
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(UpdateUserProfileDTO updateUserProfileDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update user profile
+            try
+            {
+                var resultJson = await _userService.UpdateUserProfileAsync(updateUserProfileDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // update avatar
+        [HttpPost]
+        public async Task<IActionResult> UpdateAvatar(UpdateAvatarDTO updateAvatarDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update avatar
+            try
+            {
+                var resultJson = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // update face image
+        [HttpPost]
+        public async Task<IActionResult> UpdateFaceImage(UpdateFaceImageDTO updateFaceImageDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Access Token is missing." });
+            }
+
+            // 3. Call the service to update face image
+            try
+            {
+                var resultJson = await _userService.UpdateFaceImageAsync(updateFaceImageDTO, accessToken);
+
+                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
+                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
         }
     }
 }

@@ -1,99 +1,375 @@
 ﻿<!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Sportivey</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <!-- Enhanced Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
+
 <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#3b82f6",
-            secondary: "#10b981",
-          },
-          borderRadius: {
-            none: "0px",
-            sm: "4px",
-            DEFAULT: "8px",
-            md: "12px",
-            lg: "16px",
-            xl: "20px",
-            "2xl": "24px",
-            "3xl": "32px",
-            full: "9999px",
-            button: "8px",
-          },
+        theme: {
+            extend: {
+                fontFamily: {
+                    'inter': ['Inter', 'sans-serif'],
+                    'poppins': ['Poppins', 'sans-serif'],
+                    'pacifico': ['Pacifico', 'cursive'],
+                },
+                colors: {
+                    primary: {
+                        50: '#eff6ff',
+                        100: '#dbeafe',
+                        200: '#bfdbfe',
+                        300: '#93c5fd',
+                        400: '#60a5fa',
+                        500: '#3b82f6',
+                        600: '#2563eb',
+                        700: '#1d4ed8',
+                        800: '#1e40af',
+                        900: '#1e3a8a',
+                        DEFAULT: '#3b82f6',
+                    },
+                    secondary: {
+                        50: '#f0fdf4',
+                        100: '#dcfce7',
+                        200: '#bbf7d0',
+                        300: '#86efac',
+                        400: '#4ade80',
+                        500: '#22c55e',
+                        600: '#16a34a',
+                        700: '#15803d',
+                        800: '#166534',
+                        900: '#14532d',
+                        DEFAULT: '#10b981',
+                    },
+                    accent: {
+                        50: '#faf5ff',
+                        100: '#f3e8ff',
+                        200: '#e9d5ff',
+                        300: '#d8b4fe',
+                        400: '#c084fc',
+                        500: '#a855f7',
+                        600: '#9333ea',
+                        700: '#7c2d12',
+                        800: '#6b21a8',
+                        900: '#581c87',
+                        DEFAULT: '#a855f7',
+                    }
+                },
+                borderRadius: {
+                    none: "0px",
+                    sm: "4px",
+                    DEFAULT: "8px",
+                    md: "12px",
+                    lg: "16px",
+                    xl: "20px",
+                    "2xl": "24px",
+                    "3xl": "32px",
+                    full: "9999px",
+                    button: "12px",
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    'slide-up': 'slideUp 0.5s ease-out forwards',
+                    'slide-down': 'slideDown 0.3s ease-out forwards',
+                    'bounce-subtle': 'bounceSubtle 2s infinite',
+                    'glow': 'glow 2s ease-in-out infinite alternate',
+                    'float': 'float 6s ease-in-out infinite',
+                    'gradient-shift': 'gradientShift 8s ease-in-out infinite',
+                    'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                },
+                backdropBlur: {
+                    xs: '2px',
+                    sm: '4px',
+                    DEFAULT: '8px',
+                    md: '12px',
+                    lg: '16px',
+                    xl: '24px',
+                    '2xl': '40px',
+                    '3xl': '64px',
+                },
+            },
         },
-      },
     };
 </script>
+
 <style>
-    :where([class^="ri-"])::before {
-        content: "\f3c2";
+    /* Enhanced Global Styles */
+    * {
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
     }
 
-    .hero-bg {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        position: relative;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
     }
 
+    /* Enhanced Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+
+    /* Enhanced Header Glass Effect */
+    .header-glass {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Custom Logo Style */
+    .custom-logo {
+        font-family: 'Pacifico', cursive;
+        font-size: 1.75rem;
+        font-weight: 400;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6, #22c55e);
+        background-size: 300% 300%;
+        animation: gradientShift 8s ease-in-out infinite;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Enhanced Mobile Menu */
     .mobile-menu {
         transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
     }
 
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
+    .mobile-menu.open {
+        transform: translateX(0);
+    }
 
-    .search-expanded {
+    /* Back Button Styles */
+    .back-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .back-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+
+    .back-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        transition: width 0.3s ease;
+        z-index: -1;
+    }
+
+    .back-btn:hover::before {
         width: 100%;
-        opacity: 1;
     }
 
-    .filter-sheet {
-        transform: translateY(100%);
-        transition: transform 0.3s ease-in-out;
+    /* Keyframes */
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-        .filter-sheet.open {
-            transform: translateY(0);
-        }
-
-    .stadium-card {
-        transition: transform 0.2s ease-in-out;
+    @@keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-        .stadium-card:hover {
-            transform: translateY(-2px);
-        }
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
+    @@keyframes bounceSubtle {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-4px); }
+    }
+
+    @@keyframes glow {
+        0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+        100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+    }
+
+    @@keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 </style>
-<body>
-    <header class="bg-white shadow-sm">
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
+    <!-- Enhanced Header -->
+    <header x-data="{ mobileMenuOpen: false }" class="header-glass sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <a asp-controller="Home" asp-action="Index">
-                        <h1 class="font-['Pacifico'] custom-logo text-primary">logo</h1>
+            <div class="flex justify-between items-center h-18">
+                
+                <!-- Logo Section -->
+                <div class="flex items-center flex-shrink-0 min-w-fit">
+                    <a asp-controller="Home" asp-action="Index"
+                       class="flex items-center space-x-3 transition-all duration-300 hover:scale-105 group">
+                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
+                            <i class="ri-football-line text-white text-xl animate-float"></i>
+                        </div>
+                        <h1 class="font-pacifico custom-logo hidden sm:block">
+                            Sportivey
+                        </h1>
                     </a>
                 </div>
-                <div class="flex items-center">
+
+                <!-- Right Section - Enhanced Back Button -->
+                <div class="flex items-center space-x-4">
+                    <!-- Enhanced Back Button -->
                     <a asp-controller="Home" asp-action="Index"
                        data-readdy="true"
-                       class="flex items-center space-x-2 text-gray-600 hover:text-primary transition-colors">
-                        <div class="w-5 h-5 flex items-center justify-center">
-                            <i class="ri-arrow-left-line"></i>
+                       class="back-btn flex items-center space-x-3 px-5 py-3 text-slate-600 hover:text-primary bg-white/60 backdrop-blur-sm border border-white/40 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg">
+                        <div class="w-5 h-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                            <i class="ri-arrow-left-line text-lg"></i>
                         </div>
-                        <span>Back to Home</span>
+                        <span class="font-semibold text-sm hidden sm:inline">Back to Home</span>
+                        <span class="font-semibold text-sm sm:hidden">Back</span>
                     </a>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button @@click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="lg:hidden p-2.5 text-slate-600 hover:text-primary transition-colors">
+                        <i class="ri-menu-line text-xl" x-show="!mobileMenuOpen"></i>
+                        <i class="ri-close-line text-xl" x-show="mobileMenuOpen"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div x-show="mobileMenuOpen"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-1 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-1 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="lg:hidden border-t border-white/20 bg-white/95 backdrop-blur-lg">
+                <div class="px-4 py-4 space-y-2">
+                    <div class="text-center">
+                        <a asp-controller="Home" asp-action="Index"
+                           class="inline-flex items-center space-x-2 px-4 py-2 text-slate-600 hover:text-primary hover:bg-blue-50 rounded-xl transition-all">
+                            <i class="ri-home-4-line"></i>
+                            <span>Home</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
-    <div>
+
+    <!-- Main Content with Animation -->
+    <main class="animate-fade-in min-h-screen">
         @RenderBody()
-    </div>
+    </main>
+
+    <!-- Enhanced Scripts -->
+    <script>
+        // Enhanced scroll behavior
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+        let ticking = false;
+
+        function updateHeader() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 100) {
+                if (scrollTop > lastScrollTop && !header.classList.contains('header-hidden')) {
+                    // Scrolling down
+                    header.classList.add('header-hidden');
+                    header.style.transform = 'translateY(-100%)';
+                } else if (scrollTop < lastScrollTop && header.classList.contains('header-hidden')) {
+                    // Scrolling up
+                    header.classList.remove('header-hidden');
+                    header.style.transform = 'translateY(0)';
+                }
+            } else {
+                header.classList.remove('header-hidden');
+                header.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Enhanced keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // Escape key closes mobile menu
+            if (e.key === 'Escape') {
+                // Close mobile menu if open
+                const mobileMenu = document.querySelector('[x-data]');
+                if (mobileMenu && window.Alpine) {
+                    Alpine.store('mobileMenuOpen', false);
+                }
+            }
+        });
+
+        // Performance optimization
+        window.addEventListener('load', function () {
+            document.body.classList.add('loaded');
+        });
+
+        // Enhanced button interactions
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+
+            btn.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>
