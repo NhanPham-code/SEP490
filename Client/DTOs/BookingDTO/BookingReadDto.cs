@@ -1,4 +1,4 @@
-﻿namespace BookingAPI.DTOs
+﻿namespace DTOs.BookingDTO
 {
     public class BookingReadDto
     {
@@ -6,8 +6,8 @@
         public int UserId { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
-        public DateTime StartTime { get; set; }  // đổi sang DateTime
-        public DateTime EndTime { get; set; }    // đổi sang DateTime
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         public decimal? TotalPrice { get; set; }
         public string? Note { get; set; }
         public DateTime CreatedAt { get; set; }
