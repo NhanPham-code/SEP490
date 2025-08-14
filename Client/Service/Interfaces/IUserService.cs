@@ -10,14 +10,23 @@ namespace Service.Interfaces
     public interface IUserService
     {
         Task<LoginResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO);
+
         Task<bool> RegisterAsync(RegisterRequestDTO registerRequestDTO);
-        Task<ReadUserDTO?> GetProfileAsync(string accessToken);
+
+        Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
+
+        Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId, string accessToken);
+
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
+
         Task<LoginResponseDTO> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO);
+
         Task<bool> IsEmailExistsAsync(string email);
-        Task<string> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken);
-        Task<string> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
-        Task<string> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
-        Task<ReadUserDTO?> GetUserByIdAsync(string userId, string accessToken);
+
+        Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken);
+
+        Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
+
+        Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
     }
 }

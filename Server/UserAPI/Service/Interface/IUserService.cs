@@ -16,18 +16,20 @@ namespace UserAPI.Service.Interface
 
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
 
-        Task<ReadUserDTO> RegisterAsync(RegisterRequestDTO registerRequestDTO);
+        Task<PrivateUserProfileDTO> RegisterAsync(RegisterRequestDTO registerRequestDTO);
 
-        Task<ReadUserDTO> GetUserByIdAsync(int id);
+        Task<PrivateUserProfileDTO> GetUserProfileAsync(int id);
+
+        Task<PublicUserProfileDTO> GetOtherUserProfileAsync(int id);
 
         Task<bool> DeleteUserAsync(int id);
 
         Task<bool> IsEmailExistsAsync(string email);
 
-        Task<ReadUserDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO);
+        Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO);
 
-        Task<ReadUserDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO);
+        Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO);
 
-        Task<ReadUserDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO);
+        Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO);
     }
 }

@@ -34,7 +34,7 @@ IEdmModel GetEdmModel()
     // Nếu ReadUserDTO có một thuộc tính đóng vai trò là key (ví dụ UserId),
     // bạn có thể đăng ký nó là EntityType. Nếu không, là ComplexType.
 
-    odataBuilder.EntityType<ReadUserDTO>(); // <--- Thêm dòng này
+    odataBuilder.EntityType<PrivateUserProfileDTO>(); // <--- Thêm dòng này
 
     return odataBuilder.GetEdmModel();
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData.UriParser;
+using System.Security.Claims;
 using UserAPI.DTOs;
 using UserAPI.Service;
 using UserAPI.Service.Interface;
@@ -130,16 +131,46 @@ namespace UserAPI.Controllers
 
         /// <summary>
         /// api/Users/id
+        /// Lấy thông tin người dùng hiện tại (đang đăng nhập)
+        /// Lấy bằng userId trong Access Token
+        /// </summary>
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            // lấy userId từ access token trong header
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID." });
+            }
+
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID." });
+            }
+
+            var user = await _userService.GetUserProfileAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(user);
+        }
+
+        /// <summary>
+        /// api/Users/id
+        /// Lấy thông tin người dùng khác
         /// </summary>
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUserById(int userId)
+        public async Task<IActionResult> GetOtherUserProfile(int userId)
         {
             if (userId <= 0)
             {
                 return BadRequest(new { message = "Invalid user ID." });
             }
 
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userService.GetOtherUserProfileAsync(userId);
             if (user == null)
             {
                 return NotFound(new { message = "User not found." });
@@ -192,10 +223,19 @@ namespace UserAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // So sánh với userId trong DTO
+            if (dto.UserId != userIdFromToken)
+                return Forbid();
+
             try
             {
                 var updatedUser = await _userService.UpdateUserProfileAsync(dto);
-                return Ok(new { message = "Profile updated successfully", user = updatedUser });
+                return Ok(updatedUser);
             }
             catch (InvalidOperationException ex)
             {
@@ -215,10 +255,19 @@ namespace UserAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // So sánh với userId trong DTO
+            if (dto.UserId != userIdFromToken)
+                return Forbid();
+
             try
             {
                 var updatedUser = await _userService.UpdateAvatarAsync(dto);
-                return Ok(new { message = "Avatar updated successfully", user = updatedUser });
+                return Ok(updatedUser);
             }
             catch (InvalidOperationException ex)
             {
@@ -238,10 +287,19 @@ namespace UserAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // So sánh với userId trong DTO
+            if (dto.UserId != userIdFromToken)
+                return Forbid();
+
             try
             {
                 var updatedUser = await _userService.UpdateFaceImageAsync(dto);
-                return Ok(new { message = "Face image updated successfully", user = updatedUser });
+                return Ok(updatedUser);
             }
             catch (InvalidOperationException ex)
             {

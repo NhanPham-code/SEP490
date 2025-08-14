@@ -1,6 +1,6 @@
 ﻿namespace DTOs.UserDTO
 {
-    public class ReadUserDTO
+    public class PrivateUserProfileDTO
     {
         public int UserId { get; set; }
         public string FullName { get; set; } = null!;
