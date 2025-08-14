@@ -6,13 +6,14 @@
         public int UserId { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
-        public string StartTime { get; set; }
-        public string EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         public decimal? TotalPrice { get; set; }
         public string? Note { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public int? DiscountId { get; set; }
+        public int StadiumId { get; set; }
         public List<BookingDetailReadDto> BookingDetails { get; set; } = new List<BookingDetailReadDto>();
     }
 }

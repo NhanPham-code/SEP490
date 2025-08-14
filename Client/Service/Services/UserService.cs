@@ -104,5 +104,78 @@ namespace Service.Services
                 throw new HttpRequestException($"Error checking email existence: {response.ReasonPhrase}");
             }
         }
+
+        public async Task<ReadUserDTO?> GetUserByIdAsync(string userId, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+            return await _httpClient.GetFromJsonAsync<ReadUserDTO>($"/users/getById/{userId}");
+        }
+
+        public async Task<string> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+            var respoonse  = await _httpClient.PutAsJsonAsync("/users/update-profile", updateUserProfileDTO);
+            if (respoonse.IsSuccessStatusCode)
+            {
+                return await respoonse.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                throw new HttpRequestException($"Error updating user profile: {respoonse.ReasonPhrase}");
+            }
+        }
+
+        public async Task<string> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            using var formData = new MultipartFormDataContent();
+            formData.Add(new StringContent(updateAvatarDTO.UserId.ToString()), "UserId");
+
+            if (updateAvatarDTO.Avatar != null)
+            {
+                var stream = updateAvatarDTO.Avatar.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(updateAvatarDTO.Avatar.ContentType ?? "image/jpeg");
+                formData.Add(fileContent, "Avatar", updateAvatarDTO.Avatar.FileName);
+            }
+
+            var response = await _httpClient.PutAsync("/users/update-avatar", formData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                throw new HttpRequestException($"Error updating avatar: {response.ReasonPhrase}");
+            }
+        }
+
+        public async Task<string> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            using var formData = new MultipartFormDataContent();
+            formData.Add(new StringContent(updateFaceImageDTO.UserId.ToString()), "UserId");
+
+            if (updateFaceImageDTO.FaceImage != null)
+            {
+                var stream = updateFaceImageDTO.FaceImage.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(updateFaceImageDTO.FaceImage.ContentType ?? "image/jpeg");
+                formData.Add(fileContent, "FaceImage", updateFaceImageDTO.FaceImage.FileName);
+            }
+
+            var response = await _httpClient.PutAsync("/users/update-face-image", formData);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                throw new HttpRequestException($"Error updating face image: {response.ReasonPhrase}");
+            }
+        }
     }
 }

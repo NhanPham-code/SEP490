@@ -192,24 +192,33 @@
             </form>
         </div>
 
+        <form id="bookingForm" method="post" action="/Booking/Checkout">
+            <input type="hidden" name="Date" />
+            <input type="hidden" name="StartTime" />
+            <input type="hidden" name="EndTime" />
+            <input type="hidden" name="TotalPrice" />
+            <input type="hidden" name="CourtId" />
+            <input type="hidden" name="StadiumId" />
+        </form>
+
     </div>
 
     <script>
         // Dữ liệu giả định cho sân vận động và các sân con, mô phỏng việc lấy dữ liệu từ API
         const mockStadiumData = {
-            id: 'stadium-01',
+            id: '1',
             name: 'Sân vận động Thống Nhất',
             address: '138 Đ. Đào Duy Từ, Phường 6, Quận 10, Thành phố Hồ Chí Minh',
             openTime: '5:00',
             closeTime: '22:00',
             pricePerHour: '200,000 VNĐ', // Thêm giá thuê vào dữ liệu
             courts: [
-                { id: 'court-1', name: 'Sân số 1', type: 'Sân bóng đá 5 người', bookings: [8, 9, 10] },
-                { id: 'court-2', name: 'Sân số 2', type: 'Sân bóng đá 5 người', bookings: [15, 16] },
-                { id: 'court-3', name: 'Sân số 3', type: 'Sân tennis', bookings: [11, 12, 13] },
-                { id: 'court-4', name: 'Sân số 4', type: 'Sân tennis', bookings: [] },
-                { id: 'court-5', name: 'Sân số 5', type: 'Sân cầu lông', bookings: [17, 18] },
-                { id: 'court-6', name: 'Sân số 6', type: 'Sân cầu lông', bookings: [] },
+                { id: '1', name: 'Sân số 1', type: 'Sân bóng đá 5 người', bookings: [8, 9, 10] },
+                { id: '2', name: 'Sân số 2', type: 'Sân bóng đá 5 người', bookings: [15, 16] },
+                { id: '3', name: 'Sân số 3', type: 'Sân tennis', bookings: [11, 12, 13] },
+                { id: '4', name: 'Sân số 4', type: 'Sân tennis', bookings: [] },
+                { id: '5', name: 'Sân số 5', type: 'Sân cầu lông', bookings: [17, 18] },
+                { id: '6', name: 'Sân số 6', type: 'Sân cầu lông', bookings: [] },
             ],
         };
 
@@ -217,9 +226,9 @@
         let stadiumData = mockStadiumData;
         let startTime = null;
         let endTime = null;
-        let selectedCourt = null; // Biến mới để lưu sân đã chọn
-        let selectedCourtType = null; // BIẾN MỚI: Loại sân đã chọn
-        let selectedDate = new Date().toISOString().split('T')[0]; // BIẾN MỚI: Ngày được chọn, mặc định là ngày hiện tại
+        let selectedCourts = []; // Đã đổi biến thành mảng để chọn nhiều sân
+        let selectedCourtType = null;
+        let selectedDate = new Date().toISOString().split('T')[0];
 
         // Tạo một mảng các giờ từ 5:00 đến 22:00
         const allHours = Array.from({ length: 18 }, (_, i) => i + 5);
@@ -231,7 +240,7 @@
         const stadiumAddressEl = document.getElementById('stadium-address');
         const stadiumHoursEl = document.getElementById('stadium-hours');
         const courtTypeSelectEl = document.getElementById('court-type-select');
-        const datePickerEl = document.getElementById('date-picker'); // ELEMENT MỚI
+        const datePickerEl = document.getElementById('date-picker');
         const timeButtonsContainerEl = document.getElementById('time-buttons-container');
         const courtsContainerEl = document.getElementById('courts-container');
         const timeDisplayEl = document.getElementById('time-display');
@@ -272,51 +281,41 @@
                 endTime = null;
             }
             // Reset sân đã chọn khi thay đổi thời gian
-            selectedCourt = null;
+            selectedCourts = [];
             updateUI();
         }
 
-        // Hàm cập nhật giao diện người dùng
+            // Hàm cập nhật giao diện người dùng
         function updateUI() {
             // Cập nhật các nút giờ
             renderTimeButtons();
 
-            // Lọc sân
+            // Lọc sân theo loại sân đã chọn (bước này vẫn giữ lại)
             let filteredCourts = stadiumData.courts;
-            let isContinueButtonEnabled = false;
-
-            // Lọc sân theo loại sân đã chọn
             if (selectedCourtType) {
                 filteredCourts = filteredCourts.filter(court => court.type === selectedCourtType);
             }
 
-            // Tiếp tục lọc theo thời gian
+            let isContinueButtonEnabled = false;
+
             if (startTime !== null && endTime !== null && endTime > startTime) {
                 const duration = endTime - startTime;
-                const totalPrice = (parseInt(stadiumData.pricePerHour.replace(/[^0-9]/g, '')) * duration).toLocaleString('vi-VN');
+                const pricePerCourt = parseInt(stadiumData.pricePerHour.replace(/[^0-9]/g, '')) * duration;
+                const totalPrice = pricePerCourt * selectedCourts.length;
 
-                // Hiển thị ngày đã chọn trong chuỗi thông báo
                 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 const formattedDate = new Date(selectedDate).toLocaleDateString('vi-VN', dateOptions);
 
-                timeDisplayEl.textContent = `Bạn đã chọn: ${formattedDate}, từ ${startTime}:00 đến ${endTime}:00 (${duration} giờ). Tổng giá: ${totalPrice} VNĐ`;
+                const totalDisplayPrice = totalPrice.toLocaleString('vi-VN');
+                timeDisplayEl.textContent = `Bạn đã chọn: ${formattedDate}, từ ${startTime}:00 đến ${endTime}:00 (${duration} giờ). Tổng giá dự kiến: ${totalDisplayPrice} VNĐ`;
 
-                filteredCourts = filteredCourts.filter(court => {
-                    for (let i = startTime; i < endTime; i++) {
-                        if (court.bookings.includes(i)) {
-                            return false; // Sân bị bận
-                        }
-                    }
-                    return true; // Sân trống
-                });
-
-                // Nút Tiếp tục chỉ được bật nếu có sân trống và đã chọn sân
-                isContinueButtonEnabled = filteredCourts.length > 0 && selectedCourt !== null;
+                // Nút Tiếp tục chỉ được bật nếu đã có ít nhất một sân được chọn
+                isContinueButtonEnabled = selectedCourts.length > 0;
             } else {
                 timeDisplayEl.textContent = '';
             }
 
-            // Cập nhật danh sách sân
+            // Cập nhật danh sách sân. Truyền danh sách sân đã lọc theo loại (nếu có)
             renderCourts(filteredCourts);
 
             // Cập nhật trạng thái nút "Tiếp tục"
@@ -331,60 +330,72 @@
             }
         }
 
-        // Hàm render danh sách sân
+            // Hàm render danh sách sân
         function renderCourts(courts) {
             courtsContainerEl.innerHTML = ''; // Xóa danh sách cũ
-            if (startTime !== null && endTime !== null && endTime > startTime && courts.length === 0) {
-                courtsContainerEl.innerHTML = `<p class="col-span-full text-center text-gray-500 italic">Không có sân nào trống trong khoảng thời gian này.</p>`;
-            } else {
-                courts.forEach(court => {
-                    // Kiểm tra xem sân có sẵn trong danh sách đã lọc không
-                    const isAvailable = court.bookings.length === 0 || (startTime !== null && endTime !== null && endTime > startTime && !court.bookings.some(bookedHour => bookedHour >= startTime && bookedHour < endTime));
-                    const isSelected = selectedCourt && selectedCourt.id === court.id;
-                    const courtDiv = document.createElement('div');
 
-                    // Thêm lớp CSS cho trạng thái sân
-                    const courtStatusClass = isAvailable ? 'border-green-400' : 'border-red-400';
-                    courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
-
-                    // Thêm sự kiện click chỉ khi sân khả dụng và đã chọn đủ thời gian
-                    if (isAvailable && startTime !== null && endTime !== null && endTime > startTime) {
-                        courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
-                        courtDiv.addEventListener('click', () => {
-                            selectedCourt = court;
-                            updateUI();
-                        });
-                    } else {
-                        courtDiv.classList.add('opacity-75', 'cursor-not-allowed');
-                    }
-
-                    if (isSelected) {
-                        courtDiv.classList.add('scale-105', 'border-blue-600', 'ring-2', 'ring-blue-600');
-                    }
-
-                    courtDiv.innerHTML = `
-                        <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.name}</h3>
-                        <p class="text-sm text-gray-500">${court.type}</p>
-                        <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${stadiumData.pricePerHour}/giờ</p>
-                        <p class="text-xs mt-2 ${isAvailable ? 'text-green-500 font-medium' : 'text-red-500 font-medium'}">
-                            ${isAvailable ? 'Sân trống - Có thể đặt' : 'Sân đã có người đặt'}
-                        </p>
-                    `;
-                    courtsContainerEl.appendChild(courtDiv);
-                });
+            if (courts.length === 0) {
+                courtsContainerEl.innerHTML = `<p class="col-span-full text-center text-gray-500 italic">Không có sân nào phù hợp với loại sân đã chọn.</p>`;
+                return;
             }
+
+            courts.forEach(court => {
+                const isAvailable = (startTime === null || endTime === null || endTime <= startTime) ||
+                                    !court.bookings.some(bookedHour => bookedHour >= startTime && bookedHour < endTime);
+
+                const isSelected = selectedCourts.some(selected => selected.id === court.id);
+
+                const courtDiv = document.createElement('div');
+
+                let courtStatusClass = 'border-gray-200';
+                if (isAvailable) {
+                    courtStatusClass = 'border-green-400';
+                } else {
+                    courtStatusClass = 'border-red-400';
+                }
+
+                courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
+
+                if (isAvailable && startTime !== null && endTime !== null && endTime > startTime) {
+                    courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
+                    courtDiv.addEventListener('click', () => {
+                        const courtIndex = selectedCourts.findIndex(selected => selected.id === court.id);
+                        if (courtIndex !== -1) {
+                            selectedCourts.splice(courtIndex, 1);
+                        } else {
+                            selectedCourts.push(court);
+                        }
+                        updateUI();
+                    });
+                } else {
+                    courtDiv.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+
+                if (isSelected) {
+                    courtDiv.classList.add('scale-105', 'border-blue-600', 'ring-2', 'ring-blue-600');
+                }
+
+                courtDiv.innerHTML = `
+                    <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.name}</h3>
+                    <p class="text-sm text-gray-500">${court.type}</p>
+                    <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${stadiumData.pricePerHour}/giờ</p>
+                    <p class="text-xs mt-2 ${isAvailable ? 'text-green-500 font-medium' : 'text-red-500 font-medium'}">
+                        ${isAvailable ? 'Sân trống - Có thể đặt' : 'Sân đã có người đặt'}
+                    </p>
+                `;
+                courtsContainerEl.appendChild(courtDiv);
+            });
         }
 
         // Hàm render các nút giờ
         function renderTimeButtons() {
-            timeButtonsContainerEl.innerHTML = ''; // Xóa các nút cũ
+            timeButtonsContainerEl.innerHTML = '';
             allHours.forEach(hour => {
                 const button = document.createElement('button');
                 button.textContent = `${hour}:00`;
                 button.className = `time-button px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300`;
                 button.onclick = () => handleTimeSelect(hour);
 
-                // Cập nhật trạng thái nút
                 if (startTime !== null && endTime !== null && hour > startTime && hour < endTime) {
                     button.classList.add('bg-blue-200', 'text-blue-800');
                     button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
@@ -404,30 +415,33 @@
 
         // Hàm mô phỏng chuyển sang trang checkout
         function showCheckoutPage() {
-            if (!selectedCourt) {
-                showModal('Thông báo', 'Vui lòng chọn một sân trống trước khi tiếp tục.');
-                return;
-            }
-
-            if (startTime === null || endTime === null) {
-                showModal('Thông báo', 'Vui lòng chọn đầy đủ khung giờ đặt sân.');
+            if (selectedCourts.length === 0 || startTime === null || endTime === null) {
+                showModal('Thông báo', 'Vui lòng chọn đầy đủ thông tin: ngày, giờ và ít nhất một sân.');
                 return;
             }
 
             const duration = endTime - startTime;
-            const totalPrice = (parseInt(stadiumData.pricePerHour.replace(/[^0-9]/g, '')) * duration).toLocaleString('vi-VN');
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = new Date(selectedDate).toLocaleDateString('vi-VN', dateOptions);
+            const pricePerCourt = parseInt(stadiumData.pricePerHour.replace(/[^0-9]/g, '')) * duration;
+            const totalPrice = pricePerCourt * selectedCourts.length;
+            const courtIds = selectedCourts.map(court => court.id).join(',');
 
-            showModal('Xác nhận đặt sân', `Bạn đã chọn đặt sân ${selectedCourt.name} (${selectedCourt.type}) vào ngày ${formattedDate}, từ ${startTime}:00 đến ${endTime}:00. Tổng cộng: ${totalPrice} VNĐ.
-            Trong ứng dụng thực tế, bạn sẽ được chuyển đến trang thanh toán.`);
+            const form = document.getElementById('bookingForm');
+            form.Date.value = selectedDate;
+            form.StartTime.value = startTime;
+            form.EndTime.value = endTime;
+            form.TotalPrice.value = totalPrice;
+            form.CourtId.value = courtIds; // Gửi nhiều ID sân
+            form.StadiumId.value = stadiumData.id;
+
+            form.submit();
         }
+
+        console.log("stadium id: ", stadiumData.id);
 
         // --- Logic cho Slider mới ---
         let slideIndex = 0;
         let slideTimer;
 
-        // Hàm hiển thị slide
         function showSlides() {
             let i;
             const slides = document.getElementsByClassName("slider-image");
@@ -437,25 +451,21 @@
             slideIndex++;
             if (slideIndex > slides.length) { slideIndex = 1; }
             slides[slideIndex - 1].style.display = "block";
-            clearTimeout(slideTimer); // Reset timer khi người dùng tương tác
-            slideTimer = setTimeout(showSlides, 4000); // Tự động chuyển slide sau 4 giây
+            clearTimeout(slideTimer);
+            slideTimer = setTimeout(showSlides, 4000);
         }
 
-        // Hàm chuyển slide bằng nút
         function plusSlides(n) {
-            slideIndex += n - 1; // n là 1 hoặc -1, cần -1 để khớp với chỉ mục
+            slideIndex += n - 1;
             showSlides();
         }
 
-        // HÀM MỚI: Khởi tạo và gán sự kiện cho dropdown loại sân
         function setupCourtTypeSelection() {
-            // Thêm tùy chọn "Tất cả loại sân" ban đầu
             const allOption = document.createElement('option');
             allOption.value = '';
             allOption.textContent = 'Tất cả các sân';
             courtTypeSelectEl.appendChild(allOption);
 
-            // Thêm các loại sân từ dữ liệu
             courtTypes.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type;
@@ -463,63 +473,50 @@
                 courtTypeSelectEl.appendChild(option);
             });
 
-            // Gán sự kiện khi người dùng thay đổi lựa chọn
             courtTypeSelectEl.addEventListener('change', (e) => {
-                // Cập nhật biến trạng thái và reset các lựa chọn khác
                 selectedCourtType = e.target.value;
-                selectedCourt = null;
+                selectedCourts = [];
                 startTime = null;
                 endTime = null;
-                updateUI(); // Cập nhật lại toàn bộ giao diện
-            });
-        }
-
-        // HÀM MỚI: Khởi tạo và gán sự kiện cho date picker
-        function setupDatePicker() {
-            // Đặt giá trị mặc định cho date picker là ngày hiện tại
-            datePickerEl.value = selectedDate;
-            datePickerEl.min = selectedDate; // Ngăn người dùng chọn ngày trong quá khứ
-
-            datePickerEl.addEventListener('change', (e) => {
-                selectedDate = e.target.value;
-                // Khi thay đổi ngày, reset lựa chọn giờ và sân
-                startTime = null;
-                endTime = null;
-                selectedCourt = null;
                 updateUI();
             });
         }
 
+        function setupDatePicker() {
+            datePickerEl.value = selectedDate;
+            datePickerEl.min = selectedDate;
+
+            datePickerEl.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                startTime = null;
+                endTime = null;
+                selectedCourts = [];
+                updateUI();
+            });
+        }
 
         // Khởi tạo ứng dụng
         window.onload = function() {
-            // Render thông tin sân vận động
             renderStadiumInfo();
+            setupCourtTypeSelection();
+            setupDatePicker();
+            updateUI();
 
-            setupCourtTypeSelection(); // Gọi hàm setup dropdown
-            setupDatePicker(); // Gọi hàm setup date picker
-
-            updateUI(); // Cập nhật giao diện ban đầu
-
-            // Gán sự kiện cho nút "Tiếp tục"
             continueButtonEl.onclick = showCheckoutPage;
 
-            // Gán sự kiện cho nút đóng modal
             document.getElementById('modal-close-btn').onclick = hideModal;
 
-            // Gán sự kiện cho form phản hồi
             feedbackFormEl.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const feedbackText = document.getElementById('feedback-textarea').value;
                 if (feedbackText.trim() !== '') {
                     showModal('Gửi phản hồi thành công', 'Cảm ơn bạn đã gửi phản hồi. Chúng tôi sẽ ghi nhận và cải thiện!');
-                    document.getElementById('feedback-textarea').value = ''; // Xóa nội dung
+                    document.getElementById('feedback-textarea').value = '';
                 } else {
                     showModal('Lỗi', 'Vui lòng nhập nội dung phản hồi.');
                 }
             });
 
-            // Khởi động slider
             showSlides();
         };
     </script>

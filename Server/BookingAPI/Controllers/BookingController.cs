@@ -33,11 +33,12 @@ namespace BookingAPI.Controllers
             return Ok(booking);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<BookingReadDto>> CreateBooking(BookingCreateDto bookingCreateDto)
+        [HttpPost("{userId}")]
+        public async Task<ActionResult<BookingReadDto>> CreateBooking(int userId, BookingCreateDto bookingCreateDto)
         {
             try
             {
+                bookingCreateDto.UserId = userId;
                 var createdBooking = await _bookingService.CreateBookingAsync(bookingCreateDto);
                 return CreatedAtAction(
                     nameof(GetBooking),

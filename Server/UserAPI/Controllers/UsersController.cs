@@ -27,7 +27,7 @@ namespace UserAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
-            if(string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
                 return BadRequest(new { message = "Email and password cannot be empty." });
             }
@@ -129,10 +129,10 @@ namespace UserAPI.Controllers
         }
 
         /// <summary>
-        /// api/Users?userId={userId}
+        /// api/Users/id
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> GetUserById([FromQuery] int userId)
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserById(int userId)
         {
             if (userId <= 0)
             {
@@ -163,5 +163,94 @@ namespace UserAPI.Controllers
             return Ok(exists);
         }
 
+        /// <summary>
+        /// api/Users
+        /// </summary>
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID." });
+            }
+
+            var result = await _userService.DeleteUserAsync(id);
+            if (!result)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(new { message = "User deleted successfully." });
+        }
+
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDTO dto) 
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateUserProfileAsync(dto);
+                return Ok(new { message = "Profile updated successfully", user = updatedUser });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating profile.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("update-avatar")]
+        public async Task<IActionResult> UpdateAvatar([FromForm] UpdateAvatarDTO dto) 
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateAvatarAsync(dto);
+                return Ok(new { message = "Avatar updated successfully", user = updatedUser });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating avatar.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("update-face-image")]
+        public async Task<IActionResult> UpdateFaceImage([FromForm] UpdateFaceImageDTO dto) 
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateFaceImageAsync(dto);
+                return Ok(new { message = "Face image updated successfully", user = updatedUser });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating face image.", error = ex.Message });
+            }
+        }
     }
 }

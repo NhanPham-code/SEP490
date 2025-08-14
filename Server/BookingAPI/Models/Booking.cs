@@ -20,12 +20,12 @@ namespace BookingAPI.Models
         public DateTime Date { get; set; }
 
         [Required]
-        [DataType(DataType.Time)]
-        public TimeSpan StartTime { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime StartTime { get; set; }
 
         [Required]
-        [DataType(DataType.Time)]
-        public TimeSpan EndTime { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime EndTime { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal? TotalPrice { get; set; }
@@ -38,6 +38,9 @@ namespace BookingAPI.Models
 
         [ForeignKey("Discount")]
         public int? DiscountId { get; set; }
+
+        [ForeignKey("Stadium")]
+        public int StadiumId { get; set; }
 
         // Navigation properties
         public virtual ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();

@@ -20,12 +20,14 @@ namespace UserAPI.Service.Interface
 
         Task<ReadUserDTO> GetUserByIdAsync(int id);
 
-        Task<ReadUserDTO> CreateUserAsync(RegisterRequestDTO createUserDTO);
-
-        Task<ReadUserDTO> UpdateUserAsync(UpdateUserProfileDTO updateUserProfileDTO);
-
         Task<bool> DeleteUserAsync(int id);
 
         Task<bool> IsEmailExistsAsync(string email);
+
+        Task<ReadUserDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO);
+
+        Task<ReadUserDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO);
+
+        Task<ReadUserDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO);
     }
 }
