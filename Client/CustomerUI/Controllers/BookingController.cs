@@ -1,16 +1,22 @@
 ﻿using DTOs.BookingDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CustomerUI.Controllers
 {
     public class BookingController : Controller
     {
         private readonly IBookingService _bookingService;
+        private readonly ITokenService _tokenService;
 
-        public BookingController(IBookingService bookingService)
+        public BookingController(IBookingService bookingService, ITokenService tokenService)
         {
             _bookingService = bookingService;
+            _tokenService = tokenService;
         }
 
         private string? GetAccessToken()
@@ -36,7 +42,7 @@ namespace CustomerUI.Controllers
             // Nó có thể là "1,2,3" hoặc "4"
             ViewBag.CourtIdsString = courtId;
 
-            // Bạn vẫn có thể tách ra danh sách để dùng cho logic khác nếu cần
+            // Tách ra danh sách để dùng cho logic khác nếu cần
             if (!string.IsNullOrEmpty(courtId))
             {
                 ViewBag.CourtIds = courtId.Split(',').Select(c => int.Parse(c.Trim())).ToList();
@@ -49,6 +55,44 @@ namespace CustomerUI.Controllers
             return View();
         }
 
+        public async Task<IActionResult> BookingHistory()
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
+
+            List<BookingReadDto> bookings;
+            try
+            {
+                bookings = await _bookingService.GetBookingHistoryAsync(accessToken);
+
+                // Log dữ liệu booking ra console
+                if (bookings != null && bookings.Count > 0)
+                {
+                    Console.WriteLine($"[BookingHistory] Đã lấy được {bookings.Count} booking(s):");
+                    foreach (var b in bookings)
+                    {
+                        Console.WriteLine($" - Booking Id: {b.Id}, Date: {b.Date}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("[BookingHistory] Không có booking nào được trả về.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[BookingHistory] Lỗi khi lấy lịch sử booking: " + ex.Message);
+                TempData["ErrorMessage"] = "Lỗi khi lấy lịch sử booking.";
+                bookings = new List<BookingReadDto>();
+            }
+
+            return View(bookings);
+        }
 
         public IActionResult Booking()
         {
@@ -62,7 +106,6 @@ namespace CustomerUI.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    // Redirect về trang trước với thông báo lỗi
                     TempData["ErrorMessage"] = "Thông tin đặt sân không hợp lệ. Vui lòng thử lại.";
                     return RedirectToAction("Checkout");
                 }
@@ -81,14 +124,12 @@ namespace CustomerUI.Controllers
                     return RedirectToAction("Checkout");
                 }
 
-                // Thành công - chuyển đến trang xác nhận hoặc danh sách booking
                 TempData["SuccessMessage"] = "Đặt sân thành công!";
                 TempData["BookingId"] = createdBooking.Id;
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                // Log lỗi nếu cần
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
                 return RedirectToAction("Checkout");
             }

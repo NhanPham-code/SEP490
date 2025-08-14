@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
+<<<<<<< Updated upstream
+using System.Text.Json;
+=======
+>>>>>>> Stashed changes
 using System.Threading.Tasks;
 using DTOs.BookingDTO;
 using Service.BaseService;
@@ -29,21 +33,44 @@ namespace Service.Services
         // Lấy lịch sử booking của user hiện tại qua route gateway đã giấu userId
         public async Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken)
         {
-            AddBearerAccessToken(accessToken);
+<<<<<<< Updated upstream
+            // Sử dụng HttpRequestMessage để set token thủ công
+            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            // Gọi API qua gateway, URL như định nghĩa ocelot
-            var response = await _httpClient.GetAsync("/bookings/history");
+            var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
             {
-                // Có thể log hoặc ném exception tùy nghiệp vụ
                 return new List<BookingReadDto>();
             }
-
+=======
+            AddBearerAccessToken(accessToken);
+            var response = await _httpClient.GetAsync("/bookings/history");
+            response.EnsureSuccessStatusCode();
             var bookings = await response.Content.ReadFromJsonAsync<List<BookingReadDto>>();
             return bookings ?? new List<BookingReadDto>();
         }
+>>>>>>> Stashed changes
 
+        // Phương thức mới để lấy chi tiết booking
+        public async Task<BookingReadDto> GetBookingDetailAsync(string accessToken, int bookingId)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // Gọi API qua gateway, URL như đã định nghĩa trong Ocelot
+            var response = await _httpClient.GetAsync($"/bookings/{bookingId}");                 
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var booking = await response.Content.ReadFromJsonAsync<BookingReadDto>();
+            return booking;
+        }
+
+        // Tạo booking mới
         public async Task<BookingReadDto?> CreateBookingAsync(BookingCreateDto bookingCreateDto, string accessToken)
         {
             AddBearerAccessToken(accessToken);
@@ -51,11 +78,8 @@ namespace Service.Services
             // Gọi đúng route Ocelot mapping tới backend CreateBooking
             var response = await _httpClient.PostAsJsonAsync("/Bookings/add", bookingCreateDto);
 
-            var content = await response.Content.ReadAsStringAsync();
-
             if (!response.IsSuccessStatusCode)
             {
-                // Có thể log hoặc throw exception tùy ý
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 throw new Exception($"API CreateBooking failed: {errorMessage}");
             }
@@ -65,7 +89,5 @@ namespace Service.Services
 
             return createdBooking;
         }
-
-
     }
 }
