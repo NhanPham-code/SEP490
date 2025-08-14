@@ -161,13 +161,13 @@
                     <button class="text-sm text-primary hover:text-blue-600">Clear All</button>
                 </div>
 
-                <form id="sportFilterForm" method="POST">
+                <form id="sportFilterForm">
                     <!-- Sport Type -->
                     <div class="mb-6">
                         <h4 class="font-medium mb-3">Sport Type</h4>
                         <div class="space-y-2">
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Football" class="custom-checkbox" checked>
+                                <input type="checkbox" name="sport_type[]" value="Football" class="custom-checkbox">
                                 <span class="text-sm">Football</span>
                             </label>
                             <label class="flex items-center space-x-3 cursor-pointer">
@@ -242,11 +242,11 @@
                     <div class="mb-6">
                         <h4 class="font-medium mb-3">Price Range</h4>
                         <div class="px-2">
-                            <input type="range" name="price" min="0" max="500" value="250" class="w-full mb-2">
+                            <input type="range" name="price" min="0" max="10000000" value="250" class="w-full mb-2">
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>$0</span>
                                 <span class="font-medium">$<span id="priceValue">250</span>/hour</span>
-                                <span>$500</span>
+                                <span>$10000000</span>
                             </div>
                         </div>
                     </div>
@@ -271,26 +271,6 @@
                         Apply Filters
                     </button>
                 </form>
-
-                <script>
-                    $(document).ready(function() {
-                        // Update price value display
-                        $('input[name="price"]').on('input', function() {
-                            $('#priceValue').text($(this).val());
-                        });
-
-                        // Handle form submission
-                        $('#sportFilterForm').on('submit', function(event) {
-                            event.preventDefault(); // Prevent default form submission
-                            const formData = $(this).serializeArray();
-                            console.log('Form submitted with data:', formData);
-                            // Here you can send the form data to your server or handle it as needed
-                            // For example, you can use AJAX to send the data
-
-                        });
-
-                    });
-                </script>
 
             </div>
             <div class="flex-1">
@@ -327,96 +307,178 @@
                 </div>
                 <div id="stadium-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <script>
-
-                              
-
                         $(document).ready(function() {
+                                                // Get the form element
+                                                                    form.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Prevent the form from submitting
+                                            const form = document.getElementById('sportFilterForm');
+
+                        // Collect individual form fields
+                        const sportTypes = Array.from(form.querySelectorAll('input[name="sport_type[]"]:checked')).map(checkbox => checkbox.value);
+                        const date = form.querySelector('input[name="date"]').value;
+                        const time = form.querySelector('input[name="time"]:checked')?.value || '';
+                        const price = form.querySelector('input[name="price"]').value;
+                        const location = form.querySelector('input[name="location"]').value;
+                        console.log(price);
+                        });
+                            // You can now use formData object to process or send the data
+                              
+                        
                             //get all by ajax
-                                          displayList();
+                                          displayList(buildODataQuery(sportTypes, date, time, price, location));
                         });
 
                         // danh sach san pham truoc va sau khi search
-                        function displayList(){
-                            $.ajax({
-                        url: '/Home/Stadiums', // API trả về JSON bạn đưa ở trên
-                        type: 'GET',
-                        success: function (data) {
-                            let html = '';
-                            if (data && data.length > 0) {
-                                data.forEach(function (item) {
+                        function displayList(searchTerm){
+
+                                                     $.ajax({
+                                url: '/Home/Stadiums', // Endpoint for POST request
+                                type: 'POST',
+                                contentType: 'application/json', // Specify JSON content type
+                                                data: JSON.stringify({ searchTerm: searchTerm
+                        }),
+                                success: function (data) {
+                                    let html = '';
+                                    if (data && data.length > 0) {
+                                        data.forEach(function (item) {
                                             let imageUrl = item.stadiumImages.length > 0 ? item.stadiumImages[0].imageUrl : 'default.jpg';
-                        let price = item.courts.length > 0 ? item.courts[0].pricePerHour : 0;
+                                            let price = item.courts.length > 0 ? item.courts[0].pricePerHour : 0;
 
-                        // Format tiền Việt Nam
-                        let formattedPrice = new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND'
-                        }).format(price);
-                        let address = item.address ?? '';
-                                                                            html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                            <div class="relative h-48">
-                                <img src="${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
+                                            // Format tiền Việt Nam
+                                            let formattedPrice = new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND'
+                                            }).format(price);
+                                            let address = item.address ?? '';
 
-                                <!-- Hot badge -->
-                                <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                    Hot
-                                </div>
+                                            html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                                <div class="relative h-48">
+                                                    <img src="${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
-                                <!-- Sport type badge -->
-                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
-                                    ${item.courts[0].sportType}
-                                </div>
-                            </div>
+                                                    <!-- Hot badge -->
+                                                    <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                                        Hot
+                                                    </div>
 
-                            <div class="p-4">
-                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.name}</h3>
+                                                    <!-- Sport type badge -->
+                                                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
+                                                        ${item.courts[0].sportType}
+                                                    </div>
+                                                </div>
 
-                                <div class="flex items-center text-gray-500 text-sm mb-2">
-                                    <i class="ri-map-pin-line text-gray-400 mr-1"></i>
-                                    <span>${address}</span>
-                                </div>
+                                                <div class="p-4">
+                                                    <h3 class="font-bold text-lg text-gray-900 mb-1">${item.name}</h3>
 
-                                <div class="flex items-center text-sm mb-3">
-                                    <i class="ri-star-fill text-yellow-400 mr-1"></i>
-                                    <span class="font-semibold text-gray-800">4.7</span>
-                                    <span class="text-gray-500 ml-1">(124 đánh giá)</span>
-                                </div>
+                                                    <div class="flex items-center text-gray-500 text-sm mb-2">
+                                                        <i class="ri-map-pin-line text-gray-400 mr-1"></i>
+                                                        <span>${address}</span>
+                                                    </div>
 
-                                <!-- Available time slots -->
-                                <div class="mb-4">
-                                    <div class="flex items-center text-sm text-gray-600 mb-2">
-                                        <i class="ri-time-line mr-1"></i>
-                                        <span>Khung giờ trống hôm nay:</span>
-                                    </div>
-                                    <div class="flex  grid grid-cols-4 md:grid-cols-4 xl:grid-cols-4 gap-2">
-                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">09:00</span>
-                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">11:00</span>
-                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">14:00</span>
-                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">17:00</span>
-                                    </div>
-                                </div>
+                                                    <div class="flex items-center text-sm mb-3">
+                                                        <i class="ri-star-fill text-yellow-400 mr-1"></i>
+                                                        <span class="font-semibold text-gray-800">4.7</span>
+                                                        <span class="text-gray-500 ml-1">(124 đánh giá)</span>
+                                                    </div>
 
-                                <div class=" items-center justify-end">
-                                    <div class="text-2xl font-bold text-blue-600">
-                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
-                                    </div>
-                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-                                        Đặt ngay
-                                    </button>
-                                </div>
-                            </div>
-                        </div>`;
-                                    });
-                                    $('#stadium-grid').html(html).show();
-                                } else {
+                                                    <!-- Available time slots -->
+                                                    <div class="mb-4">
+                                                        <div class="flex items-center text-sm text-gray-600 mb-2">
+                                                            <i class="ri-time-line mr-1"></i>
+                                                            <span>Khung giờ trống hôm nay:</span>
+                                                        </div>
+                                                        <div class="flex grid grid-cols-4 md:grid-cols-4 xl:grid-cols-4 gap-1">
+                                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">09:00</span>
+                                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">11:00</span>
+                                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">14:00</span>
+                                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">17:00</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="items-center justify-end">
+                                                        <div class="text-2xl font-bold text-blue-600">
+                                                            ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
+                                                        </div>
+                                                        <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+                                                            Đặt ngay
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                                        });
+                                        $('#stadium-grid').html(html).show();
+                                    } else {
+                                        $('#stadium-grid').empty().hide();
+                                    }
+                                },
+                                error: function () {
                                     $('#stadium-grid').empty().hide();
+                                    console.log('Error fetching suggestions');
                                 }
-                            },
-                            error: function () {
-                                $('#stadium-grid').empty().hide();
-                                console.log('Error fetching suggestions');
-                            }
+                            });
+                        }
+
+                        // Call displayList initially (optional)
+                        displayList();
+
+                        // Add event listener for form submission to trigger filtering
+                        $('#sportFilterForm').on('submit', function(event) {
+                            event.preventDefault(); // Prevent default form submission
+                            displayList(); // Call displayList to fetch filtered data
                         });
+
+                        // Update price display dynamically
+                        $('#sportFilterForm input[name="price"]').on('input', function() {
+                            $('#priceValue').text($(this).val());
+                        });
+                                                function buildODataQuery(sportTypes, date, time, price, location) {
+                            // Khởi tạo mảng để chứa các điều kiện lọc
+                            const filters = [];
+
+                            // Kiểm tra và thêm điều kiện cho sportTypes
+                            if (sportTypes && typeof sportTypes === 'string' && sportTypes.trim() !== '') {
+                                // Lọc các sân có court với sportType tương ứng
+                                filters.push(`courts/any(c: c/sportType eq '${encodeURIComponent(sportTypes.trim())}')`);
+                            }
+
+                            // Kiểm tra và thêm điều kiện cho date
+                            if (date && date instanceof Date && !isNaN(date)) {
+                                // Định dạng date thành chuỗi ISO (ví dụ: 2025-08-14)
+                                const formattedDate = date.toISOString().split('T')[0];
+                                // Giả sử bạn muốn kiểm tra sân có sẵn vào ngày này (cần logic cụ thể hơn từ service)
+                                filters.push(`courts/any(c: c/isAvailable eq true)`); // Có thể cần điều chỉnh
+                            }
+
+                            // Kiểm tra và thêm điều kiện cho time
+                            if (time && typeof time === 'string' && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(time)) {
+                                // Lọc các sân mở cửa và đóng cửa bao gồm thời gian này
+                                filters.push(`openTime le '${time}' and closeTime ge '${time}'`);
+                            }
+
+                            // Kiểm tra và thêm điều kiện cho price
+                            if (price != null && typeof price === 'number' && price > 0) {
+                                // Lọc các sân có court với giá nhỏ hơn hoặc bằng giá đã cho
+                                filters.push(`courts/any(c: c/pricePerHour le ${price})`);
+                            }
+
+                            // Kiểm tra và thêm điều kiện cho location
+                            if (location && typeof location === 'string' && location.trim() !== '') {
+                                // Lọc các sân có địa chỉ chứa chuỗi location
+                                filters.push(`contains(address, '${encodeURIComponent(location.trim())}')`);
+                            }
+
+                            // Tạo chuỗi query OData
+                            let query = '';
+                            if (filters.length > 0) {
+                                query = `$filter=${filters.join(' and ')}`;
+                            }
+
+                            // Thêm các query bổ sung nếu cần (ví dụ: $expand, $select)
+                            query += query ? '&' : '';
+                            query += '$expand=courts,stadiumImages'; // Mở rộng để lấy thông tin courts và stadiumImages
+
+
+                            console.log('OData Query:', query);
+                            return query ? `?${query}` : '';
                         }
 
                     </script>

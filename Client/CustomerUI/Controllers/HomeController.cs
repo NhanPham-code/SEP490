@@ -1,4 +1,5 @@
 using CustomerUI.Models;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System.Diagnostics;
@@ -24,9 +25,11 @@ namespace CustomerUI.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Stadiums()
+        public async Task<IActionResult> Stadiums(string searchTerm)
         {
-            var stadium = await _stadiumService.GetAllStadiumsAsync();
+
+
+            var stadium = await _stadiumService.SearchStadiumAsync(searchTerm);
 
             return Content(stadium, "application/json");
         }

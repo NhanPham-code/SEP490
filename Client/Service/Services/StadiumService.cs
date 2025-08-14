@@ -61,9 +61,11 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<ReadStadiumDTO>();
         }
 
-        public Task<string> SearchStadiumAsync(string searchTerm)
+        public async Task<string> SearchStadiumAsync(string searchTerm)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync("/odata/Stadium"+searchTerm);
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadAsStringAsync();
         }
 
         public Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto)
