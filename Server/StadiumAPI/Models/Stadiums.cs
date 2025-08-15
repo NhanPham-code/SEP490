@@ -18,7 +18,7 @@ namespace StadiumAPI.Models
         public string Description { get; set; }
 
         [Required]
-        public TimeSpan OpenTime { get; set; }
+        public TimeSpan OpenTime { get; set; } 
 
         [Required]
         public TimeSpan CloseTime { get; set; }

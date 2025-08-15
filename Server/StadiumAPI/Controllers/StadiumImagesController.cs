@@ -78,11 +78,12 @@ namespace StadiumAPI.Controllers
                 {
 
                     System.IO.File.Delete(oldFilePath);
-                    using (var stream = new FileStream(adminFilePath, FileMode.Create))
-                    {
-                        await imageDto.ImageUrl.CopyToAsync(stream);
-                    }
+                    
 
+                }
+                using (var stream = new FileStream(adminFilePath, FileMode.Create))
+                {
+                    await imageDto.ImageUrl.CopyToAsync(stream);
                 }
             }
             else

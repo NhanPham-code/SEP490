@@ -63,7 +63,7 @@ namespace Service.Services
 
         public async Task<string> SearchStadiumAsync(string searchTerm)
         {
-            var response = await _httpClient.GetAsync("/odata/Stadium"+searchTerm);
+            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts,StadiumImages" + searchTerm);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }

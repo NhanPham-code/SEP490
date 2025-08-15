@@ -18,31 +18,31 @@ IEdmModel GetEdmModel()
 {
     var odataBuilder = new ODataConventionModelBuilder();
 
-    // Đăng ký EntitySet cho Stadiums
-    var stadium = odataBuilder.EntitySet<Stadiums>("Stadiums");
+    // Stadiums
+    var stadium = odataBuilder.EntitySet<Stadiums>("OdataStadium");
     stadium.EntityType.HasKey(s => s.Id);
+    // Khai báo navigation property
+    stadium.EntityType.HasMany(s => s.Courts);
+    stadium.EntityType.HasMany(s => s.StadiumImages);
+    // Khai báo binding (liên kết)
     stadium.HasManyBinding(s => s.Courts, "Courts");
     stadium.HasManyBinding(s => s.StadiumImages, "StadiumImages");
 
-    // Đăng ký EntitySet cho Courts
+    // Courts
     var court = odataBuilder.EntitySet<Courts>("Courts");
     court.EntityType.HasKey(c => c.Id);
-    court.HasRequiredBinding(c => c.Stadium, "Stadiums"); // Quan hệ n-1 với Stadiums
+    court.EntityType.HasRequired(c => c.Stadium);
+    court.HasRequiredBinding(c => c.Stadium, "OdataStadium");
 
-    // Đăng ký EntitySet cho StadiumImages
+    // StadiumImages
     var stadiumImage = odataBuilder.EntitySet<StadiumImages>("StadiumImages");
     stadiumImage.EntityType.HasKey(si => si.Id);
-    stadiumImage.HasOptionalBinding(si => si.Stadium, "Stadiums"); // Quan hệ n-1 với Stadiums
-
-    // Rất quan trọng: Đăng ký ReadUserDTO là một EntityType hoặc ComplexType
-    // Việc này giúp OData hiểu cấu trúc của DTO cho các phép chiếu và metadata.
-    // Nếu ReadUserDTO có một thuộc tính đóng vai trò là key (ví dụ UserId),
-    // bạn có thể đăng ký nó là EntityType. Nếu không, là ComplexType.
-
-    odataBuilder.EntityType<ReadStadiumDTO>(); // <--- Thêm dòng này
+    stadiumImage.EntityType.HasOptional(si => si.Stadium);
+    stadiumImage.HasOptionalBinding(si => si.Stadium, "OdataStadium");
 
     return odataBuilder.GetEdmModel();
 }
+
 
 // 2. Add OData services
 builder.Services.AddControllers().AddOData(options =>
@@ -63,7 +63,7 @@ builder.Services.AddDbContext<StadiumDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Register repositories
 builder.Services.AddScoped<IStadiumRepositories, StadiumRepositories>();
 builder.Services.AddScoped<IStadiumImagesRepositories, StadiumImageRepositories>();

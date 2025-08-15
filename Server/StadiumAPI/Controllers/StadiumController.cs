@@ -49,7 +49,7 @@ namespace StadiumAPI.Controllers
         // PUT: api/ReadStadiumDTOes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id, UpdateStadiumDTO updateStadiumDTO)
+        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id,[FromForm] UpdateStadiumDTO updateStadiumDTO)
         {
             if (id != updateStadiumDTO.Id)
             {
