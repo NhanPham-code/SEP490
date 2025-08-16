@@ -13,6 +13,8 @@ namespace StadiumAPI.Models
 
         public string ImageUrl { get; set; }
 
-        public DateTime UploadedAt { get; set; } 
+        public DateTime UploadedAt { get; set; }
+        public virtual Stadiums Stadium { get; set; }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace StadiumAPI.DTOs
+﻿using StadiumAPI.Models;
+
+namespace StadiumAPI.DTOs
 {
     public class ReadStadiumDTO
     {
@@ -14,6 +16,8 @@
         public int CreatedBy { get; set; } // User ID of the creator
         public DateTime CreatedAt { get; set; } 
         public DateTime UpdatedAt { get; set; }
+        public ICollection<ReadCourtDTO> Courts { get; set; }
+        public ICollection<ReadStadiumImageDTO> StadiumImages { get; set; }
 
     }
 }
