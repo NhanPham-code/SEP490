@@ -92,8 +92,9 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
       }
     },
+    // lấy thông tin người dùng hiện tại (đang đăng nhập)
     {
-      "DownstreamPathTemplate": "/api/Users/{userId}",
+      "DownstreamPathTemplate": "/api/Users/profile",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -101,7 +102,7 @@
           "Port": 7295
         }
       ],
-      "UpstreamPathTemplate": "/users/info",
+      "UpstreamPathTemplate": "/users/me",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -109,11 +110,9 @@
       },
       "RouteClaimsRequirement": {
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-      },
-      "ChangeDownstreamPathTemplate": {
-        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
       }
     },
+    // xem thông tin người dùng theo id
     {
       "DownstreamPathTemplate": "/api/Users/{userId}",
       "DownstreamScheme": "https",
@@ -123,7 +122,7 @@
           "Port": 7295
         }
       ],
-      "UpstreamPathTemplate": "/users/getById/{userId}",
+      "UpstreamPathTemplate": "/users/otherProfile/{userId}",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",

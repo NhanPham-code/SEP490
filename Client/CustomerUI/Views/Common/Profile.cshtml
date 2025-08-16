@@ -1,4 +1,4 @@
-﻿@model DTOs.UserDTO.ReadUserDTO
+﻿@model DTOs.UserDTO.PrivateUserProfileDTO
 
 @{
     ViewData["Title"] = "User Profile";
@@ -61,6 +61,7 @@
             bottom: 8px;
             cursor: pointer;
             transition: background 0.2s;
+            z-index: 2;
         }
         .avatar-edit-btn:hover, .face-edit-btn:hover {
             background: #9333ea;
@@ -72,18 +73,19 @@
             display: flex;
             justify-content: center;
             gap: 2.5rem;
-            align-items: center;
+            align-items: flex-end;
             margin-bottom: 2.5rem;
+            flex-wrap: wrap;
         }
         .avatar-container, .face-container {
             position: relative;
             width: 140px;
-            height: 140px;
             min-width: 140px;
-            min-height: 140px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
         }
         .avatar-container img, .face-container img {
             width: 130px;
@@ -99,20 +101,81 @@
         .face-container img {
             border-radius: 1.5rem;
         }
-        @@media (max-width: 600px) {
+        .image-label {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #6366f1;
+            font-size: 1.05rem;
+            background: linear-gradient(90deg,#e0e7ff 0%,#f3e8ff 100%);
+            border-radius: 0.75rem;
+            padding: 0.25rem 0;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.02);
+        }
+        @@media (max-width: 800px) {
             .image-row { gap: 1rem; }
-            .avatar-container, .face-container { width: 100px; height: 100px; min-width: 100px; min-height: 100px; }
+            .avatar-container, .face-container { width: 100px; min-width: 100px;}
             .avatar-container img, .face-container img { width: 90px; height: 90px; }
+            .image-label { font-size: .97rem; padding: 0.18rem 0; }
+        }
+        @@media (max-width: 600px) {
+            .image-row { gap: 0.5rem; }
+            .avatar-container, .face-container { width: 78px; min-width: 78px;}
+            .avatar-container img, .face-container img { width: 62px; height: 62px; }
+            .image-label { font-size: .92rem; padding: 0.12rem 0; }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            top: 1.5rem;
+            transform: translateX(-50%);
+            z-index: 9999;
+            min-width: 240px;
+            max-width: 96vw;
+            padding: 1rem 1.5rem;
+            border-radius: .75rem;
+            font-weight: 500;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            animation: fade-in .3s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            pointer-events: auto;
+        }
+        .toast-success { background: #22c55e; color: #fff; }
+        .toast-error { background: #ef4444; color: #fff; }
+        .toast-loading { background: #fbbf24; color: #fff; }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @@keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px);}
+            to { opacity: 1;}
         }
     </style>
 }
 
+<div id="toastContainer" style="pointer-events:none;"></div>
+
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
-        <i class="ri-error-warning-line mr-2"></i>
-        @TempData["ErrorMessage"]
-    </div>
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            showToast("@TempData["ErrorMessage"]", "error");
+        });
+    </script>
 }
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 relative overflow-hidden">
@@ -120,16 +183,18 @@
         <div class="profile-card w-full max-w-3xl rounded-3xl p-6 md:p-10 animate-slide-up">
             <div class="image-row">
                 <div class="avatar-container group" id="avatarClick">
-                    <img src="@Model.AvatarUrl" alt="Avatar" class="avatar-glow" />
+                    <img id="avatarImg" src="@Model.AvatarUrl" alt="Avatar" class="avatar-glow" />
                     <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
                         <i class="ri-camera-line text-xl"></i>
                     </div>
+                    <div class="image-label">Ảnh đại diện</div>
                 </div>
                 <div class="face-container group" id="faceImageClick">
-                    <img src="@Model.FaceImageUrl" alt="FaceImage" />
+                    <img id="faceImageImg" src="@Model.FaceImageUrl" alt="FaceImage" />
                     <div class="face-edit-btn" title="Đổi ảnh khuôn mặt">
                         <i class="ri-camera-line text-xl"></i>
                     </div>
+                    <div class="image-label">Ảnh khuôn mặt</div>
                 </div>
             </div>
 
@@ -140,19 +205,19 @@
                         <div class="grid grid-cols-1 gap-6">
                             <div>
                                 <label class="text-sm text-gray-500">Họ và tên</label>
-                                <div class="font-semibold text-gray-800">@Model.FullName</div>
+                                <div id="displayFullname" class="font-semibold text-gray-800">@Model.FullName</div>
                             </div>
                             <div>
                                 <label class="text-sm text-gray-500">Email</label>
-                                <div class="font-semibold text-gray-800">@Model.Email</div>
+                                <div id="displayEmail" class="font-semibold text-gray-800">@Model.Email</div>
                             </div>
                             <div>
                                 <label class="text-sm text-gray-500">Số điện thoại</label>
-                                <div class="font-semibold text-gray-800">@Model.PhoneNumber</div>
+                                <div id="displayPhone" class="font-semibold text-gray-800">@Model.PhoneNumber</div>
                             </div>
                             <div>
                                 <label class="text-sm text-gray-500">Địa chỉ</label>
-                                <div class="font-semibold text-gray-800">@Model.Address</div>
+                                <div id="displayAddress" class="font-semibold text-gray-800">@Model.Address</div>
                             </div>
                         </div>
                     </div>
@@ -210,6 +275,9 @@
         <form id="avatarForm" enctype="multipart/form-data" method="post" action="#">
             <input type="file" id="avatarUpload" name="avatar" accept="image/*" class="mb-4 block w-full" />
             <img id="avatarPreviewModal" src="" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+            <div id="avatarLoading" class="flex justify-center mb-4 hidden">
+                <span class="loading-spinner"></span>
+            </div>
             <button type="submit" class="w-full btn-gradient mt-2">
                 <i class="ri-upload-cloud-2-line text-lg"></i>
                 <span>Lưu ảnh mới</span>
@@ -228,6 +296,9 @@
         <form id="faceForm" enctype="multipart/form-data" method="post" action="#">
             <input type="file" id="faceUpload" name="faceImage" accept="image/*" class="mb-4 block w-full" />
             <img id="facePreviewModal" src="" class="w-32 h-32 object-cover rounded-2xl mx-auto mb-4" />
+            <div id="faceLoading" class="flex justify-center mb-4 hidden">
+                <span class="loading-spinner"></span>
+            </div>
             <button type="submit" class="w-full btn-gradient mt-2">
                 <i class="ri-upload-cloud-line text-lg"></i>
                 <span>Lưu ảnh mới</span>
@@ -237,14 +308,36 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        // Lưu lại dữ liệu ban đầu để khi cancel thì set lại
+        // Toast notification
+        function showToast(message, type = "success") {
+            const icons = {
+                success: '<i class="ri-checkbox-circle-line text-xl"></i>',
+                error: '<i class="ri-close-circle-line text-xl"></i>',
+                loading: '<span class="loading-spinner"></span>'
+            };
+            const toast = document.createElement("div");
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `${icons[type] || ''}<span>${message}</span>`;
+            document.getElementById("toastContainer").appendChild(toast);
+            if (type !== "loading") {
+                setTimeout(() => { toast.remove(); }, 2700);
+            }
+            return toast;
+        }
+
+        function removeLoadingToast(toast) {
+            if (toast) toast.remove();
+        }
+
+        // Data setup
         const originalData = {
             fullname: document.getElementById("fullnameInput").value,
             email: document.getElementById("emailInput").value,
             phone: document.getElementById("phoneInput").value,
             address: document.getElementById("addressInput").value,
-            userId: document.getElementById("userIdInput")?.value // hidden input chứa userid
+            userId: document.getElementById("userIdInput")?.value
         };
 
         const editBtn = document.getElementById("editBtn");
@@ -264,6 +357,7 @@
             saveBtn.classList.remove("hidden");
             cancelBtn.classList.remove("hidden");
         });
+
         cancelBtn.addEventListener("click", function () {
             editMode = false;
             profileReadMode.classList.remove("hidden");
@@ -271,6 +365,8 @@
             editBtn.classList.remove("hidden");
             saveBtn.classList.add("hidden");
             cancelBtn.classList.add("hidden");
+
+            // reset lại dữ liệu
             document.getElementById("fullnameInput").value = originalData.fullname;
             document.getElementById("emailInput").value = originalData.email;
             document.getElementById("phoneInput").value = originalData.phone;
@@ -281,8 +377,7 @@
         profileForm.addEventListener("submit", function (e) {
             e.preventDefault();
             if (!editMode) return false;
-
-            // Chuẩn bị dữ liệu cho controller
+            const loadingToast = showToast("Đang cập nhật thông tin...", "loading");
             const dto = {
                 userId: originalData.userId,
                 fullname: document.getElementById("fullnameInput").value,
@@ -295,85 +390,128 @@
                 url: '/Common/UpdateProfile',
                 type: 'POST',
                 data: dto,
-                success: function (data) {
-                    if (data && data.message) {
-                        alert(data.message);
-                    } else {
-                        alert("Cập nhật thành công!");
-                    }
-                    location.reload();
+                success: function (updatedUser) {
+                    removeLoadingToast(loadingToast);
+                    document.getElementById("displayFullname").textContent = updatedUser.fullName;
+                    document.getElementById("displayEmail").textContent = updatedUser.email;
+                    document.getElementById("displayPhone").textContent = updatedUser.phoneNumber;
+                    document.getElementById("displayAddress").textContent = updatedUser.address;
+
+                    // Update lại dữ liệu gốc
+                    originalData.fullname = updatedUser.fullName;
+                    originalData.email = updatedUser.email;
+                    originalData.phone = updatedUser.phoneNumber;
+                    originalData.address = updatedUser.address;
+
+                    showToast("Cập nhật thành công!", "success");
+                    cancelBtn.click(); // thoát chế độ edit
                 },
                 error: function (xhr) {
+                    removeLoadingToast(loadingToast);
                     var res = xhr.responseJSON;
-                    alert(res && res.message ? res.message : 'Có lỗi xảy ra!');
+                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra!', "error");
                 }
             });
         });
 
-        // Modal avatar
+        // Avatar
         document.getElementById('avatarClick').addEventListener('click', function () {
             document.getElementById('avatarModal').classList.remove('hidden');
         });
+
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
-        // Avatar preview + AJAX
+
         document.getElementById('avatarUpload').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) document.getElementById('avatarPreviewModal').src = URL.createObjectURL(file);
         });
+
         document.getElementById('avatarForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            const loadingElm = document.getElementById('avatarLoading');
+            loadingElm.classList.remove('hidden');
+            const loadingToast = showToast("Đang cập nhật ảnh đại diện...", "loading");
+
             const formData = new FormData();
             formData.append('userId', originalData.userId);
             formData.append('avatar', document.getElementById('avatarUpload').files[0]);
+
             $.ajax({
                 url: '/Common/UpdateAvatar',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (data) {
+                success: function (updatedUser) {
+                    loadingElm.classList.add('hidden');
+                    removeLoadingToast(loadingToast);
+                    document.getElementById("avatarImg").src = updatedUser.avatarUrl || '/images/default-avatar.png';
+                    showToast("Cập nhật avatar thành công!", "success");
                     closeModal('avatarModal');
-                    alert("Cập nhật avatar thành công!");
-                    location.reload();
                 },
                 error: function (xhr) {
+                    loadingElm.classList.add('hidden');
+                    removeLoadingToast(loadingToast);
                     var res = xhr.responseJSON;
-                    alert(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật avatar!');
+                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật avatar!', "error");
                 }
             });
         });
 
-        // Modal face image
+        // Face image
         document.getElementById('faceImageClick').addEventListener('click', function () {
             document.getElementById('faceModal').classList.remove('hidden');
         });
+
         document.getElementById('faceUpload').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) document.getElementById('facePreviewModal').src = URL.createObjectURL(file);
         });
+
         document.getElementById('faceForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            const loadingElm = document.getElementById('faceLoading');
+            loadingElm.classList.remove('hidden');
+            const loadingToast = showToast("Đang cập nhật ảnh khuôn mặt...", "loading");
+
             const formData = new FormData();
             formData.append('userId', originalData.userId);
             formData.append('faceImage', document.getElementById('faceUpload').files[0]);
+
             $.ajax({
                 url: '/Common/UpdateFaceImage',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (data) {
+                success: function (updatedUser) {
+                    loadingElm.classList.add('hidden');
+                    removeLoadingToast(loadingToast);
+                    document.getElementById("faceImageImg").src = updatedUser.faceImageUrl || '';
+                    showToast("Cập nhật ảnh khuôn mặt thành công!", "success");
                     closeModal('faceModal');
-                    alert("Cập nhật ảnh khuôn mặt thành công!");
-                    location.reload();
                 },
                 error: function (xhr) {
+                    loadingElm.classList.add('hidden');
+                    removeLoadingToast(loadingToast);
                     var res = xhr.responseJSON;
-                    alert(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật ảnh khuôn mặt!');
+                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật ảnh khuôn mặt!', "error");
                 }
             });
         });
+
+        // Always scroll to top and center toast (for mobile)
+        function adjustToastPosition() {
+            var container = document.getElementById("toastContainer");
+            if (container && container.childNodes.length > 0) {
+                window.scrollTo({top: 0, behavior: "smooth"});
+            }
+        }
+        const observer = new MutationObserver(function() {
+            adjustToastPosition();
+        });
+        observer.observe(document.getElementById("toastContainer"), {childList: true});
     </script>
 }

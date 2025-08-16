@@ -56,6 +56,23 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
+        private void SaveUserInfo(PrivateUserProfileDTO userProfileDTO)
+        {
+            // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
+            var avatarFullUrl = !string.IsNullOrEmpty(userProfileDTO.AvatarUrl)
+                ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
+                : "/images/default-avatar.png";
+
+            var faceFullUrl = !string.IsNullOrEmpty(userProfileDTO.FaceImageUrl)
+                ? $"{BASE_URL}{userProfileDTO.FaceImageUrl}"
+                : "";
+
+            HttpContext.Session.SetString("UserId", userProfileDTO.UserId.ToString());
+            HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
+            HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
+            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
+        }
+
         public IActionResult Login()
         {
             return View();
@@ -325,7 +342,7 @@ namespace CustomerUI.Controllers
             }
 
             // 3. Initial service call
-            var userProfile = await _userService.GetProfileAsync(accessToken);
+            var userProfile = await _userService.GetMyProfileAsync(accessToken);
 
             // 4. If first attempt fails, attempt to refresh token
             if (userProfile == null)
@@ -345,7 +362,7 @@ namespace CustomerUI.Controllers
                         _tokenService.SaveTokens(newTokens);
 
                         // Retry the profile request with the new access token
-                        userProfile = await _userService.GetProfileAsync(newTokens.AccessToken);
+                        userProfile = await _userService.GetMyProfileAsync(newTokens.AccessToken);
 
                         if (userProfile == null)
                         {
@@ -396,10 +413,11 @@ namespace CustomerUI.Controllers
             // 3. Call the service to update user profile
             try
             {
-                var resultJson = await _userService.UpdateUserProfileAsync(updateUserProfileDTO, accessToken);
+                var updatedUser = await _userService.UpdateUserProfileAsync(updateUserProfileDTO, accessToken);
 
-                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
-                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
+
+                return Ok(updatedUser); // Trả thẳng JSON về client
             }
             catch (HttpRequestException ex)
             {
@@ -427,10 +445,19 @@ namespace CustomerUI.Controllers
             // 3. Call the service to update avatar
             try
             {
-                var resultJson = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
+                var updatedUser = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
 
-                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
-                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
+
+                updatedUser.AvatarUrl = !string.IsNullOrEmpty(updatedUser.AvatarUrl)
+                ? $"{BASE_URL}{updatedUser.AvatarUrl}"
+                : "/images/default-avatar.png";
+
+                updatedUser.FaceImageUrl = !string.IsNullOrEmpty(updatedUser.FaceImageUrl)
+                    ? $"{BASE_URL}{updatedUser.FaceImageUrl}"
+                    : "";
+
+                return Ok(updatedUser); // Trả thẳng JSON về client
             }
             catch (HttpRequestException ex)
             {
@@ -458,10 +485,19 @@ namespace CustomerUI.Controllers
             // 3. Call the service to update face image
             try
             {
-                var resultJson = await _userService.UpdateFaceImageAsync(updateFaceImageDTO, accessToken);
+                var updatedUser = await _userService.UpdateFaceImageAsync(updateFaceImageDTO, accessToken);
 
-                // Nếu resultJson là JSON string, bạn có thể trả về trực tiếp:
-                return Content(resultJson, "application/json"); // hoặc parse ra object để trả về Ok(object)
+                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
+
+                updatedUser.AvatarUrl = !string.IsNullOrEmpty(updatedUser.AvatarUrl)
+                ? $"{BASE_URL}{updatedUser.AvatarUrl}"
+                : "/images/default-avatar.png";
+
+                updatedUser.FaceImageUrl = !string.IsNullOrEmpty(updatedUser.FaceImageUrl)
+                    ? $"{BASE_URL}{updatedUser.FaceImageUrl}"
+                    : "";
+
+                return Ok(updatedUser); // Trả thẳng JSON về client
             }
             catch (HttpRequestException ex)
             {

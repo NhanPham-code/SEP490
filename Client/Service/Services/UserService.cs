@@ -82,13 +82,19 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
         }
 
-        public async Task<ReadUserDTO?> GetProfileAsync(string accessToken)
+        public async Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
-            var response = await _httpClient.GetAsync("/users/info");
+            var response = await _httpClient.GetAsync("/users/me");
             if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<ReadUserDTO>();
+            return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
+        }
+
+        public async Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+            return await _httpClient.GetFromJsonAsync<PublicUserProfileDTO>($"/users/getById/{userId}");
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -105,27 +111,21 @@ namespace Service.Services
             }
         }
 
-        public async Task<ReadUserDTO?> GetUserByIdAsync(string userId, string accessToken)
+        public async Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken)
         {
             AddBearerAccessToken(accessToken);
-            return await _httpClient.GetFromJsonAsync<ReadUserDTO>($"/users/getById/{userId}");
-        }
-
-        public async Task<string> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO, string accessToken)
-        {
-            AddBearerAccessToken(accessToken);
-            var respoonse  = await _httpClient.PutAsJsonAsync("/users/update-profile", updateUserProfileDTO);
-            if (respoonse.IsSuccessStatusCode)
+            var response  = await _httpClient.PutAsJsonAsync("/users/update-profile", updateUserProfileDTO);
+            if (response.IsSuccessStatusCode)
             {
-                return await respoonse.Content.ReadAsStringAsync();
+                return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
             }
             else
             {
-                throw new HttpRequestException($"Error updating user profile: {respoonse.ReasonPhrase}");
+                throw new HttpRequestException($"Error updating user profile: {response.ReasonPhrase}");
             }
         }
 
-        public async Task<string> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken)
+        public async Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
@@ -144,7 +144,7 @@ namespace Service.Services
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
             }
             else
             {
@@ -152,7 +152,7 @@ namespace Service.Services
             }
         }
 
-        public async Task<string> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken)
+        public async Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
@@ -170,7 +170,7 @@ namespace Service.Services
             var response = await _httpClient.PutAsync("/users/update-face-image", formData);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
             }
             else
             {
