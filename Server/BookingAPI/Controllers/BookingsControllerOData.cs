@@ -4,29 +4,36 @@ using BookingAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Results;
 
 namespace BookingAPI.Controllers
 {
-    [Route("odata/bookings")]
-    [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public class BookingsControllerOData : ODataController
+    public class BookingsController : ODataController // 🔹 Bỏ [Route], để OData tự map
     {
         private readonly IBookingService _bookingService;
         private readonly IMapper _mapper;
 
-        public BookingsControllerOData(IBookingService bookingService, IMapper mapper)
+        public BookingsController(IBookingService bookingService, IMapper mapper)
         {
             _bookingService = bookingService;
             _mapper = mapper;
         }
 
-        // OData get all bookings queryable
+        // GET /odata/Bookings
         [EnableQuery]
-        public IQueryable<Booking> GetBookings()
+        public IQueryable<Booking> Get()
         {
             return _bookingService.GetAllBookingsAsQueryable();
         }
+
+        // GET /odata/Bookings(1)
+        [EnableQuery]
+        public SingleResult<Booking> Get([FromODataUri] int key)
+        {
+            var result = _bookingService.GetAllBookingsAsQueryable()
+                                        .Where(b => b.Id == key);
+            return SingleResult.Create(result);
+        }
     }
 }
-    

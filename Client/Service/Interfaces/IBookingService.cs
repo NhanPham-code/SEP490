@@ -11,10 +11,8 @@ namespace Service.Interfaces
     {
         // Lấy lịch sử booking của user hiện tại, cần token để xác thực
         Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken);
-<<<<<<< Updated upstream
         Task<BookingReadDto?> CreateBookingAsync(BookingCreateDto bookingCreateDto, string accessToken);
-=======
         Task<BookingReadDto> GetBookingDetailAsync(string accessToken, int bookingId);
->>>>>>> Stashed changes
+        Task<List<BookingReadDto>> GetBookedCourtsAsync(string accessToken, int stadiumId, DateTime startTime, DateTime endTime);
     }
 }

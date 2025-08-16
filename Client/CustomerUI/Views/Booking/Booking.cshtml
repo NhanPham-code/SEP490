@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
         /* CSS tuỳ chỉnh */
         body {
@@ -213,11 +215,11 @@
             closeTime: '22:00',
             pricePerHour: '200,000 VNĐ', // Thêm giá thuê vào dữ liệu
             courts: [
-                { id: '1', name: 'Sân số 1', type: 'Sân bóng đá 5 người', bookings: [8, 9, 10] },
-                { id: '2', name: 'Sân số 2', type: 'Sân bóng đá 5 người', bookings: [15, 16] },
-                { id: '3', name: 'Sân số 3', type: 'Sân tennis', bookings: [11, 12, 13] },
+                { id: '1', name: 'Sân số 1', type: 'Sân bóng đá 5 người', bookings: [] },
+                { id: '2', name: 'Sân số 2', type: 'Sân bóng đá 5 người', bookings: [] },
+                { id: '3', name: 'Sân số 3', type: 'Sân tennis', bookings: [] },
                 { id: '4', name: 'Sân số 4', type: 'Sân tennis', bookings: [] },
-                { id: '5', name: 'Sân số 5', type: 'Sân cầu lông', bookings: [17, 18] },
+                { id: '5', name: 'Sân số 5', type: 'Sân cầu lông', bookings: [] },
                 { id: '6', name: 'Sân số 6', type: 'Sân cầu lông', bookings: [] },
             ],
         };
@@ -229,11 +231,14 @@
         let selectedCourts = []; // Đã đổi biến thành mảng để chọn nhiều sân
         let selectedCourtType = null;
         let selectedDate = new Date().toISOString().split('T')[0];
+        let bookedCourtIds = [];
 
         // Tạo một mảng các giờ từ 5:00 đến 22:00
         const allHours = Array.from({ length: 18 }, (_, i) => i + 5);
         // Lấy danh sách các loại sân duy nhất
-        const courtTypes = [...new Set(mockStadiumData.courts.map(court => court.type))];
+        function getCourtTypes() {
+            return [...new Set((stadiumData?.courts || []).map(c => c.type))];
+        }
 
         // Lấy các element cần tương tác
         const stadiumNameEl = document.getElementById('stadium-name');
@@ -266,24 +271,26 @@
             stadiumHoursEl.textContent = `${stadiumData.openTime} - ${stadiumData.closeTime}`;
         }
 
-        // Hàm xử lý khi người dùng chọn giờ
         function handleTimeSelect(hour) {
             if (startTime === null || (startTime !== null && endTime !== null)) {
-                // Nếu chưa có giờ bắt đầu hoặc đã có cả 2, chọn giờ bắt đầu mới
                 startTime = hour;
-                endTime = null; // Reset giờ kết thúc
+                endTime = null;
             } else if (hour > startTime) {
-                // Nếu giờ được chọn sau giờ bắt đầu, chọn giờ kết thúc
                 endTime = hour;
             } else {
-                // Nếu giờ được chọn trước hoặc bằng giờ bắt đầu, chọn lại giờ bắt đầu mới
                 startTime = hour;
                 endTime = null;
             }
             // Reset sân đã chọn khi thay đổi thời gian
             selectedCourts = [];
+
+            // GỌI FETCH CHỈ KHI ĐỦ KHOẢNG GIỜ
+            if (startTime !== null && endTime !== null && endTime > startTime && stadiumData?.id) {
+                maybeFetchBookedCourts();
+            }
             updateUI();
         }
+
 
             // Hàm cập nhật giao diện người dùng
         function updateUI() {
@@ -340,23 +347,24 @@
             }
 
             courts.forEach(court => {
-                const isAvailable = (startTime === null || endTime === null || endTime <= startTime) ||
-                                    !court.bookings.some(bookedHour => bookedHour >= startTime && bookedHour < endTime);
+                const isBooked = bookedCourtIds.includes(parseInt(court.id));
 
-                const isSelected = selectedCourts.some(selected => selected.id === court.id);
+                const isAvailable = (startTime !== null && endTime !== null && endTime > startTime) && !isBooked;
 
                 const courtDiv = document.createElement('div');
+
+                const isSelected = selectedCourts.some(selected => selected.id === court.id);
 
                 let courtStatusClass = 'border-gray-200';
                 if (isAvailable) {
                     courtStatusClass = 'border-green-400';
-                } else {
+                } else if (isBooked) {
                     courtStatusClass = 'border-red-400';
                 }
 
                 courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
 
-                if (isAvailable && startTime !== null && endTime !== null && endTime > startTime) {
+                if (isAvailable) {
                     courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
                     courtDiv.addEventListener('click', () => {
                         const courtIndex = selectedCourts.findIndex(selected => selected.id === court.id);
@@ -365,9 +373,11 @@
                         } else {
                             selectedCourts.push(court);
                         }
+                        // VẼ LẠI ĐỂ CẬP NHẬT STYLE + NÚT TIẾP TỤC
                         updateUI();
                     });
-                } else {
+                }
+                else {
                     courtDiv.classList.add('opacity-50', 'cursor-not-allowed');
                 }
 
@@ -379,13 +389,27 @@
                     <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.name}</h3>
                     <p class="text-sm text-gray-500">${court.type}</p>
                     <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${stadiumData.pricePerHour}/giờ</p>
-                    <p class="text-xs mt-2 ${isAvailable ? 'text-green-500 font-medium' : 'text-red-500 font-medium'}">
-                        ${isAvailable ? 'Sân trống - Có thể đặt' : 'Sân đã có người đặt'}
-                    </p>
+                    ${getCourtStatusHTML(isBooked, startTime, endTime)}
                 `;
+
                 courtsContainerEl.appendChild(courtDiv);
             });
         }
+
+        function getCourtStatusHTML(isBooked, startTime, endTime) {
+            const hasRange = (startTime !== null && endTime !== null && endTime > startTime);
+
+            const statusText = !hasRange
+                ? 'Chọn giờ để xem trạng thái'
+                : (isBooked ? 'Sân đã có người đặt' : 'Sân trống - Có thể đặt');
+
+            const statusClass = !hasRange
+                ? 'text-gray-500'
+                : (isBooked ? 'text-red-500 font-medium' : 'text-green-500 font-medium');
+
+            return `<p class="text-xs mt-2 ${statusClass}">${statusText}</p>`;
+        }
+
 
         // Hàm render các nút giờ
         function renderTimeButtons() {
@@ -396,7 +420,7 @@
                 button.className = `time-button px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300`;
                 button.onclick = () => handleTimeSelect(hour);
 
-                if (startTime !== null && endTime !== null && hour > startTime && hour < endTime) {
+                if (startTime !== null && endTime !== null && hour >= startTime && hour < endTime) {
                     button.classList.add('bg-blue-200', 'text-blue-800');
                     button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
                 }
@@ -461,12 +485,14 @@
         }
 
         function setupCourtTypeSelection() {
+            const types = getCourtTypes();
+            courtTypeSelectEl.innerHTML = '';
             const allOption = document.createElement('option');
             allOption.value = '';
             allOption.textContent = 'Tất cả các sân';
             courtTypeSelectEl.appendChild(allOption);
 
-            courtTypes.forEach(type => {
+            types.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type;
                 option.textContent = type;
@@ -474,13 +500,14 @@
             });
 
             courtTypeSelectEl.addEventListener('change', (e) => {
-                selectedCourtType = e.target.value;
+                selectedCourtType = e.target.value || null;
                 selectedCourts = [];
                 startTime = null;
                 endTime = null;
                 updateUI();
             });
         }
+
 
         function setupDatePicker() {
             datePickerEl.value = selectedDate;
@@ -494,6 +521,60 @@
                 updateUI();
             });
         }
+
+        // Get all booking in selected time
+        function fetchBookedCourts(stadiumId, date, startHour, endHour) {
+            $.ajax({
+                url: `/Booking/GetBookedCourts`,
+                method: "GET",
+                data: {
+                    stadiumId: stadiumId,
+                    date: date,
+                    startHour: startHour,
+                    endHour: endHour
+                },
+                success: function (data) {
+                    console.log("Booked courts:", data);
+                    bookedCourtIds = [];
+                    if (data && data.length > 0) {
+                        data.forEach(booking => {
+                            if (booking.bookingDetails && booking.bookingDetails.length > 0) {
+                                booking.bookingDetails.forEach(detail => {
+                                    bookedCourtIds.push(detail.courtId);
+                                });
+                            }
+                        });
+                    }
+                    updateUI();
+                },
+                error: function () {
+                    alert("Không thể lấy thông tin sân đã đặt.");
+                }
+            });
+        }
+
+        // check all fields before call ajax
+        function maybeFetchBookedCourts() {
+            if (
+                stadiumData?.id &&
+                selectedDate &&
+                startTime !== null &&
+                endTime !== null &&
+                endTime > startTime
+            ) {
+                console.log("Fetching booked courts for stadium:", stadiumData.id, "on date:", selectedDate, "from", startTime, "to", endTime);
+                fetchBookedCourts(stadiumData.id, selectedDate, startTime, endTime);
+            } else {
+                console.log("Không đủ thông tin để lấy sân đã đặt.");
+            }
+        }
+
+        $("#date-picker").on("change click", function () {
+            if (startTime !== null && endTime !== null && stadiumData?.id) {
+                maybeFetchBookedCourts();
+            }
+        });
+
 
         // Khởi tạo ứng dụng
         window.onload = function() {

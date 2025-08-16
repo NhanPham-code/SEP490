@@ -15,8 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 static Microsoft.OData.Edm.IEdmModel GetEdmModel()
 {
     var builder = new ODataConventionModelBuilder();
-    builder.EntitySet<Booking>("Bookings");
-    builder.EntitySet<BookingDetail>("BookingDetails");
+
+    // Khai báo EntitySet và key
+    builder.EntitySet<Booking>("Bookings")
+           .EntityType.HasKey(b => b.Id);
+
+    builder.EntitySet<BookingDetail>("BookingDetails")
+           .EntityType.HasKey(d => d.Id);
+
     return builder.GetEdmModel();
 }
 
@@ -31,31 +37,25 @@ builder.Services.AddControllers()
         .SetMaxTop(100)
         .AddRouteComponents("odata", GetEdmModel()));
 
-// Add services to the container.
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
-// Add Entity Framework
+// Entity Framework
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add repositories
+// Repositories
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
 
-// Add services
+// Services
 builder.Services.AddScoped<IBookingService, BookingService>();
 
-// Add AutoMapper
+// AutoMapper
 builder.Services.AddAutoMapper(typeof(BookingProfile));
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -63,7 +63,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

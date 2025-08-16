@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-<<<<<<< Updated upstream
 using System.Text.Json;
-=======
->>>>>>> Stashed changes
 using System.Threading.Tasks;
 using DTOs.BookingDTO;
 using Service.BaseService;
@@ -33,7 +29,6 @@ namespace Service.Services
         // Lấy lịch sử booking của user hiện tại qua route gateway đã giấu userId
         public async Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken)
         {
-<<<<<<< Updated upstream
             // Sử dụng HttpRequestMessage để set token thủ công
             var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -44,30 +39,31 @@ namespace Service.Services
             {
                 return new List<BookingReadDto>();
             }
-=======
-            AddBearerAccessToken(accessToken);
-            var response = await _httpClient.GetAsync("/bookings/history");
-            response.EnsureSuccessStatusCode();
-            var bookings = await response.Content.ReadFromJsonAsync<List<BookingReadDto>>();
-            return bookings ?? new List<BookingReadDto>();
-        }
->>>>>>> Stashed changes
 
-        // Phương thức mới để lấy chi tiết booking
-        public async Task<BookingReadDto> GetBookingDetailAsync(string accessToken, int bookingId)
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            // Deserialize theo kiểu DTO bao ngoài chứa 'value'
+            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Value ?? new List<BookingReadDto>();
+        }
+
+        // Lấy chi tiết booking theo Id
+        public async Task<BookingReadDto?> GetBookingDetailAsync(string accessToken, int bookingId)
         {
             AddBearerAccessToken(accessToken);
 
-            // Gọi API qua gateway, URL như đã định nghĩa trong Ocelot
-            var response = await _httpClient.GetAsync($"/bookings/{bookingId}");                 
+            var response = await _httpClient.GetAsync($"/bookings/{bookingId}");
 
             if (!response.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            var booking = await response.Content.ReadFromJsonAsync<BookingReadDto>();
-            return booking;
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
 
         // Tạo booking mới
@@ -75,7 +71,6 @@ namespace Service.Services
         {
             AddBearerAccessToken(accessToken);
 
-            // Gọi đúng route Ocelot mapping tới backend CreateBooking
             var response = await _httpClient.PostAsJsonAsync("/Bookings/add", bookingCreateDto);
 
             if (!response.IsSuccessStatusCode)
@@ -84,10 +79,40 @@ namespace Service.Services
                 throw new Exception($"API CreateBooking failed: {errorMessage}");
             }
 
-            // Deserialize kết quả từ backend (có cả BookingDetails)
-            var createdBooking = await response.Content.ReadFromJsonAsync<BookingReadDto>();
-
-            return createdBooking;
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
+
+        public async Task<List<BookingReadDto>> GetBookedCourtsAsync(
+    string accessToken, int stadiumId, DateTime startTime, DateTime endTime)
+        {
+            AddBearerAccessToken(accessToken);
+
+            //yyyy → năm
+            //MM → tháng
+            //dd → ngày
+            //T → ký tự cố định, ngăn cách ngày và giờ theo chuẩn ISO
+            //HH:mm: ss → giờ: phút: giây
+            //zzz → múi giờ hiện tại(VD: +07:00 cho Việt Nam)
+            string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+
+            string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
+                           $"and StartTime lt {endIso} and EndTime gt {startIso}" +
+                           "&$expand=BookingDetails";
+
+            var response = await _httpClient.GetAsync(query);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<BookingReadDto>();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return result?.Value ?? new List<BookingReadDto>();
+        }
+
     }
 }

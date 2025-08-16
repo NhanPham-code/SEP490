@@ -12,11 +12,13 @@ namespace CustomerUI.Controllers
     {
         private readonly IBookingService _bookingService;
         private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
 
-        public BookingController(IBookingService bookingService, ITokenService tokenService)
+        public BookingController(IBookingService bookingService, ITokenService tokenService, IUserService userService)
         {
             _bookingService = bookingService;
             _tokenService = tokenService;
+            _userService = userService;
         }
 
         private string? GetAccessToken()
@@ -133,6 +135,66 @@ namespace CustomerUI.Controllers
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
                 return RedirectToAction("Checkout");
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBookedCourts(int stadiumId, DateTime date, int startHour, int endHour)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+                return Unauthorized();
+
+            var startTime = date.Date.AddHours(startHour);
+            var endTime = date.Date.AddHours(endHour);
+
+            var result = await _bookingService.GetBookedCourtsAsync(accessToken, stadiumId, startTime, endTime);
+            return Json(result);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserProfile()
+        {
+
+            // Get access token from session, cookie, or claims
+            var accessToken = GetAccessToken();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không tìm thấy token xác thực. Vui lòng đăng nhập lại.",
+                    errorCode = "NO_TOKEN"
+                });
+            }
+
+            // Call UserService to get profile from Ocelot
+            var userProfile = await _userService.GetProfileAsync(accessToken);
+
+            if (userProfile == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không thể lấy thông tin người dùng từ server.",
+                    errorCode = "NO_DATA"
+                });
+            }
+
+            // Return success response
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    fullName = userProfile.FullName ?? "",
+                    phoneNumber = userProfile.PhoneNumber ?? "",
+                    email = userProfile.Email ?? "",
+                    userId = userProfile.UserId
+                },
+                message = "Lấy thông tin thành công"
+            });
         }
     }
 }

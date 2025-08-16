@@ -90,20 +90,20 @@
             </div>
 
             <!-- Thông tin người đặt -->
-            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6" id="profileForm">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Thông tin người đặt</h2>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Họ và tên</label>
-                        <input type="text" value="@User.Identity.Name" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                        <input type="text" id="customerName" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
-                        <input type="text" value="@ViewBag.CustomerPhone" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                        <input type="text" id="customerPhone" value="@ViewBag.CustomerPhone" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" value="@ViewBag.CustomerEmail" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                        <input type="email" id="customerEmail" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
                     </div>
                 </div>
             </div>
@@ -245,9 +245,42 @@
             document.getElementById('payment-method-input').value = selectedPaymentMethod;
         }
 
+        function loadUserProfile() {
+            $.ajax({
+                url: `/Booking/GetUserProfile`,
+                type: 'GET',
+                dataType: 'json',
+                timeout: 30000, // 30 seconds
+                cache: false,
+                success: function(response) {
+                    console.log('API Response:', response);
+
+                    if (response.success) {
+                        populateForm(response.data);
+                    } 
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        error: error,
+                        responseText: xhr.responseText
+                    });
+
+                },
+            });
+        }
+
+        function populateForm(data) {
+            $('#customerName').val(data.fullName || '');
+            $('#customerPhone').val(data.phoneNumber || '');
+            $('#customerEmail').val(data.email || '');
+        }
+
         window.onload = function () {
             updateInvoiceDetails();
             updateHiddenFields();
+            loadUserProfile();
 
             // Event listeners
             document.getElementById('modal-close-btn').onclick = hideModal;
