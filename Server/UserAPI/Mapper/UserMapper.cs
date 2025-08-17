@@ -10,7 +10,12 @@ namespace UserAPI.Mapper
         {
             //CreateMap<User, UserValidateResultDTO>();
 
-            CreateMap<User, ReadUserDTO>();
+            CreateMap<User, PrivateUserProfileDTO>();
+
+            CreateMap<User, PublicUserProfileDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
 
             CreateMap<RegisterRequestDTO, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())

@@ -27,7 +27,7 @@ namespace UserAPI.Service
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task<ReadUserDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO)
+        public async Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO)
         {
             var user = await _userRepository.GetUserByIdAsync(updateUserProfileDTO.UserId);
             if (user == null)
@@ -49,10 +49,10 @@ namespace UserAPI.Service
             }
 
             // Chuyển đổi sang ReadUserDTO
-            return _mapper.Map<ReadUserDTO>(updatedUser);
+            return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
         }
 
-        public async Task<ReadUserDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO)
+        public async Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO)
         {
             var user = await _userRepository.GetUserByIdAsync(updateAvatarDTO.UserId);
             if (user == null)
@@ -63,7 +63,7 @@ namespace UserAPI.Service
             // Nếu không có avatar mới, giữ nguyên avatar cũ
             if (updateAvatarDTO.Avatar == null || updateAvatarDTO.Avatar.Length == 0)
             {
-                return _mapper.Map<ReadUserDTO>(user);
+                return _mapper.Map<PrivateUserProfileDTO>(user);
             }
 
             // Lưu file avatar vào thư mục uploads/avatars
@@ -103,10 +103,10 @@ namespace UserAPI.Service
                 throw new InvalidOperationException("Failed to update avatar.");
             }
             // Chuyển đổi sang ReadUserDTO
-            return _mapper.Map<ReadUserDTO>(updatedUser);
+            return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
         }
 
-        public async Task<ReadUserDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO)
+        public async Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO)
         {
             var user = await _userRepository.GetUserByIdAsync(updateFaceImageDTO.UserId);
             if (user == null)
@@ -117,7 +117,7 @@ namespace UserAPI.Service
             // Nếu không có face image mới, giữ nguyên face image cũ
             if (updateFaceImageDTO.FaceImage == null || updateFaceImageDTO.FaceImage.Length == 0)
             {
-                return _mapper.Map<ReadUserDTO>(user);
+                return _mapper.Map<PrivateUserProfileDTO>(user);
             }
 
             // Lưu file face image vào thư mục uploads/faces
@@ -156,7 +156,7 @@ namespace UserAPI.Service
                 throw new InvalidOperationException("Failed to update face image.");
             }
             // Chuyển đổi sang ReadUserDTO
-            return _mapper.Map<ReadUserDTO>(updatedUser);
+            return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
         }
 
         private bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
@@ -359,7 +359,7 @@ namespace UserAPI.Service
             };
         }
 
-        public async Task<ReadUserDTO> RegisterAsync(RegisterRequestDTO registerDto)
+        public async Task<PrivateUserProfileDTO> RegisterAsync(RegisterRequestDTO registerDto)
         {
             // 1. Check email tồn tại
             if (await IsEmailExistsAsync(registerDto.Email))
@@ -428,7 +428,7 @@ namespace UserAPI.Service
             await _userRepository.CreateUserAsync(user);
 
             // 6. Map sang ReadUserDTO
-            return _mapper.Map<ReadUserDTO>(user);
+            return _mapper.Map<PrivateUserProfileDTO>(user);
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -437,14 +437,24 @@ namespace UserAPI.Service
             return user != null;
         }
 
-        public async Task<ReadUserDTO> GetUserByIdAsync(int id)
+        public async Task<PrivateUserProfileDTO> GetUserProfileAsync(int id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
             if (user == null)
             {
                 return null!;
             }
-            return _mapper.Map<ReadUserDTO>(user);
+            return _mapper.Map<PrivateUserProfileDTO>(user);
+        }
+
+        public async Task<PublicUserProfileDTO> GetOtherUserProfileAsync(int id)
+        {
+            var user = await _userRepository.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return null!;
+            }
+            return _mapper.Map<PublicUserProfileDTO>(user);
         }
 
         public Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
