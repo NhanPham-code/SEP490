@@ -309,10 +309,14 @@
                     <script>
                         $(document).ready(function() {
                                 //get all by ajax
-                                          displayList("");
+                                                      
                         });
                                                 // Get the form element
                                                                                             $(document).ready(function() {
+                                                                                                let skip = 0;
+                        const top = 9; // Number of items per page
+                                                                                                 $('#stadium-grid').empty().hide(); // Clear previous results
+                                          displayList("", top, skip);
                             const form = $('#sportFilterForm'); // or $('#myForm') if using an ID
                             form.on('submit', function(e) {
                                 e.preventDefault();
@@ -356,26 +360,44 @@
                         let filterString = filters.join(" and ");
                         let finalUrl = "&$filter=" + encodeURIComponent(filterString);
                         console.log(finalUrl);
+                        sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
+                        displayList(finalUrl, top, skip);
+                        });
+                                   $('#loadMoreBtn').on("click", function () {
+                            console.log('Button clicked!');
+                            
 
-                        displayList(finalUrl);
+                            var count = sessionStorage.getItem('stadiumCount') || 0;
+                            var url = sessionStorage.getItem('searchTerm') || "";
+
+                            skip += 9;
+                            if (skip + 9 >= count ){
+                                skip -= (skip + 9) - count; // Giảm skip nếu vượt quá số lượng
+                                $('#loadMoreBtn').hide(); // Ẩn nút nếu không còn dữ liệu
+                            }
+                            skip = 0;
+                            console.log('URL:', url);
+                            displayList(url, top, skip);
                         });
                         });
                                             
                             // You can now use formData object to process or send the data
-                              
+
                         
                         
 
                         // danh sach san pham truoc va sau khi search
-                        function displayList(searchTerm){
-                            var searchUrl = searchTerm + "&$top=9&$skip=0";
+                        function displayList(searchTerm, top, skip){
+                            var searchUrl = searchTerm + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);
-                            $('#stadium-grid').empty().hide(); // Clear previous results
+     
                                                                            $.ajax({
                             url: '/Home/Stadiums', // Endpoint for POST request
                             type: 'POST',
                             data: {searchTerm: searchUrl},
                             success: function (data) {
+                                const count = data["@@odata.count"];
+                                sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
                                 let html = '';
                                 if (data.value && data.value.length > 0) {
                                     data.value.forEach(function (item) {
@@ -444,7 +466,11 @@
                                             </div>
                                         </div>`;
                                     });
-                                    $('#stadium-grid').html(html).show();
+                                            if (skip === 0) {
+                            $('#stadium-grid').html(html).show();
+                        } else {
+                            $('#stadium-grid').append(html);
+                        }
                                 } else {
                                     $('#stadium-grid').empty().hide();
                                 }
@@ -456,75 +482,12 @@
                         });
                         }
 
-                        // Call displayList initially (optional)
-                        displayList();
 
-                        // Add event listener for form submission to trigger filtering
-                        $('#sportFilterForm').on('submit', function(event) {
-                            event.preventDefault(); // Prevent default form submission
-                            displayList(); // Call displayList to fetch filtered data
-                        });
 
-                        // Update price display dynamically
-                        $('#sportFilterForm input[name="price"]').on('input', function() {
-                            $('#priceValue').text($(this).val());
-                        });
-                                                
-
+                                                                              
                     </script>
                     
-                    @* 
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                        <div class="relative h-48">
-                            <img src="https://readdy.ai/api/search-image?query=Multi-purpose%20sports%20arena%20with%20synthetic%20turf%2C%20modern%20architecture%2C%20stadium%20lighting%2C%20versatile%20sports%20facility%2C%20premium%20venue%20with%20clean%20design%20and%20bright%20atmosphere&amp;width=400&amp;height=300&amp;seq=stadium006&amp;orientation=landscape" alt="Stadium" class="w-full h-full object-cover object-top">
-                            <button class="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 transition-colors">
-                                <div class="w-4 h-4 flex items-center justify-center">
-                                    <i class="ri-heart-line text-gray-600"></i>
-                                </div>
-                            </button>
-                            <div class="absolute bottom-3 left-3 bg-white px-2 py-1 rounded text-sm font-medium">
-                                Multi-Sport
-                            </div>
-                            <input type="checkbox" class="compare-checkbox absolute top-3 left-3 w-5 h-5 rounded border-2 border-white bg-white opacity-80">
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-lg mb-1">Universal Sports Arena</h3>
-                            <div class="flex items-center text-gray-600 text-sm mb-2">
-                                <div class="w-4 h-4 flex items-center justify-center mr-1">
-                                    <i class="ri-map-pin-line"></i>
-                                </div>
-                                <span>Central Community Center</span>
-                            </div>
-                            <div class="flex items-center mb-3">
-                                <div class="flex items-center mr-2">
-                                    <div class="w-4 h-4 flex items-center justify-center mr-1">
-                                        <i class="ri-star-fill text-yellow-400"></i>
-                                    </div>
-                                    <span class="text-sm font-medium">4.4</span>
-                                </div>
-                                <span class="text-sm text-gray-600">(92 reviews)</span>
-                            </div>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Versatile</span>
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Indoor</span>
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">AC</span>
-                            </div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="text-sm text-gray-600">Available slots today:</div>
-                                <div class="flex space-x-1">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">07:00</span>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">14:00</span>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">21:00</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="text-xl font-bold text-primary">$55<span class="text-sm font-normal text-gray-600">/hour</span></div>
-                                <button class="bg-primary text-white px-4 py-2 !rounded-button text-sm font-semibold hover:bg-blue-600 transition-colors whitespace-nowrap">
-                                    Book Now
-                                </button>
-                            </div>
-                        </div>
-                    </div> *@
+                   
                 </div>
                 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
                 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
@@ -540,8 +503,8 @@
                 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
                 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-                <div class="text-center mt-8">
-                    <button class="bg-white text-primary border-2 border-primary px-8 py-3 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
+                <div class="text-center mt-8" >
+                    <button id="loadMoreBtn" class="bg-white text-primary border-2 border-primary px-8 py-3 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
                         Load More Stadiums
                     </button>
                 </div>
