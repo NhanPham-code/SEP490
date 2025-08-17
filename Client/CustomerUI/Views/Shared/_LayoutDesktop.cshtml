@@ -282,9 +282,10 @@
         this.chatOpen = false;
         },
         toggleChat() {
-        this.chatOpen = !this.chatOpen;
-        this.notificationOpen = false;
+        window.location.href = '@Url.Action("Chat", "Chat")';
         }
+
+
         }"
         class="header-glass sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-8xl mx-auto px-4 lg:px-8">

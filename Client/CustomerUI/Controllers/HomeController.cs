@@ -18,6 +18,7 @@ namespace CustomerUI.Controllers
             return View();
         }
 
+        
 
         public IActionResult Privacy()
         {
