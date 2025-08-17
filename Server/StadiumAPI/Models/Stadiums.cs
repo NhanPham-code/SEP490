@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using StadiumAPI.DTOs;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StadiumAPI.Models
@@ -17,7 +18,7 @@ namespace StadiumAPI.Models
         public string Description { get; set; }
 
         [Required]
-        public TimeSpan OpenTime { get; set; }
+        public TimeSpan OpenTime { get; set; } 
 
         [Required]
         public TimeSpan CloseTime { get; set; }
@@ -30,7 +31,6 @@ namespace StadiumAPI.Models
 
         public bool IsApproved { get; set; } = false;
 
-        [ForeignKey("CreatedByUser")]
         public int CreatedBy { get; set; }
 
         public int CreatedByUser { get; set; } // Navigation property
@@ -38,5 +38,8 @@ namespace StadiumAPI.Models
         public DateTime CreatedAt { get; set; } 
 
         public DateTime UpdatedAt { get; set; }
+
+        public virtual ICollection<Courts> Courts { get; set; } // Sử dụng Courts thay vì ReadCourtDTO
+        public virtual ICollection<StadiumImages> StadiumImages { get; set; }
     }
 }

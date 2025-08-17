@@ -282,9 +282,10 @@
         this.chatOpen = false;
         },
         toggleChat() {
-        this.chatOpen = !this.chatOpen;
-        this.notificationOpen = false;
+        window.location.href = '@Url.Action("Chat", "Chat")';
         }
+
+
         }"
         class="header-glass sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-8xl mx-auto px-4 lg:px-8">
@@ -310,20 +311,13 @@
                             <i class="ri-home-4-line text-base"></i>
                             <span>Home</span>
                         </a>
-                        <a asp-controller="FindTeam" asp-action="SearchStadium"
-                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-building-line text-base"></i>
-                            <span>Stadiums</span>
-                        </a>
+   
                         <a asp-controller="FindTeam" asp-action="FindTeam"
                            class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-team-line text-base"></i>
                             <span>Teams</span>
                         </a>
-                        <a href="#" class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-football-line text-base"></i>
-                            <span>Sports</span>
-                        </a>
+ 
                         <a href="#" class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-information-line text-base"></i>
                             <span>About</span>
@@ -682,15 +676,11 @@
                     <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-home-4-line mr-3"></i>Home
                     </a>
-                    <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-building-line mr-3"></i>Find Stadiums
-                    </a>
+
                     <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-team-line mr-3"></i>Find Teams
                     </a>
-                    <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-football-line mr-3"></i>Sports
-                    </a>
+
                     <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-information-line mr-3"></i>About
                     </a>
@@ -743,8 +733,8 @@
                 <div>
                     <h4 class="text-lg font-semibold mb-4 text-white">Quick Links</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Find Stadiums</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Sports Categories</a></li>
+
+
                         <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Pricing</a></li>
                         <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">About Us</a></li>
                     </ul>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using StadiumAPI.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StadiumAPI.DTOs
@@ -27,5 +28,6 @@ namespace StadiumAPI.DTOs
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
+
     }
 }

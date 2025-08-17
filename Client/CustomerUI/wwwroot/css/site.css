@@ -12,10 +12,6 @@ html {
     }
 }
 
-/* Khoảng cách dưới cùng body để tránh footer/nút bị che mất */
-body {
-    margin-bottom: 60px;
-}
 
 /* Hiệu ứng focus cho các button, input và form-control */
 .btn:focus,
