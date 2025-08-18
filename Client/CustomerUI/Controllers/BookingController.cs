@@ -170,7 +170,7 @@ namespace CustomerUI.Controllers
             }
 
             // Call UserService to get profile from Ocelot
-            var userProfile = await _userService.GetProfileAsync(accessToken);
+            var userProfile = await _userService.GetMyProfileAsync(accessToken);
 
             if (userProfile == null)
             {
