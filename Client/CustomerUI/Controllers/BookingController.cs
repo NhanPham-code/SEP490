@@ -96,8 +96,25 @@ namespace CustomerUI.Controllers
             return View(bookings);
         }
 
-        public IActionResult Booking()
+        /*public IActionResult Booking()
         {
+            return View();
+        }*/
+
+        public IActionResult Booking(string stadiumId)
+        {
+            // Kiểm tra xem stadiumId có hợp lệ không.
+            if (string.IsNullOrEmpty(stadiumId))
+            {
+                // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
+                // hoặc trả về một trang lỗi.
+                return RedirectToAction("Booking");
+            }
+
+            // Truyền stadiumId vào ViewBag để View có thể sử dụng.
+            ViewBag.StadiumId = stadiumId;
+
+            // Trả về cùng một View "Booking.cshtml".
             return View();
         }
 
