@@ -25,6 +25,7 @@ namespace CustomerUI.Controllers
             return View();
         }
 
+
         public async Task<IActionResult> Stadiums(string searchTerm)
         {
 
@@ -33,6 +34,7 @@ namespace CustomerUI.Controllers
 
             return Content(stadium, "application/json");
         }
+
 
         public IActionResult Privacy()
         {

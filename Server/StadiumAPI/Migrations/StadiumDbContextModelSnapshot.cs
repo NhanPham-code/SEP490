@@ -383,17 +383,6 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 30,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Sân 7 người",
-                            PricePerHour = 250000m,
-                            SportType = "Bóng đá",
-                            StadiumId = 22,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = 31,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
@@ -473,198 +462,289 @@ namespace StadiumAPI.Migrations
                         new
                         {
                             Id = 2,
-                            ImageUrl = "https://i.ibb.co/v4B8zS5/san-bong-phi-long-2.jpg",
+                            ImageUrl = "img/b1a94c40-8a6e-4686-a56e-edde8ce9a985.jpg",
                             StadiumId = 1,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3,
-                            ImageUrl = "https://i.ibb.co/6803z65/san-quang-sport-1.jpg",
+                            ImageUrl = "img/bb61649d-80de-4dda-bda0-2e5de31b77a6.jpg",
                             StadiumId = 2,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4,
-                            ImageUrl = "https://i.ibb.co/T1H8g64/san-tennis-6-doi-6.jpg",
+                            ImageUrl = "img/b5768826-c8f4-4af1-9e1f-1dcee9d6ec56.jpg",
                             StadiumId = 3,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 5,
-                            ImageUrl = "https://i.ibb.co/S68Jg03/san-ro-dnc-1.jpg",
-                            StadiumId = 4,
+                            ImageUrl = "img/ab4060d7-7676-4728-b6bd-c54de7031f16.jpg",
+                            StadiumId = 2,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 6,
-                            ImageUrl = "https://i.ibb.co/wB7L3k5/san-tambo.jpg",
-                            StadiumId = 5,
+                            ImageUrl = "img/57cd9906-494d-48b9-9448-c446191b295d.jpg",
+                            StadiumId = 2,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 7,
-                            ImageUrl = "https://i.ibb.co/sK085vT/san-van-dong-can-tho.jpg",
-                            StadiumId = 6,
+                            ImageUrl = "img/2647a365-74eb-4c0e-8fc3-2c5c4fd3cda1.jpg",
+                            StadiumId = 3,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 8,
-                            ImageUrl = "https://i.ibb.co/9V0p3V8/san-van-dong-can-tho-2.jpg",
-                            StadiumId = 6,
+                            ImageUrl = "img/2a4f38ac-e941-45cc-ad2b-c76d9d37d392.jpg",
+                            StadiumId = 3,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 9,
-                            ImageUrl = "https://i.ibb.co/0y7Yv83/ho-boi-anh-vien.jpg",
-                            StadiumId = 7,
+                            ImageUrl = "img/874f1c5a-e37a-4f1e-a002-5fcf803e6a03.jpg",
+                            StadiumId = 4,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 10,
-                            ImageUrl = "https://i.ibb.co/wN90n7t/san-tennis-586.jpg",
-                            StadiumId = 8,
+                            ImageUrl = "img/bb5b3b93-05ba-4701-9a56-52a300fe1504.jpeg",
+                            StadiumId = 5,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 11,
-                            ImageUrl = "https://i.ibb.co/TmkYf7V/san-buu-dien-can-tho-1.jpg",
-                            StadiumId = 9,
+                            ImageUrl = "img/0ebe27dc-12ab-44cd-8ea7-95e234a94e6a.jpg",
+                            StadiumId = 5,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 12,
-                            ImageUrl = "https://i.ibb.co/Xz9tTq8/san-tennis-muong-thanh.jpg",
-                            StadiumId = 10,
+                            ImageUrl = "img/e36d13a7-23b3-4bfd-a421-0d370a2313ad.jpg",
+                            StadiumId = 5,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 13,
-                            ImageUrl = "https://i.ibb.co/f4g1qQj/san-bong-chuyen-586.jpg",
-                            StadiumId = 11,
+                            ImageUrl = "img/12bad99d-2b1b-48bc-a3a2-5b91cf0a9cff.jpg",
+                            StadiumId = 6,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 14,
-                            ImageUrl = "https://i.ibb.co/3s682Hn/ho-boi-vinpearl-can-tho.jpg",
-                            StadiumId = 12,
+                            ImageUrl = "img/adc0fc5e-6260-4a29-9e18-ac508157db11.jpg",
+                            StadiumId = 6,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 15,
-                            ImageUrl = "https://i.ibb.co/q5k26L1/san-cau-long-hoang-long.jpg",
-                            StadiumId = 13,
+                            ImageUrl = "img/9fc70741-ab78-4396-8165-067736a70416.jpg",
+                            StadiumId = 6,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 16,
-                            ImageUrl = "https://i.ibb.co/hK5XjP1/san-bong-anh-tuan.jpg",
-                            StadiumId = 14,
+                            ImageUrl = "img/5d9d6396-900d-4f78-84ee-c260d4d91ee9.jpg",
+                            StadiumId = 7,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 17,
-                            ImageUrl = "https://i.ibb.co/f4g1qQj/san-tennis-cong-an-ct.jpg",
-                            StadiumId = 15,
+                            ImageUrl = "img/497dc572-6091-4419-bf8c-cafcd3ee9263.jpg",
+                            StadiumId = 7,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 18,
-                            ImageUrl = "https://i.ibb.co/S68Jg03/san-ro-dnc-1.jpg",
-                            StadiumId = 16,
+                            ImageUrl = "img/89da6dac-5053-4870-a3d7-eea22bc3ea67.jpg",
+                            StadiumId = 7,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 19,
-                            ImageUrl = "https://i.ibb.co/8Y4B4Gj/san-bong-anh-tuan-2.jpg",
-                            StadiumId = 14,
+                            ImageUrl = "img/b2f0a4aa-c4e1-45c6-90f2-e14faa85c406.png",
+                            StadiumId = 8,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 20,
-                            ImageUrl = "https://i.ibb.co/q0Vw5L4/san-ro-westside.jpg",
-                            StadiumId = 16,
+                            ImageUrl = "img/37d7b03f-34cd-441d-ba51-2ae85c88188a.jpg",
+                            StadiumId = 9,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 21,
-                            ImageUrl = "https://i.ibb.co/xMvjX62/nha-thi-dau-vi-thanh.jpg",
-                            StadiumId = 17,
+                            ImageUrl = "img/52e1d9bf-2f4f-48fc-a543-7f23e61e1395.jpg",
+                            StadiumId = 9,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 22,
-                            ImageUrl = "https://i.ibb.co/wB7L3k5/san-bong-vi-thanh-hau-giang.jpg",
-                            StadiumId = 18,
+                            ImageUrl = "img/9f0dc411-87a2-4a2d-b028-69dcf82fae39.jpg",
+                            StadiumId = 10,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 23,
-                            ImageUrl = "https://i.ibb.co/F8S86P2/san-tennis-phu-hung-hg.jpg",
-                            StadiumId = 19,
+                            ImageUrl = "img/e1b8daf3-81eb-4bf7-b9c0-522dd9f80838.jpg",
+                            StadiumId = 11,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 24,
-                            ImageUrl = "https://i.ibb.co/6803z65/nha-thi-dau-vinh-long.jpg",
-                            StadiumId = 20,
+                            ImageUrl = "img/b2c0e10d-5585-46cf-a576-cb24732e1538.jpg",
+                            StadiumId = 11,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 25,
-                            ImageUrl = "https://i.ibb.co/3s682Hn/ho-boi-minh-phuong.jpg",
-                            StadiumId = 21,
+                            ImageUrl = "img/f71d6ced-8fbc-4890-915a-ac2a971a6b19.jpg",
+                            StadiumId = 12,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 26,
-                            ImageUrl = "https://i.ibb.co/3k5fH0k/san-bong-k22.jpg",
-                            StadiumId = 22,
+                            ImageUrl = "img/896651d3-9b0f-47c1-bdfb-ec343e259829.jpg",
+                            StadiumId = 12,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 27,
-                            ImageUrl = "https://i.ibb.co/3c675z2/san-cau-long-win-sport.jpg",
-                            StadiumId = 23,
+                            ImageUrl = "img/9f464a6f-62e9-4326-9734-a1ac85a8b74e.jpg",
+                            StadiumId = 12,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 28,
-                            ImageUrl = "https://i.ibb.co/3c675z2/san-bong-chuyen-bai-bien.jpg",
-                            StadiumId = 24,
+                            ImageUrl = "img/ba1b77bf-0ae7-4a44-bf2a-e6d9c31fe6e0.jpg",
+                            StadiumId = 13,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 29,
-                            ImageUrl = "https://i.ibb.co/3c675z2/san-bong-dhct.jpg",
-                            StadiumId = 25,
+                            ImageUrl = "img/2ec2068b-e1d7-48eb-abb6-fd5a1612ec29.jpg",
+                            StadiumId = 13,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 30,
+                            ImageUrl = "img/1c002bd0-f1ab-47c9-8871-87aa55f99d15.jpg",
+                            StadiumId = 14,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 31,
+                            ImageUrl = "img/7c2f592e-9db8-4ad7-b378-ceb4ee75b3db.jpg",
+                            StadiumId = 14,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 32,
+                            ImageUrl = "img/8da36e7f-6699-4da4-9622-da8310ba734b.jpg",
+                            StadiumId = 16,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 33,
+                            ImageUrl = "img/a4b0822d-b2cc-4102-9192-056740ea1e11.jpg",
+                            StadiumId = 17,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 34,
+                            ImageUrl = "img/21a9b32a-bede-4c9b-984f-db32070b4a22.jpg",
+                            StadiumId = 18,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 35,
+                            ImageUrl = "img/364ddf95-6df0-426f-86a1-7923eedc03de.jpg",
+                            StadiumId = 19,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 36,
+                            ImageUrl = "img/93d0cd83-6917-4d56-870c-871c4d63e036.jpg",
+                            StadiumId = 20,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 37,
+                            ImageUrl = "img/3749c185-1c42-4ead-88a1-e88dcfb23dca.jpg",
+                            StadiumId = 21,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 38,
+                            ImageUrl = "img/fc1d6192-449c-4322-bea1-bd8b655d5cdf.jpg",
+                            StadiumId = 21,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 39,
+                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            StadiumId = 21,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 40,
+                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            StadiumId = 23,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 41,
+                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            StadiumId = 24,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 42,
+                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            StadiumId = 25,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -1054,22 +1134,6 @@ namespace StadiumAPI.Migrations
                             Latitude = 10.0165m,
                             Longitude = 105.7879m,
                             Name = "Hồ bơi Minh Phương",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Address = "Đường 30 Tháng 4, Xuân Khánh, Ninh Kiều, Cần Thơ",
-                            CloseTime = new TimeSpan(0, 22, 0, 0, 0),
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = 3,
-                            CreatedByUser = 3,
-                            Description = "Sân bóng đá cỏ nhân tạo 7 người, vị trí trung tâm, thuận tiện di chuyển.",
-                            IsApproved = true,
-                            Latitude = 10.0305m,
-                            Longitude = 105.7699m,
-                            Name = "Sân bóng đá K22",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
