@@ -60,8 +60,15 @@ namespace DiscountAPI.Migrations
                     b.Property<double>("PercentValue")
                         .HasColumnType("float");
 
+                    b.Property<string>("StadiumIds")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -1,35 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DiscountAPI.DTO
+﻿namespace DTOs.DiscountDTO
 {
-    // CreateDiscountDTO
-    public class CreateDiscountDTO
+    public class ReadDiscountDTO
     {
-        [Required]
-        [MaxLength(50)]
+        public int Id { get; set; }
         public string Code { get; set; } = null!;
-
         public string? Description { get; set; }
-
-        [Range(0, 100)]
         public double PercentValue { get; set; }
-
         public decimal MaxDiscountAmount { get; set; }
         public decimal MinOrderAmount { get; set; }
-
-        [Required]
         public DateTime StartDate { get; set; }
-
-        [Required]
         public DateTime EndDate { get; set; }
-
-        [Required]
-        public string CodeType { get; set; } = null!; // System / Stadium / Unique
-
-        [Required]
+        public string CodeType { get; set; } = null!;
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string UserId { get; set; } = null!;
-
-        // Nếu null hoặc rỗng => áp dụng toàn hệ thống
         public List<int>? StadiumIds { get; set; } = new();
     }
 }
