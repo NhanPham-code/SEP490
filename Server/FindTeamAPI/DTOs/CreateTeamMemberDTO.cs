@@ -8,8 +8,8 @@ namespace FindTeamAPI.DTOs
         [Required]
         public int TeamPostId { get; set; } // Foreign key to the TeamPost entity
         [Required]
-        public string UserId { get; set; } = string.Empty; // User ID of the team member
-        public DateTime JoinedAt { get; set; } // Timestamp when the member joined the team
-        public bool IsCaptain { get; set; } // Indicates if the member is the captain of the team
+        public int UserId { get; set; }
+        public DateTime JoinedAt { get; set; } = DateTime.Now; // Timestamp when the member joined the team
+        public string role { get; set; }
     }
 }
