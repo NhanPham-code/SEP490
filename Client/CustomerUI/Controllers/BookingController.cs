@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Service.Services;
 
 namespace CustomerUI.Controllers
 {
@@ -13,13 +14,22 @@ namespace CustomerUI.Controllers
         private readonly IBookingService _bookingService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
-
-        public BookingController(IBookingService bookingService, ITokenService tokenService, IUserService userService)
+        private readonly IDiscountService _discountService;
+        private readonly IStadiumService _stadiumService; 
+        public BookingController(
+            IBookingService bookingService,
+            ITokenService tokenService,
+            IUserService userService,
+            IDiscountService discountService,
+            IStadiumService stadiumService) 
         {
             _bookingService = bookingService;
             _tokenService = tokenService;
             _userService = userService;
+            _discountService = discountService;
+            _stadiumService = stadiumService; 
         }
+
 
         private string? GetAccessToken()
         {
@@ -72,28 +82,155 @@ namespace CustomerUI.Controllers
             {
                 bookings = await _bookingService.GetBookingHistoryAsync(accessToken);
 
-                // Log dữ liệu booking ra console
                 if (bookings != null && bookings.Count > 0)
                 {
-                    Console.WriteLine($"[BookingHistory] Đã lấy được {bookings.Count} booking(s):");
-                    foreach (var b in bookings)
+                    var stadiumIds = bookings.Select(b => b.StadiumId).Distinct().ToList();
+                    var stadiumNames = new Dictionary<int, string>();
+                    foreach (var id in stadiumIds)
                     {
-                        Console.WriteLine($" - Booking Id: {b.Id}, Date: {b.Date}");
+                        var stadium = await _stadiumService.GetStadiumByIdAsync(id);
+                        if (stadium != null)
+                        {
+                            stadiumNames[id] = stadium.Name;
+                        }
                     }
-                }
-                else
-                {
-                    Console.WriteLine("[BookingHistory] Không có booking nào được trả về.");
+                    ViewBag.StadiumNames = stadiumNames;
+
+                    // Tạo dictionary để lưu thông tin giảm giá
+                    var discountInfo = new Dictionary<int, string>();
+                    foreach (var booking in bookings)
+                    {
+                        if (booking.DiscountId.HasValue)
+                        {
+                            // Gọi API để lấy thông tin chi tiết mã giảm giá
+                            var discount = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
+                            if (discount != null)
+                            {
+                                discountInfo[booking.Id] = $"Giảm {discount.PercentValue}%";
+                            }
+                            else
+                            {
+                                discountInfo[booking.Id] = "Mã không hợp lệ";
+                            }
+                        }
+                        else
+                        {
+                            discountInfo[booking.Id] = "Không áp dụng";
+                        }
+                    }
+                    ViewBag.DiscountInfo = discountInfo;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[BookingHistory] Lỗi khi lấy lịch sử booking: " + ex.Message);
                 TempData["ErrorMessage"] = "Lỗi khi lấy lịch sử booking.";
                 bookings = new List<BookingReadDto>();
             }
 
             return View(bookings);
+        }
+
+        public async Task<IActionResult> BookingDetail(int id)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                Console.WriteLine($"[BookingDetail] Không tìm thấy booking với ID: {id}");
+                TempData["ErrorMessage"] = "Không tìm thấy booking hoặc bạn không có quyền truy cập.";
+                return RedirectToAction("BookingHistory");
+            }
+
+            try
+            {
+                var booking = await _bookingService.GetBookingDetailAsync(accessToken, id);
+                if (booking == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy booking hoặc bạn không có quyền truy cập.";
+                    return RedirectToAction("BookingHistory");
+                }
+
+                var stadium = await _stadiumService.GetStadiumByIdAsync(booking.StadiumId);
+                ViewBag.StadiumName = stadium?.Name ?? "Không xác định";
+                ViewBag.PaymentMethod = booking.PaymentMethod;
+
+                decimal originalTotalPrice = booking.TotalPrice.GetValueOrDefault();
+                string discountCode = "Không có";
+                decimal discountAmount = 0;
+
+                if (booking.DiscountId.HasValue)
+                {
+                    var discount = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
+                    if (discount != null)
+                    {
+                        discountCode = discount.Code;
+
+                        // Thêm kiểm tra ở đây để tránh chia cho 0
+                        if (discount.PercentValue != 100)
+                        {
+                            // Công thức cho trường hợp giảm theo phần trăm
+                            var calculatedDiscount = originalTotalPrice / (1m - ((decimal)discount.PercentValue / 100m)) * ((decimal)discount.PercentValue / 100m);
+
+                            // So sánh với MaxDiscountAmount
+                            if (calculatedDiscount > discount.MaxDiscountAmount)
+                            {
+                                discountAmount = (decimal)discount.MaxDiscountAmount;
+                            }
+                            else
+                            {
+                                discountAmount = calculatedDiscount;
+                            }
+                        }
+                        else
+                        {
+                            // Nếu giảm 100%, số tiền giảm sẽ bằng tổng tiền
+                            discountAmount = originalTotalPrice;
+                        }
+
+                        // Tính toán tổng tiền ban đầu sau khi đã xác định discountAmount
+                        originalTotalPrice = originalTotalPrice + discountAmount;
+                    }
+                }
+
+                ViewBag.DiscountCode = discountCode;
+                ViewBag.DiscountAmount = discountAmount.ToString("N0");
+                ViewBag.OriginalTotalPrice = originalTotalPrice.ToString("N0");
+
+                return View(booking);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi để dễ dàng debug
+                Console.WriteLine($"[BookingDetail] Lỗi xảy ra: {ex.Message}");
+                TempData["ErrorMessage"] = "Lỗi khi lấy chi tiết booking.";
+                return RedirectToAction("BookingHistory");
+            }
+        }
+
+        // Action mới để lấy danh sách giảm giá theo StadiumId
+        [HttpGet]
+        public async Task<IActionResult> GetDiscounts(int stadiumId)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var discounts = await _discountService.GetDiscountsByStadiumIdAsync(stadiumId);
+                if (discounts == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy mã giảm giá nào cho sân vận động này." });
+                }
+                return Ok(discounts);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi
+                Console.WriteLine($"[GetDiscounts] Lỗi khi lấy danh sách giảm giá: {ex.Message}");
+                return StatusCode(500, new { message = "Lỗi server khi lấy danh sách giảm giá." });
+            }
         }
 
         /*public IActionResult Booking()

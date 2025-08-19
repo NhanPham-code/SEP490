@@ -14,6 +14,7 @@ namespace DTOs.BookingDTO
         public DateTime EndTime { get; set; }          // yyyy-MM-ddTHH:mm:ss
         public decimal? TotalPrice { get; set; }
         public string? Note { get; set; }
+        public string? PaymentMethod { get; set; }
         public int? DiscountId { get; set; }
         public int StadiumId { get; set; }
         public List<BookingDetailCreateDto> BookingDetails { get; set; } = new List<BookingDetailCreateDto>();

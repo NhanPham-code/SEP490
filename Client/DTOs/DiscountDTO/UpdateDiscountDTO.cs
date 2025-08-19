@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DiscountAPI.DTO
+namespace DTOs.DiscountDTO
 {
-    // CreateDiscountDTO
-    public class CreateDiscountDTO
+    public class UpdateDiscountDTO
     {
+        [Required]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(50)]
         public string Code { get; set; } = null!;
@@ -26,8 +28,7 @@ namespace DiscountAPI.DTO
         [Required]
         public string CodeType { get; set; } = null!; // System / Stadium / Unique
 
-        [Required]
-        public string UserId { get; set; } = null!;
+        public bool IsActive { get; set; }
 
         // Nếu null hoặc rỗng => áp dụng toàn hệ thống
         public List<int>? StadiumIds { get; set; } = new();

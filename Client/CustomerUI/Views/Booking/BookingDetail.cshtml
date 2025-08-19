@@ -1,0 +1,105 @@
+﻿@model DTOs.BookingDTO.BookingReadDto
+
+@{
+    ViewData["Title"] = "Chi tiết Booking";
+}
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden p-8">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800">Chi tiết Booking</h2>
+            <a asp-action="BookingHistory" class="text-indigo-600 hover:text-indigo-800 transition-colors duration-200 font-medium">
+                &larr; Quay lại lịch sử booking
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-8">
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Mã Booking:</span>
+                <span class="font-bold text-gray-800">@Model.Id</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Ngày:</span>
+                <span class="font-semibold text-gray-800">@Model.Date.ToString("dd/MM/yyyy")</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Thời gian:</span>
+                <span class="font-semibold text-gray-800">@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Trạng thái:</span>
+                @{
+                    var statusClass = "";
+                    var statusText = "";
+                    switch (Model.Status)
+                    {
+                        case "Confirmed": statusClass = "bg-green-100 text-green-700"; statusText = "Đã xác nhận"; break;
+                        case "Pending": statusClass = "bg-yellow-100 text-yellow-700"; statusText = "Đang chờ"; break;
+                        case "Cancelled": statusClass = "bg-red-100 text-red-700"; statusText = "Đã hủy"; break;
+                        default: statusClass = "bg-gray-100 text-gray-700"; statusText = "Không xác định"; break;
+                    }
+                }
+                <span class="px-3 py-1 text-xs font-semibold rounded-full @statusClass">
+                    @statusText
+                </span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Sân Vận Động:</span>
+                <span class="font-semibold text-gray-800">@ViewBag.StadiumName</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Thanh Toán:</span>
+                <span class="font-semibold text-gray-800">@ViewBag.PaymentMethod</span>
+            </div>
+
+            <div class="md:col-span-2">
+                <div class="flex items-center mt-2">
+                    <span class="text-gray-500 w-36">Tổng tiền ban đầu:</span>
+                    <span class="font-semibold text-gray-800">@ViewBag.OriginalTotalPrice VNĐ</span>
+                </div>
+                <div class="flex items-center mt-2">
+                    <span class="text-gray-500 w-36">Mã giảm giá:</span>
+                    <span class="font-semibold text-gray-800">@ViewBag.DiscountCode</span>
+                </div>
+                <div class="flex items-center mt-2">
+                    <span class="text-gray-500 w-36">Số tiền giảm:</span>
+                    <span class="font-semibold text-green-600">- @ViewBag.DiscountAmount VNĐ</span>
+                </div>
+                <div class="md:col-span-2 mt-4">
+                    <span class="text-gray-500">Tổng thanh toán:</span>
+                    <span class="text-4xl font-extrabold text-indigo-600 ml-4">@Model.TotalPrice?.ToString("N0") VNĐ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Các sân đã đặt</h3>
+            @if (Model.BookingDetails != null && Model.BookingDetails.Any())
+            {
+                <div class="space-y-4">
+                    @foreach (var detail in Model.BookingDetails)
+                    {
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+                            <span class="text-lg font-medium text-gray-700">Sân số: @detail.CourtId</span>
+                            @* Thêm các thông tin khác của sân nếu có *@
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-gray-400 italic">Không có thông tin chi tiết sân.</p>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Note))
+        {
+            <div class="border-t border-gray-200 pt-8 mt-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Ghi chú</h3>
+                <p class="text-gray-600 bg-gray-50 p-4 rounded-lg">
+                    @Model.Note
+                </p>
+            </div>
+        }
+    </div>
+</div>

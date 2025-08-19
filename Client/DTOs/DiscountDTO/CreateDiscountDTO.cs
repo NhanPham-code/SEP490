@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DiscountAPI.DTO
+namespace DTOs.DiscountDTO
 {
     // CreateDiscountDTO
     public class CreateDiscountDTO
