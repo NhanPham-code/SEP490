@@ -12,6 +12,6 @@ namespace Service.Interfaces
         Task<string> GetOdataTeamPostAsync(string url);
         Task<ReadTeamPostDTO> CreateTeamPost(CreateTeamPostDTO createTeamPostDTO);
         Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO);
-        Task DeleteTeamPost(int postId);
+        Task<bool> DeleteTeamPost(int postId);
     }
 }

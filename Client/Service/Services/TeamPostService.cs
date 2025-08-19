@@ -27,7 +27,7 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<ReadTeamPostDTO>();
         }
 
-        public async Task DeleteTeamPost(int postId)
+        public async Task<bool> DeleteTeamPost(int postId)
         {
             var response = await _httpClient.DeleteAsync($"/DeleteTeamPost?postId={postId}");
             response.EnsureSuccessStatusCode();
@@ -43,7 +43,9 @@ namespace Service.Services
 
         public async Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PutAsJsonAsync("/UpdateTeamPost", updateTeamPostDTO);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<ReadTeamPostDTO>();
         }
     }
 }

@@ -14,16 +14,16 @@ namespace FindTeamAPI.Controllers
 
         [HttpGet]
         [Route("GetAllTeamMember")]
-        public async Task<IActionResult> GetAllTeamMemberByTeamPost([FromQuery]int teamPostId)
+        public async Task<IActionResult> GetAllTeamMemberByTeamPost([FromQuery]int postId)
         {
             
-            return Ok((await _teamMemberService.GetAllTeamMembersAsync(teamPostId)).ToList());
+            return Ok((await _teamMemberService.GetAllTeamMembersAsync(postId)).ToList());
         }
         [HttpGet]
         [Route("GetTeamMemberByPostId")]
-        public async Task<IActionResult> GetTeamMemberByIdTeam([FromQuery] int teamId, [FromQuery] int teamPostId)
+        public async Task<IActionResult> GetTeamMemberByIdTeam([FromQuery] int teamId, [FromQuery] int postId)
         {
-            var team = await _teamMemberService.GetTeamMemberByIdAsync(teamId, teamPostId);
+            var team = await _teamMemberService.GetTeamMemberByIdAsync(teamId, postId);
             return Ok(team);
         }
 
@@ -45,9 +45,9 @@ namespace FindTeamAPI.Controllers
 
         [HttpDelete]
         [Route("DeleteTeamMember")]
-        public async Task<IActionResult> DeleteTeamMember([FromQuery]int teamMemberId, [FromQuery] int teamPostID)
+        public async Task<IActionResult> DeleteTeamMember([FromQuery]int teamMemberId, [FromQuery] int postId)
         {
-            return Ok(await _teamMemberService.DeleteTeamMemberAsync(teamMemberId, teamPostID));
+            return Ok(await _teamMemberService.DeleteTeamMemberAsync(teamMemberId, postId));
         }
 
     }
