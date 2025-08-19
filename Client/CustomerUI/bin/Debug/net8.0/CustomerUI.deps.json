@@ -97,6 +97,10 @@
           "Microsoft.AspNetCore.Http.Abstractions": "2.3.0"
         },
         "runtime": {
+          "DTOs.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          },
           "DTOs.dll": {}
         }
       },
@@ -107,6 +111,10 @@
           "Microsoft.AspNetCore.Http.Abstractions": "2.3.0"
         },
         "runtime": {
+          "Service.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          },
           "Service.dll": {}
         }
       }

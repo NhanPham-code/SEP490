@@ -214,7 +214,7 @@
 
 
 </head>
-    
+
 
 <body class="bg-gray-50" data-new-gr-c-s-check-loaded="14.1116.0" data-gr-ext-installed="">
 
@@ -245,7 +245,7 @@
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
-            
+
             <div class="w-full lg:w-80 bg-white rounded-lg shadow-sm p-6 h-fit">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold">Filter Results</h3>
@@ -315,7 +315,7 @@
                                 14:00
                             </label>
                             <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="16:00" class="hidden" >
+                                <input type="radio" name="time" value="16:00" class="hidden">
                                 16:00
                             </label>
                             <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
@@ -342,7 +342,7 @@
                         </div>
                     </div>
 
-                    
+
 
                     <!-- Location -->
                     <div class="mb-6">
@@ -400,7 +400,7 @@
                     <script>
                         $(document).ready(function() {
                                 //get all by ajax
-                                                      
+
                         });
                                                 // Get the form element
                                                                                             $(document).ready(function() {
@@ -456,7 +456,7 @@
                         });
                                    $('#loadMoreBtn').on("click", function () {
                             console.log('Button clicked!');
-                            
+
 
                             var count = sessionStorage.getItem('stadiumCount') || 0;
                             var url = sessionStorage.getItem('searchTerm') || "";
@@ -471,17 +471,17 @@
                             displayList(url, top, skip);
                         });
                         });
-                                            
+
                             // You can now use formData object to process or send the data
 
-                        
-                        
+
+
 
                         // danh sach san pham truoc va sau khi search
                         function displayList(searchTerm, top, skip){
                             var searchUrl = searchTerm + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);
-     
+
                                                                            $.ajax({
                             url: '/Home/Stadiums', // Endpoint for POST request
                             type: 'POST',
@@ -489,12 +489,14 @@
                             success: function (data) {
                                 const count = data["@@odata.count"];
                                 sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
+
                                 let html = '';
                                 if (data.value && data.value.length > 0) {
                                     data.value.forEach(function (item) {
                                         let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'default.jpg';
                                         let price = item.Courts.length > 0 ? item.Courts[0].PricePerHour : 0;
                                         // Removed console.log(item.val) as 'val' is not defined in the data structure
+                                        console.log(item);
 
                                         // Format tiền Việt Nam
                                         let formattedPrice = new Intl.NumberFormat('vi-VN', {
@@ -550,7 +552,8 @@
                                                     <div class="text-2xl font-bold text-blue-600">
                                                         ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
                                                     </div>
-                                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+                                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                                                    onclick="redirectToBooking('${item.Id}')">
                                                         Đặt ngay
                                                     </button>
                                                 </div>
@@ -575,10 +578,10 @@
 
 
 
-                                                                              
+
                     </script>
-                    
-                   
+
+
                 </div>
                 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
                 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
@@ -600,7 +603,7 @@
                 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
                 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-                <div class="text-center mt-8" >
+                <div class="text-center mt-8">
                     <button id="loadMoreBtn" class="bg-white text-primary border-2 border-primary px-8 py-3 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
                         Load More Stadiums
                     </button>
@@ -1053,7 +1056,7 @@
 
 
 
-                function setBackgroundByWeather(condition) {
+        function setBackgroundByWeather(condition) {
             let bgColor = "#007bff"; // mặc định xanh dương
 
             if (condition.includes("Mưa")) bgColor = "#4a90e2";
@@ -1064,6 +1067,11 @@
             document.body.style.background = bgColor;
         }
 
+        function redirectToBooking(stadiumId) {
+            if (stadiumId) {
+                window.location.href = `/Booking/Booking?stadiumId=${stadiumId}`;
+            }
+        }
     </script>
     
 
