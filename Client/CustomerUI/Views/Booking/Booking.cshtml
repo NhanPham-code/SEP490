@@ -1,0 +1,924 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Sân Thể Thao</title>
+    <!-- Thư viện Tailwind CSS cho styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font chữ Inter từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="~/css/Booking/Booking.css" />
+
+</head>
+<body class="min-h-screen p-4 flex items-center justify-center">
+
+    <!-- Enhanced Modal -->
+    <div id="custom-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">
+        <div class="modal-content glass-effect rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                    <span class="text-white text-2xl">✓</span>
+                </div>
+                <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                <p id="modal-message" class="text-gray-600 mb-6 leading-relaxed"></p>
+                <button id="modal-close-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="main-booking-container" class="glass-effect floating-card rounded-3xl shadow-2xl p-8 md:p-12 max-w-6xl w-full mx-auto">
+
+        <!-- Hero Slider -->
+        <div class="slider-container mb-12">
+            <img class="slider-image" src="https://placehold.co/1200x400/3b82f6/ffffff?text=Sân+Bóng+Đá+Chuyên+Nghiệp" alt="Sân vận động 1">
+            <img class="slider-image" src="https://placehold.co/1200x400/22c55e/ffffff?text=Sân+Tennis+Cao+Cấp" alt="Sân vận động 2">
+            <img class="slider-image" src="https://placehold.co/1200x400/f97316/ffffff?text=Sân+Cầu+Lông+Hiện+Đại" alt="Sân vận động 3">
+
+            <a class="slider-prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="slider-next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+
+        <!-- Stadium Info -->
+        <div class="mb-10 text-center">
+            <h1 id="stadium-name" class="text-4xl md:text-5xl font-bold gradient-text mb-4 mt-4"></h1>
+            <div class="flex items-center justify-center mb-6">
+                <svg class="w-5 h-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                <p id="stadium-address" class="text-gray-600"></p>
+            </div>
+
+            <div class="inline-flex items-center gap-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl shadow-lg">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-500">Giờ mở cửa</p>
+                        <p id="stadium-hours" class="font-semibold text-gray-800"></p>
+                    </div>
+                </div>
+                <div class="w-px h-12 bg-gray-300"></div>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 6a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 6a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm7 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-500">Giá thuê</p>
+                        <p id="stadiumPrice" class="font-semibold text-gray-800">200.000 - 300.000 VNĐ/giờ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-center gradient-text">📍 Vị trí sân</h2>
+            <div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+                <iframe id="stadium-map"
+                        width="100%"
+                        height="350"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.553950669145!2d106.66442651474932!3d10.769931892323048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f1e29e9447d%3A0x7d0e405e3a89e103!2zS2h1IEdp4bqjaSB0csOtIFRo4buRbmcgTmjqdCwgUGjGsOG7nW5nIDIsIFF14bqtbiAxMCwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1678893922639!5m2!1svi!2s"></iframe>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Booking Section -->
+        <div class="mb-12 p-8 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 rounded-3xl shadow-lg">
+            <h2 class="text-3xl font-bold mb-8 text-center gradient-text">⏰ Chọn thời gian của bạn</h2>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="space-y-2">
+                    <label for="date-picker" class="block text-sm font-semibold text-gray-700 mb-2">📅 Chọn ngày</label>
+                    <input type="date" id="date-picker" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
+                </div>
+                <div class="space-y-2">
+                    <label for="court-type-select" class="block text-sm font-semibold text-gray-700 mb-2">🏟️ Chọn loại sân</label>
+                    <div class="relative">
+                        <select id="court-type-select" class="mt-2 interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 pr-10 rounded-xl shadow-sm text-gray-700 font-medium appearance-none">
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">⏰ Chọn khung giờ</h3>
+                <div id="time-buttons-container" class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3">
+                </div>
+            </div>
+        </div>
+
+        <div id="time-display" class="mt-6 p-4 bg-white rounded-xl shadow-sm text-center text-gray-700 font-medium min-h-[60px] flex items-center justify-center"></div>
+    </div>
+
+    <!-- Courts Section -->
+    <div class="mb-12 mt-6">
+        <h2 class="text-3xl font-bold mb-8 text-center gradient-text">🏆 Danh sách sân trống</h2>
+        <div id="courts-container" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+    </div>
+
+    <!-- Continue Button -->
+    <div class="text-center mb-12">
+        <button id="continue-button" disabled
+                class="continue-btn w-full md:w-auto px-16 py-4 rounded-2xl font-bold text-white text-lg transition-all duration-300 shadow-xl cursor-not-allowed relative overflow-hidden">
+            <span class="relative z-10">🚀 Tiếp tục đặt sân</span>
+        </button>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="mb-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center gradient-text">💬 Gửi phản hồi của bạn</h2>
+        <form id="feedback-form">
+            <div class="relative">
+                <textarea id="feedback-textarea" rows="4" class="interactive-input w-full p-4 rounded-xl border-2 border-gray-200 bg-white text-gray-800 focus:ring-0 focus:border-blue-500 transition-all duration-300 resize-none" placeholder="Chia sẻ trải nghiệm của bạn về sân vận động này..."></textarea>
+                <div class="absolute bottom-3 right-3 text-xs text-gray-400" id="char-count">0/500</div>
+            </div>
+            <div class="text-right mt-6">
+                <button type="submit" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    ✨ Gửi phản hồi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mb-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
+        <div id="feedback-list" class="space-y-6 mb-8">
+        </div>
+
+        <div id="pagination-container" class="flex justify-center items-center space-x-2 mt-8">
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <button id="modal-close-btn" class="px-6 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all">Đóng</button>
+        </div>
+    </div>
+
+    <form id="bookingForm" method="post" action="/Booking/Checkout">
+        <input type="hidden" name="Date" />
+        <input type="hidden" name="StartTime" />
+        <input type="hidden" name="EndTime" />
+        <input type="hidden" name="TotalPrice" />
+        <input type="hidden" name="CourtId" />
+        <input type="hidden" name="StadiumId" />
+    </form>
+
+
+
+    <script>
+        // Biến trạng thái toàn cục của ứng dụng
+        let stadiumData = null;
+        let startTime = null;
+        let endTime = null;
+        let selectedCourts = []; // Đã đổi biến thành mảng để chọn nhiều sân
+        let selectedCourtType = null;
+        let selectedDate = new Date().toISOString().split('T')[0];
+        let bookedCourtIds = [];
+
+        // Tạo một mảng các giờ từ 5:00 đến 22:00
+        const allHours = Array.from({ length: 18 }, (_, i) => i + 5);
+        // Lấy danh sách các loại sân duy nhất
+        function getCourtTypes() {
+            return [...new Set((stadiumData?.Courts || []).map(c => c.SportType))];
+        }
+
+
+        // get stadium data from server
+        const stadiumId = '@ViewBag.StadiumId';
+        console.log("StadiumId:", stadiumId);
+
+        // Lấy các element cần tương tác
+        const stadiumNameEl = document.getElementById('stadium-name');
+        const stadiumAddressEl = document.getElementById('stadium-address');
+        const stadiumHoursEl = document.getElementById('stadium-hours');
+        const courtTypeSelectEl = document.getElementById('court-type-select');
+        const datePickerEl = document.getElementById('date-picker');
+        const timeButtonsContainerEl = document.getElementById('time-buttons-container');
+        const courtsContainerEl = document.getElementById('courts-container');
+        const timeDisplayEl = document.getElementById('time-display');
+        const continueButtonEl = document.getElementById('continue-button');
+        const feedbackFormEl = document.getElementById('feedback-form');
+        const priceEl = document.getElementById('stadiumPrice');
+
+        // Hàm hiển thị modal thông báo tùy chỉnh
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        // Hàm ẩn modal
+        function hideModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        // Hàm render thông tin sân vận động
+        function renderStadiumInfo() {
+            stadiumNameEl.textContent = stadiumData.Name;
+            stadiumAddressEl.textContent = stadiumData.Address;
+
+            // Convert OpenTime/CloseTime từ dạng ISO8601 (PT6H -> 06:00, PT22H -> 22:00)
+            const formatTime = (timeStr) => {
+                if (!timeStr) return '';
+                const match = timeStr.match(/PT(\d+)H/);
+                if (match) {
+                    let hour = parseInt(match[1], 10);
+                    return `${hour.toString().padStart(2, '0')}:00`;
+                }
+                return timeStr;
+            };
+
+            stadiumHoursEl.textContent = `${formatTime(stadiumData.OpenTime)} - ${formatTime(stadiumData.CloseTime)}`;
+            showPrice(); // Gọi hàm hiển thị giá sân
+        }
+
+        function showPrice() {
+            // Lấy tất cả giá theo giờ từ Courts
+            const prices = (stadiumData?.Courts || []).map(c => c.PricePerHour);
+            let priceText = '';
+
+            if (prices.length > 0) {
+                const minPrice = Math.min(...prices);
+                const maxPrice = Math.max(...prices);
+
+                console.log("Min Price:", minPrice, "Max Price:", maxPrice);
+
+                if (minPrice === maxPrice) {
+                    priceText = `${minPrice.toLocaleString('vi-VN')} VNĐ/giờ`;
+                } else {
+                    priceText = `${minPrice.toLocaleString('vi-VN')} - ${maxPrice.toLocaleString('vi-VN')} VNĐ/giờ`;
+                }
+            }
+
+            priceEl.textContent = priceText;
+        }
+
+        function handleTimeSelect(hour) {
+            if (startTime === null || (startTime !== null && endTime !== null)) {
+                startTime = hour;
+                endTime = null;
+            } else if (hour > startTime) {
+                endTime = hour;
+            } else {
+                startTime = hour;
+                endTime = null;
+            }
+            // Reset sân đã chọn khi thay đổi thời gian
+            selectedCourts = [];
+
+            // GỌI FETCH CHỈ KHI ĐỦ KHOẢNG GIỜ
+            if (startTime !== null && endTime !== null && endTime > startTime && stadiumData?.id) {
+                maybeFetchBookedCourts();
+            }
+            updateUI();
+        }
+
+
+        // Hàm cập nhật giao diện người dùng
+        function updateUI() {
+            // Cập nhật các nút giờ
+            renderTimeButtons();
+
+            // Lọc sân theo loại sân đã chọn
+            let filteredCourts = stadiumData.Courts;
+            if (selectedCourtType) {
+                filteredCourts = filteredCourts.filter(court => court.SportType === selectedCourtType);
+            }
+
+            let isContinueButtonEnabled = false;
+
+            if (startTime !== null && endTime !== null && endTime > startTime) {
+                const duration = endTime - startTime;
+
+                // Tính tổng giá từ danh sách sân được chọn
+                let totalPrice = 0;
+                selectedCourts.forEach(court => {
+                    totalPrice += court.PricePerHour * duration;
+                });
+
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = new Date(selectedDate).toLocaleDateString('vi-VN', dateOptions);
+
+                const totalDisplayPrice = totalPrice.toLocaleString('vi-VN');
+                timeDisplayEl.textContent = `Bạn đã chọn: ${formattedDate}, từ ${startTime}:00 đến ${endTime}:00 (${duration} giờ). Tổng giá dự kiến: ${totalDisplayPrice} VNĐ`;
+
+                // Nút Tiếp tục chỉ được bật nếu đã có ít nhất một sân được chọn
+                isContinueButtonEnabled = selectedCourts.length > 0;
+            } else {
+                timeDisplayEl.textContent = '';
+            }
+
+            // Cập nhật danh sách sân
+            renderCourts(filteredCourts);
+
+            // Cập nhật trạng thái nút "Tiếp tục"
+            if (isContinueButtonEnabled) {
+                continueButtonEl.disabled = false;
+                continueButtonEl.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                continueButtonEl.classList.add('bg-blue-600', 'hover:bg-blue-700', 'hover:shadow-lg');
+            } else {
+                continueButtonEl.disabled = true;
+                continueButtonEl.classList.add('bg-gray-400', 'cursor-not-allowed');
+                continueButtonEl.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'hover:shadow-lg');
+            }
+        }
+
+
+        // Hàm render danh sách sân
+        function renderCourts(courts) {
+            courtsContainerEl.innerHTML = ''; // Xóa danh sách cũ
+
+            if (courts.length === 0) {
+                courtsContainerEl.innerHTML = `<p class="col-span-full text-center text-gray-500 italic">Không có sân nào phù hợp với loại sân đã chọn.</p>`;
+                return;
+            }
+
+            courts.forEach(court => {
+                const isBooked = bookedCourtIds.includes(parseInt(court.Id));
+
+                const isAvailable = (startTime !== null && endTime !== null && endTime > startTime) && !isBooked;
+
+                const courtDiv = document.createElement('div');
+
+                const isSelected = selectedCourts.some(selected => selected.Id === court.Id);
+
+                let courtStatusClass = 'border-gray-200';
+                if (isAvailable) {
+                    courtStatusClass = 'border-green-400';
+                } else if (isBooked) {
+                    courtStatusClass = 'border-red-400';
+                }
+
+                courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
+
+                if (isAvailable) {
+                    courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
+                    courtDiv.addEventListener('click', () => {
+                        const courtIndex = selectedCourts.findIndex(selected => selected.Id === court.Id);
+                        if (courtIndex !== -1) {
+                            selectedCourts.splice(courtIndex, 1);
+                        } else {
+                            selectedCourts.push(court);
+                        }
+                        // VẼ LẠI ĐỂ CẬP NHẬT STYLE + NÚT TIẾP TỤC
+                        updateUI();
+                    });
+                }
+                else {
+                    courtDiv.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+
+                if (isSelected) {
+                    courtDiv.classList.add('scale-105', 'border-blue-600', 'ring-2', 'ring-blue-600');
+                }
+
+                courtDiv.innerHTML = `
+                    <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.Name}</h3>
+                    <p class="text-sm text-gray-500">${court.SportType}</p>
+                    <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${court.PricePerHour.toLocaleString()}đ/giờ</p>
+                    ${getCourtStatusHTML(isBooked, startTime, endTime)}
+                `;
+
+                courtsContainerEl.appendChild(courtDiv);
+            });
+        }
+
+
+        function getCourtStatusHTML(isBooked, startTime, endTime) {
+            const hasRange = (startTime !== null && endTime !== null && endTime > startTime);
+
+            const statusText = !hasRange
+                ? 'Chọn giờ để xem trạng thái'
+                : (isBooked ? 'Sân đã có người đặt' : 'Sân trống - Có thể đặt');
+
+            const statusClass = !hasRange
+                ? 'text-gray-500'
+                : (isBooked ? 'text-red-500 font-medium' : 'text-green-500 font-medium');
+
+            return `<p class="text-xs mt-2 ${statusClass}">${statusText}</p>`;
+        }
+
+
+        // Hàm render các nút giờ
+        function renderTimeButtons() {
+            timeButtonsContainerEl.innerHTML = '';
+
+            // Thêm class justify-center để căn giữa các nút
+            timeButtonsContainerEl.classList.add('justify-center');
+
+            allHours.forEach(hour => {
+                const button = document.createElement('button');
+                button.textContent = `${hour}:00`;
+                button.className = `time-button px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300 flex items-center justify-center`;
+                button.onclick = () => handleTimeSelect(hour);
+
+                if (startTime !== null && endTime !== null && hour >= startTime && hour < endTime) {
+                    button.classList.add('bg-blue-200', 'text-blue-800');
+                    button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                }
+                if (hour === startTime || hour === endTime) {
+                    button.classList.add('selected', 'bg-blue-600', 'text-white');
+                    button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                }
+                if ((endTime !== null && hour < startTime) || (startTime !== null && endTime === null && hour > 21)) {
+                    button.disabled = true;
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                    button.classList.remove('hover:bg-gray-300');
+                }
+                timeButtonsContainerEl.appendChild(button);
+            });
+        }
+
+        // Hàm mô phỏng chuyển sang trang checkout
+        function showCheckoutPage() {
+            if (selectedCourts.length === 0 || startTime === null || endTime === null) {
+                showModal('Thông báo', 'Vui lòng chọn đầy đủ thông tin: ngày, giờ và ít nhất một sân.');
+                return;
+            }
+
+            const duration = endTime - startTime;
+
+            // Tính tổng tiền từ các sân được chọn
+            let totalPrice = 0;
+            const courtIds = selectedCourts.map(court => {
+                totalPrice += court.PricePerHour * duration;
+                return court.Id;
+            }).join(',');
+
+            const form = document.getElementById('bookingForm');
+            form.Date.value = selectedDate;
+            form.StartTime.value = startTime;
+            form.EndTime.value = endTime;
+            form.TotalPrice.value = totalPrice;
+            form.CourtId.value = courtIds; // Gửi nhiều ID sân
+            form.StadiumId.value = stadiumData.Id; // StadiumId cũng viết hoa
+
+            form.submit();
+        }
+
+
+        // --- Logic cho Slider mới ---
+        let slideIndex = 0;
+        let slideTimer;
+
+        function showSlides() {
+            let i;
+            const slides = document.getElementsByClassName("slider-image");
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) { slideIndex = 1; }
+            slides[slideIndex - 1].style.display = "block";
+            clearTimeout(slideTimer);
+            slideTimer = setTimeout(showSlides, 4000);
+        }
+
+        function plusSlides(n) {
+            slideIndex += n - 1;
+            showSlides();
+        }
+
+        function setupCourtTypeSelection() {
+            const types = getCourtTypes();
+            console.log("Available court types:", types);
+            courtTypeSelectEl.innerHTML = '';
+            const allOption = document.createElement('option');
+            allOption.value = '';
+            allOption.textContent = 'Tất cả các sân';
+            courtTypeSelectEl.appendChild(allOption);
+
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                courtTypeSelectEl.appendChild(option);
+            });
+
+            courtTypeSelectEl.addEventListener('change', (e) => {
+                selectedCourtType = e.target.value || null;
+                selectedCourts = [];
+                startTime = null;
+                endTime = null;
+                updateUI();
+            });
+        }
+
+
+        function setupDatePicker() {
+            datePickerEl.value = selectedDate;
+            datePickerEl.min = selectedDate;
+
+            datePickerEl.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                startTime = null;
+                endTime = null;
+                selectedCourts = [];
+                updateUI();
+            });
+        }
+
+        // Hàm để lấy tất cả các giờ đã chọn
+        function getSelectedTimes() {
+            const selectedTimes = [];
+
+            // Lấy tất cả các button có class 'selected' (màu xanh đậm)
+            const selectedButtons = document.querySelectorAll('.time-button.selected');
+            selectedButtons.forEach(button => {
+                selectedTimes.push({
+                    time: button.textContent,
+                    type: 'selected', // Giờ bắt đầu hoặc kết thúc
+                    element: button
+                });
+            });
+
+            // Lấy tất cả các button có class 'bg-blue-200' (màu xanh nhạt - giờ trong khoảng)
+            const rangeButtons = document.querySelectorAll('.time-button.bg-blue-200');
+            rangeButtons.forEach(button => {
+                selectedTimes.push({
+                    time: button.textContent,
+                    type: 'range', // Giờ trong khoảng thời gian
+                    element: button
+                });
+            });
+
+            // Sắp xếp theo thời gian
+            selectedTimes.sort((a, b) => {
+                const timeA = parseInt(a.time.split(':')[0]);
+                const timeB = parseInt(b.time.split(':')[0]);
+                return timeA - timeB;
+            });
+
+            console.log('Các giờ đã chọn:', selectedTimes);
+
+            // Trả về mảng các giờ đã chọn
+            return selectedTimes;
+        }
+
+        // Hoặc nếu bạn chỉ muốn lấy giá trị giờ đơn giản
+        function getSelectedTimeValues() {
+            const selectedTimes = [];
+
+            // Lấy các button selected và bg-blue-200
+            const allSelectedButtons = document.querySelectorAll('.time-button.selected, .time-button.bg-blue-200');
+            allSelectedButtons.forEach(button => {
+                const hour = parseInt(button.textContent.split(':')[0]);
+                selectedTimes.push(hour);
+            });
+
+            // Loại bỏ trùng lặp và sắp xếp
+            const uniqueTimes = [...new Set(selectedTimes)].sort((a, b) => a - b);
+
+            console.log('Các giờ đã chọn (chỉ giá trị):', uniqueTimes);
+            return uniqueTimes;
+        }
+
+        // Get all booking in selected time
+        function fetchBookedCourts(stadiumId, date, startHour, endHour) {
+            function safeParseInt(value, defaultValue = null) {
+                const parsed = parseInt(value, 10);
+                return isNaN(parsed) ? defaultValue : parsed;
+            }
+
+            console.log(stadiumId);
+
+            const parsedStadiumId = safeParseInt(stadiumId);
+
+            if (parsedStadiumId === null) {
+                console.error("Stadium ID không hợp lệ:", stadiumId);
+                alert("ID sân vận động không hợp lệ.");
+                return;
+            }
+
+            console.log("Fetching booked courts for stadium ID:", parsedStadiumId, "on date:", date, "from", startHour, "to", endHour);
+
+            $.ajax({
+                url: `/Booking/GetBookedCourts`,
+                method: "GET",
+                data: {
+                    stadiumId: parsedStadiumId,
+                    date: date,
+                    startHour: startHour,
+                    endHour: endHour
+                },
+                success: function (data) {
+                    console.log("Booked courts:", data);
+                    bookedCourtIds = [];
+                    if (data && data.length > 0) {
+                        data.forEach(booking => {
+                            if (booking.bookingDetails && booking.bookingDetails.length > 0) {
+                                booking.bookingDetails.forEach(detail => {
+                                    bookedCourtIds.push(detail.courtId);
+                                });
+                            }
+                        });
+                    }
+                    updateUI();
+                },
+                error: function () {
+                    alert("Không thể lấy thông tin sân đã đặt.");
+                }
+            });
+        }
+
+        // check all fields before call ajax
+        function maybeFetchBookedCourts() {
+            if (
+                stadiumData?.Id &&
+                selectedDate &&
+                startTime !== null &&
+                endTime !== null &&
+                endTime > startTime
+            ) {
+                console.log("Fetching booked courts for stadium:", stadiumData.Id, "on date:", selectedDate, "from", startTime, "to", endTime);
+                fetchBookedCourts(stadiumData.Id, selectedDate, startTime, endTime);
+            } else {
+                console.log("Không đủ thông tin để lấy sân đã đặt.");
+            }
+        }
+
+        const feedbacks = [
+            {
+              name: "Trần Minh Khoa",
+              avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=1200&q=80",
+              rating: 4,
+              comment: "Sân vận động rất đẹp và hiện đại, ghế ngồi thoải mái. Rất thích hợp để xem các trận đấu lớn."
+            },
+            {
+              name: "Nguyễn Thu Phương",
+              avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b80?fit=crop&w=1200&q=80",
+              rating: 5,
+              comment: "Trải nghiệm tuyệt vời! Không gian rộng rãi, sạch sẽ. Chắc chắn sẽ quay lại."
+            },
+            {
+              name: "Phạm Văn Cường",
+              avatar: "https://images.unsplash.com/photo-1570295999919-56ceb8ecca14?fit=crop&w=1200&q=80",
+              rating: 4,
+              comment: "Mọi thứ đều ổn, tuy nhiên đường vào hơi tắc vào những ngày có sự kiện lớn."
+            },
+            {
+              name: "Lê Văn Hùng",
+              avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?fit=crop&w=1200&q=80",
+              rating: 5,
+              comment: "Sân có nhiều dịch vụ tiện ích, từ đồ ăn thức uống đến nhà vệ sinh sạch sẽ."
+            },
+            {
+              name: "Ngô Thúy Hiền",
+              avatar: "https://images.unsplash.com/photo-1542152865-c7e5a7b05615?fit=crop&w=1200&q=80",
+              rating: 3,
+              comment: "Cảnh quan đẹp, nhưng chỗ gửi xe còn hơi bất tiện."
+            },
+            {
+              name: "Trịnh Quang Vinh",
+              avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?fit=crop&w=1200&q=80",
+              rating: 5,
+              comment: "Sân cỏ chất lượng cao, hệ thống ánh sáng hiện đại. Một nơi tuyệt vời để tổ chức các giải đấu chuyên nghiệp."
+            },
+            {
+              name: "Hà Thị Ngọc Ánh",
+              avatar: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?fit=crop&w=1200&q=80",
+              rating: 4,
+              comment: "Ghế ngồi có tầm nhìn tốt, không bị che khuất. Rất hài lòng."
+            },
+            {
+              name: "Bùi Thanh Tùng",
+              avatar: "https://images.unsplash.com/photo-1554151228-14d9defb3b12?fit=crop&w=1200&q=80",
+              rating: 5,
+              comment: "Đội ngũ nhân viên thân thiện và nhiệt tình hỗ trợ. Cảm thấy rất thoải mái khi đến đây."
+            },
+            {
+              name: "Đặng Mai Chi",
+              avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?fit=crop&w=1200&q=80",
+              rating: 3,
+              comment: "Giá vé hơi cao, nhưng bù lại chất lượng sân bãi rất tốt."
+            },
+            {
+              name: "Vũ Đình Nam",
+              avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fit=crop&w=1200&q=80",
+              rating: 4,
+              comment: "Không gian thoáng đãng, âm thanh tốt. Trải nghiệm xem ca nhạc ở đây rất tuyệt vời."
+            },
+            {
+              name: "Phan Anh Tú",
+              avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=1200&q=80",
+              rating: 5,
+              comment: "Rất ấn tượng với sự chuyên nghiệp trong khâu tổ chức sự kiện tại đây."
+            },
+            {
+              name: "Lê Cẩm Ly",
+              avatar: "https://images.unsplash.com/photo-1503185912284-5271ff81b9a8?fit=crop&w=1200&q=80",
+              rating: 4,
+              comment: "Sân vận động này là một điểm đến tuyệt vời cho cả gia đình vào cuối tuần."
+            }
+        ];
+
+        const feedbackList = document.getElementById('feedback-list');
+        const paginationContainer = document.getElementById('pagination-container');
+        let currentPage = 1;
+        const feedbacksPerPage = 5; // Reduced for demonstration
+
+        function createStarRating(rating) {
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHtml += `<svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.62L12 2L9.19 8.62L2 9.24L7.46 13.97L5.82 21L12 17.27Z"></path></svg>`;
+                } else {
+                    starsHtml += `<svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.62L12 2L9.19 8.62L2 9.24L7.46 13.97L5.82 21L12 17.27Z"></path></svg>`;
+                }
+            }
+            return starsHtml;
+        }
+
+        function renderFeedbacks() {
+            feedbackList.innerHTML = '';
+            const startIndex = (currentPage - 1) * feedbacksPerPage;
+            const endIndex = startIndex + feedbacksPerPage;
+            const feedbacksToRender = feedbacks.slice(startIndex, endIndex);
+
+            feedbacksToRender.forEach(feedback => {
+                const feedbackItem = document.createElement('div');
+                feedbackItem.className = 'flex items-start space-x-4 p-4 bg-white rounded-2xl shadow-sm';
+
+                const avatar = document.createElement('img');
+                avatar.className = 'w-12 h-12 rounded-full object-cover';
+                avatar.src = feedback.avatar;
+                avatar.alt = 'User Avatar';
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'flex-1';
+
+                const namePara = document.createElement('p');
+                namePara.className = 'font-semibold text-gray-900';
+                namePara.textContent = feedback.name;
+
+                const ratingDiv = document.createElement('div');
+                ratingDiv.className = 'flex items-center mt-1';
+                ratingDiv.innerHTML = createStarRating(feedback.rating);
+
+                const commentPara = document.createElement('p');
+                commentPara.className = 'mt-2 text-gray-700';
+                commentPara.textContent = feedback.comment;
+
+                contentDiv.appendChild(namePara);
+                contentDiv.appendChild(ratingDiv);
+                contentDiv.appendChild(commentPara);
+                feedbackItem.appendChild(avatar);
+                feedbackItem.appendChild(contentDiv);
+                feedbackList.appendChild(feedbackItem);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.ceil(feedbacks.length / feedbacksPerPage);
+
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Trang trước';
+            prevBtn.className = `px-4 py-2 rounded-xl font-medium text-blue-600 bg-white border-2 border-blue-200 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50 hover:border-blue-300 transition-all duration-300'}`;
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderFeedbacks();
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+
+            // Page number buttons
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = `mx-1 px-4 py-2 rounded-xl font-medium ${currentPage === i ? 'bg-blue-600 text-white' : 'text-blue-600 bg-white border-2 border-blue-200 hover:bg-blue-50 transition-all duration-300'}`;
+                if (currentPage === i) {
+                    pageBtn.disabled = true;
+                }
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderFeedbacks();
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Trang sau';
+            nextBtn.className = `px-4 py-2 rounded-xl font-medium text-blue-600 bg-white border-2 border-blue-200 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50 hover:border-blue-300 transition-all duration-300'}`;
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderFeedbacks();
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+        }
+
+        // Hàm lấy dữ liệu sân vận động từ server
+        function fetchStadiumData(id) {
+            // Tạo chuỗi truy vấn để lấy thông tin chi tiết của một sân
+            const searchTerm = `&$filter=Id eq ${id}`;
+
+
+            $.ajax({
+                url: `/Home/Stadiums`, // Sử dụng endpoint bạn đã có
+                type: 'GET',
+                data: { searchTerm: searchTerm },
+                success: function(data) {
+                    if (data.value && data.value.length > 0) {
+                        stadiumData = data.value[0]; // Lấy đối tượng sân đầu tiên
+                        console.log('Dữ liệu sân vận động:', stadiumData);
+                        console.log('Dữ liệu sân vận động:', data.value[0]);
+                        renderStadiumInfo();
+                        setupCourtTypeSelection();
+                        setupDatePicker();
+                        updateUI(); // Cập nhật giao diện với dữ liệu mới
+                    } else {
+                        console.error('Không tìm thấy dữ liệu sân vận động.');
+                        // Xử lý trường hợp không tìm thấy dữ liệu
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Lỗi khi tải dữ liệu sân vận động:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        const datePicker = document.getElementById("date-picker");
+        if (datePicker) {
+            datePicker.addEventListener("change", function () {
+                if (startTime !== null && endTime !== null && stadiumData?.Id) {
+                    selectedDate = this.value;
+                    console.log("Date changed, fetching booked courts for new date:", selectedDate);
+                    maybeFetchBookedCourts();
+                } else {
+                    console.log("Date changed nhưng thiếu startTime, endTime hoặc stadiumData.Id");
+                }
+            });
+        } else {
+            console.error("Không tìm thấy #date-picker trong DOM!");
+        }
+
+        timeButtonsContainerEl.addEventListener('click', function(e) {
+            if (e.target.classList.contains('time-button')) {
+                console.log("Time button clicked:", e.target.textContent);
+                getSelectedTimes();
+                maybeFetchBookedCourts();
+            }
+        });
+
+        // Khởi tạo ứng dụng
+        window.onload = function() {
+            fetchStadiumData(stadiumId);
+
+            continueButtonEl.onclick = showCheckoutPage;
+
+            document.getElementById('modal-close-btn').onclick = hideModal;
+
+            feedbackFormEl.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const feedbackText = document.getElementById('feedback-textarea').value;
+                if (feedbackText.trim() !== '') {
+                    showModal('Gửi phản hồi thành công', 'Cảm ơn bạn đã gửi phản hồi. Chúng tôi sẽ ghi nhận và cải thiện!');
+                    document.getElementById('feedback-textarea').value = '';
+                } else {
+                    showModal('Lỗi', 'Vui lòng nhập nội dung phản hồi.');
+                }
+            });
+
+            showSlides();
+
+
+
+            // Initial render
+            renderFeedbacks();
+        };
+    </script>
+</body>
+</html>
