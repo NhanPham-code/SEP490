@@ -17,13 +17,33 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <style>
-        /* Custom checkbox style */
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+   
+        #map {
+            flex-grow: 1;
+            min-height: 650px;
+        }
+
+      
         input[type="checkbox"] {
             accent-color: #2563eb; /* Blue-600 */
             cursor: pointer;
         }
-        /* Custom time slot styles */
+
+       
         .time-slot {
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
@@ -39,23 +59,41 @@
                 cursor: not-allowed;
             }
 
+        
         .radius-control {
             background: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            user-select: none;
+            width: 140px;
+            font-weight: 600;
+            color: #2c3e50;
         }
 
+            .radius-control label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
             .radius-control select {
-                padding: 4px 6px;
-                border-radius: 4px;
+                padding: 5px 8px;
+                border-radius: 6px;
                 border: 1px solid #ccc;
-                font-size: 14px;
+                font-size: 16px;
+                font-weight: 600;
                 cursor: pointer;
+                transition: border-color 0.3s ease;
                 margin-left: 5px;
             }
+
+                .radius-control select:hover,
+                .radius-control select:focus {
+                    border-color: #2980b9;
+                    outline: none;
+                }
 
         .weather-card {
             background: linear-gradient(to top, #74ebd5, #ACB6E5);
@@ -65,10 +103,10 @@
             text-align: center;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             width: 100%;
-            display: flex; /* sắp xếp ngang */
-            align-items: center; /* căn giữa theo chiều dọc */
-            justify-content: center; /* căn giữa toàn hàng */
-            gap: 15px; /* khoảng cách giữa các phần tử */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
             animation: fadeIn 0.5s ease-in-out;
             box-sizing: border-box;
             margin-bottom: 10px;
@@ -94,22 +132,75 @@
             justify-content: space-between;
         }
 
-        .time-slot {
-            cursor: pointer;
+       
+        .leaflet-popup-content-wrapper {
+            font-size: 16px;
+            font-weight: 600;
         }
 
-            .time-slot.selected {
-                background-color: #007bff;
-                color: white;
-                border-color: #007bff;
+        .marker-label {
+            background: white;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+       
+        #search-box {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        #addressInput {
+            width: 200px;
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+       
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #2980b9;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #21618c;
             }
 
-            .time-slot.unavailable {
-                background-color: #f0f0f0;
-                color: #999;
-                cursor: not-allowed;
+        .btn-secondary {
+            background-color: #27ae60;
+            color: white;
+        }
+
+            .btn-secondary:hover {
+                background-color: #1e8449;
             }
 
+       
         #grid-view, #map-view, #compare-view {
             transition: all 0.3s ease;
         }
@@ -119,8 +210,8 @@
                 color: white;
                 border-color: #007bff;
             }
-
     </style>
+
 
 </head>
     
@@ -493,7 +584,13 @@
                 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
                 <div id="map-container" class="hidden bg-white rounded-lg shadow-sm overflow-hidden relative map-container" style="height: 650px; width: 100%;">
-                    <div id="leaflet-map" style="height: 100%; width: 100%;"></div>
+                    <div id="map"></div>
+
+                    <div id="search-box">
+                        <input type="text" id="addressInput" placeholder="Nhập địa chỉ..." />
+                        <button class="btn btn-primary" onclick="searchAddress()">Tìm</button>
+                        <button class="btn btn-secondary" onclick="getCurrentLocation()" title="Quay lại vị trí hiện tại">📍 Vị trí hiện tại</button>
+                    </div>
                 </div>
 
                 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -651,12 +748,7 @@
         window.host = 'readdy.ai';
     </script>
     <script>
-        let leafletMap = null;
-        let userLat, userLng;
-        let routingControl = null;
-        let radiusCircle = null;
-        let radius = 5000;
-
+        // Firebase config
         const firebaseConfig = {
           apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
           authDomain: "chatbox-993b2.firebaseapp.com",
@@ -669,228 +761,257 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const searchTags = [
-          '[sport=badminton]',
-          '[sport=football]',
-          '[sport=tennis]',
-          '[sport=basketball]',
-          '[sport=swimming]',
-          '[sport=volleyball]'
-        ];
+        let radius = 5000; // 5km default
+        let userLat, userLng;
+        let currentLat, currentLng; // Lưu vị trí hiện tại ban đầu
+        let routingControl = null;
+        let radiusCircle = null;
+        const map = L.map('map').setView([0, 0], 13);
 
-        let courtMarkers = [];
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-        function initMap() {
-            if (leafletMap) return;
-
-            leafletMap = L.map('leaflet-map').setView([0, 0], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19,
-              attribution: '© OpenStreetMap contributors'
-            }).addTo(leafletMap);
-
-            const radiusControl = L.control({ position: 'topright' });
-            radiusControl.onAdd = function () {
-                let div = L.DomUtil.create('div', 'radius-control');
-                div.innerHTML = `
-                    <label>Bán kính:
-                        <select id="radiusSelect">
-                            <option value="5000" selected>5 km</option>
-                            <option value="10000">10 km</option>
-                            <option value="15000">15 km</option>
-                        </select>
-                    </label>
-                `;
-                div.querySelector('#radiusSelect').addEventListener('change', function () {
-                    updateRadius(Number(this.value));
-                });
-                return div;
-            };
-            radiusControl.addTo(leafletMap);
-
-            getUserLocation();
-        }
-
-        function getUserLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    userLat = pos.coords.latitude;
-                    userLng = pos.coords.longitude;
-                    leafletMap.setView([userLat, userLng], 13);
-
-                    L.marker([userLat, userLng], {
-                        icon: L.icon({
-                            iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
-                            iconSize: [32, 32]
-                        })
-                    }).addTo(leafletMap).bindPopup("Vị trí của bạn");
-
-                    radiusCircle = L.circle([userLat, userLng], {
-                        color: "#2980b9",
-                        fillColor: "#2980b9",
-                        fillOpacity: 0.15,
-                        radius: radius
-                    }).addTo(leafletMap);
-
-                    loadBadmintonCourts();
-                }, () => {
-                    alert("Không lấy được vị trí của bạn.");
-                });
-            } else {
-                alert("Trình duyệt không hỗ trợ định vị.");
-            }
+        function clearRoute() {
+          if (routingControl) {
+            map.removeControl(routingControl);
+            routingControl = null;
+          }
         }
 
         function addMarker(lat, lon, name, icon) {
-            let marker = L.marker([lat, lon]).addTo(leafletMap).bindPopup(`${icon} ${name}`);
-            courtMarkers.push(marker);
-            marker.on('click', () => {
-                if (routingControl) {
-                    leafletMap.removeControl(routingControl);
-                    routingControl = null;
-                } else {
-                    routingControl = L.Routing.control({
-                        waypoints: [
-                            L.latLng(userLat, userLng),
-                            L.latLng(lat, lon)
-                        ],
-                        lineOptions: { styles: [{ color: 'red', weight: 4 }] },
-                        routeWhileDragging: false,
-                        createMarker: function() { return null; }
-                    }).addTo(leafletMap);
-                }
-            });
-        }
+          let marker = L.marker([lat, lon]).addTo(map);
+          marker.bindTooltip(`${icon} ${name}`, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'marker-label'
+          }).openTooltip();
 
-        function clearCourtMarkers() {
-            courtMarkers.forEach(marker => leafletMap.removeLayer(marker));
-            courtMarkers = [];
+          marker.on('click', () => {
+            if (routingControl) {
+              clearRoute();
+            } else {
+              routingControl = L.Routing.control({
+                waypoints: [
+                  L.latLng(userLat, userLng),
+                  L.latLng(lat, lon)
+                ],
+                lineOptions: { styles: [{ color: 'red', weight: 4 }] },
+                routeWhileDragging: false,
+                createMarker: () => null
+              }).addTo(map);
+            }
+          });
         }
 
         function distanceInMeters(lat1, lon1, lat2, lon2) {
-            const R = 6371000;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a =
-                Math.sin(dLat / 2) ** 2 +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) ** 2;
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
+          const R = 6371000;
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lon2 - lon1) * Math.PI / 180;
+          const a = Math.sin(dLat/2)**2 +
+                    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
         }
 
-        function loadBadmintonCourts() {
-            if (!userLat || !userLng) {
-                console.warn("Vị trí người dùng chưa có, không thể load sân.");
-                return;
-            }
+        const searchTags = ['[sport=badminton]', '[name~"cầu lông",i]'];
+        const searchLabel = 'Sân cầu lông';
+        const searchIcon = '🏸';
 
-            clearCourtMarkers();
+        function loadOverpassData() {
+          searchTags.forEach(tag => {
+            const query = `
+              [out:json];
+              (
+                node(around:${radius},${userLat},${userLng})${tag};
+                way(around:${radius},${userLat},${userLng})${tag};
+                relation(around:${radius},${userLat},${userLng})${tag};
+              );
+              out center;
+            `;
+            fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
+              .then(res => res.json())
+              .then(data => {
+                data.elements.forEach(place => {
+                  let lat, lon;
+                  if (place.type === 'node') {
+                    lat = place.lat;
+                    lon = place.lon;
+                  } else if ((place.type === 'way' || place.type === 'relation') && place.center) {
+                    lat = place.center.lat;
+                    lon = place.center.lon;
+                  } else {
+                    return;
+                  }
 
-            searchTags.forEach(tag => {
-                const query = `
-                [out:json];
-                (
-                    node(around:${radius},${userLat},${userLng})${tag};
-                    way(around:${radius},${userLat},${userLng})${tag};
-                    relation(around:${radius},${userLat},${userLng})${tag};
-                );
-                out center;`;
-
-                fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.elements) return;
-
-                    data.elements.forEach(place => {
-                        let lat, lon;
-                        if (place.type === 'node') {
-                            lat = place.lat;
-                            lon = place.lon;
-                        } else if ((place.type === 'way' || place.type === 'relation') && place.center) {
-                            lat = place.center.lat;
-                            lon = place.center.lon;
-                        } else {
-                            return; // Không có tọa độ
-                        }
-
-                        let dist = distanceInMeters(userLat, userLng, lat, lon);
-                        if (dist <= radius) {
-                                   let name = 'Sân thể thao';
-
-        if (place.tags) {
-            if (place.tags.name) {
-                name = place.tags.name;
-            } else if (place.tags.ref) {
-                name = place.tags.ref;
-            } else if (place.tags.description) {
-                name = place.tags.description;
-            } else if (place.tags.operator) {
-                name = place.tags.operator;
-            }
+                  let dist = distanceInMeters(userLat, userLng, lat, lon);
+                  if (dist <= radius) {
+                    let name = searchLabel;
+                    if (place.tags) {
+                      if (place.tags.name) name = place.tags.name;
+                      else if (place.tags.ref) name = place.tags.ref;
+                      else if (place.tags.description) name = place.tags.description;
+                      else if (place.tags.operator) name = place.tags.operator;
+                      else if (place.tags.sport === 'badminton') name = 'Cầu Lông';
+                    }
+                    addMarker(lat, lon, name, searchIcon);
+                  }
+                });
+              })
+              .catch(e => console.error('Lỗi Overpass:', e));
+          });
         }
 
-                            let icon = '🏸'; // mặc định icon
+        function loadFirebaseData() {
+          db.ref("customPlaces").once("value")
+            .then(snapshot => {
+              let places = snapshot.val();
+              if (!places) return;
 
-                            if (tag.includes('football')) icon = '⚽';
-                            else if (tag.includes('tennis')) icon = '🎾';
-                            else if (tag.includes('basketball')) icon = '🏀';
-                            else if (tag.includes('swimming')) icon = '🏊‍♂️';
-                            else if (tag.includes('volleyball')) icon = '🏐';
-
-                            addMarker(lat, lon, name, icon);
-                        }
-                    });
-                })
-                .catch(e => console.error("Lỗi khi lấy dữ liệu Overpass:", e));
-            });
-
-            // Load custom places Firebase
-            db.ref("customPlaces").once("value")
-                .then(snapshot => {
-                    let places = snapshot.val();
-                    if (!places) return;
-
-                    Object.values(places).forEach(place => {
-                        if (place.lat && place.lng) {
-                            let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
-                            if (dist <= radius) {
-                                addMarker(place.lat, place.lng, place.name, "📍");
-                            }
-                        }
-                    });
-                })
-                .catch(e => console.error("Lỗi khi lấy dữ liệu Firebase:", e));
+              Object.values(places).forEach(place => {
+                if (place.lat && place.lng) {
+                  let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
+                  if (dist <= radius) {
+                    addMarker(place.lat, place.lng, place.name, "📍");
+                  }
+                }
+              });
+            })
+            .catch(e => console.error('Lỗi Firebase:', e));
         }
+
+        
 
         function updateRadius(newRadius) {
-            radius = newRadius;
+          radius = newRadius;
+          if (radiusCircle) {
+            radiusCircle.setRadius(radius);
+          }
 
-            if (radiusCircle) {
-                radiusCircle.setRadius(radius);
+          // Xoá marker cũ ngoại trừ vị trí user
+          map.eachLayer(layer => {
+            if (layer instanceof L.Marker &&
+                !(layer.getLatLng().lat === userLat && layer.getLatLng().lng === userLng)) {
+              map.removeLayer(layer);
             }
+          });
 
-            clearCourtMarkers();
-
-            loadBadmintonCourts();
+          loadOverpassData();
+          loadFirebaseData();
+          loadGooglePlacesData();
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const mapView = document.getElementById('map-view');
+        function init(lat, lng, label="📍 Vị trí của bạn") {
+          userLat = lat;
+          userLng = lng;
+          map.setView([userLat, userLng], 13);
 
-            mapView.addEventListener('click', function() {
-                document.getElementById('stadium-grid').classList.add('hidden');
-                document.getElementById('map-container').classList.remove('hidden');
+          // ❌ Xóa tất cả marker cũ trừ circle
+          map.eachLayer(layer => {
+            if (layer instanceof L.Marker || layer instanceof L.Circle) {
+              map.removeLayer(layer);
+            }
+          });
 
-                setTimeout(() => {
-                    initMap();
-                    if (leafletMap) {
-                        leafletMap.invalidateSize();
-                    }
-                }, 100);
-            });
-        });
+          // ✅ Thêm lại marker user
+          L.marker([userLat, userLng], {
+            icon: L.icon({
+              iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+              iconSize: [32, 32]
+            })
+          }).addTo(map).bindTooltip(label, {permanent:true, direction:'top', className:'marker-label'});
+
+          // ✅ Thêm lại circle mới
+          radiusCircle = L.circle([userLat, userLng], {
+            color: "#2980b9",
+            fillColor: "#2980b9",
+            fillOpacity: 0.15,
+            radius: radius
+          }).addTo(map);
+
+          // ✅ Load lại dữ liệu theo vị trí mới
+          loadOverpassData();
+          loadFirebaseData();
+          loadGooglePlacesData();
+        }
+
+        // Tìm theo địa chỉ nhập
+        function searchAddress() {
+          let address = document.getElementById("addressInput").value;
+          if (!address) return;
+
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lng = parseFloat(data[0].lon);
+                init(lat, lng, "📍 " + data[0].display_name.substring(0, 30) + "...");
+              } else {
+                alert("Không tìm thấy địa chỉ!");
+              }
+            })
+            .catch(e => console.error("Lỗi tìm địa chỉ:", e));
+        }
+
+        // Hàm quay lại vị trí hiện tại
+        function getCurrentLocation() {
+          if (currentLat && currentLng) {
+            init(currentLat, currentLng, "📍 Vị trí hiện tại của bạn");
+            document.getElementById("addressInput").value = ""; // Clear search box
+          } else {
+            // Nếu chưa có vị trí hiện tại, thử lấy lại
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(pos => {
+                currentLat = pos.coords.latitude;
+                currentLng = pos.coords.longitude;
+                init(currentLat, currentLng, "📍 Vị trí hiện tại của bạn");
+                document.getElementById("addressInput").value = "";
+              }, () => {
+                alert("Không thể lấy vị trí hiện tại của bạn!");
+              });
+            } else {
+              alert("Trình duyệt không hỗ trợ định vị!");
+            }
+          }
+        }
+
+        map.on('click', clearRoute);
+
+        // Control chọn bán kính
+        const radiusControl = L.control({ position: 'topright' });
+        radiusControl.onAdd = function() {
+          let div = L.DomUtil.create('div', 'radius-control');
+          div.innerHTML = `
+            <label>Bán kính:
+              <select id="radiusSelect" aria-label="Chọn bán kính tìm kiếm">
+                <option value="5000" selected>5 km</option>
+                <option value="10000">10 km</option>
+                <option value="15000">15 km</option>
+                <option value="20000">20 km</option>
+              </select>
+            </label>
+          `;
+          div.querySelector('#radiusSelect').addEventListener('change', function() {
+            updateRadius(Number(this.value));
+          });
+          return div;
+        };
+        radiusControl.addTo(map);
+
+        // Nếu có geolocation thì lấy ban đầu
+                // Nếu có geolocation thì lấy ban đầu
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(pos => {
+            currentLat = pos.coords.latitude; // Lưu vị trí hiện tại
+            currentLng = pos.coords.longitude;
+            init(currentLat, currentLng, "📍 Vị trí hiện tại của bạn"); // Tự động load
+          }, () => {
+            alert("Không lấy được vị trí của bạn.");
+          });
+        }
     </script>
 
 
@@ -944,6 +1065,7 @@
         }
 
     </script>
+    
 
 </body>
 </html>
