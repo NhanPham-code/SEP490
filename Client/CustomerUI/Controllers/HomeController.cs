@@ -1,21 +1,38 @@
 using CustomerUI.Models;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CustomerUI.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IStadiumService _stadiumService;
 
-        public HomeController(ILogger<HomeController> logger)
+
+        public HomeController(ILogger<HomeController> logger, IStadiumService stadiumService)
         {
             _logger = logger;
+
+            _stadiumService = stadiumService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
+        }
+
+
+        public async Task<IActionResult> Stadiums(string searchTerm)
+        {
+
+
+            var stadium = await _stadiumService.SearchStadiumAsync(searchTerm);
+
+            return Content(stadium, "application/json");
         }
 
 
@@ -23,6 +40,11 @@ namespace CustomerUI.Controllers
         {
             return View();
         }
+        public IActionResult Map()
+        {
+            return View();
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

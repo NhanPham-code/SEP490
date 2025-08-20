@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
+using DTOs.BookingDTO;
+using Service.BaseService;
+using Service.Interfaces;
+
+namespace Service.Services
+{
+    public class BookingService : IBookingService
+    {
+        private readonly HttpClient _httpClient;
+
+        public BookingService(GatewayHttpClient gateway)
+        {
+            _httpClient = gateway.Client;
+        }
+
+        private void AddBearerAccessToken(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        // Lấy lịch sử booking của user hiện tại qua route gateway đã giấu userId
+        public async Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken)
+        {
+            // Sử dụng HttpRequestMessage để set token thủ công
+            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<BookingReadDto>();
+            }
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            // Deserialize theo kiểu DTO bao ngoài chứa 'value'
+            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Value ?? new List<BookingReadDto>();
+        }
+
+        // Lấy chi tiết booking theo Id
+        public async Task<BookingReadDto?> GetBookingDetailAsync(string accessToken, int bookingId)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await _httpClient.GetAsync($"/bookings/{bookingId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
+        }
+
+        // Tạo booking mới
+        public async Task<BookingReadDto?> CreateBookingAsync(BookingCreateDto bookingCreateDto, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await _httpClient.PostAsJsonAsync("/Bookings/add", bookingCreateDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API CreateBooking failed: {errorMessage}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
+        }
+
+        public async Task<List<BookingReadDto>> GetBookedCourtsAsync(
+    string accessToken, int stadiumId, DateTime startTime, DateTime endTime)
+        {
+            AddBearerAccessToken(accessToken);
+
+            //yyyy → năm
+            //MM → tháng
+            //dd → ngày
+            //T → ký tự cố định, ngăn cách ngày và giờ theo chuẩn ISO
+            //HH:mm: ss → giờ: phút: giây
+            //zzz → múi giờ hiện tại(VD: +07:00 cho Việt Nam)
+            string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+
+            string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
+                           $"and StartTime lt {endIso} and EndTime gt {startIso}" +
+                           "&$expand=BookingDetails";
+
+            var response = await _httpClient.GetAsync(query);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<BookingReadDto>();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return result?.Value ?? new List<BookingReadDto>();
+        }
+
+    }
+}

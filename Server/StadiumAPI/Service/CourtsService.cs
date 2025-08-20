@@ -47,14 +47,7 @@ namespace StadiumAPI.Service
                 .ContinueWith(task => _mapper.Map<IEnumerable<ReadCourtDTO>>(task.Result));
         }
 
-        //public IQueryable<Courts> GetAllOdataCourts(int stadiumId)
-        //{
-        //    if (stadiumId <= 0)
-        //    {
-        //        throw new ArgumentOutOfRangeException(nameof(stadiumId), "Stadium ID must be greater than zero.");
-        //    }
-        //    return _courtsRepositories.GetAllOdataCourts(stadiumId);
-        //}
+
 
         public Task<ReadCourtDTO> GetCourtByIdAsync(int id)
         {

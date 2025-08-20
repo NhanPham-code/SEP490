@@ -9,7 +9,7 @@ using StadiumAPI.Service.Interface;
 
 namespace StadiumAPI.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("odata/OdataStadium")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)] // Ignore this controller in Swagger documentation
     public class OdataStadiumController : ODataController
@@ -21,16 +21,15 @@ namespace StadiumAPI.Controllers
             _serviceStadium = serviceStadium;
             _mapper = mapper;
         }
+
         [EnableQuery]
-        public IQueryable<ReadStadiumDTO> Get(ODataQueryOptions<Stadiums> oDataQueryOptions)
+        public IQueryable<Stadiums> Get()
         {
-            // Use the service to get the OData queryable collection of stadiums
-            IQueryable<Stadiums> stadiums = _serviceStadium.GetAllOdataStadiums();
-            // Apply OData query options to the IQueryable collection
-            IQueryable<Stadiums> results = (IQueryable<Stadiums>)oDataQueryOptions.ApplyTo(stadiums);
-            // Project the results to ReadStadiumDTO using AutoMapper
-            IQueryable<ReadStadiumDTO> projectedResults = results.ProjectTo<ReadStadiumDTO>(_mapper.ConfigurationProvider);
-            return projectedResults;
+            var stadiums = _serviceStadium.GetAllOdataStadiums(); // IQueryable<Stadiums>
+            return stadiums;
         }
+
+
+
     }
 }

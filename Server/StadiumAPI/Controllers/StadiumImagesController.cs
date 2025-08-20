@@ -16,8 +16,8 @@ namespace StadiumAPI.Controllers
         }
         // GET: api/StadiumImages/{stadiumId}
         [HttpGet]
-        [Route("api/AllStadiumImages/{stadiumId}")]
-        public async Task<IActionResult> GetAllImages(int stadiumId)
+        [Route("api/AllStadiumImages")]
+        public async Task<IActionResult> GetAllImages([FromQuery] int stadiumId)
         {
             var images = await _serviceStadiumImage.GetAllImagesAsync(stadiumId);
             if (images == null || !images.Any())
@@ -56,10 +56,10 @@ namespace StadiumAPI.Controllers
             return Ok(createdImage);
         }
         // PUT: api/StadiumImages/{id}
-        [HttpPut("{id}")]
-        [Route("api/UpdateStadiumImage/{id}")]
+        [HttpPut]
+        [Route("api/UpdateStadiumImage")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UpdateImage(int id, [FromForm] UpdateStadiumImageDTO imageDto)
+        public async Task<IActionResult> UpdateImage([FromQuery] int id, [FromForm] UpdateStadiumImageDTO imageDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var existingImage = await _serviceStadiumImage.GetImageByIdAsync(imageDto.Id);
@@ -78,11 +78,12 @@ namespace StadiumAPI.Controllers
                 {
 
                     System.IO.File.Delete(oldFilePath);
-                    using (var stream = new FileStream(adminFilePath, FileMode.Create))
-                    {
-                        await imageDto.ImageUrl.CopyToAsync(stream);
-                    }
+                    
 
+                }
+                using (var stream = new FileStream(adminFilePath, FileMode.Create))
+                {
+                    await imageDto.ImageUrl.CopyToAsync(stream);
                 }
             }
             else
@@ -103,8 +104,8 @@ namespace StadiumAPI.Controllers
             return Ok(updatedImage);
         }
         // DELETE: api/StadiumImages/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteImage(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteImage([FromQuery] int id)
         {
             var image = await _serviceStadiumImage.GetImageByIdAsync(id);
             if (image == null)

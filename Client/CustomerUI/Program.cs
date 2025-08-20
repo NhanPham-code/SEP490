@@ -4,6 +4,7 @@ using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -39,6 +40,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IStadiumService, StadiumService>();
+builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
+
 
 var app = builder.Build();
 
@@ -54,11 +60,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSession();
+
 
 app.MapControllerRoute(
     name: "default",

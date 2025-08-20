@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.OData;
+﻿using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using StadiumAPI.Data;
 using StadiumAPI.DTOs;
@@ -13,21 +14,56 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var odataBuilder = new ODataConventionModelBuilder();
-// odata
-odataBuilder.EntitySet<ReadStadiumDTO>("Stadiums")
-    .EntityType.HasKey(s => s.Id);
+IEdmModel GetEdmModel()
+{
+    var odataBuilder = new ODataConventionModelBuilder();
 
-builder.Services.AddControllers().AddOData(options => options
-.AddRouteComponents("odata", odataBuilder.GetEdmModel()).Select().Filter().OrderBy().Expand().Count().SetMaxTop(100));
-odataBuilder.EntitySet<Stadiums>("OdataStadium");
+    // Stadiums
+    var stadium = odataBuilder.EntitySet<Stadiums>("OdataStadium");
+    stadium.EntityType.HasKey(s => s.Id);
+    // Khai báo navigation property
+    stadium.EntityType.HasMany(s => s.Courts);
+    stadium.EntityType.HasMany(s => s.StadiumImages);
+    // Khai báo binding (liên kết)
+    stadium.HasManyBinding(s => s.Courts, "Courts");
+    stadium.HasManyBinding(s => s.StadiumImages, "StadiumImages");
+
+    // Courts
+    var court = odataBuilder.EntitySet<Courts>("Courts");
+    court.EntityType.HasKey(c => c.Id);
+    court.EntityType.HasRequired(c => c.Stadium);
+    court.HasRequiredBinding(c => c.Stadium, "OdataStadium");
+
+    // StadiumImages
+    var stadiumImage = odataBuilder.EntitySet<StadiumImages>("StadiumImages");
+    stadiumImage.EntityType.HasKey(si => si.Id);
+    stadiumImage.EntityType.HasOptional(si => si.Stadium);
+    stadiumImage.HasOptionalBinding(si => si.Stadium, "OdataStadium");
+
+    return odataBuilder.GetEdmModel();
+}
+
+
+// 2. Add OData services
+builder.Services.AddControllers().AddOData(options =>
+{
+    // Đăng ký route components cho ODataUsersController
+    // Tiền tố "odata" phải khớp với [Route("odata/[controller]")] của ODataUsersController
+    options.AddRouteComponents("odata", GetEdmModel()) // route: /odata/ODataUsers
+        .Select()
+        .Filter()
+        .OrderBy()
+        .Expand()
+        .Count()
+        .SetMaxTop(100);
+});
 
 
 builder.Services.AddDbContext<StadiumDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Register repositories
 builder.Services.AddScoped<IStadiumRepositories, StadiumRepositories>();
 builder.Services.AddScoped<IStadiumImagesRepositories, StadiumImageRepositories>();
