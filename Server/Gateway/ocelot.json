@@ -537,6 +537,76 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       }
     },
+    // Court Relation
+    {
+      "DownstreamPathTemplate": "/GetAllCourtRelation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/GetAllCourtRelation",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/AddCourtRelation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/AddCourtRelation",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/UpdateCourtRelation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/UpdateCourtRelation",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/DeleteCourtRelation",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/DeleteCourtRelation",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
     // === FEEDBACK API ===
     {
       "DownstreamPathTemplate": "/api/Feedback",

@@ -26,6 +26,15 @@ namespace StadiumAPI.Controllers
             var courts = await _courtsService.GetAllCourtsAsync(stadiumId);
             return Ok(courts);
         }
+
+        // GET: 
+        [HttpGet("GetCourtAndCourtRealation")]
+        public async Task<IActionResult> GetCourtAndCourtRealation(int stadiumId, int courtId)
+        {
+            var results = await _courtsService.GetCourtAndCourtRelation(stadiumId, courtId);
+            return Ok(results);
+        }
+
         /// GET: api/courts/{id}
         /// 
 

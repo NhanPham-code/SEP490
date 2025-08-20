@@ -1,17 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using StadiumAPI.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace StadiumAPI.Models
+namespace StadiumAPI.DTOs
 {
-    public class CourtRelation
+    public class ReadCourtRelationDTO
     {
-        [Key]
         public int Id { get; set; }
 
-        [Required, ForeignKey("ParentCourt")]
+        [Required]
         public int ParentCourtId { get; set; } // ví dụ: sân 7
 
-        [Required, ForeignKey("ChildCourt")]
+        [Required]
         public int ChildCourtId { get; set; } // ví dụ: sân 5A
         // Navigation
         public Courts ParentCourt { get; set; }

@@ -48,6 +48,13 @@ namespace StadiumAPI.Mapper
             CreateMap<UpdateStadiumImageDTO, StadiumImages>()
                 .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
 
+            CreateMap<CourtRelations, ReadCourtRelationDTO>();
+            CreateMap<ReadCourtRelationDTO, CourtRelations>();
+
+            CreateMap<CreateCourtRelationDTO, CourtRelations>()
+                .ForMember(dest => dest.ChildCourt, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentCourt, opt => opt.Ignore());
+            CreateMap<UpdateCourtRelationDTO, CourtRelations>();
         }
     }
 }

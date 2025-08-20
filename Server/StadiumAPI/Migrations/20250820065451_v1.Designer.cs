@@ -12,8 +12,8 @@ using StadiumAPI.Data;
 namespace StadiumAPI.Migrations
 {
     [DbContext(typeof(StadiumDbContext))]
-    [Migration("20250817154423_newData")]
-    partial class newData
+    [Migration("20250820065451_v1")]
+    partial class v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,67 @@ namespace StadiumAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("StadiumAPI.Models.CourtRelations", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChildCourtId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParentCourtId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildCourtId");
+
+                    b.HasIndex("ParentCourtId");
+
+                    b.ToTable("CourtRelations", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChildCourtId = 2,
+                            ParentCourtId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ChildCourtId = 3,
+                            ParentCourtId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ChildCourtId = 22,
+                            ParentCourtId = 21
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ChildCourtId = 23,
+                            ParentCourtId = 21
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ChildCourtId = 37,
+                            ParentCourtId = 36
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ChildCourtId = 38,
+                            ParentCourtId = 36
+                        });
+                });
 
             modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
                 {
@@ -81,7 +142,7 @@ namespace StadiumAPI.Migrations
                             Id = 2,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân 5 người",
+                            Name = "Sân 5 người A",
                             PricePerHour = 200000m,
                             SportType = "Bóng đá",
                             StadiumId = 1,
@@ -92,6 +153,17 @@ namespace StadiumAPI.Migrations
                             Id = 3,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
+                            Name = "Sân 5 người B",
+                            PricePerHour = 200000m,
+                            SportType = "Bóng đá",
+                            StadiumId = 1,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
                             Name = "Sân A",
                             PricePerHour = 50000m,
                             SportType = "Cầu lông",
@@ -100,7 +172,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 5,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = false,
                             Name = "Sân B",
@@ -111,21 +183,10 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 5,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Sân Số 1",
-                            PricePerHour = 100000m,
-                            SportType = "Tennis",
-                            StadiumId = 3,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = 6,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân Số 2",
+                            Name = "Sân Số 1",
                             PricePerHour = 100000m,
                             SportType = "Tennis",
                             StadiumId = 3,
@@ -136,6 +197,17 @@ namespace StadiumAPI.Migrations
                             Id = 7,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
+                            Name = "Sân Số 2",
+                            PricePerHour = 100000m,
+                            SportType = "Tennis",
+                            StadiumId = 3,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
                             Name = "Sân chính",
                             PricePerHour = 150000m,
                             SportType = "Bóng rổ",
@@ -144,7 +216,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 9,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 1",
@@ -155,7 +227,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 10,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = false,
                             Name = "Sân 2",
@@ -166,7 +238,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 10,
+                            Id = 11,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Chính",
@@ -177,7 +249,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 11,
+                            Id = 12,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Hồ bơi 50m",
@@ -188,21 +260,10 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 12,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Sân 1",
-                            PricePerHour = 120000m,
-                            SportType = "Tennis",
-                            StadiumId = 8,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
                             Id = 13,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân 2",
+                            Name = "Sân 1",
                             PricePerHour = 120000m,
                             SportType = "Tennis",
                             StadiumId = 8,
@@ -213,10 +274,10 @@ namespace StadiumAPI.Migrations
                             Id = 14,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân Số 1",
-                            PricePerHour = 60000m,
-                            SportType = "Cầu lông",
-                            StadiumId = 9,
+                            Name = "Sân 2",
+                            PricePerHour = 120000m,
+                            SportType = "Tennis",
+                            StadiumId = 8,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -224,7 +285,7 @@ namespace StadiumAPI.Migrations
                             Id = 15,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân Số 2",
+                            Name = "Sân Số 1",
                             PricePerHour = 60000m,
                             SportType = "Cầu lông",
                             StadiumId = 9,
@@ -235,6 +296,17 @@ namespace StadiumAPI.Migrations
                             Id = 16,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
+                            Name = "Sân Số 2",
+                            PricePerHour = 60000m,
+                            SportType = "Cầu lông",
+                            StadiumId = 9,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
                             Name = "Sân Đơn",
                             PricePerHour = 150000m,
                             SportType = "Tennis",
@@ -243,7 +315,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 17,
+                            Id = 18,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Chính",
@@ -254,7 +326,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 19,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Hồ bơi ngoài trời",
@@ -265,7 +337,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 19,
+                            Id = 20,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = false,
                             Name = "Sân Số 3",
@@ -276,7 +348,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 21,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người 1",
@@ -287,7 +359,29 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 22,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 5 người A",
+                            PricePerHour = 180000m,
+                            SportType = "Bóng đá",
+                            StadiumId = 14,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 5 người B",
+                            PricePerHour = 180000m,
+                            SportType = "Bóng đá",
+                            StadiumId = 14,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 24,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Công an 1",
@@ -298,7 +392,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 25,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân chính",
@@ -309,7 +403,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 26,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân A",
@@ -320,7 +414,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 27,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Bóng Chuyền",
@@ -331,7 +425,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 28,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người 1",
@@ -342,7 +436,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 29,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 5 người",
@@ -353,7 +447,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 30,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 1",
@@ -364,7 +458,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 28,
+                            Id = 31,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân bóng chuyền",
@@ -375,7 +469,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 32,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Hồ bơi",
@@ -386,7 +480,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 31,
+                            Id = 33,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 1",
@@ -397,7 +491,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 32,
+                            Id = 34,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 2",
@@ -408,7 +502,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 33,
+                            Id = 35,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân chính",
@@ -419,11 +513,33 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 34,
+                            Id = 36,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 11 người",
                             PricePerHour = 450000m,
+                            SportType = "Bóng đá",
+                            StadiumId = 25,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 7 người A",
+                            PricePerHour = 300000m,
+                            SportType = "Bóng đá",
+                            StadiumId = 25,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 7 người B",
+                            PricePerHour = 300000m,
                             SportType = "Bóng đá",
                             StadiumId = 25,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
@@ -1190,6 +1306,25 @@ namespace StadiumAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("StadiumAPI.Models.CourtRelations", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Courts", "ChildCourt")
+                        .WithMany("ParentRelations")
+                        .HasForeignKey("ChildCourtId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StadiumAPI.Models.Courts", "ParentCourt")
+                        .WithMany("ChildRelations")
+                        .HasForeignKey("ParentCourtId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ChildCourt");
+
+                    b.Navigation("ParentCourt");
+                });
+
             modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
                 {
                     b.HasOne("StadiumAPI.Models.Stadiums", "Stadium")
@@ -1210,6 +1345,13 @@ namespace StadiumAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Stadium");
+                });
+
+            modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
+                {
+                    b.Navigation("ChildRelations");
+
+                    b.Navigation("ParentRelations");
                 });
 
             modelBuilder.Entity("StadiumAPI.Models.Stadiums", b =>

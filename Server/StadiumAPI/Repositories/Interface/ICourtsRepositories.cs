@@ -9,5 +9,6 @@ namespace StadiumAPI.Repositories.Interface
         public Task<Courts> CreateCourtAsync(Courts court);
         public Task<Courts> UpdateCourtAsync(int id, Courts court);
         public Task<bool> DeleteCourtAsync(int id);
+        public Task<Courts> GetCourtAndCourtRelation(int stadiumId, int courtId);
     }
 }

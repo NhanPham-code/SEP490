@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StadiumAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class newData : Migration
+    public partial class v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,6 +83,31 @@ namespace StadiumAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CourtRelations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentCourtId = table.Column<int>(type: "int", nullable: false),
+                    ChildCourtId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourtRelations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CourtRelations_Courts_ChildCourtId",
+                        column: x => x.ChildCourtId,
+                        principalTable: "Courts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourtRelations_Courts_ParentCourtId",
+                        column: x => x.ParentCourtId,
+                        principalTable: "Courts",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "Stadiums",
                 columns: new[] { "Id", "Address", "CloseTime", "CreatedAt", "CreatedBy", "CreatedByUser", "Description", "IsApproved", "Latitude", "Longitude", "Name", "OpenTime", "UpdatedAt" },
@@ -120,38 +145,43 @@ namespace StadiumAPI.Migrations
                 values: new object[,]
                 {
                     { 1, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người", 300000m, "Bóng đá", 1, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người", 200000m, "Bóng đá", 1, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân A", 50000m, "Cầu lông", 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân B", 50000m, "Cầu lông", 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 1", 100000m, "Tennis", 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 6, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 2", 100000m, "Tennis", 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 7, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 150000m, "Bóng rổ", 4, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 70000m, "Cầu lông", 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân 2", 70000m, "Cầu lông", 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 10, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Chính", 500000m, "Bóng đá", 6, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 11, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi 50m", 50000m, "Bơi lội", 7, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 12, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 120000m, "Tennis", 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 13, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 2", 120000m, "Tennis", 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 1", 60000m, "Cầu lông", 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 15, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 2", 60000m, "Cầu lông", 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 16, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Đơn", 150000m, "Tennis", 10, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Chính", 80000m, "Bóng chuyền", 11, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi ngoài trời", 80000m, "Bơi lội", 12, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 19, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân Số 3", 75000m, "Cầu lông", 13, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 20, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người 1", 280000m, "Bóng đá", 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 21, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Công an 1", 110000m, "Tennis", 15, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 22, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 100000m, "Bóng rổ", 16, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân A", 50000m, "Cầu lông", 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 24, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Bóng Chuyền", 70000m, "Bóng chuyền", 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người 1", 250000m, "Bóng đá", 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 26, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người", 150000m, "Bóng đá", 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 27, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 90000m, "Tennis", 19, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 28, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân bóng chuyền", 80000m, "Bóng chuyền", 20, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 29, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi", 30000m, "Bơi lội", 21, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 31, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 70000m, "Cầu lông", 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 32, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 2", 70000m, "Cầu lông", 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 33, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 150000m, "Bóng chuyền", 24, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 34, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 11 người", 450000m, "Bóng đá", 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người A", 200000m, "Bóng đá", 1, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người B", 200000m, "Bóng đá", 1, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân A", 50000m, "Cầu lông", 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân B", 50000m, "Cầu lông", 2, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 6, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 1", 100000m, "Tennis", 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 7, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 2", 100000m, "Tennis", 3, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 150000m, "Bóng rổ", 4, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 70000m, "Cầu lông", 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 10, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân 2", 70000m, "Cầu lông", 5, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 11, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Chính", 500000m, "Bóng đá", 6, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 12, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi 50m", 50000m, "Bơi lội", 7, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 13, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 120000m, "Tennis", 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 2", 120000m, "Tennis", 8, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 15, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 1", 60000m, "Cầu lông", 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 16, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Số 2", 60000m, "Cầu lông", 9, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Đơn", 150000m, "Tennis", 10, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Chính", 80000m, "Bóng chuyền", 11, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 19, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi ngoài trời", 80000m, "Bơi lội", 12, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 20, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), false, "Sân Số 3", 75000m, "Cầu lông", 13, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 21, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người 1", 280000m, "Bóng đá", 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 22, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người A", 180000m, "Bóng đá", 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người B", 180000m, "Bóng đá", 14, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 24, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Công an 1", 110000m, "Tennis", 15, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 100000m, "Bóng rổ", 16, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 26, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân A", 50000m, "Cầu lông", 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 27, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân Bóng Chuyền", 70000m, "Bóng chuyền", 17, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 28, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người 1", 250000m, "Bóng đá", 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 29, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 5 người", 150000m, "Bóng đá", 18, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 30, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 90000m, "Tennis", 19, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 31, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân bóng chuyền", 80000m, "Bóng chuyền", 20, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 32, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Hồ bơi", 30000m, "Bơi lội", 21, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 33, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 1", 70000m, "Cầu lông", 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 34, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 2", 70000m, "Cầu lông", 23, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 35, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân chính", 150000m, "Bóng chuyền", 24, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 36, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 11 người", 450000m, "Bóng đá", 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 37, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người A", 300000m, "Bóng đá", 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 38, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified), true, "Sân 7 người B", 300000m, "Bóng đá", 25, new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
@@ -203,6 +233,29 @@ namespace StadiumAPI.Migrations
                     { 42, "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg", 25, new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified) }
                 });
 
+            migrationBuilder.InsertData(
+                table: "CourtRelations",
+                columns: new[] { "Id", "ChildCourtId", "ParentCourtId" },
+                values: new object[,]
+                {
+                    { 1, 2, 1 },
+                    { 2, 3, 1 },
+                    { 3, 22, 21 },
+                    { 4, 23, 21 },
+                    { 5, 37, 36 },
+                    { 6, 38, 36 }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourtRelations_ChildCourtId",
+                table: "CourtRelations",
+                column: "ChildCourtId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourtRelations_ParentCourtId",
+                table: "CourtRelations",
+                column: "ParentCourtId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Courts_StadiumId",
                 table: "Courts",
@@ -218,10 +271,13 @@ namespace StadiumAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Courts");
+                name: "CourtRelations");
 
             migrationBuilder.DropTable(
                 name: "StadiumImages");
+
+            migrationBuilder.DropTable(
+                name: "Courts");
 
             migrationBuilder.DropTable(
                 name: "Stadiums");

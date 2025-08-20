@@ -30,8 +30,8 @@ namespace StadiumAPI.Models
 
         // Navigation
         public Stadiums Stadium { get; set; }
-        public virtual ICollection<CourtRelation> ParentRelations { get; set; } // Sân này là con của
-        public virtual ICollection<CourtRelation> ChildRelations { get; set; }
+        public virtual ICollection<CourtRelations> ParentRelations { get; set; } // Sân này là con của
+        public virtual ICollection<CourtRelations> ChildRelations { get; set; }
 
     }
 }
