@@ -45,7 +45,9 @@ namespace UserAPI.Data
                     Address = "123 Admin St",
                     PhoneNumber = "0123456789",
                     AvatarUrl = "https://example.com/avatar/admin.png",
-                    FaceImageUrl = "https://example.com/face/admin.png",
+                    FaceVideoUrl = "https://example.com/videos/admin.png",
+                    FrontCCCDUrl = "https://example.com/cccd/admin.png",
+                    RearCCCDUrl = "https://example.com/cccd/admin_rear.png",
                     IsActive = true,
                     CreatedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc),
                     UpdatedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc)

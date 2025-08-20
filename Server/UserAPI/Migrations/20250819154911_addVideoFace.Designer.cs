@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserAPI.Data;
 
@@ -11,9 +12,11 @@ using UserAPI.Data;
 namespace UserAPI.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250819154911_addVideoFace")]
+    partial class addVideoFace
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,11 +71,11 @@ namespace UserAPI.Migrations
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CCCDUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateOnly?>("DateOfBirth")
-                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -82,19 +85,10 @@ namespace UserAPI.Migrations
                     b.Property<string>("FaceVideoUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FrontCCCDUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IdentityNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -110,9 +104,6 @@ namespace UserAPI.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("RearCCCDUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -132,16 +123,15 @@ namespace UserAPI.Migrations
                             UserId = 1,
                             Address = "123 Admin St",
                             AvatarUrl = "https://example.com/avatar/admin.png",
+                            CCCDUrl = "https://example.com/cccd/admin.png",
                             CreatedDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@example.com",
                             FaceVideoUrl = "https://example.com/videos/admin.png",
-                            FrontCCCDUrl = "https://example.com/cccd/admin.png",
                             FullName = "Admin User",
                             IsActive = true,
                             PasswordHash = new byte[] { 61, 245, 95, 239, 114, 51, 117, 227, 183, 88, 194, 170, 106, 144, 54, 13, 33, 71, 118, 189, 184, 225, 12, 65, 131, 253, 201, 255, 151, 229, 142, 245, 94, 254, 157, 12, 111, 7, 197, 205, 92, 121, 191, 176, 238, 210, 90, 21, 74, 229, 48, 186, 12, 115, 248, 70, 202, 75, 52, 134, 237, 133, 70, 90 },
                             PasswordSalt = new byte[] { 141, 64, 4, 134, 215, 100, 101, 229, 217, 66, 141, 203, 233, 199, 35, 51, 46, 248, 54, 179, 214, 28, 47, 122, 137, 17, 58, 11, 78, 111, 103, 96, 106, 85, 125, 215, 222, 76, 5, 9, 7, 231, 21, 163, 240, 155, 230, 86, 2, 94, 247, 158, 118, 220, 179, 233, 5, 31, 3, 218, 189, 53, 185, 7, 191, 200, 116, 172, 23, 52, 112, 188, 35, 213, 174, 98, 224, 96, 114, 244, 81, 83, 89, 30, 40, 248, 35, 0, 151, 183, 215, 16, 10, 38, 135, 11, 128, 232, 56, 203, 156, 119, 0, 96, 55, 12, 243, 165, 15, 213, 43, 158, 103, 115, 150, 193, 65, 32, 1, 122, 27, 182, 73, 33, 127, 132, 245, 240 },
                             PhoneNumber = "0123456789",
-                            RearCCCDUrl = "https://example.com/cccd/admin_rear.png",
                             Role = "Admin",
                             UpdatedDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });

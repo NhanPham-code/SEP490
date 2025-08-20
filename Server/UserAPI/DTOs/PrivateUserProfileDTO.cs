@@ -10,8 +10,6 @@
         public string? PhoneNumber { get; set; }
         public string? AvatarUrl { get; set; }
 
-        public string? FaceImageUrl { get; set; }
-
         public bool IsActive { get; set; } = true;
 
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;

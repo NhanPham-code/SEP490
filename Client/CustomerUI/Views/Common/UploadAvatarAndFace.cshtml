@@ -1,8 +1,7 @@
 ﻿@using CustomerUI.Models
 @{
-    ViewData["Title"] = "Tải Lên Ảnh";
+    ViewData["Title"] = "Tải Lên Ảnh & Video Khuôn Mặt";
 }
-
 @if (ViewBag.ErrorMessage != null)
 {
     <div class="alert alert-danger text-center mt-3">
@@ -20,122 +19,415 @@
                     secondary: "#10b981",
                 },
                 borderRadius: {
-                    none: "0px",
-                    sm: "4px",
-                    DEFAULT: "8px",
-                    md: "12px",
-                    lg: "16px",
-                    xl: "20px",
-                    "2xl": "24px",
-                    "3xl": "32px",
-                    full: "9999px",
                     button: "8px",
                 },
             },
         },
     };
 </script>
+<style>
+    .disabled-btn {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
-<div class="flex items-center justify-center min-h-screen bg-gray-50">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Hoàn tất đăng ký</h2>
-        <p class="text-center text-gray-500 mb-8">Bạn đã xác thực thành công. Vui lòng tải lên ảnh để hoàn tất hồ sơ.</p>
+    .step-active {
+        color: #2563eb;
+        font-weight: bold;
+    }
 
-        <form asp-action="CompleteRegistration" asp-controller="Common" method="post" enctype="multipart/form-data" class="space-y-6">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
-            <input type="hidden" name="email" value="@ViewBag.Email" />
+    .step-done {
+        color: #10b981;
+        text-decoration: line-through;
+    }
+</style>
 
-            <!-- Avatar Upload -->
+<!-- ====== UI: Avatar + 1 video hướng dẫn step-by-step ====== -->
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-xl p-6 space-y-6">
+        <h2 class="text-2xl font-bold text-gray-900 text-center">Hoàn tất đăng ký</h2>
+        <p class="text-center text-gray-600">Tải avatar và quay 1 video thực hiện tuần tự các bước theo hướng dẫn.</p>
+
+        <form id="completeRegForm" enctype="multipart/form-data" class="space-y-4">
+            <!-- Avatar -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh đại diện (Avatar)</label>
-                <div class="flex items-center space-x-4">
-                    <div class="relative group">
-                        <img id="avatarPreview" src="https://ui-avatars.com/api/?name=Avatar&background=random&size=128" alt="Avatar Preview"
-                             class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 transition-shadow duration-300 group-hover:shadow-lg" />
-                        <button type="button" id="removeAvatar" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hidden group-hover:block" title="Xóa ảnh">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div>
-                        <input type="file" id="avatar" name="avatar" accept="image/*" required
-                               class="hidden" />
-                        <label for="avatar" class="cursor-pointer inline-block px-4 py-2 bg-primary text-white rounded-button font-semibold hover:bg-blue-600 transition-colors">
-                            Chọn ảnh
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- Face Image Upload -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh khuôn mặt (Face Image)</label>
-                <div class="flex items-center space-x-4">
-                    <div class="relative group">
-                        <img id="faceImagePreview" src="https://placehold.co/128x128?text=Face" alt="Face Preview"
-                             class="w-24 h-24 rounded-xl object-cover border-2 border-gray-300 transition-shadow duration-300 group-hover:shadow-lg" />
-                        <button type="button" id="removeFaceImage" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hidden group-hover:block" title="Xóa ảnh">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div>
-                        <input type="file" id="faceImage" name="faceImage" accept="image/*" required
-                               class="hidden" />
-                        <label for="faceImage" class="cursor-pointer inline-block px-4 py-2 bg-primary text-white rounded-button font-semibold hover:bg-blue-600 transition-colors">
-                            Chọn ảnh
-                        </label>
+                <div class="flex items-center gap-4">
+                    <img id="avatarPreview" class="w-20 h-20 rounded-full object-cover border"
+                         src="https://ui-avatars.com/api/?name=Avatar&background=random&size=128" alt="Avatar Preview">
+                    <div class="flex items-center gap-2">
+                        <input id="avatar" name="avatar" type="file" accept="image/*" class="hidden">
+                        <label for="avatar" class="px-4 py-2 rounded-lg bg-blue-600 text-white cursor-pointer hover:bg-blue-700">Chọn ảnh</label>
+                        <button type="button" id="removeAvatar" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">Xóa</button>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold mt-4">
+            <!-- Video & Steps -->
+            <div class="space-y-3">
+                <div class="flex items-start gap-4">
+                    <ol id="stepsList" class="list-decimal ml-5 space-y-1 text-sm text-gray-700">
+                        <li data-step="0" class="step-item">Nhìn thẳng vào camera</li>
+                        <li data-step="1" class="step-item">Quay mặt sang trái</li>
+                        <li data-step="2" class="step-item">Quay mặt sang phải</li>
+                        <li data-step="3" class="step-item">Ngẩng cao đầu</li>
+                        <li data-step="4" class="step-item">Cúi đầu xuống</li>
+                    </ol>
+                </div>
+
+                <div class="relative">
+                    <!-- Preview camera -->
+                    <video id="preview" class="w-full rounded-xl border" autoplay muted playsinline></video>
+
+                    <!-- Overlay hướng dẫn + đếm ngược -->
+                    <div id="overlay"
+                         class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white rounded-xl pointer-events-none opacity-0 transition-opacity">
+                        <div id="overlayText" class="text-lg font-semibold mb-2">Chuẩn bị…</div>
+                        <div id="countdown" class="text-4xl font-bold">3</div>
+                    </div>
+                </div>
+
+                <!-- Thanh tiến trình -->
+                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div id="progressBar" class="h-2 bg-blue-600 w-0 transition-all"></div>
+                </div>
+
+                <!-- Trạng thái -->
+                <div class="text-sm">
+                    <span class="font-semibold text-gray-800">Trạng thái: </span>
+                    <span id="statusText" class="text-blue-700">Sẵn sàng</span>
+                </div>
+
+                <!-- Nút điều khiển -->
+                <div class="flex gap-2">
+                    <button type="button" id="startBtn" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700">Bắt đầu quay</button>
+                    <button type="button" id="resetBtn" class="px-4 py-2 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600" disabled>Quay lại từ đầu</button>
+                    <button type="button" id="stopBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700" disabled>Dừng</button>
+                </div>
+
+                <!-- Preview video kết quả -->
+                <div id="finalWrap" class="hidden">
+                    <p class="text-sm font-medium text-gray-700">Xem lại video:</p>
+                    <video id="finalVideo" class="w-full rounded-xl border" controls></video>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="button" id="submitBtn"
+                    class="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
                 Hoàn tất
             </button>
         </form>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Avatar preview
-        const avatarInput = document.getElementById('avatar');
-        const avatarPreview = document.getElementById('avatarPreview');
-        const removeAvatarBtn = document.getElementById('removeAvatar');
+<script>
+    // ====== Config ======
+    const STEPS = [
+        { key: 'straight', label: 'Nhìn thẳng vào camera', seconds: 3 },
+        { key: 'left', label: 'Quay mặt sang trái', seconds: 3 },
+        { key: 'right', label: 'Quay mặt sang phải', seconds: 3 },
+        { key: 'up', label: 'Ngẩng cao đầu', seconds: 3 },
+        { key: 'down', label: 'Cúi đầu xuống', seconds: 3 },
+    ];
+    // Ngưỡng kiểm tra tuân thủ
+    const THRESHOLDS = {
+        dx: 20, // px dịch chuyển ngang
+        dy: 15, // px dịch chuyển dọc
+        diff: 12 // 0..255 độ thay đổi trung bình pixel (fallback)
+    };
 
-        avatarInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                avatarPreview.src = URL.createObjectURL(file);
-                removeAvatarBtn.classList.remove('hidden');
+    // ====== Elements ======
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const removeAvatar = document.getElementById('removeAvatar');
+
+    const videoEl = document.getElementById('preview');
+    const overlay = document.getElementById('overlay');
+    const overlayText = document.getElementById('overlayText');
+    const countdownEl = document.getElementById('countdown');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const finalWrap = document.getElementById('finalWrap');
+    const finalVideo = document.getElementById('finalVideo');
+    const submitBtn = document.getElementById('submitBtn');
+    const stepsList = document.getElementById('stepsList');
+
+    // ====== State ======
+    let stream, mediaRecorder, recordedBlobs = [];
+    let running = false;
+    let stepIndex = 0;
+    let baseline = null; // baseline face center (x,y) của bước "straight"
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let faceDetector = null;
+
+    // ====== Helpers ======
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+    const setStatus = (msg, color = 'text-blue-700') => {
+        statusText.className = color;
+        statusText.textContent = msg;
+    };
+    const setStepClass = () => {
+        [...stepsList.querySelectorAll('.step-item')].forEach((li, idx) => {
+            li.classList.remove('text-blue-700', 'line-through', 'font-semibold');
+            if (idx < stepIndex) {
+                li.classList.add('text-green-600', 'line-through');
+            } else if (idx === stepIndex) {
+                li.classList.add('text-blue-700', 'font-semibold');
             }
         });
-        removeAvatarBtn.addEventListener('click', function () {
-            avatarInput.value = '';
-            avatarPreview.src = "https://ui-avatars.com/api/?name=Avatar&background=random&size=128";
-            removeAvatarBtn.classList.add('hidden');
-        });
-
-        // Face Image preview
-        const faceInput = document.getElementById('faceImage');
-        const facePreview = document.getElementById('faceImagePreview');
-        const removeFaceBtn = document.getElementById('removeFaceImage');
-
-        faceInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                facePreview.src = URL.createObjectURL(file);
-                removeFaceBtn.classList.remove('hidden');
-            }
-        });
-        removeFaceBtn.addEventListener('click', function () {
-            faceInput.value = '';
-            facePreview.src = "https://placehold.co/128x128?text=Face";
-            removeFaceBtn.classList.add('hidden');
-        });
-    </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    };
+    function captureFrame() {
+        const w = videoEl.videoWidth || 640;
+        const h = videoEl.videoHeight || 480;
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(videoEl, 0, 0, w, h);
+        return ctx.getImageData(0, 0, w, h);
     }
-}
+    function meanAbsDiff(a, b, stride = 4) {
+        // a, b: ImageData
+        const A = a.data, B = b.data;
+        const len = Math.min(A.length, B.length);
+        let sum = 0, count = 0;
+        for (let i = 0; i < len; i += stride) {
+            sum += Math.abs(A[i] - B[i]);
+            count++;
+        }
+        return sum / count; // 0..255
+    }
+    async function detectFaceCenter() {
+        if (!faceDetector) return null;
+        try {
+            // Dùng canvas hiện tại để detect
+            const faces = await faceDetector.detect(canvas);
+            if (faces && faces.length) {
+                const box = faces[0].boundingBox;
+                return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+            }
+        } catch (e) { /* ignore */ }
+        return null;
+    }
+
+    async function checkCompliance(stepKey, baseFrame, endFrame) {
+        // Ưu tiên FaceDetector: dùng dịch chuyển tâm khuôn mặt
+        const center = await detectFaceCenter();
+
+        if (stepKey === 'straight') {
+            // Thiết lập baseline từ tâm khuôn mặt (nếu có)
+            if (center) baseline = center;
+            return true;
+        }
+
+        // Nếu có baseline & center: kiểm hướng
+        if (baseline && center) {
+            const dx = center.x - baseline.x; // >0: lệch phải
+            const dy = center.y - baseline.y; // >0: lệch xuống
+            if (stepKey === 'left' && dx <= -THRESHOLDS.dx) return true;
+            if (stepKey === 'right' && dx >= THRESHOLDS.dx) return true;
+            if (stepKey === 'up' && dy <= -THRESHOLDS.dy) return true;
+            if (stepKey === 'down' && dy >= THRESHOLDS.dy) return true;
+            // Nếu không đạt với FaceDetector, fallback xuống pixel diff (dưới)
+        }
+
+        // Fallback: chỉ kiểm mức chuyển động đủ lớn
+        const diff = meanAbsDiff(baseFrame, endFrame, 16); // lấy mẫu thưa cho nhanh
+        return diff >= THRESHOLDS.diff;
+    }
+
+    async function runSteps() {
+        running = true;
+        stepIndex = 0;
+        setStepClass();
+        finalWrap.classList.add('hidden');
+        submitBtn.disabled = true;
+
+        // Hiện overlay
+        overlay.classList.remove('opacity-0');
+
+        const totalSeconds = STEPS.reduce((s, st) => s + st.seconds, 0);
+        let elapsed = 0;
+
+        // Bắt đầu ghi
+        recordedBlobs = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size) recordedBlobs.push(e.data); };
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+            finalVideo.src = URL.createObjectURL(blob);
+            finalWrap.classList.remove('hidden');
+            submitBtn.blobVideo = blob;
+            submitBtn.disabled = false;
+            setStatus('Hoàn tất. Kiểm tra video và bấm Hoàn tất để gửi.', 'text-green-700');
+        };
+        mediaRecorder.start();
+
+        // Chạy từng bước, nếu không đạt → lặp lại bước đó
+        while (stepIndex < STEPS.length && running) {
+            const step = STEPS[stepIndex];
+
+            setStatus(`Bước ${stepIndex + 1}/${STEPS.length}: ${step.label}`);
+            setStepClass();
+
+            overlayText.textContent = step.label;
+
+            // Đếm ngược
+            let remaining = step.seconds;
+            const baseFrame = captureFrame();
+            if (step.key === 'straight') {
+                // cập nhật baseline ngay đầu bước “thẳng”
+                await detectFaceCenter().then(c => { if (c) baseline = c; });
+            }
+            while (remaining > 0 && running) {
+                countdownEl.textContent = remaining;
+                await sleep(1000);
+                remaining--;
+                elapsed++;
+                progressBar.style.width = `${Math.min(100, Math.floor(elapsed / totalSeconds * 100))}%`;
+            }
+
+            const endFrame = captureFrame();
+            const ok = await checkCompliance(step.key, baseFrame, endFrame);
+
+            if (ok) {
+                // Đạt → sang bước sau
+                stepIndex++;
+            } else {
+                // Không đạt → báo & lặp lại
+                setStatus(`Chưa đúng động tác: ${step.label}. Vui lòng thực hiện lại.`, 'text-red-700');
+                // Ngắn gọn cho người dùng thấy đang yêu cầu lặp lại
+                await sleep(1000);
+            }
+        }
+
+        overlay.classList.add('opacity-0');
+
+        if (running) {
+            // Kết thúc khi qua hết các bước
+            mediaRecorder.stop();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+            stopBtn.disabled = true;
+            running = false;
+        }
+    }
+
+    // ====== Events ======
+    avatarInput.addEventListener('change', (e) => {
+        const f = e.target.files?.[0];
+        if (f) {
+            avatarPreview.src = URL.createObjectURL(f);
+        }
+    });
+    removeAvatar.addEventListener('click', () => {
+        avatarInput.value = '';
+        avatarPreview.src = 'https://ui-avatars.com/api/?name=Avatar&background=random&size=128';
+    });
+
+    startBtn.addEventListener('click', async () => {
+        if (!stream) {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                videoEl.srcObject = stream;
+            } catch (err) {
+                setStatus('Không truy cập được camera: ' + err.message, 'text-red-700');
+                return;
+            }
+        }
+
+        // Khởi tạo FaceDetector nếu có
+        if ('FaceDetector' in window && !faceDetector) {
+            try {
+                faceDetector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+            } catch { faceDetector = null; }
+        }
+
+        // Reset state
+        baseline = null;
+        stepIndex = 0;
+        setStepClass();
+        progressBar.style.width = '0%';
+        finalWrap.classList.add('hidden');
+        submitBtn.disabled = true;
+
+        // Nút
+        startBtn.disabled = true;
+        resetBtn.disabled = false;
+        stopBtn.disabled = false;
+
+        runSteps();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            // Cho phép reset giữa chừng: dừng recorder hiện tại, hủy dữ liệu
+            mediaRecorder.stop();
+        }
+        recordedBlobs = [];
+        running = false;
+        stepIndex = 0;
+        baseline = null;
+        setStepClass();
+        progressBar.style.width = '0%';
+        finalWrap.classList.add('hidden');
+        submitBtn.disabled = true;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        setStatus('Đã reset. Bấm Bắt đầu quay để thực hiện lại.', 'text-gray-700');
+    });
+
+    stopBtn.addEventListener('click', () => {
+        // Cho phép dừng thủ công: sẽ không cho submit nếu chưa hoàn tất
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        running = false;
+        startBtn.disabled = false;
+        resetBtn.disabled = false;
+        stopBtn.disabled = true;
+        if (stepIndex < STEPS.length) {
+            setStatus('Bạn đã dừng trước khi hoàn tất tất cả bước. Vui lòng quay lại từ đầu.', 'text-red-700');
+            submitBtn.disabled = true;
+        }
+    });
+
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!submitBtn.blobVideo) {
+            setStatus('Chưa có video để gửi.', 'text-red-700');
+            return;
+        }
+
+        const form = document.getElementById('completeRegForm');
+        const formData = new FormData(form);
+        formData.append('faceVideo', submitBtn.blobVideo, 'faceVideo.webm');
+
+        try {
+            const res = await fetch('/Common/CompleteRegistration', { method: 'POST', body: formData });
+            if (res.redirected) {
+                window.location.href = res.url;
+            } else {
+                const html = await res.text();
+                document.body.innerHTML = html;
+            }
+        } catch (err) {
+            setStatus('Lỗi gửi dữ liệu: ' + err.message, 'text-red-700');
+        }
+    });
+
+    // Mở camera ngay khi trang sẵn sàng (tuỳ nhu cầu)
+    (async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            videoEl.srcObject = stream;
+            setStatus('Camera sẵn sàng. Bấm Bắt đầu quay.');
+        } catch (err) {
+            setStatus('Không truy cập được camera: ' + err.message, 'text-red-700');
+        }
+    })();
+</script>

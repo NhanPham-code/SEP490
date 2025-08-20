@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using UserAPI.Validator;
 
 namespace UserAPI.DTOs
 {
-    public class RegisterRequestDTO
+    public class StadiumManagerRegisterRequestDTO
     {
         [Required]
         public string FullName { get; set; }
@@ -19,8 +20,13 @@ namespace UserAPI.DTOs
 
         public string? PhoneNumber { get; set; }
 
-        public IFormFile? Avatar { get; set; }
+        public string? Gender { get; set; }
 
-        public IFormFile? FaceImage { get; set; }
+        [DateOfBirth(18)] // bắt buộc >= 18 tuổi
+        public string? DateOfBirth { get; set; }
+
+        public IFormFile? FrontCCCDImage { get; set; }
+
+        public IFormFile? RearCCCDImage { get; set; }
     }
 }
