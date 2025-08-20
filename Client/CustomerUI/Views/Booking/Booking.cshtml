@@ -198,14 +198,18 @@
         let selectedCourtType = null;
         let selectedDate = new Date().toISOString().split('T')[0];
         let bookedCourtIds = [];
+        let openTime;
+        let closeTime;
+        const now = new Date();
+        let isToday = selectedDate &&
+            now.toDateString() === new Date(selectedDate).toDateString();
 
-        // Tạo một mảng các giờ từ 5:00 đến 22:00
-        const allHours = Array.from({ length: 18 }, (_, i) => i + 5);
         // Lấy danh sách các loại sân duy nhất
         function getCourtTypes() {
             return [...new Set((stadiumData?.Courts || []).map(c => c.SportType))];
         }
 
+        let allHours = [];
 
         // get stadium data from server
         const stadiumId = '@ViewBag.StadiumId';
@@ -223,6 +227,7 @@
         const continueButtonEl = document.getElementById('continue-button');
         const feedbackFormEl = document.getElementById('feedback-form');
         const priceEl = document.getElementById('stadiumPrice');
+        let hasEnabledTime = false; // check if any button left for today
 
         // Hàm hiển thị modal thông báo tùy chỉnh
         function showModal(title, message) {
@@ -275,6 +280,12 @@
             }
 
             priceEl.textContent = priceText;
+        }
+
+        function parseHour(isoDuration) {
+            // VD: "PT6H" => 6
+            const match = isoDuration.match(/PT(\d+)H/);
+            return match ? parseInt(match[1], 10) : 0;
         }
 
         function handleTimeSelect(hour) {
@@ -425,8 +436,8 @@
 
         // Hàm render các nút giờ
         function renderTimeButtons() {
+            console.log("Rendering time buttons for date:", selectedDate);
             timeButtonsContainerEl.innerHTML = '';
-
             // Thêm class justify-center để căn giữa các nút
             timeButtonsContainerEl.classList.add('justify-center');
 
@@ -436,21 +447,57 @@
                 button.className = `time-button px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300 flex items-center justify-center`;
                 button.onclick = () => handleTimeSelect(hour);
 
+                if (isToday) {
+                    console.log("Today");
+                    if (
+                        hour < now.getHours() ||
+                        (hour === now.getHours() && now.getMinutes() > 0) ||
+                        hour >= closeTime // after closing time
+                    ) {
+                        button.disabled = true;
+                        button.classList.add('opacity-50', 'cursor-not-allowed');
+                        button.classList.remove('hover:bg-gray-300');
+                    } else {
+                        hasEnabledTime = true;
+                    }
+
+                    if ((endTime !== null && hour < startTime) || (startTime !== null && endTime === null)) {
+                        button.disabled = true;
+                        button.classList.add('opacity-50', 'cursor-not-allowed');
+                        button.classList.remove('hover:bg-gray-300');
+                    }
+                } else {
+                    console.log("Not today, all hours are enabled");
+                    continueButtonEl.disabled = false;
+                    continueButtonEl.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    continueButtonEl.classList.add('bg-blue-600', 'hover:bg-blue-700', 'hover:shadow-lg');
+                    button.disabled = false;
+                }
+
                 if (startTime !== null && endTime !== null && hour >= startTime && hour < endTime) {
                     button.classList.add('bg-blue-200', 'text-blue-800');
                     button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
                 }
+
                 if (hour === startTime || hour === endTime) {
                     button.classList.add('selected', 'bg-blue-600', 'text-white');
                     button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
                 }
-                if ((endTime !== null && hour < startTime) || (startTime !== null && endTime === null && hour > 21)) {
-                    button.disabled = true;
-                    button.classList.add('opacity-50', 'cursor-not-allowed');
-                    button.classList.remove('hover:bg-gray-300');
-                }
+
                 timeButtonsContainerEl.appendChild(button);
             });
+
+            if (isToday && !hasEnabledTime) {
+                console.log("No enabled time buttons for today, disabling continue button");
+                const tomorrow = new Date(now);
+                tomorrow.setDate(now.getDate() + 1);
+                datePickerEl.value = tomorrow.toISOString().split("T")[0];
+                selectedDate = datePickerEl.value; // Update the selectedDate variable
+                // Disable ngày hiện tại trở về trước
+                datePickerEl.min = tomorrow.toISOString().split("T")[0];
+                // Gọi sự kiện change bằng tay
+                datePickerEl.dispatchEvent(new Event("change"));
+            }
         }
 
         // Hàm mô phỏng chuyển sang trang checkout
@@ -535,6 +582,7 @@
 
             datePickerEl.addEventListener('change', (e) => {
                 selectedDate = e.target.value;
+                console.log("Selected date:", selectedDate);
                 startTime = null;
                 endTime = null;
                 selectedCourts = [];
@@ -854,7 +902,13 @@
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0]; // Lấy đối tượng sân đầu tiên
                         console.log('Dữ liệu sân vận động:', stadiumData);
-                        console.log('Dữ liệu sân vận động:', data.value[0]);
+                        openTime = parseHour(stadiumData.OpenTime);  
+                        closeTime = parseHour(stadiumData.CloseTime);  
+                        // Tạo một mảng các giờ
+                        allHours = Array.from(
+                            { length: closeTime - openTime + 1 },
+                            (_, i) => i + openTime
+                        );
                         renderStadiumInfo();
                         setupCourtTypeSelection();
                         setupDatePicker();
@@ -870,9 +924,15 @@
             });
         }
 
-        const datePicker = document.getElementById("date-picker");
-        if (datePicker) {
-            datePicker.addEventListener("change", function () {
+        if (datePickerEl) {
+            datePickerEl.addEventListener("change", function () {
+                selectedDate = this.value;
+                isToday = selectedDate && now.toDateString()
+                        === new Date(selectedDate).toDateString();
+                console.log("Date changed to:", isToday);
+                renderTimeButtons();
+                updateUI();
+
                 if (startTime !== null && endTime !== null && stadiumData?.Id) {
                     selectedDate = this.value;
                     console.log("Date changed, fetching booked courts for new date:", selectedDate);

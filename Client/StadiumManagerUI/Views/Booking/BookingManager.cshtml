@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Booking System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/Booking/BookingManager.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-header">Tổng booking hôm nay</div>
+                <div class="stat-value">24</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +12% so với hôm qua
+                </div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="stat-header">Đang chờ xác nhận</div>
+                <div class="stat-value">8</div>
+                <div class="stat-change">
+                    Cần xử lý
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header">Đã xác nhận</div>
+                <div class="stat-value">14</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    Sẵn sàng
+                </div>
+            </div>
+            <div class="stat-card teal">
+                <div class="stat-header">Sân đang hoạt động</div>
+                <div class="stat-value">3/4</div>
+                <div class="stat-change positive">
+                    75% tổng số sân
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Table -->
+        <div class="booking-section">
+            <div class="section-header">
+                <div class="date-nav">
+                    <div class="nav-tabs">
+                        <div class="nav-tab active" data-period="day">Daily</div>
+                        <div class="nav-tab" data-period="week">Weekly</div>
+                        <div class="nav-tab" data-period="month">Monthly</div>
+                    </div>
+                    <i class="fas fa-chevron-left date-arrow" id="prevDate"></i>
+                    <div class="date-display" id="currentDate">20 Tháng 8, 2025</div>
+                    <i class="fas fa-chevron-right date-arrow" id="nextDate"></i>
+                </div>
+                <div class="search-controls">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm khách hàng..." id="searchInput">
+                    <div class="filter-btn">Tất cả trạng thái</div>
+                    <div class="filter-btn">Tất cả sân</div>
+                </div>
+            </div>
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Khách hàng</th>
+                        <th>Sân</th>
+                        <th>Thời lượng</th>
+                        <th>Giá tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTableBody">
+                    <!-- Booking rows will be inserted here -->
+                </tbody>
+            </table>
+            <div class="pagination">
+                <div class="pagination-info">Hiển thị 1 đến 5 trong tổng số 24 booking</div>
+                <div class="pagination-controls">
+                    <div class="page-btn">Trước</div>
+                    <div class="page-btn active">1</div>
+                    <div class="page-btn">2</div>
+                    <div class="page-btn">3</div>
+                    <div class="page-btn">Sau</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIP Customers & Booking Chart (in a new grid) -->
+        <div class="main-content-grid">
+            <!-- VIP Customers -->
+            <div class="vip-customers">
+                <div class="chart-header">
+                    <h3 class="chart-title">Khách hàng thân thiết</h3>
+                </div>
+                <div class="vip-customer">
+                    <div class="vip-rank">1</div>
+                    <div class="vip-info">
+                        <div class="vip-name">Trần Hoàng Nam</div>
+                        <div class="vip-bookings">48 lượt đặt sân</div>
+                    </div>
+                </div>
+                <div class="vip-customer">
+                    <div class="vip-rank">2</div>
+                    <div class="vip-info">
+                        <div class="vip-name">Lê Minh Quang</div>
+                        <div class="vip-bookings">36 lượt đặt sân</div>
+                    </div>
+                </div>
+                <div class="vip-customer">
+                    <div class="vip-rank">3</div>
+                    <div class="vip-info">
+                        <div class="vip-name">Phạm Hữu Đức</div>
+                        <div class="vip-bookings">30 lượt đặt sân</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Thống kê booking theo ngày</h3>
+                    <div class="chart-period">Theo tuần</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="bookingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Court Chart & Time Chart (in a new grid) -->
+        <div class="dashboard-grid">
+            <!-- Court Distribution Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Phân bố booking theo sân</h3>
+                    <div class="chart-period">Theo tuần</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="courtChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Booking Volume by Time Slot Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Số lượng đặt sân theo khung giờ</h3>
+                    <div class="chart-period">Theo tuần</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Sample booking data
+            const bookings = [
+                {
+                    id: 1,
+                    time: "08:00 - 10:00",
+                    date: "20/08/2025",
+                    customer: { name: "Trần Hoàng Nam", phone: "0912 345 678", initials: "TN", color: "#3b82f6" },
+                    court: "Sân A",
+                    duration: "2 giờ",
+                    price: "400,000đ",
+                    status: "pending"
+                },
+                {
+                    id: 2,
+                    time: "10:30 - 12:30",
+                    date: "20/08/2025",
+                    customer: { name: "Lê Minh Quang", phone: "0987 654 321", initials: "LQ", color: "#10b981" },
+                    court: "Sân B",
+                    duration: "2 giờ",
+                    price: "400,000đ",
+                    status: "confirmed"
+                },
+                {
+                    id: 3,
+                    time: "14:00 - 16:00",
+                    date: "20/08/2025",
+                    customer: { name: "Phạm Hữu Đức", phone: "0901 234 567", initials: "PD", color: "#8b5cf6" },
+                    court: "Sân C",
+                    duration: "2 giờ",
+                    price: "400,000đ",
+                    status: "completed"
+                },
+                {
+                    id: 4,
+                    time: "16:30 - 18:30",
+                    date: "20/08/2025",
+                    customer: { name: "Vũ Thanh Tùng", phone: "0976 543 210", initials: "VT", color: "#f59e0b" },
+                    court: "Sân A",
+                    duration: "2 giờ",
+                    price: "400,000đ",
+                    status: "pending"
+                },
+                {
+                    id: 5,
+                    time: "19:00 - 21:00",
+                    date: "20/08/2025",
+                    customer: { name: "Đỗ Hải Long", phone: "0965 432 109", initials: "DH", color: "#ef4444" },
+                    court: "Sân D",
+                    duration: "2 giờ",
+                    price: "500,000đ",
+                    status: "cancelled"
+                }
+            ];
+
+            // Status mapping
+            const statusMap = {
+                pending: { text: "Đang chờ", class: "status-pending" },
+                confirmed: { text: "Đã xác nhận", class: "status-confirmed" },
+                completed: { text: "Đã thanh toán", class: "status-completed" },
+                cancelled: { text: "Đã hủy", class: "status-cancelled" }
+            };
+
+            // Render booking table
+            function renderBookings(bookingData = bookings) {
+                const tbody = $('#bookingTableBody');
+                tbody.empty();
+
+                bookingData.forEach(booking => {
+                    const statusInfo = statusMap[booking.status];
+                    const row = `
+                        <tr>
+                            <td>
+                                <div class="time-slot">
+                                    <div class="time-range">${booking.time}</div>
+                                    <div class="date-info">${booking.date}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="customer-info">
+                                    <div class="customer-details">
+                                        <div class="customer-name">${booking.customer.name}</div>
+                                        <div class="customer-phone">${booking.customer.phone}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${booking.court}</td>
+                            <td>${booking.duration}</td>
+                            <td class="price">${booking.price}</td>
+                            <td>
+                                <span class="status-badge ${statusInfo.class}">
+                                    ${statusInfo.text}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn view-detail" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn accept" title="Chấp nhận booking">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="action-btn deny" title="Từ chối booking">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+
+            // Tab navigation
+            $('.nav-tab').click(function() {
+                $('.nav-tab').removeClass('active');
+                $(this).addClass('active');
+
+                const period = $(this).data('period');
+                console.log('Selected period:', period);
+            });
+
+            // Date navigation
+            $('#prevDate, #nextDate').click(function() {
+                const isNext = $(this).attr('id') === 'nextDate';
+                console.log('Navigate to:', isNext ? 'next' : 'previous');
+            });
+
+            // Search functionality
+            $('#searchInput').on('input', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                const filtered = bookings.filter(booking =>
+                    booking.customer.name.toLowerCase().includes(searchTerm) ||
+                    booking.customer.phone.includes(searchTerm) ||
+                    booking.court.toLowerCase().includes(searchTerm)
+                );
+                renderBookings(filtered);
+            });
+
+            // Initialize charts
+            function initCharts() {
+                // Bar Chart - Booking by day
+                const bookingCtx = document.getElementById('bookingChart').getContext('2d');
+                new Chart(bookingCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                        datasets: [{
+                            data: [12, 18, 16, 22, 28, 35, 24],
+                            backgroundColor: '#60a5fa',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { display: false },
+                                ticks: { display: false }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+
+                // Doughnut Chart - Court distribution
+                const courtCtx = document.getElementById('courtChart').getContext('2d');
+                new Chart(courtCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Sân A', 'Sân B', 'Sân C', 'Sân D'],
+                        datasets: [{
+                            data: [35, 28, 22, 15],
+                            backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true }
+                            }
+                        }
+                    }
+                });
+
+                // Line Chart - Hourly bookings
+                const timeCtx = document.getElementById('timeChart').getContext('2d');
+                new Chart(timeCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['6-8h', '8-10h', '10-12h', '14-16h', '16-18h', '18-20h', '20-22h'],
+                        datasets: [{
+                            data: [5, 12, 8, 15, 18, 20, 16],
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#60a5fa',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Action handlers
+            $(document).on('click', '.action-btn.view-detail', function() {
+                console.log('Xem chi tiết booking');
+                // Custom modal UI instead of alert()
+                alert('Chức năng xem chi tiết booking sẽ được hiển thị ở đây.');
+            });
+
+            $(document).on('click', '.action-btn.accept', function() {
+                console.log('Chấp nhận booking');
+                // Custom modal UI instead of alert()
+                alert('Chức năng chấp nhận booking sẽ được hiển thị ở đây.');
+            });
+
+            $(document).on('click', '.action-btn.deny', function() {
+                console.log('Từ chối booking');
+                // Custom modal UI instead of alert()
+                alert('Chức năng từ chối booking sẽ được hiển thị ở đây.');
+            });
+
+            // Pagination
+            $('.page-btn').click(function() {
+                if (!$(this).hasClass('active') && !$(this).text().includes('Trước') && !$(this).text().includes('Sau')) {
+                    $('.page-btn').removeClass('active');
+                    $(this).addClass('active');
+                }
+            });
+
+            // Initialize
+            renderBookings();
+            setTimeout(initCharts, 100); // Delay to ensure canvas elements are ready
+        });
+    </script>
+</body>
+</html>
