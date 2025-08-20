@@ -47,6 +47,9 @@ namespace BookingAPI.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("StadiumId")
                         .HasColumnType("int");
 

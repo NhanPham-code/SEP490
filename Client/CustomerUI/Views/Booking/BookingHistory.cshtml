@@ -10,7 +10,7 @@
         <p class="mt-2 text-lg text-gray-500">Xem lại các lịch đặt đã hoàn thành của bạn</p>
     </div>
 
-    @if (Model == null || Model.Count == 0)
+    @if (Model == null || !Model.Any())
     {
         <div class="bg-white rounded-2xl shadow-lg p-10 text-center text-gray-500">
             <p class="text-xl font-medium">Bạn chưa có lịch booking nào.</p>
@@ -24,6 +24,9 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Tên sân
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Trạng thái
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -33,17 +36,30 @@
                             Thời gian
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Giảm giá
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Tổng tiền
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Ghi chú
                         </th>
+                        <th scope="col" class="relative px-6 py-4">
+                            <span class="sr-only">Chi tiết</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
+                    @{
+                        var stadiumNames = ViewBag.StadiumNames as Dictionary<int, string>;
+                        var discountInfo = ViewBag.DiscountInfo as Dictionary<int, string>;
+                    }
                     @foreach (var booking in Model)
                     {
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                @(stadiumNames != null && stadiumNames.ContainsKey(booking.StadiumId) ? stadiumNames[booking.StadiumId] : "Đang cập nhật...")
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @{
                                     var statusClass = "";
@@ -76,10 +92,13 @@
                                 @booking.Date.ToString("dd/MM/yyyy")
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                @booking.StartTime - @booking.EndTime
+                                @booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
+                                @(discountInfo != null && discountInfo.ContainsKey(booking.Id) ? discountInfo[booking.Id] : "Không áp dụng")
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                <span class="text-xl text-blue-600">@booking.TotalPrice</span>
+                                <span class="text-xl text-blue-600">@booking.TotalPrice?.ToString("N0") VNĐ</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 @if (!string.IsNullOrEmpty(booking.Note))
@@ -90,6 +109,9 @@
                                 {
                                     <span class="text-gray-400 italic">Không có</span>
                                 }
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a asp-action="BookingDetail" asp-route-id="@booking.Id" class="text-indigo-600 hover:text-indigo-900">Chi tiết</a>
                             </td>
                         </tr>
                     }

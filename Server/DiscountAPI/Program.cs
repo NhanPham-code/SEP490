@@ -5,28 +5,40 @@ using DiscountAPI.Respository.Interface;
 using DiscountAPI.Respository;
 using DiscountAPI.Service.Interface;
 using DiscountAPI.Service;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.AspNetCore.OData;
+using DiscountAPI.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext
+// ==================== Add Services ====================
+
+// DbContext
 builder.Services.AddDbContext<DiscountDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add AutoMapper
-builder.Services.AddAutoMapper(typeof(DiscountProfile)); // Sửa nếu tên profile khác
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(DiscountProfile));
 
-// Add Dependency Injection
+// DI for Repository & Service
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<IDiscountService, DiscountAPI.Service.DiscountService>();
 
+// OData Model configuration
+var odataBuilder = new ODataConventionModelBuilder();
+odataBuilder.EntitySet<ReadDiscountDTO>("Discounts");
 
-// Add Controllers
-builder.Services.AddControllers();
+// Add Controllers + OData
+builder.Services.AddControllers()
+    .AddOData(options => options
+        .EnableQueryFeatures() // Enable $filter, $orderby, etc.
+        .AddRouteComponents("api", odataBuilder.GetEdmModel())); // Use OData on "api"
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ==================== Build & Run ====================
 var app = builder.Build();
 
 // Middleware pipeline
@@ -38,9 +50,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

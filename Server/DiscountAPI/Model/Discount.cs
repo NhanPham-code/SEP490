@@ -30,10 +30,17 @@ namespace Models
         public DateTime EndDate { get; set; }
 
         [Required]
-        public string CodeType { get; set; }
+        public string CodeType { get; set; } // "System" hoặc "Stadium"
 
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // ID của người tạo discount
+        [Required]
+        public string UserId { get; set; }
+
+        // Nếu null hoặc rỗng => áp dụng toàn hệ thống
+        public List<int>? StadiumIds { get; set; } = new();
     }
 }

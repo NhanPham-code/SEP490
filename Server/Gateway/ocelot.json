@@ -92,7 +92,6 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
       }
     },
-    // lấy thông tin người dùng hiện tại (đang đăng nhập)
     {
       "DownstreamPathTemplate": "/api/Users/profile",
       "DownstreamScheme": "https",
@@ -112,7 +111,6 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
       }
     },
-    // xem thông tin người dùng theo id
     {
       "DownstreamPathTemplate": "/api/Users/{userId}",
       "DownstreamScheme": "https",
@@ -123,14 +121,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/otherProfile/{userId}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-      }
+      "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/Users/update-profile",
@@ -246,7 +237,6 @@
         "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
       }
     },
-
     {
       "DownstreamPathTemplate": "/odata/bookings?$filter=UserId eq {userId}",
       "DownstreamScheme": "https",
@@ -289,7 +279,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetail",
+      "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -307,7 +297,7 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
       }
     },
-    //Stadium API
+    // === STADIUM API ===
     {
       "DownstreamPathTemplate": "/odata/OdataStadium",
       "DownstreamScheme": "https",
@@ -329,7 +319,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/getByIdStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/getByIdStadium",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
@@ -341,7 +331,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/addStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/addStadium",
       "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -363,7 +353,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/updateStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/updateStadium",
       "UpstreamHttpMethod": [ "PUT" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -382,7 +372,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/deleteStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/deleteStadium",
       "UpstreamHttpMethod": [ "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -392,7 +382,7 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
       }
     },
-    // == Image API ===
+    // === IMAGE API ===
     {
       "DownstreamPathTemplate": "/api/AllStadiumImages",
       "DownstreamScheme": "https",
@@ -474,7 +464,7 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       }
     },
-    // == Courts API ===
+    // === COURTS API ===
     {
       "DownstreamPathTemplate": "/api/courtsByStadiumId",
       "DownstreamScheme": "https",
@@ -537,7 +527,7 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       }
     },
-    // Court Relation
+    // === COURT RELATION API ===
     {
       "DownstreamPathTemplate": "/GetAllCourtRelation",
       "DownstreamScheme": "https",
@@ -680,8 +670,81 @@
         "RequireAuthentication": true
       }
     },
-    // == Find Team ==
-    //Team Post
+    // === DISCOUNT API ===
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/discounts/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/{id}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/discounts/code/{code}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/code/{code}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/discounts/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    // === FIND TEAM API ===
+    // Team Post
     {
       "DownstreamPathTemplate": "/odata/OdataTeamPost",
       "DownstreamScheme": "https",
@@ -742,7 +805,7 @@
         "RequireAuthentication": true
       }
     },
-    //Team Member
+    // Team Member
     {
       "DownstreamPathTemplate": "/GetAllTeamMember",
       "DownstreamScheme": "https",

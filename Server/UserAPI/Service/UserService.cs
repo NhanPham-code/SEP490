@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using UserAPI.DTOs;
+using UserAPI.Helper;
 using UserAPI.Model;
 using UserAPI.Repository.Interface;
 using UserAPI.Service.Interface;
@@ -106,59 +107,6 @@ namespace UserAPI.Service
             return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
         }
 
-        public async Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO)
-        {
-            var user = await _userRepository.GetUserByIdAsync(updateFaceImageDTO.UserId);
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found.");
-            }
-
-            // Nếu không có face image mới, giữ nguyên face image cũ
-            if (updateFaceImageDTO.FaceImage == null || updateFaceImageDTO.FaceImage.Length == 0)
-            {
-                return _mapper.Map<PrivateUserProfileDTO>(user);
-            }
-
-            // Lưu file face image vào thư mục uploads/faces
-            // Xóa file hình cũ nếu có
-            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "faces");
-            Directory.CreateDirectory(uploadFolder); // Tạo thư mục nếu chưa tồn tại
-            if (updateFaceImageDTO.FaceImage != null && updateFaceImageDTO.FaceImage.Length > 0)
-            {
-                // Xóa file face image cũ nếu có
-                if (!string.IsNullOrEmpty(user.FaceImageUrl))
-                {
-                    string oldFaceImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.FaceImageUrl.TrimStart('/'));
-                    if (File.Exists(oldFaceImagePath))
-                    {
-                        File.Delete(oldFaceImagePath);
-                    }
-                }
-
-                // Lưu file face image mới
-                string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(updateFaceImageDTO.FaceImage.FileName)}";
-                string facePath = Path.Combine(uploadFolder, faceFileName);
-
-                using (var stream = new FileStream(facePath, FileMode.Create))
-                {
-                    await updateFaceImageDTO.FaceImage.CopyToAsync(stream);
-                }
-
-                // Cập nhật URL face image trong user
-                user.FaceImageUrl = $"/uploads/faces/{faceFileName}";
-            }
-
-            // Cập nhật thông tin vào DB
-            var updatedUser = await _userRepository.UpdateUserAsync(user);
-            if (updatedUser == null)
-            {
-                throw new InvalidOperationException("Failed to update face image.");
-            }
-            // Chuyển đổi sang ReadUserDTO
-            return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
-        }
-
         private bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
         {
             using var hmac = new HMACSHA512(storedSalt);
@@ -248,8 +196,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName, 
-                AvatarUrl = user.AvatarUrl,
-                FaceImageUrl = user.FaceImageUrl
+                AvatarUrl = user.AvatarUrl
             };
         }
 
@@ -317,8 +264,7 @@ namespace UserAPI.Service
                 RefreshToken = newRefreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl,
-                FaceImageUrl = user.FaceImageUrl
+                AvatarUrl = user.AvatarUrl
             };
         }
 
@@ -359,7 +305,7 @@ namespace UserAPI.Service
             };
         }
 
-        public async Task<PrivateUserProfileDTO> RegisterAsync(RegisterRequestDTO registerDto)
+        public async Task<PrivateUserProfileDTO> CustomerRegisterAsync(CustomerRegisterRequestDTO registerDto)
         {
             // 1. Check email tồn tại
             if (await IsEmailExistsAsync(registerDto.Email))
@@ -370,13 +316,13 @@ namespace UserAPI.Service
             // 2. Hash password
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            // 3. Lưu file avatar & face image
+            // 3. Lưu file avatar & face video
             string? avatarUrl = null;
-            string? faceImageUrl = null;
+            string? faceVideoUrl = null;
 
             string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             Directory.CreateDirectory(Path.Combine(uploadFolder, "avatars"));
-            Directory.CreateDirectory(Path.Combine(uploadFolder, "faces"));
+            Directory.CreateDirectory(Path.Combine(uploadFolder, "videos"));
 
             if (registerDto.Avatar != null && registerDto.Avatar.Length > 0)
             {
@@ -393,19 +339,19 @@ namespace UserAPI.Service
                 avatarUrl = "/uploads/avatars/default-avatar.png"; // Default avatar if not provided
             }
 
-            if (registerDto.FaceImage != null && registerDto.FaceImage.Length > 0)
+            if (registerDto.FaceVideo != null && registerDto.FaceVideo.Length > 0)
             {
-                string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FaceImage.FileName)}";
-                string facePath = Path.Combine(uploadFolder, "faces", faceFileName);
+                string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FaceVideo.FileName)}";
+                string facePath = Path.Combine(uploadFolder, "videos", faceFileName);
 
                 using (var stream = new FileStream(facePath, FileMode.Create))
                 {
-                    await registerDto.FaceImage.CopyToAsync(stream);
+                    await registerDto.FaceVideo.CopyToAsync(stream);
                 }
-                faceImageUrl = $"/uploads/faces/{faceFileName}";
+                faceVideoUrl = $"/uploads/videos/{faceFileName}";
             } else
             {
-                faceImageUrl = null;
+                faceVideoUrl = null;
             }
 
             // 4. Tạo entity User
@@ -418,10 +364,80 @@ namespace UserAPI.Service
                 Role = registerDto.Role,
                 Address = registerDto.Address,
                 PhoneNumber = registerDto.PhoneNumber,
+                Gender = registerDto.Gender,
+                DateOfBirth = string.IsNullOrEmpty(registerDto.DateOfBirth) ? null : DateHelper.Parse(registerDto.DateOfBirth),
                 AvatarUrl = avatarUrl,
-                FaceImageUrl = faceImageUrl,
+                FaceVideoUrl = faceVideoUrl,
                 IsActive = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow
+            };
+
+            // 5. Lưu vào DB
+            await _userRepository.CreateUserAsync(user);
+
+            // 6. Map sang ReadUserDTO
+            return _mapper.Map<PrivateUserProfileDTO>(user);
+        }
+
+        public async Task<PrivateUserProfileDTO> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerDto)
+        {
+            // 1. Check email tồn tại
+            if (await IsEmailExistsAsync(registerDto.Email))
+            {
+                throw new InvalidOperationException("Email already exists.");
+            }
+
+            // 2. Hash password
+            CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            // 3. Lưu file frontCCCD & RearCCCD
+            string? frontCCCDUrl = null;
+            string? rearCCCDUrl = null;
+
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            Directory.CreateDirectory(Path.Combine(uploadFolder, "cccd"));
+
+            if (registerDto.FrontCCCDImage != null && registerDto.FrontCCCDImage.Length > 0)
+            {
+                string frontFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FrontCCCDImage.FileName)}";
+                string frontPath = Path.Combine(uploadFolder, "cccd", frontFileName);
+
+                using (var stream = new FileStream(frontPath, FileMode.Create))
+                {
+                    await registerDto.FrontCCCDImage.CopyToAsync(stream);
+                }
+                frontCCCDUrl = $"/uploads/cccd/{frontFileName}";
+            }
+
+            if (registerDto.RearCCCDImage != null && registerDto.RearCCCDImage.Length > 0)
+            {
+                string rearFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.RearCCCDImage.FileName)}";
+                string rearPath = Path.Combine(uploadFolder, "cccd", rearFileName);
+
+                using (var stream = new FileStream(rearPath, FileMode.Create))
+                {
+                    await registerDto.RearCCCDImage.CopyToAsync(stream);
+                }
+                rearCCCDUrl = $"/uploads/cccd/{rearFileName}";
+            }
+
+            // 4. Tạo entity User
+            var user = new User
+            {
+                FullName = registerDto.FullName,
+                Email = registerDto.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                Role = registerDto.Role,
+                Address = registerDto.Address,
+                PhoneNumber = registerDto.PhoneNumber,
+                AvatarUrl = "/uploads/avartars/default-avatar.png",
+                FrontCCCDUrl = frontCCCDUrl,
+                RearCCCDUrl = rearCCCDUrl,
+                IsActive = true,
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow
             };
 
             // 5. Lưu vào DB
