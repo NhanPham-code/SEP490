@@ -1,6 +1,1011 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Quản lý Đặt sân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<style>
+    .filters-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+        .booking-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+    .booking-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .status-confirmed {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .status-completed {
+        background: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+    }
+
+    .booking-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .court-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+        flex-shrink: 0;
+    }
+
+        .court-icon.football {
+            background: #10b981;
+        }
+
+        .court-icon.tennis {
+            background: #f59e0b;
+        }
+
+        .court-icon.badminton {
+            background: #3b82f6;
+        }
+
+        .court-icon.basketball {
+            background: #ef4444;
+        }
+
+    .booking-info h5 {
+        margin: 0;
+        color: var(--gray-900);
+        font-weight: 600;
+    }
+
+    .booking-info p {
+        margin: 0;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .booking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-icon {
+        width: 20px;
+        color: var(--gray-500);
+        text-align: center;
+    }
+
+    .detail-text {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    .detail-value {
+        font-weight: 500;
+        color: var(--gray-900);
+    }
+
+    .booking-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn-accept {
+        background: var(--success-green);
+        border: 1px solid var(--success-green);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .btn-accept:hover {
+            background: #059669;
+            border-color: #059669;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .btn-cancel {
+        background: var(--danger-red);
+        border: 1px solid var(--danger-red);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .btn-view {
+        background: white;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .btn-view:hover {
+            background: var(--gray-50);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .filter-tab {
+        padding: 0.75rem 1rem;
+        background: none;
+        border: none;
+        color: var(--gray-600);
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .filter-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .filter-tab:hover {
+            color: var(--primary-blue);
+        }
+
+    .search-filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--gray-500);
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray-400);
+        }
+
+    @@media (max-width: 768px) {
+        .booking-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .booking-actions {
+            flex-direction: column;
+        }
+
+        .filter-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <button class="filter-tab active" data-status="all">Tất cả</button>
+    <button class="filter-tab" data-status="pending">Chờ duyệt</button>
+    <button class="filter-tab" data-status="confirmed">Đã duyệt</button>
+    <button class="filter-tab" data-status="completed">Hoàn thành</button>
+    <button class="filter-tab" data-status="cancelled">Đã hủy</button>
+</div>
+
+<!-- Stats Summary -->
+<div class="stats-summary">
+    <div class="stat-item">
+        <h3 class="stat-number text-warning">8</h3>
+        <p class="stat-label">Chờ duyệt</p>
+    </div>
+    <div class="stat-item">
+        <h3 class="stat-number text-success">15</h3>
+        <p class="stat-label">Đã duyệt</p>
+    </div>
+    <div class="stat-item">
+        <h3 class="stat-number text-primary">12</h3>
+        <p class="stat-label">Hoàn thành</p>
+    </div>
+    <div class="stat-item">
+        <h3 class="stat-number text-danger">3</h3>
+        <p class="stat-label">Đã hủy</p>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section">
+    <div class="search-filters">
+        <div class="form-group">
+            <label class="form-label">Tìm kiếm</label>
+            <input type="text" class="form-control" placeholder="Tên khách hàng, mã booking..." id="searchInput">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Loại sân</label>
+            <select class="form-control" id="courtTypeFilter">
+                <option value="">Tất cả</option>
+                <option value="football">Bóng đá</option>
+                <option value="tennis">Tennis</option>
+                <option value="badminton">Cầu lông</option>
+                <option value="basketball">Bóng rổ</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Ngày đặt</label>
+            <input type="date" class="form-control" id="dateFilter">
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                <i class="fas fa-search me-2"></i>Tìm kiếm
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Bookings List -->
+<div id="bookingsList">
+    <!-- Booking Card 1 - Pending -->
+    <div class="booking-card" data-status="pending" data-court-type="football">
+        <div class="booking-status">
+            <span class="status-badge status-pending">Chờ duyệt</span>
+        </div>
+
+        <div class="booking-header">
+            <div class="court-icon football">
+                <i class="fas fa-futbol"></i>
+            </div>
+            <div class="booking-info">
+                <h5>Sân bóng đá 1</h5>
+                <p>Booking #BK001</p>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-item">
+                <i class="fas fa-user detail-icon"></i>
+                <div class="detail-text">
+                    Khách hàng: <span class="detail-value">Nguyễn Văn An</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-phone detail-icon"></i>
+                <div class="detail-text">
+                    SĐT: <span class="detail-value">0123456789</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar detail-icon"></i>
+                <div class="detail-text">
+                    Ngày: <span class="detail-value">25/08/2025</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock detail-icon"></i>
+                <div class="detail-text">
+                    Giờ: <span class="detail-value">14:00 - 16:00</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-dollar-sign detail-icon"></i>
+                <div class="detail-text">
+                    Giá: <span class="detail-value">400,000 VNĐ</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-credit-card detail-icon"></i>
+                <div class="detail-text">
+                    Thanh toán: <span class="detail-value">Chuyển khoản</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-actions">
+            <button class="btn-view" onclick="viewBookingDetail('BK001')">
+                <i class="fas fa-eye me-1"></i>Chi tiết
+            </button>
+            <button class="btn-cancel" onclick="cancelBooking('BK001')">
+                <i class="fas fa-times me-1"></i>Từ chối
+            </button>
+            <button class="btn-accept" onclick="acceptBooking('BK001')">
+                <i class="fas fa-check me-1"></i>Duyệt
+            </button>
+        </div>
+    </div>
+
+    <!-- Booking Card 2 - Confirmed -->
+    <div class="booking-card" data-status="confirmed" data-court-type="tennis">
+        <div class="booking-status">
+            <span class="status-badge status-confirmed">Đã duyệt</span>
+        </div>
+
+        <div class="booking-header">
+            <div class="court-icon tennis">
+                <i class="fas fa-table-tennis"></i>
+            </div>
+            <div class="booking-info">
+                <h5>Sân tennis 2</h5>
+                <p>Booking #BK002</p>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-item">
+                <i class="fas fa-user detail-icon"></i>
+                <div class="detail-text">
+                    Khách hàng: <span class="detail-value">Trần Thị Bình</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-phone detail-icon"></i>
+                <div class="detail-text">
+                    SĐT: <span class="detail-value">0987654321</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar detail-icon"></i>
+                <div class="detail-text">
+                    Ngày: <span class="detail-value">26/08/2025</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock detail-icon"></i>
+                <div class="detail-text">
+                    Giờ: <span class="detail-value">08:00 - 10:00</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-dollar-sign detail-icon"></i>
+                <div class="detail-text">
+                    Giá: <span class="detail-value">300,000 VNĐ</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-credit-card detail-icon"></i>
+                <div class="detail-text">
+                    Thanh toán: <span class="detail-value">Tiền mặt</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-actions">
+            <button class="btn-view" onclick="viewBookingDetail('BK002')">
+                <i class="fas fa-eye me-1"></i>Chi tiết
+            </button>
+            <button class="btn-cancel" onclick="cancelBooking('BK002')">
+                <i class="fas fa-times me-1"></i>Hủy booking
+            </button>
+        </div>
+    </div>
+
+    <!-- Booking Card 3 - Pending -->
+    <div class="booking-card" data-status="pending" data-court-type="badminton">
+        <div class="booking-status">
+            <span class="status-badge status-pending">Chờ duyệt</span>
+        </div>
+
+        <div class="booking-header">
+            <div class="court-icon badminton">
+                <i class="fas fa-shuttlecock"></i>
+            </div>
+            <div class="booking-info">
+                <h5>Sân cầu lông 3</h5>
+                <p>Booking #BK003</p>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-item">
+                <i class="fas fa-user detail-icon"></i>
+                <div class="detail-text">
+                    Khách hàng: <span class="detail-value">Lê Văn Cường</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-phone detail-icon"></i>
+                <div class="detail-text">
+                    SĐT: <span class="detail-value">0909123456</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar detail-icon"></i>
+                <div class="detail-text">
+                    Ngày: <span class="detail-value">27/08/2025</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock detail-icon"></i>
+                <div class="detail-text">
+                    Giờ: <span class="detail-value">19:00 - 21:00</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-dollar-sign detail-icon"></i>
+                <div class="detail-text">
+                    Giá: <span class="detail-value">250,000 VNĐ</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-credit-card detail-icon"></i>
+                <div class="detail-text">
+                    Thanh toán: <span class="detail-value">Ví điện tử</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-actions">
+            <button class="btn-view" onclick="viewBookingDetail('BK003')">
+                <i class="fas fa-eye me-1"></i>Chi tiết
+            </button>
+            <button class="btn-cancel" onclick="cancelBooking('BK003')">
+                <i class="fas fa-times me-1"></i>Từ chối
+            </button>
+            <button class="btn-accept" onclick="acceptBooking('BK003')">
+                <i class="fas fa-check me-1"></i>Duyệt
+            </button>
+        </div>
+    </div>
+
+    <!-- Booking Card 4 - Completed -->
+    <div class="booking-card" data-status="completed" data-court-type="basketball">
+        <div class="booking-status">
+            <span class="status-badge status-completed">Hoàn thành</span>
+        </div>
+
+        <div class="booking-header">
+            <div class="court-icon basketball">
+                <i class="fas fa-basketball-ball"></i>
+            </div>
+            <div class="booking-info">
+                <h5>Sân bóng rổ 1</h5>
+                <p>Booking #BK004</p>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-item">
+                <i class="fas fa-user detail-icon"></i>
+                <div class="detail-text">
+                    Khách hàng: <span class="detail-value">Phạm Minh Đức</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-phone detail-icon"></i>
+                <div class="detail-text">
+                    SĐT: <span class="detail-value">0912345678</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar detail-icon"></i>
+                <div class="detail-text">
+                    Ngày: <span class="detail-value">23/08/2025</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-clock detail-icon"></i>
+                <div class="detail-text">
+                    Giờ: <span class="detail-value">16:00 - 18:00</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-dollar-sign detail-icon"></i>
+                <div class="detail-text">
+                    Giá: <span class="detail-value">350,000 VNĐ</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-credit-card detail-icon"></i>
+                <div class="detail-text">
+                    Thanh toán: <span class="detail-value">Chuyển khoản</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-actions">
+            <button class="btn-view" onclick="viewBookingDetail('BK004')">
+                <i class="fas fa-eye me-1"></i>Chi tiết
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modals -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalTitle">Xác nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmButton">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentAction = null;
+        let currentBookingId = null;
+
+        // Filter functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                filterBookings(this.getAttribute('data-status'));
+            });
+        });
+
+        function filterBookings(status) {
+            const bookings = document.querySelectorAll('.booking-card');
+            bookings.forEach(booking => {
+                if (status === 'all' || booking.getAttribute('data-status') === status) {
+                    booking.style.display = 'block';
+                } else {
+                    booking.style.display = 'none';
+                }
+            });
+            updateStats();
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courtType = document.getElementById('courtTypeFilter').value;
+            const date = document.getElementById('dateFilter').value;
+
+            const bookings = document.querySelectorAll('.booking-card');
+            bookings.forEach(booking => {
+                let show = true;
+
+                // Search filter
+                if (searchTerm && !booking.textContent.toLowerCase().includes(searchTerm)) {
+                    show = false;
+                }
+
+                // Court type filter
+                if (courtType && booking.getAttribute('data-court-type') !== courtType) {
+                    show = false;
+                }
+
+                booking.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        function updateStats() {
+            const visible = document.querySelectorAll('.booking-card[style*="block"], .booking-card:not([style])');
+            const pending = Array.from(visible).filter(b => b.getAttribute('data-status') === 'pending').length;
+            const confirmed = Array.from(visible).filter(b => b.getAttribute('data-status') === 'confirmed').length;
+            const completed = Array.from(visible).filter(b => b.getAttribute('data-status') === 'completed').length;
+            const cancelled = Array.from(visible).filter(b => b.getAttribute('data-status') === 'cancelled').length;
+
+            document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = pending;
+            document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = confirmed;
+            document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = completed;
+            document.querySelector('.stat-item:nth-child(4) .stat-number').textContent = cancelled;
+        }
+
+        function acceptBooking(bookingId) {
+            currentAction = 'accept';
+            currentBookingId = bookingId;
+
+            document.getElementById('confirmModalTitle').textContent = 'Duyệt booking';
+            document.getElementById('confirmModalBody').innerHTML = `
+                <p>Bạn có chắc chắn muốn duyệt booking <strong>${bookingId}</strong>?</p>
+                <p class="text-success"><i class="fas fa-info-circle me-2"></i>Khách hàng sẽ nhận được thông báo xác nhận.</p>
+            `;
+            document.getElementById('confirmButton').className = 'btn btn-success';
+            document.getElementById('confirmButton').innerHTML = '<i class="fas fa-check me-2"></i>Duyệt booking';
+
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+
+        function cancelBooking(bookingId) {
+            currentAction = 'cancel';
+            currentBookingId = bookingId;
+
+            document.getElementById('confirmModalTitle').textContent = 'Hủy booking';
+            document.getElementById('confirmModalBody').innerHTML = `
+                <p>Bạn có chắc chắn muốn hủy booking <strong>${bookingId}</strong>?</p>
+                <div class="mb-3">
+                    <label class="form-label">Lý do hủy:</label>
+                    <textarea class="form-control" id="cancelReason" rows="3" placeholder="Nhập lý do hủy booking..."></textarea>
+                </div>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Khách hàng sẽ nhận được thông báo hủy.</p>
+            `;
+            document.getElementById('confirmButton').className = 'btn btn-danger';
+            document.getElementById('confirmButton').innerHTML = '<i class="fas fa-times me-2"></i>Hủy booking';
+
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+
+        function viewBookingDetail(bookingId) {
+            // Redirect to booking detail page
+            window.location.href = `@Url.Action("BookingDetail", "Management")?id=${bookingId}`;
+        }
+
+        // Confirm button handler
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (currentAction === 'accept') {
+                processAcceptBooking(currentBookingId);
+            } else if (currentAction === 'cancel') {
+                processCancelBooking(currentBookingId);
+            }
+        });
+
+        function processAcceptBooking(bookingId) {
+            // Simulate API call
+            const bookingCard = document.querySelector(`[data-booking-id="${bookingId}"]`);
+
+            // Update UI
+            showToast('Booking đã được duyệt thành công!', 'success');
+
+            // Update booking status in the card
+            setTimeout(() => {
+                const statusBadge = document.querySelector(`[onclick*="${bookingId}"]`).closest('.booking-card').querySelector('.status-badge');
+                statusBadge.textContent = 'Đã duyệt';
+                statusBadge.className = 'status-badge status-confirmed';
+
+                // Update actions
+                const actionsDiv = document.querySelector(`[onclick*="${bookingId}"]`).closest('.booking-card').querySelector('.booking-actions');
+                actionsDiv.innerHTML = `
+                    <button class="btn-view" onclick="viewBookingDetail('${bookingId}')">
+                        <i class="fas fa-eye me-1"></i>Chi tiết
+                    </button>
+                    <button class="btn-cancel" onclick="cancelBooking('${bookingId}')">
+                        <i class="fas fa-times me-1"></i>Hủy booking
+                    </button>
+                `;
+
+                // Update data attribute
+                document.querySelector(`[onclick*="${bookingId}"]`).closest('.booking-card').setAttribute('data-status', 'confirmed');
+                updateStats();
+            }, 500);
+
+            bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        }
+
+        function processCancelBooking(bookingId) {
+            const reason = document.getElementById('cancelReason')?.value || '';
+
+            // Simulate API call
+            showToast('Booking đã được hủy!', 'error');
+
+            // Update booking status in the card
+            setTimeout(() => {
+                const bookingCard = document.querySelector(`[onclick*="${bookingId}"]`).closest('.booking-card');
+                const statusBadge = bookingCard.querySelector('.status-badge');
+                statusBadge.textContent = 'Đã hủy';
+                statusBadge.className = 'status-badge status-cancelled';
+
+                // Update actions
+                const actionsDiv = bookingCard.querySelector('.booking-actions');
+                actionsDiv.innerHTML = `
+                    <button class="btn-view" onclick="viewBookingDetail('${bookingId}')">
+                        <i class="fas fa-eye me-1"></i>Chi tiết
+                    </button>
+                `;
+
+                // Update data attribute
+                bookingCard.setAttribute('data-status', 'cancelled');
+                updateStats();
+            }, 500);
+
+            bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        }
+
+        function showToast(message, type) {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            // Create toast
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            // Show toast
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const bookings = document.querySelectorAll('.booking-card');
+
+            bookings.forEach(booking => {
+                const text = booking.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    booking.style.display = 'block';
+                } else {
+                    booking.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+
+            // Set today's date as default
+            document.getElementById('dateFilter').valueAsDate = new Date();
+        });
+
+        // Add real-time updates (simulate WebSocket)
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Simulate new booking notification
+                if (Math.random() > 0.95) { // 5% chance every 30 seconds
+                    showToast('Có booking mới cần duyệt!', 'info');
+
+                    // Update pending count
+                    const pendingCount = document.querySelector('.stat-item:nth-child(1) .stat-number');
+                    pendingCount.textContent = parseInt(pendingCount.textContent) + 1;
+                }
+            }, 30000);
+        }
+
+        // Start real-time updates
+        simulateRealTimeUpdates();
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            // In real app, this would reload data from server
+            console.log('Auto-refreshing booking data...');
+        }, 300000);
+    </script>
+
+    <style>
+        .toast-container {
+            z-index: 9999 !important;
+        }
+
+        .booking-card[data-status="pending"] {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .booking-card[data-status="confirmed"] {
+            border-left: 4px solid #10b981;
+        }
+
+        .booking-card[data-status="cancelled"] {
+            border-left: 4px solid #ef4444;
+        }
+
+        .booking-card[data-status="completed"] {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .btn-refresh {
+            background: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+            .btn-refresh:hover {
+                background: #2563eb;
+                border-color: #2563eb;
+                color: white;
+                transform: translateY(-1px);
+            }
+
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: var(--danger-red);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .priority-high {
+            position: relative;
+        }
+
+            .priority-high::after {
+                content: '!';
+                position: absolute;
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 20px;
+                height: 20px;
+                background: var(--danger-red);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+    </style>
+}
