@@ -107,7 +107,7 @@ namespace UserAPI.Controllers
         /// api/Users/register
         /// </summary>
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterRequestDTO request)
+        public async Task<IActionResult> Register([FromForm] CustomerRegisterRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -116,7 +116,7 @@ namespace UserAPI.Controllers
 
             try
             {
-                var newUser = await _userService.RegisterAsync(request);
+                var newUser = await _userService.CustomerRegisterAsync(request);
                 return Ok(new { message = "Register successful", user = newUser });
             }
             catch (InvalidOperationException ex)
@@ -276,38 +276,6 @@ namespace UserAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while updating avatar.", error = ex.Message });
-            }
-        }
-
-        [HttpPut("update-face-image")]
-        public async Task<IActionResult> UpdateFaceImage([FromForm] UpdateFaceImageDTO dto) 
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Lấy userId từ token
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
-                return Unauthorized(new { message = "Invalid access token" });
-
-            // So sánh với userId trong DTO
-            if (dto.UserId != userIdFromToken)
-                return Forbid();
-
-            try
-            {
-                var updatedUser = await _userService.UpdateFaceImageAsync(dto);
-                return Ok(updatedUser);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while updating face image.", error = ex.Message });
             }
         }
     }

@@ -189,13 +189,6 @@
                     </div>
                     <div class="image-label">Ảnh đại diện</div>
                 </div>
-                <div class="face-container group" id="faceImageClick">
-                    <img id="faceImageImg" src="@Model.FaceImageUrl" alt="FaceImage" />
-                    <div class="face-edit-btn" title="Đổi ảnh khuôn mặt">
-                        <i class="ri-camera-line text-xl"></i>
-                    </div>
-                    <div class="image-label">Ảnh khuôn mặt</div>
-                </div>
             </div>
 
             <form id="profileForm" method="post" action="#" class="space-y-6" autocomplete="off">
@@ -280,27 +273,6 @@
             </div>
             <button type="submit" class="w-full btn-gradient mt-2">
                 <i class="ri-upload-cloud-2-line text-lg"></i>
-                <span>Lưu ảnh mới</span>
-            </button>
-        </form>
-    </div>
-</div>
-
-<!-- Modal Face Image Upload -->
-<div id="faceModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-3xl p-8 shadow-lg w-full max-w-md relative">
-        <button type="button" onclick="closeModal('faceModal')" class="btn-cancel absolute top-4 right-4" title="Đóng">
-            <i class="ri-close-line text-2xl"></i>
-        </button>
-        <h2 class="text-xl font-bold mb-4">Cập nhật ảnh khuôn mặt</h2>
-        <form id="faceForm" enctype="multipart/form-data" method="post" action="#">
-            <input type="file" id="faceUpload" name="faceImage" accept="image/*" class="mb-4 block w-full" />
-            <img id="facePreviewModal" src="" class="w-32 h-32 object-cover rounded-2xl mx-auto mb-4" />
-            <div id="faceLoading" class="flex justify-center mb-4 hidden">
-                <span class="loading-spinner"></span>
-            </div>
-            <button type="submit" class="w-full btn-gradient mt-2">
-                <i class="ri-upload-cloud-line text-lg"></i>
                 <span>Lưu ảnh mới</span>
             </button>
         </form>
@@ -456,48 +428,6 @@
                     removeLoadingToast(loadingToast);
                     var res = xhr.responseJSON;
                     showToast(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật avatar!', "error");
-                }
-            });
-        });
-
-        // Face image
-        document.getElementById('faceImageClick').addEventListener('click', function () {
-            document.getElementById('faceModal').classList.remove('hidden');
-        });
-
-        document.getElementById('faceUpload').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) document.getElementById('facePreviewModal').src = URL.createObjectURL(file);
-        });
-
-        document.getElementById('faceForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const loadingElm = document.getElementById('faceLoading');
-            loadingElm.classList.remove('hidden');
-            const loadingToast = showToast("Đang cập nhật ảnh khuôn mặt...", "loading");
-
-            const formData = new FormData();
-            formData.append('userId', originalData.userId);
-            formData.append('faceImage', document.getElementById('faceUpload').files[0]);
-
-            $.ajax({
-                url: '/Common/UpdateFaceImage',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (updatedUser) {
-                    loadingElm.classList.add('hidden');
-                    removeLoadingToast(loadingToast);
-                    document.getElementById("faceImageImg").src = updatedUser.faceImageUrl || '';
-                    showToast("Cập nhật ảnh khuôn mặt thành công!", "success");
-                    closeModal('faceModal');
-                },
-                error: function (xhr) {
-                    loadingElm.classList.add('hidden');
-                    removeLoadingToast(loadingToast);
-                    var res = xhr.responseJSON;
-                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật ảnh khuôn mặt!', "error");
                 }
             });
         });

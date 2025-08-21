@@ -33,7 +33,7 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
         }
 
-        public async Task<bool> RegisterAsync(RegisterRequestDTO dto)
+        public async Task<bool> RegisterAsync(CustomerRegisterRequestDTO dto)
         {
             using var form = new MultipartFormDataContent();
 
@@ -48,6 +48,12 @@ namespace Service.Services
             if (!string.IsNullOrEmpty(dto.PhoneNumber))
                 form.Add(new StringContent(dto.PhoneNumber), nameof(dto.PhoneNumber));
 
+            if (!string.IsNullOrEmpty(dto.Gender))
+                form.Add(new StringContent(dto.Gender), nameof(dto.Gender));
+
+            if (!string.IsNullOrEmpty(dto.DateOfBirth))
+                form.Add(new StringContent(dto.DateOfBirth), nameof(dto.DateOfBirth));
+
             if (dto.Avatar != null)
             {
                 var avatarContent = new StreamContent(dto.Avatar.OpenReadStream());
@@ -56,12 +62,12 @@ namespace Service.Services
                 form.Add(avatarContent, nameof(dto.Avatar), dto.Avatar.FileName);
             }
 
-            if (dto.FaceImage != null)
+            if (dto.FaceVideo != null)
             {
-                var faceContent = new StreamContent(dto.FaceImage.OpenReadStream());
+                var faceContent = new StreamContent(dto.FaceVideo.OpenReadStream());
                 faceContent.Headers.ContentType =
-                    new MediaTypeHeaderValue(dto.FaceImage.ContentType);
-                form.Add(faceContent, nameof(dto.FaceImage), dto.FaceImage.FileName);
+                    new MediaTypeHeaderValue(dto.FaceVideo.ContentType);
+                form.Add(faceContent, nameof(dto.FaceVideo), dto.FaceVideo.FileName);
             }
 
             var response = await _httpClient.PostAsync("/users/register", form);
@@ -91,10 +97,9 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
         }
 
-        public async Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId, string accessToken)
+        public async Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId)
         {
-            AddBearerAccessToken(accessToken);
-            return await _httpClient.GetFromJsonAsync<PublicUserProfileDTO>($"/users/getById/{userId}");
+            return await _httpClient.GetFromJsonAsync<PublicUserProfileDTO>($"/users/otherProfile/{userId}");
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)

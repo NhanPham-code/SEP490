@@ -130,12 +130,20 @@
 
         }
 
+        .opacity-50 { opacity: 0.5; }
+        .cursor-not-allowed { cursor: not-allowed; }
+        .animate-pulse { animation: pulse 1s infinite; }
+        @@keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.7); }
+            50% { box-shadow: 0 0 10px 5px rgba(220,38,38,.7); }
+        }
+
 
     </style>
 </head>
 @{
     var ErrorMessage = TempData["ErrorMessage"] as string;
-    var RegisterRequestDTO = TempData["RegisterRequestDTO"] as DTOs.UserDTO.RegisterRequestDTO;
+    var RegisterRequestDTO = TempData["RegisterRequestDTO"] as DTOs.UserDTO.CustomerRegisterRequestDTO;
 }
 
 @if (ErrorMessage != null)
@@ -151,29 +159,29 @@
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <div class="flex justify-center mb-8">
                     <div class="inline-flex rounded-full p-1 bg-gray-100">
-                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 active" data-tab="signin">Sign In</button>
-                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200" data-tab="signup">Sign Up</button>
+                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 active" data-tab="signin">Đăng Nhập</button>
+                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200" data-tab="signup">Đăng Ký</button>
                     </div>
                 </div>
                 <div id="signin-form" class="tab-content">
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-                        <p class="text-gray-600">Sign in to access your account</p>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại</h2>
+                        <p class="text-gray-600">Đăng nhập để trải nghiệm hệ thống</p>
                     </div>
                     <form id="login-form" class="space-y-6" method="post">
                         <div>
-                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <div class="relative">
-                                <input type="email" id="login-email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your email">
+                                <input type="email" id="login-email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập vào email của bạn">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-mail-line text-gray-400"></i>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Mật Khẩu</label>
                             <div class="relative">
-                                <input type="password" id="login-password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your password">
+                                <input type="password" id="login-password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập vào mật khẩu của bạn">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-lock-line text-gray-400"></i>
                                 </div>
@@ -188,19 +196,48 @@
                                 <div class="w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center">
                                     <i class="ri-check-line text-primary text-xs hidden"></i>
                                 </div>
-                                <span class="text-sm text-gray-600"> Remember me</span>
+                                <span class="text-sm text-gray-600">Nhớ mật khẩu</span>
                             </label>
-                            <a href="#" class="text-sm text-primary hover:text-blue-600">Forgot password?</a>
+                            <a href="#" class="text-sm text-primary hover:text-blue-600">Quên mật khẩu</a>
                         </div>
                         <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
-                            <span>Sign In</span>
+                            <span>Đăng nhập</span>
                         </button>
+
+                        <!-- Nút đăng nhập bằng khuôn mặt -->
+                        <div class="mt-4 flex flex-col items-center">
+                            <button type="button" id="face-login-btn" class="w-full bg-secondary text-white py-3 px-4 rounded-button hover:bg-green-600 transition-colors font-semibold flex items-center justify-center">
+                                <i class="ri-camera-line mr-2"></i>
+                                <span>Đăng nhập bằng khuôn mặt</span>
+                            </button>
+                        </div>
+                        <!-- Modal quay video khuôn mặt -->
+                        <div id="face-login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                            <div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center max-w-sm w-full">
+                                <h3 class="text-xl font-bold mb-2">Đăng nhập bằng khuôn mặt</h3>
+                                <p class="text-gray-600 mb-4 text-center">Vui lòng nhìn vào camera và quay video khuôn mặt trong 5 giây.</p>
+                                <video id="face-video" width="320" height="240" autoplay muted class="rounded-lg border mb-2"></video>
+
+                                <!-- Trạng thái ghi video -->
+                                <div id="recording-status" class="text-red-500 font-semibold mb-2 hidden">Đang ghi video...</div>
+
+                                <div id="face-login-controls" class="flex gap-2">
+                                    <button type="button" id="start-record-btn" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">Bắt đầu</button>
+                                    <button type="button" id="stop-record-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200" disabled>Dừng</button>
+                                </div>
+                                <video id="face-playback" width="320" height="240" controls class="rounded-lg border mb-2 hidden"></video>
+                                <div class="flex justify-between w-full mt-2">
+                                    <button type="button" id="face-login-cancel" class="text-gray-500 hover:text-gray-700 font-medium">Hủy</button>
+                                    <button type="button" id="face-login-submit" class="bg-secondary text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200" disabled>Gửi video xác thực</button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div id="signup-form" class="tab-content hidden">
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-                        <p class="text-gray-600">Join our platform to book your favorite stadiums</p>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Đăng ký tài khoảng</h2>
+                        <p class="text-gray-600">Đăng kí tài khoảng để trải nghiệm hệ thống</p>
                     </div>
                     <div id="form-error" class="error-message bg-red-50 border border-red-200 rounded-lg p-4 mb-6 hidden">
                         <div class="flex items-center">
@@ -212,9 +249,9 @@
                     </div>
                     <form id="signup-form-inner" class="space-y-6" method="post" asp-controller="Common" asp-action="Register">
                         <div>
-                            <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
                             <div class="relative">
-                                <input type="text" id="fullname" name="fullname" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your full name">
+                                <input type="text" id="fullname" name="fullname" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập họ và tên">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-user-line text-gray-400"></i>
                                 </div>
@@ -222,9 +259,9 @@
                             <div id="fullname-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         </div>
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <div class="relative">
-                                <input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your email">
+                                <input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập email">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-mail-line text-gray-400"></i>
                                 </div>
@@ -232,9 +269,9 @@
                             <div id="email-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         </div>
                         <div>
-                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
                             <div class="relative">
-                                <input type="text" id="address" name="address" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your address">
+                                <input type="text" id="address" name="address" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập địa chỉ">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-home-line text-gray-400"></i>
                                 </div>
@@ -242,19 +279,49 @@
                             <div id="address-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         </div>
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
                             <div class="relative">
-                                <input type="tel" id="phone" name="phoneNumber" required pattern="[0-9]{10,15}" class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter your phone">
+                                <input type="tel" id="phone" name="phoneNumber" required pattern="[0-9]{10,15}" class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập số điện thoại">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-phone-line text-gray-400"></i>
                                 </div>
                             </div>
                             <div id="phone-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         </div>
+                        <!-- Gender -->
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Giới tính</label>
                             <div class="relative">
-                                <input type="password" id="password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Create a password">
+                                <select id="gender" name="gender" required
+                                        class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-user-heart-line text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div id="gender-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div>
+                            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-2">Ngày sinh</label>
+                            <div class="relative">
+                                <input type="date" id="dateOfBirth" name="dateOfBirth" required
+                                       class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-calendar-line text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div id="dob-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Tạo mật khẩu">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-lock-line text-gray-400"></i>
                                 </div>
@@ -264,7 +331,7 @@
                             </div>
                             <div class="mt-2">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs text-gray-500">Password strength</span>
+                                    <span class="text-xs text-gray-500">Độ mạnh mật khẩu</span>
                                     <span id="strength-text" class="text-xs text-gray-500"></span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-1">
@@ -274,9 +341,9 @@
                             <div id="password-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         </div>
                         <div>
-                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
                             <div class="relative">
-                                <input type="password" id="confirm-password" name="confirm-password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Confirm your password">
+                                <input type="password" id="confirm-password" name="confirm-password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Xác nhận mật khẩu của bạn">
                                 <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                                     <i class="ri-lock-line text-gray-400"></i>
                                 </div>
@@ -293,16 +360,16 @@
                                     <i class="ri-check-line text-primary text-sm hidden"></i>
                                 </div>
                                 <span class="text-sm text-gray-700 leading-5">
-                                    I agree to the
-                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Terms of Service</a>
+                                    Tôi đồng ý với
+                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Điều khoản dịch vụ</a>
                                     and
-                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Privacy Policy</a>
+                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Chính sách bảo mật</a>
                                 </span>
                             </label>
                         </div>
                         <div id="terms-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
                         <button type="submit" id="signup-btn" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
-                            <span id="signup-text">Create Account</span>
+                            <span id="signup-text">Tạo tài khoảng</span>
                             <div id="signup-spinner" class="loading-spinner w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2 hidden"></div>
                         </button>
                         <div class="relative my-6">
@@ -310,7 +377,7 @@
                                 <div class="w-full border-t border-gray-300"></div>
                             </div>
                             <div class="relative flex justify-center text-sm">
-                                <span class="px-4 bg-white text-gray-500">or continue with</span>
+                                <span class="px-4 bg-white text-gray-500">hoặc</span>
                             </div>
                         </div>
                         <div class="space-y-3">
@@ -318,13 +385,13 @@
                                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                                     <i class="ri-google-fill text-red-500"></i>
                                 </div>
-                                <span class="text-gray-700 font-medium">Sign up with Google</span>
+                                <span class="text-gray-700 font-medium">Đăng kí với Google</span>
                             </button>
                         </div>
                         <div class="text-center pt-4">
                             <p class="text-gray-600">
                                 Already have an account?
-                                <a href="https://readdy.ai/home/6e478e59-67a3-479d-b717-11cb821df867/1e671e07-9379-42a1-892f-d1ea2862e449" data-readdy="true" class="text-primary hover:text-blue-600 font-semibold transition-colors">Sign In</a>
+                                <a asp-controller="Common" asp-action="Login" data-readdy="true" class="text-primary hover:text-blue-600 font-semibold transition-colors">Đăng nhập</a>
                             </p>
                         </div>
                     </form>
@@ -561,6 +628,126 @@
                     signupFormInner.submit();
                 }
             });
+        });
+
+        // === Đăng nhập bằng khuôn mặt ===
+        const faceLoginBtn = document.getElementById('face-login-btn');
+        const faceLoginModal = document.getElementById('face-login-modal');
+        const faceVideo = document.getElementById('face-video');
+        const facePlayback = document.getElementById('face-playback');
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const faceLoginCancel = document.getElementById('face-login-cancel');
+        const faceLoginSubmit = document.getElementById('face-login-submit');
+        const recordingStatus = document.getElementById('recording-status');
+
+        let mediaRecorder;
+        let recordedBlobs = [];
+        let stream;
+
+        // Mở modal đăng nhập bằng khuôn mặt
+        faceLoginBtn.addEventListener('click', async () => {
+            faceLoginModal.classList.remove('hidden');
+            facePlayback.classList.add('hidden');
+            faceLoginSubmit.disabled = true;
+            startRecordBtn.disabled = false;
+            stopRecordBtn.disabled = true;
+            // Mở camera
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                faceVideo.srcObject = stream;
+            } catch (err) {
+                alert('Không thể truy cập camera: ' + err.message);
+                faceLoginModal.classList.add('hidden');
+            }
+        });
+
+        // Bắt đầu quay video
+        startRecordBtn.addEventListener('click', () => {
+            recordedBlobs = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data && event.data.size > 0) {
+                    recordedBlobs.push(event.data);
+                }
+            };
+            mediaRecorder.onstart = () => {
+                recordingStatus.classList.remove('hidden');
+                startRecordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                stopRecordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                stopRecordBtn.classList.add('animate-pulse');
+            };
+            mediaRecorder.onstop = () => {
+                recordingStatus.classList.add('hidden');
+                startRecordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                stopRecordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                stopRecordBtn.classList.remove('animate-pulse');
+                const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
+                facePlayback.src = window.URL.createObjectURL(superBuffer);
+                facePlayback.classList.remove('hidden');
+                faceLoginSubmit.disabled = false;
+            };
+            mediaRecorder.start();
+            startRecordBtn.disabled = true;
+            stopRecordBtn.disabled = false;
+            // Tự động dừng sau 5 giây
+            setTimeout(() => {
+                if (mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    startRecordBtn.disabled = false;
+                    stopRecordBtn.disabled = true;
+                }
+            }, 5000);
+        });
+
+        // Dừng quay video
+        stopRecordBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+                startRecordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+            }
+        });
+
+        // Hủy đăng nhập bằng khuôn mặt
+        faceLoginCancel.addEventListener('click', () => {
+            faceLoginModal.classList.add('hidden');
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            facePlayback.classList.add('hidden');
+        });
+
+        // Gửi video lên API xác thực khuôn mặt
+        faceLoginSubmit.addEventListener('click', () => {
+            const videoBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+            const formData = new FormData();
+            formData.append('faceVideo', videoBlob, 'loginface.webm');
+            // Gửi lên API xác thực, thay đổi đường dẫn cho phù hợp với API của bạn
+            fetch('/api/user/login-face', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Đăng nhập thành công!');
+                        window.location.href = '/'; // hoặc chuyển tới trang dashboard
+                    } else {
+                        alert('Đăng nhập bằng khuôn mặt không thành công!');
+                    }
+                    faceLoginModal.classList.add('hidden');
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                })
+                .catch(err => {
+                    alert('Có lỗi xảy ra: ' + err.message);
+                    faceLoginModal.classList.add('hidden');
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                });
         });
     </script>
 </body>
