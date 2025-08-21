@@ -123,14 +123,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/otherProfile/{userId}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-      }
+      "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/Users/update-profile",
@@ -289,7 +282,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetail",
+      "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -610,6 +603,106 @@
         "RequireAuthentication": true
       }
     },
+    //----------------------------------Discount-------------------------------
+    // Endpoint: GET /discounts - For GetAll()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: POST /discounts - For Create()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    // Endpoint: GET /discounts/{id} - For GetById()
+    {
+      "DownstreamPathTemplate": "/api/discounts/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: PUT /discounts - For Update()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ]
+    },
+    // Endpoint: GET /discounts/code/{code} - For GetByCode()
+    {
+      "DownstreamPathTemplate": "/api/discounts/code/{code}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/code/{code}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: GET /discounts/stadium/{stadiumId} - For GetByStadiumId()
+    {
+      "DownstreamPathTemplate": "/api/discounts/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    }
+
+  ],
+  "UpstreamPathTemplate": "/feedback/{id}",
+  "UpstreamHttpMethod": [ "DELETE" ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer",
+    "RequireAuthentication": true
+  },
+
     {
       "DownstreamPathTemplate": "/api/Feedback/stadium/{stadiumId}",
       "DownstreamScheme": "https",
@@ -621,8 +714,9 @@
       ],
       "UpstreamPathTemplate": "/feedback/stadium/{stadiumId}",
       "UpstreamHttpMethod": [ "GET" ]
-    }
+    },
   ],
+
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:7136"
   },

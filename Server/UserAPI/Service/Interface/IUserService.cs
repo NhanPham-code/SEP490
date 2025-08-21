@@ -16,7 +16,9 @@ namespace UserAPI.Service.Interface
 
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
 
-        Task<PrivateUserProfileDTO> RegisterAsync(RegisterRequestDTO registerRequestDTO);
+        Task<PrivateUserProfileDTO> CustomerRegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
+
+        Task<PrivateUserProfileDTO> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerRequestDTO);
 
         Task<PrivateUserProfileDTO> GetUserProfileAsync(int id);
 
@@ -29,7 +31,5 @@ namespace UserAPI.Service.Interface
         Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO);
 
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO);
-
-        Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO);
     }
 }

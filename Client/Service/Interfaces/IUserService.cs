@@ -11,11 +11,11 @@ namespace Service.Interfaces
     {
         Task<LoginResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO);
 
-        Task<bool> RegisterAsync(RegisterRequestDTO registerRequestDTO);
+        Task<bool> RegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
 
         Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
 
-        Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId, string accessToken);
+        Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId);
 
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
 

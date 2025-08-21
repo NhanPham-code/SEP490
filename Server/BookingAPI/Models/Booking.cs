@@ -32,6 +32,8 @@ namespace BookingAPI.Models
 
         public string? Note { get; set; }
 
+        public string? PaymentMethod { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;

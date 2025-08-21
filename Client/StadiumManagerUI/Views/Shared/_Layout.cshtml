@@ -1,49 +1,359 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
+    @await RenderSectionAsync("Styles", required: false)
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - StadiumManagerUI</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/StadiumManagerUI.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Sportivey</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-bg: #FFFFFF;
+            --nav-link-color: #888888;
+            --nav-link-hover-bg: #F0F2F5;
+            --nav-link-active-bg: #F0F7FF;
+            --nav-link-active-color: #007AFF;
+            --nav-link-active-border: #007AFF;
+            --primary-blue: #007AFF;
+            --success-green: #2ECC71;
+            --warning-orange: #FF9500;
+            --danger-red: #FF3B30;
+            --text-dark: #333333;
+            --text-muted: #888888;
+            --border-color: #DDDDDD;
+            --light-bg: #E4EBFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+            transition: margin-left 0.3s;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(to bottom, #d6e2ff, #639eff);
+            border-right: none;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+
+        .sidebar-logo {
+            width: 32px;
+            height: 32px;
+            background: #2b68eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            color: #1a2a5d;
+            margin: 0;
+        }
+
+        .sidebar-subtitle {
+            color: #3b509d;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: #020058;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+            .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: #1a2a5d;
+            }
+
+            .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.4);
+                color: #1a2a5d;
+                font-weight: 600;
+                border-left: 3px solid #6688e4;
+                border-right: none;
+                border-radius: 0 50px 50px 0;
+            }
+
+        .nav-icon {
+            width: 20px;
+            font-size: 16px;
+            color: #3b509d;
+            transition: color 0.2s;
+        }
+
+        .nav-link.active .nav-icon {
+            color: #1a2a5d;
+        }
+
+        .nav-link:hover .nav-icon {
+            color: #1a2a5d;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .header-title {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .user-info {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+            .user-info .dropdown-toggle::after {
+                display: none;
+            }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a2a5d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: relative;
+            margin-right: 1rem;
+        }
+
+            .notification-badge::after {
+                content: '';
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 8px;
+                height: 8px;
+                background: var(--danger-red);
+                border-radius: 50%;
+            }
+
+        .content {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        /* Thêm CSS cho nút đăng nhập/đăng ký */
+        .auth-buttons .btn {
+            border-radius: 50px;
+            padding: 8px 20px;
+        }
+
+        .auth-buttons .btn-primary {
+            background-color: #007AFF;
+            border-color: #007AFF;
+        }
+
+        .auth-buttons .btn-outline-primary {
+            border-color: #007AFF;
+            color: #007AFF;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        }
+    </style>
+
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">StadiumManagerUI</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">S</div>
+            <div>
+                <h5 class="sidebar-title">Sportivey</h5>
+                <small class="sidebar-subtitle">Stadium Owner</small>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="@Url.Action("Index", "Home")" class="nav-link active">
+                    <i class="nav-icon fas fa-chart-pie"></i>
+                    Tổng quan
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Courts", "Management")" class="nav-link">
+                    <i class="nav-icon fas fa-futbol"></i>
+                    Quản lý Sân
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Bookings", "Management")" class="nav-link">
+                    <i class="nav-icon fas fa-calendar-alt"></i>
+                    Quản lý Đặt sân
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Inventory", "Management")" class="nav-link">
+                    <i class="nav-icon fas fa-boxes"></i>
+                    Quản lý Kho
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Revenue", "Management")" class="nav-link">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    Quản lý Doanh thu
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Pricing", "Management")" class="nav-link">
+                    <i class="nav-icon fas fa-tags"></i>
+                    Mã giảm giá
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Support", "Customer")" class="nav-link">
+                    <i class="nav-icon fas fa-headset"></i>
+                    Chat & Hỗ trợ
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="@Url.Action("Settings", "Account")" class="nav-link">
+                    <i class="nav-icon fas fa-cog"></i>
+                    Cài đặt
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header class="header">
+            <div>
+                <h1 class="header-title">@ViewData["Title"]</h1>
+                <p class="header-subtitle">Chào mừng trở lại, Nguyễn Văn Minh</p>
+            </div>
+
+            @* Logic để kiểm tra người dùng đã đăng nhập chưa *@
+            @if (true) // Thay thế `true` bằng logic xác thực người dùng
+            {
+                <div class="user-info dropdown">
+                    <div class="notification-badge">
+                        <i class="fas fa-bell text-muted"></i>
+                    </div>
+                    <span class="fw-medium">Nguyễn Văn Minh</span>
+                    <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">NM</div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Thông tin tài khoản</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#">Đăng xuất</a></li>
                     </ul>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+            }
+            else
+            {
+                <div class="auth-buttons d-flex gap-2">
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">Đăng nhập</a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-primary">Đăng ký</a>
+                </div>
+            }
+        </header>
+
+        <main class="content">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - StadiumManagerUI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

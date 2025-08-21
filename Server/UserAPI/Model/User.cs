@@ -32,9 +32,19 @@ namespace UserAPI.Model
         [MaxLength(15)]
         public string? PhoneNumber { get; set; }
 
+        public string? Gender { get; set; }
+
+        public DateOnly? DateOfBirth { get; set; }
+
         public string? AvatarUrl { get; set; }
 
-        public string? FaceImageUrl { get; set; }
+        public string? FaceVideoUrl { get; set; }
+
+        public string? IdentityNumber { get; set; }
+
+        public string? FrontCCCDUrl { get; set; }
+
+        public string? RearCCCDUrl { get; set; }
 
         public bool IsActive { get; set; } = true;
 

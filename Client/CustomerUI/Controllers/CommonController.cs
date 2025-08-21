@@ -1,4 +1,5 @@
-﻿using DTOs.UserDTO;
+﻿using DTOs.Helper;
+using DTOs.UserDTO;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Interfaces;
@@ -154,17 +155,20 @@ namespace CustomerUI.Controllers
 
         // Action xử lý đăng ký người dùng mới
         [HttpPost]
-        public async Task<IActionResult> Register(string fullname, string email, string password, string address, string phoneNumber)
+        public async Task<IActionResult> Register(string fullname, string email, string password, string address, string phoneNumber,
+            string gender, string dateOfBirth)
         {
             // Tạo một DTO từ các tham số riêng lẻ để tận dụng các validation đã định nghĩa
-            var registerRequestDTO = new RegisterRequestDTO
+            var registerRequestDTO = new CustomerRegisterRequestDTO
             {
                 FullName = fullname,
                 Email = email,
                 Password = password,
                 Address = address,
                 PhoneNumber = phoneNumber,
-                Role = ROLE_DEFAULT // Giả định vai trò là "Customer"
+                Role = ROLE_DEFAULT, // Giả định vai trò là "Customer"
+                Gender = gender,
+                DateOfBirth = dateOfBirth
             };
 
             // Thực hiện server-side validation thủ công trên DTO mới
@@ -269,8 +273,9 @@ namespace CustomerUI.Controllers
 
         // Action xử lý việc tải lên ảnh đại diện và ảnh khuôn mặt
         [HttpPost]
-        public async Task<IActionResult> CompleteRegistration(IFormFile avatar, IFormFile faceImage)
+        public async Task<IActionResult> CompleteRegistration(IFormFile avatar, IFormFile faceVideo)
         {
+
             // Lấy dữ liệu tạm từ session
             var tempRegisterData = HttpContext.Session.GetObjectFromJson<dynamic>("TempRegisterData");
 
@@ -281,7 +286,7 @@ namespace CustomerUI.Controllers
             }
 
             // Tạo một DTO từ dữ liệu tạm
-            var registerRequestDTO = new RegisterRequestDTO
+            var registerRequestDTO = new CustomerRegisterRequestDTO
             {
                 FullName = tempRegisterData.RegisterData.FullName,
                 Email = tempRegisterData.RegisterData.Email,
@@ -289,12 +294,13 @@ namespace CustomerUI.Controllers
                 Address = tempRegisterData.RegisterData.Address,
                 PhoneNumber = tempRegisterData.RegisterData.PhoneNumber,
                 Role = tempRegisterData.RegisterData.Role,
+                Gender = tempRegisterData.RegisterData.Gender,
+                DateOfBirth = tempRegisterData.RegisterData.DateOfBirth,
                 Avatar = avatar,
-                FaceImage = faceImage
+                FaceVideo = faceVideo // nhận dạng IFormFile chuẩn
             };
 
-
-            // Gọi service để đăng ký người dùng
+            // Gọi service để đăng ký người dùng (API sẽ xử lý lưu file video từ base64)
             var isRegistered = await _userService.RegisterAsync(registerRequestDTO);
 
             if (!isRegistered)
@@ -446,46 +452,6 @@ namespace CustomerUI.Controllers
             try
             {
                 var updatedUser = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
-
-                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
-
-                updatedUser.AvatarUrl = !string.IsNullOrEmpty(updatedUser.AvatarUrl)
-                ? $"{BASE_URL}{updatedUser.AvatarUrl}"
-                : "/images/default-avatar.png";
-
-                updatedUser.FaceImageUrl = !string.IsNullOrEmpty(updatedUser.FaceImageUrl)
-                    ? $"{BASE_URL}{updatedUser.FaceImageUrl}"
-                    : "";
-
-                return Ok(updatedUser); // Trả thẳng JSON về client
-            }
-            catch (HttpRequestException ex)
-            {
-                return BadRequest(new { message = $"Failed to update profile: {ex.Message}" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"Error: {ex.Message}" });
-            }
-        }
-
-        // update face image
-        [HttpPost]
-        public async Task<IActionResult> UpdateFaceImage(UpdateFaceImageDTO updateFaceImageDTO)
-        {
-            // 1. Get access token from cookie
-            var accessToken = _tokenService.GetAccessTokenFromCookie();
-
-            // 2. Handle missing access token
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                return Unauthorized(new { message = "Access Token is missing." });
-            }
-
-            // 3. Call the service to update face image
-            try
-            {
-                var updatedUser = await _userService.UpdateFaceImageAsync(updateFaceImageDTO, accessToken);
 
                 SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
 
