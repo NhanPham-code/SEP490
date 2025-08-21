@@ -393,6 +393,7 @@
                         });
                                                 // Get the form element
                                                                                             $(document).ready(function() {
+                                                                                                sessionStorage.setItem('searchTerm', "")
                                                                                                 let skip = 0;
                         const top = 9; // Number of items per page
                                                                                                  $('#stadium-grid').empty().hide(); // Clear previous results
@@ -439,6 +440,7 @@
                         // Nối filter
                         let filterString = filters.join(" and ");
                         let finalUrl = "&$filter=" + encodeURIComponent(filterString);
+                        skip = 0;
                         console.log(finalUrl);
                         sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
                         displayList(finalUrl, top, skip);
@@ -451,14 +453,15 @@
                             var url = sessionStorage.getItem('searchTerm') || "";
                             var minTop = 0;
                             skip += 9;
-                            if (skip + 9> count ){
+                            
+                            if (skip + 9 > count ){
                                 minTop = skip - count; // Giảm skip nếu vượt quá số lượng
                                 $('#loadMoreBtn').hide(); // Ẩn nút nếu không còn dữ liệu
                             }else if(skip == count){
                                 $('#loadMoreBtn').hide();
                             }
                             
-                            console.log('URL:', url);
+                            console.log('URL:', count);
                             displayList(url, top - minTop, skip);
                         });
                         });
@@ -478,9 +481,13 @@
                             type: 'POST',
                             data: {searchTerm: searchUrl},
                             success: function (data) {
-                                const count = data["@@odata.count"];
+                                let count = data["@@odata.count"];
                                 sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
                                 $("#count").text(`Đã tìm thấy ${count}`);
+                                console.log(skip);
+                                if (skip + 9 >= count){
+                                    $('#loadMoreBtn').hide();
+                                }
                                 let html = '';
                                 if (data.value && data.value.length > 0) {
                                     data.value.forEach(function (item) {
