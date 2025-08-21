@@ -1,11 +1,19 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Quản lý đặt sân";
+    var stadiumNames = ViewBag.StadiumNames as Dictionary<int, string>;
+    var discountInfo = ViewBag.DiscountInfo as Dictionary<int, string>;
+}
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Booking System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<link rel="stylesheet" href="~/css/Booking/BookingManager.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/Booking/BookingManager.css" />
+}
+
 
 
 <div class="container">
@@ -160,6 +168,11 @@
 
 <script>
     $(document).ready(function() {
+        var stadiumNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stadiumNames));
+        var discountInfo = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(discountInfo));
+
+        console.log("stadiumNames:", stadiumNames);
+        console.log("discountInfo:", discountInfo);
         // Sample booking data
         const bookings = [
             {

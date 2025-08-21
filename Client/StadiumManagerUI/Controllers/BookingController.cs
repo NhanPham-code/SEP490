@@ -23,11 +23,11 @@ namespace StadiumManagerUI.Controllers
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
 
-            /*if (string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
                 TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
                 return RedirectToAction("Login", "Common");
-            }*/
+            }
 
             List<BookingReadDto> bookings;
             try
