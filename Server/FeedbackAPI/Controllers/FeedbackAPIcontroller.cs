@@ -79,6 +79,13 @@ namespace FeedbackAPI.Controllers
 
             return Ok(new { message = "Deleted successfully" });
         }
+        [HttpGet("stadium/{stadiumId}")]
+        public async Task<IActionResult> GetByStadiumId(int stadiumId)
+        {
+            var feedbacks = await _service.GetByStadiumIdAsync(stadiumId);
+            return Ok(feedbacks);
+        }
+
 
     }
 }

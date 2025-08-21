@@ -62,5 +62,11 @@ namespace FeedbackAPI.Service
             await _repository.SaveChangesAsync();
             return true;
         }
+        public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId)
+        {
+            var feedbacks = await _repository.GetByStadiumIdAsync(stadiumId);
+            return _mapper.Map<IEnumerable<FeedbackResponse>>(feedbacks);
+        }
+
     }
 }

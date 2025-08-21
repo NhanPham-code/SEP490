@@ -1,4 +1,5 @@
-﻿using Service.BaseService;
+﻿
+using Service.BaseService;
 using Service.Interfaces;
 using Service.Services;
 
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 
 var app = builder.Build();

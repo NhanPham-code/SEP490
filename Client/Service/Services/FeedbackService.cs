@@ -1,49 +1,124 @@
-﻿using FeedbackAPI.DTOs;
-using FeedbackAPI.Service;
-using System.Net.Http.Json;
-using Service.Interfaces;
-using Service.BaseService;
+﻿    using FeedbackAPI.DTOs;
+    using Service.BaseService;
+    using Service.Interfaces;
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Net.Http.Json;
+    using System.Threading.Tasks;
 
-namespace FeedbackClient.Service
-{
-    public class FeedbackService : IFeedbackService
+    namespace Service.Services
     {
-        private readonly HttpClient _httpClient;
-
-        public FeedbackService(HttpClient httpClient)
+        public class FeedbackService : IFeedbackService
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        }
+            private readonly HttpClient _httpClient;
 
-        public async Task<IEnumerable<FeedbackResponse>> GetAllAsync()
-        {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<FeedbackResponse>>("api/feedback")
-                   ?? new List<FeedbackResponse>();
-        }
+            public FeedbackService(GatewayHttpClient gateway)
+            {
+                _httpClient = gateway.Client;
+            }
 
-        public async Task<FeedbackResponse?> GetByIdAsync(int id)
-        {
-            return await _httpClient.GetFromJsonAsync<FeedbackResponse>($"api/feedback/{id}");
-        }
+            private void AddBearerAccessToken(string token)
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
 
-        public async Task<FeedbackResponse?> CreateAsync(CreateFeedback dto)
-        {
-            var response = await _httpClient.PostAsJsonAsync("api/feedback", dto);
-            if (!response.IsSuccessStatusCode) return null;
+            public async Task<IEnumerable<FeedbackResponse>> GetAllAsync(string accessToken)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.GetAsync("feedback"); // Fixed: removed "api/" prefix
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[FeedbackService] GetAllAsync failed: {response.StatusCode}");
+                    return new List<FeedbackResponse>();
+                }
+                return await response.Content.ReadFromJsonAsync<IEnumerable<FeedbackResponse>>()
+                       ?? new List<FeedbackResponse>();
+            }
 
-            return await response.Content.ReadFromJsonAsync<FeedbackResponse>();
-        }
+            public async Task<FeedbackResponse?> GetByIdAsync(string accessToken, int id)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.GetAsync($"feedback/{id}"); // Fixed: removed "api/" prefix
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[FeedbackService] GetByIdAsync failed: {response.StatusCode}");
+                    return null;
+                }
+                return await response.Content.ReadFromJsonAsync<FeedbackResponse>();
+            }
 
-        public async Task<bool> UpdateAsync(int id, UpdateFeedback dto)
-        {
-            var response = await _httpClient.PutAsJsonAsync($"api/feedback/{id}", dto);
-            return response.IsSuccessStatusCode;
-        }
+            public async Task<FeedbackResponse?> CreateAsync(CreateFeedback dto, string accessToken)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.PostAsJsonAsync("feedback", dto); // Fixed: removed "api/" prefix
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[FeedbackService] CreateAsync failed: {response.StatusCode} - {errorMessage}");
+                    throw new Exception($"API CreateFeedback failed: {errorMessage}");
+                }
+                return await response.Content.ReadFromJsonAsync<FeedbackResponse>();
+            }
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"api/feedback/{id}");
-            return response.IsSuccessStatusCode;
+            public async Task<bool> UpdateAsync(string accessToken, int id, UpdateFeedback dto)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.PutAsJsonAsync($"feedback/{id}", dto); // Fixed: removed "api/" prefix
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[FeedbackService] UpdateAsync failed: {response.StatusCode}");
+                }
+                return response.IsSuccessStatusCode;
+            }
+
+            public async Task<bool> DeleteAsync(string accessToken, int id)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.DeleteAsync($"feedback/{id}"); // Fixed: removed "api/" prefix
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[FeedbackService] DeleteAsync failed: {response.StatusCode}");
+                }
+                return response.IsSuccessStatusCode;
+            }
+
+            // FIXED VERSION - with proper authentication and path
+            public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId)
+            {
+                // Option 1: If this endpoint doesn't require authentication (public data)
+                var response = await _httpClient.GetAsync($"feedback/stadium/{stadiumId}");
+                Console.WriteLine($"[FeedbackService] GET feedback/stadium/{stadiumId} => {response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[FeedbackService] Error content: {errorContent}");
+                    return new List<FeedbackResponse>();
+                }
+
+                return await response.Content.ReadFromJsonAsync<IEnumerable<FeedbackResponse>>()
+                       ?? new List<FeedbackResponse>();
+            }
+
+            // Alternative version if authentication is required
+            public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdWithAuthAsync(int stadiumId, string accessToken)
+            {
+                AddBearerAccessToken(accessToken);
+                var response = await _httpClient.GetAsync($"feedback/stadium/{stadiumId}");
+                Console.WriteLine($"[FeedbackService] GET feedback/stadium/{stadiumId} => {response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[FeedbackService] Error content: {errorContent}");
+                    return new List<FeedbackResponse>();
+                }
+
+                return await response.Content.ReadFromJsonAsync<IEnumerable<FeedbackResponse>>()
+                       ?? new List<FeedbackResponse>();
+            }
         }
     }
-}
