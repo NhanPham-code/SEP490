@@ -1,700 +1,700 @@
 {
-    "Routes": [
-        // === USER API ===
+  "Routes": [
+    // === USER API ===
+    {
+      "DownstreamPathTemplate": "/api/Users/login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
         {
-            "DownstreamPathTemplate": "/api/Users/login",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/login",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/logout",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/logout",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/checkEmailExits",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/checkEmail",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/register",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/register",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/refresh-token",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/refreshToken",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        {
-            "DownstreamPathTemplate": "/{everything}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/{everything}",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/odata/ODataUsers",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/get",
-            "UpstreamHttpMethod": [ "GET" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-            }
-        },
-        // lấy thông tin người dùng hiện tại (đang đăng nhập)
-        {
-            "DownstreamPathTemplate": "/api/Users/profile",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/me",
-            "UpstreamHttpMethod": [ "GET" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-            }
-        },
-        // xem thông tin người dùng theo id
-        {
-            "DownstreamPathTemplate": "/api/Users/{userId}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/otherProfile/{userId}",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/update-profile",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/update-profile",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/update-avatar",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/update-avatar",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/update-face-image",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/update-face-image",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/{userId}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/{userId}",
-            "UpstreamHttpMethod": [ "DELETE" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
-            },
-            "ChangeDownstreamPathTemplate": {
-                "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Users/reset-password",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7295
-                }
-            ],
-            "UpstreamPathTemplate": "/users/forgot-password",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-        // === BOOKING API ===
-        {
-            "DownstreamPathTemplate": "/api/Booking/{userId}",
-            "UpstreamPathTemplate": "/Bookings/add",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7015
-                }
-            ],
-            "UpstreamHttpMethod": [ "POST" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-            },
-            "ChangeDownstreamPathTemplate": {
-                "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
-            }
-        },
-
-        {
-            "DownstreamPathTemplate": "/odata/bookings?$filter=UserId eq {userId}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7015
-                }
-            ],
-            "UpstreamPathTemplate": "/bookings/history",
-            "UpstreamHttpMethod": [ "GET" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-            },
-            "ChangeDownstreamPathTemplate": {
-                "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/odata/bookings",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7015
-                }
-            ],
-            "UpstreamPathTemplate": "/bookings/booked",
-            "UpstreamHttpMethod": [ "GET" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7015
-                }
-            ],
-            "UpstreamPathTemplate": "/bookings/{bookingId}",
-            "UpstreamHttpMethod": [ "GET" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-            }
-        },
-        //Stadium API
-        {
-            "DownstreamPathTemplate": "/odata/OdataStadium",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/odata/Stadium",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Stadium",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/getByIdStadium", // Fixed: Added leading "/"
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Stadium",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/addStadium", // Fixed: Added leading "/"
-            "UpstreamHttpMethod": [ "POST" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
-            },
-            "ChangeDownstreamPathTemplate": {
-                "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Stadium",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/updateStadium", // Fixed: Added leading "/"
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Stadium",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/deleteStadium", // Fixed: Added leading "/"
-            "UpstreamHttpMethod": [ "DELETE" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
-            }
-        },
-        // == Image API ===
-        {
-            "DownstreamPathTemplate": "/api/AllStadiumImages",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/images/getAllByStadiumId",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/StadiumImages",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/images/getById",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/AddStadiumImages",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/images/upload",
-            "UpstreamHttpMethod": [ "POST" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/UpdateStadiumImage",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/images/update",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/StadiumImage",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/images",
-            "UpstreamHttpMethod": [ "DELETE" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-            }
-        },
-        // == Courts API ===
-        {
-            "DownstreamPathTemplate": "/api/courtsByStadiumId",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/courts/getByIdStadium",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/courtsById",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/courts/getById",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Courts",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/courts/addCourt",
-            "UpstreamHttpMethod": [ "POST" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Courts",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7280
-                }
-            ],
-            "UpstreamPathTemplate": "/courts/updateCourt",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            },
-            "RouteClaimsRequirement": {
-                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-            }
-        },
-        // === FEEDBACK API ===
-        {
-            "DownstreamPathTemplate": "/api/Feedback",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7221
-                }
-            ],
-            "UpstreamPathTemplate": "/feedback",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Feedback/{id}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7221
-                }
-            ],
-            "UpstreamPathTemplate": "/feedback/{id}",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-        {
-            "DownstreamPathTemplate": "/api/Feedback",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7221
-                }
-            ],
-            "UpstreamPathTemplate": "/feedback",
-            "UpstreamHttpMethod": [ "POST" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Feedback/{id}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7221
-                }
-            ],
-            "UpstreamPathTemplate": "/feedback/{id}",
-            "UpstreamHttpMethod": [ "PUT" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            }
-        },
-        {
-            "DownstreamPathTemplate": "/api/Feedback/{id}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7221
-                }
-            ],
-            "UpstreamPathTemplate": "/feedback/{id}",
-            "UpstreamHttpMethod": [ "DELETE" ],
-            "AuthenticationOptions": {
-                "AuthenticationProviderKey": "Bearer",
-                "RequireAuthentication": true
-            }
-        },
-        //----------------------------------Discount-------------------------------
-        // Endpoint: GET /discounts - For GetAll()
-        {
-            "DownstreamPathTemplate": "/api/discounts",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts",
-            "UpstreamHttpMethod": [
-                "GET"
-            ]
-        },
-        // Endpoint: POST /discounts - For Create()
-        {
-            "DownstreamPathTemplate": "/api/discounts",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts",
-            "UpstreamHttpMethod": [
-                "POST"
-            ]
-        },
-        // Endpoint: GET /discounts/{id} - For GetById()
-        {
-            "DownstreamPathTemplate": "/api/discounts/{id}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts/{id}",
-            "UpstreamHttpMethod": [
-                "GET"
-            ]
-        },
-        // Endpoint: PUT /discounts - For Update()
-        {
-            "DownstreamPathTemplate": "/api/discounts",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts",
-            "UpstreamHttpMethod": [
-                "PUT"
-            ]
-        },
-        // Endpoint: GET /discounts/code/{code} - For GetByCode()
-        {
-            "DownstreamPathTemplate": "/api/discounts/code/{code}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts/code/{code}",
-            "UpstreamHttpMethod": [
-                "GET"
-            ]
-        },
-        // Endpoint: GET /discounts/stadium/{stadiumId} - For GetByStadiumId()
-        {
-            "DownstreamPathTemplate": "/api/discounts/stadium/{stadiumId}",
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 7134
-                }
-            ],
-            "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
-            "UpstreamHttpMethod": [
-                "GET"
-            ]
+          "Host": "localhost",
+          "Port": 7295
         }
-    ],
+      ],
+      "UpstreamPathTemplate": "/users/login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/logout",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/logout",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/checkEmailExits",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/checkEmail",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/register",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/register",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/refresh-token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/refreshToken",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/{everything}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/odata/ODataUsers",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/get",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
+      }
+    },
+    // lấy thông tin người dùng hiện tại (đang đăng nhập)
+    {
+      "DownstreamPathTemplate": "/api/Users/profile",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/me",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      }
+    },
+    // xem thông tin người dùng theo id
+    {
+      "DownstreamPathTemplate": "/api/Users/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/otherProfile/{userId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/update-profile",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/update-profile",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/update-avatar",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/update-avatar",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/update-face-image",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/update-face-image",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/{userId}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/reset-password",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/forgot-password",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    // === BOOKING API ===
+    {
+      "DownstreamPathTemplate": "/api/Booking/{userId}",
+      "UpstreamPathTemplate": "/Bookings/add",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/odata/bookings?$filter=UserId eq {userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/bookings/history",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/odata/bookings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/bookings/booked",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/bookings/{bookingId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      }
+    },
+    //Stadium API
+    {
+      "DownstreamPathTemplate": "/odata/OdataStadium",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/odata/Stadium",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Stadium",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/getByIdStadium", // Fixed: Added leading "/"
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Stadium",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/addStadium", // Fixed: Added leading "/"
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Stadium",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/updateStadium", // Fixed: Added leading "/"
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Stadium",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/deleteStadium", // Fixed: Added leading "/"
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
+    },
+    // == Image API ===
+    {
+      "DownstreamPathTemplate": "/api/AllStadiumImages",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images/getAllByStadiumId",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumImages",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images/getById",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/AddStadiumImages",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images/upload",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/UpdateStadiumImage",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images/update",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumImage",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    // == Courts API ===
+    {
+      "DownstreamPathTemplate": "/api/courtsByStadiumId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/courts/getByIdStadium",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/courtsById",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/courts/getById",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Courts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/courts/addCourt",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Courts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/courts/updateCourt",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      }
+    },
+    // === FEEDBACK API ===
+    {
+      "DownstreamPathTemplate": "/api/Feedback",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/feedback",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Feedback/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/feedback/{id}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Feedback",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/feedback",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Feedback/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/feedback/{id}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Feedback/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/feedback/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    //----------------------------------Discount-------------------------------
+    // Endpoint: GET /discounts - For GetAll()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: POST /discounts - For Create()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    // Endpoint: GET /discounts/{id} - For GetById()
+    {
+      "DownstreamPathTemplate": "/api/discounts/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: PUT /discounts - For Update()
+    {
+      "DownstreamPathTemplate": "/api/discounts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ]
+    },
+    // Endpoint: GET /discounts/code/{code} - For GetByCode()
+    {
+      "DownstreamPathTemplate": "/api/discounts/code/{code}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/code/{code}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    // Endpoint: GET /discounts/stadium/{stadiumId} - For GetByStadiumId()
+    {
+      "DownstreamPathTemplate": "/api/discounts/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    }
+  ],
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:7136"
   },
