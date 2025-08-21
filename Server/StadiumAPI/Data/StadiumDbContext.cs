@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StadiumAPI.Models;
 using StadiumAPI.DTOs;
+using StadiumAPI.Models;
 using System;
 
 namespace StadiumAPI.Data
@@ -11,6 +11,7 @@ namespace StadiumAPI.Data
         {
         }
         public DbSet<Courts> Courts { get; set; }
+        public DbSet<CourtRelations> CourtRelations { get; set; }
         public DbSet<Stadiums> Stadiums { get; set; }
         public DbSet<StadiumImages> StadiumImages { get; set; }
 
@@ -18,12 +19,32 @@ namespace StadiumAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            // Explicitly map tables
             modelBuilder.Entity<Courts>().ToTable("Courts");
             modelBuilder.Entity<Stadiums>().ToTable("Stadiums");
             modelBuilder.Entity<StadiumImages>().ToTable("StadiumImages");
+            modelBuilder.Entity<CourtRelations>().ToTable("CourtRelations"); // Map CourtRelation to table
 
             var fixedDate = new DateTime(2025, 8, 14, 10, 0, 0);
 
+            modelBuilder.Entity<CourtRelations>()
+           .HasOne(cr => cr.ChildCourt)
+           .WithMany(c => c.ParentRelations)
+           .HasForeignKey(cr => cr.ChildCourtId)
+           .OnDelete(DeleteBehavior.Cascade); // Keep cascade for ChildCourtId
+
+            modelBuilder.Entity<CourtRelations>()
+                .HasOne(cr => cr.ParentCourt)
+                .WithMany(c => c.ChildRelations)
+                .HasForeignKey(cr => cr.ParentCourtId)
+                .OnDelete(DeleteBehavior.NoAction); // Use NoAction for ParentCourtId
+
+            modelBuilder.Entity<Courts>()
+                .HasOne(c => c.Stadium)
+                .WithMany(s => s.Courts)
+                .HasForeignKey(c => c.StadiumId)
+                .OnDelete(DeleteBehavior.Cascade); // Adjust as needed
             // ===== STADIUMS =====
             modelBuilder.Entity<Stadiums>().HasData(
                 new Stadiums
@@ -414,39 +435,58 @@ namespace StadiumAPI.Data
 
             // ===== COURTS =====
             modelBuilder.Entity<Courts>().HasData(
+                // Existing courts with added child courts for parent-child relationships
                 new Courts { Id = 1, StadiumId = 1, Name = "Sân 7 người", SportType = "Bóng đá", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 2, StadiumId = 1, Name = "Sân 5 người", SportType = "Bóng đá", PricePerHour = 200000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 3, StadiumId = 2, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 4, StadiumId = 2, Name = "Sân B", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 5, StadiumId = 3, Name = "Sân Số 1", SportType = "Tennis", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 6, StadiumId = 3, Name = "Sân Số 2", SportType = "Tennis", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 7, StadiumId = 4, Name = "Sân chính", SportType = "Bóng rổ", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 8, StadiumId = 5, Name = "Sân 1", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 9, StadiumId = 5, Name = "Sân 2", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 10, StadiumId = 6, Name = "Sân Chính", SportType = "Bóng đá", PricePerHour = 500000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 11, StadiumId = 7, Name = "Hồ bơi 50m", SportType = "Bơi lội", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 12, StadiumId = 8, Name = "Sân 1", SportType = "Tennis", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 13, StadiumId = 8, Name = "Sân 2", SportType = "Tennis", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 14, StadiumId = 9, Name = "Sân Số 1", SportType = "Cầu lông", PricePerHour = 60000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 15, StadiumId = 9, Name = "Sân Số 2", SportType = "Cầu lông", PricePerHour = 60000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 16, StadiumId = 10, Name = "Sân Đơn", SportType = "Tennis", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 17, StadiumId = 11, Name = "Sân Chính", SportType = "Bóng chuyền", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 18, StadiumId = 12, Name = "Hồ bơi ngoài trời", SportType = "Bơi lội", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 19, StadiumId = 13, Name = "Sân Số 3", SportType = "Cầu lông", PricePerHour = 75000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 20, StadiumId = 14, Name = "Sân 7 người 1", SportType = "Bóng đá", PricePerHour = 280000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 21, StadiumId = 15, Name = "Sân Công an 1", SportType = "Tennis", PricePerHour = 110000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 22, StadiumId = 16, Name = "Sân chính", SportType = "Bóng rổ", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 23, StadiumId = 17, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 24, StadiumId = 17, Name = "Sân Bóng Chuyền", SportType = "Bóng chuyền", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 25, StadiumId = 18, Name = "Sân 7 người 1", SportType = "Bóng đá", PricePerHour = 250000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 26, StadiumId = 18, Name = "Sân 5 người", SportType = "Bóng đá", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 27, StadiumId = 19, Name = "Sân 1", SportType = "Tennis", PricePerHour = 90000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 28, StadiumId = 20, Name = "Sân bóng chuyền", SportType = "Bóng chuyền", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 29, StadiumId = 21, Name = "Hồ bơi", SportType = "Bơi lội", PricePerHour = 30000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 31, StadiumId = 23, Name = "Sân 1", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 32, StadiumId = 23, Name = "Sân 2", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 33, StadiumId = 24, Name = "Sân chính", SportType = "Bóng chuyền", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 34, StadiumId = 25, Name = "Sân 11 người", SportType = "Bóng đá", PricePerHour = 450000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+                new Courts { Id = 2, StadiumId = 1, Name = "Sân 5 người A", SportType = "Bóng đá", PricePerHour = 200000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 3, StadiumId = 1, Name = "Sân 5 người B", SportType = "Bóng đá", PricePerHour = 200000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }, // Added child court
+                new Courts { Id = 4, StadiumId = 2, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 5, StadiumId = 2, Name = "Sân B", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 6, StadiumId = 3, Name = "Sân Số 1", SportType = "Tennis", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 7, StadiumId = 3, Name = "Sân Số 2", SportType = "Tennis", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 8, StadiumId = 4, Name = "Sân chính", SportType = "Bóng rổ", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 9, StadiumId = 5, Name = "Sân 1", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 10, StadiumId = 5, Name = "Sân 2", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 11, StadiumId = 6, Name = "Sân Chính", SportType = "Bóng đá", PricePerHour = 500000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 12, StadiumId = 7, Name = "Hồ bơi 50m", SportType = "Bơi lội", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 13, StadiumId = 8, Name = "Sân 1", SportType = "Tennis", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 14, StadiumId = 8, Name = "Sân 2", SportType = "Tennis", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 15, StadiumId = 9, Name = "Sân Số 1", SportType = "Cầu lông", PricePerHour = 60000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 16, StadiumId = 9, Name = "Sân Số 2", SportType = "Cầu lông", PricePerHour = 60000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 17, StadiumId = 10, Name = "Sân Đơn", SportType = "Tennis", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 18, StadiumId = 11, Name = "Sân Chính", SportType = "Bóng chuyền", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 19, StadiumId = 12, Name = "Hồ bơi ngoài trời", SportType = "Bơi lội", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 20, StadiumId = 13, Name = "Sân Số 3", SportType = "Cầu lông", PricePerHour = 75000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 21, StadiumId = 14, Name = "Sân 7 người 1", SportType = "Bóng đá", PricePerHour = 280000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 22, StadiumId = 14, Name = "Sân 5 người A", SportType = "Bóng đá", PricePerHour = 180000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }, // Added child court
+                new Courts { Id = 23, StadiumId = 14, Name = "Sân 5 người B", SportType = "Bóng đá", PricePerHour = 180000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }, // Added child court
+                new Courts { Id = 24, StadiumId = 15, Name = "Sân Công an 1", SportType = "Tennis", PricePerHour = 110000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 25, StadiumId = 16, Name = "Sân chính", SportType = "Bóng rổ", PricePerHour = 100000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 26, StadiumId = 17, Name = "Sân A", SportType = "Cầu lông", PricePerHour = 50000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 27, StadiumId = 17, Name = "Sân Bóng Chuyền", SportType = "Bóng chuyền", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 28, StadiumId = 18, Name = "Sân 7 người 1", SportType = "Bóng đá", PricePerHour = 250000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 29, StadiumId = 18, Name = "Sân 5 người", SportType = "Bóng đá", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 30, StadiumId = 19, Name = "Sân 1", SportType = "Tennis", PricePerHour = 90000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 31, StadiumId = 20, Name = "Sân bóng chuyền", SportType = "Bóng chuyền", PricePerHour = 80000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 32, StadiumId = 21, Name = "Hồ bơi", SportType = "Bơi lội", PricePerHour = 30000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 33, StadiumId = 23, Name = "Sân 1", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 34, StadiumId = 23, Name = "Sân 2", SportType = "Cầu lông", PricePerHour = 70000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 35, StadiumId = 24, Name = "Sân chính", SportType = "Bóng chuyền", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 36, StadiumId = 25, Name = "Sân 11 người", SportType = "Bóng đá", PricePerHour = 450000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 37, StadiumId = 25, Name = "Sân 7 người A", SportType = "Bóng đá", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }, // Added child court
+                new Courts { Id = 38, StadiumId = 25, Name = "Sân 7 người B", SportType = "Bóng đá", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate } // Added child court
+            );
+
+            // ===== COURT RELATIONS =====
+            modelBuilder.Entity<CourtRelations>().HasData(
+                // Example: Sân 7 người (Id=1) at Sân Bóng Phi Long (StadiumId=1) is parent to two 5-a-side courts (Id=2, Id=3)
+                new CourtRelations { Id = 1, ParentCourtId = 1, ChildCourtId = 2 },
+                new CourtRelations { Id = 2, ParentCourtId = 1, ChildCourtId = 3 },
+                // Example: Sân 7 người 1 (Id=21) at Sân bóng đá Anh Tuấn (StadiumId=14) is parent to two 5-a-side courts (Id=22, Id=23)
+                new CourtRelations { Id = 3, ParentCourtId = 21, ChildCourtId = 22 },
+                new CourtRelations { Id = 4, ParentCourtId = 21, ChildCourtId = 23 },
+                // Example: Sân 11 người (Id=36) at Sân bóng đá Đại học Cần Thơ (StadiumId=25) is parent to two 7-a-side courts (Id=37, Id=38)
+                new CourtRelations { Id = 5, ParentCourtId = 36, ChildCourtId = 37 },
+                new CourtRelations { Id = 6, ParentCourtId = 36, ChildCourtId = 38 }
             );
 
             // ===== IMAGES =====

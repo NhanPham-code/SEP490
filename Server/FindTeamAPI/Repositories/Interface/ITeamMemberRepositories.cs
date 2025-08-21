@@ -9,6 +9,7 @@ namespace FindTeamAPI.Repositories.Interface
         Task<TeamMember> CreateTeamMemberAsync(TeamMember teamMember);
         Task<TeamMember> UpdateTeamMemberAsync(TeamMember teamMember);
         Task<bool> DeleteTeamMemberAsync(int teamId, int memberId);
-        Task<bool> IsTeamMemberExistsAsync(int teamId, int memberId);
+        Task<bool> IsTeamMemberExistsAsync(int teamId);
+        Task<bool> DeleteMemberByMemberId(int teamId, int memberId, int UserId);
     }
 }
