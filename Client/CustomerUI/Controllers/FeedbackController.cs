@@ -13,7 +13,7 @@ namespace CustomerUI.Controllers
         private readonly IFeedbackService _feedbackService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
-
+        private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
         public FeedbackController(IFeedbackService feedbackService, ITokenService tokenService, IUserService userService)
         {
             _feedbackService = feedbackService;
@@ -355,43 +355,57 @@ namespace CustomerUI.Controllers
         {
             try
             {
-                Console.WriteLine($"[Controller] Getting feedbacks for stadium: {stadiumId}");
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
-                Console.WriteLine($"[Controller] Retrieved {stadiumFeedbacks?.Count() ?? 0} feedbacks");
 
-                // 👇 Lấy user hiện tại giống như hàm Create
+                var feedbackWithUser = new List<object>();
+
+                if (stadiumFeedbacks != null)
+                {
+                    foreach (var fb in stadiumFeedbacks)
+                    {
+                        var userProfile = await _userService.GetOtherUserByIdAsync(fb.UserId.ToString());
+                        feedbackWithUser.Add(new
+                        {
+                            fb.Id,
+                            fb.Rating,
+                            fb.Comment,
+                            fb.StadiumId,
+                            fb.UserId,
+                            User = userProfile != null ? new
+                            {
+                                userProfile.FullName,
+                                AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
+        ? $"{BASE_URL}{userProfile.AvatarUrl}"
+        : "/images/default-avatar.png"
+                            } : null
+
+                        });
+                    }
+                }
+
                 var accessToken = GetAccessToken();
                 int? currentUserId = null;
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     var userProfile = await _userService.GetMyProfileAsync(accessToken);
                     if (userProfile != null)
-                    {
-                        currentUserId = userProfile.UserId; // y chang Create
-                    }
+                        currentUserId = userProfile.UserId;
                 }
 
                 return Json(new
                 {
                     success = true,
-                    data = stadiumFeedbacks ?? new List<FeedbackResponse>(),
-                    count = stadiumFeedbacks?.Count() ?? 0,
-                    currentUserId = currentUserId // 👈 trả thêm userId hiện tại
+                    data = feedbackWithUser,
+                    count = feedbackWithUser.Count,
+                    currentUserId
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Error: {ex.Message}");
-                Console.WriteLine($"[GetFeedbacksByStadiumDirect] StackTrace: {ex.StackTrace}");
-                return Json(new
-                {
-                    success = false,
-                    message = "Lỗi khi lấy danh sách phản hồi.",
-                    data = new List<FeedbackResponse>(),
-                    error = ex.Message
-                });
+                return Json(new { success = false, message = ex.Message });
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> GetMyFeedbackForStadium(int stadiumId)
         {
@@ -413,6 +427,26 @@ namespace CustomerUI.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetOtherUserProfile(int userId)
+        {
+            try
+            {
+                if (userId <= 0)
+                    return BadRequest(new { success = false, message = "UserId không hợp lệ." });
+
+                var otherUser = await _userService.GetOtherUserByIdAsync(userId.ToString());
+                if (otherUser == null)
+                    return NotFound(new { success = false, message = "Không tìm thấy thông tin người dùng." });
+
+                return Json(new { success = true, data = otherUser });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetOtherUserProfile] Lỗi: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Có lỗi xảy ra khi lấy thông tin user." });
             }
         }
 

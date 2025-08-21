@@ -239,7 +239,6 @@
         "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
       }
     },
-
     {
       "DownstreamPathTemplate": "/odata/bookings?$filter=UserId eq {userId}",
       "DownstreamScheme": "https",
@@ -322,7 +321,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/getByIdStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/getByIdStadium",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
@@ -334,7 +333,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/addStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/addStadium",
       "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -356,7 +355,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/updateStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/updateStadium",
       "UpstreamHttpMethod": [ "PUT" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -375,7 +374,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/deleteStadium", // Fixed: Added leading "/"
+      "UpstreamPathTemplate": "/deleteStadium",
       "UpstreamHttpMethod": [ "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -603,6 +602,18 @@
         "RequireAuthentication": true
       }
     },
+    {
+      "DownstreamPathTemplate": "/api/Feedback/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/Feedback/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
     //----------------------------------Discount-------------------------------
     // Endpoint: GET /discounts - For GetAll()
     {
@@ -694,29 +705,7 @@
         "GET"
       ]
     }
-
   ],
-  "UpstreamPathTemplate": "/feedback/{id}",
-  "UpstreamHttpMethod": [ "DELETE" ],
-  "AuthenticationOptions": {
-    "AuthenticationProviderKey": "Bearer",
-    "RequireAuthentication": true
-  },
-
-    {
-      "DownstreamPathTemplate": "/api/Feedback/stadium/{stadiumId}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7221
-        }
-      ],
-      "UpstreamPathTemplate": "/feedback/stadium/{stadiumId}",
-      "UpstreamHttpMethod": [ "GET" ]
-    },
-  ],
-
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:7136"
   },
