@@ -1,492 +1,655 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    ViewData["Title"] = "Đăng nhập / Đăng ký";
+    Layout = null;
+}
 
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Stadium Booking Platform</title>
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#3b82f6",
-                        secondary: "#10b981",
-                    },
-                    borderRadius: {
-                        none: "0px",
-                        sm: "4px",
-                        DEFAULT: "8px",
-                        md: "12px",
-                        lg: "16px",
-                        xl: "20px",
-                        "2xl": "24px",
-                        "3xl": "32px",
-                        full: "9999px",
-                        button: "8px",
-                    },
-                },
-            },
-        };
-    </script>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Sportivey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <style>
-                .password-toggle {
-                        cursor: pointer;
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+        * {
+            font-family: 'Inter', sans-serif;
         }
 
-                .error-message {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                        transition: all 0.3s ease;
-
+        /* Sport-themed background */
+        body {
+            background: linear-gradient(135deg, 
+                #1e40af 0%,    /* Deep blue */
+                #059669 25%,   /* Emerald green */
+                #dc2626 50%,   /* Red */
+                #ea580c 75%,   /* Orange */
+                #7c3aed 100%   /* Purple */
+            );
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
         }
 
-                    .error-message.show {
-                            opacity: 1;
-                            transform: translateY(0);
-
+        @@keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-                .loading-spinner {
-                        animation: spin 1s linear infinite;
-
+        /* Add sport pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px, 60px 60px, 30px 30px;
+            pointer-events: none;
+            z-index: 0;
         }
 
-                .social-button {
-                        transition: all 0.2s ease;
-
+        #container {
+            position: relative;
+            z-index: 1;
         }
 
-                    .social-button:hover {
-                            transform: translateY(-1px);
-
+        /* Base container for forms */
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+            transition: all 0.6s ease-in-out;
         }
 
-                .form-input {
-                        transition: all 0.2s ease;
-
+        /* Login and Register initial positions */
+        .login-container {
+            left: 0;
+            z-index: 2;
         }
 
-                    .form-input:focus {
-                            transform: translateY(-1px);
-
+        .register-container {
+            left: 0;
+            z-index: 1;
+            opacity: 0;
         }
 
-                .password-strength {
-                        height: 4px;
-                        border-radius: 2px;
-                        transition: all 0.3s ease;
-
+        /* Animation when switching to Register panel */
+        .right-panel-active .login-container {
+            transform: translateX(100%);
+            opacity: 0;
         }
 
-                .strength-weak {
-                        background-color: #ef4444;
-                        width: 25%;
-
+        .right-panel-active .register-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
         }
 
-                .strength-fair {
-                        background-color: #f59e0b;
-                        width: 50%;
+        @@keyframes show {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
 
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
         }
 
-                .strength-good {
-                        background-color: #10b981;
-                        width: 75%;
-
+        /* Overlay styles with sport theme */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 100;
+            transition: transform 0.6s ease-in-out;
         }
 
-                .strength-strong {
-                        background-color: #059669;
-                        width: 100%;
-
+        .right-panel-active .overlay-container {
+            transform: translateX(-100%);
         }
 
-                .tab-button {
-                        position: relative;
-
+        .overlay {
+            background: linear-gradient(135deg, 
+                #1e40af 0%,    /* Sports blue */
+                #059669 50%,   /* Field green */
+                #dc2626 100%   /* Energy red */
+            );
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
         }
 
-                    .tab-button.active {
-                            background-color: white;
-
+        .right-panel-active .overlay {
+            transform: translateX(50%);
         }
 
-                        .tab-button.active::after {
-                                content: '';
-                                position: absolute;
-                                bottom: -1px;
-                                left: 0;
-                                right: 0;
-                                height: 2px;
-                                background-color: #3b82f6;
-
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            color: #fff;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
         }
 
-        .opacity-50 { opacity: 0.5; }
-        .cursor-not-allowed { cursor: not-allowed; }
-        .animate-pulse { animation: pulse 1s infinite; }
-        @@keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.7); }
-            50% { box-shadow: 0 0 10px 5px rgba(220,38,38,.7); }
+        .overlay-left {
+            transform: translateX(-20%);
         }
 
+        .right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
 
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        /* Separated form content for scrolling */
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-content {
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 12px;
+        }
+
+        /* Password input container */
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s ease;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #1e40af;
+        }
+
+        /* Floating label input styles */
+        .floating-label {
+            position: relative;
+        }
+
+        .floating-label input,
+        .floating-label select {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .floating-label input:focus,
+        .floating-label select:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .floating-label .icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            transition: color 0.3s ease;
+        }
+
+        .floating-label input:focus + .icon,
+        .floating-label select:focus + .icon {
+            color: #1e40af;
+        }
+
+        /* Button styles with sport theme */
+        .submit-btn {
+            background: linear-gradient(135deg, #1e40af 0%, #059669 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(30, 64, 175, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .overlay-btn {
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .overlay-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .face-login-btn {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+        }
+
+        .face-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(5, 150, 105, 0.4);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Password strength indicator */
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background-color: #ef4444; width: 25%; }
+        .strength-fair { background-color: #f59e0b; width: 50%; }
+        .strength-good { background-color: #10b981; width: 75%; }
+        .strength-strong { background-color: #059669; width: 100%; }
+
+        /* Error message styling */
+        .error-message {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Checkbox styling */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .custom-checkbox.checked {
+            background: #1e40af;
+            border-color: #1e40af;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sport-themed container */
+        #container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .form-container {
+                width: 100%;
+                position: static;
+                padding: 2rem;
+            }
+            .overlay-container {
+                display: none;
+            }
+            #container {
+                width: 100%;
+                max-width: 400px;
+                min-height: auto;
+            }
+        }
     </style>
 </head>
-@{
-    var ErrorMessage = TempData["ErrorMessage"] as string;
-    var RegisterRequestDTO = TempData["RegisterRequestDTO"] as DTOs.UserDTO.CustomerRegisterRequestDTO;
-}
+<body class="min-h-screen flex items-center justify-center p-4">
+    @{
+        var ErrorMessage = TempData["ErrorMessage"] as string;
+    }
 
-@if (ErrorMessage != null)
-{
-    <div class="alert alert-danger text-center mt-3">
-        @ErrorMessage
+    @if (ErrorMessage != null)
+    {
+        <div class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            @ErrorMessage
+        </div>
+    }
+
+    <div id="container" class="relative rounded-3xl shadow-2xl overflow-hidden w-[900px] max-w-full min-h-[600px]">
+
+        <!-- Login Form -->
+        <div class="form-container login-container">
+            <div class="form-header">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                    Chào mừng trở lại!
+                </h1>
+                <p class="text-gray-600">Đăng nhập để tiếp tục hành trình thể thao</p>
+            </div>
+            <div class="form-content">
+                <form method="post" asp-controller="Common" asp-action="Login" class="space-y-6">
+                    <div class="floating-label">
+                        <input type="email" name="email" placeholder="Email" required />
+                        <i class="ri-mail-line icon text-xl"></i>
+                    </div>
+                    <div class="floating-label password-container">
+                        <input type="password" name="password" placeholder="Mật khẩu" required id="loginPassword" />
+                        <i class="ri-lock-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('loginPassword', this)"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="remember-me" name="RememberMe" class="sr-only">
+                            <div class="custom-checkbox" onclick="toggleCheckbox('remember-me', this)">
+                                <i class="ri-check-line text-white text-sm hidden"></i>
+                            </div>
+                            <label for="remember-me" class="cursor-pointer">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-green-600 text-sm transition-colors">Quên mật khẩu?</a>
+                    </div>
+                    <button type="submit" class="submit-btn w-full">
+                        <span class="button-text">Đăng nhập</span>
+                    </button>
+
+                    <!-- Face Login Button -->
+                    <button type="button" id="face-login-btn" class="face-login-btn w-full">
+                        <i class="ri-camera-line mr-2"></i>
+                        <span>Đăng nhập bằng khuôn mặt</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-container register-container">
+            <div class="form-header">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent mb-2">
+                    Tham gia cùng chúng tôi
+                </h1>
+                <p class="text-gray-600">Đăng ký để bắt đầu hành trình thể thao</p>
+            </div>
+            <div class="form-content">
+                <form method="post" asp-controller="Common" asp-action="Register" class="space-y-4" id="registerForm">
+                    <div class="floating-label">
+                        <input type="text" name="fullname" placeholder="Họ và tên" required id="fullname" />
+                        <i class="ri-user-3-line icon text-xl"></i>
+                    </div>
+                    <div id="fullname-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label">
+                        <input type="email" name="email" placeholder="Email" required id="email" />
+                        <i class="ri-mail-line icon text-xl"></i>
+                    </div>
+                    <div id="email-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label">
+                        <input type="text" name="address" placeholder="Địa chỉ" required id="address" />
+                        <i class="ri-home-line icon text-xl"></i>
+                    </div>
+                    <div id="address-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label">
+                        <input type="tel" name="phoneNumber" placeholder="Số điện thoại" required id="phone" pattern="[0-9]{10,15}" />
+                        <i class="ri-phone-line icon text-xl"></i>
+                    </div>
+                    <div id="phone-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label">
+                        <select name="gender" required id="gender">
+                            <option value="">Chọn giới tính</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                        <i class="ri-user-heart-line icon text-xl"></i>
+                    </div>
+                    <div id="gender-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label">
+                        <input type="date" name="dateOfBirth" required id="dateOfBirth" />
+                        <i class="ri-calendar-line icon text-xl"></i>
+                    </div>
+                    <div id="dob-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label password-container">
+                        <input type="password" name="password" placeholder="Mật khẩu" required id="registerPassword" />
+                        <i class="ri-lock-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('registerPassword', this)"></i>
+                    </div>
+                    <div class="mt-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-500">Độ mạnh mật khẩu</span>
+                            <span id="strength-text" class="text-xs text-gray-500"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1">
+                            <div id="strength-bar" class="password-strength bg-gray-200"></div>
+                        </div>
+                    </div>
+                    <div id="password-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="floating-label password-container">
+                        <input type="password" name="confirm-password" placeholder="Xác nhận mật khẩu" required id="confirmPassword" />
+                        <i class="ri-lock-2-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('confirmPassword', this)"></i>
+                    </div>
+                    <div id="confirm-password-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="agree-terms" name="terms" required class="sr-only">
+                        <div class="custom-checkbox" onclick="toggleCheckbox('agree-terms', this)">
+                            <i class="ri-check-line text-white text-sm hidden"></i>
+                        </div>
+                        <label for="agree-terms" class="cursor-pointer text-sm">Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản</a> và <a href="#" class="text-blue-600 hover:underline">Chính sách</a></label>
+                    </div>
+                    <div id="terms-error" class="error-message text-red-600 text-sm hidden"></div>
+
+                    <button type="submit" class="submit-btn w-full" id="submitBtn">
+                        <span id="submitText">Đăng ký</span>
+                        <div id="submitSpinner" class="loading ml-2 hidden"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1 class="text-3xl font-bold mb-4">Chào mừng trở lại! ⚽</h1>
+                    <p class="text-lg mb-6">Đã có tài khoản? Đăng nhập để tiếp tục hành trình thể thao của bạn.</p>
+                    <button class="overlay-btn" id="signIn">Đăng nhập</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1 class="text-3xl font-bold mb-4">Xin chào, vận động viên! 🏆</h1>
+                    <p class="text-lg mb-6">Tạo tài khoản để bắt đầu hành trình thể thao tuyệt vời.</p>
+                    <button class="overlay-btn" id="signUp">Đăng ký</button>
+                </div>
+            </div>
+        </div>
     </div>
-}
 
-<body class="bg-gray-50 min-h-screen">
-    <main class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <div class="bg-white rounded-2xl shadow-xl p-8">
-                <div class="flex justify-center mb-8">
-                    <div class="inline-flex rounded-full p-1 bg-gray-100">
-                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 active" data-tab="signin">Đăng Nhập</button>
-                        <button type="button" class="tab-button px-6 py-2 rounded-full text-sm font-medium transition-all duration-200" data-tab="signup">Đăng Ký</button>
-                    </div>
-                </div>
-                <div id="signin-form" class="tab-content">
-                    <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại</h2>
-                        <p class="text-gray-600">Đăng nhập để trải nghiệm hệ thống</p>
-                    </div>
-                    <form id="login-form" class="space-y-6" method="post">
-                        <div>
-                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <div class="relative">
-                                <input type="email" id="login-email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập vào email của bạn">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-mail-line text-gray-400"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Mật Khẩu</label>
-                            <div class="relative">
-                                <input type="password" id="login-password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập vào mật khẩu của bạn">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-lock-line text-gray-400"></i>
-                                </div>
-                                <button type="button" id="login-password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-eye-line text-gray-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" id="remember-me" class="mr-2 sr-only">
-                                <div class="w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center">
-                                    <i class="ri-check-line text-primary text-xs hidden"></i>
-                                </div>
-                                <span class="text-sm text-gray-600">Nhớ mật khẩu</span>
-                            </label>
-                            <a href="#" class="text-sm text-primary hover:text-blue-600">Quên mật khẩu</a>
-                        </div>
-                        <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
-                            <span>Đăng nhập</span>
-                        </button>
+    <!-- Face Login Modal -->
+    <div id="face-login-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
+        <div class="modal-content rounded-xl shadow-2xl p-8 flex flex-col items-center max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold mb-2">Đăng nhập bằng khuôn mặt</h3>
+            <p class="text-gray-600 mb-4 text-center">Vui lòng nhìn vào camera và quay video khuôn mặt trong 5 giây.</p>
+            <video id="face-video" width="320" height="240" autoplay muted class="rounded-lg border mb-2"></video>
 
-                        <!-- Nút đăng nhập bằng khuôn mặt -->
-                        <div class="mt-4 flex flex-col items-center">
-                            <button type="button" id="face-login-btn" class="w-full bg-secondary text-white py-3 px-4 rounded-button hover:bg-green-600 transition-colors font-semibold flex items-center justify-center">
-                                <i class="ri-camera-line mr-2"></i>
-                                <span>Đăng nhập bằng khuôn mặt</span>
-                            </button>
-                        </div>
-                        <!-- Modal quay video khuôn mặt -->
-                        <div id="face-login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-                            <div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center max-w-sm w-full">
-                                <h3 class="text-xl font-bold mb-2">Đăng nhập bằng khuôn mặt</h3>
-                                <p class="text-gray-600 mb-4 text-center">Vui lòng nhìn vào camera và quay video khuôn mặt trong 5 giây.</p>
-                                <video id="face-video" width="320" height="240" autoplay muted class="rounded-lg border mb-2"></video>
+            <div id="recording-status" class="text-red-500 font-semibold mb-2 hidden">Đang ghi video...</div>
 
-                                <!-- Trạng thái ghi video -->
-                                <div id="recording-status" class="text-red-500 font-semibold mb-2 hidden">Đang ghi video...</div>
-
-                                <div id="face-login-controls" class="flex gap-2">
-                                    <button type="button" id="start-record-btn" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">Bắt đầu</button>
-                                    <button type="button" id="stop-record-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200" disabled>Dừng</button>
-                                </div>
-                                <video id="face-playback" width="320" height="240" controls class="rounded-lg border mb-2 hidden"></video>
-                                <div class="flex justify-between w-full mt-2">
-                                    <button type="button" id="face-login-cancel" class="text-gray-500 hover:text-gray-700 font-medium">Hủy</button>
-                                    <button type="button" id="face-login-submit" class="bg-secondary text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200" disabled>Gửi video xác thực</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div id="signup-form" class="tab-content hidden">
-                    <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Đăng ký tài khoảng</h2>
-                        <p class="text-gray-600">Đăng kí tài khoảng để trải nghiệm hệ thống</p>
-                    </div>
-                    <div id="form-error" class="error-message bg-red-50 border border-red-200 rounded-lg p-4 mb-6 hidden">
-                        <div class="flex items-center">
-                            <div class="w-5 h-5 flex items-center justify-center mr-3">
-                                <i class="ri-error-warning-line text-red-500"></i>
-                            </div>
-                            <p class="text-red-700 text-sm" id="error-text"></p>
-                        </div>
-                    </div>
-                    <form id="signup-form-inner" class="space-y-6" method="post" asp-controller="Common" asp-action="Register">
-                        <div>
-                            <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
-                            <div class="relative">
-                                <input type="text" id="fullname" name="fullname" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập họ và tên">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-user-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="fullname-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <div class="relative">
-                                <input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập email">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-mail-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="email-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div>
-                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
-                            <div class="relative">
-                                <input type="text" id="address" name="address" required class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập địa chỉ">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-home-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="address-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
-                            <div class="relative">
-                                <input type="tel" id="phone" name="phoneNumber" required pattern="[0-9]{10,15}" class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Nhập số điện thoại">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-phone-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="phone-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <!-- Gender -->
-                        <div>
-                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Giới tính</label>
-                            <div class="relative">
-                                <select id="gender" name="gender" required
-                                        class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-                                    <option value="">Chọn giới tính</option>
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                    <option value="Khác">Khác</option>
-                                </select>
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-user-heart-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="gender-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-
-                        <!-- Date of Birth -->
-                        <div>
-                            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-2">Ngày sinh</label>
-                            <div class="relative">
-                                <input type="date" id="dateOfBirth" name="dateOfBirth" required
-                                       class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-calendar-line text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div id="dob-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
-                            <div class="relative">
-                                <input type="password" id="password" name="password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Tạo mật khẩu">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-lock-line text-gray-400"></i>
-                                </div>
-                                <button type="button" id="password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center" tabindex="-1">
-                                    <i class="ri-eye-line text-gray-400"></i>
-                                </button>
-                            </div>
-                            <div class="mt-2">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs text-gray-500">Độ mạnh mật khẩu</span>
-                                    <span id="strength-text" class="text-xs text-gray-500"></span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-1">
-                                    <div id="strength-bar" class="password-strength bg-gray-200"></div>
-                                </div>
-                            </div>
-                            <div id="password-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div>
-                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
-                            <div class="relative">
-                                <input type="password" id="confirm-password" name="confirm-password" required class="form-input w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Xác nhận mật khẩu của bạn">
-                                <div class="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
-                                    <i class="ri-lock-line text-gray-400"></i>
-                                </div>
-                                <button type="button" id="confirm-password-toggle" class="password-toggle absolute right-4 top-3.5 w-5 h-5 flex items-center justify-center" tabindex="-1">
-                                    <i class="ri-eye-line text-gray-400"></i>
-                                </button>
-                            </div>
-                            <div id="confirm-password-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        </div>
-                        <div class="flex items-start">
-                            <label class="flex items-start cursor-pointer">
-                                <input type="checkbox" id="terms" name="terms" required class="mr-3 mt-1 sr-only">
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center mr-3 mt-0.5 transition-colors">
-                                    <i class="ri-check-line text-primary text-sm hidden"></i>
-                                </div>
-                                <span class="text-sm text-gray-700 leading-5">
-                                    Tôi đồng ý với
-                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Điều khoản dịch vụ</a>
-                                    and
-                                    <a href="#" class="text-primary hover:text-blue-600 transition-colors">Chính sách bảo mật</a>
-                                </span>
-                            </label>
-                        </div>
-                        <div id="terms-error" class="error-message text-red-600 text-sm mt-1 hidden"></div>
-                        <button type="submit" id="signup-btn" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors whitespace-nowrap font-semibold flex items-center justify-center">
-                            <span id="signup-text">Tạo tài khoảng</span>
-                            <div id="signup-spinner" class="loading-spinner w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2 hidden"></div>
-                        </button>
-                        <div class="relative my-6">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-4 bg-white text-gray-500">hoặc</span>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            <button type="button" class="social-button w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-button hover:bg-gray-50 transition-all whitespace-nowrap">
-                                <div class="w-5 h-5 flex items-center justify-center mr-3">
-                                    <i class="ri-google-fill text-red-500"></i>
-                                </div>
-                                <span class="text-gray-700 font-medium">Đăng kí với Google</span>
-                            </button>
-                        </div>
-                        <div class="text-center pt-4">
-                            <p class="text-gray-600">
-                                Already have an account?
-                                <a asp-controller="Common" asp-action="Login" data-readdy="true" class="text-primary hover:text-blue-600 font-semibold transition-colors">Đăng nhập</a>
-                            </p>
-                        </div>
-                    </form>
-                </div>
-                <div class="text-center">
-                    <p class="text-sm text-gray-500">
-                        By creating an account, you agree to our
-                        <a href="#" class="text-primary hover:text-blue-600 transition-colors">Terms of Service</a>
-                        and
-                        <a href="#" class="text-primary hover:text-blue-600 transition-colors">Privacy Policy</a>
-                    </p>
-                </div>
+            <div id="face-login-controls" class="flex gap-2">
+                <button type="button" id="start-record-btn" class="submit-btn">Bắt đầu</button>
+                <button type="button" id="stop-record-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold" disabled>Dừng</button>
+            </div>
+            <video id="face-playback" width="320" height="240" controls class="rounded-lg border mb-2 hidden"></video>
+            <div class="flex justify-between w-full mt-2">
+                <button type="button" id="face-login-cancel" class="text-gray-500 hover:text-gray-700 font-medium">Hủy</button>
+                <button type="button" id="face-login-submit" class="submit-btn" disabled>Gửi video xác thực</button>
             </div>
         </div>
-    </main>
-    <footer class="bg-white border-t border-gray-200 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-gray-500 text-sm">
-                <p>&copy; 2025 Stadium Booking Platform. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // === 1. DOM Elements ===
-            const signinTab = document.querySelector('[data-tab="signin"]');
-            const signupTab = document.querySelector('[data-tab="signup"]');
-            const signinForm = document.getElementById('signin-form');
-            const signupForm = document.getElementById('signup-form');
-            const signupFormInner = document.getElementById('signup-form-inner');
-            const signupBtn = document.getElementById('signup-btn');
-            const signupText = document.getElementById('signup-text');
-            const signupSpinner = document.getElementById('signup-spinner');
+        // Toggle password visibility
+        function togglePassword(inputId, toggleIcon) {
+            const passwordInput = document.getElementById(inputId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('ri-eye-line');
+                toggleIcon.classList.add('ri-eye-off-line');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('ri-eye-off-line');
+                toggleIcon.classList.add('ri-eye-line');
+            }
+        }
 
-            const loginPasswordInput = document.getElementById('login-password');
-            const loginPasswordToggle = document.getElementById('login-password-toggle');
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-            const passwordToggle = document.getElementById('password-toggle');
-            const confirmPasswordToggle = document.getElementById('confirm-password-toggle');
+        // Toggle custom checkbox
+        function toggleCheckbox(inputId, checkboxDiv) {
+            const checkbox = document.getElementById(inputId);
+            const icon = checkboxDiv.querySelector('i');
+            
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                checkboxDiv.classList.add('checked');
+                icon.classList.remove('hidden');
+            } else {
+                checkboxDiv.classList.remove('checked');
+                icon.classList.add('hidden');
+            }
+        }
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+
+            // Tab switching
+            signUpButton.addEventListener('click', () => {
+                container.classList.add('right-panel-active');
+            });
+
+            signInButton.addEventListener('click', () => {
+                container.classList.remove('right-panel-active');
+            });
+
+            // Password strength checker
+            const passwordInput = document.getElementById('registerPassword');
             const strengthBar = document.getElementById('strength-bar');
             const strengthText = document.getElementById('strength-text');
-            const termsCheckbox = document.getElementById('terms');
-            const rememberMeCheckbox = document.getElementById('remember-me');
 
-            // Mảng chứa các đối tượng để quản lý các trường input và thông báo lỗi của chúng
-            const formFields = [
-                { id: 'fullname', errorId: 'fullname-error', regex: /^[a-zA-Z\s]{2,}$/, message: 'Họ tên phải có ít nhất 2 ký tự và không chứa số.' },
-                { id: 'email', errorId: 'email-error', regex: /^[^@@]+@@[^@@]+\.[^@@]+$/, message: 'Vui lòng nhập một địa chỉ email hợp lệ.' },
-                { id: 'address', errorId: 'address-error', regex: /^.{5,}$/, message: 'Địa chỉ phải có ít nhất 5 ký tự.' },
-                { id: 'phone', errorId: 'phone-error', regex: /^\d{10,15}$/, message: 'Số điện thoại phải có từ 10-15 chữ số.' },
-            ];
-
-            // === 2. Tab Switching Logic ===
-            const switchTab = (tabName) => {
-                if (tabName === 'signin') {
-                    signinTab.classList.add('active');
-                    signupTab.classList.remove('active');
-                    signinForm.classList.remove('hidden');
-                    signupForm.classList.add('hidden');
-                } else if (tabName === 'signup') {
-                    signupTab.classList.add('active');
-                    signinTab.classList.remove('active');
-                    signupForm.classList.remove('hidden');
-                    signinForm.classList.add('hidden');
-                }
-            };
-            signinTab.addEventListener('click', () => switchTab('signin'));
-            signupTab.addEventListener('click', () => switchTab('signup'));
-
-            // === 3. Password Visibility Toggles ===
-            const setupPasswordToggle = (inputElement, toggleButton) => {
-                const iconElement = toggleButton.querySelector('i');
-                toggleButton.addEventListener('click', () => {
-                    const isPassword = inputElement.type === 'password';
-                    inputElement.type = isPassword ? 'text' : 'password';
-                    iconElement.className = isPassword ? 'ri-eye-off-line text-gray-400' : 'ri-eye-line text-gray-400';
-                });
-            };
-            setupPasswordToggle(loginPasswordInput, loginPasswordToggle);
-            setupPasswordToggle(passwordInput, passwordToggle);
-            setupPasswordToggle(confirmPasswordInput, confirmPasswordToggle);
-
-            // === 4. Password Strength Checker ===
-            const getPasswordStrength = (password) => {
+            function getPasswordStrength(password) {
                 let strength = 0;
                 if (password.length >= 8) strength++;
                 if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
                 if (/\d/.test(password)) strength++;
                 if (/[^a-zA-Z\d\s]/.test(password)) strength++;
                 return strength;
-            };
+            }
 
-            const updatePasswordStrengthUI = (password) => {
+            function updatePasswordStrengthUI(password) {
                 const strength = getPasswordStrength(password);
                 let strengthClass = '';
                 let strengthTextContent = '';
@@ -508,49 +671,48 @@
                 }
                 strengthBar.className = `password-strength ${strengthClass}`;
                 strengthText.textContent = strengthTextContent;
-            };
+            }
 
-            passwordInput.addEventListener('input', (event) => {
-                updatePasswordStrengthUI(event.target.value);
-            });
-
-            // === 5. Custom Checkbox Logic ===
-            const setupCustomCheckbox = (checkbox) => {
-                const iconElement = checkbox.nextElementSibling.querySelector('i');
-                checkbox.addEventListener('change', () => {
-                    iconElement.classList.toggle('hidden', !checkbox.checked);
+            if (passwordInput) {
+                passwordInput.addEventListener('input', (event) => {
+                    updatePasswordStrengthUI(event.target.value);
                 });
-            };
-            setupCustomCheckbox(termsCheckbox);
-            setupCustomCheckbox(rememberMeCheckbox);
+            }
 
-            // === 6. Real-time Validation and Submission Handling ===
-            const showError = (elementId, message) => {
+            // Form validation
+            const formFields = [
+                { id: 'fullname', errorId: 'fullname-error', regex: /^[a-zA-ZÀ-ỹ\s]{2,}$/, message: 'Họ tên phải có ít nhất 2 ký tự và không chứa số.' },
+                { id: 'email', errorId: 'email-error', regex: /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/, message: 'Vui lòng nhập một địa chỉ email hợp lệ.' },
+                { id: 'address', errorId: 'address-error', regex: /^.{5,}$/, message: 'Địa chỉ phải có ít nhất 5 ký tự.' },
+                { id: 'phone', errorId: 'phone-error', regex: /^\d{10,15}$/, message: 'Số điện thoại phải có từ 10-15 chữ số.' },
+            ];
+
+            function showError(elementId, message) {
                 const errorElement = document.getElementById(elementId);
                 errorElement.textContent = message;
                 errorElement.classList.remove('hidden');
                 setTimeout(() => errorElement.classList.add('show'), 10);
-            };
+            }
 
-            const hideError = (elementId) => {
+            function hideError(elementId) {
                 const errorElement = document.getElementById(elementId);
                 errorElement.classList.remove('show');
                 setTimeout(() => {
                     errorElement.classList.add('hidden');
                     errorElement.textContent = '';
                 }, 300);
-            };
+            }
 
-            const validateField = (field, value) => {
+            function validateField(field, value) {
                 if (!value || !field.regex.test(value)) {
                     showError(field.errorId, field.message);
                     return false;
                 }
                 hideError(field.errorId);
                 return true;
-            };
+            }
 
-            // Thêm validation khi người dùng rời khỏi trường nhập
+            // Add validation listeners
             formFields.forEach(field => {
                 const inputElement = document.getElementById(field.id);
                 if (inputElement) {
@@ -560,194 +722,176 @@
                 }
             });
 
-            // Validation đặc biệt cho mật khẩu và xác nhận mật khẩu
-            passwordInput.addEventListener('blur', () => {
-                const password = passwordInput.value;
-                const strength = getPasswordStrength(password);
-                if (password.length > 0 && strength < 3) {
-                    showError('password-error', 'Mật khẩu phải đạt độ mạnh "Tốt" trở lên.');
-                } else {
-                    hideError('password-error');
-                }
-            });
+            // Password validation
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            if (passwordInput && confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('blur', () => {
+                    const password = passwordInput.value;
+                    const confirmPassword = confirmPasswordInput.value;
+                    if (confirmPassword.length > 0 && password !== confirmPassword) {
+                        showError('confirm-password-error', 'Mật khẩu xác nhận không khớp.');
+                    } else {
+                        hideError('confirm-password-error');
+                    }
+                });
+            }
 
-            confirmPasswordInput.addEventListener('blur', () => {
-                const password = passwordInput.value;
-                const confirmPassword = confirmPasswordInput.value;
-                if (confirmPassword.length > 0 && password !== confirmPassword) {
-                    showError('confirm-password-error', 'Mật khẩu xác nhận không khớp.');
-                } else {
-                    hideError('confirm-password-error');
-                }
-            });
+            // Form submission
+            const registerForm = document.getElementById('registerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
 
-            // Validation cho ô checkbox điều khoản
-            termsCheckbox.addEventListener('change', () => {
-                if (!termsCheckbox.checked) {
-                    showError('terms-error', 'Bạn phải đồng ý với Điều khoản và Chính sách quyền riêng tư.');
-                } else {
-                    hideError('terms-error');
-                }
-            });
+            if (registerForm) {
+                registerForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
 
-            // Xử lý sự kiện khi form được gửi đi
-            signupFormInner.addEventListener('submit', (event) => {
-                // Ngăn form gửi đi mặc định
-                event.preventDefault();
+                    let isValid = true;
+                    formFields.forEach(field => {
+                        const inputElement = document.getElementById(field.id);
+                        if (!validateField(field, inputElement.value)) {
+                            isValid = false;
+                        }
+                    });
 
-                // Chạy lại tất cả validation cuối cùng
-                let isValid = true;
-                formFields.forEach(field => {
-                    const inputElement = document.getElementById(field.id);
-                    if (!validateField(field, inputElement.value)) {
+                    // Additional validations
+                    if (passwordInput && getPasswordStrength(passwordInput.value) < 3) {
+                        showError('password-error', 'Mật khẩu phải đạt độ mạnh "Tốt" trở lên.');
                         isValid = false;
                     }
+
+                    if (passwordInput && confirmPasswordInput && passwordInput.value !== confirmPasswordInput.value) {
+                        showError('confirm-password-error', 'Mật khẩu xác nhận không khớp.');
+                        isValid = false;
+                    }
+
+                    const termsCheckbox = document.getElementById('agree-terms');
+                    if (!termsCheckbox.checked) {
+                        showError('terms-error', 'Bạn phải đồng ý với Điều khoản và Chính sách quyền riêng tư.');
+                        isValid = false;
+                    }
+
+                    if (isValid) {
+                        submitText.classList.add('hidden');
+                        submitSpinner.classList.remove('hidden');
+                        submitBtn.disabled = true;
+                        registerForm.submit();
+                    }
                 });
-
-                // Kiểm tra validation đặc biệt
-                if (getPasswordStrength(passwordInput.value) < 3) {
-                    showError('password-error', 'Mật khẩu phải đạt độ mạnh "Tốt" trở lên.');
-                    isValid = false;
-                }
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    showError('confirm-password-error', 'Mật khẩu xác nhận không khớp.');
-                    isValid = false;
-                }
-                if (!termsCheckbox.checked) {
-                    showError('terms-error', 'Bạn phải đồng ý với Điều khoản và Chính sách quyền riêng tư.');
-                    isValid = false;
-                }
-
-                // Nếu form hợp lệ, hiển thị hiệu ứng loading và gửi form đi
-                if (isValid) {
-                    signupText.classList.add('hidden');
-                    signupSpinner.classList.remove('hidden');
-                    signupBtn.disabled = true;
-
-                    // **Sửa lỗi: Thêm dòng này để gửi form đi sau khi validation thành công**
-                    signupFormInner.submit();
-                }
-            });
-        });
-
-        // === Đăng nhập bằng khuôn mặt ===
-        const faceLoginBtn = document.getElementById('face-login-btn');
-        const faceLoginModal = document.getElementById('face-login-modal');
-        const faceVideo = document.getElementById('face-video');
-        const facePlayback = document.getElementById('face-playback');
-        const startRecordBtn = document.getElementById('start-record-btn');
-        const stopRecordBtn = document.getElementById('stop-record-btn');
-        const faceLoginCancel = document.getElementById('face-login-cancel');
-        const faceLoginSubmit = document.getElementById('face-login-submit');
-        const recordingStatus = document.getElementById('recording-status');
-
-        let mediaRecorder;
-        let recordedBlobs = [];
-        let stream;
-
-        // Mở modal đăng nhập bằng khuôn mặt
-        faceLoginBtn.addEventListener('click', async () => {
-            faceLoginModal.classList.remove('hidden');
-            facePlayback.classList.add('hidden');
-            faceLoginSubmit.disabled = true;
-            startRecordBtn.disabled = false;
-            stopRecordBtn.disabled = true;
-            // Mở camera
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                faceVideo.srcObject = stream;
-            } catch (err) {
-                alert('Không thể truy cập camera: ' + err.message);
-                faceLoginModal.classList.add('hidden');
             }
-        });
 
-        // Bắt đầu quay video
-        startRecordBtn.addEventListener('click', () => {
-            recordedBlobs = [];
-            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data && event.data.size > 0) {
-                    recordedBlobs.push(event.data);
-                }
-            };
-            mediaRecorder.onstart = () => {
-                recordingStatus.classList.remove('hidden');
-                startRecordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                stopRecordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                stopRecordBtn.classList.add('animate-pulse');
-            };
-            mediaRecorder.onstop = () => {
-                recordingStatus.classList.add('hidden');
-                startRecordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                stopRecordBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                stopRecordBtn.classList.remove('animate-pulse');
-                const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
-                facePlayback.src = window.URL.createObjectURL(superBuffer);
-                facePlayback.classList.remove('hidden');
-                faceLoginSubmit.disabled = false;
-            };
-            mediaRecorder.start();
-            startRecordBtn.disabled = true;
-            stopRecordBtn.disabled = false;
-            // Tự động dừng sau 5 giây
-            setTimeout(() => {
-                if (mediaRecorder.state === "recording") {
-                    mediaRecorder.stop();
+            // Face login functionality
+            const faceLoginBtn = document.getElementById('face-login-btn');
+            const faceLoginModal = document.getElementById('face-login-modal');
+            const faceVideo = document.getElementById('face-video');
+            const facePlayback = document.getElementById('face-playback');
+            const startRecordBtn = document.getElementById('start-record-btn');
+            const stopRecordBtn = document.getElementById('stop-record-btn');
+            const faceLoginCancel = document.getElementById('face-login-cancel');
+            const faceLoginSubmit = document.getElementById('face-login-submit');
+            const recordingStatus = document.getElementById('recording-status');
+
+            let mediaRecorder;
+            let recordedBlobs = [];
+            let stream;
+
+            if (faceLoginBtn) {
+                faceLoginBtn.addEventListener('click', async () => {
+                    faceLoginModal.classList.remove('hidden');
+                    facePlayback.classList.add('hidden');
+                    faceLoginSubmit.disabled = true;
                     startRecordBtn.disabled = false;
                     stopRecordBtn.disabled = true;
-                }
-            }, 5000);
-        });
-
-        // Dừng quay video
-        stopRecordBtn.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-                startRecordBtn.disabled = false;
-                stopRecordBtn.disabled = true;
-            }
-        });
-
-        // Hủy đăng nhập bằng khuôn mặt
-        faceLoginCancel.addEventListener('click', () => {
-            faceLoginModal.classList.add('hidden');
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            facePlayback.classList.add('hidden');
-        });
-
-        // Gửi video lên API xác thực khuôn mặt
-        faceLoginSubmit.addEventListener('click', () => {
-            const videoBlob = new Blob(recordedBlobs, { type: 'video/webm' });
-            const formData = new FormData();
-            formData.append('faceVideo', videoBlob, 'loginface.webm');
-            // Gửi lên API xác thực, thay đổi đường dẫn cho phù hợp với API của bạn
-            fetch('/api/user/login-face', {
-                method: 'POST',
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Đăng nhập thành công!');
-                        window.location.href = '/'; // hoặc chuyển tới trang dashboard
-                    } else {
-                        alert('Đăng nhập bằng khuôn mặt không thành công!');
-                    }
-                    faceLoginModal.classList.add('hidden');
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
-                    }
-                })
-                .catch(err => {
-                    alert('Có lỗi xảy ra: ' + err.message);
-                    faceLoginModal.classList.add('hidden');
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
+                    
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                        faceVideo.srcObject = stream;
+                    } catch (err) {
+                        alert('Không thể truy cập camera: ' + err.message);
+                        faceLoginModal.classList.add('hidden');
                     }
                 });
+
+                startRecordBtn.addEventListener('click', () => {
+                    recordedBlobs = [];
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data && event.data.size > 0) {
+                            recordedBlobs.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstart = () => {
+                        recordingStatus.classList.remove('hidden');
+                        startRecordBtn.disabled = true;
+                        stopRecordBtn.disabled = false;
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        recordingStatus.classList.add('hidden');
+                        startRecordBtn.disabled = false;
+                        stopRecordBtn.disabled = true;
+                        const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
+                        facePlayback.src = window.URL.createObjectURL(superBuffer);
+                        facePlayback.classList.remove('hidden');
+                        faceLoginSubmit.disabled = false;
+                    };
+                    
+                    mediaRecorder.start();
+                    
+                    setTimeout(() => {
+                        if (mediaRecorder.state === "recording") {
+                            mediaRecorder.stop();
+                        }
+                    }, 5000);
+                });
+
+                stopRecordBtn.addEventListener('click', () => {
+                    if (mediaRecorder && mediaRecorder.state === "recording") {
+                        mediaRecorder.stop();
+                    }
+                });
+
+                faceLoginCancel.addEventListener('click', () => {
+                    faceLoginModal.classList.add('hidden');
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                    facePlayback.classList.add('hidden');
+                });
+
+                faceLoginSubmit.addEventListener('click', () => {
+                    const videoBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('faceVideo', videoBlob, 'loginface.webm');
+                    
+                    fetch('/api/user/login-face', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đăng nhập thành công!');
+                            window.location.href = '/';
+                        } else {
+                            alert('Đăng nhập bằng khuôn mặt không thành công!');
+                        }
+                        faceLoginModal.classList.add('hidden');
+                        if (stream) {
+                            stream.getTracks().forEach(track => track.stop());
+                        }
+                    })
+                    .catch(err => {
+                        alert('Có lỗi xảy ra: ' + err.message);
+                        faceLoginModal.classList.add('hidden');
+                        if (stream) {
+                            stream.getTracks().forEach(track => track.stop());
+                        }
+                    });
+                });
+            }
         });
     </script>
 </body>

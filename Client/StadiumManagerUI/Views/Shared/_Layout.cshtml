@@ -177,35 +177,120 @@
                 display: none;
             }
 
+        /* Avatar Styles - Cập nhật */
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
             background: #1a2a5d;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-avatar:hover {
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 50%;
+        }
+
+        /* Fallback cho khi không có ảnh */
+        .user-avatar-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #007AFF, #639eff);
             color: white;
             font-weight: 600;
-            flex-shrink: 0;
-            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
         }
 
         .notification-badge {
             position: relative;
             margin-right: 1rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
         }
 
-            .notification-badge::after {
-                content: '';
-                position: absolute;
-                top: -2px;
-                right: -2px;
-                width: 8px;
-                height: 8px;
-                background: var(--danger-red);
-                border-radius: 50%;
-            }
+        .notification-badge:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-badge i {
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .notification-badge:hover i {
+            color: var(--primary-blue);
+        }
+
+        .notification-badge::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger-red);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* User name styling */
+        .user-info .fw-medium {
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 500;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Dropdown menu styling */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.25rem;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--danger-red) !important;
+        }
 
         .content {
             padding: 2rem;
@@ -230,26 +315,37 @@
 
         /* Responsive */
         @@media (max-width: 768px) {
-            .sidebar
+            .sidebar {
+                transform: translateX(-100%);
+            }
 
-        {
-            transform: translateX(-100%);
-        }
+            .sidebar.show {
+                transform: translateX(0);
+            }
 
-        .sidebar.show {
-            transform: translateX(0);
-        }
+            .main-content {
+                margin-left: 0;
+            }
 
-        .main-content {
-            margin-left: 0;
-        }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+            }
 
-        .header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-        }
+            .user-info .fw-medium {
+                display: none;
+            }
 
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+            }
+
+            .notification-badge {
+                margin-right: 0.5rem;
+            }
         }
     </style>
 
@@ -316,26 +412,61 @@
         </div>
     </nav>
 
+    @{
+        var accessToken = Context.Request.Cookies["AccessToken"];
+        var fullName = Context.Session.GetString("FullName");
+        var avatarUrl = Context.Session.GetString("AvatarUrl");
+    }
     <div class="main-content">
         <header class="header">
             <div>
                 <h1 class="header-title">@ViewData["Title"]</h1>
-                <p class="header-subtitle">Chào mừng trở lại, Nguyễn Văn Minh</p>
+                <p class="header-subtitle">Chào mừng trở lại, @fullName</p>
             </div>
 
             @* Logic để kiểm tra người dùng đã đăng nhập chưa *@
             @if (true) // Thay thế `true` bằng logic xác thực người dùng
             {
                 <div class="user-info dropdown">
-                    <div class="notification-badge">
-                        <i class="fas fa-bell text-muted"></i>
+                    <div class="notification-badge" title="Thông báo">
+                        <i class="fas fa-bell"></i>
                     </div>
-                    <span class="fw-medium">Nguyễn Văn Minh</span>
-                    <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">NM</div>
+                    <span class="fw-medium" title="@fullName">@fullName</span>
+                    <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Menu tài khoản">
+                        @if (!string.IsNullOrEmpty(avatarUrl))
+                        {
+                            <img src="@avatarUrl" alt="Avatar của @fullName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="user-avatar-fallback" style="display: none;">
+                                @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="user-avatar-fallback">
+                                @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                            </div>
+                        }
+                    </div>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">Thông tin tài khoản</a></li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Profile", "Account")">
+                                <i class="fas fa-user me-2"></i>
+                                Thông tin tài khoản
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
+                                <i class="fas fa-cog me-2"></i>
+                                Cài đặt
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#">Đăng xuất</a></li>
+                        <li>
+                            <a class="dropdown-item text-danger" asp-controller="Common" asp-action="Logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
                     </ul>
                 </div>
             }
