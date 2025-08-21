@@ -13,6 +13,12 @@ using StadiumAPI.Service.Interface;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 IEdmModel GetEdmModel()
 {
@@ -68,11 +74,13 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IStadiumRepositories, StadiumRepositories>();
 builder.Services.AddScoped<IStadiumImagesRepositories, StadiumImageRepositories>();
 builder.Services.AddScoped<ICourtsRepositories, CourtsRepositories>();
+builder.Services.AddScoped<ICourtRelationRepositories, CourtRelationRepositories>();
 
 // Register services
 builder.Services.AddScoped<IServiceStadium, ServiceStadium>();
 builder.Services.AddScoped<IStadiumImagesService, StadiumImagesService>();
 builder.Services.AddScoped<ICourtsService, CourtsService>();
+builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
