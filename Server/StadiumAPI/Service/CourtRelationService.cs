@@ -32,6 +32,12 @@ namespace StadiumAPI.Service
             return await _courtRelationRepositories.DeleteCourtRelationByParentId(parentId);
         }
 
+        public async Task<IEnumerable<ReadCourtRelationDTO>> GetAllCourtRelationByChildId(int childId)
+        {
+            var entities = await _courtRelationRepositories.GetAllCourtRelationByChildId(childId);
+            return _mapper.Map<IEnumerable<ReadCourtRelationDTO>>(entities);
+        }
+
         public async Task<IEnumerable<ReadCourtRelationDTO>> GetAllCourtRelationByParentId(int parentId)
         {
             var courtRelation = await _courtRelationRepositories.GetAllCourtRelationByParentId(parentId);

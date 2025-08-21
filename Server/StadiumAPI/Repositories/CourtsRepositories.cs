@@ -41,7 +41,7 @@ public class CourtsRepositories : ICourtsRepositories
             .ToListAsync();
     }
 
-    public async Task<Courts> GetCourtAndCourtRelation(int stadiumId, int courtId)
+    public async Task<Courts> GetCourtAndCourtRelation(int stadiumId)
     {
         var court = await _context.Courts
          .Include(c => c.ChildRelations)
@@ -52,7 +52,7 @@ public class CourtsRepositories : ICourtsRepositories
 
         if (court == null)
         {
-            throw new KeyNotFoundException($"Court with ID {courtId} in Stadium {stadiumId} not found.");
+            throw new KeyNotFoundException($"Court in Stadium {stadiumId} not found.");
         }
 
         return court;

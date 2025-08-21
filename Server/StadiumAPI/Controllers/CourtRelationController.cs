@@ -13,15 +13,23 @@ namespace StadiumAPI.Controllers
             _courtRelationService = courtRelationService;
         }
 
-        [HttpGet("GetAllCourtRelation")]
-        public async Task<IActionResult> GetAllCourtRelationByParentId(int parentId)
+        [HttpGet("GetAllCourtRelationParentId")]
+        public async Task<IActionResult> GetAllCourtRelationByParentId([FromQuery] int parentId)
         {
             var a = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
             return Ok(a);
         }
 
+        [HttpGet("GetAllCourtRelationByChildId")]
+        public async Task<IActionResult> GetAllCourtRelationByChildId([FromQuery] int childId)
+        {
+            var a = await _courtRelationService.GetAllCourtRelationByChildId(childId);
+            return Ok(a);
+        }
+
+
         [HttpPost("AddCourtRelation")]
-        public async Task<IActionResult> CreateCourtRelation([FromForm] int[] childCourt, int parentCourt)
+        public async Task<IActionResult> CreateCourtRelation([FromBody] int[] childCourt, [FromQuery]int parentCourt)
         {
 
 
@@ -40,7 +48,7 @@ namespace StadiumAPI.Controllers
         }
 
         [HttpPut("UpdateCourtRelation")]
-        public async Task<IActionResult> UpdateCourtRelation([FromForm] int[] childCourt, int parentId)
+        public async Task<IActionResult> UpdateCourtRelation([FromForm] int[] childCourt, [FromQuery]int parentId)
         {
 
             var court = (await _courtRelationService.GetAllCourtRelationByParentId(parentId)).ToArray();

@@ -529,7 +529,7 @@
     },
     // === COURT RELATION API ===
     {
-      "DownstreamPathTemplate": "/GetAllCourtRelation",
+      "DownstreamPathTemplate": "/GetAllCourtRelationParentId",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -537,7 +537,19 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/GetAllCourtRelation",
+      "UpstreamPathTemplate": "/GetAllCourtRelationParent",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/GetAllCourtRelationByChildId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/GetAllCourtRelationChild",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {

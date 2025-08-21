@@ -33,6 +33,11 @@ namespace StadiumAPI.Repositories
             return await _context.SaveChangesAsync().ContinueWith(t => true);
         }
 
+        public async Task<IEnumerable<CourtRelations>> GetAllCourtRelationByChildId(int childId)
+        {
+            return await _context.CourtRelations.Where(c => c.ChildCourtId == childId).ToListAsync();
+        }
+
         public async Task<IEnumerable<CourtRelations>> GetAllCourtRelationByParentId(int parentId)
         {
             return await _context.CourtRelations.Where(c => c.ParentCourtId == parentId).ToListAsync();

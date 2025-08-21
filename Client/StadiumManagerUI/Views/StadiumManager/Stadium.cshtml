@@ -1,0 +1,179 @@
+﻿
+@{
+    ViewData["Title"] = "StadiumHome";
+}
+
+<h2 class="mb-4">Quản lý Stadium</h2>
+
+<!-- Nút mở modal thêm -->
+<button class="btn btn-primary mb-3" onclick="openCreate()">+ Thêm Stadium</button>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Tên sân</th>
+            <th>Địa chỉ</th>
+            <th>Mô tả</th>
+            <th>Mở cửa</th>
+            <th>Đóng cửa</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="stadiumTableBody">
+        <!-- dữ liệu load bằng AJAX -->
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="stadiumModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="stadiumForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm Stadium</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="StadiumId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Tên sân</label>
+                        <input type="text" id="Name" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" id="Address" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea id="Description" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giờ mở cửa</label>
+                        <input type="time" id="OpenTime" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giờ đóng cửa</label>
+                        <input type="time" id="CloseTime" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const apiBase = "/"; // base URL API của bạn
+
+        // Load danh sách stadium
+        function loadStadiums() {
+            $.get(apiBase + "odata/Stadium?$count=true", function (res) {
+                let data = res.value;
+                let rows = "";
+                data.forEach(s => {
+                    rows += `
+                        <tr id="row-${s.Id}">
+                            <td>${s.Name}</td>
+                            <td>${s.Address}</td>
+                            <td>${s.Description}</td>
+                            <td>${s.OpenTime}</td>
+                            <td>${s.CloseTime}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="openEdit(${s.Id})">Sửa</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStadium(${s.Id})">Xóa</button>
+                            </td>
+                        </tr>`;
+                });
+                $("#stadiumTableBody").html(rows);
+            });
+        }
+
+        // Mở modal tạo mới
+        function openCreate() {
+            $("#modalTitle").text("Thêm Stadium");
+            $("#StadiumId").val("");
+            $("#Name, #Address, #Description, #OpenTime, #CloseTime").val("");
+            $("#stadiumModal").modal("show");
+        }
+
+        // Mở modal sửa
+        function openEdit(id) {
+            $.get(apiBase + "getByIdStadium?id=" + id, function (s) {
+                $("#modalTitle").text("Sửa Stadium");
+                $("#StadiumId").val(s.Id);
+                $("#Name").val(s.Name);
+                $("#Address").val(s.Address);
+                $("#Description").val(s.Description);
+                $("#OpenTime").val(s.OpenTime);
+                $("#CloseTime").val(s.CloseTime);
+                $("#stadiumModal").modal("show");
+            });
+        }
+
+        // Lưu (tạo hoặc cập nhật)
+        $("#stadiumForm").submit(function (e) {
+            e.preventDefault();
+            let id = $("#StadiumId").val();
+            let data = {
+                Name: $("#Name").val(),
+                Address: $("#Address").val(),
+                Description: $("#Description").val(),
+                OpenTime: $("#OpenTime").val(),
+                CloseTime: $("#CloseTime").val()
+            };
+
+            if (id === "") {
+                // create
+                $.ajax({
+                    url: apiBase + "addStadium",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function () {
+                        $("#stadiumModal").modal("hide");
+                        loadStadiums();
+                    }
+                });
+            } else {
+                // update
+                data.Id = parseInt(id);
+                $.ajax({
+                    url: apiBase + "updateStadium?id=" + id,
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function () {
+                        $("#stadiumModal").modal("hide");
+                        loadStadiums();
+                    }
+                });
+            }
+        });
+
+        // Xóa stadium
+        function deleteStadium(id) {
+            if (confirm("Bạn có chắc muốn xóa stadium này?")) {
+                $.ajax({
+                    url: apiBase + "deleteStadium?id=" + id,
+                    type: "DELETE",
+                    success: function () {
+                        $("#row-" + id).remove();
+                    }
+                });
+            }
+        }
+
+        // Load lần đầu
+        $(document).ready(function () {
+            loadStadiums();
+        });
+    </script>
+}
+
+

@@ -44,9 +44,9 @@ namespace StadiumAPI.Service
             return _mapper.Map<IEnumerable<ReadCourtDTO>>(courts);
         }
 
-        public async Task<ReadCourtDTO> GetCourtAndCourtRelation(int stadiumId, int courtId)
+        public async Task<ReadCourtDTO> GetCourtAndCourtRelation(int stadiumId)
         {
-            var courts = await _courtsRepositories.GetCourtAndCourtRelation(stadiumId, courtId);
+            var courts = await _courtsRepositories.GetCourtAndCourtRelation(stadiumId);
             return _mapper.Map<ReadCourtDTO>(courts);
         }
 
