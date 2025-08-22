@@ -7,172 +7,119 @@
 
 <!-- Nút mở modal thêm -->
 <button class="btn btn-primary mb-3" onclick="openCreate()">+ Thêm Stadium</button>
+<div id="stadium-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Tên sân</th>
-            <th>Địa chỉ</th>
-            <th>Mô tả</th>
-            <th>Mở cửa</th>
-            <th>Đóng cửa</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody id="stadiumTableBody">
-        <!-- dữ liệu load bằng AJAX -->
-    </tbody>
-</table>
-
-<!-- Modal -->
-<div class="modal fade" id="stadiumModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="stadiumForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Thêm Stadium</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="StadiumId" />
-
-                    <div class="mb-3">
-                        <label class="form-label">Tên sân</label>
-                        <input type="text" id="Name" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Địa chỉ</label>
-                        <input type="text" id="Address" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea id="Description" class="form-control"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Giờ mở cửa</label>
-                        <input type="time" id="OpenTime" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Giờ đóng cửa</label>
-                        <input type="time" id="CloseTime" class="form-control" required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Lưu</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section Scripts{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const apiBase = "https://localhost:7136"; // base URL API của bạn
-
-        // Load danh sách stadium
-        function loadStadiums() {
-            $.get(apiBase + "odata/Stadium?$count=true", function (res) {
-                let data = res.value;
-                let rows = "";
-                data.forEach(s => {
-                    rows += `
-                        <tr id="row-${s.Id}">
-                            <td>${s.Name}</td>
-                            <td>${s.Address}</td>
-                            <td>${s.Description}</td>
-                            <td>${s.OpenTime}</td>
-                            <td>${s.CloseTime}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning" onclick="openEdit(${s.Id})">Sửa</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteStadium(${s.Id})">Xóa</button>
-                            </td>
-                        </tr>`;
-                });
-                $("#stadiumTableBody").html(rows);
-            });
-        }
-
-        // Mở modal tạo mới
-        function openCreate() {
-            $("#modalTitle").text("Thêm Stadium");
-            $("#StadiumId").val("");
-            $("#Name, #Address, #Description, #OpenTime, #CloseTime").val("");
-            $("#stadiumModal").modal("show");
-        }
-
-        // Mở modal sửa
-        function openEdit(id) {
-            $.get(apiBase + "getByIdStadium?id=" + id, function (s) {
-                $("#modalTitle").text("Sửa Stadium");
-                $("#StadiumId").val(s.Id);
-                $("#Name").val(s.Name);
-                $("#Address").val(s.Address);
-                $("#Description").val(s.Description);
-                $("#OpenTime").val(s.OpenTime);
-                $("#CloseTime").val(s.CloseTime);
-                $("#stadiumModal").modal("show");
-            });
-        }
-
-        // Lưu (tạo hoặc cập nhật)
-        $("#stadiumForm").submit(function (e) {
-            e.preventDefault();
-            let id = $("#StadiumId").val();
-            let data = {
-                Name: $("#Name").val(),
-                Address: $("#Address").val(),
-                Description: $("#Description").val(),
-                OpenTime: $("#OpenTime").val(),
-                CloseTime: $("#CloseTime").val()
-            };
-
-            if (id === "") {
-                // create
-                $.ajax({
-                    url: apiBase + "addStadium",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
-                    success: function () {
-                        $("#stadiumModal").modal("hide");
-                        loadStadiums();
-                    }
-                });
-            } else {
-                // update
-                data.Id = parseInt(id);
-                $.ajax({
-                    url: apiBase + "updateStadium?id=" + id,
-                    type: "PUT",
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
-                    success: function () {
-                        $("#stadiumModal").modal("hide");
-                        loadStadiums();
-                    }
-                });
-            }
+        $(document).ready(function() {
+            displayList("&$filter=CreatedBy eq 1");
         });
 
-        // Xóa stadium
-        function deleteStadium(id) {
-            if (confirm("Bạn có chắc muốn xóa stadium này?")) {
-                $.ajax({
-                    url: apiBase + "deleteStadium?id=" + id,
-                    type: "DELETE",
-                    success: function () {
-                        $("#row-" + id).remove();
-                    }
-                });
+
+                function displayList(searchTerm){
+            var searchUrl = searchTerm + `&$top=${top}&$skip=${skip}`;
+            console.log(searchUrl);
+
+                                                           $.ajax({
+            url: '/StadiumManager/GetAllAndSearch', // Endpoint for POST request
+            type: 'POST',
+            data: {searchTerm: searchUrl},
+            success: function (data) {
+                let count = data["@@odata.count"];
+                sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
+                console.log(skip);
+                let html = '';
+                if (data.value && data.value.length > 0) {
+                    data.value.forEach(function (item) {
+                        let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'default.jpg';
+                        let price = item.Courts.length > 0 ? item.Courts[0].PricePerHour : 0;
+                        // Removed console.log(item.val) as 'val' is not defined in the data structure
+                        console.log(item);
+
+                        // Format tiền Việt Nam
+                        let formattedPrice = new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(price);
+                        let address = item.Address ?? '';
+
+                        html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div class="relative h-48">
+                                <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
+
+                                <!-- Hot badge -->
+                                <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                    Hot
+                                </div>
+
+                                <!-- Sport type badge -->
+                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
+                                    ${item.Courts[0].SportType}
+                                </div>
+                            </div>
+
+                            <div class="p-4 ">
+                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
+
+                                <div class="flex items-center text-gray-500 text-sm mb-2">
+                                    <i class="ri-map-pin-line text-gray-400 mr-1"></i>
+                                    <span>${address}</span>
+                                </div>
+
+                                <div class="flex items-center text-sm mb-3">
+                                    <i class="ri-star-fill text-yellow-400 mr-1"></i>
+                                    <span class="font-semibold text-gray-800">4.7</span>
+                                    <span class="text-gray-500 ml-1">(124 đánh giá)</span>
+                                </div>
+
+                                <!-- Available time slots -->
+                                <div class="mb-4">
+                                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                                        <i class="ri-time-line mr-1"></i>
+                                        <span>Khung giờ trống hôm nay:</span>
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-1">
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">09:00</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">11:00</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">14:00</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">17:00</span>
+                                    </div>
+                                </div>
+
+                                <div class=" items-center justify-end">
+                                    <div class="text-2xl font-bold text-blue-600">
+                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
+                                    </div>
+                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                                    onclick="redirectToBooking('${item.Id}')">
+                                        Đặt ngay
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                            if (skip === 0) {
+            $('#stadium-grid').html(html).show();
+        } else {
+            $('#stadium-grid').append(html);
+        }
+                } else {
+                    $('#stadium-grid').empty().hide();
+                }
+            },
+            error: function () {
+                $('#stadium-grid').empty().hide();
+                console.log('Error fetching suggestions');
             }
+        });
         }
 
-        // Load lần đầu
-        $(document).ready(function () {
-            loadStadiums();
-        });
+
     </script>
 }
 

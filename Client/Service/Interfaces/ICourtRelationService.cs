@@ -9,10 +9,10 @@ namespace Service.Interfaces
 {
     public interface ICourtRelationService
     {
-        Task<ReadCourtRelationDTO> GetAllCourtRelationByParentId(int parentId);
-        Task<ReadCourtRelationDTO> GetAllCourtRelationBychildId(int childId);
-        Task<ReadCourtRelationDTO> CreateCourtRelation(int[] childCourt, int parentCourt);
-        Task<ReadCourtRelationDTO> UpdateCourtRelation(int[] childCourt, int parentCourt);
+        Task<IEnumerable<ReadCourtRelationDTO>> GetAllCourtRelationByParentId(int parentId);
+        Task<IEnumerable<ReadCourtRelationDTO>> GetAllCourtRelationBychildId(int childId);
+        Task<IEnumerable<ReadCourtRelationDTO>> CreateCourtRelation(int[] childCourt, int parentCourt);
+        Task<IEnumerable<ReadCourtRelationDTO>> UpdateCourtRelation(int[] childCourt, int parentCourt);
         Task<bool> DeleteCourtRelation(int parentId);
     }
 }
