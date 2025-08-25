@@ -358,7 +358,6 @@
             }
         }
 
-
         // Hàm render danh sách sân
         function renderCourts(courts) {
             courtsContainerEl.innerHTML = ''; // Xóa danh sách cũ
@@ -368,56 +367,121 @@
                 return;
             }
 
-            courts.forEach(court => {
-                const isBooked = bookedCourtIds.includes(parseInt(court.Id));
-
-                const isAvailable = (startTime !== null && endTime !== null && endTime > startTime) && !isBooked;
-
-                const courtDiv = document.createElement('div');
-
-                const isSelected = selectedCourts.some(selected => selected.Id === court.Id);
-
-                let courtStatusClass = 'border-gray-200';
-                if (isAvailable) {
-                    courtStatusClass = 'border-green-400';
-                } else if (isBooked) {
-                    courtStatusClass = 'border-red-400';
+            // Nhóm các sân theo tên (ví dụ: "Sân 5 người", "Sân 7 người")
+            const groupedCourts = courts.reduce((acc, court) => {
+                // Lấy phần tên sân để nhóm, ví dụ "Sân 5 người" từ "Sân 5 người A"
+                const courtNameType = court.Name.replace(/ \w$/, '');
+                if (!acc[courtNameType]) {
+                    acc[courtNameType] = [];
                 }
+                acc[courtNameType].push(court);
+                return acc;
+            }, {});
 
-                courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
+            // Lặp qua các nhóm sân và render từng nhóm
+            for (const type in groupedCourts) {
+                const courtsOfType = groupedCourts[type];
 
-                if (isAvailable) {
-                    courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
-                    courtDiv.addEventListener('click', () => {
-                        const courtIndex = selectedCourts.findIndex(selected => selected.Id === court.Id);
-                        if (courtIndex !== -1) {
-                            selectedCourts.splice(courtIndex, 1);
-                        } else {
-                            selectedCourts.push(court);
-                        }
-                        // VẼ LẠI ĐỂ CẬP NHẬT STYLE + NÚT TIẾP TỤC
-                        updateUI();
-                    });
-                }
-                else {
-                    courtDiv.classList.add('opacity-50', 'cursor-not-allowed');
-                }
+                // Tạo tiêu đề cho loại sân, ví dụ "Sân 7 người"
+                const heading = document.createElement('h3');
+                heading.className = "text-xl font-bold text-gray-800 mt-6 mb-2 col-span-full";
+                heading.textContent = type;
+                courtsContainerEl.appendChild(heading);
 
-                if (isSelected) {
-                    courtDiv.classList.add('scale-105', 'border-blue-600', 'ring-2', 'ring-blue-600');
-                }
+                // Lặp qua từng sân trong nhóm và render với khung cũ của bạn
+                courtsOfType.forEach(court => {
+                    const isBooked = bookedCourtIds.includes(parseInt(court.Id));
+                    const isAvailable = (startTime !== null && endTime !== null && endTime > startTime) && !isBooked;
+                    const isSelected = selectedCourts.some(selected => selected.Id === court.Id);
 
-                courtDiv.innerHTML = `
-                    <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.Name}</h3>
-                    <p class="text-sm text-gray-500">${court.SportType}</p>
-                    <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${court.PricePerHour.toLocaleString()}đ/giờ</p>
-                    ${getCourtStatusHTML(isBooked, startTime, endTime)}
-                `;
+                    const courtDiv = document.createElement('div');
+                    let courtStatusClass = 'border-gray-200';
+                    if (isAvailable) {
+                        courtStatusClass = 'border-green-400';
+                    } else if (isBooked) {
+                        courtStatusClass = 'border-red-400';
+                    }
 
-                courtsContainerEl.appendChild(courtDiv);
-            });
+                    // Sử dụng lại class cũ của bạn
+                    courtDiv.className = `bg-white rounded-xl shadow-md p-4 transition-transform duration-200 border-2 ${courtStatusClass}`;
+
+                    if (isAvailable) {
+                        courtDiv.classList.add('hover:scale-105', 'hover:shadow-lg', 'cursor-pointer');
+                        courtDiv.addEventListener('click', () => {
+                            // Cập nhật UI trước
+                            console.log("Court: ", court);
+                            // Lấy ID của sân được click
+                            const courtId = court.Id;
+                            console.log("Court ID:", courtId);
+
+                            let courtIndex = selectedCourts.findIndex(selected => selected.Id === court.Id);
+                            console.log("Court index:", courtIndex, "Selected courts:", selectedCourts);
+                            if (courtIndex !== -1) {
+                                selectedCourts.splice(courtIndex, 1);
+                            } else {
+                                selectedCourts.push(court);
+                            }
+
+                            // Gọi hàm AJAX với courtId
+                            fetchCourtRelationData(courtId);
+
+                            updateUI();
+                        });
+                    } else {
+                        courtDiv.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+
+                    if (isSelected) {
+                        courtDiv.classList.add('scale-105', 'border-blue-600', 'ring-2', 'ring-blue-600');
+                    }
+
+                    courtDiv.innerHTML = `
+                        <h3 class="text-lg font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'}">${court.Name}</h3>
+                        <p class="text-sm text-gray-500">${court.SportType}</p>
+                        <p class="text-sm text-gray-800 font-bold mt-2">Giá: ${court.PricePerHour.toLocaleString()}đ/giờ</p>
+                        ${getCourtStatusHTML(isBooked, startTime, endTime)}
+                    `;
+
+                    courtsContainerEl.appendChild(courtDiv);
+                });
+            }
         }
 
+        // Hàm AJAX sử dụng jQuery
+        function fetchCourtRelationData(courtId) {
+            if (!courtId) {
+                console.error("Court ID is missing.");
+                return;
+            }
+
+            // Cuộc gọi thứ nhất: Lấy parentId
+            $.ajax({
+                url: "/Booking/GetAllCourtRelationByParentId", // Giả định Controller là 'Booking'
+                type: "GET",
+                data: { parentId: courtId },
+                success: function (parentData) {
+                    console.log('Dữ liệu Parent:', parentData);
+                    // Có thể cập nhật UI tại đây
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi lấy dữ liệu Parent:", error);
+                }
+            });
+
+            // Cuộc gọi thứ hai: Lấy childId
+            $.ajax({
+                url: "/Booking/GetAllCourtRelationBychildId", // Giả định Controller là 'Booking'
+                type: "GET",
+                data: { childId: courtId },
+                success: function (childData) {
+                    console.log('Dữ liệu Child:', childData);
+                    // Có thể cập nhật UI tại đây
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi lấy dữ liệu Child:", error);
+                }
+            });
+        }
 
         function getCourtStatusHTML(isBooked, startTime, endTime) {
             const hasRange = (startTime !== null && endTime !== null && endTime > startTime);
@@ -452,7 +516,7 @@
                     if (
                         hour < now.getHours() ||
                         (hour === now.getHours() && now.getMinutes() > 0) ||
-                        hour >= closeTime // after closing time
+                        hour > closeTime // after closing time
                     ) {
                         button.disabled = true;
                         button.classList.add('opacity-50', 'cursor-not-allowed');
@@ -461,7 +525,8 @@
                         hasEnabledTime = true;
                     }
 
-                    if ((endTime !== null && hour < startTime) || (startTime !== null && endTime === null)) {
+                    if (endTime !== null && hour < startTime) {
+                        // Đã có khoảng giờ: khóa các giờ trước startTime
                         button.disabled = true;
                         button.classList.add('opacity-50', 'cursor-not-allowed');
                         button.classList.remove('hover:bg-gray-300');

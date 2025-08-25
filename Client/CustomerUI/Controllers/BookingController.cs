@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Service.Services;
+using StadiumAPI.DTOs;
 
 namespace CustomerUI.Controllers
 {
@@ -16,18 +17,21 @@ namespace CustomerUI.Controllers
         private readonly IUserService _userService;
         private readonly IDiscountService _discountService;
         private readonly IStadiumService _stadiumService; 
+        private readonly ICourtRelationService _courtRelationService;
         public BookingController(
             IBookingService bookingService,
             ITokenService tokenService,
             IUserService userService,
             IDiscountService discountService,
-            IStadiumService stadiumService) 
+            IStadiumService stadiumService,
+            ICourtRelationService courtRelationService) 
         {
             _bookingService = bookingService;
             _tokenService = tokenService;
             _userService = userService;
             _discountService = discountService;
             _stadiumService = stadiumService; 
+            _courtRelationService = courtRelationService;
         }
 
 
@@ -349,6 +353,61 @@ namespace CustomerUI.Controllers
                 },
                 message = "Lấy thông tin thành công"
             });
+        }
+
+        public async Task<List<ReadCourtRelationDTO>> GetAllCourtRelationByChildId(int childId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/GetAllCourtRelationChild?childId={childId}");
+                response.EnsureSuccessStatusCode();
+
+                // Debug JSON response
+                var jsonString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"JSON Response: {jsonString}");
+
+                // Deserialize thành List
+                var result = JsonSerializer.Deserialize<List<ReadCourtRelationDTO>>(jsonString, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true // Ignore case sensitivity
+                });
+
+                return result ?? new List<ReadCourtRelationDTO>();
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new HttpRequestException($"Failed to get court relations for child ID {childId}", ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Failed to parse JSON response for child ID {childId}", ex);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourtRelationByParentId(int parentId)
+        {
+            // Kiểm tra xem ID có hợp lệ không
+            if (parentId <= 0)
+            {
+                return BadRequest("Parent ID is invalid.");
+            }
+
+            try
+            {
+                var result = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
+                if (result == null)
+                {
+                    return NotFound("No court relations found for this parent ID.");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi để dễ dàng gỡ lỗi
+                // _logger.LogError(ex, "An error occurred while getting court relations by parent ID.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
         }
     }
 }

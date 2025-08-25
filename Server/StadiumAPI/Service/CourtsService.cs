@@ -17,61 +17,58 @@ namespace StadiumAPI.Service
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public Task<ReadCourtDTO> CreateCourtAsync(CreateCourtDTO createCourtDTO)
+        public async Task<ReadCourtDTO> CreateCourtAsync(CreateCourtDTO createCourtDTO)
         {
             if (createCourtDTO == null)
-            {
                 throw new ArgumentNullException(nameof(createCourtDTO));
-            }
+
             var court = _mapper.Map<Courts>(createCourtDTO);
-            return _courtsRepositories.CreateCourtAsync(court)
-                .ContinueWith(task => _mapper.Map<ReadCourtDTO>(task.Result));
+            var createdCourt = await _courtsRepositories.CreateCourtAsync(court);
+            return _mapper.Map<ReadCourtDTO>(createdCourt);
         }
 
         public Task<bool> DeleteCourtAsync(int id)
         {
             if (id <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(id), "Court ID must be greater than zero.");
-            }
+
             return _courtsRepositories.DeleteCourtAsync(id);
         }
 
-        public Task<IEnumerable<ReadCourtDTO>> GetAllCourtsAsync(int stadiumId)
+        public async Task<IEnumerable<ReadCourtDTO>> GetAllCourtsAsync(int stadiumId)
         {
             if (stadiumId <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(stadiumId), "Stadium ID must be greater than zero.");
-            }
-            return _courtsRepositories.GetAllCourtsAsync(stadiumId)
-                .ContinueWith(task => _mapper.Map<IEnumerable<ReadCourtDTO>>(task.Result));
+
+            var courts = await _courtsRepositories.GetAllCourtsAsync(stadiumId);
+            return _mapper.Map<IEnumerable<ReadCourtDTO>>(courts);
         }
 
+        public async Task<ReadCourtDTO> GetCourtAndCourtRelation(int stadiumId)
+        {
+            var courts = await _courtsRepositories.GetCourtAndCourtRelation(stadiumId);
+            return _mapper.Map<ReadCourtDTO>(courts);
+        }
 
-
-        public Task<ReadCourtDTO> GetCourtByIdAsync(int id)
+        public async Task<ReadCourtDTO> GetCourtByIdAsync(int id)
         {
             if (id <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(id), "Court ID must be greater than zero.");
-            }
-            return _courtsRepositories.GetCourtByIdAsync(id)
-                .ContinueWith(task => _mapper.Map<ReadCourtDTO>(task.Result));
+
+            var court = await _courtsRepositories.GetCourtByIdAsync(id);
+            return _mapper.Map<ReadCourtDTO>(court);
         }
 
-        public Task<ReadCourtDTO> UpdateCourtAsync(int id, UpdateCourtDTO updateCourtDTO)
+        public async Task<ReadCourtDTO> UpdateCourtAsync(int id, UpdateCourtDTO updateCourtDTO)
         {
             if (updateCourtDTO == null)
-            {
                 throw new ArgumentNullException(nameof(updateCourtDTO));
-            }
             if (id <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(id), "Court ID must be greater than zero.");
-            }
+
             var court = _mapper.Map<Courts>(updateCourtDTO);
-            return _courtsRepositories.UpdateCourtAsync(id, court)
-                .ContinueWith(task => _mapper.Map<ReadCourtDTO>(task.Result));
+            var updatedCourt = await _courtsRepositories.UpdateCourtAsync(id, court);
+            return _mapper.Map<ReadCourtDTO>(updatedCourt);
         }
     }
 }
