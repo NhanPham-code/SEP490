@@ -63,6 +63,7 @@
         <input type="hidden" id="booking-date" name="Date" value="" />
         <input type="hidden" id="booking-start-time" name="StartTime" value="" />
         <input type="hidden" id="booking-end-time" name="EndTime" value="" />
+        <input type="hidden" id="booking-original-price" name="OriginalPrice" value="" />
         <input type="hidden" id="booking-total-price" name="TotalPrice" value="" />
         <input type="hidden" id="booking-note" name="Note" value="" />
         <input type="hidden" id="booking-discount-id" name="DiscountId" value="" />
@@ -93,8 +94,8 @@
                         <span id="checkout-duration" class="font-bold"></span>
                     </div>
                     <div class="flex justify-between border-t pt-3 mt-3 border-gray-200">
-                        <span>Tạm tính:</span>
-                        <span id="checkout-subtotal-price"></span>
+                        <span>Giá gốc:</span>
+                        <span id="checkout-original-price"></span>
                     </div>
                     <div class="flex justify-between text-green-600 font-bold hidden" id="discount-amount-row">
                         <span>Giảm giá:</span>
@@ -251,10 +252,12 @@
             $('#checkout-duration').text(`${bookingData.endTime - bookingData.startTime} giờ`);
             $('#checkout-subtotal-price').text(formatCurrency(subtotalPrice));
             $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
-            $('#checkout-total-price').text(formatCurrency(totalPrice));
+            $('#checkout-original-price').text(formatCurrency(subtotalPrice)); // Correctly shows the original price (subtotal)
+            $('#checkout-total-price').text(formatCurrency(totalPrice)); // Correctly shows the total price (after discount)
 
             if (discountAmount > 0) {
                 $('#discount-amount-row').removeClass('hidden');
+                $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
             } else {
                 $('#discount-amount-row').addClass('hidden');
             }
@@ -265,9 +268,9 @@
             const dateISO = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
                 ? rawDate
                 : (() => {
-                      const [d, m, y] = rawDate.split(/[\/\-\.]/);
-                      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-                  })();
+                    const [d, m, y] = rawDate.split(/[\/\-\.]/);
+                    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                })();
 
             const hh = (n) => String(n).padStart(2, "0");
             const startDateTime = `${dateISO}T${hh(bookingData.startTime)}:00:00`;
@@ -276,7 +279,8 @@
             $('#booking-date').val(dateISO);
             $('#booking-start-time').val(startDateTime);
             $('#booking-end-time').val(endDateTime);
-            $('#booking-total-price').val(totalPrice);
+            $('#booking-original-price').val(subtotalPrice); // Use subtotalPrice for original price
+            $('#booking-total-price').val(totalPrice); // Use totalPrice for final price
             $('#booking-note').val('');
             $('#booking-discount-id').val(discountId || '');
             $('#booking-stadium-id').val(bookingData.stadiumId);

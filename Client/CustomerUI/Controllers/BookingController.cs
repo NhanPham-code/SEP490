@@ -355,58 +355,59 @@ namespace CustomerUI.Controllers
             });
         }
 
-        public async Task<List<ReadCourtRelationDTO>> GetAllCourtRelationByChildId(int childId)
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourtRelationBychildId(int childId)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"/GetAllCourtRelationChild?childId={childId}");
-                response.EnsureSuccessStatusCode();
-
-                // Debug JSON response
-                var jsonString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"JSON Response: {jsonString}");
-
-                // Deserialize thành List
-                var result = JsonSerializer.Deserialize<List<ReadCourtRelationDTO>>(jsonString, new JsonSerializerOptions
+                if (childId <= 0)
                 {
-                    PropertyNameCaseInsensitive = true // Ignore case sensitivity
-                });
+                    return BadRequest("Invalid childId parameter");
+                }
 
-                return result ?? new List<ReadCourtRelationDTO>();
+                var courtRelations = await _courtRelationService.GetAllCourtRelationBychildId(childId);
+
+                if (courtRelations == null || !courtRelations.Any())
+                {
+                    return Json(new List<ReadCourtRelationDTO>());
+                }
+
+                return Json(courtRelations);
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                throw new HttpRequestException($"Failed to get court relations for child ID {childId}", ex);
-            }
-            catch (JsonException ex)
-            {
-                throw new InvalidOperationException($"Failed to parse JSON response for child ID {childId}", ex);
+                // Log the exception if you have logging configured
+                // _logger.LogError(ex, "Error occurred while getting court relations for childId: {ChildId}", childId);
+
+                return StatusCode(500, "An error occurred while processing your request");
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCourtRelationByParentId(int parentId)
         {
-            // Kiểm tra xem ID có hợp lệ không
-            if (parentId <= 0)
-            {
-                return BadRequest("Parent ID is invalid.");
-            }
-
             try
             {
-                var result = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
-                if (result == null)
+                if (parentId <= 0)
                 {
-                    return NotFound("No court relations found for this parent ID.");
+                    return BadRequest("Invalid parentId parameter");
                 }
-                return Ok(result);
+
+                var courtRelations = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
+
+                if (courtRelations == null || !courtRelations.Any())
+                {
+                    return Json(new List<ReadCourtRelationDTO>());
+                }
+
+                return Json(courtRelations);
             }
             catch (Exception ex)
             {
-                // Ghi log lỗi để dễ dàng gỡ lỗi
-                // _logger.LogError(ex, "An error occurred while getting court relations by parent ID.");
-                return StatusCode(500, "An internal server error occurred.");
+                // Log the exception if you have logging configured
+                // _logger.LogError(ex, "Error occurred while getting court relations for parentId: {ParentId}", parentId);
+
+                return StatusCode(500, "An error occurred while processing your request");
             }
         }
     }

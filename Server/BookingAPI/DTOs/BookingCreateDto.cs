@@ -11,6 +11,7 @@ namespace BookingAPI.DTOs
         public DateTime StartTime { get; set; }  // đổi sang DateTime
         public DateTime EndTime { get; set; }    // đổi sang DateTime
         public decimal? TotalPrice { get; set; }
+        public decimal? OriginalPrice { get; set; }
         public string? Note { get; set; }
         public string? PaymentMethod { get; set; }
         public int? DiscountId { get; set; }

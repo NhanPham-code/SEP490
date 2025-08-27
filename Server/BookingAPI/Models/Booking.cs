@@ -30,6 +30,9 @@ namespace BookingAPI.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal? TotalPrice { get; set; }
 
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? OriginalPrice { get; set; }
+
         public string? Note { get; set; }
 
         public string? PaymentMethod { get; set; }
