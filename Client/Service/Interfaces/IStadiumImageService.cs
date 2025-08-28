@@ -10,8 +10,11 @@ namespace Service.Interfaces
     public interface IStadiumImageService
     {
         Task<IEnumerable<ReadStadiumImageDTO>> GetStadiumImagesAsync(int stadiumId);
-        Task<ReadStadiumImageDTO> AddStadiumImageAsync(int stadiumId, CreateStadiumImageDTO createStadiumImageDTO);
+
+        Task<ReadStadiumImageDTO> AddStadiumImageAsync(CreateStadiumImageDTO createStadiumImageDTO);
+
         Task<bool> DeleteStadiumImageAsync(int stadiumId);
+
         Task<ReadStadiumImageDTO> UpdateStadiumImageAsync(int stadiumId, UpdateStadiumImageDTO updateStadiumImageDTO);
     }
 }

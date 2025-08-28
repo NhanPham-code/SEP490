@@ -49,7 +49,7 @@ namespace StadiumAPI.Controllers
         // PUT: api/ReadStadiumDTOes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id,[FromForm] UpdateStadiumDTO updateStadiumDTO)
+        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id, [FromBody] UpdateStadiumDTO updateStadiumDTO)
         {
             if (id != updateStadiumDTO.Id)
             {
@@ -64,7 +64,6 @@ namespace StadiumAPI.Controllers
             }
 
             update = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
-            
 
             return Ok(update);
         }
@@ -72,7 +71,7 @@ namespace StadiumAPI.Controllers
         // POST: api/ReadStadiumDTOes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromForm]CreateStadiumDTO createStadiumDTO)
+        public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromBody] CreateStadiumDTO createStadiumDTO)
         {
             var createdStadium = await _serviceStadium.CreateStadiumAsync(createStadiumDTO);
 
@@ -89,10 +88,7 @@ namespace StadiumAPI.Controllers
                 return NotFound();
             }
 
-            await _serviceStadium.DeleteStadiumAsync(id);
-
-            return NoContent();
+            return Ok(await _serviceStadium.DeleteStadiumAsync(id));
         }
-
     }
 }

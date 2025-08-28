@@ -14,6 +14,7 @@ namespace StadiumAPI.Controllers
             _serviceStadiumImage = serviceStadiumImage;
             _env = env;
         }
+
         // GET: api/StadiumImages/{stadiumId}
         [HttpGet]
         [Route("api/AllStadiumImages")]
@@ -26,15 +27,13 @@ namespace StadiumAPI.Controllers
             }
             return Ok(images);
         }
+
         // POST: api/StadiumImages
         [HttpPost]
         [Route("api/AddStadiumImages")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddImage([FromForm] CreateStadiumImageDTO imageDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
                 return BadRequest("Image file is required.");
 
@@ -55,6 +54,7 @@ namespace StadiumAPI.Controllers
             var createdImage = await _serviceStadiumImage.AddImageAsync(imageDto, $"img/{uniqueFileName}");
             return Ok(createdImage);
         }
+
         // PUT: api/StadiumImages/{id}
         [HttpPut]
         [Route("api/UpdateStadiumImage")]
@@ -76,10 +76,7 @@ namespace StadiumAPI.Controllers
                 var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingImage.ImageUrl);
                 if (System.IO.File.Exists(oldFilePath) && existingImage.ImageUrl != newImageURL)
                 {
-
                     System.IO.File.Delete(oldFilePath);
-                    
-
                 }
                 using (var stream = new FileStream(adminFilePath, FileMode.Create))
                 {
@@ -88,7 +85,6 @@ namespace StadiumAPI.Controllers
             }
             else
             {
-
                 if (existingImage != null)
                 {
                     uniqueFileName = existingImage.ImageUrl;
@@ -103,11 +99,12 @@ namespace StadiumAPI.Controllers
             var updatedImage = await _serviceStadiumImage.UpdateImageAsync(id, imageDto, newImageURL);
             return Ok(updatedImage);
         }
+
         // DELETE: api/StadiumImages/{id}
-        [HttpDelete]
+        [HttpDelete("DeleteStadiumImage")]
         public async Task<IActionResult> DeleteImage([FromQuery] int id)
         {
-            var image = await _serviceStadiumImage.GetImageByIdAsync(id);
+            var image = (await _serviceStadiumImage.GetAllImagesAsync(id)).ToList();
             if (image == null)
             {
                 return NotFound("Image not found.");
@@ -118,11 +115,17 @@ namespace StadiumAPI.Controllers
                 return BadRequest("Failed to delete the image.");
             }
             // Optionally, delete the file from the server
-            var filePath = Path.Combine(_env.WebRootPath, image.ImageUrl);
-            if (System.IO.File.Exists(filePath))
+            foreach (var img in image)
             {
-                System.IO.File.Delete(filePath);
+                // Ghép path tuyệt đối trong wwwroot/images
+                var filePath = Path.Combine(_env.WebRootPath, img.ImageUrl);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
             }
+
             return Ok(true);
         }
     }

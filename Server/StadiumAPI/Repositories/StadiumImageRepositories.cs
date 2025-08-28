@@ -10,6 +10,7 @@ namespace StadiumAPI.Repositories
     public class StadiumImageRepositories : IStadiumImagesRepositories
     {
         private readonly StadiumDbContext _context;
+
         public StadiumImageRepositories(StadiumDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -27,10 +28,10 @@ namespace StadiumAPI.Repositories
         {
             if (id <= 0)
                 throw new ArgumentException("Invalid image ID.", nameof(id));
-            var image = _context.StadiumImages.Find(id);
+            var image = _context.StadiumImages.Where(i => i.StadiumId.Equals(id));
             if (image == null)
                 throw new KeyNotFoundException($"Image with ID {id} not found.");
-            _context.StadiumImages.Remove(image);
+            _context.StadiumImages.RemoveRange(image);
             return _context.SaveChangesAsync().ContinueWith(t => true);
         }
 
@@ -38,7 +39,7 @@ namespace StadiumAPI.Repositories
         {
             if (stadiumId <= 0)
                 throw new ArgumentException("Invalid stadium ID.", nameof(stadiumId));
-            return await _context.StadiumImages.Select(i => i).ToListAsync();
+            return await _context.StadiumImages.Where(i => i.StadiumId.Equals(stadiumId)).ToListAsync();
         }
 
         public Task<StadiumImages> GetImageByIdAsync(int id)

@@ -98,9 +98,9 @@ namespace StadiumAPI.Controllers
             var result = await _courtsService.DeleteCourtAsync(id);
             if (!result)
             {
-                return NotFound();
+                return Ok(result);
             }
-            return NoContent();
+            return Ok(result);
         }
 
     }
