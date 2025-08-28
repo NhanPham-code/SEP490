@@ -182,5 +182,16 @@ namespace Service.Services
                 throw new HttpRequestException($"Error updating face image: {response.ReasonPhrase}");
             }
         }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        {
+            if(string.IsNullOrEmpty(resetPasswordDTO.Email) || string.IsNullOrEmpty(resetPasswordDTO.NewPassword) || resetPasswordDTO.NewPassword.Length < 6)
+            {
+                throw new ArgumentException("Invalid email or password");
+            }
+
+            var response = await _httpClient.PutAsJsonAsync("/users/forgot-password", resetPasswordDTO);
+            return response.IsSuccessStatusCode;
+        }
     }
 }

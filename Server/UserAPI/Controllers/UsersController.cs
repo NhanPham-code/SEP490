@@ -278,5 +278,28 @@ namespace UserAPI.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating avatar.", error = ex.Message });
             }
         }
+
+        [HttpPut("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _userService.ResetPasswordAsync(dto);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Failed to reset password. Email may not exist." });
+                }
+                return Ok(new { message = "Password reset successful." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while resetting password.", error = ex.Message });
+            }
+        }
     }
 }

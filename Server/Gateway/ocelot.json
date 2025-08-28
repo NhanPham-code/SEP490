@@ -219,7 +219,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/forgot-password",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": [ "PUT" ]
     },
     // === BOOKING API ===
     {
