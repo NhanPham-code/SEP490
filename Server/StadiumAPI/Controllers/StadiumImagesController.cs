@@ -28,31 +28,45 @@ namespace StadiumAPI.Controllers
             return Ok(images);
         }
 
-        // POST: api/StadiumImages
         [HttpPost]
-        [Route("api/AddStadiumImages")]
+        [Route("/api/AddStadiumImages")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddImage([FromForm] CreateStadiumImageDTO imageDto)
+        public async Task<IActionResult> AddImages([FromForm] List<CreateStadiumImageDTO> imagesDto)
         {
-            if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
-                return BadRequest("Image file is required.");
+            if (imagesDto == null || !imagesDto.Any() || imagesDto.Any(dto => dto.ImageUrl == null))
+                return BadRequest("At least one image file is required.");
 
             var uploadsFolder = Path.Combine(_env.WebRootPath, "img");
-            if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder); // Creates directory if it doesn't exist
+
+            var createdImages = new List<ReadStadiumImageDTO>();
+
+            try
             {
-                Directory.CreateDirectory(uploadsFolder);
+                foreach (var imageDto in imagesDto)
+                {
+                    if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
+                        continue;
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageDto.ImageUrl.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageDto.ImageUrl.CopyToAsync(stream);
+                    }
+
+                    var createdImage = await _serviceStadiumImage.AddImageAsync(imageDto, $"img/{uniqueFileName}");
+                    createdImages.Add(createdImage);
+                }
+
+                return Ok(createdImages);
             }
-
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageDto.ImageUrl.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            catch (Exception ex)
             {
-                await imageDto.ImageUrl.CopyToAsync(stream);
+                // Log the exception (implement proper logging)
+                return StatusCode(500, "An error occurred while uploading images.");
             }
-
-            var createdImage = await _serviceStadiumImage.AddImageAsync(imageDto, $"img/{uniqueFileName}");
-            return Ok(createdImage);
         }
 
         // PUT: api/StadiumImages/{id}
@@ -101,32 +115,47 @@ namespace StadiumAPI.Controllers
         }
 
         // DELETE: api/StadiumImages/{id}
-        [HttpDelete("DeleteStadiumImage")]
-        public async Task<IActionResult> DeleteImage([FromQuery] int id)
+        [HttpDelete]
+        [Route("api/DeleteStadiumImage")]
+        public async Task<IActionResult> DeleteImages([FromQuery] int stadiumId)
         {
-            var image = (await _serviceStadiumImage.GetAllImagesAsync(id)).ToList();
-            if (image == null)
-            {
-                return NotFound("Image not found.");
-            }
-            var isDeleted = await _serviceStadiumImage.DeleteImageAsync(id);
-            if (!isDeleted)
-            {
-                return BadRequest("Failed to delete the image.");
-            }
-            // Optionally, delete the file from the server
-            foreach (var img in image)
-            {
-                // Ghép path tuyệt đối trong wwwroot/images
-                var filePath = Path.Combine(_env.WebRootPath, img.ImageUrl);
+            var images = (await _serviceStadiumImage.GetAllImagesAsync(stadiumId)).ToList();
 
-                if (System.IO.File.Exists(filePath))
+            if (images == null || !images.Any())
+            {
+                return NotFound("No images found for this stadium.");
+            }
+
+            bool allDeleted = true;
+
+            foreach (var img in images)
+            {
+                var isDeleted = await _serviceStadiumImage.DeleteImageAsync(img.Id);
+                if (isDeleted)
                 {
-                    System.IO.File.Delete(filePath);
+                    // Xóa file vật lý
+                    var filePath = Path.Combine(
+                        _env.WebRootPath,
+                        img.ImageUrl.TrimStart('/', '\\') // loại bỏ dấu / hoặc \ ở đầu nếu có
+                    );
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                else
+                {
+                    allDeleted = false;
                 }
             }
 
-            return Ok(true);
+            if (!allDeleted)
+            {
+                return BadRequest("Some images could not be deleted.");
+            }
+
+            return Ok(new { success = true });
         }
     }
 }

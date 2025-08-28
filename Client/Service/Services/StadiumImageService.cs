@@ -23,30 +23,44 @@ namespace Service.Services
             token = _tokenService.GetAccessTokenFromCookie();
         }
 
-        public async Task<ReadStadiumImageDTO> AddStadiumImageAsync(CreateStadiumImageDTO dto)
+        public async Task<List<ReadStadiumImageDTO>> AddStadiumImageAsync(List<CreateStadiumImageDTO> dtos)
         {
+            if (dtos == null || !dtos.Any() || dtos.All(dto => dto.ImageUrl == null || dto.ImageUrl.Length == 0))
+            {
+                throw new ArgumentException("No valid images provided.");
+            }
+
             using var form = new MultipartFormDataContent();
 
-            // File
-            form.Add(new StreamContent(dto.ImageUrl.OpenReadStream()), "ImageUrl", dto.ImageUrl.FileName);
+            for (int i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
+                if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
+                {
+                    Console.WriteLine($"Skipping DTO {i}: ImageUrl is null or empty.");
+                    continue;
+                }
 
-            // StadiumId
-            form.Add(new StringContent(dto.StadiumId.ToString()), "StadiumId");
+                form.Add(new StringContent(dto.StadiumId.ToString()), $"[{i}].stadiumId");
+                form.Add(new StreamContent(dto.ImageUrl.OpenReadStream()), $"[{i}].imageUrl", dto.ImageUrl.FileName);
+                form.Add(new StringContent(dto.UploadedAt.ToString("o")), $"[{i}].uploadedAt");
+            }
 
-            // UploadedAt
-            form.Add(new StringContent(DateTime.Now.ToString("o")), "UploadedAt");
-
-            // Gọi API upload
             var response = await _httpClient.PostAsync("/images/upload", form);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {response.StatusCode}, Content: {errorContent}");
+                throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorContent}");
+            }
 
-            var result = await response.Content.ReadFromJsonAsync<ReadStadiumImageDTO>();
-            return result!;
+            var result = await response.Content.ReadFromJsonAsync<List<ReadStadiumImageDTO>>();
+            return result ?? new List<ReadStadiumImageDTO>();
         }
 
         public async Task<bool> DeleteStadiumImageAsync(int stadiumId)
         {
-            var response = await _httpClient.DeleteAsync($"/images?id={stadiumId}");
+            var response = await _httpClient.DeleteAsync($"/images/delete?stadiumId={stadiumId}");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync() == "true";
         }

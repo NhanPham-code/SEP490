@@ -446,7 +446,7 @@
       //}
     },
     {
-      "DownstreamPathTemplate": "/DeleteStadiumImage",
+      "DownstreamPathTemplate": "/api/DeleteStadiumImage",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -454,7 +454,7 @@
           "Port": 7280
         }
       ],
-      "UpstreamPathTemplate": "/images",
+      "UpstreamPathTemplate": "/images/delete",
       "UpstreamHttpMethod": [ "DELETE" ]
       //"AuthenticationOptions": {
       //  "AuthenticationProviderKey": "Bearer",

@@ -9,6 +9,6 @@ namespace DTOs.StadiumDTO
     public class CreateStadiumRequest
     {
         public CreateStadiumDTO Stadium { get; set; }
-        public CreateStadiumImageDTO StadiumImage { get; set; }
+        public List<CreateStadiumImageDTO> StadiumImage { get; set; }
     }
 }

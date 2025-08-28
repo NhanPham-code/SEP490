@@ -15,7 +15,7 @@
 
     <script>
                 // Complete Enhanced Stadium Management JavaScript with Improved Modals
-
+        let selectedImages = [];
         // Constants
         const CONFIG = {
             API_ENDPOINTS: {
@@ -298,10 +298,10 @@
                     if (longitude) formData.append('Stadium.Longitude', longitude);
 
                     // Add images
-                    const images = document.getElementById('newImageUpload').files;
-                    for (let i = 0; i < images.length; i++) {
-                        formData.append('StadiumImage.ImageUrl', images[i]);
-                    }
+                                    const images = document.getElementById("newImageUpload").files;
+        for (let i = 0; i < images.length; i++) {
+            formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
+        }
 
                     return formData;
                 }
@@ -1143,8 +1143,9 @@
             });
 
             $.ajax({
-                url: `${CONFIG.API_ENDPOINTS.DELETE}/${stadiumId}`,
-                type: 'DELETE',
+                url: `${CONFIG.API_ENDPOINTS.DELETE}`,
+                type: 'GET',
+                data:{id: stadiumId},
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
@@ -2283,7 +2284,7 @@
                                     Sân đã được thêm thành công
                                 </h3>
                                 <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
-                                    Sân mới đã được tạo và đang chờ phê duyệt
+                                    Sân ${response.value.name} đã được tạo và đang chờ phê duyệt
                                 </p>
                             </div>
                         `,

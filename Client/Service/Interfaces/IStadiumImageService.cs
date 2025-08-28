@@ -11,7 +11,7 @@ namespace Service.Interfaces
     {
         Task<IEnumerable<ReadStadiumImageDTO>> GetStadiumImagesAsync(int stadiumId);
 
-        Task<ReadStadiumImageDTO> AddStadiumImageAsync(CreateStadiumImageDTO createStadiumImageDTO);
+        Task<List<ReadStadiumImageDTO>> AddStadiumImageAsync(List<CreateStadiumImageDTO> createStadiumImageDTO);
 
         Task<bool> DeleteStadiumImageAsync(int stadiumId);
 

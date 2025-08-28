@@ -46,26 +46,33 @@ namespace StadiumManagerUI.Controllers
         {
             CreateStadiumRequest.Stadium.CreatedBy = 3;
             var stadium = await _service.CreateStadiumAsync(CreateStadiumRequest.Stadium);
-            CreateStadiumRequest.StadiumImage.StadiumId = stadium.Id;
-            var image = await _imageService.AddStadiumImageAsync(CreateStadiumRequest.StadiumImage);
-            if (stadium != null)
+
+            if (stadium == null)
             {
                 return RedirectToAction("Stadium");
             }
+            else
+            {
+                foreach (var imageDto in CreateStadiumRequest.StadiumImage)
+                {
+                    imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                }
+                var image = await _imageService.AddStadiumImageAsync(CreateStadiumRequest.StadiumImage);
+            }
 
-            return View(stadium);
+            return Json(new { success = 200, value = stadium });
         }
 
         public async Task<IActionResult> DeleteStadium(int id)
         {
-            var stadium = await _service.DeleteStadiumAsync(id);
             var image = await _imageService.DeleteStadiumImageAsync(id);
+            var stadium = await _service.DeleteStadiumAsync(id);
 
             if (!stadium)
             {
                 return RedirectToAction("Stadium");
             }
-            return View(stadium);
+            return Json(new { success = 200, value = stadium });
         }
     }
 }

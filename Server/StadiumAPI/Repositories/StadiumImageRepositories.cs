@@ -16,12 +16,14 @@ namespace StadiumAPI.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Task<StadiumImages> AddImageAsync(StadiumImages image)
+        public async Task<StadiumImages> AddImageAsync(StadiumImages image)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image));
+
             _context.StadiumImages.Add(image);
-            return _context.SaveChangesAsync().ContinueWith(t => image);
+            await _context.SaveChangesAsync();
+            return image;
         }
 
         public Task<bool> DeleteImageAsync(int id)
