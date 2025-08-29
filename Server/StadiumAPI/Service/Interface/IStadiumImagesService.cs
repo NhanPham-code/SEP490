@@ -13,6 +13,8 @@ namespace StadiumAPI.Service.Interface
 
         Task<ReadStadiumImageDTO> UpdateImageAsync(int id, UpdateStadiumImageDTO image, string imageUrl);
 
-        Task<bool> DeleteImageAsync(int id);
+        Task<bool> DeleteImageAsync(List<ReadStadiumImageDTO> stadiumImages);
+
+        Task<bool> DeleteImageByStadiumIdAsync(int stadiumId);
     }
 }

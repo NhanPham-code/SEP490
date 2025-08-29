@@ -15,15 +15,16 @@
 
     <script>
                 // Complete Enhanced Stadium Management JavaScript with Improved Modals
-        let selectedImages = [];
+
         // Constants
         const CONFIG = {
             API_ENDPOINTS: {
                 SEARCH: '/StadiumManager/GetAllAndSearch',
                 DELETE: '/StadiumManager/DeleteStadium',
                 CREATE: '/StadiumManager/CreateNewStadium',
-                EDIT: '/StadiumManager/Edit',
-                EXPORT: '/StadiumManager/ExportReport'
+                EDIT: '/StadiumManager/UpdateStadium',
+                EXPORT: '/StadiumManager/ExportReport',
+                DELETE_IMAGE: '/StadiumManager/DeleteImageById'
             },
             PAGINATION: {
                 ITEMS_PER_PAGE: 9,
@@ -942,147 +943,9 @@
             `;
         }
 
-        // Image handling functions
-        function handleNewImageUpload(event) {
-            const files = event.target.files;
-            const previewContainer = document.getElementById('newImagePreview');
-            previewContainer.innerHTML = '';
 
-            if (files.length === 0) {
-                previewContainer.classList.add('hidden');
-                return;
-            }
 
-            previewContainer.classList.remove('hidden');
-
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageDiv = document.createElement('div');
-                        imageDiv.className = 'image-item';
-                        imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" />
-                            ${index === 0 ? '<div class="primary-badge">Chính</div>' : ''}
-                            <button type="button" class="delete-image-btn" onclick="removeNewPreviewImage(this, ${index})" title="Xóa ảnh">
-                                <i class="ri-close-line"></i>
-                            </button>
-                        `;
-                        previewContainer.appendChild(imageDiv);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        function handleEditImageUpload(event) {
-            const files = event.target.files;
-            const previewContainer = document.getElementById('editImagePreview');
-            previewContainer.innerHTML = '';
-
-            if (files.length === 0) {
-                previewContainer.classList.add('hidden');
-                return;
-            }
-
-            previewContainer.classList.remove('hidden');
-
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageDiv = document.createElement('div');
-                        imageDiv.className = 'image-item';
-                        imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" />
-                            <button type="button" class="delete-image-btn" onclick="removeEditPreviewImage(this, ${index})" title="Xóa ảnh">
-                                <i class="ri-close-line"></i>
-                            </button>
-                        `;
-                        previewContainer.appendChild(imageDiv);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        function removeNewPreviewImage(button, index) {
-            const imageItem = button.closest('.image-item');
-            imageItem.remove();
-
-            // Update file input
-            const input = document.getElementById('newImageUpload');
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
-
-            files.forEach((file, fileIndex) => {
-                if (fileIndex !== index) {
-                    dt.items.add(file);
-                }
-            });
-
-            input.files = dt.files;
-
-            // Hide preview container if empty
-            if (document.querySelectorAll('#newImagePreview .image-item').length === 0) {
-                document.getElementById('newImagePreview').classList.add('hidden');
-            }
-
-            // Re-render with updated indices
-            handleNewImageUpload({ target: input });
-        }
-
-        function removeEditPreviewImage(button, index) {
-            const imageItem = button.closest('.image-item');
-            imageItem.remove();
-
-            // Update file input
-            const input = document.getElementById('editImageUpload');
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
-
-            files.forEach((file, fileIndex) => {
-                if (fileIndex !== index) {
-                    dt.items.add(file);
-                }
-            });
-
-            input.files = dt.files;
-
-            // Hide preview container if empty
-            if (document.querySelectorAll('#editImagePreview .image-item').length === 0) {
-                document.getElementById('editImagePreview').classList.add('hidden');
-            }
-        }
-
-        function deleteCurrentImage(button) {
-            const imageItem = button.closest('.image-item');
-            imageItem.classList.add('deleted-image');
-            button.style.display = 'none';
-        }
-
-        function updateApprovalStatusDisplay() {
-            const select = document.getElementById('editIsApproved');
-            const statusIcon = document.querySelector('.status-icon');
-            const statusInfo = document.querySelector('.status-info');
-            const isApproved = select.value === 'true';
-
-            if (isApproved) {
-                statusIcon.className = 'status-icon status-approved';
-                statusIcon.innerHTML = '<i class="ri-checkbox-circle-line"></i>';
-                statusInfo.innerHTML = `
-                    <h4>Sân đã được phê duyệt</h4>
-                    <p>Sân này đã được phê duyệt và hiển thị công khai</p>
-                `;
-            } else {
-                statusIcon.className = 'status-icon status-pending';
-                statusIcon.innerHTML = '<i class="ri-time-line"></i>';
-                statusInfo.innerHTML = `
-                    <h4>Sân đang chờ phê duyệt</h4>
-                    <p>Sân này đang chờ được phê duyệt để hiển thị công khai</p>
-                `;
-            }
-        }
+        
 
         // Delete Confirmation Modal
         function confirmDelete(stadiumId) {
@@ -1630,33 +1493,31 @@
                             }
 
                             const formData = new FormData();
-                            formData.append('Id', stadiumId);
-                            formData.append('Name', name);
-                            formData.append('Address', address);
-                            formData.append('Description', document.getElementById('editDescription').value || '');
-                            formData.append('OpenTime', openTime);
-                            formData.append('CloseTime', closeTime);
-                            formData.append('IsApproved', document.getElementById('editIsApproved').value);
+                            formData.append('Stadium.Id', stadiumId);
+                            formData.append('Stadium.Name', name);
+                            formData.append('Stadium.Address', address);
+                            formData.append('Stadium.Description', document.getElementById('editDescription').value || '');
+                            formData.append('Stadium.OpenTime', openTime);
+                            formData.append('Stadium.CloseTime', closeTime);
+                            formData.append('Stadium.IsApproved', document.getElementById('editIsApproved').value);
 
                             const latitude = document.getElementById('editLatitude').value;
                             const longitude = document.getElementById('editLongitude').value;
-                            if (latitude) formData.append('Latitude', latitude);
-                            if (longitude) formData.append('Longitude', longitude);
+                            if (latitude) formData.append('Stadium.Latitude', latitude);
+                            if (longitude) formData.append('Stadium.Longitude', longitude);
 
                             // Add new images
-                            const newImages = document.getElementById('editImageUpload').files;
-                            for (let i = 0; i < newImages.length; i++) {
-                                formData.append('NewImages', newImages[i]);
-                            }
+
+                            appendToFormData(formData);
 
                             // Add deleted image IDs
                             const deletedImages = document.querySelectorAll('.deleted-image');
-                            deletedImages.forEach(item => {
-                                const imageId = item.getAttribute('data-image-id');
-                                if (imageId) {
-                                    formData.append('DeletedImageIds', imageId);
-                                }
-                            });
+                            deletedImages.forEach((item, i) => {
+                                            const imageId = item.getAttribute('data-image-id');
+                                            if (imageId) {
+                                                formData.append(`DeletedImageIds[${i}]`, imageId);
+                                            }
+                                        });
 
                             return formData;
                         }
@@ -1677,6 +1538,7 @@
                 }
             });
         }
+
                 // Complete Enhanced Stadium Management JavaScript - Missing Functions Implementation
 
         // Enhanced Edit Modal HTML Generator
@@ -1777,10 +1639,7 @@
                                     <i class="ri-checkbox-circle-line"></i>
                                     Trạng thái phê duyệt
                                 </label>
-                                <select id="editIsApproved" class="form-input" onchange="updateApprovalStatusDisplay()">
-                                    <option value="false" ${!stadium.IsApproved ? 'selected' : ''}>Chưa được duyệt</option>
-                                    <option value="true" ${stadium.IsApproved ? 'selected' : ''}>Đã được duyệt</option>
-                                </select>
+                                <span id="editIsApproved" value="${stadium.IsApproved}"></span>
                                 <div class="input-helper">Chỉ sân đã được duyệt mới hiển thị công khai</div>
                             </div>
 
@@ -1869,8 +1728,9 @@
 
                 ${getModalStyles()}
             `;
-        }
 
+        }
+             
         // Helper function to render current images for edit modal
         function renderCurrentImagesForEdit(images) {
             if (!images || images.length === 0) {
@@ -1902,6 +1762,7 @@
                 </div>
             `;
         }
+
 
         // Complete Create Modal HTML Generator (fixing the incomplete code)
         function generateCreateModalHTML() {
@@ -2371,35 +2232,61 @@
             });
         }
 
-        // Image handling enhancement functions
+                // Xử lý upload ảnh mới (merge thêm ảnh thay vì ghi đè)
         function handleNewImageUpload(event) {
-            const files = event.target.files;
+            const input = event.target;
+            const newFiles = Array.from(input.files);
             const previewContainer = document.getElementById('newImagePreview');
-
             if (!previewContainer) return;
 
+            // Lấy các file cũ đang có trong input (nếu có)
+            const oldFiles = input._files || [];
+
+            // Merge: file cũ + file mới
+            const mergedFiles = [...oldFiles, ...newFiles];
+
+            // Cập nhật lại input.files
+            const dt = new DataTransfer();
+            mergedFiles.forEach(file => dt.items.add(file));
+            input.files = dt.files;
+
+            // Lưu tạm trong input để lần sau merge tiếp
+            input._files = mergedFiles;
+
+            // Render lại preview
+            renderPreview(mergedFiles, previewContainer, input);
+        }
+
+        function renderPreview(files, previewContainer, input) {
             previewContainer.innerHTML = '';
 
-            if (files.length === 0) {
+            if (!files || files.length === 0) {
                 previewContainer.classList.add('hidden');
                 return;
             }
 
             previewContainer.classList.remove('hidden');
 
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) { // 10MB limit
+            files.forEach((file, index) => {
+                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         const imageDiv = document.createElement('div');
                         imageDiv.className = 'image-item';
+
                         imageDiv.innerHTML = `
                             <img src="${e.target.result}" alt="Preview" />
                             ${index === 0 ? '<div class="primary-badge">Chính</div>' : ''}
-                            <button type="button" class="delete-image-btn" onclick="removeNewPreviewImage(this, ${index})" title="Xóa ảnh">
+                            <button type="button" class="delete-image-btn" title="Xóa ảnh">
                                 <i class="ri-close-line"></i>
                             </button>
                         `;
+
+                        // Gắn sự kiện xóa
+                        imageDiv.querySelector('.delete-image-btn').addEventListener('click', () => {
+                            removeNewPreviewImage(index, input, previewContainer);
+                        });
+
                         previewContainer.appendChild(imageDiv);
                     };
                     reader.readAsDataURL(file);
@@ -2414,106 +2301,68 @@
             });
         }
 
+        function removeNewPreviewImage(indexToRemove, input, previewContainer) {
+            const files = input._files || [];
+            const updatedFiles = files.filter((_, index) => index !== indexToRemove);
+
+            // Cập nhật lại input.files
+            const dt = new DataTransfer();
+            updatedFiles.forEach(file => dt.items.add(file));
+            input.files = dt.files;
+            input._files = updatedFiles;
+
+            // Render lại preview
+            renderPreview(updatedFiles, previewContainer, input);
+        }
+
+
+                // Mảng lưu file mới được chọn
+                   let selectedFiles = [];
+
         function handleEditImageUpload(event) {
-            const files = event.target.files;
             const previewContainer = document.getElementById('editImagePreview');
 
-            if (!previewContainer) return;
+            Array.from(event.target.files).forEach(file => {
+                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) {
+                    selectedFiles.push(file);
 
-            previewContainer.innerHTML = '';
-
-            if (files.length === 0) {
-                previewContainer.classList.add('hidden');
-                return;
-            }
-
-            previewContainer.classList.remove('hidden');
-
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) { // 10MB limit
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const imageDiv = document.createElement('div');
-                        imageDiv.className = 'image-item';
+                        imageDiv.className = 'image-item relative inline-block m-2';
                         imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" />
-                            <button type="button" class="delete-image-btn" onclick="removeEditPreviewImage(this, ${index})" title="Xóa ảnh">
+                            <img src="${e.target.result}" alt="Preview" class="w-32 h-32 object-cover rounded" />
+                            <button type="button" class="delete-image-btn absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                                onclick="removeEditPreviewImage(this, ${selectedFiles.length - 1})">
                                 <i class="ri-close-line"></i>
                             </button>
                         `;
                         previewContainer.appendChild(imageDiv);
                     };
                     reader.readAsDataURL(file);
-                } else if (file.size > 10 * 1024 * 1024) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'File quá lớn',
-                        text: `File "${file.name}" vượt quá giới hạn 10MB`,
-                        confirmButtonColor: '#f59e0b'
-                    });
-                }
-            });
-        }
-
-        function removeNewPreviewImage(button, index) {
-            const imageItem = button.closest('.image-item');
-            const previewContainer = document.getElementById('newImagePreview');
-            const input = document.getElementById('newImageUpload');
-
-            if (!imageItem || !input) return;
-
-            // Remove the visual element
-            imageItem.remove();
-
-            // Update file input by creating new file list without the removed item
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
-
-            files.forEach((file, fileIndex) => {
-                if (fileIndex !== index) {
-                    dt.items.add(file);
                 }
             });
 
-            input.files = dt.files;
-
-            // Hide preview container if empty
-            if (previewContainer.querySelectorAll('.image-item').length === 0) {
-                previewContainer.classList.add('hidden');
-            } else {
-                // Re-render with updated indices to maintain primary badge on first image
-                handleNewImageUpload({ target: input });
-            }
+            previewContainer.classList.remove('hidden');
+            event.target.value = ""; // ở đây reset input không sao vì đã lưu vào selectedFiles
         }
 
         function removeEditPreviewImage(button, index) {
-            const imageItem = button.closest('.image-item');
-            const previewContainer = document.getElementById('editImagePreview');
-            const input = document.getElementById('editImageUpload');
-
-            if (!imageItem || !input) return;
-
-            // Remove the visual element
-            imageItem.remove();
-
-            // Update file input by creating new file list without the removed item
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
-
-            files.forEach((file, fileIndex) => {
-                if (fileIndex !== index) {
-                    dt.items.add(file);
-                }
-            });
-
-            input.files = dt.files;
-
-            // Hide preview container if empty
-            if (previewContainer.querySelectorAll('.image-item').length === 0) {
-                previewContainer.classList.add('hidden');
-            }
+            selectedFiles.splice(index, 1); // xoá khỏi mảng
+            button.closest('.image-item').remove();
         }
 
+        function appendToFormData(formData) {
+            selectedFiles.forEach((file, i) => {
+                formData.append(`StadiumImage[${i}].ImageUrl`, file);
+            });
+            selectedFiles = []; // Clear after appending
+        }
+
+
+
+
+        //delete image on edit 
         function deleteCurrentImage(button) {
             const imageItem = button.closest('.image-item');
             if (!imageItem) return;
@@ -2555,42 +2404,54 @@
         }
 
         // Enhanced time formatting with better error handling
-                function formatTimeForDisplay(timeString) {
-            if (!timeString) return '--:--';
+                       function formatTimeForDisplay(time) {
+            if (!time) return '--:--';
 
             try {
-                // Handle ISO 8601 duration format (e.g., PT6H, PT23H)
-                if (typeof timeString === 'string' && timeString.startsWith('PT')) {
-                    const hoursMatch = timeString.match(/PT(\d+)H/);
-                    if (hoursMatch && hoursMatch[1]) {
-                        const hours = parseInt(hoursMatch[1]).toString().padStart(2, '0');
-                        return `${hours}:00`;
-                    }
-                }
-                // Handle standard time format (HH:mm:ss)
-                else if (typeof timeString === 'string' && timeString.includes(':')) {
-                    const parts = timeString.split(':');
-                    if (parts.length >= 2) {
-                        const hours = parseInt(parts[0]).toString().padStart(2, '0');
-                        const minutes = parseInt(parts[1]).toString().padStart(2, '0');
-                        return `${hours}:${minutes}`;
+                if (typeof time === 'string') {
+                    if (time.startsWith('PT')) {
+                        const hoursMatch = time.match(/PT(\d+)H/);
+                        if (hoursMatch && hoursMatch[1]) {
+                            const hours = parseInt(hoursMatch[1]).toString().padStart(2, '0');
+                            return `${hours}:00`;
+                        }
+                    } else if (time.includes(':')) {
+                        const parts = time.split(':');
+                        if (parts.length >= 2) {
+                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
+                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
+                            return `${hours}:${minutes}`;
+                        }
                     }
                 }
 
-                return '--:--'; // Fallback for unrecognized formats
+                if (time instanceof Date) {
+                    const hours = time.getHours().toString().padStart(2, '0');
+                    const minutes = time.getMinutes().toString().padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+
+                return '--:--';
             } catch (error) {
                 console.warn('Error formatting time for display:', error);
                 return '--:--';
             }
         }
-
-        function formatTimeForInput(timeString) {
+                        function formatTimeForInput(timeString) {
             if (!timeString) return '';
 
             try {
-                // Handle different time formats for input fields
                 if (typeof timeString === 'string') {
-                    // Handle TimeSpan format (HH:mm:ss or HH:mm:ss.fffffff)
+                    // Handle ISO 8601 Duration format (e.g., PT6H)
+                    if (timeString.startsWith('PT')) {
+                        const match = timeString.match(/PT(\d+)H/);
+                        if (match && match[1]) {
+                            const hours = match[1].padStart(2, '0');
+                            return `${hours}:00`;
+                        }
+                    }
+
+                    // Handle HH:mm:ss format
                     if (timeString.includes(':')) {
                         const parts = timeString.split(':');
                         if (parts.length >= 2) {
@@ -2694,8 +2555,9 @@
             }
 
             const filterQuery = filters.length > 1 ? ` and ${filters.slice(1).join(' and ')}` : '';
-            const searchQuery = `&$filter=${filters[0]}${filterQuery}&$expand=Courts,StadiumImages&$orderby=UpdatedAt desc&$count=true&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}`;
+            const searchQuery = `&$filter=${filters[0]}${filterQuery}&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}`;
 
+            console.log('Advanced Search Query:', searchQuery);
             loadDataWithQuery(searchQuery);
         }
 
@@ -2708,6 +2570,7 @@
                 type: 'POST',
                 data: { url: query },
                 success: function (data) {
+                    console.log('Data loaded with advanced search:', data.value);
                     updateUI(data);
                     hideLoading();
 
@@ -2959,9 +2822,9 @@
                 <i class="ri-basketball-line input-icon"></i>
                 <select id="sport-type-filter" class="form-select">
                     <option value="all">Tất cả loại sân</option>
-                    <option value="Football">Bóng đá</option>
-                    <option value="Basketball">Bóng rổ</option>
-                    <option value="Badminton">Cầu lông</option>
+                    <option value="Bóng đá">Bóng đá</option>
+                    <option value="Bóng rổ">Bóng rổ</option>
+                    <option value="Cầu lông">Cầu lông</option>
                     <option value="Tennis">Tennis</option>
                 </select>
             </div>

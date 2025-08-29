@@ -130,7 +130,7 @@ namespace StadiumAPI.Controllers
 
             foreach (var img in images)
             {
-                var isDeleted = await _serviceStadiumImage.DeleteImageAsync(img.Id);
+                var isDeleted = await _serviceStadiumImage.DeleteImageByStadiumIdAsync(img.Id);
                 if (isDeleted)
                 {
                     // Xóa file vật lý
@@ -156,6 +156,41 @@ namespace StadiumAPI.Controllers
             }
 
             return Ok(new { success = true });
+        }
+
+        [HttpDelete]
+        [Route("api/DeleteImagesByImgId")]
+        public async Task<IActionResult> DeleteImagesByImgId([FromBody] int[] id)
+        {
+            if (id == null || id.Length == 0)
+                return BadRequest("No ids provided.");
+
+            var images = new List<ReadStadiumImageDTO>();
+            foreach (var imgId in id)
+            {
+                var img = await _serviceStadiumImage.GetImageByIdAsync(imgId);
+                if (img != null)
+                    images.Add(img);
+            }
+
+            if (!images.Any())
+                return NotFound("No images found for this stadium.");
+
+            var isDeleted = await _serviceStadiumImage.DeleteImageAsync(images);
+            if (!isDeleted)
+                return BadRequest("Some images could not be deleted.");
+
+            foreach (var img in images)
+            {
+                var filePath = Path.Combine(
+                    _env.WebRootPath,
+                    img.ImageUrl.TrimStart('/', '\\')
+                );
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
+            }
+
+            return Ok(true);
         }
     }
 }

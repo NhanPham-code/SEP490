@@ -11,19 +11,10 @@ namespace StadiumManagerUI.Controllers
         private readonly IStadiumImageService _imageService;
 
         [BindProperty]
-        public CreateStadiumDTO createStadiumDTO { get; set; } = new CreateStadiumDTO();
-
-        [BindProperty]
-        public CreateStadiumImageDTO createStadiumImageDTO { get; set; } = new CreateStadiumImageDTO();
-
-        [BindProperty]
-        public UpdateStadiumDTO updateStadiumDTO { get; set; } = new UpdateStadiumDTO();
-
-        [BindProperty]
-        public UpdateStadiumImageDTO updateStadiumImageDTO { get; set; } = new UpdateStadiumImageDTO();
-
-        [BindProperty]
         public CreateStadiumRequest CreateStadiumRequest { get; set; } = new CreateStadiumRequest();
+
+        [BindProperty]
+        public UpdateStadiumRequest UpdateStadiumRequest { get; set; } = new UpdateStadiumRequest();
 
         public StadiumManagerController(IStadiumService service, IStadiumImageService imageService)
         {
@@ -63,16 +54,48 @@ namespace StadiumManagerUI.Controllers
             return Json(new { success = 200, value = stadium });
         }
 
+        public async Task<IActionResult> UpdateStadium()
+        {
+            UpdateStadiumRequest.Stadium.CreatedBy = 3;
+            var stadium = await _service.UpdateStadiumAsync(UpdateStadiumRequest.Stadium.Id, UpdateStadiumRequest.Stadium);
+            bool check = false;
+            if (stadium == null)
+            {
+                return Json(new { success = 400, value = stadium });
+            }
+            else
+            {
+                if (UpdateStadiumRequest.StadiumImage.Any())
+                {
+                    foreach (var imageDto in UpdateStadiumRequest.StadiumImage)
+                    {
+                        imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    }
+                    var image = await _imageService.AddStadiumImageAsync(UpdateStadiumRequest.StadiumImage);
+                    if (image != null) check = true;
+                }
+                if (UpdateStadiumRequest.DeletedImageIds.Any())
+                {
+                    check = await _imageService.DeleteStadiumImageByIdAsync(UpdateStadiumRequest.DeletedImageIds);
+                }
+            }
+            if (check)
+                return Json(new { success = 200, value = stadium });
+            else
+                return Json(new { success = 400, value = stadium });
+        }
+
         public async Task<IActionResult> DeleteStadium(int id)
         {
             var image = await _imageService.DeleteStadiumImageAsync(id);
             var stadium = await _service.DeleteStadiumAsync(id);
 
-            if (!stadium)
+            if (stadium && image)
             {
-                return RedirectToAction("Stadium");
+                return Json(new { success = 200, value = stadium });
             }
-            return Json(new { success = 200, value = stadium });
+            else
+                return Json(new { success = 400, value = stadium });
         }
     }
 }

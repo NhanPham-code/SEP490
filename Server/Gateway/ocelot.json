@@ -464,6 +464,25 @@
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
     },
+    {
+      "DownstreamPathTemplate": "/api/DeleteImagesByImgId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/images/deleteById",
+      "UpstreamHttpMethod": [ "DELETE" ]
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "Bearer",
+      //  "RequireAuthentication": true
+      //},
+      //"RouteClaimsRequirement": {
+      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      //}
+    },
     // === COURTS API ===
     {
       "DownstreamPathTemplate": "/api/courtsByStadiumId",

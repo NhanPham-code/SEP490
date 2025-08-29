@@ -18,7 +18,6 @@ namespace Service.Services
         private readonly ITokenService _tokenService;
         private string token = string.Empty;
 
-
         public StadiumService(GatewayHttpClient httpClient, ITokenService tokenService)
         {
             _httpClient = httpClient.Client;
@@ -28,7 +27,6 @@ namespace Service.Services
 
         public void AddBearerAccessToken()
         {
-            
             _httpClient.DefaultRequestHeaders.Authorization = null;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
@@ -70,7 +68,9 @@ namespace Service.Services
 
         public Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto)
         {
-            throw new NotImplementedException();
+            var response = _httpClient.PutAsJsonAsync($"/updateStadium?id={id}", stadiumDto);
+            response.Result.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return response.Result.Content.ReadFromJsonAsync<ReadStadiumDTO>();
         }
     }
 }

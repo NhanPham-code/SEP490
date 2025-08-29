@@ -14,6 +14,8 @@ namespace StadiumAPI.Repositories.Interface
 
         Task<StadiumImages> UpdateImageAsync(int id, StadiumImages image);
 
-        Task<bool> DeleteImageAsync(int id);
+        Task<bool> DeleteImageAsync(List<StadiumImages> stadiumImages);
+
+        Task<bool> DeleteImageByStadiumIdAsync(int stadiumId);
     }
 }

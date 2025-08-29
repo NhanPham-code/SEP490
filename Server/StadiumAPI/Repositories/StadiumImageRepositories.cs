@@ -26,13 +26,23 @@ namespace StadiumAPI.Repositories
             return image;
         }
 
-        public Task<bool> DeleteImageAsync(int id)
+        public async Task<bool> DeleteImageAsync(List<StadiumImages> stadiumImages)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid image ID.", nameof(id));
-            var image = _context.StadiumImages.Where(i => i.StadiumId.Equals(id));
+            if (stadiumImages.Count == 0)
+                throw new KeyNotFoundException("No images found with the given IDs.");
+            _context.ChangeTracker.Clear();
+            _context.StadiumImages.RemoveRange(stadiumImages);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public Task<bool> DeleteImageByStadiumIdAsync(int stadiumId)
+        {
+            if (stadiumId <= 0)
+                throw new ArgumentException("Invalid image ID.", nameof(stadiumId));
+            var image = _context.StadiumImages.Where(i => i.StadiumId.Equals(stadiumId));
             if (image == null)
-                throw new KeyNotFoundException($"Image with ID {id} not found.");
+                throw new KeyNotFoundException($"Image with ID {stadiumId} not found.");
             _context.StadiumImages.RemoveRange(image);
             return _context.SaveChangesAsync().ContinueWith(t => true);
         }

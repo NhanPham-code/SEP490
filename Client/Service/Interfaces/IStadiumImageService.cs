@@ -15,6 +15,8 @@ namespace Service.Interfaces
 
         Task<bool> DeleteStadiumImageAsync(int stadiumId);
 
+        Task<bool> DeleteStadiumImageByIdAsync(int[] id);
+
         Task<ReadStadiumImageDTO> UpdateStadiumImageAsync(int stadiumId, UpdateStadiumImageDTO updateStadiumImageDTO);
     }
 }

@@ -11,6 +11,6 @@
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
         public bool IsApproved { get; set; }
-        public int UpdatedBy { get; set; } // User ID of the updater
+        public int CreatedBy { get; set; } // User ID of the updater
     }
 }

@@ -1125,3 +1125,19 @@ body {
         display: none;
     }
 }
+
+.modal-backdrop {
+    z-index: 1040 !important; /* backdrop luôn dưới */
+}
+
+.modal {
+    z-index: 1050 !important; /* modal edit */
+}
+
+.swal2-container {
+    z-index: 20000 !important; /* cao hơn modal */
+}
+
+.swal2-popup {
+    z-index: 20001 !important; /* popup Swal */
+}

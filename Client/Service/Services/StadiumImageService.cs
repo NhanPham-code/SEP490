@@ -1,4 +1,5 @@
 ﻿using DTOs.StadiumDTO;
+using Org.BouncyCastle.Crypto;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Service.Services
@@ -63,6 +65,25 @@ namespace Service.Services
             var response = await _httpClient.DeleteAsync($"/images/delete?stadiumId={stadiumId}");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync() == "true";
+        }
+
+        public async Task<bool> DeleteStadiumImageByIdAsync(int[] ids)
+        {
+            var json = JsonSerializer.Serialize(ids); // [1,2,3]
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(_httpClient.BaseAddress, "images/deleteById"), // route gateway
+                Content = content
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var resultString = await response.Content.ReadAsStringAsync();
+            return bool.TryParse(resultString, out var result) && result;
         }
 
         public async Task<IEnumerable<ReadStadiumImageDTO>> GetStadiumImagesAsync(int stadiumId)
