@@ -1427,7 +1427,6 @@
                         });
                         return;
                     }
-
                     Swal.fire({
                         title: `
                             <div class="modal-header">
@@ -1639,7 +1638,7 @@
                                     <i class="ri-checkbox-circle-line"></i>
                                     Trạng thái phê duyệt
                                 </label>
-                                <span id="editIsApproved" value="${stadium.IsApproved}"></span>
+                                <input type="hidden" id="editIsApproved" name="IsActive" value="${stadium.IsApproved}">
                                 <div class="input-helper">Chỉ sân đã được duyệt mới hiển thị công khai</div>
                             </div>
 
@@ -1728,7 +1727,7 @@
 
                 ${getModalStyles()}
             `;
-
+            
         }
              
         // Helper function to render current images for edit modal

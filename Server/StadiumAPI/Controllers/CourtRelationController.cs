@@ -16,6 +16,10 @@ namespace StadiumAPI.Controllers
         [HttpGet("GetAllCourtRelationParentId")]
         public async Task<IActionResult> GetAllCourtRelationByParentId([FromQuery] int parentId)
         {
+            if (parentId <= 0)
+            {
+                return NotFound("ParentId is required.");
+            }
             var a = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
             return Ok(a);
         }
@@ -27,12 +31,9 @@ namespace StadiumAPI.Controllers
             return Ok(a);
         }
 
-
         [HttpPost("AddCourtRelation")]
-        public async Task<IActionResult> CreateCourtRelation([FromBody] int[] childCourt, [FromQuery]int parentCourt)
+        public async Task<IActionResult> CreateCourtRelation([FromBody] int[] childCourt, [FromQuery] int parentCourt)
         {
-
-
             var createCourtRelationDTOs = new List<CreateCourtRelationDTO>();
             for (int i = 0; i < childCourt.Length; i++)
             {
@@ -48,9 +49,8 @@ namespace StadiumAPI.Controllers
         }
 
         [HttpPut("UpdateCourtRelation")]
-        public async Task<IActionResult> UpdateCourtRelation([FromForm] int[] childCourt, [FromQuery]int parentId)
+        public async Task<IActionResult> UpdateCourtRelation([FromForm] int[] childCourt, [FromQuery] int parentId)
         {
-
             var court = (await _courtRelationService.GetAllCourtRelationByParentId(parentId)).ToArray();
 
             var updateCourtRelationDTOs = new List<UpdateCourtRelationDTO>();
@@ -61,14 +61,12 @@ namespace StadiumAPI.Controllers
                     Id = court[i].Id,
                     ChildCourtId = childCourt[i],
                     ParentCourtId = parentId
-
                 });
             }
 
             var result = await _courtRelationService.UpdataCourtRelation(updateCourtRelationDTOs);
             return Ok(result);
         }
-
 
         [HttpDelete("DeleteCourtRelation")]
         public async Task<IActionResult> DeleteCourRelation([FromQuery] int parentId)

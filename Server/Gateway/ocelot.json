@@ -518,14 +518,14 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/addCourt",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-      }
+      "UpstreamHttpMethod": [ "POST" ]
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "Bearer",
+      //  "RequireAuthentication": true
+      //},
+      //"RouteClaimsRequirement": {
+      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      //}
     },
     {
       "DownstreamPathTemplate": "/api/Courts",
@@ -537,14 +537,14 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/updateCourt",
-      "UpstreamHttpMethod": [ "PUT" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-      }
+      "UpstreamHttpMethod": [ "PUT" ]
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "Bearer",
+      //  "RequireAuthentication": true
+      //},
+      //"RouteClaimsRequirement": {
+      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      //}
     },
     {
       "DownstreamPathTemplate": "/api/Courts",
@@ -556,14 +556,14 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/Delete",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-      }
+      "UpstreamHttpMethod": [ "DELETE" ]
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "Bearer",
+      //  "RequireAuthentication": true
+      //},
+      //"RouteClaimsRequirement": {
+      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
+      //}
     },
     // === COURT RELATION API ===
     {

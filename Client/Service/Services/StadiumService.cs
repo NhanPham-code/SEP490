@@ -61,7 +61,7 @@ namespace Service.Services
 
         public async Task<string> SearchStadiumAsync(string searchTerm)
         {
-            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts,StadiumImages&$count=true" + searchTerm);
+            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true" + searchTerm);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }
