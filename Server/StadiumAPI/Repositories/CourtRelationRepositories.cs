@@ -9,6 +9,7 @@ namespace StadiumAPI.Repositories
     public class CourtRelationRepositories : ICourtRelationRepositories
     {
         private readonly StadiumDbContext _context;
+
         public CourtRelationRepositories(StadiumDbContext context)
         {
             _context = context;
@@ -16,15 +17,16 @@ namespace StadiumAPI.Repositories
 
         public async Task<IEnumerable<CourtRelations>> CreateCourtRelation(List<CourtRelations> courtRelation)
         {
+            _context.ChangeTracker.Clear();
             await _context.AddRangeAsync(courtRelation);
             await _context.SaveChangesAsync();
 
             return courtRelation.AsEnumerable<CourtRelations>();
-
         }
 
         public async Task<bool> DeleteCourtRelationByParentId(int parentId)
         {
+            _context.ChangeTracker.Clear();
             var deleteCourtRelation = GetAllCourtRelationByParentId(parentId);
             for (int i = 0; i < deleteCourtRelation.Result.Count(); i++)
             {
@@ -52,8 +54,6 @@ namespace StadiumAPI.Repositories
             var parentCourtId = courtRelation.FirstOrDefault()?.ParentCourtId;
 
             return await GetAllCourtRelationByParentId(parentCourtId.Value);
-
-
         }
     }
 }

@@ -7,6 +7,8 @@ using StadiumAPI.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -62,6 +64,8 @@ namespace StadiumAPI.Controllers
             {
                 return NotFound();
             }
+            updateStadiumDTO.NameUnsigned = RemoveDiacritics(updateStadiumDTO.Name).ToLower();
+            updateStadiumDTO.AddressUnsigned = RemoveDiacritics(updateStadiumDTO.Address).ToLower();
 
             update = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
 
@@ -73,6 +77,9 @@ namespace StadiumAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromBody] CreateStadiumDTO createStadiumDTO)
         {
+            createStadiumDTO.NameUnsigned = RemoveDiacritics(createStadiumDTO.Name).ToLower();
+            createStadiumDTO.AddressUnsigned = RemoveDiacritics(createStadiumDTO.Address).ToLower();
+
             var createdStadium = await _serviceStadium.CreateStadiumAsync(createStadiumDTO);
 
             return Ok(createdStadium);
@@ -89,6 +96,23 @@ namespace StadiumAPI.Controllers
             }
 
             return Ok(await _serviceStadium.DeleteStadiumAsync(id));
+        }
+
+        private string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            // Normalize thành dạng Decomposed
+            string normalized = text.Normalize(NormalizationForm.FormD);
+
+            // Loại bỏ ký tự dấu
+            Regex regex = new Regex("\\p{IsCombiningDiacriticalMarks}+");
+            string noDiacritics = regex.Replace(normalized, string.Empty);
+
+            // Đổi đ -> d
+            noDiacritics = noDiacritics.Replace('đ', 'd').Replace('Đ', 'D');
+
+            return noDiacritics;
         }
     }
 }

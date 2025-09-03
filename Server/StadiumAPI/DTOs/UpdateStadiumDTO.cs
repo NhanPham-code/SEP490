@@ -4,7 +4,9 @@
     {
         public int Id { get; set; } // Stadium ID
         public string Name { get; set; }
+        public string NameUnsigned { get; set; }
         public string Address { get; set; }
+        public string AddressUnsigned { get; set; }
         public string Description { get; set; }
         public TimeSpan OpenTime { get; set; }
         public TimeSpan CloseTime { get; set; }

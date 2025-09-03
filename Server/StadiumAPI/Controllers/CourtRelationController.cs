@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using StadiumAPI.DTOs;
 using StadiumAPI.Service.Interface;
 
@@ -44,7 +45,23 @@ namespace StadiumAPI.Controllers
                 });
             }
 
-            var result = await _courtRelationService.CreateCourtRelation(createCourtRelationDTOs);
+            if (!childCourt.Any())
+            {
+                return BadRequest("ParentCourt already has relations. Use UpdateCourtRelation instead.");
+            }
+
+            for (int i = 0; i < childCourt.Length; i++)
+            {
+                var check = (await _courtRelationService.GetAllCourtRelationByChildId(parentCourt)).ToList();
+                if (check.Any() && check[0].ParentCourtId == parentCourt)
+                {
+                    return Ok(check[i]);
+                }
+            }
+            var result = Enumerable.Empty<ReadCourtRelationDTO>();
+            // tạo quan hệ nếu chưa tồn tại
+            result = await _courtRelationService.CreateCourtRelation(createCourtRelationDTOs);
+
             return Ok(result);
         }
 
@@ -56,12 +73,20 @@ namespace StadiumAPI.Controllers
             var updateCourtRelationDTOs = new List<UpdateCourtRelationDTO>();
             for (int i = 0; i < court.Length; i++)
             {
+                var child = (await _courtRelationService.GetAllCourtRelationByChildId(childCourt[i])).ToList();
                 updateCourtRelationDTOs.Add(new UpdateCourtRelationDTO
                 {
                     Id = court[i].Id,
                     ChildCourtId = childCourt[i],
                     ParentCourtId = parentId
                 });
+                for (int j = 0; j < childCourt.Length; j++)
+                {
+                    if (child[i].ParentCourtId == childCourt[j] && child.Any())
+                    {
+                        return Ok(child[i]);
+                    }
+                }
             }
 
             var result = await _courtRelationService.UpdataCourtRelation(updateCourtRelationDTOs);

@@ -147,10 +147,7 @@
                             ${stadium.Address || 'Chưa cập nhật địa chỉ'}
                         </div>
                         <div class="info-grid">
-                            <div class="info-card sport-info">
-                                <div class="info-label">Loại sân</div>
-                                <div class="info-value">${getSportTypes(stadium.Courts)}</div>
-                            </div>
+                            
                             <div class="info-card price-info">
                                 <div class="info-label">Giá/giờ</div>
                                 <div class="info-value">${formatPrice(stadium.Courts)}</div>
@@ -158,6 +155,12 @@
                             <div class="info-card time-info">
                                 <div class="info-label">Giờ hoạt động</div>
                                 <div class="info-value">${formatTimeForDisplay(stadium.OpenTime)} - ${formatTimeForDisplay(stadium.CloseTime)}</div>
+                            </div>
+                        </div>
+                        <div class="pb-4">
+                            <div class="info-card sport-info">
+                                <div class="info-label">Loại sân</div>
+                                <div class="info-value">${getSportTypes(stadium.Courts)}</div>
                             </div>
                         </div>
                         <div class="card-actions">
@@ -288,7 +291,9 @@
 
                     const formData = new FormData();
                     formData.append('Stadium.Name', name);
+                    formData.append('Stadium.NameUnsigned', address);
                     formData.append('Stadium.Address', address);
+                    formData.append('Stadium.AddressUnsigned', address);
                     formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
                     formData.append('Stadium.OpenTime', openTime);
                     formData.append('Stadium.CloseTime', closeTime);
@@ -1114,11 +1119,23 @@
         }
 
         // Utility Functions
-        function updateDateTime() {
-            const now = new Date();
-            const formattedDate = now.toISOString().replace('T', ' ').substring(0, 19);
-            $('#current-time').text(formattedDate);
-        }
+function updateDateTime() {
+    const now = new Date();
+
+    // Lấy giờ Việt Nam (Asia/Ho_Chi_Minh)
+    const formattedDate = now.toLocaleString("en-GB", {
+        timeZone: "Asia/Ho_Chi_Minh",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    $('#current-time').text(formattedDate);
+}
+
 
         function showLoading() {
             $('#loading-container').show();
@@ -1494,7 +1511,9 @@
                             const formData = new FormData();
                             formData.append('Stadium.Id', stadiumId);
                             formData.append('Stadium.Name', name);
+                            formData.append('Stadium.NameUnsigned', address);
                             formData.append('Stadium.Address', address);
+                            formData.append('Stadium.AddressUnsigned', address);
                             formData.append('Stadium.Description', document.getElementById('editDescription').value || '');
                             formData.append('Stadium.OpenTime', openTime);
                             formData.append('Stadium.CloseTime', closeTime);

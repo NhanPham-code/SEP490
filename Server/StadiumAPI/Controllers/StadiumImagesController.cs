@@ -4,7 +4,7 @@ using StadiumAPI.Service.Interface;
 
 namespace StadiumAPI.Controllers
 {
-    public class StadiumImagesController : Controller
+    public class StadiumImagesController : ControllerBase
     {
         private readonly IStadiumImagesService _serviceStadiumImage;
         private readonly IWebHostEnvironment _env;

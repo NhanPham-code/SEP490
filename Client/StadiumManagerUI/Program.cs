@@ -3,8 +3,9 @@ using Service.Interfaces;
 using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
 // Cookies
@@ -61,11 +62,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Common}/{action=Login}/{id?}");
 
 app.Run();

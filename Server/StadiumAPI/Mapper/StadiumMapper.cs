@@ -6,8 +6,8 @@ namespace StadiumAPI.Mapper
 {
     public class StadiumMapper : Profile
     {
-        public StadiumMapper() {
-
+        public StadiumMapper()
+        {
             // Stadium Mappings
             CreateMap<Stadiums, ReadStadiumDTO>();
 
@@ -35,7 +35,6 @@ namespace StadiumAPI.Mapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-
             // Stadium Image Mappings
             CreateMap<StadiumImages, ReadStadiumImageDTO>();
 
@@ -43,7 +42,6 @@ namespace StadiumAPI.Mapper
 
             CreateMap<CreateStadiumImageDTO, StadiumImages>()
                 .ForMember(dest => dest.ImageUrl, opt => opt.Ignore()); // nếu bạn xử lý upload ở service
-
 
             CreateMap<UpdateStadiumImageDTO, StadiumImages>()
                 .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());

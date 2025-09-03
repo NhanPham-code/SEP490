@@ -28,5 +28,7 @@ namespace Service.Interfaces
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
 
         Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
+
+        Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
     }
 }

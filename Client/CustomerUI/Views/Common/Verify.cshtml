@@ -1,113 +1,350 @@
 ﻿@using CustomerUI.Models
 @{
-    ViewData["Title"] = "Verify Account";
+    ViewData["Title"] = "Xác thực tài khoản";
+    Layout = null;
 }
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger text-center mt-3">
-        @TempData["ErrorMessage"]
-    </div>
-}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Sportivey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#3b82f6",
-                    secondary: "#10b981",
-                },
-                borderRadius: {
-                    none: "0px",
-                    sm: "4px",
-                    DEFAULT: "8px",
-                    md: "12px",
-                    lg: "16px",
-                    xl: "20px",
-                    "2xl": "24px",
-                    "3xl": "32px",
-                    full: "9999px",
-                    button: "8px",
-                },
-            },
-        },
-    };
-</script>
-<style>
-    :where([class^="ri-"])::before {
-        content: "\f3c2";
+    <link href="~/css/common/verify.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="notification error">
+            <i class="ri-error-warning-line mr-2"></i>
+            @TempData["ErrorMessage"]
+        </div>
     }
 
-    .hero-bg {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-    }
+    <div class="verify-container rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
+        
+        <!-- Background Sport Icons -->
+        <div class="sport-icon">⚽</div>
+        <div class="sport-icon">🏀</div>
+        <div class="sport-icon">🏆</div>
 
-    .mobile-menu {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-    }
+        <!-- Header -->
+        <div class="text-center mb-8 relative z-10 verify-header">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4 header-icon">
+                <i class="ri-shield-check-line text-3xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                Xác thực tài khoản
+            </h1>
+            <p class="text-gray-600 leading-relaxed">
+                Chúng tôi đã gửi mã xác thực 6 chữ số đến<br>
+                <span class="font-semibold text-blue-600">@ViewBag.Email</span>
+            </p>
+        </div>
 
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-
-    .search-expanded {
-        width: 100%;
-        opacity: 1;
-    }
-
-    .filter-sheet {
-        transform: translateY(100%);
-        transition: transform 0.3s ease-in-out;
-    }
-
-        .filter-sheet.open {
-            transform: translateY(0);
-        }
-
-    .stadium-card {
-        transition: transform 0.2s ease-in-out;
-    }
-
-        .stadium-card:hover {
-            transform: translateY(-2px);
-        }
-
-</style>
-
-<div class="flex items-center justify-center min-h-screen bg-gray-50">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Verify your account</h2>
-        <p class="text-center text-gray-500 mb-8">We've sent a 6-digit code to <span class="font-medium text-primary">@ViewBag.Email</span></p>
-
-        <form asp-action="Verify" asp-controller="Common" method="post">
+        <!-- Verification Form -->
+        <form asp-action="Verify" asp-controller="Common" method="post" id="verifyForm" class="relative z-10">
             <input type="hidden" name="email" value="@ViewBag.Email" />
+            
             <div class="space-y-6">
+                <!-- Code Input -->
                 <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-3">
+                        <i class="ri-key-line mr-2"></i>
+                        Nhập mã xác thực
+                    </label>
                     <div class="relative">
-                        <input type="text" id="code" name="code" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg text-center tracking-widest" maxlength="6" pattern="[0-9]{6}" placeholder="------">
+                        <input 
+                            type="text" 
+                            id="code" 
+                            name="code" 
+                            required 
+                            class="code-input" 
+                            maxlength="6" 
+                            pattern="[0-9]{6}" 
+                            placeholder="● ● ● ● ● ●"
+                            autocomplete="one-time-code"
+                            inputmode="numeric"
+                        />
                     </div>
-                    @* This line displays validation errors *@
+                    
+                    @* Display validation errors *@
                     @if (ViewData.ModelState.ContainsKey("Code"))
                     {
-                        <div class="text-red-600 text-sm mt-2">
+                        <div class="error-message">
+                            <i class="ri-error-warning-line mr-2"></i>
                             @ViewData.ModelState["Code"].Errors.FirstOrDefault()?.ErrorMessage
                         </div>
                     }
                 </div>
-                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-button hover:bg-blue-600 transition-colors font-semibold">
-                    Verify Account
+
+                <!-- Timer Display -->
+                <div class="text-center">
+                    <div class="timer-container" id="timerContainer">
+                        <i class="ri-time-line timer-icon"></i>
+                        <span id="timerText">Mã hết hạn sau: <span id="countdown">60</span>s</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="submitText">
+                        <i class="ri-shield-check-line mr-2"></i>
+                        Xác thực tài khoản
+                    </span>
+                    <div id="submitSpinner" class="loading ml-2 hidden"></div>
                 </button>
             </div>
         </form>
 
-        <div class="text-center mt-6">
-            <p class="text-gray-600">
-                Didn't receive the code?
-                <a asp-controller="Common" asp-action="ResendCode" class="text-primary hover:text-blue-600 transition-colors font-semibold">Resend Code</a>
-            </p>
+        <!-- Resend Section -->
+        <div class="text-center mt-8 relative z-10">
+            <p class="text-gray-600 mb-4">Không nhận được mã?</p>
+            <div class="space-y-3">
+                <button type="button" id="resendBtn" class="resend-btn disabled:opacity-50" disabled>
+                    <i class="ri-refresh-line mr-2"></i>
+                    <span id="resendText">Gửi lại mã</span>
+                </button>
+                <div>
+                    <a href="@Url.Action("Login", "Common")" class="text-blue-600 hover:text-green-600 transition-colors text-sm back-link">
+                        <i class="ri-arrow-left-line mr-1"></i>
+                        Quay lại đăng nhập
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <!-- Success/Error Messages -->
+        <div id="messageContainer" class="mt-4 relative z-10"></div>
     </div>
-</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const codeInput = document.getElementById('code');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            const resendBtn = document.getElementById('resendBtn');
+            const resendText = document.getElementById('resendText');
+            const countdownElement = document.getElementById('countdown');
+            const timerContainer = document.getElementById('timerContainer');
+            const timerTextElement = document.getElementById('timerText');
+            const messageContainer = document.getElementById('messageContainer');
+            const verifyForm = document.getElementById('verifyForm');
+
+            let countdownTimer;
+            let timeLeft = 60;
+            let isSubmitting = false;
+
+            // Start countdown timer
+            function startCountdown() {
+                timeLeft = 60;
+                resendBtn.disabled = true;
+                timerContainer.style.display = 'inline-flex';
+                timerTextElement.innerHTML = `Mã hết hạn sau: <span id="countdown">${timeLeft}</span>s`;
+
+                timerContainer.classList.remove('warning', 'danger');
+
+                clearInterval(countdownTimer);
+                countdownTimer = setInterval(() => {
+                    timeLeft--;
+                    const countdownEl = document.getElementById('countdown');
+                    if (countdownEl) {
+                        countdownEl.textContent = timeLeft;
+                    }
+
+                    if (timeLeft <= 10 && timeLeft > 0) {
+                        timerContainer.classList.add('warning');
+                        timerContainer.classList.remove('danger');
+                    } else if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        timerTextElement.textContent = 'Mã đã hết hạn!';
+                        timerContainer.classList.add('danger');
+                        timerContainer.classList.remove('warning');
+                        resendBtn.disabled = false;
+                    } else {
+                        timerContainer.classList.remove('warning', 'danger');
+                    }
+                }, 1000);
+            }
+
+            // Show message function
+            function showMessage(text, type) {
+                const messageClass = type === 'error' ? 'error-message' : 'success-message';
+                const icon = type === 'error' ? 'ri-error-warning-line' : 'ri-check-line';
+
+                messageContainer.innerHTML = `
+                    <div class="${messageClass}">
+                        <i class="${icon} mr-2"></i>
+                        ${text}
+                    </div>
+                `;
+
+                // Auto hide success messages on mobile
+                if (type === 'success' && window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        messageContainer.innerHTML = '';
+                    }, 3000);
+                }
+            }
+
+            // Code input formatting with mobile enhancements
+            codeInput.addEventListener('input', function (e) {
+                // Only allow numbers
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                e.target.classList.remove('error');
+                messageContainer.innerHTML = '';
+
+                // Auto submit when 6 digits are entered
+                if (e.target.value.length === 6) {
+                    // Small delay for better UX on mobile
+                    setTimeout(() => {
+                        verifyForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }, 200);
+                }
+            });
+
+            // Enhanced paste support for mobile
+            codeInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const numbers = paste.replace(/[^0-9]/g, '').slice(0, 6);
+                e.target.value = numbers;
+                
+                if (numbers.length === 6) {
+                    setTimeout(() => {
+                        verifyForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }, 200);
+                }
+            });
+
+            // Form submission with enhanced mobile feedback
+            verifyForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                if (isSubmitting) return;
+
+                if (timeLeft <= 0) {
+                    showMessage('Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới.', 'error');
+                    codeInput.classList.add('error');
+                    codeInput.focus();
+                    return;
+                }
+
+                if (codeInput.value.length !== 6) {
+                    showMessage('Vui lòng nhập đầy đủ 6 chữ số.', 'error');
+                    codeInput.classList.add('error');
+                    codeInput.focus();
+                    return;
+                }
+
+                const formData = new URLSearchParams(new FormData(verifyForm));
+
+                isSubmitting = true;
+                submitText.classList.add('hidden');
+                submitSpinner.classList.remove('hidden');
+                submitBtn.disabled = true;
+                codeInput.disabled = true;
+
+                fetch(verifyForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('Xác thực thành công! Đang chuyển hướng...', 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirectUrl;
+                        }, 1000);
+                    } else {
+                        showMessage(data.message || 'Mã xác thực không đúng.', 'error');
+                        codeInput.classList.add('error');
+                        codeInput.focus();
+                        codeInput.select();
+                    }
+                })
+                .catch(error => {
+                    showMessage('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', 'error');
+                })
+                .finally(() => {
+                    isSubmitting = false;
+                    submitText.classList.remove('hidden');
+                    submitSpinner.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    codeInput.disabled = false;
+                });
+            });
+
+            // Enhanced resend functionality
+            resendBtn.addEventListener('click', function () {
+                if (resendBtn.disabled) return;
+
+                resendText.innerHTML = '<div class="loading mr-2"></div>Đang gửi...';
+                resendBtn.disabled = true;
+
+                fetch('@Url.Action("ResendCode", "Common")', { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('Mã xác thực mới đã được gửi!', 'success');
+                        startCountdown();
+                        codeInput.value = '';
+                        codeInput.focus();
+                    } else {
+                        showMessage(data.message || 'Có lỗi xảy ra khi gửi mã.', 'error');
+                        resendBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    showMessage('Có lỗi xảy ra khi gửi lại mã.', 'error');
+                    resendBtn.disabled = false;
+                })
+                .finally(() => {
+                    resendText.innerHTML = '<i class="ri-refresh-line mr-2"></i>Gửi lại mã';
+                });
+            });
+
+            // Mobile-specific enhancements
+            if (window.innerWidth <= 768) {
+                // Prevent zoom on focus for iOS
+                codeInput.addEventListener('focus', function() {
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                    }, 100);
+                });
+
+                // Handle orientation change
+                window.addEventListener('orientationchange', function() {
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                    }, 100);
+                });
+            }
+
+            // Initialize
+            codeInput.focus();
+            startCountdown();
+
+            // Auto-hide error messages from server
+            setTimeout(() => {
+                const serverNotifications = document.querySelectorAll('.notification');
+                serverNotifications.forEach(notification => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translate(-50%, -30px) scale(0.9)';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

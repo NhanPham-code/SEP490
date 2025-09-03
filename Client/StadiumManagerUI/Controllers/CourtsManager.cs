@@ -66,21 +66,63 @@ namespace StadiumManagerUI.Controllers
             return Json(courtRelations);
         }
 
+        public async Task<IActionResult> GetAllCourtRelationsByChildId(int childId)
+        {
+            var courtRelations = await _courtRelationService.GetAllCourtRelationBychildId(childId);
+            return Json(courtRelations);
+        }
+
         public async Task<IActionResult> CreateCourtRelation(int courtParentId, int[] courtChildId)
         {
             var createdCourtRelation = await _courtRelationService.CreateCourtRelation(courtChildId, courtParentId);
-            return Json(createdCourtRelation);
+            foreach (var item in createdCourtRelation)
+            {
+                if (item.ChildCourtId == courtParentId)
+                {
+                    return Json(new { success = 400, value = $"Sân này đã được đặt làm con của {item.ChildCourt.Name}" });
+                }
+            }
+
+            return Json(new { success = 200, value = createdCourtRelation });
         }
 
         public async Task<IActionResult> UpdateCourtRelation(int courtParentId, int[] courtChildId)
         {
-            var updatedCourtRelation = await _courtRelationService.UpdateCourtRelation(courtChildId, courtParentId);
-            return Json(updatedCourtRelation);
+            var updatedCourtRelation = Enumerable.Empty<ReadCourtRelationDTO>();
+            var parentRelations = await _courtRelationService.GetAllCourtRelationByParentId(courtParentId);
+            if (parentRelations.Count() < courtChildId.Length || parentRelations.Count() > courtChildId.Length)
+            {
+                var deleted = await _courtRelationService.DeleteCourtRelation(courtParentId);
+                if (courtChildId.Length > 0)
+                {
+                    updatedCourtRelation = await _courtRelationService.CreateCourtRelation(courtChildId, courtParentId);
+                }
+            }
+            else if (parentRelations.Count() == courtChildId.Length)
+            {
+                bool isSame = false;
+                updatedCourtRelation = await _courtRelationService.UpdateCourtRelation(courtChildId, courtParentId);
+                updatedCourtRelation.ToList().ForEach(cr =>
+                {
+                    if (cr.ChildCourtId == courtParentId)
+                    {
+                        isSame = true;
+                    }
+                });
+                if (isSame)
+                {
+                    return Json(new { success = 400, value = $"Sân này đã được đặt làm con của {courtParentId}" });
+                }
+            }
+
+            return Json(new { success = 200, value = updatedCourtRelation });
         }
 
         public async Task<IActionResult> DeleteCourt(int id)
         {
+            await _courtRelationService.DeleteCourtRelation(id);
             var result = await _courtService.DeleteCourtAsync(id);
+
             return Json(result);
         }
     }

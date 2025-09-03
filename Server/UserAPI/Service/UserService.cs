@@ -473,9 +473,20 @@ namespace UserAPI.Service
             return _mapper.Map<PublicUserProfileDTO>(user);
         }
 
-        public Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetUserByEmailAsync(resetPasswordDTO.Email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            // Cập nhật mật khẩu mới
+            CreatePasswordHash(resetPasswordDTO.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            return await _userRepository.UpdateUserAsync(user) != null;
         }
 
         public async Task<bool> DeleteUserAsync(int id)

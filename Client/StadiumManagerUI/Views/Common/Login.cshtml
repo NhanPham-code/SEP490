@@ -1,0 +1,492 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập / Đăng ký";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Sport-themed background */
+        body {
+            background: linear-gradient(135deg, 
+                #1e40af 0%,    /* Deep blue */
+                #059669 25%,   /* Emerald green */
+                #dc2626 50%,   /* Red */
+                #ea580c 75%,   /* Orange */
+                #7c3aed 100%   /* Purple */
+            );
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @@keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Add sport pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px, 60px 60px, 30px 30px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Base container for forms */
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+            transition: all 0.6s ease-in-out;
+        }
+
+        /* Login and Register initial positions */
+        .login-container {
+            left: 0;
+            z-index: 2;
+        }
+
+        .register-container {
+            left: 0;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        /* Animation when switching to Register panel */
+        .right-panel-active .login-container {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .right-panel-active .register-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        @@keyframes show {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        /* Overlay styles with sport theme */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 100;
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .overlay {
+            background: linear-gradient(135deg, 
+                #1e40af 0%,    /* Sports blue */
+                #059669 50%,   /* Field green */
+                #dc2626 100%   /* Energy red */
+            );
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            color: #fff;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        /* Separated form content for scrolling */
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-content {
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 12px;
+        }
+
+        /* Password input container */
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s ease;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #1e40af;
+        }
+
+        /* Floating label input styles */
+        .floating-label {
+            position: relative;
+        }
+
+        .floating-label input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .floating-label input:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .floating-label .icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            transition: color 0.3s ease;
+        }
+
+        .floating-label input:focus + .icon {
+            color: #1e40af;
+        }
+
+        /* Button styles with sport theme */
+        .submit-btn {
+            background: linear-gradient(135deg, #1e40af 0%, #059669 100%);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(30, 64, 175, 0.4);
+        }
+
+        .overlay-btn {
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .overlay-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .social-login {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            color: #64748b;
+        }
+
+        .forgot-password {
+            color: #1e40af;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #059669;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Sport-themed container */
+        #container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="container" class="relative rounded-3xl shadow-2xl overflow-hidden w-[900px] max-w-full min-h-[600px]">
+
+        <!-- Login Form -->
+        <div class="form-container login-container">
+            <div class="form-header">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                    Chào mừng trở lại!
+                </h1>
+                <p class="text-gray-600">Đăng nhập để tiếp tục</p>
+            </div>
+            <div class="form-content">
+                <form method="post" asp-controller="Common" asp-action="Login" class="space-y-6">
+                    @Html.AntiForgeryToken()
+                    <div class="floating-label">
+                        <input type="text" name="email" placeholder="Email" required />
+                        <i class="ri-mail-line icon text-xl"></i>
+                    </div>
+                    <div class="floating-label password-container">
+                        <input type="password" name="password" placeholder="Mật khẩu" required id="loginPassword" />
+                        <i class="ri-lock-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('loginPassword', this)"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="remember-me" name="RememberMe">
+                            <label for="remember-me">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                    </div>
+                    <button type="submit" class="submit-btn w-full">
+                        <span class="button-text">Đăng nhập</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-container register-container">
+            <div class="form-header">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent mb-2">
+                    Tạo tài khoản mới
+                </h1>
+                <p class="text-gray-600">Đăng ký để bắt đầu</p>
+            </div>
+            <div class="form-content">
+                <form method="post" action="/Account/Register" class="space-y-4">
+                    @Html.AntiForgeryToken()
+                    <div class="floating-label">
+                        <input type="text" name="FullName" placeholder="Họ và tên" required />
+                        <i class="ri-user-3-line icon text-xl"></i>
+                    </div>
+                    <div class="floating-label">
+                        <input type="email" name="Email" placeholder="Email" required />
+                        <i class="ri-mail-line icon text-xl"></i>
+                    </div>
+                    <div class="floating-label password-container">
+                        <input type="password" name="Password" placeholder="Mật khẩu" required id="registerPassword" />
+                        <i class="ri-lock-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('registerPassword', this)"></i>
+                    </div>
+                    <div class="floating-label password-container">
+                        <input type="password" name="ConfirmPassword" placeholder="Xác nhận mật khẩu" required id="confirmPassword" />
+                        <i class="ri-lock-2-line icon text-xl"></i>
+                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('confirmPassword', this)"></i>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="agree-terms" name="AgreeToTerms" required>
+                        <label for="agree-terms">Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản</a></label>
+                    </div>
+                    <button type="submit" class="submit-btn w-full"><span class="button-text">Đăng ký</span></button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1 class="text-3xl font-bold mb-4">Chào mừng trở lại! ⚽</h1>
+                    <p class="text-lg mb-6">Đã có tài khoản? Đăng nhập để tiếp tục hành trình thể thao của bạn.</p>
+                    <button class="overlay-btn" id="signIn">Đăng nhập</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1 class="text-3xl font-bold mb-4">Xin chào, vận động viên! 🏆</h1>
+                    <p class="text-lg mb-6">Tạo tài khoản để bắt đầu hành trình thể thao tuyệt vời.</p>
+                    <button class="overlay-btn" id="signUp">Đăng ký</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+
+            signUpButton.addEventListener('click', () => {
+                container.classList.add('right-panel-active');
+            });
+
+            signInButton.addEventListener('click', () => {
+                container.classList.remove('right-panel-active');
+            });
+
+            // Password matching validation
+            const registerForm = document.querySelector('form[action*="Register"]');
+            if (registerForm) {
+                const password = registerForm.querySelector('input[name="Password"]');
+                const confirmPassword = registerForm.querySelector('input[name="ConfirmPassword"]');
+
+                const validatePasswordMatch = () => {
+                    if (password.value !== confirmPassword.value) {
+                        confirmPassword.setCustomValidity('Mật khẩu không khớp.');
+                    } else {
+                        confirmPassword.setCustomValidity('');
+                    }
+                };
+                password.addEventListener('input', validatePasswordMatch);
+                confirmPassword.addEventListener('input', validatePasswordMatch);
+            }
+        });
+
+        // Function to toggle password visibility
+        function togglePassword(inputId, toggleIcon) {
+            const passwordInput = document.getElementById(inputId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('ri-eye-line');
+                toggleIcon.classList.add('ri-eye-off-line');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('ri-eye-off-line');
+                toggleIcon.classList.add('ri-eye-line');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -57,7 +57,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ServeUnknownFileTypes = true // Cho phép phục vụ các loại file không xác định
+});
 
 app.UseRouting();
 app.UseSession();
