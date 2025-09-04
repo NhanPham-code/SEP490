@@ -1,8 +1,224 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Tổng Quan";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Styles {
+    <style>
+        /* Custom styles cho dashboard nếu cần */
+    </style>
+}
+
+<div class="p-6">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Tổng Người Dùng</p>
+                    <p class="text-3xl font-bold text-gray-900">12,543</p>
+                    <p class="text-green-600 text-sm font-medium">+12.5% so với tháng trước</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-user-line text-2xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Doanh Thu Tháng</p>
+                    <p class="text-3xl font-bold text-gray-900">2.5M VNĐ</p>
+                    <p class="text-green-600 text-sm font-medium">+8.2% so với tháng trước</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-money-dollar-circle-line text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Mã Giảm Giá</p>
+                    <p class="text-3xl font-bold text-gray-900">24</p>
+                    <p class="text-orange-600 text-sm font-medium">8 mã đang hoạt động</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-coupon-line text-2xl text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Đánh Giá Mới</p>
+                    <p class="text-3xl font-bold text-gray-900">89</p>
+                    <p class="text-red-600 text-sm font-medium">24 chưa phản hồi</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-feedback-line text-2xl text-red-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Doanh Thu 6 Tháng Gần Đây</h3>
+            <canvas id="revenueChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Người Dùng Mới</h3>
+            <canvas id="userChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="/Admin/Users" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-user-settings-line text-2xl text-blue-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Quản Lý Người Dùng</h3>
+                    <p class="text-gray-500 text-sm">Xem và quản lý tài khoản</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="/Admin/Coupons" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-coupon-line text-2xl text-orange-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Mã Giảm Giá</h3>
+                    <p class="text-gray-500 text-sm">Tạo và quản lý khuyến mãi</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="/Admin/Revenue" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-line-chart-line text-2xl text-green-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Báo Cáo Doanh Thu</h3>
+                    <p class="text-gray-500 text-sm">Theo dõi và phân tích</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="/Admin/Venues" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-building-2-line text-2xl text-purple-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Quản Lý Sân Bóng</h3>
+                    <p class="text-gray-500 text-sm">Thêm, sửa và xóa sân</p>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize Charts
+            initializeDashboardCharts();
+
+            // Show welcome toast
+            showToast('Chào mừng đến với Dashboard Sportivey!', 'success', 3000);
+        });
+
+        function initializeDashboardCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['T4/2025', 'T5/2025', 'T6/2025', 'T7/2025', 'T8/2025', 'T9/2025'],
+                        datasets: [{
+                            label: 'Doanh Thu (triệu VNĐ)',
+                            data: [1.8, 2.1, 2.3, 2.0, 2.4, 2.5],
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // User Chart
+            const userCtx = document.getElementById('userChart');
+            if (userCtx) {
+                new Chart(userCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['T4/2025', 'T5/2025', 'T6/2025', 'T7/2025', 'T8/2025', 'T9/2025'],
+                        datasets: [{
+                            label: 'Người dùng mới',
+                            data: [850, 920, 1050, 980, 1150, 1200],
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: 'rgb(16, 185, 129)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

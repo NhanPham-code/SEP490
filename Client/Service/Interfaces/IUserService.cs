@@ -11,7 +11,9 @@ namespace Service.Interfaces
     {
         Task<LoginResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO);
 
-        Task<bool> RegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
+        Task<bool> CustomerRegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
+
+        Task<bool> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerRequestDTO);
 
         Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
 

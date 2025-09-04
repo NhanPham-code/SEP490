@@ -1,0 +1,359 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập quản trị";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Quản trị Sportivey</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <link href="~/css/login.css" rel="stylesheet" />
+</head>
+
+<body>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="bg-gradient-admin">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="admin-login-card w-full max-w-md rounded-2xl p-8 animate-slide-up">
+
+                <!-- Admin Brand -->
+                <div class="admin-brand">
+                    <div class="admin-logo">
+                        <i class="ri-shield-keyhole-line"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold mb-2">Bảng Điều Khiển</h1>
+                    <p class="text-lg text-gray-300">Hệ Thống Quản Lý Sportivey</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="adminLoginForm" autocomplete="off">
+                    <!-- Email Field -->
+                    <div class="form-field">
+                        <label class="form-label">
+                            <i class="ri-mail-line mr-2"></i>Địa chỉ Email
+                        </label>
+                        <div class="form-input-group">
+                            <i class="ri-mail-line input-icon"></i>
+                            <input type="email" id="emailInput" 
+                                   class="form-input" 
+                                   placeholder="Nhập email quản trị viên"
+                                   required 
+                                   autocomplete="username" />
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-field">
+                        <label class="form-label">
+                            <i class="ri-lock-line mr-2"></i>Mật khẩu
+                        </label>
+                        <div class="form-input-group">
+                            <i class="ri-lock-line input-icon"></i>
+                            <input type="password" id="passwordInput" 
+                                   class="form-input" 
+                                   placeholder="Nhập mật khẩu của bạn"
+                                   required 
+                                   autocomplete="current-password" />
+                            <i class="ri-eye-off-line password-toggle" id="passwordToggle" title="Hiện/Ẩn mật khẩu"></i>
+                        </div>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" id="loginBtn" class="btn-admin-login mt-6">
+                        <i class="ri-shield-check-line text-xl"></i>
+                        <span id="loginBtnText">Truy Cập Bảng Điều Khiển</span>
+                        <div id="loginSpinner" class="loading-spinner hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    <i class="ri-alert-line mr-2"></i>
+                    <strong>Truy Cập Hạn Chế:</strong> Khu vực này chỉ dành cho quản trị viên được ủy quyền. 
+                    Tất cả các lần thử truy cập đều được ghi lại và giám sát.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        'use strict';
+
+        // Admin Login Module
+        window.AdminLogin = (function () {
+            let loginForm, loginBtn, loginBtnText, loginSpinner;
+            let passwordInput, passwordToggle, emailInput;
+            let isLogging = false;
+
+            // Enhanced Toast System
+            function showToast(message, type = "success", duration = 4000) {
+                const icons = {
+                    success: '<i class="ri-checkbox-circle-line text-xl"></i>',
+                    error: '<i class="ri-close-circle-line text-xl"></i>',
+                    loading: '<div class="loading-spinner"></div>',
+                    warning: '<i class="ri-alert-line text-xl"></i>'
+                };
+
+                const toast = document.createElement("div");
+                toast.className = `toast toast-${type}`;
+                toast.innerHTML = `
+                    ${icons[type] || ''}
+                    <span class="flex-1">${message}</span>
+                    ${type !== 'loading' ? '<i class="ri-close-line cursor-pointer ml-2" onclick="this.parentElement.remove()"></i>' : ''}
+                `;
+
+                const container = document.getElementById("toastContainer");
+                if (container) {
+                    container.appendChild(toast);
+
+                    if (type !== "loading" && duration > 0) {
+                        setTimeout(() => {
+                            if (toast.parentElement) {
+                                toast.style.animation = 'fadeOut 0.3s ease';
+                                setTimeout(() => {
+                                    if (toast.parentElement) {
+                                        toast.remove();
+                                    }
+                                }, 300);
+                            }
+                        }, duration);
+                    }
+                }
+
+                return toast;
+            }
+
+            function removeLoadingToast(toast) {
+                if (toast && toast.parentElement) {
+                    toast.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }
+
+            function initializeUIElements() {
+                loginForm = document.getElementById("adminLoginForm");
+                loginBtn = document.getElementById("loginBtn");
+                loginBtnText = document.getElementById("loginBtnText");
+                loginSpinner = document.getElementById("loginSpinner");
+                passwordInput = document.getElementById("passwordInput");
+                passwordToggle = document.getElementById("passwordToggle");
+                emailInput = document.getElementById("emailInput");
+
+                console.log('Các thành phần giao diện đăng nhập quản trị đã được khởi tạo');
+            }
+
+            function validateForm() {
+                if (!emailInput || !passwordInput) {
+                    console.error('Không tìm thấy các thành phần form bắt buộc');
+                    return false;
+                }
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!email) {
+                    showToast("Vui lòng nhập email", "error");
+                    emailInput.focus();
+                    return false;
+                }
+
+                // Enhanced email validation
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(email)) {
+                    showToast("Vui lòng nhập email hợp lệ", "error");
+                    emailInput.focus();
+                    return false;
+                }
+
+                if (!password) {
+                    showToast("Vui lòng nhập mật khẩu", "error");
+                    passwordInput.focus();
+                    return false;
+                }
+
+                if (password.length < 6) {
+                    showToast("Mật khẩu phải có ít nhất 6 ký tự", "error");
+                    passwordInput.focus();
+                    return false;
+                }
+
+                return true;
+            }
+
+            function togglePasswordVisibility() {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                
+                if (type === 'text') {
+                    passwordToggle.className = 'ri-eye-line password-toggle';
+                    passwordToggle.title = 'Ẩn mật khẩu';
+                } else {
+                    passwordToggle.className = 'ri-eye-off-line password-toggle';
+                    passwordToggle.title = 'Hiện mật khẩu';
+                }
+            }
+
+            function setLoadingState(loading) {
+                isLogging = loading;
+                
+                if (loading) {
+                    loginBtnText.textContent = 'Đang xác thực...';
+                    loginSpinner.classList.remove('hidden');
+                    loginBtn.disabled = true;
+                } else {
+                    loginBtnText.textContent = 'Truy Cập Bảng Điều Khiển';
+                    loginSpinner.classList.add('hidden');
+                    loginBtn.disabled = false;
+                }
+            }
+
+            // Main login function using your API
+            async function performLogin() {
+                if (!validateForm()) return;
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                setLoadingState(true);
+                const loadingToast = showToast("Đang xác thực tài khoản quản trị...", "loading");
+
+                try {
+                    // Call your existing login API
+                    const response = await $.ajax({
+                        url: '/Login/Login', // Adjust this to your actual login endpoint
+                        type: 'POST',
+                        data: {
+                            email: email,
+                            password: password
+                        },
+                        timeout: 10000
+                    });
+
+                    removeLoadingToast(loadingToast);
+
+                    if (response && response.success) {
+                        showToast("Đăng nhập thành công! Đang chuyển hướng...", "success");
+                        
+                        setTimeout(() => {
+                            if (response.redirectUrl) {
+                                window.location.href = response.redirectUrl;
+                            } else {
+                                window.location.href = '/Admin/Dashboard'; // Default admin dashboard
+                            }
+                        }, 1500);
+                    } else {
+                        const errorMessage = response && response.message ? response.message : "Đăng nhập thất bại!";
+                        showToast(errorMessage, "error");
+                        
+                        // Clear password on error
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
+                } catch (error) {
+                    removeLoadingToast(loadingToast);
+                    console.error('Lỗi đăng nhập:', error);
+                    
+                    let errorMessage = "Có lỗi xảy ra khi đăng nhập!";
+                    if (error.responseJSON && error.responseJSON.message) {
+                        errorMessage = error.responseJSON.message;
+                    } else if (error.statusText) {
+                        errorMessage = `Lỗi kết nối: ${error.statusText}`;
+                    }
+                    
+                    showToast(errorMessage, "error");
+                    
+                    // Clear password on error
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                } finally {
+                    setLoadingState(false);
+                }
+            }
+
+            function initializeEventListeners() {
+                // Password toggle
+                if (passwordToggle) {
+                    passwordToggle.addEventListener('click', togglePasswordVisibility);
+                }
+
+                // Form submission
+                if (loginForm) {
+                    loginForm.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        
+                        if (isLogging) return;
+                        
+                        performLogin();
+                    });
+                }
+
+                // Enter key handling
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' && !isLogging) {
+                        if (document.activeElement === emailInput || document.activeElement === passwordInput) {
+                            e.preventDefault();
+                            performLogin();
+                        }
+                    }
+                });
+
+                // Focus management
+                if (emailInput) {
+                    setTimeout(() => emailInput.focus(), 300);
+                }
+
+                // Security: Log access attempt
+                console.log('Trang đăng nhập quản trị được truy cập lúc:', new Date().toISOString());
+            }
+
+            function init() {
+                initializeUIElements();
+                initializeEventListeners();
+                
+                showToast("Cổng đăng nhập quản trị đã sẵn sàng", "success", 2500);
+                console.log('Trang đăng nhập quản trị được khởi tạo thành công');
+            }
+
+            return {
+                init: init,
+                showToast: showToast
+            };
+        })();
+
+        // Make showToast globally available
+        window.showToast = function(message, type, duration) {
+            return window.AdminLogin && window.AdminLogin.showToast ?
+                   window.AdminLogin.showToast(message, type, duration) :
+                   console.log('Toast:', message, type);
+        };
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            console.log('jQuery đã sẵn sàng, đang khởi tạo đăng nhập quản trị...');
+            if (window.AdminLogin) {
+                window.AdminLogin.init();
+            }
+        });
+
+        // Security: Prevent right-click context menu (optional)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>

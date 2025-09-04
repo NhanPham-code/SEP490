@@ -47,14 +47,9 @@ namespace CustomerUI.Controllers
                 ? $"{BASE_URL}{response.AvatarUrl}"
                 : $"{BASE_URL}/avatars/default-avatar.png";
 
-            var faceFullUrl = !string.IsNullOrEmpty(response.FaceImageUrl)
-                ? $"{BASE_URL}{response.FaceImageUrl}"
-                : "";
-
             HttpContext.Session.SetString("UserId", response.UserId.ToString());
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
-            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
         private void SaveUserInfo(PrivateUserProfileDTO userProfileDTO)
@@ -64,14 +59,9 @@ namespace CustomerUI.Controllers
                 ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
                 : $"{BASE_URL}/avatars/default-avatar.png";
 
-            var faceFullUrl = !string.IsNullOrEmpty(userProfileDTO.FaceImageUrl)
-                ? $"{BASE_URL}{userProfileDTO.FaceImageUrl}"
-                : "";
-
             HttpContext.Session.SetString("UserId", userProfileDTO.UserId.ToString());
             HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
-            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
         public IActionResult Login()
@@ -85,7 +75,7 @@ namespace CustomerUI.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                return Json(new { success = false, message = "Email và mật khẩu không được để trống." });
+                return Json(new { success = false, message = "Email và Password không được để trống." });
             }
 
             var model = new LoginRequestDTO
@@ -98,25 +88,24 @@ namespace CustomerUI.Controllers
             try
             {
                 var response = await _userService.LoginAsync(model);
-                if (response == null || string.IsNullOrEmpty(response.AccessToken))
+                if (response == null)
                 {
-                    return Json(new { success = false, message = "Email hoặc mật khẩu không đúng." });
+                    return Json(new { success = false, message = "Email hoặc mật khẩu không đúng!" });
+                }
+
+                if (response.IsValid == false)
+                {
+                    return Json(new { success = false, message = response.Message });
                 }
 
                 // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
                 SaveTokenCookiesAndUserInfo(response);
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Đăng nhập thành công!",
-                    redirectUrl = Url.Action("Index", "Home")
-                });
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi nếu cần
-                return Json(new { success = false, message = "Đăng nhập thất bại: Email hoặc mật khẩu không đúng." });
+                return Json(new { success = false, message = "Login failed: " + ex.Message });
             }
         }
 
@@ -356,7 +345,7 @@ namespace CustomerUI.Controllers
             };
 
             // Gọi service để đăng ký người dùng (API sẽ xử lý lưu file video từ base64)
-            var isRegistered = await _userService.RegisterAsync(registerRequestDTO);
+            var isRegistered = await _userService.CustomerRegisterAsync(registerRequestDTO);
 
             if (!isRegistered)
             {
@@ -543,12 +532,14 @@ namespace CustomerUI.Controllers
             }
         }
 
+        // Hiển thị trang quên mật khẩu
         [HttpGet]
         public IActionResult ForgotPassword()
         {
             return View();
         }
 
+        // Gửi mã xác thực đặt lại mật khẩu
         [HttpPost]
         public async Task<IActionResult> SendResetCode(string email)
         {

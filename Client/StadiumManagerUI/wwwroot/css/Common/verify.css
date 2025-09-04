@@ -1,0 +1,700 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Sport-themed background */
+body {
+    background: linear-gradient(135deg, #1e40af 0%, /* Deep blue */
+    #059669 25%, /* Emerald green */
+    #0891b2 50%, /* Teal */
+    #f59e0b 75%, /* Golden yellow */
+    #7c3aed 100% /* Purple */
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Add sport pattern overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 2px, transparent 2px), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 2px, transparent 2px), radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 50px 50px, 60px 60px, 30px 30px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.verify-container {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Code input styling */
+.code-input {
+    width: 100%;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.5em;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+    .code-input:focus {
+        outline: none;
+        border-color: #0891b2;
+        box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .code-input:hover {
+        border-color: #0891b2;
+        transform: translateY(-1px);
+    }
+
+    .code-input.error {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+        animation: shake 0.5s ease-in-out;
+    }
+
+/* Submit button with sport theme */
+.submit-btn {
+    background: linear-gradient(135deg, #1e40af 0%, #0891b2 50%, #059669 100%);
+    border: none;
+    padding: 16px 32px;
+    border-radius: 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(8, 145, 178, 0.3);
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(8, 145, 178, 0.4);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+/* Resend button */
+.resend-btn {
+    background: transparent;
+    border: 2px solid #0891b2;
+    color: #0891b2;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .resend-btn:hover:not(:disabled) {
+        background: #0891b2;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .resend-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: #9ca3af;
+        color: #9ca3af;
+    }
+
+/* Timer styling */
+.timer-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(8, 145, 178, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #0891b2;
+    border: 1px solid rgba(8, 145, 178, 0.2);
+    transition: all 0.3s ease;
+}
+
+    .timer-container.warning {
+        background: rgba(245, 158, 11, 0.1) !important;
+        color: #f59e0b !important;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .timer-container.danger {
+        background: rgba(220, 38, 38, 0.1) !important;
+        color: #dc2626 !important;
+        border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+.timer-icon {
+    animation: tick 1s infinite;
+}
+
+@keyframes tick {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Error message styling */
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+/* Success message styling */
+.success-message {
+    background: rgba(5, 150, 105, 0.1);
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    color: #059669;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* DESKTOP SPORT ICONS POSITIONING - FIX CHO DESKTOP */
+.sport-icon {
+    font-size: 3rem;
+    color: #0891b2;
+    opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
+    position: absolute;
+    z-index: 1;
+}
+
+    /* DESKTOP positioning - DEFAULT */
+    .sport-icon:nth-child(1) {
+        top: 2rem;
+        right: 2rem;
+    }
+
+    .sport-icon:nth-child(2) {
+        bottom: 2rem;
+        left: 2rem;
+    }
+
+    .sport-icon:nth-child(3) {
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        font-size: 2.5rem;
+    }
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Ensure sport-icon:nth-child(3) maintains proper transform during animation */
+.sport-icon:nth-child(3) {
+    animation: floatWithTransform 3s ease-in-out infinite;
+    animation-delay: -2s;
+}
+
+@keyframes floatWithTransform {
+    0%, 100% {
+        transform: translateY(-50%);
+    }
+
+    50% {
+        transform: translateY(calc(-50% - 10px));
+    }
+}
+
+.sport-icon:nth-child(2) {
+    animation-delay: -1s;
+}
+
+/* Fixed notification positioning */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    max-width: 500px;
+    width: calc(100% - 2rem);
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(20px);
+    animation: slideInAlert 0.5s ease;
+}
+
+    .notification.error {
+        background: rgba(239, 68, 68, 0.95);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: white;
+    }
+
+@keyframes slideInAlert {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -30px) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .verify-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        border-radius: 24px;
+    }
+
+    /* MOBILE SPORT ICONS POSITIONING - OVERRIDE DESKTOP */
+    .sport-icon {
+        font-size: 2rem;
+        opacity: 0.2;
+    }
+
+        .sport-icon:nth-child(1) {
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .sport-icon:nth-child(2) {
+            bottom: 1rem;
+            left: 1rem;
+        }
+
+        .sport-icon:nth-child(3) {
+            top: 40%;
+            right: 0.5rem;
+            font-size: 1.5rem;
+            transform: none; /* Remove desktop transform */
+            animation: float 3s ease-in-out infinite; /* Use regular float animation */
+            animation-delay: -2s;
+        }
+
+    /* Header adjustments */
+    .verify-header {
+        margin-bottom: 2rem;
+    }
+
+        .verify-header h1 {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .verify-header p {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+    .header-icon {
+        width: 4rem !important;
+        height: 4rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+        .header-icon i {
+            font-size: 1.5rem !important;
+        }
+
+    /* Code input - mobile optimized */
+    .code-input {
+        padding: 18px 16px;
+        font-size: 20px;
+        letter-spacing: 0.3em;
+        border-radius: 14px;
+        min-height: 60px;
+    }
+
+        .code-input::placeholder {
+            font-size: 16px;
+            letter-spacing: 0.2em;
+        }
+
+    /* Timer - mobile responsive */
+    .timer-container {
+        padding: 10px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        flex-wrap: wrap;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* Buttons - mobile optimized */
+    .submit-btn {
+        padding: 16px 24px;
+        font-size: 16px;
+        border-radius: 14px;
+        min-height: 56px;
+    }
+
+    .resend-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 10px;
+        min-height: 44px;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    /* Messages - mobile responsive */
+    .error-message,
+    .success-message {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-top: 1rem;
+    }
+
+    /* Form spacing */
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1.5rem;
+    }
+
+    /* Label styling */
+    label {
+        font-size: 14px !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    /* Back link - mobile friendly */
+    .back-link {
+        font-size: 14px;
+        padding: 8px 0;
+        display: inline-block;
+    }
+
+    /* Notification positioning */
+    .notification {
+        top: 15px;
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+        transform: none;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .verify-container {
+        padding: 1.5rem 1rem;
+        border-radius: 20px;
+        max-width: 100%;
+    }
+
+    /* Even smaller header for tiny screens */
+    .verify-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .header-icon {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+    }
+
+    /* TINY MOBILE SPORT ICONS */
+    .sport-icon {
+        font-size: 1.5rem;
+    }
+
+        .sport-icon:nth-child(3) {
+            font-size: 1rem;
+        }
+
+    /* Code input - compact for small screens */
+    .code-input {
+        padding: 16px 12px;
+        font-size: 18px;
+        min-height: 56px;
+    }
+
+    /* Buttons - more compact */
+    .submit-btn {
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 52px;
+    }
+
+    .resend-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+
+    /* Timer - more compact */
+    .timer-container {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    /* Messages - compact */
+    .error-message,
+    .success-message {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    /* Notification - full width on tiny screens */
+    .notification {
+        top: 10px;
+        left: 0.5rem;
+        right: 0.5rem;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+/* DESKTOP SPECIFIC OVERRIDES - CHO SCREEN LỚN HƠN 768px */
+@media (min-width: 769px) {
+    /* Ensure desktop sport icons are properly positioned */
+    .sport-icon {
+        font-size: 3rem;
+        opacity: 0.3;
+    }
+
+        .sport-icon:nth-child(1) {
+            top: 2rem;
+            right: 2rem;
+        }
+
+        .sport-icon:nth-child(2) {
+            bottom: 2rem;
+            left: 2rem;
+        }
+
+        .sport-icon:nth-child(3) {
+            top: 50%;
+            right: 1rem;
+            font-size: 2.5rem;
+            transform: translateY(-50%);
+            animation: floatWithTransform 3s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+
+    /* Desktop container adjustments */
+    .verify-container {
+        max-width: 28rem; /* 448px */
+        padding: 2rem;
+    }
+
+    /* Desktop form elements */
+    .code-input {
+        padding: 20px;
+        font-size: 24px;
+    }
+
+    .submit-btn {
+        padding: 16px 32px;
+        font-size: 16px;
+    }
+
+    .resend-btn {
+        width: auto;
+        margin-top: 0;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+    .verify-container {
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+
+    .verify-header {
+        margin-bottom: 1rem;
+    }
+
+    .header-icon {
+        width: 3rem !important;
+        height: 3rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .sport-icon {
+        display: none; /* Hide decorative icons in landscape */
+    }
+}
+
+/* High DPI screens adjustments */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .code-input {
+        border-width: 1px;
+    }
+
+    .submit-btn, .resend-btn {
+        border-width: 1px;
+    }
+}
+
+/* Dark mode support (for future) */
+@media (prefers-color-scheme: dark) {
+    .verify-container {
+        background: rgba(31, 41, 55, 0.95);
+        border: 1px solid rgba(55, 65, 81, 0.3);
+    }
+
+    .code-input {
+        background: rgba(55, 65, 81, 0.5);
+        color: white;
+        border-color: #374151;
+    }
+
+        .code-input::placeholder {
+            color: #9ca3af;
+        }
+}
+
+/* Focus management for better UX */
+.code-input:focus {
+    -webkit-user-select: all;
+    -moz-user-select: all;
+    -ms-user-select: all;
+    user-select: all;
+}
+
+/* Prevent zoom on iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .code-input, .submit-btn, .resend-btn {
+        font-size: 16px;
+    }
+}
+
+/* LARGE DESKTOP ADJUSTMENTS */
+@media (min-width: 1200px) {
+    .sport-icon:nth-child(1) {
+        top: 3rem;
+        right: 3rem;
+        font-size: 3.5rem;
+    }
+
+    .sport-icon:nth-child(2) {
+        bottom: 3rem;
+        left: 3rem;
+        font-size: 3.5rem;
+    }
+
+    .sport-icon:nth-child(3) {
+        right: 2rem;
+        font-size: 3rem;
+    }
+}

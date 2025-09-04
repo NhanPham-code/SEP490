@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using UserAPI.Validator;
+﻿using DTOs.Validator;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
-namespace UserAPI.DTOs
+namespace DTOs.UserDTO
 {
     public class StadiumManagerRegisterRequestDTO
     {
