@@ -948,5 +948,70 @@
     </script>
 
     @RenderSection("Scripts", required: false)
+
+    // Function to update user info in header dynamically
+    <script>
+        // Enhanced global function for header update from session
+        window.refreshHeaderFromSession = function () {
+            console.log('🔄 Refreshing header with session data...');
+
+            fetch('/Common/GetUserHeaderInfo')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📊 Session data received:', data);
+
+                    // Update avatar images
+                    const avatarImages = document.querySelectorAll('img[alt="Avatar"]');
+                    avatarImages.forEach(img => {
+                        if (img) {
+                            const updatedAvatarUrl = data.avatarUrl + '?t=' + Date.now();
+                            console.log(`Updating avatar: ${img.src} → ${updatedAvatarUrl}`);
+                            img.src = updatedAvatarUrl;
+                            img.onerror = function () {
+                                this.src = '/images/default-avatar.png';
+                            };
+                        }
+                    });
+
+                    // Update full name
+                    const fullNameElements = document.querySelectorAll('.p-4 .font-semibold'); // Selector của FullName
+                    fullNameElements.forEach(element => {
+                        if (element && data.fullName) {
+                            console.log(`Updating full name: ${element.textContent} → ${data.fullName}`);
+                            element.textContent = data.fullName;
+                        }
+                    });
+
+                    // Update email
+                    const emailElements = document.querySelectorAll('.p-4 .text-sm');
+                    emailElements.forEach(element => {
+                        if (element && data.email) {
+                            console.log(`Updating email: ${element.textContent} → ${data.email}`);
+                            element.textContent = data.email;
+                        }
+                    });
+
+                    console.log('✅ Header refreshed successfully!');
+                })
+                .catch(error => {
+                    console.error('❌ Error refreshing header from session:', error);
+                });
+        };
+
+        // Auto-initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🚀 Mobile layout header refresh initialized');
+            console.log('💡 Available functions: refreshHeaderFromSession()');
+
+            // Test function for development
+            if (window.location.hostname === 'localhost') {
+                window.testSessionRefresh = function () {
+                    console.log('🧪 Testing session refresh...');
+                    return window.refreshHeaderFromSession();
+                };
+            }
+        });
+    </script>
+
 </body>
 </html>

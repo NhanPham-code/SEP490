@@ -5,169 +5,13 @@
 }
 
 @section Styles {
+    <!-- CSS riêng cho trang Profile -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .btn-gradient {
-            background: linear-gradient(90deg,#3b82f6 0%,#8b5cf6 100%);
-            color: #fff;
-            font-weight: 600;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.10);
-            transition: all 0.2s;
-            min-height: 44px;
-            min-width: 120px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-gradient:hover {
-            background: linear-gradient(90deg,#2563eb 0%,#8b5cf6 100%);
-            box-shadow: 0 8px 32px rgba(59,130,246,0.15);
-            transform: translateY(-2px) scale(1.04);
-        }
-        .btn-cancel {
-            background: #fff;
-            color: #8b5cf6;
-            border: 2px solid #8b5cf6;
-            border-radius: 12px;
-            font-weight: 600;
-            min-height: 44px;
-            min-width: 120px;
-            transition: all 0.2s;
-        }
-        .btn-cancel:hover {
-            background: #f3e8ff;
-            color: #7c3aed;
-            border-color: #7c3aed;
-        }
-        .avatar-glow {
-            box-shadow: 0 0 0 4px rgba(59,130,246,0.1), 0 0 20px rgba(59,130,246,0.3);
-        }
-        .avatar-edit-btn, .face-edit-btn {
-            background: rgba(59,130,246,0.93);
-            color: #fff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 8px rgba(59,130,246,0.12);
-            position: absolute;
-            right: 8px;
-            bottom: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            z-index: 2;
-        }
-        .avatar-edit-btn:hover, .face-edit-btn:hover {
-            background: #9333ea;
-        }
-        .modal-bg {
-            background: rgba(0,0,0,0.5);
-        }
-        .image-row {
-            display: flex;
-            justify-content: center;
-            gap: 2.5rem;
-            align-items: flex-end;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-        }
-        .avatar-container, .face-container {
-            position: relative;
-            width: 140px;
-            min-width: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-        .avatar-container img, .face-container img {
-            width: 130px;
-            height: 130px;
-            object-fit: cover;
-            border-radius: 1.5rem;
-            border: 4px solid #fff;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.09);
-        }
-        .avatar-container img {
-            border-radius: 50%;
-        }
-        .face-container img {
-            border-radius: 1.5rem;
-        }
-        .image-label {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 0.5rem;
-            font-weight: 600;
-            color: #6366f1;
-            font-size: 1.05rem;
-            background: linear-gradient(90deg,#e0e7ff 0%,#f3e8ff 100%);
-            border-radius: 0.75rem;
-            padding: 0.25rem 0;
-            box-shadow: 0 2px 8px rgba(99,102,241,0.02);
-        }
-        @@media (max-width: 800px) {
-            .image-row { gap: 1rem; }
-            .avatar-container, .face-container { width: 100px; min-width: 100px;}
-            .avatar-container img, .face-container img { width: 90px; height: 90px; }
-            .image-label { font-size: .97rem; padding: 0.18rem 0; }
-        }
-        @@media (max-width: 600px) {
-            .image-row { gap: 0.5rem; }
-            .avatar-container, .face-container { width: 78px; min-width: 78px;}
-            .avatar-container img, .face-container img { width: 62px; height: 62px; }
-            .image-label { font-size: .92rem; padding: 0.12rem 0; }
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            top: 1.5rem;
-            transform: translateX(-50%);
-            z-index: 9999;
-            min-width: 240px;
-            max-width: 96vw;
-            padding: 1rem 1.5rem;
-            border-radius: .75rem;
-            font-weight: 500;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
-            animation: fade-in .3s;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            pointer-events: auto;
-        }
-        .toast-success { background: #22c55e; color: #fff; }
-        .toast-error { background: #ef4444; color: #fff; }
-        .toast-loading { background: #fbbf24; color: #fff; }
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @@keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @@keyframes fade-in {
-            from { opacity: 0; transform: translateY(-10px);}
-            to { opacity: 1;}
-        }
-    </style>
+    <link href="~/css/common/profile.css" rel="stylesheet" />
 }
 
-<div id="toastContainer" style="pointer-events:none;"></div>
+<!-- Nội dung HTML của trang -->
+<div id="toastContainer" class="toast-container"></div>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -178,100 +22,193 @@
     </script>
 }
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 relative overflow-hidden">
+<!-- Back Button -->
+<button type="button" id="backBtn" class="back-to-home-btn" title="Quay lại">
+    <i class="ri-arrow-left-line"></i>
+    <span>Quay lại</span>
+</button>
+
+<div class="bg-gradient-sport">
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4 py-8">
-        <div class="profile-card w-full max-w-3xl rounded-3xl p-6 md:p-10 animate-slide-up">
-            <div class="image-row">
-                <div class="avatar-container group" id="avatarClick">
-                    <img id="avatarImg" src="@Model.AvatarUrl" alt="Avatar" class="avatar-glow" />
-                    <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
-                        <i class="ri-camera-line text-xl"></i>
-                    </div>
-                    <div class="image-label">Ảnh đại diện</div>
-                </div>
+        <div class="profile-card w-full max-w-4xl rounded-3xl p-6 md:p-10 animate-slide-up">
+
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                    Thông tin cá nhân
+                </h1>
+                <p class="text-gray-600 text-lg">Quản lý thông tin tài khoản của bạn</p>
             </div>
 
+            <!-- Avatar Section -->
+            <div class="avatar-section">
+                <div class="avatar-container group" id="avatarClick" title="Nhấn để thay đổi ảnh đại diện">
+                    <img id="avatarImg" src="@Context.Session.GetString("AvatarUrl")" alt="Avatar" class="avatar-glow" />
+                    <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
+                        <i class="ri-camera-line text-lg"></i>
+                    </div>
+                </div>
+                <div class="avatar-label">Ảnh đại diện</div>
+            </div>
+
+            <!-- Profile Form -->
             <form id="profileForm" method="post" action="#" class="space-y-6" autocomplete="off">
                 <input type="hidden" id="userIdInput" value="@Model.UserId" />
+
                 <div id="profileFields">
-                    <div id="profileReadMode">
-                        <div class="grid grid-cols-1 gap-6">
-                            <div>
-                                <label class="text-sm text-gray-500">Họ và tên</label>
-                                <div id="displayFullname" class="font-semibold text-gray-800">@Model.FullName</div>
+                    <!-- Read Mode -->
+                    <div id="profileReadMode" class="animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-user-line mr-2"></i>Họ và tên
+                                </label>
+                                <div id="displayFullname" class="form-display">@Model.FullName</div>
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Email</label>
-                                <div id="displayEmail" class="font-semibold text-gray-800">@Model.Email</div>
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-mail-line mr-2"></i>Email
+                                </label>
+                                <div id="displayEmail" class="form-display readonly-field">@Model.Email</div>
+                                <div class="readonly-notice">
+                                    <i class="ri-lock-line text-xs"></i>
+                                    <span>Email không thể thay đổi để bảo mật tài khoản</span>
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Số điện thoại</label>
-                                <div id="displayPhone" class="font-semibold text-gray-800">@Model.PhoneNumber</div>
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-phone-line mr-2"></i>Số điện thoại
+                                </label>
+                                <div id="displayPhone" class="form-display">@Model.PhoneNumber</div>
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Địa chỉ</label>
-                                <div id="displayAddress" class="font-semibold text-gray-800">@Model.Address</div>
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-map-pin-line mr-2"></i>Địa chỉ
+                                </label>
+                                <div id="displayAddress" class="form-display">@Model.Address</div>
                             </div>
                         </div>
                     </div>
-                    <div id="profileEditMode" class="hidden">
-                        <div class="grid grid-cols-1 gap-6">
-                            <div>
-                                <label class="text-sm text-gray-500">Họ và tên</label>
+
+                    <!-- Edit Mode -->
+                    <div id="profileEditMode" class="hidden animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-user-line mr-2"></i>Họ và tên
+                                </label>
                                 <input type="text" name="FullName" id="fullnameInput"
-                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.FullName" />
+                                       class="form-input" value="@Model.FullName"
+                                       placeholder="Nhập họ và tên" />
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Email</label>
-                                <input type="email" name="Email" id="emailInput"
-                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.Email" />
+                            <!-- EMAIL FIELD - CHỈ HIỂN THỊ, KHÔNG THỂ CHỈNH SỬA -->
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-mail-line mr-2"></i>Email
+                                </label>
+                                <div class="form-display readonly-field">@Model.Email</div>
+                                <div class="readonly-notice">
+                                    <i class="ri-lock-line text-xs"></i>
+                                    <span>Email không thể thay đổi để bảo mật tài khoản</span>
+                                </div>
+                                <!-- HIDDEN INPUT CHO FORM SUBMISSION -->
+                                <input type="hidden" name="Email" id="emailInput" value="@Model.Email" />
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Số điện thoại</label>
-                                <input type="text" name="PhoneNumber" id="phoneInput"
-                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.PhoneNumber" />
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-phone-line mr-2"></i>Số điện thoại
+                                </label>
+                                <input type="tel" name="PhoneNumber" id="phoneInput"
+                                       class="form-input" value="@Model.PhoneNumber"
+                                       placeholder="Nhập số điện thoại" />
                             </div>
-                            <div>
-                                <label class="text-sm text-gray-500">Địa chỉ</label>
+                            <div class="form-field">
+                                <label class="form-label">
+                                    <i class="ri-map-pin-line mr-2"></i>Địa chỉ
+                                </label>
                                 <input type="text" name="Address" id="addressInput"
-                                       class="w-full border-b-2 border-primary py-2 text-base font-semibold outline-none" value="@Model.Address" />
+                                       class="form-input" value="@Model.Address"
+                                       placeholder="Nhập địa chỉ" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-4 justify-center mt-8">
+
+                <!-- Action Buttons -->
+                <div class="form-buttons mt-8">
                     <button type="button" id="editBtn" class="btn-gradient">
                         <i class="ri-edit-line text-lg"></i>
-                        <span>Sửa thông tin</span>
+                        <span>Chỉnh sửa</span>
                     </button>
                     <button type="submit" id="saveBtn" class="btn-gradient hidden">
                         <i class="ri-save-3-line text-lg"></i>
-                        <span>Lưu</span>
+                        <span>Lưu thay đổi</span>
                     </button>
                     <button type="button" id="cancelBtn" class="btn-cancel hidden">
                         <i class="ri-close-line text-lg"></i>
-                        <span>Huỷ</span>
+                        <span>Hủy bỏ</span>
                     </button>
                 </div>
             </form>
+
+            <!-- Stats Section -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="stat-card">
+                    <i class="ri-user-check-line text-2xl text-blue-600 mb-2"></i>
+                    <div class="font-semibold text-gray-800">Tài khoản đã xác thực</div>
+                    <div class="text-sm text-gray-500">Bảo mật cao</div>
+                </div>
+                <div class="stat-card">
+                    <i class="ri-shield-check-line text-2xl text-green-600 mb-2"></i>
+                    <div class="font-semibold text-gray-800">Email được bảo vệ</div>
+                    <div class="text-sm text-gray-500">Không thể thay đổi</div>
+                </div>
+                <div class="stat-card">
+                    <i class="ri-time-line text-2xl text-purple-600 mb-2"></i>
+                    <div class="font-semibold text-gray-800">Hoạt động gần đây</div>
+                    <div class="text-sm text-gray-500">Hôm nay</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Avatar Upload -->
-<div id="avatarModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-3xl p-8 shadow-lg w-full max-w-md relative">
-        <button type="button" onclick="closeModal('avatarModal')" class="btn-cancel absolute top-4 right-4" title="Đóng">
-            <i class="ri-close-line text-2xl"></i>
+<!-- Enhanced Avatar Upload Modal -->
+<div id="avatarModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden">
+    <div class="modal-content w-full max-w-md relative">
+        <button type="button" onclick="closeModal('avatarModal')" class="modal-close-btn" title="Đóng">
+            <i class="ri-close-line text-lg"></i>
         </button>
-        <h2 class="text-xl font-bold mb-4">Cập nhật ảnh đại diện</h2>
+
+        <h2 class="text-xl font-bold mb-6 text-center">
+            <i class="ri-camera-line mr-2 text-blue-600"></i>
+            Cập nhật ảnh đại diện
+        </h2>
+
         <form id="avatarForm" enctype="multipart/form-data" method="post" action="#">
-            <input type="file" id="avatarUpload" name="avatar" accept="image/*" class="mb-4 block w-full" />
-            <img id="avatarPreviewModal" src="" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
-            <div id="avatarLoading" class="flex justify-center mb-4 hidden">
-                <span class="loading-spinner"></span>
+            <!-- HIDDEN FILE INPUT -->
+            <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;" />
+
+            <!-- FILE UPLOAD AREA -->
+            <div class="file-upload mb-6" id="fileUploadArea" style="cursor: pointer;">
+                <i class="ri-upload-cloud-2-line text-3xl text-gray-400 mb-2" style="pointer-events: none;"></i>
+                <p class="text-gray-600 font-medium" style="pointer-events: none;">Nhấn để chọn ảnh</p>
+                <p class="text-sm text-gray-400 mt-1" style="pointer-events: none;">JPG, PNG hoặc GIF (tối đa 5MB)</p>
             </div>
-            <button type="submit" class="w-full btn-gradient mt-2">
+
+            <!-- IMAGE PREVIEW -->
+            <div id="imagePreviewContainer" class="text-center mb-4 hidden">
+                <p class="text-sm text-gray-600 mb-2">Ảnh đã chọn:</p>
+                <img id="avatarPreviewModal" src="" class="avatar-preview mx-auto" />
+                <p id="fileInfo" class="text-xs text-gray-500 mt-2"></p>
+            </div>
+
+            <div id="avatarLoading" class="flex justify-center items-center py-4 hidden">
+                <div class="loading-spinner mr-3"></div>
+                <span class="text-gray-600">Đang tải lên...</span>
+            </div>
+
+            <button type="submit" class="w-full btn-gradient mt-4" id="uploadAvatarBtn" disabled>
                 <i class="ri-upload-cloud-2-line text-lg"></i>
                 <span>Lưu ảnh mới</span>
             </button>
@@ -280,168 +217,536 @@
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jQuery được load trong Layout, có thể sử dụng trực tiếp -->
+    
     <script>
-        // Toast notification
-        function showToast(message, type = "success") {
-            const icons = {
-                success: '<i class="ri-checkbox-circle-line text-xl"></i>',
-                error: '<i class="ri-close-circle-line text-xl"></i>',
-                loading: '<span class="loading-spinner"></span>'
+        'use strict';
+
+        // Profile Page Module - Namespace để tránh xung đột global
+        window.ProfilePage = (function() {
+            // Private variables
+            let originalData = {
+                fullname: '',
+                phone: '',
+                address: '',
+                userId: '',
+                email: ''
             };
-            const toast = document.createElement("div");
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `${icons[type] || ''}<span>${message}</span>`;
-            document.getElementById("toastContainer").appendChild(toast);
-            if (type !== "loading") {
-                setTimeout(() => { toast.remove(); }, 2700);
+
+            let editBtn, saveBtn, cancelBtn, profileReadMode, profileEditMode, profileForm, backBtn;
+            let editMode = false;
+
+            // Enhanced Toast System
+            function showToast(message, type = "success", duration = 3000) {
+                const icons = {
+                    success: '<i class="ri-checkbox-circle-line text-xl"></i>',
+                    error: '<i class="ri-close-circle-line text-xl"></i>',
+                    loading: '<div class="loading-spinner"></div>',
+                    warning: '<i class="ri-alert-line text-xl"></i>'
+                };
+
+                const toast = document.createElement("div");
+                toast.className = `toast toast-${type}`;
+                toast.innerHTML = `
+                    ${icons[type] || ''}
+                    <span class="flex-1">${message}</span>
+                    ${type !== 'loading' ? '<i class="ri-close-line cursor-pointer ml-2" onclick="this.parentElement.remove()"></i>' : ''}
+                `;
+
+                const container = document.getElementById("toastContainer");
+                if (container) {
+                    container.appendChild(toast);
+
+                    if (type !== "loading" && duration > 0) {
+                        setTimeout(() => {
+                            if (toast.parentElement) {
+                                toast.style.animation = 'fadeOut 0.3s ease';
+                                setTimeout(() => {
+                                    if (toast.parentElement) {
+                                        toast.remove();
+                                    }
+                                }, 300);
+                            }
+                        }, duration);
+                    }
+                }
+
+                return toast;
             }
-            return toast;
-        }
 
-        function removeLoadingToast(toast) {
-            if (toast) toast.remove();
-        }
+            function removeLoadingToast(toast) {
+                if (toast && toast.parentElement) {
+                    toast.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }
 
-        // Data setup
-        const originalData = {
-            fullname: document.getElementById("fullnameInput").value,
-            email: document.getElementById("emailInput").value,
-            phone: document.getElementById("phoneInput").value,
-            address: document.getElementById("addressInput").value,
-            userId: document.getElementById("userIdInput")?.value
+            // Initialize data
+            function initializeData() {
+                const fullnameInput = document.getElementById("fullnameInput");
+                const phoneInput = document.getElementById("phoneInput");
+                const addressInput = document.getElementById("addressInput");
+                const userIdInput = document.getElementById("userIdInput");
+                const emailInput = document.getElementById("emailInput");
+
+                originalData.fullname = fullnameInput ? fullnameInput.value || '' : '';
+                originalData.phone = phoneInput ? phoneInput.value || '' : '';
+                originalData.address = addressInput ? addressInput.value || '' : '';
+                originalData.userId = userIdInput ? userIdInput.value || '' : '';
+                originalData.email = emailInput ? emailInput.value || '' : '';
+
+                console.log('Original data initialized:', originalData);
+            }
+
+            // Initialize UI Elements
+            function initializeUIElements() {
+                editBtn = document.getElementById("editBtn");
+                saveBtn = document.getElementById("saveBtn");
+                cancelBtn = document.getElementById("cancelBtn");
+                profileReadMode = document.getElementById("profileReadMode");
+                profileEditMode = document.getElementById("profileEditMode");
+                profileForm = document.getElementById("profileForm");
+                backBtn = document.getElementById("backBtn");
+
+                console.log('UI Elements initialized');
+            }
+
+            // Enhanced Back Button Functionality
+            function handleBackNavigation() {
+                console.log('Back button clicked');
+                
+                if (editMode) {
+                    if (confirm('Bạn có thay đổi chưa được lưu. Bạn có muốn thoát không?')) {
+                        toggleEditMode(false);
+                        goBack();
+                    }
+                    return;
+                }
+                
+                goBack();
+            }
+
+            function goBack() {
+                if (document.referrer && document.referrer !== window.location.href) {
+                    window.history.back();
+                } else if (window.history.length > 1) {
+                    window.history.go(-1);
+                } else {
+                    window.location.href = '/';
+                }
+            }
+
+            // Enhanced Edit Mode Toggle
+            function toggleEditMode(isEdit) {
+                console.log('Toggle edit mode:', isEdit);
+
+                editMode = isEdit;
+
+                if (isEdit) {
+                    if (profileReadMode) profileReadMode.classList.add("hidden");
+                    if (profileEditMode) profileEditMode.classList.remove("hidden");
+                    if (editBtn) editBtn.classList.add("hidden");
+                    if (saveBtn) saveBtn.classList.remove("hidden");
+                    if (cancelBtn) cancelBtn.classList.remove("hidden");
+
+                    setTimeout(() => {
+                        const fullnameInput = document.getElementById("fullnameInput");
+                        if (fullnameInput) {
+                            fullnameInput.focus();
+                        }
+                    }, 100);
+                } else {
+                    if (profileReadMode) profileReadMode.classList.remove("hidden");
+                    if (profileEditMode) profileEditMode.classList.add("hidden");
+                    if (editBtn) editBtn.classList.remove("hidden");
+                    if (saveBtn) saveBtn.classList.add("hidden");
+                    if (cancelBtn) cancelBtn.classList.add("hidden");
+
+                    // Reset form data
+                    const fullnameInput = document.getElementById("fullnameInput");
+                    const phoneInput = document.getElementById("phoneInput");
+                    const addressInput = document.getElementById("addressInput");
+
+                    if (fullnameInput) fullnameInput.value = originalData.fullname;
+                    if (phoneInput) phoneInput.value = originalData.phone;
+                    if (addressInput) addressInput.value = originalData.address;
+                }
+            }
+
+            // Enhanced Form Validation
+            function validateForm() {
+                const fullnameInput = document.getElementById("fullnameInput");
+                const phoneInput = document.getElementById("phoneInput");
+
+                if (!fullnameInput) {
+                    console.error('Fullname input not found');
+                    return false;
+                }
+
+                const fullname = fullnameInput.value.trim();
+                const phone = phoneInput ? phoneInput.value.trim() : '';
+
+                if (!fullname) {
+                    showToast("Vui lòng nhập họ và tên", "error");
+                    fullnameInput.focus();
+                    return false;
+                }
+
+                if (phone) {
+                    const phoneRegex = /^[0-9]{10,11}$/;
+                    if (!phoneRegex.test(phone)) {
+                        showToast("Số điện thoại không hợp lệ (10-11 số)", "error");
+                        phoneInput.focus();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            // Modal Functions
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    resetModalState();
+                }
+            }
+
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('hidden');
+                    resetModalState();
+                }
+            }
+
+            function resetModalState() {
+                const avatarUpload = document.getElementById('avatarUpload');
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const uploadBtn = document.getElementById('uploadAvatarBtn');
+
+                if (avatarUpload) avatarUpload.value = '';
+                if (previewContainer) previewContainer.classList.add('hidden');
+                if (uploadBtn) uploadBtn.disabled = true;
+            }
+
+            // File handling functions
+            function triggerFileSelect() {
+                const avatarUpload = document.getElementById('avatarUpload');
+                if (avatarUpload) {
+                    avatarUpload.click();
+                } else {
+                    showToast("Lỗi: Không thể mở hộp thoại chọn file", "error");
+                }
+            }
+
+            function handleFileSelect(file) {
+                console.log('File selected:', file.name, file.size, file.type);
+
+                if (!file.type.startsWith('image/')) {
+                    showToast("Vui lòng chọn file ảnh (JPG, PNG, GIF)", "error");
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast("File quá lớn, vui lòng chọn file dưới 5MB", "error");
+                    return;
+                }
+
+                const reader = new FileReader();
+                const avatarPreview = document.getElementById('avatarPreviewModal');
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const fileInfo = document.getElementById('fileInfo');
+                const uploadBtn = document.getElementById('uploadAvatarBtn');
+
+                reader.onload = function (e) {
+                    if (avatarPreview && previewContainer) {
+                        avatarPreview.src = e.target.result;
+                        previewContainer.classList.remove('hidden');
+
+                        if (fileInfo) {
+                            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                            fileInfo.textContent = `${file.name} (${sizeInMB} MB)`;
+                        }
+
+                        if (uploadBtn) {
+                            uploadBtn.disabled = false;
+                        }
+
+                        showToast("Ảnh đã được chọn và hiển thị", "success", 1500);
+                    }
+                };
+
+                reader.onerror = function () {
+                    showToast("Lỗi khi đọc file ảnh", "error");
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            // Initialize all event listeners
+            function initializeEventListeners() {
+                // Back Button Event
+                if (backBtn) {
+                    backBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        handleBackNavigation();
+                    });
+                }
+
+                // Edit Button Event
+                if (editBtn) {
+                    editBtn.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        toggleEditMode(true);
+                    });
+                }
+
+                // Cancel Button Event
+                if (cancelBtn) {
+                    cancelBtn.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        toggleEditMode(false);
+                    });
+                }
+
+                // Avatar Click Event
+                const avatarContainer = document.getElementById('avatarClick');
+                if (avatarContainer) {
+                    avatarContainer.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        openModal('avatarModal');
+                    });
+                }
+
+                // File upload events
+                const fileUploadArea = document.getElementById('fileUploadArea');
+                const avatarUpload = document.getElementById('avatarUpload');
+
+                if (fileUploadArea) {
+                    fileUploadArea.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        triggerFileSelect();
+                    });
+                }
+
+                if (avatarUpload) {
+                    avatarUpload.addEventListener('change', function (e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            handleFileSelect(file);
+                        }
+                    });
+                }
+
+                // Form submissions
+                if (profileForm) {
+                    profileForm.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        
+                        if (!editMode || !validateForm()) return;
+
+                        const loadingToast = showToast("Đang cập nhật thông tin...", "loading");
+
+                        const fullnameInput = document.getElementById("fullnameInput");
+                        const addressInput = document.getElementById("addressInput");
+                        const phoneInput = document.getElementById("phoneInput");
+
+                        const dto = {
+                            userId: originalData.userId,
+                            fullname: fullnameInput ? fullnameInput.value.trim() : '',
+                            email: originalData.email,
+                            address: addressInput ? addressInput.value.trim() : '',
+                            phoneNumber: phoneInput ? phoneInput.value.trim() : ''
+                        };
+
+                        if (saveBtn) saveBtn.disabled = true;
+                        if (cancelBtn) cancelBtn.disabled = true;
+
+                        $.ajax({
+                            url: '/Common/UpdateProfile',
+                            type: 'POST',
+                            data: dto,
+                            timeout: 10000,
+                            success: function (updatedUser) {
+                                removeLoadingToast(loadingToast);
+
+                                console.log('Update profile success');
+
+                                // Update profile display
+                                document.getElementById("displayFullname").textContent = updatedUser.fullName;
+                                document.getElementById("displayPhone").textContent = updatedUser.phoneNumber;
+                                document.getElementById("displayAddress").textContent = updatedUser.address;
+
+                                // Refresh header để lấy dữ liệu session mới
+                                if (typeof window.refreshHeaderFromSession === 'function') {
+                                    window.refreshHeaderFromSession();
+                                }
+
+                                showToast("Cập nhật thông tin thành công!", "success");
+                                toggleEditMode(false);
+                            },
+                            error: function (xhr) {
+                                removeLoadingToast(loadingToast);
+                                const res = xhr.responseJSON;
+                                const errorMessage = res && res.message ? res.message : 'Có lỗi xảy ra, vui lòng thử lại!';
+                                showToast(errorMessage, "error");
+                            },
+                            complete: function () {
+                                if (saveBtn) saveBtn.disabled = false;
+                                if (cancelBtn) cancelBtn.disabled = false;
+                            }
+                        });
+                    });
+                }
+
+                // Avatar form submission
+                const avatarForm = document.getElementById('avatarForm');
+                if (avatarForm) {
+                    avatarForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const file = avatarUpload ? avatarUpload.files[0] : null;
+                        if (!file) {
+                            showToast("Vui lòng chọn ảnh trước khi tải lên", "error");
+                            return;
+                        }
+
+                        const loadingElm = document.getElementById('avatarLoading');
+                        const uploadBtn = document.getElementById('uploadAvatarBtn');
+
+                        if (loadingElm) loadingElm.classList.remove('hidden');
+                        if (uploadBtn) uploadBtn.disabled = true;
+
+                        const loadingToast = showToast("Đang tải lên ảnh đại diện...", "loading");
+
+                        const formData = new FormData();
+                        formData.append('userId', originalData.userId);
+                        formData.append('avatar', file);
+
+                        $.ajax({
+                            url: '/Common/UpdateAvatar',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            timeout: 30000,
+                            success: function (updatedUser) {
+                                // Hide loading elements
+                                if (loadingElm) loadingElm.classList.add('hidden');
+                                removeLoadingToast(loadingToast);
+
+                                // Update avatar in profile page
+                                const avatarImg = document.getElementById("avatarImg");
+                                if (avatarImg) {
+                                    const avatarUrl = updatedUser.avatarUrl || 'https://localhost:7136/avatars/default-avatar.png';
+                                    avatarImg.src = avatarUrl + '?t=' + Date.now(); // Add cache buster
+                                }
+
+                                // Refresh header để lấy dữ liệu session mới
+                                if (typeof window.refreshHeaderFromSession === 'function') {
+                                    console.log('🔄 Refreshing header from session...');
+                                    window.refreshHeaderFromSession();
+                                } else {
+                                    console.error('❌ refreshHeaderFromSession function not found');
+                                }
+
+                                showToast("Cập nhật ảnh đại diện thành công!", "success");
+                                closeModal('avatarModal');
+                            },
+                            error: function (xhr) {
+                                // Hide loading elements and display error
+                                if (loadingElm) loadingElm.classList.add('hidden');
+                                removeLoadingToast(loadingToast);
+
+                                const res = xhr.responseJSON;
+                                const errorMessage = res && res.message ? res.message : 'Có lỗi xảy ra khi tải lên ảnh!';
+                                showToast(errorMessage, "error");
+                            },
+                            complete: function () {
+                                if (uploadBtn) uploadBtn.disabled = false;
+                            }
+                        });
+                    });
+                }
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        if (editMode) {
+                            toggleEditMode(false);
+                        } else {
+                            handleBackNavigation();
+                        }
+                    }
+
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's' && editMode) {
+                        e.preventDefault();
+                        if (profileForm) profileForm.dispatchEvent(new Event('submit'));
+                    }
+                });
+
+                // Browser back button handling
+                window.addEventListener('popstate', function(e) {
+                    if (editMode) {
+                        e.preventDefault();
+                        if (confirm('Bạn có thay đổi chưa được lưu. Bạn có muốn thoát không?')) {
+                            toggleEditMode(false);
+                        } else {
+                            window.history.pushState(null, '', window.location.href);
+                        }
+                    }
+                });
+
+                // Mobile-specific enhancements
+                if (window.innerWidth <= 768) {
+                    const editableInputs = document.querySelectorAll('input:not([type="hidden"]):not([type="file"])');
+                    editableInputs.forEach(input => {
+                        input.addEventListener('focus', function () {
+                            this.style.fontSize = '16px';
+                        });
+                    });
+                }
+
+                // Handle orientation change
+                window.addEventListener('orientationchange', function () {
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                    }, 500);
+                });
+            }
+
+            // Public initialization method
+            function init() {
+                initializeData();
+                initializeUIElements();
+                initializeEventListeners();
+                
+                showToast("Trang profile đã sẵn sàng", "success", 2000);
+                console.log('Profile page initialized successfully');
+            }
+
+            // Public API
+            return {
+                init: init,
+                closeModal: closeModal // Export for global access
+            };
+        })();
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            console.log('jQuery ready, initializing profile page...');
+            window.ProfilePage.init();
+        });
+
+        // Make closeModal globally available for onclick handlers
+        window.closeModal = function(modalId) {
+            window.ProfilePage.closeModal(modalId);
         };
-
-        const editBtn = document.getElementById("editBtn");
-        const saveBtn = document.getElementById("saveBtn");
-        const cancelBtn = document.getElementById("cancelBtn");
-        const profileReadMode = document.getElementById("profileReadMode");
-        const profileEditMode = document.getElementById("profileEditMode");
-        const profileForm = document.getElementById("profileForm");
-        let editMode = false;
-
-        // Edit mode toggle
-        editBtn.addEventListener("click", function () {
-            editMode = true;
-            profileReadMode.classList.add("hidden");
-            profileEditMode.classList.remove("hidden");
-            editBtn.classList.add("hidden");
-            saveBtn.classList.remove("hidden");
-            cancelBtn.classList.remove("hidden");
-        });
-
-        cancelBtn.addEventListener("click", function () {
-            editMode = false;
-            profileReadMode.classList.remove("hidden");
-            profileEditMode.classList.add("hidden");
-            editBtn.classList.remove("hidden");
-            saveBtn.classList.add("hidden");
-            cancelBtn.classList.add("hidden");
-
-            // reset lại dữ liệu
-            document.getElementById("fullnameInput").value = originalData.fullname;
-            document.getElementById("emailInput").value = originalData.email;
-            document.getElementById("phoneInput").value = originalData.phone;
-            document.getElementById("addressInput").value = originalData.address;
-        });
-
-        // AJAX update profile
-        profileForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            if (!editMode) return false;
-            const loadingToast = showToast("Đang cập nhật thông tin...", "loading");
-            const dto = {
-                userId: originalData.userId,
-                fullname: document.getElementById("fullnameInput").value,
-                email: document.getElementById("emailInput").value,
-                address: document.getElementById("addressInput").value,
-                phoneNumber: document.getElementById("phoneInput").value
-            };
-
-            $.ajax({
-                url: '/Common/UpdateProfile',
-                type: 'POST',
-                data: dto,
-                success: function (updatedUser) {
-                    removeLoadingToast(loadingToast);
-                    document.getElementById("displayFullname").textContent = updatedUser.fullName;
-                    document.getElementById("displayEmail").textContent = updatedUser.email;
-                    document.getElementById("displayPhone").textContent = updatedUser.phoneNumber;
-                    document.getElementById("displayAddress").textContent = updatedUser.address;
-
-                    // Update lại dữ liệu gốc
-                    originalData.fullname = updatedUser.fullName;
-                    originalData.email = updatedUser.email;
-                    originalData.phone = updatedUser.phoneNumber;
-                    originalData.address = updatedUser.address;
-
-                    showToast("Cập nhật thành công!", "success");
-                    cancelBtn.click(); // thoát chế độ edit
-                },
-                error: function (xhr) {
-                    removeLoadingToast(loadingToast);
-                    var res = xhr.responseJSON;
-                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra!', "error");
-                }
-            });
-        });
-
-        // Avatar
-        document.getElementById('avatarClick').addEventListener('click', function () {
-            document.getElementById('avatarModal').classList.remove('hidden');
-        });
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        document.getElementById('avatarUpload').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) document.getElementById('avatarPreviewModal').src = URL.createObjectURL(file);
-        });
-
-        document.getElementById('avatarForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const loadingElm = document.getElementById('avatarLoading');
-            loadingElm.classList.remove('hidden');
-            const loadingToast = showToast("Đang cập nhật ảnh đại diện...", "loading");
-
-            const formData = new FormData();
-            formData.append('userId', originalData.userId);
-            formData.append('avatar', document.getElementById('avatarUpload').files[0]);
-
-            $.ajax({
-                url: '/Common/UpdateAvatar',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (updatedUser) {
-                    loadingElm.classList.add('hidden');
-                    removeLoadingToast(loadingToast);
-                    document.getElementById("avatarImg").src = updatedUser.avatarUrl || '/images/default-avatar.png';
-                    showToast("Cập nhật avatar thành công!", "success");
-                    closeModal('avatarModal');
-                },
-                error: function (xhr) {
-                    loadingElm.classList.add('hidden');
-                    removeLoadingToast(loadingToast);
-                    var res = xhr.responseJSON;
-                    showToast(res && res.message ? res.message : 'Có lỗi xảy ra khi cập nhật avatar!', "error");
-                }
-            });
-        });
-
-        // Always scroll to top and center toast (for mobile)
-        function adjustToastPosition() {
-            var container = document.getElementById("toastContainer");
-            if (container && container.childNodes.length > 0) {
-                window.scrollTo({top: 0, behavior: "smooth"});
-            }
-        }
-        const observer = new MutationObserver(function() {
-            adjustToastPosition();
-        });
-        observer.observe(document.getElementById("toastContainer"), {childList: true});
     </script>
 }

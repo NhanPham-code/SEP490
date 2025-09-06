@@ -582,9 +582,10 @@
                                 <button @@click="open = !open"
                                         class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
                                     <img src="@avatarUrl" alt="Avatar"
-                                         class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300" />
+                                         class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
+                                         data-user-avatar />
                                     <div class="hidden xl:block text-left">
-                                        <p class="text-sm font-bold text-slate-800 leading-none">@(fullName?.Split(' ').FirstOrDefault() ?? "User")</p>
+                                        <p class="text-sm font-bold text-slate-800 leading-none" data-user-firstname>@(fullName?.Split(' ').FirstOrDefault() ?? "User")</p>
                                         <p class="text-xs text-slate-600 font-medium">Premium</p>
                                     </div>
                                     <i class="ri-arrow-down-s-line text-slate-500 group-hover:text-blue-600 transition-all duration-300 text-sm"
@@ -606,10 +607,11 @@
                                     <div class="p-6 border-b border-slate-200">
                                         <div class="flex items-center space-x-4">
                                             <img src="@avatarUrl" alt="Avatar"
-                                                 class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg" />
+                                                 class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
+                                                 data-user-avatar />
                                             <div class="flex-1">
-                                                <p class="font-bold text-slate-800 text-base">@fullName</p>
-                                                <p class="text-sm text-slate-600 mt-1">@Context.Session.GetString("Email")</p>
+                                                <p class="font-bold text-slate-800 text-base" data-user-fullname>@fullName</p>
+                                                <p class="text-sm text-slate-600 mt-1" data-user-email>@Context.Session.GetString("Email")</p>
                                                 <span class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold mt-2">
                                                     <i class="ri-vip-crown-line mr-1"></i>Premium
                                                 </span>
@@ -926,5 +928,45 @@
     </script>
 
     @RenderSection("Scripts", required: false)
+
+    // update user info in header dynamically
+
+    <script>
+        // Simplified function - sử dụng session data từ server
+        window.refreshHeaderFromSession = function () {
+            console.log('🔄 Refreshing header with latest session data from server...');
+
+            fetch('/Common/GetUserHeaderInfo')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Latest session data:', data);
+
+                    // Update avatar images
+                    document.querySelectorAll('img[data-user-avatar]').forEach(img => {
+                        const newSrc = `${data.avatarUrl}?t=${Date.now()}`;
+                        console.log(`Avatar: ${img.src} → ${newSrc}`);
+                        img.src = newSrc;
+                    });
+
+                    // Update names
+                    document.querySelectorAll('[data-user-firstname]').forEach(el => {
+                        el.textContent = data.fullName.split(' ')[0] || 'User';
+                    });
+
+                    document.querySelectorAll('[data-user-fullname]').forEach(el => {
+                        el.textContent = data.fullName;
+                    });
+
+                    document.querySelectorAll('[data-user-email]').forEach(el => {
+                        el.textContent = data.email;
+                    });
+
+                    console.log('✅ Header updated successfully');
+                })
+                .catch(error => {
+                    console.error('❌ Failed to refresh header from session:', error);
+                });
+        };
+    </script>
 </body>
 </html>

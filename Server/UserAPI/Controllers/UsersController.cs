@@ -37,7 +37,7 @@ namespace UserAPI.Controllers
 
             if (!result.IsValid)
             {
-                return Unauthorized(new { message = result.Message });
+                return Unauthorized(result);
             }
 
             return Ok(result);
@@ -104,10 +104,10 @@ namespace UserAPI.Controllers
         }
 
         /// <summary>
-        /// api/Users/register
+        /// api/Users/CustomerRegister
         /// </summary>
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] CustomerRegisterRequestDTO request)
+        [HttpPost("CustomerRegister")]
+        public async Task<IActionResult> CustomerRegister([FromForm] CustomerRegisterRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -117,6 +117,32 @@ namespace UserAPI.Controllers
             try
             {
                 var newUser = await _userService.CustomerRegisterAsync(request);
+                return Ok(new { message = "Register successful", user = newUser });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while registering user.", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// api/Users/ManagerRegister
+        /// </summary>
+        [HttpPost("ManagerRegister")]
+        public async Task<IActionResult> ManagerRegister([FromForm] StadiumManagerRegisterRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var newUser = await _userService.StadiumManagerRegisterAsync(request);
                 return Ok(new { message = "Register successful", user = newUser });
             }
             catch (InvalidOperationException ex)
@@ -276,6 +302,29 @@ namespace UserAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while updating avatar.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _userService.ResetPasswordAsync(dto);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Failed to reset password. Email may not exist." });
+                }
+                return Ok(new { message = "Password reset successful." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while resetting password.", error = ex.Message });
             }
         }
     }

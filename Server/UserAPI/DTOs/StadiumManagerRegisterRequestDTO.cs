@@ -25,6 +25,8 @@ namespace UserAPI.DTOs
         [DateOfBirth(18)] // bắt buộc >= 18 tuổi
         public string? DateOfBirth { get; set; }
 
+        public IFormFile? Avatar { get; set; }
+
         public IFormFile? FrontCCCDImage { get; set; }
 
         public IFormFile? RearCCCDImage { get; set; }

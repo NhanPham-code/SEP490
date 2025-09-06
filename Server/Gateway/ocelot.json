@@ -38,7 +38,7 @@
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Users/register",
+      "DownstreamPathTemplate": "/api/Users/CustomerRegister",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -46,7 +46,19 @@
           "Port": 7295
         }
       ],
-      "UpstreamPathTemplate": "/users/register",
+      "UpstreamPathTemplate": "/users/CustomerRegister",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/ManagerRegister",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/ManagerRegister",
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
@@ -212,7 +224,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/forgot-password",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": [ "PUT" ]
     },
     // === BOOKING API ===
     {

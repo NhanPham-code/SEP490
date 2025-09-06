@@ -45,7 +45,6 @@ builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,10 +63,8 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Common}/{action=Login}/{id?}");
 
 app.Run();

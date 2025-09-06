@@ -11,7 +11,9 @@ namespace Service.Interfaces
     {
         Task<LoginResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO);
 
-        Task<bool> RegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
+        Task<bool> CustomerRegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
+
+        Task<bool> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerRequestDTO);
 
         Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
 
@@ -28,5 +30,7 @@ namespace Service.Interfaces
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
 
         Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
+
+        Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
     }
 }

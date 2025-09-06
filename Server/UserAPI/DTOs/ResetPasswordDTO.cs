@@ -8,7 +8,7 @@ namespace UserAPI.DTOs
         public string Email { get; set; } = null!;
 
         [Required]
-        [MinLength(3)]
+        [MinLength(6)]
         public string NewPassword { get; set; } = null!;
     }
 }
