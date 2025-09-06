@@ -935,6 +935,71 @@
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
       }
+    },
+    // == Stadium Video ==
+    {
+      "DownstreamPathTemplate": "/api/AllStadiumVideos",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/AllStadiumVideos",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumVideoById",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/StadiumVideoById",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/AddStadiumVideo",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/AddStadiumVideo",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/DeleteStadiumVideoById",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/DeleteStadiumVideoById",
+      "UpstreamHttpMethod": [ "DELETE" ]
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "Bearer",
+      //  "RequireAuthentication": true
+      //}
+    },
+    {
+      "DownstreamPathTemplate": "/api/DeleteStadiumVideosByStadiumId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/deleteStadiumVideosByStadiumId",
+      "UpstreamHttpMethod": [ "DELETE" ]
     }
   ],
   "GlobalConfiguration": {

@@ -9,17 +9,19 @@ namespace StadiumManagerUI.Controllers
     {
         private readonly IStadiumService _service;
         private readonly IStadiumImageService _imageService;
+        private readonly IStadiumVideoSetvice _videoService;
 
         [BindProperty]
         public CreateStadiumRequest CreateStadiumRequest { get; set; } = new CreateStadiumRequest();
 
         [BindProperty]
-        public UpdateStadiumRequest UpdateStadiumRequest { get; set; } = new UpdateStadiumRequest();
+        public UpdateStadiumRequest updateStadiumRequest { get; set; } = new UpdateStadiumRequest();
 
-        public StadiumManagerController(IStadiumService service, IStadiumImageService imageService)
+        public StadiumManagerController(IStadiumService service, IStadiumImageService imageService, IStadiumVideoSetvice videoService)
         {
             _service = service;
             _imageService = imageService;
+            _videoService = videoService;
         }
 
         public IActionResult Stadium()
@@ -36,6 +38,10 @@ namespace StadiumManagerUI.Controllers
         public async Task<IActionResult> CreateNewStadium()
         {
             CreateStadiumRequest.Stadium.CreatedBy = 3;
+            if (CreateStadiumRequest.StadiumImage == null)
+            {
+                return Json(new { success = 400 });
+            }
             var stadium = await _service.CreateStadiumAsync(CreateStadiumRequest.Stadium);
 
             if (stadium == null)
@@ -48,7 +54,12 @@ namespace StadiumManagerUI.Controllers
                 {
                     imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
                 }
+                foreach (var imageDto in CreateStadiumRequest.StadiumVideo)
+                {
+                    imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                }
                 var image = await _imageService.AddStadiumImageAsync(CreateStadiumRequest.StadiumImage);
+                var video = await _videoService.AddStadiumVideoAsync(CreateStadiumRequest.StadiumVideo);
             }
 
             return Json(new { success = 200, value = stadium });
@@ -56,8 +67,8 @@ namespace StadiumManagerUI.Controllers
 
         public async Task<IActionResult> UpdateStadium()
         {
-            UpdateStadiumRequest.Stadium.CreatedBy = 3;
-            var stadium = await _service.UpdateStadiumAsync(UpdateStadiumRequest.Stadium.Id, UpdateStadiumRequest.Stadium);
+            updateStadiumRequest.Stadium.CreatedBy = 3;
+            var stadium = await _service.UpdateStadiumAsync(updateStadiumRequest.Stadium.Id, updateStadiumRequest.Stadium);
             bool check = false;
             if (stadium == null)
             {
@@ -65,18 +76,31 @@ namespace StadiumManagerUI.Controllers
             }
             else
             {
-                if (UpdateStadiumRequest.StadiumImage.Any())
+                if (updateStadiumRequest.StadiumImage.Any())
                 {
-                    foreach (var imageDto in UpdateStadiumRequest.StadiumImage)
+                    foreach (var imageDto in updateStadiumRequest.StadiumImage)
                     {
                         imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
                     }
-                    var image = await _imageService.AddStadiumImageAsync(UpdateStadiumRequest.StadiumImage);
+                    var image = await _imageService.AddStadiumImageAsync(updateStadiumRequest.StadiumImage);
                     if (image != null) check = true;
                 }
-                if (UpdateStadiumRequest.DeletedImageIds.Any())
+                if (updateStadiumRequest.DeletedImageIds.Any())
                 {
-                    check = await _imageService.DeleteStadiumImageByIdAsync(UpdateStadiumRequest.DeletedImageIds);
+                    check = await _imageService.DeleteStadiumImageByIdAsync(updateStadiumRequest.DeletedImageIds);
+                }
+                if (updateStadiumRequest.StadiumVideo.Any())
+                {
+                    foreach (var imageDto in updateStadiumRequest.StadiumVideo)
+                    {
+                        imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    }
+                    var image = await _videoService.AddStadiumVideoAsync(updateStadiumRequest.StadiumVideo);
+                    if (image != null) check = true;
+                }
+                if (updateStadiumRequest.DeletedVideoIds.Any())
+                {
+                    check = await _videoService.DeleteStadiumVideoAsync(updateStadiumRequest.DeletedVideoIds);
                 }
             }
             if (check)
@@ -88,6 +112,7 @@ namespace StadiumManagerUI.Controllers
         public async Task<IActionResult> DeleteStadium(int id)
         {
             var image = await _imageService.DeleteStadiumImageAsync(id);
+            var video = await _videoService.DeleteAllVideosByStadiumId(id);
             var stadium = await _service.DeleteStadiumAsync(id);
 
             if (stadium && image)

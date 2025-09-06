@@ -10,5 +10,6 @@ namespace DTOs.StadiumDTO
     {
         public CreateStadiumDTO Stadium { get; set; }
         public List<CreateStadiumImageDTO> StadiumImage { get; set; }
+        public List<CreateStadiumVideoDTO> StadiumVideo { get; set; }
     }
 }

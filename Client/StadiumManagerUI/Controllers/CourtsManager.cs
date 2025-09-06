@@ -29,10 +29,9 @@ namespace StadiumManagerUI.Controllers
             _courtRelationService = courtRelationService;
         }
 
-        [Route("CourtsManager/CourtManager/{stadiumId}")]
-        public IActionResult CourtManager(int stadiumId)
+        [Route("CourtsManager/CourtManager")]
+        public IActionResult CourtManager()
         {
-            ViewBag.StadiumId = stadiumId;
             return View();
         }
 

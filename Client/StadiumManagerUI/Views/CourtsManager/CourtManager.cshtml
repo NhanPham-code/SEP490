@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Quản Lý Sân";
-    int stadiumId = ViewBag.StadiumId;
+    string name = ViewBag.Name;
     string currentUser = "tiendatln"; // You can get this from your auth system
     DateTime time = DateTime.UtcNow;
     TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -98,7 +98,7 @@
                     </div>
                     <div class="stadium-info">
                         <span class="badge bg-primary">
-                            <i class="ri-building-line me-1"></i>Sân vận động #@stadiumId
+                            <i class="ri-building-line me-1"></i>Sân vận động #@name
                         </span>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
     </div>
 
     <script>
-        const stadiumId = @stadiumId;
+        const stadiumId = sessionStorage.getItem('currentStadiumId');
         const currentUser = '@currentUser';
         const currentDateTime = '@currentUtc.ToString("yyyy-MM-dd HH:mm:ss")';
         let selectedSportType = '';

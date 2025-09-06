@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StadiumAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class NameUnsigned : Migration
+    public partial class StadiumVideo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,6 +79,27 @@ namespace StadiumAPI.Migrations
                     table.PrimaryKey("PK_StadiumImages", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StadiumImages_Stadiums_StadiumId",
+                        column: x => x.StadiumId,
+                        principalTable: "Stadiums",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StadiumVideos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StadiumId = table.Column<int>(type: "int", nullable: false),
+                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StadiumVideos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StadiumVideos_Stadiums_StadiumId",
                         column: x => x.StadiumId,
                         principalTable: "Stadiums",
                         principalColumn: "Id",
@@ -255,6 +276,11 @@ namespace StadiumAPI.Migrations
                 name: "IX_StadiumImages_StadiumId",
                 table: "StadiumImages",
                 column: "StadiumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StadiumVideos_StadiumId",
+                table: "StadiumVideos",
+                column: "StadiumId");
         }
 
         /// <inheritdoc />
@@ -265,6 +291,9 @@ namespace StadiumAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "StadiumImages");
+
+            migrationBuilder.DropTable(
+                name: "StadiumVideos");
 
             migrationBuilder.DropTable(
                 name: "Courts");

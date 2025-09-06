@@ -47,8 +47,11 @@ namespace StadiumAPI.Controllers
                 {
                     if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
                         continue;
-
-                    var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageDto.ImageUrl.FileName)}";
+                    var uniqueFileName = string.Empty;
+                    do
+                    {
+                        uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageDto.ImageUrl.FileName)}";
+                    } while (System.IO.File.Exists(Path.Combine(uploadsFolder, uniqueFileName)));
                     var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -88,7 +91,7 @@ namespace StadiumAPI.Controllers
                 Directory.CreateDirectory(adminfolderPath);
 
                 var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingImage.ImageUrl);
-                if (System.IO.File.Exists(oldFilePath) && existingImage.ImageUrl != newImageURL)
+                if (System.IO.File.Exists(oldFilePath))
                 {
                     System.IO.File.Delete(oldFilePath);
                 }
@@ -123,7 +126,7 @@ namespace StadiumAPI.Controllers
 
             if (images == null || !images.Any())
             {
-                return NotFound("No images found for this stadium.");
+                return Ok(true);
             }
 
             bool allDeleted = true;

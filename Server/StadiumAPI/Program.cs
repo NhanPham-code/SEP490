@@ -33,6 +33,7 @@ IEdmModel GetEdmModel()
     // Khai báo binding (liên kết)
     stadium.HasManyBinding(s => s.Courts, "Courts");
     stadium.HasManyBinding(s => s.StadiumImages, "StadiumImages");
+    stadium.HasManyBinding(s => s.StadiumVideos, "StadiumVideos");
 
     // Courts
     var court = odataBuilder.EntitySet<Courts>("Courts");
@@ -46,9 +47,14 @@ IEdmModel GetEdmModel()
     stadiumImage.EntityType.HasOptional(si => si.Stadium);
     stadiumImage.HasOptionalBinding(si => si.Stadium, "OdataStadium");
 
+    // stadium Video
+    var stadiumVideo = odataBuilder.EntitySet<StadiumVideos>("StadiumVideos");
+    stadiumImage.EntityType.HasKey(si => si.Id);
+    stadiumImage.EntityType.HasOptional(si => si.Stadium);
+    stadiumImage.HasOptionalBinding(si => si.Stadium, "OdataStadium");
+
     return odataBuilder.GetEdmModel();
 }
-
 
 // 2. Add OData services
 builder.Services.AddControllers().AddOData(options =>
@@ -64,10 +70,8 @@ builder.Services.AddControllers().AddOData(options =>
         .SetMaxTop(100);
 });
 
-
 builder.Services.AddDbContext<StadiumDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Register repositories
@@ -75,12 +79,14 @@ builder.Services.AddScoped<IStadiumRepositories, StadiumRepositories>();
 builder.Services.AddScoped<IStadiumImagesRepositories, StadiumImageRepositories>();
 builder.Services.AddScoped<ICourtsRepositories, CourtsRepositories>();
 builder.Services.AddScoped<ICourtRelationRepositories, CourtRelationRepositories>();
+builder.Services.AddScoped<IStadiumVideosRepositories, StadiumVideoRepositories>();
 
 // Register services
 builder.Services.AddScoped<IServiceStadium, ServiceStadium>();
 builder.Services.AddScoped<IStadiumImagesService, StadiumImagesService>();
 builder.Services.AddScoped<ICourtsService, CourtsService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
+builder.Services.AddScoped<IStadiumVideosService, StadiumVideoService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -95,7 +101,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseHttpsRedirection();
 

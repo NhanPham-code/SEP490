@@ -53,6 +53,14 @@ namespace StadiumAPI.Mapper
                 .ForMember(dest => dest.ChildCourt, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentCourt, opt => opt.Ignore());
             CreateMap<UpdateCourtRelationDTO, CourtRelations>();
+
+            CreateMap<StadiumVideos, ReadStadiumVideoDTO>();
+
+            CreateMap<ReadStadiumVideoDTO, StadiumVideos>();
+            CreateMap<CreateStadiumVideoDTO, StadiumVideos>()
+                .ForMember(dest => dest.VideoUrl, opt => opt.Ignore()); // nếu bạn xử lý upload ở service
+            CreateMap<UpdateStadiumVideoDTO, StadiumVideos>()
+                .ForMember(dest => dest.VideoUrl, opt => opt.Ignore()); // nếu bạn xử lý upload ở service
         }
     }
 }

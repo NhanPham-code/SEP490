@@ -1,8 +1,21 @@
-﻿using Service.BaseService;
+﻿using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Service.BaseService;
 using Service.Interfaces;
 using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cho phép upload file lớn
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 50000000; // hoặc số cụ thể, ví dụ 500_000_000 cho 500MB
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.ModelBinderProviders.Insert(0, new SimpleTypeModelBinderProvider());
+});
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
@@ -46,6 +59,7 @@ builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICourtService, CourtService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
+builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
 
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
@@ -68,6 +82,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Common}/{action=Login}/{id?}");
+    pattern: "{controller=StadiumManager}/{action=Stadium}/{id?}");
 
 app.Run();

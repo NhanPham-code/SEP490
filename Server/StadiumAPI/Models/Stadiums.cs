@@ -44,5 +44,6 @@ namespace StadiumAPI.Models
 
         public virtual ICollection<Courts> Courts { get; set; } // Sử dụng Courts thay vì ReadCourtDTO
         public virtual ICollection<StadiumImages> StadiumImages { get; set; }
+        public virtual ICollection<StadiumVideos> StadiumVideos { get; set; }
     }
 }

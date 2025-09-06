@@ -16,6 +16,7 @@ namespace StadiumAPI.Data
         public DbSet<CourtRelations> CourtRelations { get; set; }
         public DbSet<Stadiums> Stadiums { get; set; }
         public DbSet<StadiumImages> StadiumImages { get; set; }
+        public DbSet<StadiumVideos> StadiumVideos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,7 +26,29 @@ namespace StadiumAPI.Data
             modelBuilder.Entity<Courts>().ToTable("Courts");
             modelBuilder.Entity<Stadiums>().ToTable("Stadiums");
             modelBuilder.Entity<StadiumImages>().ToTable("StadiumImages");
-            modelBuilder.Entity<CourtRelations>().ToTable("CourtRelations"); // Map CourtRelation to table
+            modelBuilder.Entity<CourtRelations>().ToTable("CourtRelations");
+            modelBuilder.Entity<StadiumVideos>().ToTable("StadiumVideos");
+
+            // Courts - Stadium
+            modelBuilder.Entity<Courts>()
+                .HasOne(c => c.Stadium)
+                .WithMany(s => s.Courts)
+                .HasForeignKey(c => c.StadiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // StadiumImages - Stadium
+            modelBuilder.Entity<StadiumImages>()
+                .HasOne(si => si.Stadium)
+                .WithMany(s => s.StadiumImages)
+                .HasForeignKey(si => si.StadiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // StadiumVideos - Stadium
+            modelBuilder.Entity<StadiumVideos>()
+                .HasOne(sv => sv.Stadium)
+                .WithMany(s => s.StadiumVideos)
+                .HasForeignKey(sv => sv.StadiumId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             var fixedDate = new DateTime(2025, 8, 14, 10, 0, 0);
 

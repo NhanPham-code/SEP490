@@ -545,7 +545,6 @@ h2 {
     border-radius: var(--border-radius);
     border: 2px solid transparent;
     text-decoration: none;
-    cursor: pointer;
     transition: var(--transition-normal);
     white-space: nowrap;
     position: relative;

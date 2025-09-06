@@ -12,8 +12,8 @@ using StadiumAPI.Data;
 namespace StadiumAPI.Migrations
 {
     [DbContext(typeof(StadiumDbContext))]
-    [Migration("20250903063012_NameUnsigned")]
-    partial class NameUnsigned
+    [Migration("20250904113146_StadiumVideo")]
+    partial class StadiumVideo
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -789,6 +789,31 @@ namespace StadiumAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("StadiumAPI.Models.StadiumVideos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StadiumId");
+
+                    b.ToTable("StadiumVideos", (string)null);
+                });
+
             modelBuilder.Entity("StadiumAPI.Models.Stadiums", b =>
                 {
                     b.Property<int>("Id")
@@ -1289,6 +1314,17 @@ namespace StadiumAPI.Migrations
                     b.Navigation("Stadium");
                 });
 
+            modelBuilder.Entity("StadiumAPI.Models.StadiumVideos", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", "Stadium")
+                        .WithMany("StadiumVideos")
+                        .HasForeignKey("StadiumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stadium");
+                });
+
             modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
                 {
                     b.Navigation("ChildRelations");
@@ -1301,6 +1337,8 @@ namespace StadiumAPI.Migrations
                     b.Navigation("Courts");
 
                     b.Navigation("StadiumImages");
+
+                    b.Navigation("StadiumVideos");
                 });
 #pragma warning restore 612, 618
         }

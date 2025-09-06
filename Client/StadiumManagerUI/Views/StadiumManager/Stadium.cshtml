@@ -122,12 +122,17 @@
             hideLoading();
         }
 
+                function goToDetail(stadiumId) {
+            sessionStorage.setItem("currentStadiumId", stadiumId);
+                    window.location.href = "/CourtsManager/CourtManager";
+        }
+
         function renderStadiumGrid(stadiums) {
             if (!stadiums || stadiums.length === 0) {
                 $('#stadium-grid').html('');
                 return;
             }
-
+                    
             const html = stadiums.map(stadium => `
                 <div class="stadium-card animate-fade-in">
                     <div class="stadium-image">
@@ -164,9 +169,10 @@
                             </div>
                         </div>
                         <div class="card-actions">
-                            <a href="/CourtsManager/CourtManager/${stadium.Id}" class="details-btn">
-                                <i class="ri-information-line"></i> Chi tiết
-                            </a>
+                                            <button onclick="goToDetail(${stadium.Id})" class="details-btn">
+           <i class="ri-information-line"></i> Chi tiết
+        </button>
+
                             <div class="action-buttons">
                                 <button onclick="openEditModal(${stadium.Id})" class="action-btn edit-btn" title="Chỉnh sửa">
                                     <i class="ri-edit-line"></i>
@@ -309,6 +315,12 @@
             formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
         }
 
+                    //add video
+                                const videos = document.getElementById("newVideoUpload").files;
+            for (let i = 0; i < videos.length; i++) {
+                formData.append(`StadiumVideo[${i}].VideoUrl`, videos[i]);
+            }
+
                     return formData;
                 }
             }).then((result) => {
@@ -318,165 +330,7 @@
             });
         }
 
-        // Generate Create Modal HTML
-        function generateCreateModalHTML() {
-            return `
-                <div class="enhanced-modal-content">
-                    <form id="newStadiumForm" class="stadium-form">
-                        <!-- Basic Information Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-information-line"></i>
-                                <h3>Thông Tin Cơ Bản</h3>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-building-2-line"></i>
-                                        Tên sân
-                                    </label>
-                                    <input type="text" id="newName" class="form-input"
-                                           placeholder="Nhập tên sân thể thao">
-                                    <div class="input-helper">Tên sân sẽ hiển thị công khai</div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-map-pin-2-line"></i>
-                                        Địa chỉ
-                                    </label>
-                                    <input type="text" id="newAddress" class="form-input"
-                                           placeholder="Nhập địa chỉ chi tiết">
-                                    <div class="input-helper">Địa chỉ đầy đủ giúp khách hàng dễ tìm</div>
-                                </div>
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label class="form-label">
-                                    <i class="ri-file-text-line"></i>
-                                    Mô tả sân
-                                </label>
-                                <textarea id="newDescription" rows="3" class="form-textarea"
-                                          placeholder="Mô tả về sân, tiện ích, đặc điểm nổi bật..."></textarea>
-                                <div class="input-helper">Mô tả chi tiết giúp thu hút khách hàng</div>
-                            </div>
-                        </div>
-
-                        <!-- Operating Hours Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-time-line"></i>
-                                <h3>Giờ Hoạt Động</h3>
-                            </div>
-
-                            <div class="time-input-group">
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-sun-line"></i>
-                                        Giờ mở cửa
-                                    </label>
-                                    <input type="time" id="newOpenTime" class="form-input time-input"
-                                           value="06:00" min="05:00" max="23:59">
-                                    <div class="input-helper">Thời gian bắt đầu hoạt động</div>
-                                </div>
-
-                                <div class="time-separator">
-                                    <i class="ri-arrow-right-line"></i>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-moon-line"></i>
-                                        Giờ đóng cửa
-                                    </label>
-                                    <input type="time" id="newCloseTime" class="form-input time-input"
-                                           value="22:00" min="06:00" max="23:59">
-                                    <div class="input-helper">Thời gian kết thúc hoạt động</div>
-                                </div>
-                            </div>
-
-                            <div class="time-preview">
-                                <i class="ri-calendar-line"></i>
-                                <span>Sân sẽ hoạt động từ <strong id="timePreview">06:00 - 22:00</strong> hàng ngày</span>
-                            </div>
-                        </div>
-
-                        <!-- Location Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-map-line"></i>
-                                <h3>Vị Trí GPS (Tùy chọn)</h3>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        <i class="ri-compass-line"></i>
-                                        Vĩ độ (Latitude)
-                                    </label>
-                                    <input type="number" step="any" id="editLatitude"
-                                           value="${stadium.Latitude || ''}" class="form-input"
-                                           placeholder="10.762622">
-                                    <div class="input-helper">Tọa độ vĩ độ GPS</div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        <i class="ri-navigation-line"></i>
-                                        Kinh độ (Longitude)
-                                    </label>
-                                    <input type="number" step="any" id="editLongitude"
-                                           value="${stadium.Longitude || ''}" class="form-input"
-                                           placeholder="106.660172">
-                                    <div class="input-helper">Tọa độ kinh độ GPS</div>
-                                </div>
-                            </div>
-
-                            <div class="location-helper">
-                                <i class="ri-information-line"></i>
-                                <span>Tọa độ GPS giúp khách hàng định vị chính xác sân của bạn</span>
-                            </div>
-                        </div>
-
-                        <!-- Images Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-image-line"></i>
-                                <h3>Hình Ảnh Sân</h3>
-                            </div>
-
-                            <div class="image-upload-area">
-                                ${renderCurrentImagesForEdit(stadium.StadiumImages)}
-
-                                <div class="upload-zone" onclick="document.getElementById('editImageUpload').click()">
-                                    <div class="upload-content">
-                                        <div class="upload-icon">
-                                            <i class="ri-upload-cloud-2-line"></i>
-                                        </div>
-                                        <div class="upload-text">
-                                            <strong>Thêm hình ảnh mới</strong>
-                                            <p>PNG, JPG, JPEG tối đa 10MB mỗi file</p>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="editImageUpload" class="hidden"
-                                           multiple accept="image/*" onchange="handleEditImageUpload(event)">
-                                </div>
-
-                                <div id="editImagePreview" class="image-preview-grid hidden"></div>
-                            </div>
-
-                            <div class="image-helper">
-                                <i class="ri-lightbulb-line"></i>
-                                <span>Hình ảnh đầu tiên sẽ được làm ảnh đại diện chính</span>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                ${getModalStyles()}
-            `;
-        }
+       
 
         // Helper function to render current images for edit modal
         function renderCurrentImagesForEdit(images) {
@@ -1071,11 +925,11 @@
             });
 
             $.ajax({
-                url: `${CONFIG.API_ENDPOINTS.EDIT}/${formData.get('Id')}`,
+                url: CONFIG.API_ENDPOINTS.EDIT,
                 type: 'POST',
                 processData: false,
                 contentType: false,
-                data: formData,
+                        data: formData,
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
@@ -1537,10 +1391,33 @@ function updateDateTime() {
                                             }
                                         });
 
+                            // Add new videos
+                            appendVideosToFormData(formData);
+
+                            // Add deleted video IDs
+                                        const deletedVideos = document.querySelectorAll('.deleted-video');
+            deletedVideos.forEach((item, i) => {
+                const videoId = item.getAttribute('data-video-id');
+                if (videoId && videoId !== 'undefined') {
+                                    formData.append(`DeletedVideoIds[${i}]`, videoId);
+                                    console.log('Deleted video ID added to FormData:', videoId);
+                }
+            });
+
+            console.log('FormData prepared for submission:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+                                    console.log('FormData prepared for submission:', Array.from(formData.entries()));
                             return formData;
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            console.log("🚀 Đang gửi FormData:");
+    for (const [key, value] of result.value.entries()) {
+        console.log(`   ${key}: ${value}`);
+    }
                             saveStadiumChanges(result.value);
                         }
                     });
@@ -1556,14 +1433,17 @@ function updateDateTime() {
                 }
             });
         }
-
+                function getVideoCount(videos) {
+            if (!videos || videos.length === 0) return 'Không có video';
+            return `${videos.length} video`;
+        }
                 // Complete Enhanced Stadium Management JavaScript - Missing Functions Implementation
 
         // Enhanced Edit Modal HTML Generator
         function generateEditModalHTML(stadium) {
             return `
                 <div class="enhanced-modal-content">
-                    <form id="editStadiumForm" class="stadium-form">
+                            <form id="editStadiumForm" class="stadium-form" enctype="multipart/form-data">
                         <!-- Basic Information Section -->
                         <div class="form-section">
                             <div class="section-header">
@@ -1741,6 +1621,39 @@ function updateDateTime() {
                                 <span>Hình ảnh đầu tiên sẽ được làm ảnh đại diện chính</span>
                             </div>
                         </div>
+                                
+        <!-- Videos Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="ri-video-line"></i>
+                <h3>Video Giới Thiệu Sân</h3>
+            </div>
+
+            <div class="video-upload-area">
+                ${renderCurrentVideosForEdit(stadium.StadiumVideos)}
+
+                <div class="upload-zone" onclick="document.getElementById('editVideoUpload').click()">
+                    <div class="upload-content">
+                        <div class="upload-icon">
+                            <i class="ri-video-upload-line"></i>
+                        </div>
+                        <div class="upload-text">
+                            <strong>Thêm video mới</strong>
+                            <p>MP4, AVI, MOV tối đa 30MB mỗi file</p>
+                        </div>
+                    </div>
+                    <input type="file" id="editVideoUpload" class="hidden"
+                           multiple accept="video/*" onchange="handleEditVideoUpload(event)">
+                </div>
+
+                <div id="editVideoPreview" class="video-preview-grid hidden"></div>
+            </div>
+
+            <div class="video-helper">
+                <i class="ri-lightbulb-line"></i>
+                <span>Video giúp khách hàng hiểu rõ hơn về sân của bạn</span>
+            </div>
+        </div>
                     </form>
                 </div>
 
@@ -1786,7 +1699,7 @@ function updateDateTime() {
         function generateCreateModalHTML() {
             return `
                 <div class="enhanced-modal-content">
-                    <form id="newStadiumForm" class="stadium-form">
+                            <form id="newStadiumForm" class="stadium-form" enctype="multipart/form-data">
                         <!-- Basic Information Section -->
                         <div class="form-section">
                             <div class="section-header">
@@ -1931,6 +1844,36 @@ function updateDateTime() {
                                 <span>Hình ảnh đầu tiên sẽ được làm ảnh đại diện chính</span>
                             </div>
                         </div>
+                                <!-- Videos Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="ri-video-line"></i>
+                <h3>Video Giới Thiệu Sân</h3>
+            </div>
+
+            <div class="video-upload-area">
+                <div class="upload-zone" onclick="document.getElementById('newVideoUpload').click()">
+                    <div class="upload-content">
+                        <div class="upload-icon">
+                            <i class="ri-video-upload-line"></i>
+                        </div>
+                        <div class="upload-text">
+                            <strong>Chọn hoặc kéo thả video</strong>
+                            <p>MP4, AVI, MOV tối đa 30MB mỗi file</p>
+                        </div>
+                    </div>
+                    <input type="file" id="newVideoUpload" class="hidden"
+                           multiple accept="video/*" onchange="handleNewVideoUpload(event)">
+                </div>
+
+                <div id="newVideoPreview" class="video-preview-grid hidden"></div>
+            </div>
+
+            <div class="video-helper">
+                <i class="ri-lightbulb-line"></i>
+                <span>Video giúp khách hàng hiểu rõ hơn về sân của bạn</span>
+            </div>
+        </div>
                     </form>
                 </div>
 
@@ -1942,6 +1885,128 @@ function updateDateTime() {
         function getModalStyles() {
             return `
                 <style>
+                        /* Video Upload Styles */
+        .video-upload-area {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .video-preview-grid, .current-videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .video-item {
+            position: relative;
+            background: #f8fafc;
+            border: 2px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .video-item:hover {
+                transform: scale(1.02);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            }
+
+        .preview-video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 12px;
+            background: white;
+        }
+
+        .video-name {
+            display: block;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-size {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .delete-video-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+            .delete-video-btn:hover {
+                background: #dc2626;
+                transform: scale(1.1);
+            }
+
+        .deleted-video {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+            .deleted-video::after {
+                content: 'Đã xóa';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(239, 68, 68, 0.9);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+        .video-helper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #065f46;
+            font-size: 0.875rem;
+            margin-top: 16px;
+        }
+
+        .empty-videos {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
+            background: rgba(248, 250, 252, 0.5);
+        }
+
+        @@media (max-width: 768px) {
+            .video-preview-grid, .current-videos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
                     .enhanced-modal-content {
                         max-height: 70vh;
                         overflow-y: auto;
@@ -2602,6 +2667,218 @@ function updateDateTime() {
                     showErrorState(error);
                 }
             });
+        }
+
+                // Global variables for video handling
+        let selectedVideos = [];
+
+        // Handle new video upload for create modal
+        function handleNewVideoUpload(event) {
+            const input = event.target;
+            const newFiles = Array.from(input.files);
+            const previewContainer = document.getElementById('newVideoPreview');
+            if (!previewContainer) return;
+
+            // Get existing files
+            const oldFiles = input._videos || [];
+            const mergedFiles = [...oldFiles, ...newFiles];
+
+            // Update input files
+            const dt = new DataTransfer();
+            mergedFiles.forEach(file => dt.items.add(file));
+            input.files = dt.files;
+            input._videos = mergedFiles;
+
+            // Render preview
+            renderVideoPreview(mergedFiles, previewContainer, input, 'new');
+        }
+
+        // Handle edit video upload
+        function handleEditVideoUpload(event) {
+            const previewContainer = document.getElementById('editVideoPreview');
+
+            Array.from(event.target.files).forEach(file => {
+                if (file.type.startsWith('video/') && file.size <= 30 * 1024 * 1024) {
+                    selectedVideos.push(file);
+
+                    const videoDiv = document.createElement('div');
+                    videoDiv.className = 'video-item';
+                    videoDiv.innerHTML = `
+                        <video controls class="preview-video">
+                            <source src="${URL.createObjectURL(file)}" type="${file.type}">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="video-info">
+                            <span class="video-name">${file.name}</span>
+                            <span class="video-size">${formatFileSize(file.size)}</span>
+                        </div>
+                        <button type="button" class="delete-video-btn" onclick="removeEditVideoPreview(this, ${selectedVideos.length - 1})">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    `;
+                    previewContainer.appendChild(videoDiv);
+                } else if (file.size > 30 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'File quá lớn',
+                        text: `Video "${file.name}" vượt quá giới hạn 30MB`,
+                        confirmButtonColor: '#f59e0b'
+                    });
+                }
+            });
+
+            previewContainer.classList.remove('hidden');
+            event.target.value = "";
+        }
+
+        // Render video preview
+        function renderVideoPreview(files, previewContainer, input, type) {
+            previewContainer.innerHTML = '';
+
+            if (!files || files.length === 0) {
+                previewContainer.classList.add('hidden');
+                return;
+            }
+
+            previewContainer.classList.remove('hidden');
+
+            files.forEach((file, index) => {
+                if (file.type.startsWith('video/') && file.size <= 30 * 1024 * 1024) {
+                    const videoDiv = document.createElement('div');
+                    videoDiv.className = 'video-item';
+
+                    videoDiv.innerHTML = `
+                        <video controls class="preview-video">
+                            <source src="${URL.createObjectURL(file)}" type="${file.type}">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="video-info">
+                            <span class="video-name">${file.name}</span>
+                            <span class="video-size">${formatFileSize(file.size)}</span>
+                        </div>
+                        <button type="button" class="delete-video-btn" onclick="removeNewVideoPreview(${index}, '${type}')">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    `;
+
+                    previewContainer.appendChild(videoDiv);
+                } else if (file.size > 30 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'File quá lớn',
+                        text: `Video "${file.name}" vượt quá giới hạn 30MB`,
+                        confirmButtonColor: '#f59e0b'
+                    });
+                }
+            });
+        }
+
+        // Remove video from new upload preview
+        function removeNewVideoPreview(indexToRemove, type) {
+            const input = document.getElementById(`${type}VideoUpload`);
+            const previewContainer = document.getElementById(`${type}VideoPreview`);
+
+            const files = input._videos || [];
+            const updatedFiles = files.filter((_, index) => index !== indexToRemove);
+
+            const dt = new DataTransfer();
+            updatedFiles.forEach(file => dt.items.add(file));
+            input.files = dt.files;
+            input._videos = updatedFiles;
+
+            renderVideoPreview(updatedFiles, previewContainer, input, type);
+        }
+
+        // Remove video from edit preview
+        function removeEditVideoPreview(button, index) {
+            selectedVideos.splice(index, 1);
+            button.closest('.video-item').remove();
+        }
+
+        // Render current videos for edit modal
+                function renderCurrentVideosForEdit(videos) {
+            if (!videos || videos.length === 0) {
+                return `
+                    <div class="current-videos-section">
+                        <h4 style="margin: 0 0 16px 0; color: #6b7280; font-size: 0.875rem;">Video hiện tại</h4>
+                        <div class="empty-videos">
+                            <i class="ri-video-line" style="font-size: 2rem; color: #d1d5db;"></i>
+                            <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 0.875rem;">Chưa có video</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="current-videos-section">
+                    <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 0.875rem; font-weight: 600;">Video hiện tại</h4>
+                    <div class="current-videos-grid">
+                        ${videos.map((video, index) => `
+                            <div class="video-item" data-video-id="${video.Id || index}">
+                                <video controls class="preview-video">
+                                            <source src="https://localhost:7280/${video.VideoUrl}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-info">
+                                    ${video.UploadedAt ? `<span class="video-uploaded-at">${new Date(video.UploadedAt).toLocaleString()}</span>` : ""}
+                                </div>
+                                <button type="button" class="delete-video-btn" onclick="deleteCurrentVideo(this)" title="Xóa video">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Delete current video
+        function deleteCurrentVideo(button) {
+            const videoItem = button.closest('.video-item');
+            if (!videoItem) return;
+
+            videoItem.classList.add('deleted-video');
+            button.style.display = 'none';
+
+            const videoId = videoItem.getAttribute('data-video-id');
+            console.log(`Video ${videoId} marked for deletion`);
+        }
+
+        // Utility function to format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Get video URL
+        function getUrlVideo(video) {
+            if (!video || !video.VideoUrl) {
+                return '/api/placeholder/video';
+            }
+
+            let videoUrl = video.VideoUrl;
+
+            if (videoUrl.startsWith('/') || videoUrl.startsWith('uploads/')) {
+                return `https://localhost:7280/${videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl}`;
+            }
+
+            if (videoUrl.startsWith('http')) {
+                return videoUrl;
+            }
+
+            return `https://localhost:7280/${videoUrl}`;
+        }
+
+        // Append videos to form data
+        function appendVideosToFormData(formData) {
+            selectedVideos.forEach((file, i) => {
+                         formData.append(`StadiumVideo[${i}].VideoUrl`, file);
+                        console.log('File in appendVideosToFormData:', file);
+            });
+            selectedVideos = [];
         }
 
         // Enhanced error handling
