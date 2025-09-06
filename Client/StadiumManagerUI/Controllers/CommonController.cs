@@ -23,7 +23,7 @@ namespace StadiumManagerUI.Controllers
 
     public class CommonController : Controller
     {
-        private static readonly string ROLE_DEFAULT = "Customer";
+        private static readonly string ROLE_DEFAULT = "StadiumManager";
         private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
@@ -45,16 +45,11 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
                 ? $"{BASE_URL}{response.AvatarUrl}"
-                : "/images/default-avatar.png";
-
-            var faceFullUrl = !string.IsNullOrEmpty(response.FaceImageUrl)
-                ? $"{BASE_URL}{response.FaceImageUrl}"
-                : "";
+                : $"{BASE_URL}/avatars/default-avatar.png";
 
             HttpContext.Session.SetString("UserId", response.UserId.ToString());
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
-            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
         private void SaveUserInfo(PrivateUserProfileDTO userProfileDTO)
@@ -62,16 +57,11 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(userProfileDTO.AvatarUrl)
                 ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
-                : "/images/default-avatar.png";
-
-            var faceFullUrl = !string.IsNullOrEmpty(userProfileDTO.FaceImageUrl)
-                ? $"{BASE_URL}{userProfileDTO.FaceImageUrl}"
-                : "";
+                : $"{BASE_URL}/avatars/default-avatar.png";
 
             HttpContext.Session.SetString("UserId", userProfileDTO.UserId.ToString());
             HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
-            HttpContext.Session.SetString("FaceImageUrl", faceFullUrl);
         }
 
         public IActionResult Login()
@@ -85,8 +75,7 @@ namespace StadiumManagerUI.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                TempData["ErrorMessage"] = "Email and Password can not be emtpy.";
-                return View();
+                return Json(new { success = false, message = "Email và Password không được để trống." });
             }
 
             var model = new LoginRequestDTO
@@ -99,22 +88,24 @@ namespace StadiumManagerUI.Controllers
             try
             {
                 var response = await _userService.LoginAsync(model);
-                if (response == null || string.IsNullOrEmpty(response.AccessToken))
+                if (response == null)
                 {
-                    TempData["ErrorMessage"] = "Invalid Email or Password.";
-                    return View();
+                    return Json(new { success = false, message = "Email hoặc mật khẩu không đúng!" });
+                }
+
+                if (response.IsValid == false)
+                {
+                    return Json(new { success = false, message = response.Message });
                 }
 
                 // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
                 SaveTokenCookiesAndUserInfo(response);
 
-                return RedirectToAction("Index", "Home");
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi nếu cần
-                TempData["ErrorMessage"] = "Login failed: " + ex.Message;
-                return View();
+                return Json(new { success = false, message = "Login failed: " + ex.Message });
             }
         }
 
@@ -129,7 +120,7 @@ namespace StadiumManagerUI.Controllers
             Response.Cookies.Delete("AccessToken");
             Response.Cookies.Delete("RefreshToken");
 
-            // Xóa session
+            // Xóa session lưu các thông tin của người dùng
             HttpContext.Session.Clear();
 
             // Gọi API logout
@@ -155,10 +146,10 @@ namespace StadiumManagerUI.Controllers
 
         // Action xử lý đăng ký người dùng mới
         [HttpPost]
-        public async Task<IActionResult> Register(string fullname, string email, string password, string address, string phoneNumber,
-            string gender, string dateOfBirth)
+        public async Task<IActionResult> Register(string fullname, string email, string password, string address,
+            string phoneNumber, string gender, string dateOfBirth)
         {
-            // Tạo một DTO từ các tham số riêng lẻ để tận dụng các validation đã định nghĩa
+            // Tạo DTO
             var registerRequestDTO = new CustomerRegisterRequestDTO
             {
                 FullName = fullname,
@@ -166,114 +157,167 @@ namespace StadiumManagerUI.Controllers
                 Password = password,
                 Address = address,
                 PhoneNumber = phoneNumber,
-                Role = ROLE_DEFAULT, // Giả định vai trò là "Customer"
+                Role = ROLE_DEFAULT,
                 Gender = gender,
                 DateOfBirth = dateOfBirth
             };
 
-            // Thực hiện server-side validation thủ công trên DTO mới
+            // Server-side validation
             if (!TryValidateModel(registerRequestDTO))
             {
-                // Trả về view với lỗi nếu validation thất bại
-                TempData["ErrorMessage"] = "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại.";
-                TempData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
-                return View("Login"); // Giả định form đăng ký ở trang Login
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault();
+
+                return Json(new
+                {
+                    success = false,
+                    message = errors ?? "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại."
+                });
             }
 
-            // 1. Kiểm tra xem email đã tồn tại chưa
-            if (await _userService.IsEmailExistsAsync(registerRequestDTO.Email))
+            try
             {
-                TempData["ErrorMessage"] = "Email này đã tồn tại. ";
-                TempData["RegisterRequestDTO"] = registerRequestDTO; // Để hiển thị lại thông tin đã nhập
-                return View("Login"); // Giả định form đăng ký ở trang Login
+                // Kiểm tra email tồn tại
+                if (await _userService.IsEmailExistsAsync(registerRequestDTO.Email))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Email này đã tồn tại. Vui lòng sử dụng email khác."
+                    });
+                }
+
+                // Tạo mã xác thực
+                var verificationCode = new Random().Next(100000, 999999).ToString();
+
+                // Lưu vào session
+                var tempRegisterData = new TempRegistrationData
+                {
+                    RegisterData = registerRequestDTO,
+                    VerificationCode = verificationCode,
+                    VerificationCodeTimestamp = DateTime.UtcNow
+                };
+
+                HttpContext.Session.SetObjectAsJson("TempRegisterData", tempRegisterData);
+
+                // Gửi email
+                await _emailService.SendEmailAsync(
+                    registerRequestDTO.Email,
+                    "Mã Xác Thực Đăng Ký - Sportivey",
+                    $"Xin chào {registerRequestDTO.FullName},\n\nMã xác thực của bạn là: {verificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Đăng ký thành công! Mã xác thực đã được gửi đến email của bạn.",
+                    redirectUrl = Url.Action("Verify"),
+                    email = registerRequestDTO.Email
+                });
             }
-
-            // 2. Tạo mã xác thực
-            var verificationCode = new Random().Next(100000, 999999).ToString();
-
-            // 3. Lưu thông tin đăng ký và mã xác thực vào session tạm thời
-            // Tạo một DTO tạm thời để lưu vào session
-            var tempRegisterData = new
+            catch (Exception ex)
             {
-                RegisterData = registerRequestDTO,
-                VerificationCode = verificationCode
-            };
-
-            HttpContext.Session.SetObjectAsJson("TempRegisterData", tempRegisterData);
-
-            // 4. Gửi mã xác thực về email
-            await _emailService.SendEmailAsync(
-                registerRequestDTO.Email,
-                "Mã Xác Thực Đăng Ký",
-                $"Xin chào {registerRequestDTO.FullName}, mã xác thực của bạn là: {verificationCode}");
-
-            // 5. Chuyển hướng người dùng đến trang xác thực
-            TempData["Email"] = registerRequestDTO.Email;
-            return RedirectToAction("Verify");
+                return Json(new
+                {
+                    success = false,
+                    message = "Đã có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại."
+                });
+            }
         }
 
         // Action hiển thị trang xác thực
         [HttpGet]
         public IActionResult Verify()
         {
-            // Lấy email từ TempData để hiển thị cho người dùng
-            ViewBag.Email = TempData["Email"];
+            // Lấy dữ liệu tạm từ session
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+
+            // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
+            if (tempRegisterData == null)
+            {
+                return Json(new { success = false, message = "Phiên đăng ký đã hết hạn hoặc không hợp lệ. Vui lòng thử lại." });
+            }
+
+            ViewBag.Email = tempRegisterData.RegisterData.Email;
             return View();
         }
 
-        // Action xử lý việc xác thực mã
+        // Action xử lý việc xác thực mã qua AJAX
         [HttpPost]
         public async Task<IActionResult> Verify(string email, string code)
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<dynamic>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
 
-            // Kiểm tra dữ liệu session và mã xác thực
-            if (tempRegisterData == null || tempRegisterData.VerificationCode != code)
+            // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
+            if (tempRegisterData == null)
             {
-                TempData["ErrorMessage"] = "Mã xác thực không đúng. Vui lòng thử lại.";
-                TempData["Email"] = email; // Gán lại email để hiển thị
-                return View();
+                return Json(new { success = false, message = "Phiên đăng ký đã hết hạn hoặc không hợp lệ. Vui lòng thử lại." });
             }
 
-            return View("UploadAvatarAndFace");
+            // Trường hợp 2: Mã đã hết hạn theo thời gian
+            if (DateTime.UtcNow - tempRegisterData.VerificationCodeTimestamp > TimeSpan.FromSeconds(60))
+            {
+                return Json(new { success = false, message = "Mã xác thực đã hết hạn. Vui lòng yêu cầu gửi lại mã mới." });
+            }
+
+            // Trường hợp 3: Mã không đúng hoặc email không khớp
+            if (tempRegisterData.RegisterData.Email != email || tempRegisterData.VerificationCode != code)
+            {
+                return Json(new { success = false, message = "Mã xác thực không đúng. Vui lòng thử lại." });
+            }
+
+            // Trường hợp 4: Xác thực thành công
+            // Không xóa session ở đây, vì cần dùng ở bước tiếp theo (UploadAvatarAndFace)
+            return Json(new
+            {
+                success = true,
+                redirectUrl = Url.Action("UploadCccd", "Common") // Đảm bảo "Common" là tên Controller của bạn
+            });
         }
 
         [HttpGet]
         public async Task<IActionResult> ResendCode()
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<dynamic>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
 
             if (tempRegisterData == null)
             {
-                ViewBag.ErrorMessage = "Không tìm thấy dữ liệu đăng ký tạm thời.";
-                return View("Verify");
+                return Json(new { success = false, message = "Không tìm thấy dữ liệu đăng ký tạm thời." });
             }
 
             // Gửi lại mã xác thực
             var registerRequestDTO = tempRegisterData.RegisterData;
-            var verificationCode = tempRegisterData.VerificationCode;
 
             // Tạo lại mã xác thực mới
             var newVerificationCode = new Random().Next(100000, 999999).ToString();
 
-            // Cập nhật mã xác thực trong dữ liệu tạm
-            tempRegisterData.VerificationCode = newVerificationCode;
-
             await _emailService.SendEmailAsync(
-                               registerRequestDTO.Email,
-                                              "Mã Xác Thực Đăng Ký",
-                                                             $"Xin chào {registerRequestDTO.FullName}, mã xác thực của bạn là: {newVerificationCode}");
+                    registerRequestDTO.Email,
+                    "Mã Xác Thực Đăng Ký - Sportivey",
+                    $"Xin chào {registerRequestDTO.FullName},\n\nMã xác thực của bạn là: {newVerificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
 
-            ViewBag.SuccessMessage = "Mã xác thực đã được gửi lại đến email của bạn.";
-            ViewBag.Email = registerRequestDTO.Email; // Gán lại email để hiển thị
-            return View("Verify");
+            // Cập nhật lại session với mã mới
+            tempRegisterData.VerificationCode = newVerificationCode;
+            tempRegisterData.VerificationCodeTimestamp = DateTime.UtcNow; // Cập nhật lại thời gian gửi mã
+
+            HttpContext.Session.SetObjectAsJson("TempRegisterData", tempRegisterData);
+
+            return Json(new { success = true, message = "Mã xác thực mới đã được gửi thành công." });
+        }
+
+        // Action hiển thị trang tải lên ảnh đại diện và ảnh khuôn mặt
+        [HttpGet]
+        public IActionResult UploadCccd()
+        {
+            return View();
         }
 
         // Action xử lý việc tải lên ảnh đại diện và ảnh khuôn mặt
         [HttpPost]
-        public async Task<IActionResult> CompleteRegistration(IFormFile avatar, IFormFile faceVideo)
+        public async Task<IActionResult> CompleteRegistration(IFormFile avatar, IFormFile frontCccdImage)
         {
 
             // Lấy dữ liệu tạm từ session
@@ -286,7 +330,7 @@ namespace StadiumManagerUI.Controllers
             }
 
             // Tạo một DTO từ dữ liệu tạm
-            var registerRequestDTO = new CustomerRegisterRequestDTO
+            var registerRequestDTO = new StadiumManagerRegisterRequestDTO
             {
                 FullName = tempRegisterData.RegisterData.FullName,
                 Email = tempRegisterData.RegisterData.Email,
@@ -297,11 +341,11 @@ namespace StadiumManagerUI.Controllers
                 Gender = tempRegisterData.RegisterData.Gender,
                 DateOfBirth = tempRegisterData.RegisterData.DateOfBirth,
                 Avatar = avatar,
-                FaceVideo = faceVideo // nhận dạng IFormFile chuẩn
+                FrontCCCDImage = frontCccdImage // nhận dạng IFormFile chuẩn
             };
 
             // Gọi service để đăng ký người dùng (API sẽ xử lý lưu file video từ base64)
-            var isRegistered = await _userService.RegisterAsync(registerRequestDTO);
+            var isRegistered = await _userService.StadiumManagerRegisterAsync(registerRequestDTO);
 
             if (!isRegistered)
             {
@@ -473,6 +517,95 @@ namespace StadiumManagerUI.Controllers
             {
                 return StatusCode(500, new { message = $"Error: {ex.Message}" });
             }
+        }
+
+        // Hiển thị trang quên mật khẩu
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        // Gửi mã xác thực đặt lại mật khẩu
+        [HttpPost]
+        public async Task<IActionResult> SendResetCode(string email)
+        {
+            // check email tồn tại
+            if (!await _userService.IsEmailExistsAsync(email))
+            {
+                return Json(new { success = false, message = "Email không tồn tại trong hệ thống." });
+            }
+
+            // Tạo mã xác thực
+            var resetCode = new Random().Next(100000, 999999).ToString();
+
+            // Lưu mã xác thực vào session
+            HttpContext.Session.SetString("ResetEmail", email);
+            HttpContext.Session.SetString("PasswordResetCode", resetCode);
+            HttpContext.Session.SetObjectAsJson("CodeTimeExits", DateTime.UtcNow);
+
+            // Gửi mã xác thực về email
+            await _emailService.SendEmailAsync(
+                               email,
+                                              "Mã Xác Thực Đặt Lại Mật Khẩu",
+                                                             $"Mã xác thực đặt lại mật khẩu của bạn là: {resetCode}");
+
+            return Json(new { success = true, email = email, message = "Mã xác thực đã được gửi đến email của bạn." });
+        }
+
+        [HttpPost]
+        public IActionResult VerifyResetCode(string email, string code)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
+            {
+                return Json(new { success = false, message = "Email và mã xác thực không được để trống." });
+            }
+
+            var sessionEmail = HttpContext.Session.GetString("ResetEmail");
+            var sessionCode = HttpContext.Session.GetString("PasswordResetCode");
+            var codeTimeExits = HttpContext.Session.GetObjectFromJson<DateTime>("CodeTimeExits");
+
+            // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
+            if (string.IsNullOrEmpty(sessionEmail) || string.IsNullOrEmpty(sessionCode) || codeTimeExits == default)
+            {
+                return Json(new { success = false, message = "Phiên đặt lại mật khẩu đã hết hạn hoặc không hợp lệ. Vui lòng thử lại." });
+            }
+
+            // Trường hợp 2: Mã đã hết hạn theo thời gian
+            if (DateTime.UtcNow - codeTimeExits > TimeSpan.FromSeconds(60))
+            {
+                return Json(new { success = false, message = "Mã xác thực đã hết hạn. Vui lòng yêu cầu gửi lại mã mới." });
+            }
+
+            // Trường hợp 3: Mã không đúng hoặc email không khớp
+            if (sessionEmail != email || sessionCode != code)
+            {
+                return Json(new { success = false, message = "Mã xác thực không đúng. Vui lòng thử lại." });
+            }
+
+            // Trường hợp 4: Xác thực thành công
+            return Json(new { success = true, email = email, message = "Xác thực thành công. Vui lòng đặt lại mật khẩu mới." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(string email, string code, string newPassword, string confirmPassword)
+        {
+            var resetPasswordDTO = new ResetPasswordDTO
+            {
+                Email = email,
+                NewPassword = newPassword
+            };
+
+            var result = await _userService.ResetPasswordAsync(resetPasswordDTO);
+            if (!result)
+            {
+                return Json(new { success = false, message = "Đặt lại mật khẩu không thành công. Vui lòng thử lại." });
+            }
+
+            // Xóa session sau khi đặt lại mật khẩu thành công
+            HttpContext.Session.Clear();
+
+            return Json(new { success = true, message = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập với mật khẩu mới." });
         }
     }
 }

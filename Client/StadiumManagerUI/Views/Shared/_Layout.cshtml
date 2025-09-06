@@ -7,7 +7,7 @@
     <title>@ViewData["Title"] - Sportivey</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
-    
+
     <style>
         :root {
             --sidebar-width: 250px;
@@ -194,19 +194,19 @@
             flex-shrink: 0;
         }
 
-        .user-avatar:hover {
-            border-color: var(--primary-blue);
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-        }
+            .user-avatar:hover {
+                border-color: var(--primary-blue);
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            }
 
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            border-radius: 50%;
-        }
+            .user-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                border-radius: 50%;
+            }
 
         /* Fallback cho khi không có ảnh */
         .user-avatar-fallback {
@@ -231,31 +231,31 @@
             transition: background-color 0.3s ease;
         }
 
-        .notification-badge:hover {
-            background-color: #f8f9fa;
-        }
+            .notification-badge:hover {
+                background-color: #f8f9fa;
+            }
 
-        .notification-badge i {
-            font-size: 18px;
-            color: var(--text-muted);
-            transition: color 0.3s ease;
-        }
+            .notification-badge i {
+                font-size: 18px;
+                color: var(--text-muted);
+                transition: color 0.3s ease;
+            }
 
-        .notification-badge:hover i {
-            color: var(--primary-blue);
-        }
+            .notification-badge:hover i {
+                color: var(--primary-blue);
+            }
 
-        .notification-badge::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 10px;
-            height: 10px;
-            background: var(--danger-red);
-            border-radius: 50%;
-            border: 2px solid white;
-        }
+            .notification-badge::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                width: 10px;
+                height: 10px;
+                background: var(--danger-red);
+                border-radius: 50%;
+                border: 2px solid white;
+            }
 
         /* User name styling */
         .user-info .fw-medium {
@@ -283,14 +283,14 @@
             transition: all 0.2s ease;
         }
 
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
+            .dropdown-item:hover {
+                background-color: #f8f9fa;
+            }
 
-        .dropdown-item.text-danger:hover {
-            background-color: rgba(255, 59, 48, 0.1);
-            color: var(--danger-red) !important;
-        }
+            .dropdown-item.text-danger:hover {
+                background-color: rgba(255, 59, 48, 0.1);
+                color: var(--danger-red) !important;
+            }
 
         .content {
             padding: 2rem;
@@ -319,9 +319,9 @@
                 transform: translateX(-100%);
             }
 
-            .sidebar.show {
-                transform: translateX(0);
-            }
+                .sidebar.show {
+                    transform: translateX(0);
+                }
 
             .main-content {
                 margin-left: 0;
@@ -418,7 +418,14 @@
         var accessToken = Context.Request.Cookies["AccessToken"];
         var fullName = Context.Session.GetString("FullName");
         var avatarUrl = Context.Session.GetString("AvatarUrl");
+
+        // Nếu không có accessToken hoặc fullName => Người dùng chưa đăng nhập
+        if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(fullName))
+        {
+            Context.Response.Redirect(Url.Action("Login", "Common"));
+        }
     }
+
     <div class="main-content">
         <header class="header">
             <div>
@@ -426,59 +433,48 @@
                 <p class="header-subtitle">Chào mừng trở lại, @fullName</p>
             </div>
 
-            @* Logic để kiểm tra người dùng đã đăng nhập chưa *@
-            @if (true) // Thay thế `true` bằng logic xác thực người dùng
-            {
-                <div class="user-info dropdown">
-                    <div class="notification-badge" title="Thông báo">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <span class="fw-medium" title="@fullName">@fullName</span>
-                    <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Menu tài khoản">
-                        @if (!string.IsNullOrEmpty(avatarUrl))
-                        {
-                            <img src="@avatarUrl" alt="Avatar của @fullName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                            <div class="user-avatar-fallback" style="display: none;">
-                                @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="user-avatar-fallback">
-                                @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
-                            </div>
-                        }
-                    </div>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="@Url.Action("Profile", "Account")">
-                                <i class="fas fa-user me-2"></i>
-                                Thông tin tài khoản
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
-                                <i class="fas fa-cog me-2"></i>
-                                Cài đặt
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" asp-controller="Common" asp-action="Logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Đăng xuất
-                            </a>
-                        </li>
-                    </ul>
+            <div class="user-info dropdown">
+                <div class="notification-badge" title="Thông báo">
+                    <i class="fas fa-bell"></i>
                 </div>
-            }
-            else
-            {
-                <div class="auth-buttons d-flex gap-2">
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">Đăng nhập</a>
-                    <a href="@Url.Action("Register", "Account")" class="btn btn-primary">Đăng ký</a>
+                <span class="fw-medium" title="@fullName">@fullName</span>
+                <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Menu tài khoản">
+                    @if (!string.IsNullOrEmpty(avatarUrl))
+                    {
+                        <img src="@avatarUrl" alt="Avatar của @fullName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="user-avatar-fallback" style="display: none;">
+                            @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="user-avatar-fallback">
+                            @(fullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                        </div>
+                    }
                 </div>
-            }
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" asp-controller="Common" asp-action="Profile">
+                            <i class="fas fa-user me-2"></i>
+                            Thông tin tài khoản
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
+                            <i class="fas fa-cog me-2"></i>
+                            Cài đặt
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" asp-controller="Common" asp-action="Logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Đăng xuất
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </header>
 
         <main class="content">

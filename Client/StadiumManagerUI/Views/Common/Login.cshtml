@@ -7,380 +7,83 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Sportivey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <style>
-        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Sport-themed background */
-        body {
-            background: linear-gradient(135deg, 
-                #1e40af 0%,    /* Deep blue */
-                #059669 25%,   /* Emerald green */
-                #dc2626 50%,   /* Red */
-                #ea580c 75%,   /* Orange */
-                #7c3aed 100%   /* Purple */
-            );
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
-
-        @@keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Add sport pattern overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 2px, transparent 2px),
-                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 2px, transparent 2px),
-                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px, 60px 60px, 30px 30px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        #container {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Base container for forms */
-        .form-container {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0 40px;
-            transition: all 0.6s ease-in-out;
-        }
-
-        /* Login and Register initial positions */
-        .login-container {
-            left: 0;
-            z-index: 2;
-        }
-
-        .register-container {
-            left: 0;
-            z-index: 1;
-            opacity: 0;
-        }
-
-        /* Animation when switching to Register panel */
-        .right-panel-active .login-container {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        .right-panel-active .register-container {
-            transform: translateX(100%);
-            opacity: 1;
-            z-index: 5;
-            animation: show 0.6s;
-        }
-
-        @@keyframes show {
-            0%, 49.99% {
-                opacity: 0;
-                z-index: 1;
-            }
-
-            50%, 100% {
-                opacity: 1;
-                z-index: 5;
-            }
-        }
-
-        /* Overlay styles with sport theme */
-        .overlay-container {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 50%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 100;
-            transition: transform 0.6s ease-in-out;
-        }
-
-        .right-panel-active .overlay-container {
-            transform: translateX(-100%);
-        }
-
-        .overlay {
-            background: linear-gradient(135deg, 
-                #1e40af 0%,    /* Sports blue */
-                #059669 50%,   /* Field green */
-                #dc2626 100%   /* Energy red */
-            );
-            position: relative;
-            left: -100%;
-            height: 100%;
-            width: 200%;
-            transform: translateX(0);
-            transition: transform 0.6s ease-in-out;
-        }
-
-        .right-panel-active .overlay {
-            transform: translateX(50%);
-        }
-
-        .overlay-panel {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 0 40px;
-            text-align: center;
-            top: 0;
-            height: 100%;
-            width: 50%;
-            color: #fff;
-            transform: translateX(0);
-            transition: transform 0.6s ease-in-out;
-        }
-
-        .overlay-left {
-            transform: translateX(-20%);
-        }
-
-        .right-panel-active .overlay-left {
-            transform: translateX(0);
-        }
-
-        .overlay-right {
-            right: 0;
-            transform: translateX(0);
-        }
-
-        .right-panel-active .overlay-right {
-            transform: translateX(20%);
-        }
-
-        /* Separated form content for scrolling */
-        .form-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .form-content {
-            width: 100%;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 12px;
-        }
-
-        /* Password input container */
-        .password-container {
-            position: relative;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #64748b;
-            transition: color 0.3s ease;
-            z-index: 10;
-        }
-
-        .password-toggle:hover {
-            color: #1e40af;
-        }
-
-        /* Floating label input styles */
-        .floating-label {
-            position: relative;
-        }
-
-        .floating-label input {
-            width: 100%;
-            padding: 16px 20px 16px 50px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .floating-label input:focus {
-            outline: none;
-            border-color: #1e40af;
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-        }
-
-        .floating-label .icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            transition: color 0.3s ease;
-        }
-
-        .floating-label input:focus + .icon {
-            color: #1e40af;
-        }
-
-        /* Button styles with sport theme */
-        .submit-btn {
-            background: linear-gradient(135deg, #1e40af 0%, #059669 100%);
-            border: none;
-            padding: 16px 32px;
-            border-radius: 16px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(30, 64, 175, 0.4);
-        }
-
-        .overlay-btn {
-            border: 2px solid white;
-            background: transparent;
-            color: white;
-            padding: 12px 32px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .overlay-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.05);
-        }
-
-        .social-login {
-            display: flex;
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .social-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-weight: 500;
-            color: #64748b;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 24px 0;
-            color: #64748b;
-        }
-
-        .forgot-password {
-            color: #1e40af;
-            font-size: 14px;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-password:hover {
-            color: #059669;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @@keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Sport-themed container */
-        #container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-    </style>
+    <link href="~/css/common/login.css" rel="stylesheet" />
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
+    <!-- Toast Container - THÊM MỚI -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <a href="@Url.Action("Index", "Home")" class="back-btn">
+        <i class="ri-home-line"></i>
+        <span>Trang chủ</span>
+    </a>
+
     <div id="container" class="relative rounded-3xl shadow-2xl overflow-hidden w-[900px] max-w-full min-h-[600px]">
 
+        <!-- Mobile Tabs -->
+        <div class="mobile-tabs">
+            <div class="mobile-tab active" id="mobile-login-tab">
+                <i class="ri-login-circle-line mr-2"></i>Đăng nhập
+            </div>
+            <div class="mobile-tab" id="mobile-register-tab">
+                <i class="ri-user-add-line mr-2"></i>Đăng ký
+            </div>
+        </div>
+
         <!-- Login Form -->
-        <div class="form-container login-container">
+        <div class="form-container login-container mobile-active">
             <div class="form-header">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
                     Chào mừng trở lại!
                 </h1>
-                <p class="text-gray-600">Đăng nhập để tiếp tục</p>
+                <p class="text-gray-600">Đăng nhập để tiếp tục hành trình thể thao</p>
             </div>
             <div class="form-content">
-                <form method="post" asp-controller="Common" asp-action="Login" class="space-y-6">
-                    @Html.AntiForgeryToken()
-                    <div class="floating-label">
-                        <input type="text" name="email" placeholder="Email" required />
-                        <i class="ri-mail-line icon text-xl"></i>
+                <div id="login-alert" class="alert-container"></div>
+
+                <form id="loginForm" class="space-y-6">
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="email" id="login-email" placeholder="Email" required />
+                            <i class="ri-mail-line icon text-xl"></i>
+                        </div>
+                        <div id="login-email-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="floating-label password-container">
-                        <input type="password" name="password" placeholder="Mật khẩu" required id="loginPassword" />
-                        <i class="ri-lock-line icon text-xl"></i>
-                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('loginPassword', this)"></i>
+
+                    <div class="field-group">
+                        <div class="floating-label password-container">
+                            <input type="password" id="login-password" placeholder="Mật khẩu" required />
+                            <i class="ri-lock-line icon text-xl"></i>
+                            <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('login-password', this)"></i>
+                        </div>
+                        <div id="login-password-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
+
                     <div class="flex items-center justify-between">
                         <div class="checkbox-wrapper">
-                            <input type="checkbox" id="remember-me" name="RememberMe">
-                            <label for="remember-me">Ghi nhớ đăng nhập</label>
+                            <input type="checkbox" id="remember-me" class="sr-only">
+                            <div class="custom-checkbox" onclick="toggleCheckbox('remember-me', this)">
+                                <i class="ri-check-line text-white text-sm hidden"></i>
+                            </div>
+                            <label for="remember-me" class="cursor-pointer">Ghi nhớ đăng nhập</label>
                         </div>
-                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                        <a asp-controller="Common" asp-action="ForgotPassword" class="text-blue-600 hover:text-green-600 text-sm transition-colors">Quên mật khẩu?</a>
                     </div>
-                    <button type="submit" class="submit-btn w-full">
+                    <button type="submit" class="submit-btn w-full" id="login-btn">
                         <span class="button-text">Đăng nhập</span>
+                        <div class="loading ml-2 hidden"></div>
                     </button>
                 </form>
             </div>
@@ -390,36 +93,147 @@
         <div class="form-container register-container">
             <div class="form-header">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent mb-2">
-                    Tạo tài khoản mới
+                    Tham gia cùng chúng tôi
                 </h1>
-                <p class="text-gray-600">Đăng ký để bắt đầu</p>
+                <p class="text-gray-600">Đăng ký để bắt đầu hành trình thể thao</p>
             </div>
             <div class="form-content">
-                <form method="post" action="/Account/Register" class="space-y-4">
-                    @Html.AntiForgeryToken()
-                    <div class="floating-label">
-                        <input type="text" name="FullName" placeholder="Họ và tên" required />
-                        <i class="ri-user-3-line icon text-xl"></i>
+                <div id="register-alert" class="alert-container"></div>
+
+                <form id="registerForm" class="space-y-4">
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="text" id="register-fullname" placeholder="Họ và tên" required />
+                            <i class="ri-user-3-line icon text-xl"></i>
+                        </div>
+                        <div id="register-fullname-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="floating-label">
-                        <input type="email" name="Email" placeholder="Email" required />
-                        <i class="ri-mail-line icon text-xl"></i>
+
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="email" id="register-email" placeholder="Email" required />
+                            <i class="ri-mail-line icon text-xl"></i>
+                        </div>
+                        <div id="register-email-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="floating-label password-container">
-                        <input type="password" name="Password" placeholder="Mật khẩu" required id="registerPassword" />
-                        <i class="ri-lock-line icon text-xl"></i>
-                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('registerPassword', this)"></i>
+
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="text" id="register-address" placeholder="Địa chỉ" required />
+                            <i class="ri-home-line icon text-xl"></i>
+                        </div>
+                        <div id="register-address-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="floating-label password-container">
-                        <input type="password" name="ConfirmPassword" placeholder="Xác nhận mật khẩu" required id="confirmPassword" />
-                        <i class="ri-lock-2-line icon text-xl"></i>
-                        <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('confirmPassword', this)"></i>
+
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="tel" id="register-phone" placeholder="Số điện thoại" required pattern="[0-9]{10,15}" />
+                            <i class="ri-phone-line icon text-xl"></i>
+                        </div>
+                        <div id="register-phone-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="agree-terms" name="AgreeToTerms" required>
-                        <label for="agree-terms">Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản</a></label>
+
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <div class="custom-select" id="gender-select-wrapper">
+                                <div class="custom-select-trigger" id="gender-trigger">
+                                    <span class="placeholder">Chọn giới tính</span>
+                                    <i class="ri-arrow-down-s-line custom-select-arrow"></i>
+                                </div>
+                                <div class="custom-select-dropdown" id="gender-dropdown">
+                                    <div class="custom-select-option" data-value="Nam">👨 Nam</div>
+                                    <div class="custom-select-option" data-value="Nữ">👩 Nữ</div>
+                                    <div class="custom-select-option" data-value="Khác">🏳️‍⚧️ Khác</div>
+                                </div>
+                            </div>
+                            <select id="register-gender" required style="display: none;">
+                                <option value="">Chọn giới tính</option>
+                                <option value="Nam">👨 Nam</option>
+                                <option value="Nữ">👩 Nữ</option>
+                                <option value="Khác">🏳️‍⚧️ Khác</option>
+                            </select>
+                            <i class="ri-user-heart-line icon text-xl"></i>
+                        </div>
+                        <div id="register-gender-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
                     </div>
-                    <button type="submit" class="submit-btn w-full"><span class="button-text">Đăng ký</span></button>
+
+                    <div class="field-group">
+                        <div class="floating-label">
+                            <input type="date" id="register-dob" required />
+                            <i class="ri-calendar-line icon text-xl"></i>
+                        </div>
+                        <div id="register-dob-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="floating-label password-container">
+                            <input type="password" id="register-password" placeholder="Mật khẩu" required />
+                            <i class="ri-lock-line icon text-xl"></i>
+                            <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('register-password', this)"></i>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-gray-500">Độ mạnh mật khẩu</span>
+                                <span id="strength-text" class="text-xs text-gray-500"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1">
+                                <div id="strength-bar" class="password-strength bg-gray-200"></div>
+                            </div>
+                        </div>
+                        <div id="register-password-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="floating-label password-container">
+                            <input type="password" id="confirm-password" placeholder="Xác nhận mật khẩu" required />
+                            <i class="ri-lock-2-line icon text-xl"></i>
+                            <i class="ri-eye-line password-toggle text-xl" onclick="togglePassword('confirm-password', this)"></i>
+                        </div>
+                        <div id="confirm-password-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="agree-terms" required class="sr-only">
+                            <div class="custom-checkbox" onclick="toggleCheckbox('agree-terms', this)">
+                                <i class="ri-check-line text-white text-sm hidden"></i>
+                            </div>
+                            <label for="agree-terms" class="cursor-pointer text-sm">Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản</a> và <a href="#" class="text-blue-600 hover:underline">Chính sách</a></label>
+                        </div>
+                        <div id="agree-terms-error" class="field-error">
+                            <i class="ri-error-warning-line"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn w-full" id="register-btn">
+                        <span class="button-text">Đăng ký</span>
+                        <div class="loading ml-2 hidden"></div>
+                    </button>
                 </form>
             </div>
         </div>
@@ -442,41 +256,9 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const signUpButton = document.getElementById('signUp');
-            const signInButton = document.getElementById('signIn');
-            const container = document.getElementById('container');
-
-            signUpButton.addEventListener('click', () => {
-                container.classList.add('right-panel-active');
-            });
-
-            signInButton.addEventListener('click', () => {
-                container.classList.remove('right-panel-active');
-            });
-
-            // Password matching validation
-            const registerForm = document.querySelector('form[action*="Register"]');
-            if (registerForm) {
-                const password = registerForm.querySelector('input[name="Password"]');
-                const confirmPassword = registerForm.querySelector('input[name="ConfirmPassword"]');
-
-                const validatePasswordMatch = () => {
-                    if (password.value !== confirmPassword.value) {
-                        confirmPassword.setCustomValidity('Mật khẩu không khớp.');
-                    } else {
-                        confirmPassword.setCustomValidity('');
-                    }
-                };
-                password.addEventListener('input', validatePasswordMatch);
-                confirmPassword.addEventListener('input', validatePasswordMatch);
-            }
-        });
-
-        // Function to toggle password visibility
+        // Enhanced utility functions
         function togglePassword(inputId, toggleIcon) {
             const passwordInput = document.getElementById(inputId);
-            
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('ri-eye-line');
@@ -487,6 +269,576 @@
                 toggleIcon.classList.add('ri-eye-line');
             }
         }
+
+        function toggleCheckbox(inputId, checkboxDiv) {
+            const checkbox = document.getElementById(inputId);
+            const icon = checkboxDiv.querySelector('i');
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                checkboxDiv.classList.add('checked');
+                icon.classList.remove('hidden');
+            } else {
+                checkboxDiv.classList.remove('checked');
+                icon.classList.add('hidden');
+            }
+        }
+
+        // ENHANCED ALERT SYSTEM - ĐÃ CẢI TIẾN
+        function showAlert(containerId, message, type = 'error', autoHide = true, isToast = false) {
+            const container = isToast ?
+                document.getElementById('toast-container') :
+                document.getElementById(containerId);
+
+            if (!container) return;
+
+            const alertId = 'alert-' + Date.now();
+            const alertClass = `alert-${type}`;
+            const iconMap = {
+                'success': 'ri-check-circle-line',
+                'error': 'ri-error-warning-line',
+                'warning': 'ri-alert-line'
+            };
+            const icon = iconMap[type] || 'ri-information-line';
+
+            const alertHtml = `
+                        <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
+                            <div class="alert-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="alert-content">
+                                ${message}
+                            </div>
+                            <div class="alert-close" onclick="closeAlert('${alertId}')">
+                                <i class="ri-close-line"></i>
+                            </div>
+                            ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
+                        </div>
+                    `;
+
+            if (isToast) {
+                container.insertAdjacentHTML('afterbegin', alertHtml);
+            } else {
+                container.innerHTML = alertHtml;
+            }
+
+            if (autoHide && (type === 'success' || isToast)) {
+                setTimeout(() => {
+                    closeAlert(alertId);
+                }, 5000);
+            }
+
+            // Scroll to alert for mobile if it's local
+            if (!isToast && window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const alertElement = document.getElementById(alertId);
+                    if (alertElement) {
+                        alertElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
+                        });
+                    }
+                }, 100);
+            }
+        }
+
+        // Show toast notification (global) - MỚI
+        function showToast(message, type = 'success', autoHide = true) {
+            showAlert('toast-container', message, type, autoHide, true);
+        }
+
+        // Show form validation summary - MỚI
+        function showFormErrorSummary(containerId, errors) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const errorList = Array.isArray(errors) ? errors : [errors];
+            const errorItems = errorList.map(error => `<li>${error}</li>`).join('');
+
+            const alertHtml = `
+                        <div class="form-error-summary">
+                            <div class="alert-icon">
+                                <i class="ri-error-warning-line"></i>
+                            </div>
+                            <div class="alert-content">
+                                <strong>Vui lòng kiểm tra các lỗi sau:</strong>
+                                <ul style="margin: 8px 0 0 0; padding-left: 16px;">
+                                    ${errorItems}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+
+            container.innerHTML = alertHtml;
+
+            // Auto scroll to error summary on mobile
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    container.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }, 100);
+            }
+        }
+
+        function closeAlert(alertId) {
+            const alert = document.getElementById(alertId);
+            if (alert) {
+                alert.classList.add('alert-exit');
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            }
+        }
+
+        function clearAlert(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const alerts = container.querySelectorAll('.alert, .form-error-summary');
+            alerts.forEach(alert => {
+                alert.classList.add('alert-exit');
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            });
+        }
+
+        // Field validation system
+        function showFieldError(fieldId, message) {
+            const input = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + '-error');
+
+            if (input && errorDiv) {
+                input.classList.add('error');
+                errorDiv.querySelector('span').textContent = message;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        function clearFieldError(fieldId) {
+            const input = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + '-error');
+
+            if (input && errorDiv) {
+                input.classList.remove('error');
+                errorDiv.classList.remove('show');
+                setTimeout(() => {
+                    errorDiv.querySelector('span').textContent = '';
+                }, 200);
+            }
+        }
+
+        function clearAllFieldErrors(formId) {
+            const form = document.getElementById(formId);
+            const errorDivs = form.querySelectorAll('.field-error.show');
+            const errorInputs = form.querySelectorAll('input.error, select.error, .custom-select-trigger.error');
+
+            errorInputs.forEach(input => input.classList.remove('error'));
+            errorDivs.forEach(div => {
+                div.classList.remove('show');
+                setTimeout(() => {
+                    div.querySelector('span').textContent = '';
+                }, 200);
+            });
+        }
+
+        function showLoading(buttonId) {
+            const button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.querySelector('.button-text').classList.add('hidden');
+            button.querySelector('.loading').classList.remove('hidden');
+        }
+
+        function hideLoading(buttonId) {
+            const button = document.getElementById(buttonId);
+            button.disabled = false;
+            button.querySelector('.button-text').classList.remove('hidden');
+            button.querySelector('.loading').classList.add('hidden');
+        }
+
+        // Validation functions
+        function validateEmail(email) {
+            return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+        }
+
+        function validatePhone(phone) {
+            return /^\d{10,15}$/.test(phone);
+        }
+
+        function validateFullName(name) {
+            return /^[a-zA-ZÀ-ỹ\s]{2,}$/.test(name);
+        }
+
+        function getPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d\s]/.test(password)) strength++;
+            return strength;
+        }
+
+        function updatePasswordStrengthUI(password) {
+            const strength = getPasswordStrength(password);
+            const strengthBar = document.getElementById('strength-bar');
+            const strengthText = document.getElementById('strength-text');
+            let strengthClass = '';
+            let strengthTextContent = '';
+
+            if (password.length > 0) {
+                if (strength <= 1) {
+                    strengthClass = 'strength-weak';
+                    strengthTextContent = 'Yếu';
+                } else if (strength === 2) {
+                    strengthClass = 'strength-fair';
+                    strengthTextContent = 'Trung bình';
+                } else if (strength === 3) {
+                    strengthClass = 'strength-good';
+                    strengthTextContent = 'Tốt';
+                } else if (strength >= 4) {
+                    strengthClass = 'strength-strong';
+                    strengthTextContent = 'Rất tốt';
+                }
+            }
+            strengthBar.className = `password-strength ${strengthClass}`;
+            strengthText.textContent = strengthTextContent;
+        }
+
+        // CUSTOM SELECT FUNCTIONALITY
+        function initCustomSelects() {
+            const customSelects = document.querySelectorAll('.custom-select');
+
+            customSelects.forEach(selectWrapper => {
+                const trigger = selectWrapper.querySelector('.custom-select-trigger');
+                const dropdown = selectWrapper.querySelector('.custom-select-dropdown');
+                const options = selectWrapper.querySelectorAll('.custom-select-option');
+                const hiddenSelect = selectWrapper.parentElement.querySelector('select[style*="display: none"]');
+
+                // Toggle dropdown
+                trigger.addEventListener('click', function (e) {
+                    e.stopPropagation();
+
+                    // Close other dropdowns
+                    document.querySelectorAll('.custom-select-trigger.active').forEach(otherTrigger => {
+                        if (otherTrigger !== trigger) {
+                            otherTrigger.classList.remove('active');
+                            otherTrigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
+                        }
+                    });
+
+                    // Toggle current dropdown
+                    trigger.classList.toggle('active');
+                    dropdown.classList.toggle('active');
+                });
+
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', function (e) {
+                        e.stopPropagation();
+
+                        const value = this.dataset.value;
+                        const text = this.textContent;
+
+                        // Update trigger display
+                        const placeholderElement = trigger.querySelector('.placeholder');
+                        placeholderElement.textContent = text;
+                        placeholderElement.className = 'selected-value';
+
+                        // Update hidden select
+                        if (hiddenSelect) {
+                            hiddenSelect.value = value;
+                            hiddenSelect.dispatchEvent(new Event('change'));
+                        }
+
+                        // Update visual state
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+
+                        // Close dropdown
+                        trigger.classList.remove('active');
+                        dropdown.classList.remove('active');
+
+                        // Clear any validation errors
+                        if (hiddenSelect) {
+                            clearFieldError(hiddenSelect.id);
+                            // Also clear trigger error styling
+                            trigger.classList.remove('error');
+                        }
+                    });
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function () {
+                document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
+                    trigger.classList.remove('active');
+                    trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
+                });
+            });
+
+            // Prevent dropdown close when scrolling inside
+            document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+                dropdown.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            });
+        }
+
+        // Enhanced field error function for custom select
+        function showFieldErrorForSelect(fieldId, message) {
+            const hiddenSelect = document.getElementById(fieldId);
+            const trigger = hiddenSelect.parentElement.querySelector('.custom-select-trigger');
+            const errorDiv = document.getElementById(fieldId + '-error');
+
+            if (trigger && errorDiv) {
+                trigger.classList.add('error');
+                errorDiv.querySelector('span').textContent = message;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        // Main application
+        document.addEventListener('DOMContentLoaded', function () {
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+            const mobileLoginTab = document.getElementById('mobile-login-tab');
+            const mobileRegisterTab = document.getElementById('mobile-register-tab');
+            const loginContainer = document.querySelector('.login-container');
+            const registerContainer = document.querySelector('.register-container');
+
+            // Initialize custom selects
+            initCustomSelects();
+
+            // Tab switching
+            function switchToLogin() {
+                container.classList.remove('right-panel-active');
+                mobileLoginTab.classList.add('active');
+                mobileRegisterTab.classList.remove('active');
+                loginContainer.classList.add('mobile-active');
+                registerContainer.classList.remove('mobile-active');
+                clearAlert('login-alert');
+                clearAllFieldErrors('loginForm');
+            }
+
+            function switchToRegister() {
+                container.classList.add('right-panel-active');
+                mobileRegisterTab.classList.add('active');
+                mobileLoginTab.classList.remove('active');
+                registerContainer.classList.add('mobile-active');
+                loginContainer.classList.remove('mobile-active');
+                clearAlert('register-alert');
+                clearAllFieldErrors('registerForm');
+            }
+
+            signUpButton?.addEventListener('click', switchToRegister);
+            signInButton?.addEventListener('click', switchToLogin);
+            mobileLoginTab?.addEventListener('click', switchToLogin);
+            mobileRegisterTab?.addEventListener('click', switchToRegister);
+
+            // Password strength
+            document.getElementById('register-password')?.addEventListener('input', (e) => {
+                updatePasswordStrengthUI(e.target.value);
+                if (e.target.value) {
+                    clearFieldError('register-password');
+                }
+            });
+
+            // Real-time validation
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    if (input.value) {
+                        clearFieldError(input.id);
+                    }
+                });
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('error')) {
+                        clearFieldError(input.id);
+                    }
+                });
+            });
+
+            // LOGIN FORM
+            document.getElementById('loginForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                clearAlert('login-alert');
+                clearAllFieldErrors('loginForm');
+
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const rememberMe = document.getElementById('remember-me').checked;
+
+                let hasError = false;
+
+                if (!email) {
+                    showFieldError('login-email', 'Email không được để trống');
+                    hasError = true;
+                } else if (!validateEmail(email)) {
+                    showFieldError('login-email', 'Email không hợp lệ');
+                    hasError = true;
+                }
+
+                if (!password) {
+                    showFieldError('login-password', 'Mật khẩu không được để trống');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    showAlert('login-alert', 'Vui lòng kiểm tra lại thông tin đã nhập', 'error');
+                    return;
+                }
+
+                showLoading('login-btn');
+
+                try {
+                    const response = await fetch('@Url.Action("Login", "Common")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ email, password, RememberMe: rememberMe })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // TOAST cho thành công
+                        showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+                        setTimeout(() => {
+                            window.location.href = result.redirectUrl || '/';
+                        }, 1500);
+                    } else {
+                        // ALERT cho lỗi trả về từ server
+                        showAlert('login-alert', result.message || 'Đăng nhập thất bại', 'error');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showAlert('login-alert', 'Lỗi kết nối. Vui lòng thử lại sau.', 'error');
+                } finally {
+                    hideLoading('login-btn');
+                }
+            });
+
+            // REGISTER FORM
+            document.getElementById('registerForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                clearAlert('register-alert');
+                clearAllFieldErrors('registerForm');
+
+                const formData = {
+                    fullname: document.getElementById('register-fullname').value.trim(),
+                    email: document.getElementById('register-email').value.trim(),
+                    address: document.getElementById('register-address').value.trim(),
+                    phoneNumber: document.getElementById('register-phone').value.trim(),
+                    gender: document.getElementById('register-gender').value,
+                    dateOfBirth: document.getElementById('register-dob').value,
+                    password: document.getElementById('register-password').value
+                };
+
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const termsAccepted = document.getElementById('agree-terms').checked;
+
+                let hasError = false;
+
+                // Validation with field-level errors
+                if (!formData.fullname) {
+                    showFieldError('register-fullname', 'Họ tên không được để trống');
+                    hasError = true;
+                } else if (!validateFullName(formData.fullname)) {
+                    showFieldError('register-fullname', 'Họ tên phải có ít nhất 2 ký tự và không chứa số');
+                    hasError = true;
+                }
+
+                if (!formData.email) {
+                    showFieldError('register-email', 'Email không được để trống');
+                    hasError = true;
+                } else if (!validateEmail(formData.email)) {
+                    showFieldError('register-email', 'Email không hợp lệ');
+                    hasError = true;
+                }
+
+                if (!formData.address) {
+                    showFieldError('register-address', 'Địa chỉ không được để trống');
+                    hasError = true;
+                } else if (formData.address.length < 5) {
+                    showFieldError('register-address', 'Địa chỉ phải có ít nhất 5 ký tự');
+                    hasError = true;
+                }
+
+                if (!formData.phoneNumber) {
+                    showFieldError('register-phone', 'Số điện thoại không được để trống');
+                    hasError = true;
+                } else if (!validatePhone(formData.phoneNumber)) {
+                    showFieldError('register-phone', 'Số điện thoại phải có từ 10-15 chữ số');
+                    hasError = true;
+                }
+
+                if (!formData.gender) {
+                    showFieldErrorForSelect('register-gender', 'Vui lòng chọn giới tính');
+                    hasError = true;
+                }
+
+                if (!formData.dateOfBirth) {
+                    showFieldError('register-dob', 'Vui lòng chọn ngày sinh');
+                    hasError = true;
+                }
+
+                if (!formData.password) {
+                    showFieldError('register-password', 'Mật khẩu không được để trống');
+                    hasError = true;
+                } else if (getPasswordStrength(formData.password) < 3) {
+                    showFieldError('register-password', 'Mật khẩu phải đạt độ mạnh "Tốt" trở lên');
+                    hasError = true;
+                }
+
+                if (!confirmPassword) {
+                    showFieldError('confirm-password', 'Vui lòng xác nhận mật khẩu');
+                    hasError = true;
+                } else if (formData.password !== confirmPassword) {
+                    showFieldError('confirm-password', 'Mật khẩu xác nhận không khớp');
+                    hasError = true;
+                }
+
+                if (!termsAccepted) {
+                    showFieldError('agree-terms', 'Bạn phải đồng ý với Điều khoản và Chính sách');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    showAlert('register-alert', 'Vui lòng kiểm tra lại thông tin đã nhập', 'error');
+                    return;
+                }
+
+                showLoading('register-btn');
+
+                try {
+                    const response = await fetch('@Url.Action("Register", "Common")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams(formData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // SỬ DỤNG TOAST CHO SUCCESS MESSAGE
+                        showToast('Đăng ký thành công! Mã xác thực đã được gửi đến email của bạn.', 'success');
+                        setTimeout(() => {
+                            window.location.href = result.redirectUrl || '@Url.Action("Verify", "Common")';
+                        }, 2000);
+                    } else {
+                        // GIỮ LOCAL ALERT CHO ERROR
+                        showAlert('register-alert', result.message || 'Đăng ký thất bại', 'error');
+                    }
+                } catch (error) {
+                    console.error('Register error:', error);
+                    showAlert('register-alert', 'Lỗi kết nối. Vui lòng thử lại sau.', 'error');
+                } finally {
+                    hideLoading('register-btn');
+                }
+            });
+        });
     </script>
 </body>
 </html>

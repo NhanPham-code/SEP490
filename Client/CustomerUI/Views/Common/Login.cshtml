@@ -703,13 +703,13 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        // SỬ DỤNG TOAST CHO SUCCESS MESSAGE
+                        // TOAST cho thành công
                         showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
                         setTimeout(() => {
                             window.location.href = result.redirectUrl || '/';
                         }, 1500);
                     } else {
-                        // GIỮ LOCAL ALERT CHO ERROR
+                        // ALERT cho lỗi trả về từ server
                         showAlert('login-alert', result.message || 'Đăng nhập thất bại', 'error');
                     }
                 } catch (error) {
