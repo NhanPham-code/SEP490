@@ -29,7 +29,8 @@ namespace UserAPI.Service
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.FullName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role), // ASP.NET
+            new Claim("Role", user.Role) // Ocelot
             };
 
             var token = new JwtSecurityToken(
