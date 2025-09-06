@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using StadiumAPI.DTOs;
 using StadiumAPI.Service.Interface;
@@ -33,6 +34,7 @@ namespace StadiumAPI.Controllers
         }
 
         [HttpPost("AddCourtRelation")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> CreateCourtRelation([FromBody] int[] childCourt, [FromQuery] int parentCourt)
         {
             var createCourtRelationDTOs = new List<CreateCourtRelationDTO>();
@@ -66,6 +68,7 @@ namespace StadiumAPI.Controllers
         }
 
         [HttpPut("UpdateCourtRelation")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> UpdateCourtRelation([FromForm] int[] childCourt, [FromQuery] int parentId)
         {
             var court = (await _courtRelationService.GetAllCourtRelationByParentId(parentId)).ToArray();
@@ -94,6 +97,7 @@ namespace StadiumAPI.Controllers
         }
 
         [HttpDelete("DeleteCourtRelation")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteCourRelation([FromQuery] int parentId)
         {
             return Ok(await _courtRelationService.DeleteCourtRelationByParentId(parentId));

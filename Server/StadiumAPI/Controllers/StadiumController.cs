@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StadiumAPI.Data;
@@ -51,6 +52,7 @@ namespace StadiumAPI.Controllers
         // PUT: api/ReadStadiumDTOes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id, [FromBody] UpdateStadiumDTO updateStadiumDTO)
         {
             if (id != updateStadiumDTO.Id)
@@ -75,6 +77,7 @@ namespace StadiumAPI.Controllers
         // POST: api/ReadStadiumDTOes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromBody] CreateStadiumDTO createStadiumDTO)
         {
             createStadiumDTO.NameUnsigned = RemoveDiacritics(createStadiumDTO.Name).ToLower();
@@ -87,6 +90,7 @@ namespace StadiumAPI.Controllers
 
         // DELETE: api/ReadStadiumDTOes/5
         [HttpDelete]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteReadStadiumDTO([FromQuery] int id)
         {
             var readStadiumDTO = await _serviceStadium.GetStadiumByIdAsync(id);

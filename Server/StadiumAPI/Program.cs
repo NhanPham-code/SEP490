@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using StadiumAPI.Data;
@@ -9,6 +10,7 @@ using StadiumAPI.Repositories;
 using StadiumAPI.Repositories.Interface;
 using StadiumAPI.Service;
 using StadiumAPI.Service.Interface;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +71,44 @@ builder.Services.AddControllers().AddOData(options =>
         .Count()
         .SetMaxTop(100);
 });
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+
+            // ✅ Cấu hình này đảm bảo Ocelot đọc được đúng claim gốc
+            NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+        };
+
+        // ✅ Bắt buộc: Không cho .NET tự ánh xạ claim
+        options.MapInboundClaims = false;
+    });
+
+// Authorization policies (cho phép Customer) để dùng trong Controller
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+    {
+        policy.RequireRole("Customer");
+    });
+});
 
 builder.Services.AddDbContext<StadiumDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -106,6 +146,7 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
+app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();
