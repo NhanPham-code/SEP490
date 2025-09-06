@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using System.Text;
@@ -14,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 // Load ocelot.json
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-builder.Services.AddOcelot();
+builder.Services.AddOcelot(builder.Configuration);
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -35,15 +36,8 @@ builder.Services.AddAuthentication("Bearer")
             IssuerSigningKey = new SymmetricSecurityKey(key),
 
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-
-            // ✅ Cấu hình này đảm bảo Ocelot đọc được đúng claim gốc
-            NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
-            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            ClockSkew = TimeSpan.Zero
         };
-
-        // ✅ Bắt buộc: Không cho .NET tự ánh xạ claim
-        options.MapInboundClaims = false;
     });
 
 // Authorization policies
@@ -63,6 +57,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Use Ocelot middleware
+await app.UseOcelot();
+
 app.MapControllers();
 
 app.Use(async (context, next) =>
@@ -74,7 +71,5 @@ app.Use(async (context, next) =>
     }
     await next();
 });
-// Use Ocelot middleware
-await app.UseOcelot();
 
 app.Run();

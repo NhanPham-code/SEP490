@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData.UriParser;
 using System.Security.Claims;
@@ -156,11 +157,12 @@ namespace UserAPI.Controllers
         }
 
         /// <summary>
-        /// api/Users/id
+        /// api/Users/profile
         /// Lấy thông tin người dùng hiện tại (đang đăng nhập)
         /// Lấy bằng userId trong Access Token
         /// </summary>
         [HttpGet("profile")]
+        [Authorize(Roles = "Customer,StadiumManager")]
         public async Task<IActionResult> GetUserProfile()
         {
             // lấy userId từ access token trong header
@@ -189,6 +191,7 @@ namespace UserAPI.Controllers
         /// Lấy thông tin người dùng khác
         /// </summary>
         [HttpGet("{userId}")]
+        [Authorize(Roles = "Customer,StadiumManager,Admin")]
         public async Task<IActionResult> GetOtherUserProfile(int userId)
         {
             if (userId <= 0)
@@ -242,6 +245,7 @@ namespace UserAPI.Controllers
 
 
         [HttpPut("update-profile")]
+        [Authorize(Roles = "Customer,StadiumManager")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDTO dto) 
         {
             if (!ModelState.IsValid)
@@ -274,6 +278,7 @@ namespace UserAPI.Controllers
         }
 
         [HttpPut("update-avatar")]
+        [Authorize(Roles = "Customer,StadiumManager")]
         public async Task<IActionResult> UpdateAvatar([FromForm] UpdateAvatarDTO dto) 
         {
             if (!ModelState.IsValid)
