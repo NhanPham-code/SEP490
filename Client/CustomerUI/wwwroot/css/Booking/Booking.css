@@ -1,4 +1,6 @@
-﻿body {
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
@@ -303,3 +305,488 @@
     }
 }
 
+/*Clock css*/
+.clocks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 800px;
+    width: 100%;
+}
+
+.clock {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.am-clock {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    border: 8px solid #fdcb6e;
+}
+
+.pm-clock {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    border: 8px solid #74b9ff;
+}
+
+.clock-face {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.am-clock .clock-face {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 0 20px rgba(253, 203, 110, 0.3);
+}
+
+.pm-clock .clock-face {
+    background: rgba(45, 52, 54, 0.9);
+    box-shadow: inset 0 0 20px rgba(116, 185, 255, 0.3);
+}
+
+.icon {
+    position: absolute;
+    top: -30px;
+    font-size: 40px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.sun-icon {
+    color: #f39c12;
+    animation: rotate 10s linear infinite, float 3s ease-in-out infinite;
+}
+
+.moon-icon {
+    color: #74b9ff;
+}
+
+.clock-label {
+    position: absolute;
+    bottom: -50px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hour-numbers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.hour-number {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-size: 16px;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -10px;
+    margin-top: -10px;
+}
+
+.am-clock .hour-number {
+    color: #2d3436;
+}
+
+.pm-clock .hour-number {
+    color: #ddd;
+}
+
+/* Clickable hour sectors */
+.clocks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 800px;
+    width: 100%;
+}
+
+.clock {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.am-clock {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    border: 8px solid #fdcb6e;
+}
+
+.pm-clock {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    border: 8px solid #74b9ff;
+}
+
+.clock-face {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.am-clock .clock-face {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 0 20px rgba(253, 203, 110, 0.3);
+}
+
+.pm-clock .clock-face {
+    background: rgba(45, 52, 54, 0.9);
+    box-shadow: inset 0 0 20px rgba(116, 185, 255, 0.3);
+}
+
+.icon {
+    position: absolute;
+    top: -30px;
+    font-size: 40px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.sun-icon {
+    color: #f39c12;
+    animation: rotate 10s linear infinite, float 3s ease-in-out infinite;
+}
+
+.moon-icon {
+    color: #74b9ff;
+}
+
+.clock-label {
+    position: absolute;
+    bottom: -50px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hour-numbers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.hour-number {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-size: 16px;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -10px;
+    margin-top: -10px;
+}
+
+.am-clock .hour-number {
+    color: #2d3436;
+}
+
+.pm-clock .hour-number {
+    color: #ddd;
+}
+
+/* Schedule Table Styles */
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    background: white;
+}
+
+/* Timeline Header */
+.timeline-header {
+    position: relative;
+    height: 60px;
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 0;
+}
+
+.timeline-track {
+    position: absolute;
+    top: 30px;
+    left: 120px;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.timeline-marker {
+    position: absolute;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 3px solid #667eea;
+    border-radius: 50%;
+    transform: translateX(-50%);
+}
+
+.timeline-label {
+    position: absolute;
+    top: -35px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.court-header-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 100%;
+    background: #f1f5f9;
+    border-right: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .court-header-placeholder::before {
+        content: '';
+        width: 20px;
+        height: 2px;
+        background: #cbd5e0;
+        border-radius: 1px;
+    }
+
+/* Court Info Column */
+.court-info {
+    background: #f7fafc;
+    padding: 12px 16px;
+    border-right: 2px solid #e2e8f0;
+    vertical-align: middle;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    min-width: 120px;
+}
+
+.court-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.court-details {
+    font-size: 12px;
+    color: #718096;
+    margin-bottom: 2px;
+}
+
+.court-price {
+    font-size: 12px;
+    color: #38a169;
+    font-weight: 500;
+}
+
+/* Time Slot Cells */
+.time-slot {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    /* Available Slots */
+    .time-slot.available {
+        background: #f0fff4;
+        border-color: #c6f6d5;
+    }
+
+        .time-slot.available:hover {
+            background: #c6f6d5;
+            border-color: #68d391;
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(104, 211, 145, 0.3);
+        }
+
+    /* Booked Slots */
+    .time-slot.booked {
+        background: #fed7d7;
+        border-color: #feb2b2;
+        cursor: not-allowed;
+    }
+
+.booking-indicator {
+    color: #e53e3e;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Locked Slots */
+.time-slot.locked {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    cursor: not-allowed;
+    position: relative;
+}
+
+    .time-slot.locked::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient( 45deg, transparent, transparent 4px, rgba(160, 174, 192, 0.3) 4px, rgba(160, 174, 192, 0.3) 8px );
+    }
+
+/* Row Alternating Colors */
+.schedule-table tbody tr:nth-child(even) .court-info {
+    background: #edf2f7;
+}
+
+.schedule-table tbody tr:nth-child(odd) .court-info {
+    background: #f7fafc;
+}
+
+/* Hover Effects for Rows */
+.schedule-table tbody tr:hover .court-info {
+    background: #e6fffa !important;
+    border-color: #4fd1c7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .schedule-table {
+        font-size: 12px;
+    }
+
+    .time-slot {
+        width: 45px;
+        height: 45px;
+    }
+
+    .court-info {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+
+    .court-name {
+        font-size: 13px;
+    }
+
+    .court-details,
+    .court-price {
+        font-size: 11px;
+    }
+
+    .time-header {
+        min-width: 45px;
+        font-size: 11px;
+        padding: 8px 4px;
+    }
+}
+
+/* Loading State */
+.loading-schedule {
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+    font-style: italic;
+}
+
+/* Animation for newly booked slots */
+@keyframes bookingSuccess {
+    0% {
+        transform: scale(1);
+        background: #c6f6d5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        background: #68d391;
+    }
+
+    100% {
+        transform: scale(1);
+        background: #fed7d7;
+    }
+}
+
+.time-slot.booking-animation {
+    animation: bookingSuccess 0.6s ease-in-out;
+}
+
+/* Scrollable container for large tables */
+.schedule-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 70vh;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+    /* Custom scrollbar */
+    .schedule-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .schedule-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .schedule-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+        .schedule-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }

@@ -13,6 +13,7 @@ namespace Service.Interfaces
         Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken);
         Task<BookingReadDto?> CreateBookingAsync(BookingCreateDto bookingCreateDto, string accessToken);
         Task<BookingReadDto> GetBookingDetailAsync(string accessToken, int bookingId);
-        Task<List<BookingReadDto>> GetBookedCourtsAsync(string accessToken, int stadiumId, DateTime startTime, DateTime endTime);
+        Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime startTime, DateTime endTime);
+        Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime date);
     }
 }

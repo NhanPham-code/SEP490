@@ -19,14 +19,6 @@ namespace BookingAPI.Models
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 
-        [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime StartTime { get; set; }
-
-        [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime EndTime { get; set; }
-
         [Column(TypeName = "decimal(10,2)")]
         public decimal? TotalPrice { get; set; }
 

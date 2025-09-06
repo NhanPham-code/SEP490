@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingAPI.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    [Migration("20250825154223_init")]
+    [Migration("20250828143029_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -44,9 +44,6 @@ namespace BookingAPI.Migrations
                     b.Property<int?>("DiscountId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -58,9 +55,6 @@ namespace BookingAPI.Migrations
 
                     b.Property<int>("StadiumId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -98,6 +92,12 @@ namespace BookingAPI.Migrations
 
                     b.Property<int>("CourtId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

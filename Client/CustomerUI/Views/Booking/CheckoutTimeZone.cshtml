@@ -1,20 +1,5 @@
-﻿@using System.Text.Json
-@using DTOs.BookingDTO
-@{
+﻿@{
     ViewBag.Title = "Thanh Toán";
-}
-@if (TempData["BookingSuccess"] != null && (bool)TempData["BookingSuccess"])
-{
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: '@TempData["SuccessMessage"]',
-            showConfirmButton: false,
-            timer: 2500
-        });
-    </script>
 }
 
 <!DOCTYPE html>
@@ -82,7 +67,6 @@
         <input type="hidden" id="booking-total-price" name="TotalPrice" value="" />
         <input type="hidden" id="booking-note" name="Note" value="" />
         <input type="hidden" id="booking-discount-id" name="DiscountId" value="" />
-        <input type="hidden" id="payment-amount" name="PaymentAmount" value="" />
         <div id="court-ids-container"></div>
         <input type="hidden" id="payment-method-input" name="PaymentMethod" value="bank_transfer" />
         <input type="hidden" id="booking-stadium-id" name="StadiumId" value="" />
@@ -97,20 +81,18 @@
                         <span>Sân vận động:</span>
                         <span id="checkout-stadium-name" class="font-bold"></span>
                     </div>
-                    <table class="w-full text-sm text-gray-700 mb-4">
-                        <thead>
-                            <tr class="border-b font-semibold">
-                                <th class="py-2 text-left">Sân</th>
-                                <th class="py-2 text-center">Khung giờ</th>
-                                <th class="py-2 text-right">Giá mỗi giờ</th>
-                                <th class="py-2 text-right">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody id="checkout-invoice-body">
-                            <!-- Rows will be injected here -->
-                        </tbody>
-                    </table>
-
+                    <div class="flex justify-between">
+                        <span>Sân:</span>
+                        <span id="checkout-court-name" class="font-bold text-indigo-600"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Thời gian:</span>
+                        <span id="checkout-time" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Tổng số giờ:</span>
+                        <span id="checkout-duration" class="font-bold"></span>
+                    </div>
                     <div class="flex justify-between border-t pt-3 mt-3 border-gray-200">
                         <span>Giá gốc:</span>
                         <span id="checkout-original-price"></span>
@@ -174,6 +156,8 @@
                 </div>
             </div>
 
+            <input type="hidden" id="payment-amount" name="PaymentAmount" value="" />
+
             <div class="flex justify-between items-center gap-4 mt-8">
                 <button type="button" id="back-button"
                         class="min-w-[150px] px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">
@@ -190,14 +174,13 @@
     <script>
         // Lấy dữ liệu từ ViewBag (ASP.NET MVC truyền sang)
         const bookingData = {
-            stadiumId: @ViewBag.StadiumId, // Already an integer, no need to parse
-            date: "@ViewBag.Date", // Razor string interpolation
-            totalPrice: @ViewBag.TotalPrice, // Already a number
-            courts: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Courts ?? new List<CourtBookingData>()))
+            stadiumId: parseInt("@ViewBag.StadiumId"),
+            courtIdsString: "@ViewBag.CourtIdsString",
+            date: "@ViewBag.Date",
+            startTime: parseInt("@ViewBag.StartTime"),
+            endTime: parseInt("@ViewBag.EndTime"),
+            totalPrice: parseFloat("@ViewBag.TotalPrice")
         };
-
-
-        console.log("BookingData:", bookingData);
 
         let stadiumData = null;
         let subtotalPrice = bookingData.totalPrice;
@@ -224,7 +207,7 @@
         }
 
         function formatCurrency(amount) {
-            return `${amount.toLocaleString('vi-VN')}`;
+            return `${amount.toLocaleString('vi-VN')} VNĐ`;
         }
 
         function fetchStadiumData(id) {
@@ -236,7 +219,6 @@
                 success: function(data) {
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0];
-                        console.log('Dữ liệu sân vận động:', stadiumData);
                         updateInvoiceDetails();
                     } else {
                         console.error('Không tìm thấy dữ liệu sân vận động.');
@@ -249,50 +231,30 @@
         }
 
         function updateInvoiceDetails() {
-            if (!stadiumData || !bookingData.courts) return;
+            if (!stadiumData) return;
 
-            // Cập nhật tên sân vận động trên giao diện
+            // Tên sân vận động
             $('#checkout-stadium-name').text(stadiumData.Name);
 
-            const courts = JSON.parse(bookingData.courts);
-            const invoiceBody = $('#checkout-invoice-body');
-            invoiceBody.empty(); // Xóa các hàng cũ trước khi thêm hàng mới
+            // Tên sân con
+            let courtNames = "";
+            if (bookingData.courtIdsString) {
+                const courtIdsArray = bookingData.courtIdsString.split(',').map(id => parseInt(id));
+                courtNames = courtIdsArray.map(id => {
+                    const court = stadiumData.Courts.find(c => c.Id === id);
+                    return court ? court.Name : `Sân ${id}`;
+                }).join(', ');
+            }
+            $('#checkout-court-name').text(courtNames);
 
-            let subtotal = 0;
+            // Các thông tin khác
+            $('#checkout-time').text(`${bookingData.startTime}:00 - ${bookingData.endTime}:00`);
+            $('#checkout-duration').text(`${bookingData.endTime - bookingData.startTime} giờ`);
+            $('#checkout-subtotal-price').text(formatCurrency(subtotalPrice));
+            $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
+            $('#checkout-original-price').text(formatCurrency(subtotalPrice)); // Correctly shows the original price (subtotal)
+            $('#checkout-total-price').text(formatCurrency(totalPrice)); // Correctly shows the total price (after discount)
 
-            // Lặp qua từng sân đã đặt để tạo chi tiết hóa đơn
-            courts.forEach(court => {
-                const times = court.times.sort(); // Sắp xếp thời gian để lấy khung giờ chính xác
-                const startTime = times[0].split('-')[0];
-                const endTime = times[times.length - 1].split('-')[1];
-                const timeRange = `${startTime} - ${endTime}`;
-                const duration = court.times.length;
-
-                // Tìm kiếm thông tin sân từ stadiumData bằng courtId
-                const matchedCourt = stadiumData.Courts.find(c => c.Id === court.courtId);
-                const pricePerHour = matchedCourt?.PricePerHour || 0;
-                const courtName = matchedCourt?.Name || 'Không xác định';
-                const total = duration * pricePerHour;
-                subtotal += total;
-
-                // Tạo hàng HTML để hiển thị thông tin sân đã đặt
-                const row = `
-                    <tr class="border-b">
-                        <td class="py-2">${courtName}</td>
-                        <td class="py-2 text-center">${timeRange}</td>
-                        <td class="py-2 text-right">${formatCurrency(pricePerHour)}</td>
-                        <td class="py-2 text-right font-bold">${formatCurrency(total)}</td>
-                    </tr>
-                `;
-                invoiceBody.append(row);
-            });
-
-            // Cập nhật các giá trị tổng cộng trên giao diện
-            $('#checkout-original-price').text(formatCurrency(subtotal));
-            $('#checkout-total-price').text(formatCurrency(bookingData.totalPrice));
-
-            // Hiển thị hoặc ẩn dòng giảm giá tùy thuộc vào số tiền giảm
-            const discountAmount = subtotal - bookingData.totalPrice;
             if (discountAmount > 0) {
                 $('#discount-amount-row').removeClass('hidden');
                 $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
@@ -315,85 +277,58 @@
             const endDateTime = `${dateISO}T${hh(bookingData.endTime)}:00:00`;
 
             $('#booking-date').val(dateISO);
-            $('#booking-start-time').val(startDateTime);
-            $('#booking-end-time').val(endDateTime);
-            $('#booking-original-price').val(subtotalPrice); // Use subtotalPrice for original price
-            $('#booking-total-price').val(totalPrice); // Use totalPrice for final price
+            // You can remove these single fields as they are not needed for the BookingDetails list
+            // $('#booking-start-time').val(startDateTime);
+            // $('#booking-end-time').val(endDateTime);
+            $('#booking-original-price').val(subtotalPrice);
+            $('#booking-total-price').val(totalPrice);
             $('#booking-note').val('');
             $('#booking-discount-id').val(discountId || '');
             $('#booking-stadium-id').val(bookingData.stadiumId);
 
             const courtIdsContainer = $('#court-ids-container');
             courtIdsContainer.empty();
+            if (bookingData.courtIdsString) {
+                const courtIdsArray = bookingData.courtIdsString.split(',');
+                courtIdsArray.forEach((courtId, index) => {
+                    // Create a hidden input for CourtId
+                    const courtInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].CourtId`,
+                        value: courtId.trim()
+                    });
 
-            let courtsArray = [];
+                    // Create a hidden input for StartTime
+                    const startTimeInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].StartTime`,
+                        value: startDateTime
+                    });
 
-            try {
-                courtsArray = typeof bookingData.courts === 'string'
-                    ? JSON.parse(bookingData.courts)
-                    : bookingData.courts;
-            } catch (err) {
-                console.error('Lỗi parse courts:', err);
+                    // Create a hidden input for EndTime
+                    const endTimeInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].EndTime`,
+                        value: endDateTime
+                    });
+
+                    courtIdsContainer.append(courtInput);
+                    courtIdsContainer.append(startTimeInput);
+                    courtIdsContainer.append(endTimeInput);
+                });
             }
-
-            let detailIndex = 0;
-
-            courtsArray.forEach((court) => {
-                const mergedRanges = mergeTimeRanges(court.times);
-
-                mergedRanges.forEach(({ start, end }) => {
-                    const startTime = `${dateISO}T${start}:00`;
-                    const endTime = `${dateISO}T${end}:00`;
-
-                    const baseName = `BookingDetails[${detailIndex}]`;
-
-                    courtIdsContainer.append($('<input>').attr({
-                        type: 'hidden',
-                        name: `${baseName}.CourtId`,
-                        value: court.courtId
-                    }));
-
-                    courtIdsContainer.append($('<input>').attr({
-                        type: 'hidden',
-                        name: `${baseName}.StartTime`,
-                        value: startTime
-                    }));
-
-                    courtIdsContainer.append($('<input>').attr({
-                        type: 'hidden',
-                        name: `${baseName}.EndTime`,
-                        value: endTime
-                    }));
-
-                detailIndex++;
-            });
-
-            });
             $('#payment-method-input').val($('input[name="payment-method"]:checked').val());
-        }
 
-        function mergeTimeRanges(times) {
-            const merged = [];
-            times.sort(); // Ensure chronological order
-
-            let [start, end] = times[0].split('-');
-
-            for (let i = 1; i < times.length; i++) {
-                const [nextStart, nextEnd] = times[i].split('-');
-
-                if (nextStart === end) {
-                    // Extend current range
-                    end = nextEnd;
-                } else {
-                    // Push current range and start new one
-                    merged.push({ start, end });
-                    start = nextStart;
-                    end = nextEnd;
-                }
+            // This part is crucial for the payment amount
+            const paymentMethod = $('input[name="payment-method"]:checked').val();
+            let paymentAmount = 0;
+            const total = parseFloat($('#checkout-total-price').text().replace(/[^0-9]/g, ''));
+            if (paymentMethod === 'vnpay_50') {
+                paymentAmount = total * 0.5;
+            } else if (paymentMethod === 'vnpay_100') {
+                paymentAmount = total;
             }
-
-            merged.push({ start, end }); // Push final range
-            return merged;
+            $('#payment-amount').val(paymentAmount);
         }
 
         function loadUserProfile() {
@@ -420,7 +355,6 @@
                 type: 'GET',
                 success: function(response) {
                     if (response && response.length > 0) {
-                        console.log('Danh sách mã giảm giá:', response);
                         renderDiscounts(response);
                     } else {
                         $('#discount-list').html('<p class="text-gray-500 italic">Không có mã giảm giá nào cho sân này.</p>');
@@ -455,54 +389,8 @@
             });
         }
 
-        function applyDiscount(id, percent, minAmount, maxAmount, code) {
-            const subtotal = calculateSubtotal();
-
-            // Kiểm tra điều kiện áp dụng mã
-            if (subtotal < minAmount) {
-                showModal('Lỗi', `Đơn hàng chưa đủ điều kiện áp dụng mã giảm giá (tối thiểu ${formatCurrency(minAmount)}).`);
-                return;
-            }
-
-            // Tính toán số tiền được giảm
-            let discountAmount = Math.floor((subtotal * percent) / 100);
-            // Áp dụng giới hạn giảm giá tối đa
-            if (discountAmount > maxAmount) {
-                discountAmount = maxAmount;
-            }
-
-            // Cập nhật các biến toàn cục
-            discountId = id;
-            totalPrice = subtotal - discountAmount;
-
-            // Cập nhật giao diện người dùng
-            $('#selected-discount-code').text(`Mã: ${code} (-${formatCurrency(discountAmount)})`);
-            $('#checkout-original-price').text(formatCurrency(subtotal));
-            $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
-            $('#checkout-total-price').text(formatCurrency(totalPrice));
-            $('#discount-amount-row').removeClass('hidden');
-
-            hideDiscountModal(); // Đóng modal sau khi áp dụng thành công
-            updateHiddenFields(); // Cập nhật các trường ẩn cho form
-        }
-
-        function calculateSubtotal() {
-            const courts = JSON.parse(bookingData.courts);
-            let subtotal = 0;
-
-            courts.forEach(court => {
-                const duration = court.times.length;
-                const matchedCourt = stadiumData.Courts.find(c => c.Id === court.courtId);
-                const pricePerHour = matchedCourt?.PricePerHour || 0;
-                subtotal += duration * pricePerHour;
-            });
-
-            return subtotal;
-        }
-
         // --- Event Listeners ---
         $(document).ready(function() {
-            console.log(bookingData);
             fetchStadiumData(bookingData.stadiumId);
             updateHiddenFields();
             loadUserProfile();
@@ -511,21 +399,34 @@
             $('#close-discount-modal').click(hideDiscountModal);
             $('#back-button').click(() => window.history.back());
 
-
-            $('#discount-list').on('click', '.apply-discount-btn', function() {
-                const card = $(this).closest('[data-id]');
-                const discountId = parseInt(card.data('id'));
-                const percent = parseFloat(card.data('percent'));
-                const minAmount = parseInt(card.data('min-amount'));
-                const maxAmount = parseInt(card.data('max-amount'));
-                const code = card.find('.font-bold').text(); // Lấy mã code từ thẻ <span>
-
-                applyDiscount(discountId, percent, minAmount, maxAmount, code);
-            });
-
             $('#select-discount-button').click(() => {
                 fetchDiscounts();
                 showDiscountModal();
+            });
+
+            $('#discount-list').on('click', '.apply-discount-btn', function() {
+                const card = $(this).closest('[data-id]');
+                const discountIdRaw = card.data('id');
+                const percent = card.data('percent');
+                const minAmount = card.data('min-amount');
+                const maxAmount = card.data('max-amount');
+                const code = card.find('.text-lg').text();
+
+                if (subtotalPrice < minAmount) {
+                    showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
+                    return;
+                }
+
+                const calculatedDiscount = subtotalPrice * (percent / 100);
+                discountAmount = Math.min(calculatedDiscount, maxAmount);
+                totalPrice = subtotalPrice - discountAmount;
+                discountId = discountIdRaw;
+
+                $('#selected-discount-code').text(`Đã chọn mã: ${code}`);
+                updateInvoiceDetails();
+                updateHiddenFields();
+                hideDiscountModal();
+                showModal('Thành công', `Mã giảm giá "${code}" đã được áp dụng. Bạn được giảm ${formatCurrency(discountAmount)}.`);
             });
 
             $('input[name="payment-method"]').change(function() {

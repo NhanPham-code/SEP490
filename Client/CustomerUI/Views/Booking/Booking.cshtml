@@ -178,7 +178,7 @@
         </div>
     </div>
 
-    <form id="bookingForm" method="post" action="/Booking/Checkout">
+    <form id="bookingForm" method="post" action="/Booking/CheckoutTimeZone">
         <input type="hidden" name="Date" />
         <input type="hidden" name="StartTime" />
         <input type="hidden" name="EndTime" />
@@ -1195,8 +1195,8 @@
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0]; // Lấy đối tượng sân đầu tiên
                         console.log('Dữ liệu sân vận động:', stadiumData);
-                        openTime = parseHour(stadiumData.OpenTime);  
-                        closeTime = parseHour(stadiumData.CloseTime);  
+                        openTime = parseHour(stadiumData.OpenTime);
+                        closeTime = parseHour(stadiumData.CloseTime);
                         // Tạo một mảng các giờ
                         allHours = Array.from(
                             { length: closeTime - openTime + 1 },

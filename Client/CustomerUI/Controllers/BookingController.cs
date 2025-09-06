@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Service.Services;
 using StadiumAPI.DTOs;
+using System.Text.Json;
 
 namespace CustomerUI.Controllers
 {
@@ -46,7 +47,18 @@ namespace CustomerUI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Checkout(string date, int startTime, int endTime, decimal totalPrice, string courtId, string stadiumId)
+        public IActionResult Checkout([FromForm] CheckoutRequest request)
+        {
+            ViewBag.Date = request.Date;
+            ViewBag.TotalPrice = request.TotalPrice;
+            ViewBag.StadiumId = request.StadiumId;
+            ViewBag.Courts = request.Courts;
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CheckoutTimeZone(string date, int startTime, int endTime, decimal totalPrice, string courtId, string stadiumId)
         {
             ViewBag.Date = date;
             ViewBag.StartTime = startTime;
@@ -284,9 +296,11 @@ namespace CustomerUI.Controllers
                     return RedirectToAction("Checkout");
                 }
 
+                TempData["BookingSuccess"] = true;
                 TempData["SuccessMessage"] = "Đặt sân thành công!";
-                TempData["BookingId"] = createdBooking.Id;
-                return RedirectToAction("Index", "Home");
+
+                // Thay vì chỉ RedirectToAction, hãy thêm tham số truy vấn
+                return RedirectToAction("BookingHistory");
             }
             catch (Exception ex)
             {
@@ -298,17 +312,53 @@ namespace CustomerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBookedCourts(int stadiumId, DateTime date, int startHour, int endHour)
         {
-            var accessToken = _tokenService.GetAccessTokenFromCookie();
-            if (string.IsNullOrEmpty(accessToken))
-                return Unauthorized();
+            //var accessToken = _tokenService.GetAccessTokenFromCookie();
+            //if (string.IsNullOrEmpty(accessToken))
+            //    return Unauthorized();
 
             var startTime = date.Date.AddHours(startHour);
             var endTime = date.Date.AddHours(endHour);
 
-            var result = await _bookingService.GetBookedCourtsAsync(accessToken, stadiumId, startTime, endTime);
+            var result = await _bookingService.GetBookedCourtsAsync(stadiumId, startTime, endTime);
             return Json(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetBookedCourtsByDay(int stadiumId, DateTime date)
+        {
+            //var accessToken = _tokenService.GetAccessTokenFromCookie();
+            //if (string.IsNullOrEmpty(accessToken))
+            //    return Unauthorized();
+
+            //var startTime = date.Date.AddHours(startHour);
+            //var endTime = date.Date.AddHours(endHour);
+
+            var result = await _bookingService.GetBookedCourtsAsync(stadiumId, date);
+            return Json(result);
+        }
+
+
+        // add endpoint for Clock.cshtml 
+        public IActionResult Clock()
+        {
+            return View();
+        }
+
+        public IActionResult VisuallyBooking(string stadiumId)
+        {
+            if (string.IsNullOrEmpty(stadiumId))
+            {
+                // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
+                // hoặc trả về một trang lỗi.
+                return RedirectToAction("VisuallyBooking");
+            }
+
+            // Truyền stadiumId vào ViewBag để View có thể sử dụng.
+            ViewBag.StadiumId = stadiumId;
+
+            // Trả về cùng một View "Booking.cshtml".
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetUserProfile()
