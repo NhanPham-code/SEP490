@@ -82,10 +82,9 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
 
-        public async Task<List<BookingReadDto>> GetBookedCourtsAsync(
-    string accessToken, int stadiumId, DateTime startTime, DateTime endTime)
+        public async Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime startTime, DateTime endTime)
         {
-            AddBearerAccessToken(accessToken);
+            //AddBearerAccessToken(accessToken);
 
             //yyyy → năm
             //MM → tháng
@@ -96,9 +95,10 @@ namespace Service.Services
             string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
             string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
 
+
             string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
-                           $"and StartTime lt {endIso} and EndTime gt {startIso}" +
-                           "&$expand=BookingDetails";
+               $"and BookingDetails/any(d: d/StartTime lt {endIso} and d/EndTime gt {startIso})" +
+               "&$expand=BookingDetails";
 
             var response = await _httpClient.GetAsync(query);
 
@@ -114,5 +114,33 @@ namespace Service.Services
             return result?.Value ?? new List<BookingReadDto>();
         }
 
+        public async Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime date)
+        {
+            // Tạo khoảng thời gian từ đầu ngày đến cuối ngày
+            var startTime = new DateTimeOffset(date.Date, TimeSpan.FromHours(7)); // +07:00
+            var endTime = startTime.AddDays(1);
+
+            // Encode đúng định dạng ISO + timezone
+            string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+
+            // Tạo query đúng định dạng OData
+            string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
+                           $"and Date ge {startIso} and Date lt {endIso}" +
+                           "&$expand=BookingDetails";
+
+            var response = await _httpClient.GetAsync(query);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<BookingReadDto>();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return result?.Value ?? new List<BookingReadDto>();
+        }
     }
 }

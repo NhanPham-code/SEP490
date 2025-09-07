@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Service.Services;
+using StadiumAPI.DTOs;
+using System.Text.Json;
 
 namespace CustomerUI.Controllers
 {
@@ -16,18 +18,21 @@ namespace CustomerUI.Controllers
         private readonly IUserService _userService;
         private readonly IDiscountService _discountService;
         private readonly IStadiumService _stadiumService; 
+        private readonly ICourtRelationService _courtRelationService;
         public BookingController(
             IBookingService bookingService,
             ITokenService tokenService,
             IUserService userService,
             IDiscountService discountService,
-            IStadiumService stadiumService) 
+            IStadiumService stadiumService,
+            ICourtRelationService courtRelationService) 
         {
             _bookingService = bookingService;
             _tokenService = tokenService;
             _userService = userService;
             _discountService = discountService;
             _stadiumService = stadiumService; 
+            _courtRelationService = courtRelationService;
         }
 
 
@@ -42,7 +47,18 @@ namespace CustomerUI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Checkout(string date, int startTime, int endTime, decimal totalPrice, string courtId, string stadiumId)
+        public IActionResult Checkout([FromForm] CheckoutRequest request)
+        {
+            ViewBag.Date = request.Date;
+            ViewBag.TotalPrice = request.TotalPrice;
+            ViewBag.StadiumId = request.StadiumId;
+            ViewBag.Courts = request.Courts;
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CheckoutTimeZone(string date, int startTime, int endTime, decimal totalPrice, string courtId, string stadiumId)
         {
             ViewBag.Date = date;
             ViewBag.StartTime = startTime;
@@ -280,9 +296,11 @@ namespace CustomerUI.Controllers
                     return RedirectToAction("Checkout");
                 }
 
+                TempData["BookingSuccess"] = true;
                 TempData["SuccessMessage"] = "Đặt sân thành công!";
-                TempData["BookingId"] = createdBooking.Id;
-                return RedirectToAction("Index", "Home");
+
+                // Thay vì chỉ RedirectToAction, hãy thêm tham số truy vấn
+                return RedirectToAction("BookingHistory");
             }
             catch (Exception ex)
             {
@@ -294,17 +312,53 @@ namespace CustomerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBookedCourts(int stadiumId, DateTime date, int startHour, int endHour)
         {
-            var accessToken = _tokenService.GetAccessTokenFromCookie();
-            if (string.IsNullOrEmpty(accessToken))
-                return Unauthorized();
+            //var accessToken = _tokenService.GetAccessTokenFromCookie();
+            //if (string.IsNullOrEmpty(accessToken))
+            //    return Unauthorized();
 
             var startTime = date.Date.AddHours(startHour);
             var endTime = date.Date.AddHours(endHour);
 
-            var result = await _bookingService.GetBookedCourtsAsync(accessToken, stadiumId, startTime, endTime);
+            var result = await _bookingService.GetBookedCourtsAsync(stadiumId, startTime, endTime);
             return Json(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetBookedCourtsByDay(int stadiumId, DateTime date)
+        {
+            //var accessToken = _tokenService.GetAccessTokenFromCookie();
+            //if (string.IsNullOrEmpty(accessToken))
+            //    return Unauthorized();
+
+            //var startTime = date.Date.AddHours(startHour);
+            //var endTime = date.Date.AddHours(endHour);
+
+            var result = await _bookingService.GetBookedCourtsAsync(stadiumId, date);
+            return Json(result);
+        }
+
+
+        // add endpoint for Clock.cshtml 
+        public IActionResult Clock()
+        {
+            return View();
+        }
+
+        public IActionResult VisuallyBooking(string stadiumId)
+        {
+            if (string.IsNullOrEmpty(stadiumId))
+            {
+                // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
+                // hoặc trả về một trang lỗi.
+                return RedirectToAction("VisuallyBooking");
+            }
+
+            // Truyền stadiumId vào ViewBag để View có thể sử dụng.
+            ViewBag.StadiumId = stadiumId;
+
+            // Trả về cùng một View "Booking.cshtml".
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetUserProfile()
@@ -349,6 +403,62 @@ namespace CustomerUI.Controllers
                 },
                 message = "Lấy thông tin thành công"
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourtRelationBychildId(int childId)
+        {
+            try
+            {
+                if (childId <= 0)
+                {
+                    return BadRequest("Invalid childId parameter");
+                }
+
+                var courtRelations = await _courtRelationService.GetAllCourtRelationBychildId(childId);
+
+                if (courtRelations == null || !courtRelations.Any())
+                {
+                    return Json(new List<ReadCourtRelationDTO>());
+                }
+
+                return Json(courtRelations);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if you have logging configured
+                // _logger.LogError(ex, "Error occurred while getting court relations for childId: {ChildId}", childId);
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourtRelationByParentId(int parentId)
+        {
+            try
+            {
+                if (parentId <= 0)
+                {
+                    return BadRequest("Invalid parentId parameter");
+                }
+
+                var courtRelations = await _courtRelationService.GetAllCourtRelationByParentId(parentId);
+
+                if (courtRelations == null || !courtRelations.Any())
+                {
+                    return Json(new List<ReadCourtRelationDTO>());
+                }
+
+                return Json(courtRelations);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if you have logging configured
+                // _logger.LogError(ex, "Error occurred while getting court relations for parentId: {ParentId}", parentId);
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
         }
     }
 }
