@@ -1,5 +1,6 @@
 ﻿using BookingAPI.DTOs;
 using BookingAPI.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingAPI.Controllers
@@ -34,6 +35,7 @@ namespace BookingAPI.Controllers
         }
 
         [HttpPost("{userId}")]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<BookingReadDto>> CreateBooking(int userId, BookingCreateDto bookingCreateDto)
         {
             try
