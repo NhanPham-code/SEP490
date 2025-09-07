@@ -104,9 +104,9 @@ builder.Services.AddAuthentication("Bearer")
 // Authorization policies (cho phép Customer) để dùng trong Controller
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Customer", policy =>
+    options.AddPolicy("StadiumManager", policy =>
     {
-        policy.RequireRole("Customer");
+        policy.RequireRole("StadiumManager");
     });
 });
 
@@ -146,7 +146,7 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.UseAuthorization();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

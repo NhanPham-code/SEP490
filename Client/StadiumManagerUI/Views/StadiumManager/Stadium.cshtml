@@ -50,7 +50,7 @@
         $(document).ready(function () {
             initializeApp();
             updateDateTime();
-            setInterval(updateDateTime, 1000);
+            setInterval(updateDateTime, 10000);
         });
 
         // Core Functions
@@ -67,7 +67,7 @@
                     state.filters.search = $(this).val();
                     state.currentPage = 1;
                     loadData();
-                }, 300);
+                }, 1000);
             });
 
             $('#status-filter, #sport-type-filter').on('change', function () {
@@ -88,7 +88,7 @@
             $('#empty-state').hide();
 
             const filterQuery = buildFilterQuery();
-            const searchTerm = `&$filter=CreatedBy eq 3${filterQuery}`;
+            const searchTerm = `&$filter=${filterQuery}`;
 
             $.ajax({
                 url: CONFIG.API_ENDPOINTS.SEARCH,

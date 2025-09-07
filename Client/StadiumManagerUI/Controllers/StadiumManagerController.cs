@@ -1,6 +1,7 @@
 ﻿using DTOs.StadiumDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace StadiumManagerUI.Controllers
@@ -10,6 +11,8 @@ namespace StadiumManagerUI.Controllers
         private readonly IStadiumService _service;
         private readonly IStadiumImageService _imageService;
         private readonly IStadiumVideoSetvice _videoService;
+        private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
 
         [BindProperty]
         public CreateStadiumRequest CreateStadiumRequest { get; set; } = new CreateStadiumRequest();
@@ -17,27 +20,40 @@ namespace StadiumManagerUI.Controllers
         [BindProperty]
         public UpdateStadiumRequest updateStadiumRequest { get; set; } = new UpdateStadiumRequest();
 
-        public StadiumManagerController(IStadiumService service, IStadiumImageService imageService, IStadiumVideoSetvice videoService)
+        public StadiumManagerController(IStadiumService service, IStadiumImageService imageService,
+            IStadiumVideoSetvice videoService, ITokenService tokenService, IUserService userService)
         {
             _service = service;
             _imageService = imageService;
             _videoService = videoService;
+            _tokenService = tokenService;
+            _userService = userService;
         }
 
         public IActionResult Stadium()
         {
+            var token = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Common");
+            }
             return View();
         }
 
         public async Task<IActionResult> GetAllAndSearch(string url)
         {
+            var token = _tokenService.GetAccessTokenFromCookie();
+            var userId = await _userService.GetMyProfileAsync(token);
+            url += $"CreatedBy eq {userId.UserId}";
             var stadium = await _service.SearchStadiumAsync(url);
             return Content(stadium, "application/json");
         }
 
         public async Task<IActionResult> CreateNewStadium()
         {
-            CreateStadiumRequest.Stadium.CreatedBy = 3;
+            var token = _tokenService.GetAccessTokenFromCookie();
+            var userId = await _userService.GetMyProfileAsync(token);
+            CreateStadiumRequest.Stadium.CreatedBy = userId.UserId;
             if (CreateStadiumRequest.StadiumImage == null)
             {
                 return Json(new { success = 400 });
@@ -67,7 +83,9 @@ namespace StadiumManagerUI.Controllers
 
         public async Task<IActionResult> UpdateStadium()
         {
-            updateStadiumRequest.Stadium.CreatedBy = 3;
+            var token = _tokenService.GetAccessTokenFromCookie();
+            var userId = await _userService.GetMyProfileAsync(token);
+            updateStadiumRequest.Stadium.CreatedBy = userId.UserId;
             var stadium = await _service.UpdateStadiumAsync(updateStadiumRequest.Stadium.Id, updateStadiumRequest.Stadium);
             bool check = false;
             if (stadium == null)

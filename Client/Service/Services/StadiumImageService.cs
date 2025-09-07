@@ -5,6 +5,7 @@ using Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -25,8 +26,15 @@ namespace Service.Services
             token = _tokenService.GetAccessTokenFromCookie();
         }
 
+        public void AddBearerAccessToken()
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
         public async Task<List<ReadStadiumImageDTO>> AddStadiumImageAsync(List<CreateStadiumImageDTO> dtos)
         {
+            AddBearerAccessToken();
             if (dtos == null || !dtos.Any() || dtos.All(dto => dto.ImageUrl == null || dto.ImageUrl.Length == 0))
             {
                 throw new ArgumentException("No valid images provided.");
@@ -62,6 +70,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteStadiumImageAsync(int stadiumId)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.DeleteAsync($"/images/delete?stadiumId={stadiumId}");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync() == "true";
@@ -69,6 +78,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteStadiumImageByIdAsync(int[] ids)
         {
+            AddBearerAccessToken();
             var json = JsonSerializer.Serialize(ids); // [1,2,3]
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -97,6 +107,7 @@ namespace Service.Services
 
         public async Task<ReadStadiumImageDTO> UpdateStadiumImageAsync(int stadiumId, UpdateStadiumImageDTO updateStadiumImageDTO)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.PutAsJsonAsync($"/images/update?stadiumId={stadiumId}", updateStadiumImageDTO);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadFromJsonAsync<ReadStadiumImageDTO>();

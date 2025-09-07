@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using StadiumAPI.DTOs;
 using StadiumAPI.Service.Interface;
@@ -42,6 +43,7 @@ namespace StadiumAPI.Controllers
 
         [HttpPost("AddStadiumVideo")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> AddVideo([FromForm] List<CreateStadiumVideoDTO> createStadiumVideoDTO)
         {
             if (!createStadiumVideoDTO.Any() || createStadiumVideoDTO.Any(dto => dto.VideoUrl == null))
@@ -78,6 +80,7 @@ namespace StadiumAPI.Controllers
 
         [HttpDelete]
         [Route("/api/DeleteStadiumVideoById")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteVideoById([FromBody] int[] id)
         {
             if (id == null || id.Length == 0)
@@ -127,6 +130,7 @@ namespace StadiumAPI.Controllers
 
         [HttpDelete]
         [Route("/api/DeleteStadiumVideosByStadiumId")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteVideosByStadiumId([FromQuery] int stadiumId)
         {
             var video = await _serviceStadiumVideo.GetAllVideosAsync(stadiumId);

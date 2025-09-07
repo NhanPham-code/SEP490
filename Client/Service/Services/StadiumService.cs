@@ -33,6 +33,7 @@ namespace Service.Services
 
         public async Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.PostAsJsonAsync("/addStadium", stadiumDto);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadFromJsonAsync<ReadStadiumDTO>();
@@ -40,6 +41,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteStadiumAsync(int id)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.DeleteAsync($"/deleteStadium?id={id}");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync() == "true";
@@ -68,6 +70,7 @@ namespace Service.Services
 
         public Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto)
         {
+            AddBearerAccessToken();
             var response = _httpClient.PutAsJsonAsync($"/updateStadium?id={id}", stadiumDto);
             response.Result.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return response.Result.Content.ReadFromJsonAsync<ReadStadiumDTO>();

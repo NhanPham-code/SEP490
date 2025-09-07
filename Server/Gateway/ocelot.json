@@ -38,7 +38,7 @@
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Users/CustomerRegister",
+      "DownstreamPathTemplate": "/api/Users/register",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -46,19 +46,7 @@
           "Port": 7295
         }
       ],
-      "UpstreamPathTemplate": "/users/CustomerRegister",
-      "UpstreamHttpMethod": [ "POST" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/Users/ManagerRegister",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7295
-        }
-      ],
-      "UpstreamPathTemplate": "/users/ManagerRegister",
+      "UpstreamPathTemplate": "/users/register",
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
@@ -101,7 +89,7 @@
         "RequireAuthentication": true
       },
       "RouteClaimsRequirement": {
-        "Role": "Admin"
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
       }
     },
     {
@@ -120,7 +108,7 @@
         "RequireAuthentication": true
       },
       "RouteClaimsRequirement": {
-        "Role": "Customer"
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
       }
     },
     {
@@ -344,11 +332,11 @@
         }
       ],
       "UpstreamPathTemplate": "/addStadium",
-      "UpstreamHttpMethod": [ "POST" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
       //},
@@ -366,11 +354,11 @@
         }
       ],
       "UpstreamPathTemplate": "/updateStadium",
-      "UpstreamHttpMethod": [ "PUT" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
       //}
@@ -385,11 +373,11 @@
         }
       ],
       "UpstreamPathTemplate": "/deleteStadium",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
       //}
@@ -429,11 +417,11 @@
         }
       ],
       "UpstreamPathTemplate": "/images/upload",
-      "UpstreamHttpMethod": [ "POST" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -448,11 +436,11 @@
         }
       ],
       "UpstreamPathTemplate": "/images/update",
-      "UpstreamHttpMethod": [ "PUT" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -467,11 +455,11 @@
         }
       ],
       "UpstreamPathTemplate": "/images/delete",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -486,11 +474,11 @@
         }
       ],
       "UpstreamPathTemplate": "/images/deleteById",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -530,11 +518,11 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/addCourt",
-      "UpstreamHttpMethod": [ "POST" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -549,11 +537,11 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/updateCourt",
-      "UpstreamHttpMethod": [ "PUT" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -568,11 +556,11 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/Delete",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -612,11 +600,11 @@
         }
       ],
       "UpstreamPathTemplate": "/AddCourtRelation",
-      "UpstreamHttpMethod": [ "POST" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -631,11 +619,11 @@
         }
       ],
       "UpstreamPathTemplate": "/UpdateCourtRelation",
-      "UpstreamHttpMethod": [ "PUT" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -650,11 +638,11 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteCourtRelation",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //},
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}
@@ -995,11 +983,11 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteStadiumVideoById",
-      "UpstreamHttpMethod": [ "DELETE" ]
-      //"AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //}
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     },
     {
       "DownstreamPathTemplate": "/api/DeleteStadiumVideosByStadiumId",

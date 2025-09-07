@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StadiumAPI.DTOs;
 using StadiumAPI.Service.Interface;
 
@@ -31,6 +32,7 @@ namespace StadiumAPI.Controllers
         [HttpPost]
         [Route("/api/AddStadiumImages")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> AddImages([FromForm] List<CreateStadiumImageDTO> imagesDto)
         {
             if (imagesDto == null || !imagesDto.Any() || imagesDto.Any(dto => dto.ImageUrl == null))
@@ -76,6 +78,7 @@ namespace StadiumAPI.Controllers
         [HttpPut]
         [Route("api/UpdateStadiumImage")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> UpdateImage([FromQuery] int id, [FromForm] UpdateStadiumImageDTO imageDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -120,6 +123,7 @@ namespace StadiumAPI.Controllers
         // DELETE: api/StadiumImages/{id}
         [HttpDelete]
         [Route("api/DeleteStadiumImage")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteImages([FromQuery] int stadiumId)
         {
             var images = (await _serviceStadiumImage.GetAllImagesAsync(stadiumId)).ToList();
@@ -163,6 +167,7 @@ namespace StadiumAPI.Controllers
 
         [HttpDelete]
         [Route("api/DeleteImagesByImgId")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteImagesByImgId([FromBody] int[] id)
         {
             if (id == null || id.Length == 0)

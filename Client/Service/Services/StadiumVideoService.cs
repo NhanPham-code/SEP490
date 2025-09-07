@@ -4,6 +4,7 @@ using Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -14,14 +15,25 @@ namespace Service.Services
     public class StadiumVideoService : IStadiumVideoSetvice
     {
         private readonly HttpClient _httpClient;
+        private readonly ITokenService _tokenService;
+        private string token = string.Empty;
 
-        public StadiumVideoService(GatewayHttpClient httpClient)
+        public StadiumVideoService(GatewayHttpClient httpClient, ITokenService tokenService)
         {
             _httpClient = httpClient.Client;
+            _tokenService = tokenService;
+            token = _tokenService.GetAccessTokenFromCookie();
+        }
+
+        public void AddBearerAccessToken()
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
         public async Task<IEnumerable<ReadStadiumVideoDTO>> AddStadiumVideoAsync(List<CreateStadiumVideoDTO> dtos)
         {
+            AddBearerAccessToken();
             using var form = new MultipartFormDataContent();
 
             for (int i = 0; i < dtos.Count; i++)
@@ -38,6 +50,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteAllVideosByStadiumId(int stadiumId)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.DeleteAsync($"/deleteStadiumVideosByStadiumId?stadiumId={stadiumId}");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<bool>();
@@ -45,6 +58,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteStadiumVideoAsync(int[] id)
         {
+            AddBearerAccessToken();
             var json = JsonSerializer.Serialize(id); // [1,2,3]
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -78,6 +92,7 @@ namespace Service.Services
 
         public async Task<ReadStadiumVideoDTO> UpdateStadiumVideoAsync(int id, CreateStadiumVideoDTO stadiumVideoDTO)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.PutAsJsonAsync($"/UpdateStadiumVideo?id={id}", stadiumVideoDTO);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<ReadStadiumVideoDTO>();

@@ -82,6 +82,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=StadiumManager}/{action=Stadium}/{id?}");
+    pattern: "{controller=Common}/{action=Login}/{id?}");
 
 app.Run();
