@@ -1,7 +1,19 @@
 ﻿@model List<DTOs.BookingDTO.BookingReadDto>
-
 @{
     ViewData["Title"] = "Lịch sử Booking";
+}
+@if (TempData["BookingSuccess"] != null && (bool)TempData["BookingSuccess"])
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Thành công!',
+            text: '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))',
+            showConfirmButton: false,
+            timer: 2500
+        });
+    </script>
 }
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -91,9 +103,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 @booking.Date.ToString("dd/MM/yyyy")
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            @* <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 @booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")
-                            </td>
+                            </td> *@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
                                 @(discountInfo != null && discountInfo.ContainsKey(booking.Id) ? discountInfo[booking.Id] : "Không áp dụng")
                             </td>

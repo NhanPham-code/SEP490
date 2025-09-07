@@ -1,0 +1,450 @@
+﻿body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+/*CSS form dash board*/
+.dashboard-layout {
+    display: flex;
+    justify-content: space-between; /* đẩy 2 cụm ra 2 bên */
+    align-items: center;
+    gap: 20px;
+}
+
+/* Bên trái */
+.calendar-section {
+    flex: 0 0 auto;
+}
+
+/* Cụm thống kê */
+.stats-wrapper {
+    display: flex;
+    flex-direction: row; /* các box nằm ngang */
+    background: #eafaf1;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden; /* để bo góc đẹp */
+}
+
+/* Mỗi item bên trong */
+.stat-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+}
+
+    /* Thêm đường ngăn cách ở item đầu */
+    .stat-item:first-child {
+        border-right: 2px solid #d1f2eb;
+    }
+
+.stat-icon {
+    font-size: 32px;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #27ae60;
+}
+
+.stat-info p {
+    margin: 5px 0 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/*
+CSS for booking schedule*/
+.schedule-container {
+    display: flex !important;
+    flex-direction: row;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Prevent outer scroll */
+    background-color: #fff;
+    position: relative;
+}
+
+
+    /* Dành cho trình duyệt WebKit (Chrome, Safari, Edge) */
+    .schedule-container::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn */
+    }
+
+.fixed-column {
+    width: 150px; /* Adjust as needed */
+    flex-shrink: 0;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    
+    /*grid-template-rows: 40px repeat(3, 100px);*/ /* 40px cho phần đầu, 100px cho mỗi sân */
+}
+
+
+    .fixed-column .court-name {
+        /*height: 100px;*/ /* Chiều cao cố định của mỗi ô */
+        border: none;
+        border-top: none; /* Bỏ viền trên để tránh bị dày */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #ffffff;
+        text-align: center;
+        width: 100%;
+        background-color: #66cc66 !important;
+/*        border-bottom: 1px solid black;
+*/    }
+
+.scrollable-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /*overflow-x: auto;
+    overflow-y: hidden;*/
+        }
+
+/*.scrollable-area {
+    flex: 1;*/ /* take up remaining space */
+    /*display: flex;
+    flex-direction: column;*/
+    /*overflow: visible;*/ /* allow children to overflow if they need to */
+/*}*/
+.scrollable-area {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+    /* Add this to hide the scrollbar for WebKit browsers */
+    .scrollable-area::-webkit-scrollbar {
+        display: none !important;
+    }
+
+.scrollable-content {
+    display: flex;
+    flex-direction: column;
+    /*min-width: 2600px;*/ /* Or whatever width your grid needs */
+}
+
+.time-header-wrapper,
+.schedule-body-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+    .time-header-wrapper::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn */
+    }
+
+    .schedule-body-wrapper::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn */
+    }
+
+.time-header {
+    background: aqua;
+    height: 50px;
+    position: relative;
+    display: grid;
+    /* Tăng min-width để các ô rộng hơn */
+    /*min-width: 2600px;*/
+}
+
+.padding-column {
+    background: transparent;
+}
+
+.time-slot {
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+    .time-slot:last-of-type {
+        border-right: none;
+    }
+
+    .time-slot:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .time-slot.selected {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        margin: 2px;
+    }
+
+    /* Thanh vàng ở đầu mỗi ô time-slot */
+    .time-slot::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 0;
+        width: 3px;
+        height: 20px;
+        background-color: #f1c40f;
+    }
+
+    /* Thanh vàng ở cuối ô cuối cùng */
+    .time-slot:last-of-type::after {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: 0;
+        width: 3px;
+        height: 20px;
+        background-color: #f1c40f;
+    }
+
+/* Nhãn thời gian */
+.time-label {
+    position: absolute;
+    top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    z-index: 20;
+}
+
+.schedule-grid {
+    background-color: #e8e8e8;
+    display: grid;
+    /* Tăng min-width để các ô rộng hơn */
+    /*min-width: 2600px;*/
+    border: 0 !important; /* Thêm dòng này để loại bỏ border */
+    padding: 0 !important;
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+    border: 1px solid black;
+}
+
+.grid-padding {
+    background-color: #e8e8e8;
+}
+
+.grid-cell {
+    background-color: white;
+    border-bottom: 1px solid black; /* Thêm viền dưới */
+    border-right: 1px solid black; /* Thêm viền phải */
+    /*border-top: none;*/
+    /*display: flex;
+    align-items: center;
+    justify-content: center;*/
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    font-size: 10px;
+    text-align: center;
+    height: 100px; /* Kích thước nhỏ hơn */
+    width: 100px; /* Kích thước nhỏ hơn */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    transform-style: preserve-3d;
+    position: relative;
+}
+
+/*    .grid-cell:hover {
+        background-color: green;
+    }*/
+
+    .grid-cell.selected {
+        background-color: #007bff; /* Đổi màu nền thành xanh dương (#007bff) */
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Thêm đổ bóng để tạo hiệu ứng 3D */
+        border: 2px solid #000; /* Làm viền đậm hơn khi được chọn */
+    }
+
+        /* Remove left border for selected cells that have a selected neighbor on the left */
+        .grid-cell.selected.no-border-left {
+            border-left: none;
+        }
+
+        /* Remove right border for selected cells that have a selected neighbor on the right */
+        .grid-cell.selected.no-border-right {
+            border-right: none;
+        }
+
+        .grid-cell.selected.no-border-top {
+            border-top: none;
+        }
+
+        /* Ẩn border dưới nếu có ô liền kề bên dưới đã được chọn */
+        .grid-cell.selected.no-border-bottom {
+            border-bottom: none;
+        }
+
+    .grid-cell.booked {
+/*        pointer-events: none;
+*/        user-select: none;
+        cursor: not-allowed !important; /* Use !important here */
+        background-color: red; /* Red background for booked cells */
+    }
+
+.related-booking {
+    background-color: deeppink;
+    cursor: not-allowed;
+/*    pointer-events: none;
+*/}
+
+.booking-related-overlay {
+    /* Removed background-color as we'll use a gradient */
+    /* Thêm hiệu ứng sọc chéo */
+    background: repeating-linear-gradient( 45deg, #f8d7da, /* Light red/pink for the base */
+    #f8d7da 10px, /* Light red/pink for the base, 10px width */
+    #f5c6cb 10px, /* Slightly darker pink for the stripe */
+    #f5c6cb 20px /* Slightly darker pink for the stripe, 10px width */
+    );
+    /* Bạn có thể điều chỉnh màu sắc và header-label-containerkích thước (10px, 20px) để phù hợp với thiết kế của bạn */
+    opacity: 0.8; /* Làm cho các sọc mờ hơn một chút nếu cần */
+}
+
+
+.stadium-info {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .stadium-info h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+    }
+
+    .stadium-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+.court-name {
+    height: 100px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid black;
+    border-top: none;
+    background-color: #f0f0f0;
+}
+
+    .court-name:first-of-type {
+        height: 50px;
+        border-top-left-radius: 10px;
+        background: #00FFFF !important;
+    }
+
+    .court-name:last-of-type {
+        height: 100px; /* Assuming the last one should be 100px, but you can change this */
+        border-bottom-left-radius: 10px; /* Add border-radius to the bottom-left corner */
+    }
+
+#timeHeader {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.booked-accepted {
+    background-color: #a0e7a0;
+    color: #004400;
+    font-weight: bold;
+}
+
+.grid-row {
+    position: relative;
+}
+
+.booking-overlay {
+    background-color: red;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /*Ensures the overlay appears above the grid lines */
+    pointer-events: none; /*Prevents the overlay from blocking click events on the underlying cells */
+}
+
+.court-row {
+    display: grid;
+    border-left: 1px solid black;
+}
+
+.court-row:last-of-type {
+    border-bottom: none;
+}
+
+.unselectable {
+    cursor: not-allowed;
+}
+
+.legend-container {
+    display: flex;
+    justify-content: center; /* Căn giữa các mục chú thích */
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa các mục */
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Khoảng cách giữa màu và chữ */
+}
+
+.legend-color {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px; /* Bo góc nhẹ */
+    border: 1px solid #ccc;
+}
+
+.legend-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: black; /* Màu chữ trắng */
+}
+
+.legend-color.related {
+    background: repeating-linear-gradient( 45deg, #f8d7da, #f8d7da 10px, #f5c6cb 10px, #f5c6cb 20px ) !important;
+    opacity: 0.8;
+}
+
+.legend-color.blocked {
+    background: #a9a9a9 !important;
+}
+
+.legend-color.event {
+    background: #007bff !important;
+}
+
+@media (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+        align-items: center; /* Căn giữa các mục theo chiều dọc */
+        gap: 1.5rem;
+    }
+}

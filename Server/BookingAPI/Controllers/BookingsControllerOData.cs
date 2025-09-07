@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using BookingAPI.Models;
 using BookingAPI.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace BookingAPI.Controllers
 {
@@ -29,6 +30,7 @@ namespace BookingAPI.Controllers
 
         // GET /odata/Bookings(1)
         [EnableQuery]
+        [Authorize(Roles = "Customer,StadiumManager")]
         public SingleResult<Booking> Get([FromODataUri] int key)
         {
             var result = _bookingService.GetAllBookingsAsQueryable()
