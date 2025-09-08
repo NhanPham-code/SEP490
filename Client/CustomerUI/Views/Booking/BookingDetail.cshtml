@@ -16,16 +16,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-8">
             <div class="flex items-center">
                 <span class="text-gray-500 w-24">Mã Booking:</span>
-                <span class="font-bold text-gray-800">@Model.Id</span>
+                <span class="font-bold text-gray-800">#@Model.Id</span>
             </div>
             <div class="flex items-center">
                 <span class="text-gray-500 w-24">Ngày:</span>
                 <span class="font-semibold text-gray-800">@Model.Date.ToString("dd/MM/yyyy")</span>
             </div>
-            @* <div class="flex items-center">
-                <span class="text-gray-500 w-24">Thời gian:</span>
-                <span class="font-semibold text-gray-800">@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</span>
-            </div> *@
             <div class="flex items-center">
                 <span class="text-gray-500 w-24">Trạng thái:</span>
                 @{
@@ -34,9 +30,9 @@
                     switch (Model.Status)
                     {
                         case "Confirmed": statusClass = "bg-green-100 text-green-700"; statusText = "Đã xác nhận"; break;
-                        case "Pending": statusClass = "bg-yellow-100 text-yellow-700"; statusText = "Đang chờ"; break;
+                        case "pending": statusClass = "bg-yellow-100 text-yellow-700"; statusText = "Đang chờ"; break;
                         case "Cancelled": statusClass = "bg-red-100 text-red-700"; statusText = "Đã hủy"; break;
-                        default: statusClass = "bg-gray-100 text-gray-700"; statusText = "Không xác định"; break;
+                        default: statusClass = "bg-gray-100 text-gray-700"; statusText = $"{Model.Status}"; break;
                     }
                 }
                 <span class="px-3 py-1 text-xs font-semibold rounded-full @statusClass">
@@ -49,25 +45,31 @@
             </div>
             <div class="flex items-center">
                 <span class="text-gray-500 w-24">Thanh Toán:</span>
-                <span class="font-semibold text-gray-800">@ViewBag.PaymentMethod</span>
+                <span class="font-semibold text-gray-800">@(Model.PaymentMethod ?? "Chưa xác định")</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-gray-500 w-24">Ngày tạo:</span>
+                <span class="font-semibold text-gray-800">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
             </div>
 
-            <div class="md:col-span-2">
-                <div class="flex items-center mt-2">
-                    <span class="text-gray-500 w-36">Tổng tiền ban đầu:</span>
+            <div class="md:col-span-2 bg-gray-50 p-4 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-500">Tổng tiền ban đầu:</span>
                     <span class="font-semibold text-gray-800">@ViewBag.OriginalTotalPrice VNĐ</span>
                 </div>
-                <div class="flex items-center mt-2">
-                    <span class="text-gray-500 w-36">Mã giảm giá:</span>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-500">Mã giảm giá:</span>
                     <span class="font-semibold text-gray-800">@ViewBag.DiscountCode</span>
                 </div>
-                <div class="flex items-center mt-2">
-                    <span class="text-gray-500 w-36">Số tiền giảm:</span>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-gray-500">Số tiền giảm:</span>
                     <span class="font-semibold text-green-600">- @ViewBag.DiscountAmount VNĐ</span>
                 </div>
-                <div class="md:col-span-2 mt-4">
-                    <span class="text-gray-500">Tổng thanh toán:</span>
-                    <span class="text-4xl font-extrabold text-indigo-600 ml-4">@Model.TotalPrice?.ToString("N0") VNĐ</span>
+                <div class="border-t border-gray-300 pt-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-medium text-gray-700">Tổng thanh toán:</span>
+                        <span class="text-2xl font-extrabold text-indigo-600">@Model.TotalPrice?.ToString("N0") VNĐ</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,16 +81,35 @@
                 <div class="space-y-4">
                     @foreach (var detail in Model.BookingDetails)
                     {
-                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
-                            <span class="text-lg font-medium text-gray-700">Sân số: @detail.CourtId</span>
-                            @* Thêm các thông tin khác của sân nếu có *@
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="flex items-center">
+                                    <span class="text-gray-500 w-16">Sân:</span>
+                                    <span class="font-medium text-gray-800">#@detail.CourtId</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-gray-500 w-20">Bắt đầu:</span>
+                                    <span class="font-medium text-gray-800">@detail.StartTime.ToString("HH:mm dd/MM/yyyy")</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-gray-500 w-20">Kết thúc:</span>
+                                    <span class="font-medium text-gray-800">@detail.EndTime.ToString("HH:mm dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <span class="text-sm text-gray-600">
+                                    Thời gian: @((detail.EndTime - detail.StartTime).TotalHours) giờ
+                                </span>
+                            </div>
                         </div>
                     }
                 </div>
             }
             else
             {
-                <p class="text-gray-400 italic">Không có thông tin chi tiết sân.</p>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p class="text-yellow-700 italic">Không có thông tin chi tiết sân.</p>
+                </div>
             }
         </div>
 
@@ -96,10 +117,26 @@
         {
             <div class="border-t border-gray-200 pt-8 mt-8">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">Ghi chú</h3>
-                <p class="text-gray-600 bg-gray-50 p-4 rounded-lg">
-                    @Model.Note
-                </p>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-blue-800">
+                        @Model.Note
+                    </p>
+                </div>
             </div>
         }
+
+        <div class="border-t border-gray-200 pt-6 mt-8">
+            <div class="flex justify-between items-center text-sm text-gray-500">
+                <span>Cập nhật lần cuối: @Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                @if (Model.Status == "Pending")
+                {
+                    <div class="space-x-2">
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                            Hủy booking
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>

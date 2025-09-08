@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DTOs.DiscountDTO;
 using Service.BaseService;
 using Service.Interfaces;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace Service.Services
 {
@@ -57,6 +58,7 @@ namespace Service.Services
         // GET /discounts/code/{code} - For GetByCode()
         public async Task<ReadDiscountDTO?> GetDiscountByCodeAsync(string code)
         {
+
             var response = await _httpClient.GetAsync($"/discounts/code/{code}");
 
             if (!response.IsSuccessStatusCode)
@@ -83,8 +85,9 @@ namespace Service.Services
         }
 
         // POST /discounts - For Create()
-        public async Task<ReadDiscountDTO?> CreateDiscountAsync(CreateDiscountDTO dto)
+        public async Task<ReadDiscountDTO?> CreateDiscountAsync(string accessToken, CreateDiscountDTO dto)
         {
+            AddBearerAccessToken(accessToken);
             var response = await _httpClient.PostAsJsonAsync("/discounts", dto);
 
             if (!response.IsSuccessStatusCode)
@@ -97,12 +100,21 @@ namespace Service.Services
         }
 
         // PUT /discounts - For Update()
-        public async Task<bool> UpdateDiscountAsync(UpdateDiscountDTO dto)
+        public async Task<bool> UpdateDiscountAsync(string accessToken, UpdateDiscountDTO dto)
         {
+            AddBearerAccessToken(accessToken);
             var response = await _httpClient.PutAsJsonAsync("/discounts", dto);
 
             // Return true if the update was successful (204 NoContent)
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<ReadDiscountDTO>?> GetDiscountsByUserAsync(string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+            var response = await _httpClient.GetAsync($"/discounts");
+            if (!response.IsSuccessStatusCode) return null;
+            return await response.Content.ReadFromJsonAsync<List<ReadDiscountDTO>>();
         }
     }
 }

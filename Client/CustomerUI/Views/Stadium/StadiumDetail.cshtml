@@ -1,0 +1,668 @@
+﻿@model DTOs.StadiumDTO.ReadStadiumDTO
+@{
+	ViewData["Title"] = Model.Name;
+	// Tính toán giá sân và giờ hoạt động
+	var minPrice = Model.Courts?.Any() == true ? Model.Courts.Min(c => c.PricePerHour) : 0;
+	var maxPrice = Model.Courts?.Any() == true ? Model.Courts.Max(c => c.PricePerHour) : 0;
+	var priceRange = minPrice == maxPrice ? $"{minPrice:N0} VNĐ/giờ" : $"{minPrice:N0} - {maxPrice:N0} VNĐ/giờ";
+	var operatingHours = $"{Model.OpenTime:hh\\:mm} - {Model.CloseTime:hh\\:mm}";
+	var mapEmbedUrl = (Model.Latitude.HasValue && Model.Longitude.HasValue)
+		? $"https://maps.google.com/maps?q={Model.Latitude},{Model.Longitude}&hl=vi&z=16&amp;output=embed"
+		: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.553950669145!2d106.66442651474932!3d10.769931892323048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f1e29e9447d%3A0x7d0e405e3a89e103!2zS2h1IEdp4bqjaSB0csOtIFRo4buRbmcgTmjhuqV0LCBQaOG7sOG7nW5nIDIsIFF14bqtbiAxMCwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1678893922639!5m2!1svi!2s";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewData["Title"]</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<style>
+		body {
+			font-family: 'Inter', sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+		}
+
+		.glass-effect {
+			backdrop-filter: blur(20px);
+			background: rgba(255, 255, 255, 0.25);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+		}
+
+		.gradient-text {
+			background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.section-divider {
+			height: 2px;
+			background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+			margin: 2rem 0;
+		}
+
+		.slider-container {
+			max-width: 100%;
+			position: relative;
+			margin: auto;
+			border-radius: 1.5rem;
+			overflow: hidden;
+			box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+		}
+
+		.slider-prev, .slider-next {
+			cursor: pointer;
+			position: absolute;
+			top: 50%;
+			width: auto;
+			margin-top: -22px;
+			padding: 16px;
+			color: white;
+			font-weight: bold;
+			font-size: 20px;
+			transition: all 0.3s ease;
+			user-select: none;
+			background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+			border-radius: 0 12px 12px 0;
+			backdrop-filter: blur(10px);
+		}
+
+		.slider-next {
+			right: 0;
+			border-radius: 12px 0 0 12px;
+		}
+
+			.slider-prev:hover, .slider-next:hover {
+				background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+				transform: scale(1.05);
+			}
+
+		.interactive-input {
+			transition: all 0.3s ease;
+		}
+
+			.interactive-input:focus {
+				transform: scale(1.01);
+				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+			}
+
+		.primary-btn {
+			background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+			position: relative;
+			overflow: hidden;
+			transition: all 0.3s ease;
+		}
+
+			.primary-btn::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+				transition: left 0.6s;
+			}
+
+			.primary-btn:hover::before {
+				left: 100%;
+			}
+
+			.primary-btn:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+			}
+
+		.secondary-btn {
+			background: linear-gradient(135deg, #10b981, #059669);
+			border: 2px solid rgba(16, 185, 129, 0.3);
+			transition: all 0.3s ease;
+		}
+
+			.secondary-btn:hover {
+				background: linear-gradient(135deg, #059669, #047857);
+				border-color: rgba(16, 185, 129, 0.5);
+				transform: translateY(-1px);
+				box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+			}
+
+		.modal {
+			background: rgba(0, 0, 0, 0.7);
+			backdrop-filter: blur(5px);
+			display: none;
+			animation: fadeIn 0.3s ease-out;
+		}
+
+		@@keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		@@keyframes slideUp {
+			from {
+				transform: translateY(50px);
+				opacity: 0;
+			}
+
+			to {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+
+		.modal-content {
+			animation: slideUp 0.3s ease-out;
+		}
+
+		.icon-circle {
+			width: 40px;
+			height: 40px;
+			background: #E3F2FD;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.info-card {
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+		}
+
+			.info-card::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+				transform: translateX(-100%);
+				transition: transform 0.6s;
+			}
+
+			.info-card:hover::before {
+				transform: translateX(100%);
+			}
+
+			.info-card:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+			}
+
+		.booking-option {
+			transition: all 0.3s ease;
+			border: 2px solid transparent;
+		}
+
+			.booking-option:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+				border-color: #3b82f6;
+			}
+
+		.floating-chat {
+			position: fixed;
+			bottom: 30px;
+			right: 30px;
+			z-index: 40;
+		}
+
+		@@media (max-width: 768px) {
+			.floating-chat {
+				bottom: 20px;
+				right: 20px;
+			}
+		}
+
+		.chat-bubble {
+			animation: bounce 2s infinite;
+		}
+
+		@@keyframes bounce {
+			0%, 20%, 53%, 80%, 100% {
+				transform: translate3d(0,0,0);
+			}
+
+			40%, 43% {
+				transform: translate3d(0,-5px,0);
+			}
+
+			70% {
+				transform: translate3d(0,-3px,0);
+			}
+
+			90% {
+				transform: translate3d(0,-2px,0);
+			}
+		}
+
+		.action-section {
+			background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+	</style>
+</head>
+<body class="min-h-screen p-4 flex flex-col items-center">
+
+	<!-- Feedback Modal -->
+	<div id="custom-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">
+		<div class="modal-content glass-effect rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
+			<div class="text-center">
+				<div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+					<span class="text-white text-2xl">✓</span>
+				</div>
+				<h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+				<p id="modal-message" class="text-gray-600 mb-6 leading-relaxed"></p>
+				<button id="modal-close-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+					Đóng
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Booking Options Modal -->
+	<div id="booking-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">
+		<div class="modal-content glass-effect rounded-3xl p-8 shadow-2xl max-w-lg w-full mx-4">
+			<div class="text-center mb-6">
+				<div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center">
+					<span class="text-white text-3xl">🏟️</span>
+				</div>
+				<h3 class="text-3xl font-bold gradient-text mb-3">Chọn cách đặt sân</h3>
+				<p class="text-gray-600">Lựa chọn phương thức đặt sân phù hợp với bạn</p>
+			</div>
+
+			<div class="space-y-4 mb-8">
+				<div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingVisually()">
+					<div class="flex items-center space-x-4">
+						<div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center">
+							<span class="text-2xl">📅</span>
+						</div>
+						<div class="flex-1">
+							<h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân trực quan</h4>
+							<p class="text-gray-600 text-sm">Giao diện mới với lịch trực quan, dễ sử dụng và hiện đại</p>
+							<span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">Khuyến nghị</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingTraditional()">
+					<div class="flex items-center space-x-4">
+						<div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+							<span class="text-2xl">📋</span>
+						</div>
+						<div class="flex-1">
+							<h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân theo danh sách</h4>
+							<p class="text-gray-600 text-sm">Phương thức truyền thống, ổn định và quen thuộc</p>
+							<span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Ổn định</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="text-center">
+				<button id="booking-modal-close-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300">
+					Hủy
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Floating Chat Button -->
+	<div class="floating-chat">
+		<button id="floating-chat-btn" class="chat-bubble w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110">
+			<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+				<path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+			</svg>
+		</button>
+	</div>
+
+	<div class="glass-effect rounded-3xl shadow-2xl p-8 md:p-12 max-w-6xl w-full mx-auto">
+
+		<div class="mb-10 text-center">
+			<h1 id="stadium-name" class="text-4xl md:text-5xl font-bold gradient-text mb-4 mt-4">@Model.Name</h1>
+			<div class="flex items-center justify-center mb-6">
+				<svg class="w-5 h-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+					<path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" />
+				</svg>
+				<p id="stadium-address" class="text-gray-600">@Model.Address</p>
+			</div>
+
+			<div class="slider-container mb-10">
+				<div class="relative w-full h-80 overflow-hidden rounded-2xl">
+					@if (Model.StadiumImages != null && Model.StadiumImages.Any())
+					{
+						foreach (var image in Model.StadiumImages)
+						{
+							<div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+								<img src="@image.ImageUrl" class="slider-image object-cover w-full h-full" alt="Hình ảnh sân @Model.Name">
+								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+									<p class="text-sm">Hình ảnh sân vận động.</p>
+								</div>
+							</div>
+						}
+					}
+					else
+					{
+						// Ảnh mặc định nếu không có ảnh nào
+						<div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100">
+							<img src="https://images.unsplash.com/photo-1541252260770-cefd4f3d2a7c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="slider-image object-cover w-full h-full" alt="Sân banh cỏ tự nhiên">
+							<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+								<p class="text-sm">Sân cỏ chất lượng cao.</p>
+							</div>
+						</div>
+					}
+				</div>
+
+				<a class="slider-prev absolute top-1/2 left-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-r-lg" onclick="plusSlides(-1)">❮</a>
+				<a class="slider-next absolute top-1/2 right-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-l-lg" onclick="plusSlides(1)">❯</a>
+			</div>
+			</br>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+				<div class="info-card glass-effect p-6 rounded-2xl shadow-lg">
+					<div class="flex items-center gap-4">
+						<div class="icon-circle">
+							<svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<p class="text-sm text-gray-500 font-medium">Giờ mở cửa</p>
+							<p id="stadium-hours" class="font-semibold text-gray-800 text-lg">@operatingHours</p>
+						</div>
+					</div>
+				</div>
+
+				@* <div class="info-card glass-effect p-6 rounded-2xl shadow-lg"> *@
+				@* 	<div class="flex items-center gap-4"> *@
+				@* 		<div class="icon-circle"> *@
+				@* 			<svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20"> *@
+				@* 				<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" /> *@
+				@* 				<path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 6a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 6a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm7 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" /> *@
+				@* 			</svg> *@
+				@* 		</div> *@
+				@* 		<div class="text-left"> *@
+				@* 			<p class="text-sm text-gray-500 font-medium">Giá thuê sân</p> *@
+				@* 			<p id="stadiumPrice" class="font-semibold text-gray-800 text-lg">@priceRange</p> *@
+				@* 		</div> *@
+				@* 	</div> *@
+				@* </div> *@
+			</div>
+		</div>
+
+		<!-- Booking Action Section -->
+		<div class="action-section rounded-3xl shadow-lg p-8 mb-12 backdrop-filter backdrop-blur-sm">
+			<div class="text-center">
+				<h2 class="text-3xl font-bold gradient-text mb-3">Đặt sân ngay hôm nay!</h2>
+				<p class="text-gray-600 mb-8 text-lg">Chọn thời gian phù hợp và bắt đầu trải nghiệm tuyệt vời</p>
+
+				<button id="booking-btn" class="primary-btn w-full md:w-auto px-12 py-4 rounded-2xl font-bold text-white text-xl transition-all duration-300 shadow-xl relative overflow-hidden">
+					<span class="relative z-10 flex items-center justify-center gap-3">
+						<span class="text-2xl">🚀</span>
+						<span>Đặt Sân Ngay</span>
+					</span>
+				</button>
+
+				<p class="text-sm text-gray-500 mt-4">
+					<svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+					</svg>
+					Xác nhận nhanh chóng • Thanh toán đa dạng • Hỗ trợ 24/7
+				</p>
+			</div>
+		</div>
+
+		<div class="section-divider"></div>
+
+		<div class="mb-12">
+			<h2 class="text-2xl font-bold mb-6 text-center gradient-text">📍 Vị trí sân</h2>
+			<div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+				<iframe id="stadium-map"
+						width="100%"
+						height="350"
+						style="border:0;"
+						allowfullscreen=""
+						loading="lazy"
+						referrerpolicy="no-referrer-when-downgrade"
+						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.553950669145!2d106.66442651474932!3d10.769931892323048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f1e29e9447d%3A0x7d0e405e3a89e103!2zS2h1IEdp4bqjaSB0csOtIFRo4buRbmcgTmjhuqV0LCBQaOG7sOG7nW5nIDIsIFF14bqtbiAxMCwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1678893922639!5m2!1svi!2s"></iframe>
+			</div>
+
+			<div class="mt-6 text-center">
+				<button class="text-blue-600 font-medium flex items-center justify-center gap-2 mx-auto hover:text-blue-700 transition-colors">
+					<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+					</svg>
+					Xem chỉ đường
+				</button>
+			</div>
+		</div>
+
+		<div class="section-divider"></div>
+
+		<div class="mb-12 p-8 rounded-3xl shadow-lg glass-effect">
+			<h2 class="text-2xl font-bold mb-6 text-center gradient-text">💬 Gửi phản hồi của bạn</h2>
+			<form id="feedback-form">
+				<div class="relative">
+					<textarea id="feedback-textarea" rows="4" class="interactive-input w-full p-4 rounded-xl border-2 border-gray-200 bg-white text-gray-800 focus:ring-0 focus:border-blue-500 transition-all duration-300 resize-none" placeholder="Chia sẻ trải nghiệm của bạn về sân vận động này..."></textarea>
+					<div class="absolute bottom-3 right-3 text-xs text-gray-400" id="char-count">0/500</div>
+				</div>
+				<div class="text-right mt-6">
+					<button type="submit" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+						✨ Gửi phản hồi
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="mb-12 p-8 rounded-3xl shadow-lg glass-effect">
+			<h2 class="text-2xl font-bold mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
+			<div id="feedback-list" class="space-y-6 mb-8"></div>
+			<div id="pagination-container" class="flex justify-center items-center space-x-2 mt-8"></div>
+		</div>
+
+	</div>
+
+	<script>
+		let slideIndex = 0;
+		let slideTimer;
+		const stadiumId = @Model.Id;
+
+		// Dữ liệu đánh giá vẫn là dữ liệu giả.
+		// Bạn sẽ cần tạo một API endpoint để lấy dữ liệu này và gọi nó ở đây.
+		const feedbacks = [
+			{ name: "Nguyễn Văn An", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fit=crop&w=1200&q=80", rating: 5, comment: "Sân rất đẹp và chất lượng. Nhân viên phục vụ nhiệt tình, chuyên nghiệp." },
+			{ name: "Trần Thị Bình", avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b80?fit=crop&w=1200&q=80", rating: 4, comment: "Vị trí thuận tiện, dễ tìm. Giá cả hợp lý cho chất lượng sân." },
+			{ name: "Phạm Văn Cường", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb8ecca14?fit=crop&w=1200&q=80", rating: 4, comment: "Mọi thứ đều ổn, tuy nhiên đường vào hơi tắc vào những ngày có sự kiện lớn." },
+			{ name: "Lê Văn Hùng", avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?fit=crop&w=1200&q=80", rating: 5, comment: "Sân có nhiều dịch vụ tiện ích, từ đồ ăn thức uống đến nhà vệ sinh sạch sẽ." },
+			{ name: "Ngô Thúy Hiền", avatar: "https://images.unsplash.com/photo-1542152865-c7e5a7b05615?fit=crop&w=1200&q=80", rating: 3, comment: "Cảnh quan đẹp, nhưng chỗ gửi xe còn hơi bất tiện." },
+			{ name: "Trịnh Quang Vinh", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?fit=crop&w=1200&q=80", rating: 5, comment: "Sân cỏ chất lượng cao, hệ thống ánh sáng hiện đại. Một nơi tuyệt vời để tổ chức các giải đấu chuyên nghiệp." }
+		];
+		let currentPage = 1;
+		const feedbacksPerPage = 3;
+
+		const feedbackFormEl = document.getElementById('feedback-form');
+		const feedbackList = document.getElementById('feedback-list');
+		const paginationContainer = document.getElementById('pagination-container');
+		const modalEl = document.getElementById('custom-modal');
+		const bookingModalEl = document.getElementById('booking-modal');
+
+		function showSlides() {
+			let slides = document.getElementsByClassName("slider-item");
+			if (slides.length === 0) return;
+
+			for (let i = 0; i < slides.length; i++) {
+				slides[i].style.opacity = "0";
+			}
+			slideIndex++;
+			if (slideIndex > slides.length) { slideIndex = 1 }
+			slides[slideIndex - 1].style.opacity = "1";
+			slideTimer = setTimeout(showSlides, 4000);
+		}
+
+		function plusSlides(n) {
+			let slides = document.getElementsByClassName("slider-item");
+			if (slides.length === 0) return;
+			clearTimeout(slideTimer);
+			slideIndex += n;
+			if (slideIndex > slides.length) {slideIndex = 1}
+			if (slideIndex < 1) {slideIndex = slides.length}
+
+			for (let i = 0; i < slides.length; i++) {
+				slides[i].style.opacity = "0";
+			}
+			slides[slideIndex - 1].style.opacity = "1";
+			slideTimer = setTimeout(showSlides, 4000); // Restart timer
+		}
+
+		function showModal(title, message) {
+			document.getElementById('modal-title').textContent = title;
+			document.getElementById('modal-message').textContent = message;
+			modalEl.style.display = 'flex';
+		}
+
+		function hideModal() {
+			modalEl.style.display = 'none';
+		}
+
+		function showBookingModal() {
+			bookingModalEl.style.display = 'flex';
+		}
+
+		function hideBookingModal() {
+			bookingModalEl.style.display = 'none';
+		}
+
+		function bookingVisually() {
+			window.location.href = `/Booking/VisuallyBooking?stadiumId=${stadiumId}`;
+		}
+
+		function bookingTraditional() {
+			window.location.href = `/Booking/Booking?stadiumId=${stadiumId}`;
+		}
+
+		function chatWithOwner() {
+			// Giả sử OwnerId có trong Model, nếu không bạn cần một cách khác để lấy nó
+			// Ví dụ: window.location.href = `/Chat/User/${@Model.CreatedBy}`;
+			window.location.href = `/Chat/Stadium/${stadiumId}`;
+		}
+
+		function createStarRating(rating) {
+			let starsHtml = '';
+			for (let i = 1; i <= 5; i++) {
+				starsHtml += `<svg class="w-5 h-5 fill-current ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.62L12 2L9.19 8.62L2 9.24L7.46 13.97L5.82 21L12 17.27Z"></path></svg>`;
+			}
+			return starsHtml;
+		}
+
+		function renderFeedbacks() {
+			feedbackList.innerHTML = '';
+			const startIndex = (currentPage - 1) * feedbacksPerPage;
+			const endIndex = startIndex + feedbacksPerPage;
+			const feedbacksToRender = feedbacks.slice(startIndex, endIndex);
+
+			feedbacksToRender.forEach(feedback => {
+				const feedbackItem = document.createElement('div');
+				feedbackItem.className = 'flex items-start space-x-4 p-6 bg-white rounded-2xl shadow-sm border border-gray-100';
+				feedbackItem.innerHTML = `
+					<img class="w-12 h-12 rounded-full object-cover" src="${feedback.avatar}" alt="User Avatar">
+					<div class="flex-1">
+						<p class="font-semibold text-gray-900 text-lg">${feedback.name}</p>
+						<div class="flex items-center mt-2">${createStarRating(feedback.rating)}</div>
+						<p class="mt-3 text-gray-700 leading-relaxed">${feedback.comment}</p>
+					</div>`;
+				feedbackList.appendChild(feedbackItem);
+			});
+			renderPagination();
+		}
+
+		function renderPagination() {
+			paginationContainer.innerHTML = '';
+			const totalPages = Math.ceil(feedbacks.length / feedbacksPerPage);
+
+			if (totalPages <= 1) return;
+
+			const prevBtn = document.createElement('button');
+			prevBtn.textContent = '← Trang trước';
+			prevBtn.className = `px-6 py-3 rounded-xl font-medium text-blue-600 bg-white border-2 border-blue-200 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50 hover:border-blue-300 transition-all duration-300'}`;
+			prevBtn.disabled = currentPage === 1;
+			prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderFeedbacks(); } };
+			paginationContainer.appendChild(prevBtn);
+
+			for (let i = 1; i <= totalPages; i++) {
+				const pageBtn = document.createElement('button');
+				pageBtn.textContent = i;
+				pageBtn.className = `mx-1 px-4 py-3 rounded-xl font-medium ${currentPage === i ? 'bg-blue-600 text-white shadow-lg' : 'text-blue-600 bg-white border-2 border-blue-200 hover:bg-blue-50 transition-all duration-300'}`;
+				pageBtn.onclick = () => { currentPage = i; renderFeedbacks(); };
+				paginationContainer.appendChild(pageBtn);
+			}
+
+			const nextBtn = document.createElement('button');
+			nextBtn.textContent = 'Trang sau →';
+			nextBtn.className = `px-6 py-3 rounded-xl font-medium text-blue-600 bg-white border-2 border-blue-200 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50 hover:border-blue-300 transition-all duration-300'}`;
+			nextBtn.disabled = currentPage === totalPages;
+			nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderFeedbacks(); } };
+			paginationContainer.appendChild(nextBtn);
+		}
+
+		// Character counter
+		document.getElementById('feedback-textarea').addEventListener('input', function() {
+			const length = this.value.length;
+			document.getElementById('char-count').textContent = `${length}/500`;
+
+			if (length > 500) {
+				this.value = this.value.substring(0, 500);
+				document.getElementById('char-count').textContent = '500/500';
+			}
+		});
+
+		// Form submit
+		feedbackFormEl.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const feedbackText = document.getElementById('feedback-textarea').value;
+			if (feedbackText.trim() !== '') {
+				// TODO: Gửi feedback lên server bằng AJAX
+				showModal('Gửi phản hồi thành công', 'Cảm ơn bạn đã gửi phản hồi. Chúng tôi sẽ ghi nhận và cải thiện!');
+				document.getElementById('feedback-textarea').value = '';
+				document.getElementById('char-count').textContent = '0/500';
+			} else {
+				showModal('Lỗi', 'Vui lòng nhập nội dung phản hồi.');
+			}
+		});
+
+		// Event listeners
+		document.getElementById('modal-close-btn').onclick = hideModal;
+		document.getElementById('booking-modal-close-btn').onclick = hideBookingModal;
+		document.getElementById('booking-btn').onclick = showBookingModal;
+		document.getElementById('floating-chat-btn').onclick = chatWithOwner;
+
+		// Click outside modal to close
+		window.onclick = function(event) {
+			if (event.target === modalEl) {
+				hideModal();
+			}
+			if (event.target === bookingModalEl) {
+				hideBookingModal();
+			}
+		}
+
+		// Initialize
+		window.onload = function() {
+			showSlides();
+			renderFeedbacks();
+		};
+	</script>
+</body>
+</html>
