@@ -12,7 +12,7 @@ namespace Service.Interfaces
         string? GetAccessTokenFromHeader();
         string? GetAccessTokenFromCookie();
         string? GetRefreshTokenFromCookie();
-        void SaveTokens(LoginResponseDTO response);
+        void SaveTokensToCookies(LoginResponseDTO response, bool rememberMe);
         void ClearTokens();
     }
 }

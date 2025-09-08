@@ -39,27 +39,56 @@ namespace Service.Services
             return _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];
         }
 
-        // Phương thức để lưu token vào cookie
-        // Bạn có thể chuyển đoạn code lưu cookie từ controller vào đây
-        public void SaveTokens(LoginResponseDTO response)
+        public void SaveTokensToCookies(LoginResponseDTO response, bool rememberMe)
         {
-            var cookieOptions = new CookieOptions
+            // 1. Thiết lập chung cho các cookie cần bảo mật (chứa token)
+            var secureCookieOptions = new CookieOptions
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = response.AccessTokenExpiresAt
+                HttpOnly = true, // Quan trọng: Ngăn JavaScript truy cập -> chống XSS
+                Secure = true,   // Chỉ gửi qua HTTPS
+                SameSite = SameSiteMode.Strict // Chống CSRF
             };
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append("AccessToken", response.AccessToken!, cookieOptions);
 
-            var refreshOptions = new CookieOptions
+            // 2. Thiết lập cho cookie chứa thông tin công khai (thời gian hết hạn)
+            var publicCookieOptions = new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false, // Cho phép JavaScript đọc nếu cần (ví dụ: để hiển thị thông báo sắp hết hạn)
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
+                SameSite = SameSiteMode.Strict
             };
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append("RefreshToken", response.RefreshToken!, refreshOptions);
+
+            // 3. Xử lý thời gian sống của cookie
+            if (rememberMe)
+            {
+                var refreshTokenExpiry = DateTime.UtcNow.AddDays(7); // Ví dụ: Refresh token sống 7 ngày
+                secureCookieOptions.Expires = refreshTokenExpiry; // Cho RefreshToken sống cùng thời gian
+                publicCookieOptions.Expires = refreshTokenExpiry; // Các cookie khác cũng nên sống tương đương
+            }
+            // Nếu không "Remember Me", không set Expires, chúng sẽ trở thành session cookies
+            // và bị xóa khi đóng trình duyệt. Đây là hành vi mặc định và đúng đắn.
+
+            // 4. Lưu các cookie
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append("AccessToken", response.AccessToken!, secureCookieOptions);
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append("RefreshToken", response.RefreshToken!, secureCookieOptions);
+
+            // 5. LƯU COOKIE THỜI GIAN HẾT HẠN (QUAN TRỌNG NHẤT)
+            // Dùng định dạng chuẩn ISO 8601 ("o") để đảm bảo không lỗi văn hóa (culture) khi parse
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append(
+                "AccessTokenExpiresAt",
+                response.AccessTokenExpiresAt.ToString("o"),
+                publicCookieOptions
+            );
+
+            // Tùy chọn: Lưu trạng thái "Remember Me" để middleware biết cách đặt hạn cho cookie mới
+            if (rememberMe)
+            {
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("RememberMe", "true", publicCookieOptions);
+            }
+            else
+            {
+                // Xóa cookie này nếu người dùng không chọn "Remember Me" trong lần đăng nhập mới nhất
+                _httpContextAccessor.HttpContext?.Response.Cookies.Delete("RememberMe");
+            }
         }
 
         // Phương thức để xóa token
@@ -67,6 +96,8 @@ namespace Service.Services
         {
             _httpContextAccessor.HttpContext?.Response.Cookies.Delete("AccessToken");
             _httpContextAccessor.HttpContext?.Response.Cookies.Delete("RefreshToken");
+            _httpContextAccessor.HttpContext?.Response.Cookies.Delete("AccessTokenExpiresAt");
+            _httpContextAccessor.HttpContext?.Response.Cookies.Delete("RememberMe");
         }
     }
 }

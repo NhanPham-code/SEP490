@@ -342,12 +342,12 @@
                 setTimeout(() => {
                     // Call logout endpoint
                     $.ajax({
-                        url: '/Admin/Logout',
-                        type: 'POST',
+                        url: '/Account/Logout',
+                        type: 'GET',
                         success: function () {
                             showToast('Đã đăng xuất thành công!', 'success', 2000);
                             setTimeout(() => {
-                                window.location.href = '/Login/AdminLogin';
+                                window.location.href = '/Account/Login';
                             }, 2000);
                         },
                         error: function () {
