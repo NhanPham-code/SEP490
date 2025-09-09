@@ -420,7 +420,7 @@
         var avatarUrl = Context.Session.GetString("AvatarUrl");
 
         // Nếu không có accessToken hoặc fullName => Người dùng chưa đăng nhập
-        if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(fullName))
+        if (string.IsNullOrEmpty(accessToken))
         {
             Context.Response.Redirect(Url.Action("Login", "Common"));
         }

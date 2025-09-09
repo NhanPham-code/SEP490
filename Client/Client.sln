@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StadiumManagerUI", "Stadium
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminUI", "AdminUI\AdminUI.csproj", "{5E22D886-BDB2-401E-B07A-C1869F964D08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{6B49F9DC-85DB-40FD-801C-77A345BEC828}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{6B49F9DC-85DB-40FD-801C-77A345BEC828}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "DTOs\DTOs.csproj", "{E967965D-5E52-4BE8-B945-257B6ABCEE2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DTOs", "DTOs\DTOs.csproj", "{E967965D-5E52-4BE8-B945-257B6ABCEE2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Middlewares", "Middlewares\Middlewares.csproj", "{B6ED327C-8FD6-45F1-9E49-A9D1E7341A56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E967965D-5E52-4BE8-B945-257B6ABCEE2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6ED327C-8FD6-45F1-9E49-A9D1E7341A56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6ED327C-8FD6-45F1-9E49-A9D1E7341A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6ED327C-8FD6-45F1-9E49-A9D1E7341A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6ED327C-8FD6-45F1-9E49-A9D1E7341A56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

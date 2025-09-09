@@ -36,12 +36,10 @@ namespace StadiumManagerUI.Controllers
             _tokenService = tokenService;
         }
 
+        // Dùng cho hàm Login và Register
         // Xử lý lưu token và thông tin người dùng vào cookie và session
-        private void SaveTokenCookiesAndUserInfo(LoginResponseDTO response)
+        private void UpdateUserSession(LoginResponseDTO response)
         {
-            // Lưu token vào cookie (HttpOnly để bảo mật)
-            _tokenService.SaveTokens(response);
-
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
                 ? $"{BASE_URL}{response.AvatarUrl}"
@@ -52,7 +50,8 @@ namespace StadiumManagerUI.Controllers
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
 
-        private void SaveUserInfo(PrivateUserProfileDTO userProfileDTO)
+        // Dùng cho hàm UpdateProfile và UpdateAvatar (khác ở tham số truyền vào)
+        private void UpdateUserSession(PrivateUserProfileDTO userProfileDTO)
         {
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(userProfileDTO.AvatarUrl)
@@ -71,7 +70,7 @@ namespace StadiumManagerUI.Controllers
 
         // Xử lý login
         [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password, bool rememberMe)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
@@ -98,8 +97,11 @@ namespace StadiumManagerUI.Controllers
                     return Json(new { success = false, message = response.Message });
                 }
 
-                // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
-                SaveTokenCookiesAndUserInfo(response);
+                // Lưu token vào cookie (HttpOnly để bảo mật)
+                _tokenService.SaveTokensToCookies(response, rememberMe);
+
+                // Lưu thông tin người dùng vào session
+                UpdateUserSession(response);
 
                 return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
             }
@@ -117,8 +119,7 @@ namespace StadiumManagerUI.Controllers
             var refreshToken = Request.Cookies["RefreshToken"];
 
             // Xóa cookies
-            Response.Cookies.Delete("AccessToken");
-            Response.Cookies.Delete("RefreshToken");
+            _tokenService.ClearTokens();
 
             // Xóa session lưu các thông tin của người dùng
             HttpContext.Session.Clear();
@@ -370,8 +371,11 @@ namespace StadiumManagerUI.Controllers
                 return View("Verify");
             }
 
-            // Lưu token vào cookie (HttpOnly để bảo mật) và lưu thông tin người dùng vào session
-            SaveTokenCookiesAndUserInfo(loginResponse);
+            // Lưu token vào cookie (HttpOnly để bảo mật)
+            _tokenService.SaveTokensToCookies(loginResponse, false); // không lưu "Remember Me" sau đăng ký
+
+            // Lưu thông tin người dùng vào session
+            UpdateUserSession(loginResponse);
 
             return RedirectToAction("Index", "Home");
         }
@@ -382,7 +386,6 @@ namespace StadiumManagerUI.Controllers
         {
             // 1. Get tokens from cookie
             var accessToken = _tokenService.GetAccessTokenFromCookie();
-            var refreshToken = _tokenService.GetRefreshTokenFromCookie();
 
             // 2. Handle missing access token
             if (string.IsNullOrEmpty(accessToken))
@@ -394,55 +397,15 @@ namespace StadiumManagerUI.Controllers
             // 3. Initial service call
             var userProfile = await _userService.GetMyProfileAsync(accessToken);
 
-            // 4. If first attempt fails, attempt to refresh token
             if (userProfile == null)
             {
-                if (!string.IsNullOrEmpty(refreshToken))
-                {
-                    try
-                    {
-                        // Call the refresh token service
-                        var newTokens = await _userService.RefreshTokenAsync(new RefreshTokenRequestDTO
-                        {
-                            AccessToken = accessToken,
-                            RefreshToken = refreshToken
-                        });
-
-                        // Save the new tokens
-                        _tokenService.SaveTokens(newTokens);
-
-                        // Retry the profile request with the new access token
-                        userProfile = await _userService.GetMyProfileAsync(newTokens.AccessToken);
-
-                        if (userProfile == null)
-                        {
-                            // Redirect if retry also fails
-                            TempData["ErrorMessage"] = "Failed to retrieve user profile after token refresh.";
-                            return RedirectToAction("Login");
-                        }
-                    }
-                    catch (HttpRequestException)
-                    {
-                        // Redirect on refresh failure
-                        TempData["ErrorMessage"] = "Session has expired. Please log in again.";
-                        return RedirectToAction("Login");
-                    }
-                }
-                else
-                {
-                    // Redirect if no refresh token is available
-                    TempData["ErrorMessage"] = "Session has expired. Please log in again.";
-                    return RedirectToAction("Login");
-                }
+                TempData["ErrorMessage"] = "Could not retrieve your profile. Please log in again.";
+                return RedirectToAction("Logout", "Account");
             }
 
             userProfile.AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
                 ? $"{BASE_URL}{userProfile.AvatarUrl}"
-                : "/images/default-avatar.png";
-
-            userProfile.FaceImageUrl = !string.IsNullOrEmpty(userProfile.FaceImageUrl)
-                ? $"{BASE_URL}{userProfile.FaceImageUrl}"
-                : "";
+                : $"{BASE_URL}/avatars/default-avatar.png";
 
             return View(userProfile);
         }
@@ -465,7 +428,7 @@ namespace StadiumManagerUI.Controllers
             {
                 var updatedUser = await _userService.UpdateUserProfileAsync(updateUserProfileDTO, accessToken);
 
-                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
+                UpdateUserSession(updatedUser); // Lưu thông tin người dùng vào session
 
                 return Ok(updatedUser); // Trả thẳng JSON về client
             }
@@ -497,7 +460,7 @@ namespace StadiumManagerUI.Controllers
             {
                 var updatedUser = await _userService.UpdateAvatarAsync(updateAvatarDTO, accessToken);
 
-                SaveUserInfo(updatedUser); // Lưu thông tin người dùng vào session
+                UpdateUserSession(updatedUser); // Lưu thông tin người dùng vào session
 
                 updatedUser.AvatarUrl = !string.IsNullOrEmpty(updatedUser.AvatarUrl)
                 ? $"{BASE_URL}{updatedUser.AvatarUrl}"

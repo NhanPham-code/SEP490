@@ -118,9 +118,6 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "Role": "Customer"
       }
     },
     {
