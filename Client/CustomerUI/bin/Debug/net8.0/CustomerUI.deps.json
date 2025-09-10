@@ -233,7 +233,10 @@
           "Microsoft.AspNetCore.Http.Abstractions": "2.3.0"
         },
         "runtime": {
-          "DTOs.dll": {}
+          "DTOs.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Middlewares/1.0.0": {
@@ -242,7 +245,10 @@
           "Service": "1.0.0"
         },
         "runtime": {
-          "Middlewares.dll": {}
+          "Middlewares.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Service/1.0.0": {
@@ -254,7 +260,10 @@
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
-          "Service.dll": {}
+          "Service.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
