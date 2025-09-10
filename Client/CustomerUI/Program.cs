@@ -1,4 +1,5 @@
-﻿using Service.BaseService;
+﻿using Middlewares;
+using Service.BaseService;
 using Service.Interfaces;
 using Service.Services;
 
@@ -64,11 +65,15 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
 app.UseSession();
+
+app.UseMiddleware<TokenRefreshMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+app.UseMiddleware<TokenSessionMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
 
 app.MapControllerRoute(
     name: "default",
