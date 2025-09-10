@@ -10,27 +10,40 @@ namespace StadiumAPI.Repositories
     public class StadiumImageRepositories : IStadiumImagesRepositories
     {
         private readonly StadiumDbContext _context;
+
         public StadiumImageRepositories(StadiumDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Task<StadiumImages> AddImageAsync(StadiumImages image)
+        public async Task<StadiumImages> AddImageAsync(StadiumImages image)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image));
+
             _context.StadiumImages.Add(image);
-            return _context.SaveChangesAsync().ContinueWith(t => image);
+            await _context.SaveChangesAsync();
+            return image;
         }
 
-        public Task<bool> DeleteImageAsync(int id)
+        public async Task<bool> DeleteImageAsync(List<StadiumImages> stadiumImages)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid image ID.", nameof(id));
-            var image = _context.StadiumImages.Find(id);
+            if (stadiumImages.Count == 0)
+                throw new KeyNotFoundException("No images found with the given IDs.");
+            _context.ChangeTracker.Clear();
+            _context.StadiumImages.RemoveRange(stadiumImages);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public Task<bool> DeleteImageByStadiumIdAsync(int stadiumId)
+        {
+            if (stadiumId <= 0)
+                throw new ArgumentException("Invalid image ID.", nameof(stadiumId));
+            var image = _context.StadiumImages.Where(i => i.StadiumId.Equals(stadiumId));
             if (image == null)
-                throw new KeyNotFoundException($"Image with ID {id} not found.");
-            _context.StadiumImages.Remove(image);
+                throw new KeyNotFoundException($"Image with ID {stadiumId} not found.");
+            _context.StadiumImages.RemoveRange(image);
             return _context.SaveChangesAsync().ContinueWith(t => true);
         }
 
@@ -38,7 +51,7 @@ namespace StadiumAPI.Repositories
         {
             if (stadiumId <= 0)
                 throw new ArgumentException("Invalid stadium ID.", nameof(stadiumId));
-            return await _context.StadiumImages.Select(i => i).ToListAsync();
+            return await _context.StadiumImages.Where(i => i.StadiumId.Equals(stadiumId)).ToListAsync();
         }
 
         public Task<StadiumImages> GetImageByIdAsync(int id)

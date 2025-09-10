@@ -368,7 +368,7 @@ namespace UserAPI.Service
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Role = registerDto.Role,
+                Role = "Customer",
                 Address = registerDto.Address,
                 PhoneNumber = registerDto.PhoneNumber,
                 Gender = registerDto.Gender,
@@ -460,7 +460,7 @@ namespace UserAPI.Service
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Role = registerDto.Role,
+                Role = "StadiumManager",
                 Address = registerDto.Address,
                 PhoneNumber = registerDto.PhoneNumber,
                 Gender = registerDto.Gender,
@@ -525,6 +525,90 @@ namespace UserAPI.Service
         public async Task<bool> DeleteUserAsync(int id)
         {
             return await _userRepository.DeleteUserAsync(id);
+        }
+
+        public async Task<LoginResponseDTO> LoginOrRegisterWithGoogleAsync(GoogleUserInfoDTO googleUser)
+        {
+            // 1. Tìm người dùng bằng email
+            var user = await _userRepository.GetUserByEmailAsync(googleUser.Email);
+            bool isNewUser = false;
+
+            if (user == null)
+            {
+                // 2. Nếu không có -> Tạo người dùng mới
+                isNewUser = true;
+                user = new User
+                {
+                    FullName = googleUser.FullName,
+                    Email = googleUser.Email,
+                    GoogleId = googleUser.GoogleId,
+                    Provider = "google",
+                    Role = "Customer", // Mặc định là Customer (chỉ Customer mới được dùng Google Login)
+                    IsActive = true, // Kích hoạt tài khoản ngay lập tức
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    AvatarUrl = "/uploads/avatars/default-avatar.png" // Bắt đầu với avatar mặc định
+                };
+
+                // Không cần tạo password hash vì họ sẽ luôn đăng nhập qua Google
+                // Nếu logic yêu cầu password, bạn có thể tạo một chuỗi ngẫu nhiên
+                CreatePasswordHash(Guid.NewGuid().ToString(), out byte[] hash, out byte[] salt);
+                user.PasswordHash = hash;
+                user.PasswordSalt = salt;
+
+                await _userRepository.CreateUserAsync(user);
+            }
+            else
+            {
+                // 3. Nếu có -> Liên kết tài khoản nếu cần
+
+                // Chỉ cho phép đăng nhập nếu là Customer
+                if (user.Role != "Customer")
+                {
+                    return new LoginResponseDTO { IsValid = false, Message = "Tài khoản với vai trò quản trị không được phép đăng nhập bằng Google." };
+                }
+
+                // Kiểm tra nếu tài khoản bị khóa
+                if (user.IsActive == false)
+                {
+                    return new LoginResponseDTO { IsValid = false, Message = "Tài khoản của bạn đã bị khóa." };
+                }
+
+                // Cập nhật GoogleId và Provider nếu chưa có
+                if (string.IsNullOrEmpty(user.GoogleId))
+                {
+                    user.GoogleId = googleUser.GoogleId;
+                    user.Provider = string.IsNullOrEmpty(user.Provider) ? "google" : $"{user.Provider},google";
+                    await _userRepository.UpdateUserAsync(user);
+                }
+            }
+
+            // 4. Tạo Access Token và Refresh Token của hệ thống bạn
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            // 5. Lưu Refresh Token
+            var refreshTokenEntity = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.UserId,
+                ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpiresDays"]!)),
+                CreatedDate = DateTime.UtcNow
+            };
+            await _refreshTokenRepository.CreateRefreshTokenAsync(refreshTokenEntity);
+
+            // 6. Trả về kết quả
+            return new LoginResponseDTO
+            {
+                IsValid = true,
+                Message = isNewUser ? "Đăng ký bằng Google thành công!" : "Đăng nhập bằng Google thành công!",
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                UserId = user.UserId,
+                FullName = user.FullName,
+                AvatarUrl = user.AvatarUrl
+            };
         }
     }
 }

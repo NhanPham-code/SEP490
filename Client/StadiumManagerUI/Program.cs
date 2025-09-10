@@ -1,12 +1,28 @@
+
+﻿using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+
 ﻿using Middlewares;
+
 using Service.BaseService;
 using Service.Interfaces;
 using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Cho phép upload file lớn
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 50000000; // hoặc số cụ thể, ví dụ 500_000_000 cho 500MB
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.ModelBinderProviders.Insert(0, new SimpleTypeModelBinderProvider());
+});
+
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
 // Cookies
@@ -45,8 +61,12 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ICourtService, CourtService>();
+builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
+builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
 
 var app = builder.Build();
+app.UseDeveloperExceptionPage();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -60,6 +80,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseMiddleware<NoCacheMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
 
 app.UseSession();
 

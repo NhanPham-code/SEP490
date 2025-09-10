@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DTOs.StadiumDTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace StadiumAPI.DTOs
 {
@@ -12,7 +13,7 @@ namespace StadiumAPI.DTOs
         [Required]
         public int ChildCourtId { get; set; } // ví dụ: sân 5A
         // Navigation
-        public ReadCourtRelationDTO ParentCourt { get; set; }
-        public ReadCourtRelationDTO ChildCourt { get; set; }
+        public ReadCourtDTO ParentCourt { get; set; }
+        public ReadCourtDTO ChildCourt { get; set; }
     }
 }

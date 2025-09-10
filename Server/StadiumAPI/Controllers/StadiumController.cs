@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StadiumAPI.Data;
 using StadiumAPI.DTOs;
+using StadiumAPI.Models;
 using StadiumAPI.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -49,31 +53,31 @@ namespace StadiumAPI.Controllers
         // PUT: api/ReadStadiumDTOes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id,[FromForm] UpdateStadiumDTO updateStadiumDTO)
+        [Authorize(Roles = ("StadiumManager"))]
+        public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id, [FromBody] UpdateStadiumDTO updateStadiumDTO)
         {
             if (id != updateStadiumDTO.Id)
             {
                 return BadRequest();
             }
 
-            var update = await _serviceStadium.GetStadiumByIdAsync(id);
+            updateStadiumDTO.NameUnsigned = RemoveDiacritics(updateStadiumDTO.Name).ToLower();
+            updateStadiumDTO.AddressUnsigned = RemoveDiacritics(updateStadiumDTO.Address).ToLower();
 
-            if (update == null)
-            {
-                return NotFound();
-            }
+            var updated = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
 
-            update = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
-            
-
-            return Ok(update);
+            return Ok(updated);
         }
 
         // POST: api/ReadStadiumDTOes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromForm]CreateStadiumDTO createStadiumDTO)
+        [Authorize(Roles = ("StadiumManager"))]
+        public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromBody] CreateStadiumDTO createStadiumDTO)
         {
+            createStadiumDTO.NameUnsigned = RemoveDiacritics(createStadiumDTO.Name).ToLower();
+            createStadiumDTO.AddressUnsigned = RemoveDiacritics(createStadiumDTO.Address).ToLower();
+
             var createdStadium = await _serviceStadium.CreateStadiumAsync(createStadiumDTO);
 
             return Ok(createdStadium);
@@ -81,18 +85,27 @@ namespace StadiumAPI.Controllers
 
         // DELETE: api/ReadStadiumDTOes/5
         [HttpDelete]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteReadStadiumDTO([FromQuery] int id)
         {
-            var readStadiumDTO = await _serviceStadium.GetStadiumByIdAsync(id);
-            if (readStadiumDTO == null)
-            {
-                return NotFound();
-            }
-
-            await _serviceStadium.DeleteStadiumAsync(id);
-
-            return NoContent();
+            return Ok(await _serviceStadium.DeleteStadiumAsync(id));
         }
 
+        private string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            // Normalize thành dạng Decomposed
+            string normalized = text.Normalize(NormalizationForm.FormD);
+
+            // Loại bỏ ký tự dấu
+            Regex regex = new Regex("\\p{IsCombiningDiacriticalMarks}+");
+            string noDiacritics = regex.Replace(normalized, string.Empty);
+
+            // Đổi đ -> d
+            noDiacritics = noDiacritics.Replace('đ', 'd').Replace('Đ', 'D');
+
+            return noDiacritics;
+        }
     }
 }

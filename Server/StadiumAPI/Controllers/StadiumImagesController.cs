@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StadiumAPI.DTOs;
 using StadiumAPI.Service.Interface;
 
 namespace StadiumAPI.Controllers
 {
-    public class StadiumImagesController : Controller
+    public class StadiumImagesController : ControllerBase
     {
         private readonly IStadiumImagesService _serviceStadiumImage;
         private readonly IWebHostEnvironment _env;
@@ -14,6 +15,7 @@ namespace StadiumAPI.Controllers
             _serviceStadiumImage = serviceStadiumImage;
             _env = env;
         }
+
         // GET: api/StadiumImages/{stadiumId}
         [HttpGet]
         [Route("api/AllStadiumImages")]
@@ -26,39 +28,57 @@ namespace StadiumAPI.Controllers
             }
             return Ok(images);
         }
-        // POST: api/StadiumImages
-        [HttpPost]
-        [Route("api/AddStadiumImages")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddImage([FromForm] CreateStadiumImageDTO imageDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
-                return BadRequest("Image file is required.");
+        [HttpPost]
+        [Route("/api/AddStadiumImages")]
+        [Consumes("multipart/form-data")]
+        [Authorize(Roles = ("StadiumManager"))]
+        public async Task<IActionResult> AddImages([FromForm] List<CreateStadiumImageDTO> imagesDto)
+        {
+            if (imagesDto == null || !imagesDto.Any() || imagesDto.Any(dto => dto.ImageUrl == null))
+                return BadRequest("At least one image file is required.");
 
             var uploadsFolder = Path.Combine(_env.WebRootPath, "img");
-            if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder); // Creates directory if it doesn't exist
+
+            var createdImages = new List<ReadStadiumImageDTO>();
+
+            try
             {
-                Directory.CreateDirectory(uploadsFolder);
+                foreach (var imageDto in imagesDto)
+                {
+                    if (imageDto.ImageUrl == null || imageDto.ImageUrl.Length == 0)
+                        continue;
+                    var uniqueFileName = string.Empty;
+                    do
+                    {
+                        uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageDto.ImageUrl.FileName)}";
+                    } while (System.IO.File.Exists(Path.Combine(uploadsFolder, uniqueFileName)));
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageDto.ImageUrl.CopyToAsync(stream);
+                    }
+
+                    var createdImage = await _serviceStadiumImage.AddImageAsync(imageDto, $"img/{uniqueFileName}");
+                    createdImages.Add(createdImage);
+                }
+
+                return Ok(createdImages);
             }
-
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageDto.ImageUrl.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            catch (Exception ex)
             {
-                await imageDto.ImageUrl.CopyToAsync(stream);
+                // Log the exception (implement proper logging)
+                return StatusCode(500, "An error occurred while uploading images.");
             }
-
-            var createdImage = await _serviceStadiumImage.AddImageAsync(imageDto, $"img/{uniqueFileName}");
-            return Ok(createdImage);
         }
+
         // PUT: api/StadiumImages/{id}
         [HttpPut]
         [Route("api/UpdateStadiumImage")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> UpdateImage([FromQuery] int id, [FromForm] UpdateStadiumImageDTO imageDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -74,12 +94,9 @@ namespace StadiumAPI.Controllers
                 Directory.CreateDirectory(adminfolderPath);
 
                 var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingImage.ImageUrl);
-                if (System.IO.File.Exists(oldFilePath) && existingImage.ImageUrl != newImageURL)
+                if (System.IO.File.Exists(oldFilePath))
                 {
-
                     System.IO.File.Delete(oldFilePath);
-                    
-
                 }
                 using (var stream = new FileStream(adminFilePath, FileMode.Create))
                 {
@@ -88,7 +105,6 @@ namespace StadiumAPI.Controllers
             }
             else
             {
-
                 if (existingImage != null)
                 {
                     uniqueFileName = existingImage.ImageUrl;
@@ -103,26 +119,85 @@ namespace StadiumAPI.Controllers
             var updatedImage = await _serviceStadiumImage.UpdateImageAsync(id, imageDto, newImageURL);
             return Ok(updatedImage);
         }
+
         // DELETE: api/StadiumImages/{id}
         [HttpDelete]
-        public async Task<IActionResult> DeleteImage([FromQuery] int id)
+        [Route("api/DeleteStadiumImage")]
+        [Authorize(Roles = ("StadiumManager"))]
+        public async Task<IActionResult> DeleteImages([FromQuery] int stadiumId)
         {
-            var image = await _serviceStadiumImage.GetImageByIdAsync(id);
-            if (image == null)
+            var images = (await _serviceStadiumImage.GetAllImagesAsync(stadiumId)).ToList();
+
+            if (images == null || !images.Any())
             {
-                return NotFound("Image not found.");
+                return Ok(true);
             }
-            var isDeleted = await _serviceStadiumImage.DeleteImageAsync(id);
+
+            bool allDeleted = true;
+
+            foreach (var img in images)
+            {
+                var isDeleted = await _serviceStadiumImage.DeleteImageByStadiumIdAsync(img.Id);
+                if (isDeleted)
+                {
+                    // Xóa file vật lý
+                    var filePath = Path.Combine(
+                        _env.WebRootPath,
+                        img.ImageUrl.TrimStart('/', '\\') // loại bỏ dấu / hoặc \ ở đầu nếu có
+                    );
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                else
+                {
+                    allDeleted = false;
+                }
+            }
+
+            if (!allDeleted)
+            {
+                return BadRequest("Some images could not be deleted.");
+            }
+
+            return Ok(new { success = true });
+        }
+
+        [HttpDelete]
+        [Route("api/DeleteImagesByImgId")]
+        [Authorize(Roles = ("StadiumManager"))]
+        public async Task<IActionResult> DeleteImagesByImgId([FromBody] int[] id)
+        {
+            if (id == null || id.Length == 0)
+                return BadRequest("No ids provided.");
+
+            var images = new List<ReadStadiumImageDTO>();
+            foreach (var imgId in id)
+            {
+                var img = await _serviceStadiumImage.GetImageByIdAsync(imgId);
+                if (img != null)
+                    images.Add(img);
+            }
+
+            if (!images.Any())
+                return NotFound("No images found for this stadium.");
+
+            var isDeleted = await _serviceStadiumImage.DeleteImageAsync(images);
             if (!isDeleted)
+                return BadRequest("Some images could not be deleted.");
+
+            foreach (var img in images)
             {
-                return BadRequest("Failed to delete the image.");
+                var filePath = Path.Combine(
+                    _env.WebRootPath,
+                    img.ImageUrl.TrimStart('/', '\\')
+                );
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
             }
-            // Optionally, delete the file from the server
-            var filePath = Path.Combine(_env.WebRootPath, image.ImageUrl);
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
+
             return Ok(true);
         }
     }

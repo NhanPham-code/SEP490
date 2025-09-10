@@ -330,7 +330,9 @@
 
                     @{
                         var accessToken = Context.Request.Cookies["AccessToken"];
+                        Console.WriteLine("AccessToken: " + accessToken); // Debugging line to check token value
                         var fullName = Context.Session.GetString("FullName");
+                        Console.WriteLine("FullName: " + fullName); // Debugging line to check full name value
                         var avatarUrl = Context.Session.GetString("AvatarUrl");
                     }
 
