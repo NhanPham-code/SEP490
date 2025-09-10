@@ -13,7 +13,7 @@ namespace StadiumAPI.DTOs
         [Required]
         public int ChildCourtId { get; set; } // ví dụ: sân 5A
         // Navigation
-        public Courts ParentCourt { get; set; }
-        public Courts ChildCourt { get; set; }
+        public ReadCourtDTO ParentCourt { get; set; }
+        public ReadCourtDTO ChildCourt { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace Service.Interfaces
 {
     public interface ICourtService
     {
-        Task<IEnumerable<ReadCourtDTO>> GetAllCourtsAsync();
+        Task<IEnumerable<ReadCourtDTO>> GetAllCourtsAsync(int stadiumId);
         Task<ReadCourtDTO> GetCourtByIdAsync(int id);
         Task<ReadCourtDTO> CreateCourtAsync(CreateCourtDTO courtDto);
         Task<ReadCourtDTO> UpdateCourtAsync(int id, UpdateCourtDTO courtDto);

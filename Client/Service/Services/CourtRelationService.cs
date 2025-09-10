@@ -13,7 +13,6 @@ namespace Service.Services
 {
     public class CourtRelationService : ICourtRelationService
     {
-
         private readonly HttpClient _httpClient;
         private readonly ITokenService _tokenService;
         private string token = string.Empty;
@@ -25,10 +24,8 @@ namespace Service.Services
             token = _tokenService.GetAccessTokenFromCookie();
         }
 
-
         public void AddBearerAccessToken()
         {
-
             _httpClient.DefaultRequestHeaders.Authorization = null;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
@@ -68,7 +65,7 @@ namespace Service.Services
         public async Task<IEnumerable<ReadCourtRelationDTO>> UpdateCourtRelation(int[] childCourt, int parentCourt)
         {
             AddBearerAccessToken();
-            var response = await _httpClient.PutAsJsonAsync($"/UpdateCourtRelation?=parentId{parentCourt}", childCourt);
+            var response = await _httpClient.PutAsJsonAsync($"/UpdateCourtRelation?parentId={parentCourt}", childCourt);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<IEnumerable<ReadCourtRelationDTO>>();

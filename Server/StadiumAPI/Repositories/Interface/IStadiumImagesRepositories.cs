@@ -3,13 +3,19 @@ using StadiumAPI.Models;
 
 namespace StadiumAPI.Repositories.Interface
 {
-    public interface IStadiumImagesRepositories
+    public interface IStadiumVideosRepositories
     {
         // Define methods for managing stadium images, e.g.:
-        Task<IEnumerable<StadiumImages>> GetAllImagesAsync(int stadiumId);
-        Task<StadiumImages> GetImageByIdAsync(int id);
-        Task<StadiumImages> AddImageAsync(StadiumImages image);
-        Task<StadiumImages> UpdateImageAsync(int id, StadiumImages image);
-        Task<bool> DeleteImageAsync(int id);
+        Task<IEnumerable<StadiumVideos>> GetAllStadiumVideoByStadiumId(int stadiumId);
+
+        Task<StadiumVideos> GetVideoByIdAsync(int id);
+
+        Task<StadiumVideos> AddVideoAsync(StadiumVideos image);
+
+        Task<StadiumVideos> UpdateVideoAsync(int id, StadiumVideos image);
+
+        Task<bool> DeleteVideoAsync(List<StadiumVideos> stadiumVideos);
+
+        Task<bool> DeleteVIdeoByStadiumIdAsync(int stadiumId);
     }
 }
