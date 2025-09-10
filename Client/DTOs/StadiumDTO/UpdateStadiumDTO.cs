@@ -14,5 +14,6 @@
         public decimal? Longitude { get; set; }
         public bool IsApproved { get; set; }
         public int CreatedBy { get; set; } // User ID of the updater
+        public bool IsLocked { get; set; }
     }
 }

@@ -47,7 +47,7 @@ namespace StadiumAPI.Controllers
         public async Task<IActionResult> AddVideo([FromForm] List<CreateStadiumVideoDTO> createStadiumVideoDTO)
         {
             if (!createStadiumVideoDTO.Any() || createStadiumVideoDTO.Any(dto => dto.VideoUrl == null))
-                return BadRequest("A video file is required.");
+                return Ok();
 
             var uploadsFolder = Path.Combine(_env.WebRootPath, "videos");
             Directory.CreateDirectory(uploadsFolder);
@@ -134,6 +134,8 @@ namespace StadiumAPI.Controllers
         public async Task<IActionResult> DeleteVideosByStadiumId([FromQuery] int stadiumId)
         {
             var video = await _serviceStadiumVideo.GetAllVideosAsync(stadiumId);
+            if (video == null || !video.Any())
+                return Ok(true);
 
             foreach (var vid in video)
             {

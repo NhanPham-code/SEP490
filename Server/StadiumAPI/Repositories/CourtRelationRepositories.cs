@@ -37,7 +37,7 @@ namespace StadiumAPI.Repositories
 
         public async Task<IEnumerable<CourtRelations>> GetAllCourtRelationByChildId(int childId)
         {
-            return await _context.CourtRelations.Where(c => c.ChildCourtId == childId).ToListAsync();
+            return await _context.CourtRelations.Where(c => c.ChildCourtId == childId).Include(r => r.ParentCourt).ToListAsync();
         }
 
         public async Task<IEnumerable<CourtRelations>> GetAllCourtRelationByParentId(int parentId)

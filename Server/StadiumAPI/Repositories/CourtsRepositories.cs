@@ -23,10 +23,18 @@ public class CourtsRepositories : ICourtsRepositories
 
     public async Task<bool> DeleteCourtAsync(int id)
     {
+        _context.ChangeTracker.Clear();
         var court = await _context.Courts.FindAsync(id);
         if (court == null) return false;
-
-        _context.Courts.Remove(court);
+        if (court.IsAvailable == true)
+        {
+            court.IsAvailable = false;
+        }
+        else
+        {
+            court.IsAvailable = true;
+        }
+        _context.Courts.Update(court);
         await _context.SaveChangesAsync();
         return true;
     }

@@ -66,16 +66,23 @@ namespace StadiumManagerUI.Controllers
             }
             else
             {
-                foreach (var imageDto in CreateStadiumRequest.StadiumImage)
+                if (CreateStadiumRequest.StadiumImage != null)
                 {
-                    imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    foreach (var imageDto in CreateStadiumRequest.StadiumImage)
+                    {
+                        imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    }
+                    var image = await _imageService.AddStadiumImageAsync(CreateStadiumRequest.StadiumImage);
                 }
-                foreach (var imageDto in CreateStadiumRequest.StadiumVideo)
+
+                if (CreateStadiumRequest.StadiumVideo != null)
                 {
-                    imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    foreach (var imageDto in CreateStadiumRequest.StadiumVideo)
+                    {
+                        imageDto.StadiumId = stadium.Id; // Gán đúng ID đã tạo
+                    }
+                    var video = await _videoService.AddStadiumVideoAsync(CreateStadiumRequest.StadiumVideo);
                 }
-                var image = await _imageService.AddStadiumImageAsync(CreateStadiumRequest.StadiumImage);
-                var video = await _videoService.AddStadiumVideoAsync(CreateStadiumRequest.StadiumVideo);
             }
 
             return Json(new { success = 200, value = stadium });
@@ -86,6 +93,7 @@ namespace StadiumManagerUI.Controllers
             var token = _tokenService.GetAccessTokenFromCookie();
             var userId = await _userService.GetMyProfileAsync(token);
             updateStadiumRequest.Stadium.CreatedBy = userId.UserId;
+            updateStadiumRequest.Stadium.IsLocked = false;
             var stadium = await _service.UpdateStadiumAsync(updateStadiumRequest.Stadium.Id, updateStadiumRequest.Stadium);
             bool check = false;
             if (stadium == null)
@@ -129,16 +137,15 @@ namespace StadiumManagerUI.Controllers
 
         public async Task<IActionResult> DeleteStadium(int id)
         {
-            var image = await _imageService.DeleteStadiumImageAsync(id);
-            var video = await _videoService.DeleteAllVideosByStadiumId(id);
-            var stadium = await _service.DeleteStadiumAsync(id);
+            
+            var locked = await _service.DeleteStadiumAsync(id);
 
-            if (stadium && image)
+            if (locked)
             {
-                return Json(new { success = 200, value = stadium });
+                return Json(new { success = 200, value = locked });
             }
             else
-                return Json(new { success = 400, value = stadium });
+                return Json(new { success = 400, value = locked });
         }
     }
 }

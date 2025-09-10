@@ -38,6 +38,30 @@
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
+      "DownstreamPathTemplate": "/api/Users/CustomerRegister",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/CustomerRegister",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/ManagerRegister",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/ManagerRegister",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/register",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -269,7 +293,7 @@
         }
       ],
       "UpstreamPathTemplate": "/bookings/booked",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": [ "GET" ]
       //"AuthenticationOptions": {
       //  "AuthenticationProviderKey": "Bearer",
       //  "RequireAuthentication": true
@@ -421,7 +445,7 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
+      }
       //"RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       //}

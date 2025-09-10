@@ -19,6 +19,7 @@ namespace StadiumAPI.DTOs
         public int CreatedBy { get; set; } // User ID of the creator
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool IsLocked { get; set; }
         public ICollection<ReadCourtDTO> Courts { get; set; }
         public ICollection<ReadStadiumImageDTO> StadiumImages { get; set; }
     }

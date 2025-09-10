@@ -41,6 +41,7 @@ namespace StadiumAPI.Models
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
+        public bool IsLocked { get; set; }
 
         public virtual ICollection<Courts> Courts { get; set; } // Sử dụng Courts thay vì ReadCourtDTO
         public virtual ICollection<StadiumImages> StadiumImages { get; set; }

@@ -93,7 +93,7 @@ namespace StadiumAPI.Controllers
 
         [HttpDelete("api/courts")]
         [Authorize(Roles = ("StadiumManager"))]
-        public async Task<IActionResult> DeleteCourt(int id)
+        public async Task<IActionResult> DeleteCourt([FromQuery]int id)
         {
             if (id <= 0)
             {

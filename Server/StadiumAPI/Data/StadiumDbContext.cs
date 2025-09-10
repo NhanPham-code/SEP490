@@ -87,7 +87,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -105,7 +106,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -123,7 +125,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -141,7 +144,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -159,7 +163,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -177,7 +182,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -195,7 +201,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -213,7 +220,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 2,
                     CreatedByUser = 2,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -231,7 +239,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 3,
                     CreatedByUser = 3,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -249,7 +258,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -267,7 +277,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -285,7 +296,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 2,
                     CreatedByUser = 2,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -303,7 +315,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 3,
                     CreatedByUser = 3,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -321,7 +334,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 4,
                     CreatedByUser = 4,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -339,7 +353,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -357,7 +372,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 2,
                     CreatedByUser = 2,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -375,7 +391,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 3,
                     CreatedByUser = 3,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -393,7 +410,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -411,7 +429,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 4,
                     CreatedByUser = 4,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -429,7 +448,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 4,
                     CreatedByUser = 4,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -447,7 +467,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 1,
                     CreatedByUser = 1,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 },
                 new Stadiums
                 {
@@ -465,7 +486,8 @@ namespace StadiumAPI.Data
                     CreatedBy = 2,
                     CreatedByUser = 2,
                     CreatedAt = fixedDate,
-                    UpdatedAt = fixedDate
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
                 }
             );
 

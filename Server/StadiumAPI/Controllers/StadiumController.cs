@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StadiumAPI.Data;
 using StadiumAPI.DTOs;
+using StadiumAPI.Models;
 using StadiumAPI.Service.Interface;
 using System;
 using System.Collections.Generic;
@@ -60,18 +61,12 @@ namespace StadiumAPI.Controllers
                 return BadRequest();
             }
 
-            var update = await _serviceStadium.GetStadiumByIdAsync(id);
-
-            if (update == null)
-            {
-                return NotFound();
-            }
             updateStadiumDTO.NameUnsigned = RemoveDiacritics(updateStadiumDTO.Name).ToLower();
             updateStadiumDTO.AddressUnsigned = RemoveDiacritics(updateStadiumDTO.Address).ToLower();
 
-            update = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
+            var updated = await _serviceStadium.UpdateStadiumAsync(id, updateStadiumDTO);
 
-            return Ok(update);
+            return Ok(updated);
         }
 
         // POST: api/ReadStadiumDTOes
@@ -93,12 +88,6 @@ namespace StadiumAPI.Controllers
         [Authorize(Roles = ("StadiumManager"))]
         public async Task<IActionResult> DeleteReadStadiumDTO([FromQuery] int id)
         {
-            var readStadiumDTO = await _serviceStadium.GetStadiumByIdAsync(id);
-            if (readStadiumDTO == null)
-            {
-                return NotFound();
-            }
-
             return Ok(await _serviceStadium.DeleteStadiumAsync(id));
         }
 

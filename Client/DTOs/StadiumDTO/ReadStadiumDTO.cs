@@ -17,6 +17,7 @@
         public int CreatedBy { get; set; } // User ID of the creator
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool IsLocked { get; set; }
         public virtual ICollection<ReadCourtDTO> Courts { get; set; } // Sử dụng Courts thay vì ReadCourtDTO
         public virtual ICollection<ReadStadiumImageDTO> StadiumImages { get; set; }
     }

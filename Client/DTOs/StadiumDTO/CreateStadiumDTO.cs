@@ -11,6 +11,7 @@
         public TimeSpan CloseTime { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
+        public bool IsLocked { get; set; } = false;
         public int CreatedBy { get; set; } // User ID of the creator
     }
 }

@@ -8,6 +8,8 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="~/css/stadium/stadium.css"/>
+<link rel="stylesheet" href="~/css/stadium/Background.css" />
+
 
 @section Scripts {
     
@@ -67,7 +69,7 @@
                     state.filters.search = $(this).val();
                     state.currentPage = 1;
                     loadData();
-                }, 1000);
+                }, 3000);
             });
 
             $('#status-filter, #sport-type-filter').on('change', function () {
@@ -169,18 +171,23 @@
                             </div>
                         </div>
                         <div class="card-actions">
-                                            <button onclick="goToDetail(${stadium.Id})" class="details-btn">
+                                                    <button onclick="goToDetail(${stadium.Id})" class="details-btn loading">
            <i class="ri-information-line"></i> Chi tiết
         </button>
 
-                            <div class="action-buttons">
-                                <button onclick="openEditModal(${stadium.Id})" class="action-btn edit-btn" title="Chỉnh sửa">
-                                    <i class="ri-edit-line"></i>
-                                </button>
-                                <button onclick="confirmDelete(${stadium.Id})" class="action-btn delete-btn" title="Xóa">
-                                    <i class="ri-delete-bin-line"></i>
-                                </button>
-                            </div>
+                                    <div class="action-buttons">
+            <button onclick="openEditModal(${stadium.Id})" class="action-btn edit-btn" title="Chỉnh sửa">
+                <i class="ri-edit-line"></i>
+            </button>
+            ${stadium.IsLocked ?
+                `<button onclick="confirmUnlock(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
+                    <i class="ri-lock-unlock-line"></i>
+                </button>` :
+                `<button onclick="confirmLock(${stadium.Id})" class="action-btn lock-btn" title="Khóa">
+                    <i class="ri-lock-line"></i>
+                </button>`
+            }
+        </div>
                         </div>
                     </div>
                 </div>
@@ -271,58 +278,68 @@
                     closeTimeInput.addEventListener('change', updateTimePreview);
                     updateTimePreview();
                 },
-                preConfirm: () => {
-                    const name = document.getElementById('newName').value.trim();
-                    const address = document.getElementById('newAddress').value.trim();
-                    const openTime = document.getElementById('newOpenTime').value;
-                    const closeTime = document.getElementById('newCloseTime').value;
+                        preConfirm: () => {
+            // Clear any existing validation messages
+            Swal.resetValidationMessage();
 
-                    // Enhanced validation
-                    if (!name) {
-                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Vui lòng nhập tên sân');
+            try {
+                const name = document.getElementById('newName').value.trim();
+                const address = document.getElementById('newAddress').value.trim();
+                const openTime = document.getElementById('newOpenTime').value;
+                const closeTime = document.getElementById('newCloseTime').value;
+                const images = document.getElementById("newImageUpload").files;
+                const videos = document.getElementById("newVideoUpload").files;
+
+                // Validation với error handling
+                const validations = [
+                    { condition: !name, message: 'Vui lòng nhập tên sân' },
+                    { condition: !address, message: 'Vui lòng nhập địa chỉ' },
+                    { condition: !openTime || !closeTime, message: 'Vui lòng chọn giờ hoạt động' },
+                    { condition: !validateTimeRange(openTime, closeTime), message: 'Giờ đóng cửa phải sau giờ mở cửa' },
+                    { condition: images.length === 0, message: 'Hãy tải lên hình ảnh về sân của bạn' },
+                    { condition: videos.length === 0, message: 'Hãy tải lên video về sân của bạn' }
+                ];
+
+                for (const validation of validations) {
+                    if (validation.condition) {
+                        Swal.showValidationMessage(`<i class="ri-error-warning-line mr-1"></i>${validation.message}`);
                         return false;
                     }
-                    if (!address) {
-                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Vui lòng nhập địa chỉ');
-                        return false;
-                    }
-                    if (!openTime || !closeTime) {
-                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Vui lòng chọn giờ hoạt động');
-                        return false;
-                    }
-                    if (!validateTimeRange(openTime, closeTime)) {
-                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Giờ đóng cửa phải sau giờ mở cửa');
-                        return false;
-                    }
-
-                    const formData = new FormData();
-                    formData.append('Stadium.Name', name);
-                    formData.append('Stadium.NameUnsigned', address);
-                    formData.append('Stadium.Address', address);
-                    formData.append('Stadium.AddressUnsigned', address);
-                    formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
-                    formData.append('Stadium.OpenTime', openTime);
-                    formData.append('Stadium.CloseTime', closeTime);
-
-                    const latitude = document.getElementById('newLatitude').value;
-                    const longitude = document.getElementById('newLongitude').value;
-                    if (latitude) formData.append('Stadium.Latitude', latitude);
-                    if (longitude) formData.append('Stadium.Longitude', longitude);
-
-                    // Add images
-                                    const images = document.getElementById("newImageUpload").files;
-        for (let i = 0; i < images.length; i++) {
-            formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
-        }
-
-                    //add video
-                                const videos = document.getElementById("newVideoUpload").files;
-            for (let i = 0; i < videos.length; i++) {
-                formData.append(`StadiumVideo[${i}].VideoUrl`, videos[i]);
-            }
-
-                    return formData;
                 }
+
+                // Build FormData...
+                const formData = new FormData();
+                formData.append('Stadium.Name', name);
+                formData.append('Stadium.NameUnsigned', address);
+                formData.append('Stadium.Address', address);
+                formData.append('Stadium.AddressUnsigned', address);
+                formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
+                formData.append('Stadium.OpenTime', openTime);
+                formData.append('Stadium.CloseTime', closeTime);
+
+                const latitude = document.getElementById('newLatitude').value;
+                const longitude = document.getElementById('newLongitude').value;
+                if (latitude) formData.append('Stadium.Latitude', latitude);
+                if (longitude) formData.append('Stadium.Longitude', longitude);
+
+                // Add images
+                for (let i = 0; i < images.length; i++) {
+                    formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
+                }
+
+                // Add videos
+                for (let i = 0; i < videos.length; i++) {
+                    formData.append(`StadiumVideo[${i}].VideoUrl`, videos[i]);
+                }
+
+                return formData;
+
+            } catch (error) {
+                console.error('Validation error:', error);
+                Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Có lỗi xảy ra, vui lòng thử lại');
+                return false;
+            }
+        }
             }).then((result) => {
                 if (result.isConfirmed) {
                     createNewStadium(result.value);
@@ -393,7 +410,7 @@
                     }
 
                     .modal-header {
-                        display: flex;
+                                display: ruby-text;
                         align-items: center;
                         gap: 12px;
                         margin-bottom: 8px;
@@ -405,8 +422,8 @@
                         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
                         border-radius: 12px;
                         display: flex;
-                        align-items: center;
-                        justify-content: center;
+                                        align-items: center;
+                                justify-content: center;
                         color: white;
                         font-size: 24px;
                     }
@@ -803,18 +820,60 @@
         }
 
 
+        // Unlock stadium
+                             function confirmUnlock(stadiumId) {
+            Swal.fire({
+                title: `
+                    <div class="modal-header">
+                        <div class="modal-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <i class="ri-lock-unlock-line"></i>
+                        </div>
+                        <div class="modal-title-text">Xác nhận Mở khóa sân</div>
+                    </div>
+                `,
+                html: `
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1);
+                                    border: 3px solid rgba(16, 185, 129, 0.3); border-radius: 50%;
+                                    margin: 0 auto 24px; display: flex; align-items: center; justify-content: center;">
+                            <i class="ri-check-line" style="font-size: 48px; color: #10b981;"></i>
+                        </div>
+                        <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
+                            Bạn có chắc chắn muốn mở khóa sân này không?
+                        </h3>
+                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem; line-height: 1.6;">
+                            Sân này sẽ được kích hoạt trở lại<br>
+                            và có thể sử dụng bình thường.
+                        </p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="ri-lock-unlock-line mr-1"></i>Mở khóa sân',
+                cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy bỏ',
+                width: '500px',
+                customClass: {
+                    confirmButton: 'enhanced-confirm-btn success',
+                    cancelButton: 'enhanced-cancel-btn',
+                    popup: 'enhanced-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                            deleteStadium(stadiumId); // Gọi function unlock thay vì delete
+                }
+            });
+        }
 
-        
-
-        // Delete Confirmation Modal
-        function confirmDelete(stadiumId) {
+        // Function for locking stadium
+        function confirmLock(stadiumId) {
             Swal.fire({
                 title: `
                     <div class="modal-header">
                         <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                            <i class="ri-delete-bin-line"></i>
+                            <i class="ri-lock-line"></i>
                         </div>
-                        <div class="modal-title-text">Xác nhận xóa sân</div>
+                        <div class="modal-title-text">Xác nhận Khóa sân</div>
                     </div>
                 `,
                 html: `
@@ -825,18 +884,18 @@
                             <i class="ri-alert-line" style="font-size: 48px; color: #ef4444;"></i>
                         </div>
                         <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                            Bạn có chắc chắn muốn xóa sân này?
+                            Bạn có chắc chắn muốn khóa sân này không?
                         </h3>
                         <p style="margin: 0; color: #6b7280; font-size: 0.875rem; line-height: 1.6;">
-                            Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan<br>
-                            đến sân này sẽ bị xóa vĩnh viễn.
+                            Tất cả dữ liệu liên quan<br>
+                            đến sân này sẽ bị khóa đến khi nào mở lại.
                         </p>
                     </div>
                 `,
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: '<i class="ri-delete-bin-line mr-1"></i>Xóa sân',
+                confirmButtonText: '<i class="ri-lock-line mr-1"></i>Khóa sân',
                 cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy bỏ',
                 width: '500px',
                 customClass: {
@@ -846,70 +905,12 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    deleteStadium(stadiumId);
+                    deleteStadium(stadiumId); // Gọi function lock thay vì delete
                 }
             });
         }
 
-        function deleteStadium(stadiumId) {
-            Swal.fire({
-                title: 'Đang xóa sân...',
-                html: `
-                    <div class="loading-content">
-                        <div class="loading-spinner-custom" style="border-top-color: #ef4444;"></div>
-                        <p style="margin-top: 16px; color: #6b7280;">Đang xóa sân khỏi hệ thống...</p>
-                    </div>
-                `,
-                showConfirmButton: false,
-                allowOutsideClick: false
-            });
-
-            $.ajax({
-                url: `${CONFIG.API_ENDPOINTS.DELETE}`,
-                type: 'GET',
-                data:{id: stadiumId},
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Đã xóa thành công!',
-                        html: `
-                            <div style="text-align: center; padding: 20px 0;">
-                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669);
-                                            border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="ri-check-line" style="font-size: 40px; color: white;"></i>
-                                </div>
-                                <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                                    Sân đã được thêm thành công
-                                </h3>
-                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
-                                    Sân mới đã được tạo và đang chờ phê duyệt
-                                </p>
-                            </div>
-                        `,
-                        confirmButtonText: 'Tuyệt vời!',
-                        confirmButtonColor: '#10b981'
-                    }).then(() => {
-
-                        loadData();
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error creating stadium:', error);
-                    let errorMessage = 'Không thể thêm sân mới. Vui lòng thử lại!';
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Có lỗi xảy ra',
-                        text: errorMessage,
-                        confirmButtonColor: '#dc2626'
-                    });
-                }
-            });
-        }
+      
 
         function saveStadiumChanges(formData) {
             Swal.fire({
@@ -1281,7 +1282,7 @@ function updateDateTime() {
 
         // Enhanced Edit Modal
         function openEditModal(stadiumId) {
-            let search = `&$filter=Id eq ${stadiumId}`;
+            let search = `&$filter=Id eq ${stadiumId} and `;
 
             $.ajax({
                 url: CONFIG.API_ENDPOINTS.SEARCH,
@@ -1663,7 +1664,7 @@ function updateDateTime() {
         }
              
         // Helper function to render current images for edit modal
-        function renderCurrentImagesForEdit(images) {
+                function renderCurrentImagesForEdit(images) {
             if (!images || images.length === 0) {
                 return `
                     <div class="current-images-section">
@@ -1684,9 +1685,11 @@ function updateDateTime() {
                             <div class="image-item" data-image-id="${image.Id || index}">
                                 <img src="${getUrlImage([image])}" alt="Stadium image" />
                                 ${index === 0 ? '<div class="primary-badge">Chính</div>' : ''}
-                                <button type="button" class="delete-image-btn" onclick="deleteCurrentImage(this)" title="Xóa ảnh">
-                                    <i class="ri-delete-bin-line"></i>
-                                </button>
+                                ${index !== 0 ? `
+                                    <button type="button" class="delete-image-btn" onclick="deleteCurrentImage(this)" title="Xóa ảnh">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                ` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -2032,9 +2035,8 @@ function updateDateTime() {
                     }
 
                     .modal-header {
-                        display: flex;
+                                display: ruby-text;
                         align-items: center;
-                        gap: 12px;
                         margin-bottom: 8px;
                     }
 
@@ -2276,7 +2278,7 @@ function updateDateTime() {
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Xóa thành công!',
+                        title: 'Khóa thành công!',
                         html: `
                             <div style="text-align: center; padding: 20px 0;">
                                 <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669);
@@ -2284,11 +2286,8 @@ function updateDateTime() {
                                     <i class="ri-check-line" style="font-size: 40px; color: white;"></i>
                                 </div>
                                 <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                                    Sân đã được xóa khỏi hệ thống
+                                    Sân đã được xóa khóa
                                 </h3>
-                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
-                                    Tất cả dữ liệu liên quan đã được xóa vĩnh viễn
-                                </p>
                             </div>
                         `,
                         confirmButtonText: 'Đã hiểu',
@@ -2299,7 +2298,7 @@ function updateDateTime() {
                 },
                 error: function(xhr, status, error) {
                     console.error('Error deleting stadium:', error);
-                    let errorMessage = 'Không thể xóa sân. Vui lòng thử lại!';
+                    let errorMessage = 'Không thể khóa sân. Vui lòng thử lại!';
 
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
@@ -3063,16 +3062,15 @@ function updateDateTime() {
             updateDateTime();
             setInterval(updateDateTime, 1000);
         });
+
        
     </script>
 }
 
-<div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
+<div class="floating-sports-icons">
+    <!-- Sports icons will be generated dynamically -->
 </div>
+<script src="~/js/Stadium.js"></script>
 
 <div class="admin-container">
     <!-- Header Section -->
