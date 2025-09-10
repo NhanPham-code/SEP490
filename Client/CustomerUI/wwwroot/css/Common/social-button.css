@@ -1,0 +1,920 @@
+﻿/* ==================== ENHANCED SOCIAL BUTTONS CSS ==================== */
+/* Phiên bản cải tiến với layout 2 hàng và UI/UX hiện đại - FIXED VERSION */
+
+/* Container cho social login */
+.social-login-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    width: 100%;
+}
+
+/* Enhanced Divider "HOẶC" - FIX: Thêm styling cho social-login-divider */
+.login-divider,
+.social-login-divider {
+    position: relative;
+    text-align: center;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: slideInUp 0.6s ease forwards;
+    animation-delay: 0.2s;
+    /* FIX: Đảm bảo margin cho register form */
+    margin: 24px 0;
+    /* FIX: Đảm bảo container căn giữa */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+    /* FIX: Đảm bảo cả 2 divider đều có line ngang */
+    .login-divider::before,
+    .social-login-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e2e8f0 10%, #cbd5e1 50%, #e2e8f0 90%, transparent);
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    /* FIX: Style cho cả divider-text và span trong social-login-divider */
+    .divider-text,
+    .social-login-divider span {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(12px);
+        padding: 0 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        letter-spacing: 0.8px;
+        position: relative;
+        z-index: 2;
+        text-transform: uppercase;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        /* FIX: Đảm bảo text luôn được hiển thị ở giữa */
+        display: inline-block;
+        white-space: nowrap;
+        /* FIX: Căn giữa text bên trong */
+        text-align: center;
+        /* FIX: Đảm bảo không bị override bởi CSS khác */
+        margin: 0 auto !important;
+        /* FIX: Đảm bảo block element để căn giữa hoạt động */
+        flex-shrink: 0;
+    }
+
+    /* FIX: Xử lý riêng cho my-6 class của Tailwind */
+    .social-login-divider.my-6 {
+        margin: 24px 0 !important;
+        /* FIX: Đảm bảo flex layout */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    /* FIX: Override cho bất kỳ CSS nào có thể ảnh hưởng */
+    .social-login-divider span {
+        /* Force center alignment */
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        position: relative !important;
+    }
+
+/* Layout 2 hàng cho buttons */
+.social-buttons-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* FIX: Container cho social login buttons (cho cả login và register) */
+.social-login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+    /* FIX: Container cho Google button để căn giữa - áp dụng cho cả 2 form */
+    .social-buttons-grid .g_id_signin,
+    .social-login-buttons .g_id_signin,
+    .google-button {
+        width: 100% !important;
+        height: 56px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        opacity: 0;
+        animation: slideInLeft 0.6s ease forwards;
+        animation-delay: 0.4s;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+        /* FIX: Đảm bảo iframe Google button căn giữa */
+        .social-buttons-grid .g_id_signin iframe,
+        .social-login-buttons .g_id_signin iframe,
+        .google-button iframe {
+            width: 100% !important;
+            height: 56px !important;
+            margin: 0 auto !important;
+        }
+
+/* Enhanced base style cho social buttons */
+.social-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    height: 56px;
+    padding: 0 24px;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #374151;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    user-select: none;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    animation: slideInRight 0.6s ease forwards;
+    animation-delay: 0.6s;
+    z-index: 1;
+}
+
+    /* FIX: Gradient border effect - chỉ hiện khi hover */
+    .social-btn::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        padding: 2px;
+        background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+        border-radius: inherit;
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: xor;
+        -webkit-mask-composite: xor;
+        transition: all 0.4s ease;
+        z-index: -1;
+        opacity: 0;
+    }
+
+    .social-btn:hover::after {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+        animation: borderRotate 3s linear infinite;
+        opacity: 1;
+    }
+
+@keyframes borderRotate {
+    0% {
+        background: linear-gradient(0deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    25% {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    50% {
+        background: linear-gradient(180deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    75% {
+        background: linear-gradient(270deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    100% {
+        background: linear-gradient(360deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+}
+
+/* FIX: Shimmer effect khi hover - không ảnh hưởng đến visibility */
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.8s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.social-btn:hover::before {
+    left: 100%;
+}
+
+.social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.social-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Icon container với enhanced styling */
+.social-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover .social-btn-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Enhanced text styling */
+.social-btn-text {
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    z-index: 2;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover .social-btn-text {
+    transform: translateX(2px);
+}
+
+/* Enhanced loading spinner */
+.social-btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    z-index: 3;
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spinEnhanced 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+@keyframes spinEnhanced {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* ==================== BIOMETRIC BUTTON ENHANCED - FIXED ==================== */
+.biometric-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 200%;
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+    .biometric-btn:hover {
+        background-position: 100% 0;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #9333ea 100%);
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .biometric-btn:active {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .biometric-btn:focus-visible {
+        outline: 3px solid rgba(102, 126, 234, 0.3);
+        outline-offset: 3px;
+    }
+
+/* Enhanced biometric icon */
+.biometric-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.biometric-btn:hover .biometric-icon-wrapper {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.15) rotate(-5deg);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* FIX: Giới hạn pulse animation để không ảnh hưởng đến button */
+.biometric-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseAdvanced 2.5s ease-in-out infinite;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.biometric-btn:hover .biometric-pulse {
+    opacity: 1;
+}
+
+@keyframes pulseAdvanced {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.8;
+        border-width: 3px;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.4;
+        border-width: 2px;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+/* ==================== ENHANCED BUTTON STATES ==================== */
+
+/* Enhanced Loading State */
+.social-btn.loading {
+    pointer-events: none;
+    cursor: not-allowed;
+    animation: loadingPulse 2s ease-in-out infinite;
+    visibility: visible !important;
+    opacity: 0.8 !important;
+}
+
+@keyframes loadingPulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.social-btn.loading .social-btn-text,
+.social-btn.loading .social-btn-icon {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.9);
+}
+
+.social-btn.loading .social-btn-loading {
+    opacity: 1;
+    visibility: visible;
+}
+
+.social-btn.loading.biometric-btn .loading-spinner {
+    border-color: rgba(255, 255, 255, 0.4);
+    border-top-color: #ffffff;
+}
+
+/* Enhanced Success State */
+.social-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: #10b981 !important;
+    color: white !important;
+    animation: successBounce 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+@keyframes successBounce {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(1.1) translateY(-5px);
+    }
+
+    60% {
+        transform: scale(0.98) translateY(-2px);
+    }
+
+    100% {
+        transform: scale(1) translateY(-3px);
+    }
+}
+
+/* Enhanced Error State */
+.social-btn.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-color: #ef4444 !important;
+    color: white !important;
+    animation: errorShake 0.8s ease;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+@keyframes errorShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* ==================== ENHANCED INFO SECTION ==================== */
+.biometric-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: rgba(99, 102, 241, 0.05);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    border-radius: 12px;
+    color: #6366f1;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: slideInUp 0.6s ease forwards;
+    animation-delay: 0.8s;
+}
+
+    .biometric-info:hover {
+        background: rgba(99, 102, 241, 0.08);
+        border-color: rgba(99, 102, 241, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .biometric-info i {
+        font-size: 16px;
+        color: #6366f1;
+        animation: infoIconPulse 3s ease-in-out infinite;
+    }
+
+@keyframes infoIconPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* ==================== SLIDE ANIMATIONS ==================== */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+    .social-btn {
+        height: 60px;
+        font-size: 16px;
+        gap: 16px;
+        padding: 0 28px;
+    }
+
+    .social-btn-icon, .biometric-icon-wrapper {
+        width: 30px;
+        height: 30px;
+    }
+
+    .social-buttons-grid .g_id_signin,
+    .social-login-buttons .g_id_signin,
+    .google-button {
+        height: 60px !important;
+    }
+
+        .social-buttons-grid .g_id_signin iframe,
+        .social-login-buttons .g_id_signin iframe,
+        .google-button iframe {
+            height: 60px !important;
+        }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .social-login-section {
+        margin-top: 24px;
+        padding-top: 20px;
+    }
+
+    .social-buttons-grid,
+    .social-login-buttons {
+        gap: 14px;
+    }
+
+        .social-btn,
+        .social-buttons-grid .g_id_signin,
+        .social-login-buttons .g_id_signin,
+        .google-button {
+            height: 52px !important;
+        }
+
+            .social-buttons-grid .g_id_signin iframe,
+            .social-login-buttons .g_id_signin iframe,
+            .google-button iframe {
+                height: 52px !important;
+            }
+
+    .social-btn {
+        font-size: 14px;
+        gap: 12px;
+        padding: 0 20px;
+    }
+
+    .social-btn-icon, .biometric-icon-wrapper {
+        width: 26px;
+        height: 26px;
+    }
+
+    .biometric-info {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .social-login-section {
+        margin-top: 20px;
+        padding-top: 16px;
+    }
+
+    .login-divider,
+    .social-login-divider {
+        margin-bottom: 20px;
+    }
+
+        .divider-text,
+        .social-login-divider span {
+            font-size: 12px;
+            padding: 0 16px;
+        }
+
+    .social-buttons-grid,
+    .social-login-buttons {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+        .social-btn,
+        .social-buttons-grid .g_id_signin,
+        .social-login-buttons .g_id_signin,
+        .google-button {
+            height: 56px !important;
+        }
+
+            .social-buttons-grid .g_id_signin iframe,
+            .social-login-buttons .g_id_signin iframe,
+            .google-button iframe {
+                height: 56px !important;
+            }
+
+    .social-btn {
+        font-size: 15px;
+        gap: 14px;
+        padding: 0 24px;
+        border-radius: 14px;
+    }
+
+    .social-btn-icon, .biometric-icon-wrapper {
+        width: 28px;
+        height: 28px;
+    }
+
+    .biometric-info {
+        font-size: 12px;
+        margin-top: 10px;
+        padding: 10px 12px;
+    }
+
+    /* Touch-friendly hover effects */
+    .social-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .social-login-section {
+        margin-top: 16px;
+        padding-top: 12px;
+    }
+
+    .social-btn,
+    .social-buttons-grid .g_id_signin,
+    .social-login-buttons .g_id_signin,
+    .google-button {
+        height: 52px !important;
+    }
+
+        .social-buttons-grid .g_id_signin iframe,
+        .social-login-buttons .g_id_signin iframe,
+        .google-button iframe {
+            height: 52px !important;
+        }
+
+    .social-btn {
+        font-size: 14px;
+        gap: 12px;
+        border-radius: 12px;
+        padding: 0 20px;
+    }
+
+    .social-btn-icon, .biometric-icon-wrapper {
+        width: 24px;
+        height: 24px;
+    }
+
+    .loading-spinner {
+        width: 20px;
+        height: 20px;
+    }
+
+    .biometric-info {
+        font-size: 11px;
+        margin-top: 8px;
+        padding: 8px 10px;
+    }
+}
+
+/* ==================== DARK MODE SUPPORT ==================== */
+@media (prefers-color-scheme: dark) {
+    .divider-text,
+    .social-login-divider span {
+        background: rgba(17, 24, 39, 0.98);
+        color: #9ca3af;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-divider::before,
+    .social-login-divider::before {
+        background: linear-gradient(90deg, transparent, #374151 10%, #4b5563 50%, #374151 90%, transparent);
+    }
+
+    .social-btn {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+        .social-btn::after {
+            background: linear-gradient(135deg, #374151, #4b5563);
+        }
+
+        .social-btn:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        }
+
+    .biometric-info {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.2);
+        color: #a5b4fc;
+    }
+
+    .loading-spinner {
+        border-color: #4b5563;
+    }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .social-btn {
+        border-width: 3px;
+        border-color: currentColor;
+    }
+
+    .biometric-btn {
+        border: 3px solid #ffffff;
+    }
+
+    .biometric-pulse,
+    .social-btn::before,
+    .social-btn::after {
+        display: none;
+    }
+
+    .biometric-info {
+        border-width: 2px;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .social-btn::before,
+    .social-btn::after,
+    .biometric-pulse {
+        display: none;
+    }
+
+    .social-btn:hover .social-btn-icon,
+    .social-btn:hover .biometric-icon-wrapper,
+    .social-btn:hover .social-btn-text {
+        transform: none;
+    }
+
+    .loading-spinner {
+        animation: none;
+        border: 3px solid currentColor;
+        border-top-color: transparent;
+    }
+}
+
+/* Focus Management */
+.social-btn:focus-visible,
+.social-buttons-grid .g_id_signin:focus-visible,
+.social-login-buttons .g_id_signin:focus-visible,
+.google-button:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+/* Print Styles */
+@media print {
+    .social-login-section,
+    .social-login-buttons {
+        display: none;
+    }
+}
+
+/* ==================== TOOLTIP ENHANCEMENTS ==================== */
+
+/* Tooltip for biometric info */
+.biometric-info {
+    position: relative;
+    cursor: help;
+}
+
+    .biometric-info::before {
+        content: 'Hỗ trợ đăng nhập nhanh chóng và bảo mật cao';
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        pointer-events: none;
+    }
+
+    .biometric-info::after {
+        content: '';
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #1f2937;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .biometric-info:hover::before,
+    .biometric-info:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
+/* ==================== RIPPLE EFFECT ==================== */
+.social-btn {
+    overflow: hidden;
+    position: relative;
+}
+
+    .social-btn:active::before {
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1%, transparent 1%);
+        background-size: 10000% 10000%;
+        animation: ripple 0.6s ease;
+    }
+
+@keyframes ripple {
+    0% {
+        background-size: 0% 0%;
+        opacity: 1;
+    }
+
+    100% {
+        background-size: 10000% 10000%;
+        opacity: 0;
+    }
+}

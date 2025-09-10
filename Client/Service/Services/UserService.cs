@@ -243,5 +243,15 @@ namespace Service.Services
             var response = await _httpClient.PutAsJsonAsync("/users/forgot-password", resetPasswordDTO);
             return response.IsSuccessStatusCode;
         }
+
+        public async Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest)
+        {
+            // Gọi đến endpoint /users/google-auth của API Server
+            var response = await _httpClient.PostAsJsonAsync("/users/google-auth", googleRequest);
+
+            // Đọc kết quả trả về, dù thành công hay thất bại
+            // API Server sẽ trả về cấu trúc LoginResponseDTO với IsValid = false nếu có lỗi
+            return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+        }
     }
 }

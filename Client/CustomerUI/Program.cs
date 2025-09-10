@@ -66,6 +66,8 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseRouting();
 
+app.UseMiddleware<NoCacheMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+
 app.UseSession();
 
 app.UseMiddleware<TokenRefreshMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN

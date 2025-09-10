@@ -32,5 +32,7 @@ namespace Service.Interfaces
         Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
 
         Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
+
+        Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest);
     }
 }

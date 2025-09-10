@@ -29,12 +29,15 @@ namespace CustomerUI.Controllers
         private readonly IEmailService _emailService;
         private readonly ITokenService _tokenService;
 
+        private readonly IConfiguration _configuration;
 
-        public CommonController(IUserService userService, IEmailService emailService, ITokenService tokenService)
+
+        public CommonController(IUserService userService, IEmailService emailService, ITokenService tokenService, IConfiguration configuration)
         {
             _userService = userService;
             _emailService = emailService;
             _tokenService = tokenService;
+            _configuration = configuration;
         }
 
         // Dùng cho hàm Login và Register
@@ -64,8 +67,48 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GoogleAuth([FromBody] GoogleApiLoginRequestDTO request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.IdToken))
+            {
+                return Json(new { success = false, message = "Google Token không hợp lệ." });
+            }
+
+            try
+            {
+                var response = await _userService.LoginWithGoogleAsync(request);
+
+                if (response == null)
+                {
+                    return Json(new { success = false, message = response?.Message ?? "Đăng nhập bằng Google thất bại." });
+                }
+
+                if(response.IsValid == false)
+                {
+                    return Json(new { success = false, message = response.Message });
+                }
+
+                _tokenService.SaveTokensToCookies(response, false);
+                UpdateUserSession(response);
+
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Đã có lỗi xảy ra phía máy chủ. " + ex.Message });
+            }
+        }
+
         public IActionResult Login()
         {
+            // Đọc Client ID từ IConfiguration và truyền sang View
+            var googleClientId = _configuration["GoogleAuth:ClientId"];
+
+            // DEBUG: Log để kiểm tra
+            Console.WriteLine($"Google Client ID: {googleClientId}");
+
+            ViewBag.GoogleClientId = googleClientId;
             return View();
         }
 

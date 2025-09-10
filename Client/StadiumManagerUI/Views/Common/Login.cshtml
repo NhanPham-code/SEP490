@@ -173,7 +173,7 @@
                     </div>
 
                     <div class="field-group">
-                        <div class="floating-label">
+                        <div class="floating-label date-input-wrapper">
                             <input type="date" id="register-dob" required />
                             <i class="ri-calendar-line icon text-xl"></i>
                         </div>
@@ -301,19 +301,19 @@
             const icon = iconMap[type] || 'ri-information-line';
 
             const alertHtml = `
-                        <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
-                            <div class="alert-icon">
-                                <i class="${icon}"></i>
-                            </div>
-                            <div class="alert-content">
-                                ${message}
-                            </div>
-                            <div class="alert-close" onclick="closeAlert('${alertId}')">
-                                <i class="ri-close-line"></i>
-                            </div>
-                            ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
-                        </div>
-                    `;
+                                <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
+                                    <div class="alert-icon">
+                                        <i class="${icon}"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        ${message}
+                                    </div>
+                                    <div class="alert-close" onclick="closeAlert('${alertId}')">
+                                        <i class="ri-close-line"></i>
+                                    </div>
+                                    ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
+                                </div>
+                            `;
 
             if (isToast) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
@@ -355,18 +355,18 @@
             const errorItems = errorList.map(error => `<li>${error}</li>`).join('');
 
             const alertHtml = `
-                        <div class="form-error-summary">
-                            <div class="alert-icon">
-                                <i class="ri-error-warning-line"></i>
-                            </div>
-                            <div class="alert-content">
-                                <strong>Vui lòng kiểm tra các lỗi sau:</strong>
-                                <ul style="margin: 8px 0 0 0; padding-left: 16px;">
-                                    ${errorItems}
-                                </ul>
-                            </div>
-                        </div>
-                    `;
+                                <div class="form-error-summary">
+                                    <div class="alert-icon">
+                                        <i class="ri-error-warning-line"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <strong>Vui lòng kiểm tra các lỗi sau:</strong>
+                                        <ul style="margin: 8px 0 0 0; padding-left: 16px;">
+                                            ${errorItems}
+                                        </ul>
+                                    </div>
+                                </div>
+                            `;
 
             container.innerHTML = alertHtml;
 
@@ -505,7 +505,7 @@
             strengthText.textContent = strengthTextContent;
         }
 
-        // CUSTOM SELECT FUNCTIONALITY
+        // CUSTOM SELECT FUNCTIONALITY - ĐÃ SỬA LỖI
         function initCustomSelects() {
             const customSelects = document.querySelectorAll('.custom-select');
 
@@ -515,73 +515,83 @@
                 const options = selectWrapper.querySelectorAll('.custom-select-option');
                 const hiddenSelect = selectWrapper.parentElement.querySelector('select[style*="display: none"]');
 
+                // Remove existing event listeners to prevent duplication
+                const newTrigger = trigger.cloneNode(true);
+                trigger.parentNode.replaceChild(newTrigger, trigger);
+
+                const newDropdown = dropdown.cloneNode(true);
+                dropdown.parentNode.replaceChild(newDropdown, dropdown);
+
+                // Get updated references
+                const updatedTrigger = selectWrapper.querySelector('.custom-select-trigger');
+                const updatedDropdown = selectWrapper.querySelector('.custom-select-dropdown');
+                const updatedOptions = selectWrapper.querySelectorAll('.custom-select-option');
+
                 // Toggle dropdown
-                trigger.addEventListener('click', function (e) {
+                updatedTrigger.addEventListener('click', function (e) {
+                    e.preventDefault();
                     e.stopPropagation();
 
                     // Close other dropdowns
                     document.querySelectorAll('.custom-select-trigger.active').forEach(otherTrigger => {
-                        if (otherTrigger !== trigger) {
+                        if (otherTrigger !== updatedTrigger) {
                             otherTrigger.classList.remove('active');
                             otherTrigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
                         }
                     });
 
                     // Toggle current dropdown
-                    trigger.classList.toggle('active');
-                    dropdown.classList.toggle('active');
+                    updatedTrigger.classList.toggle('active');
+                    updatedDropdown.classList.toggle('active');
                 });
 
                 // Handle option selection
-                options.forEach(option => {
+                updatedOptions.forEach(option => {
                     option.addEventListener('click', function (e) {
+                        e.preventDefault();
                         e.stopPropagation();
 
                         const value = this.dataset.value;
                         const text = this.textContent;
 
                         // Update trigger display
-                        const placeholderElement = trigger.querySelector('.placeholder');
+                        const placeholderElement = updatedTrigger.querySelector('.placeholder, .selected-value');
                         placeholderElement.textContent = text;
                         placeholderElement.className = 'selected-value';
 
                         // Update hidden select
                         if (hiddenSelect) {
                             hiddenSelect.value = value;
-                            hiddenSelect.dispatchEvent(new Event('change'));
+                            // Trigger change event
+                            const changeEvent = new Event('change', { bubbles: true });
+                            hiddenSelect.dispatchEvent(changeEvent);
                         }
 
                         // Update visual state
-                        options.forEach(opt => opt.classList.remove('selected'));
+                        updatedOptions.forEach(opt => opt.classList.remove('selected'));
                         this.classList.add('selected');
 
                         // Close dropdown
-                        trigger.classList.remove('active');
-                        dropdown.classList.remove('active');
+                        updatedTrigger.classList.remove('active');
+                        updatedDropdown.classList.remove('active');
 
                         // Clear any validation errors
                         if (hiddenSelect) {
                             clearFieldError(hiddenSelect.id);
-                            // Also clear trigger error styling
-                            trigger.classList.remove('error');
+                            updatedTrigger.classList.remove('error');
                         }
                     });
                 });
             });
 
             // Close dropdowns when clicking outside
-            document.addEventListener('click', function () {
-                document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
-                    trigger.classList.remove('active');
-                    trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
-                });
-            });
-
-            // Prevent dropdown close when scrolling inside
-            document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
-                dropdown.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
+                        trigger.classList.remove('active');
+                        trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
+                    });
+                }
             });
         }
 
@@ -607,6 +617,31 @@
             const mobileRegisterTab = document.getElementById('mobile-register-tab');
             const loginContainer = document.querySelector('.login-container');
             const registerContainer = document.querySelector('.register-container');
+
+            // Set max date for date input (18 years ago)
+            const dobInput = document.getElementById('register-dob');
+            if (dobInput) {
+                const today = new Date();
+                const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+
+                dobInput.max = maxDate.toISOString().split('T')[0];
+                dobInput.min = minDate.toISOString().split('T')[0];
+
+                // Force date picker to open on click
+                dobInput.addEventListener('click', function () {
+                    if (this.showPicker) {
+                        this.showPicker();
+                    }
+                });
+
+                // Handle focus
+                dobInput.addEventListener('focus', function () {
+                    if (this.showPicker) {
+                        this.showPicker();
+                    }
+                });
+            }
 
             // Initialize custom selects
             initCustomSelects();

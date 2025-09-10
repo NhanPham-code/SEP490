@@ -2,6 +2,18 @@
   "Routes": [
     // === USER API ===
     {
+      "DownstreamPathTemplate": "/api/Users/google-auth",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/google-auth",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/login",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -278,7 +290,7 @@
         }
       ],
       "UpstreamPathTemplate": "/bookings/booked",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": [ "GET" ]
       //"AuthenticationOptions": {
       //  "AuthenticationProviderKey": "Bearer",
       //  "RequireAuthentication": true

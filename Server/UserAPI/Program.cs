@@ -106,6 +106,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 // Inject Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 // Inject AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
