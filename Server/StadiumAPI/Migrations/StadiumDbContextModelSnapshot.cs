@@ -60,26 +60,26 @@ namespace StadiumAPI.Migrations
                         new
                         {
                             Id = 3,
-                            ChildCourtId = 22,
-                            ParentCourtId = 21
+                            ChildCourtId = 20,
+                            ParentCourtId = 19
                         },
                         new
                         {
                             Id = 4,
-                            ChildCourtId = 23,
-                            ParentCourtId = 21
+                            ChildCourtId = 21,
+                            ParentCourtId = 19
                         },
                         new
                         {
                             Id = 5,
-                            ChildCourtId = 37,
-                            ParentCourtId = 36
+                            ChildCourtId = 35,
+                            ParentCourtId = 34
                         },
                         new
                         {
                             Id = 6,
-                            ChildCourtId = 38,
-                            ParentCourtId = 36
+                            ChildCourtId = 36,
+                            ParentCourtId = 34
                         });
                 });
 
@@ -130,7 +130,7 @@ namespace StadiumAPI.Migrations
                             IsAvailable = true,
                             Name = "Sân 7 người",
                             PricePerHour = 300000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 7",
                             StadiumId = 1,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -141,7 +141,7 @@ namespace StadiumAPI.Migrations
                             IsAvailable = true,
                             Name = "Sân 5 người A",
                             PricePerHour = 200000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 5",
                             StadiumId = 1,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -152,7 +152,7 @@ namespace StadiumAPI.Migrations
                             IsAvailable = true,
                             Name = "Sân 5 người B",
                             PricePerHour = 200000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 5",
                             StadiumId = 1,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -240,7 +240,7 @@ namespace StadiumAPI.Migrations
                             IsAvailable = true,
                             Name = "Sân Chính",
                             PricePerHour = 500000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 11",
                             StadiumId = 6,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -249,10 +249,10 @@ namespace StadiumAPI.Migrations
                             Id = 12,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Hồ bơi 50m",
-                            PricePerHour = 50000m,
-                            SportType = "Bơi lội",
-                            StadiumId = 7,
+                            Name = "Sân 1",
+                            PricePerHour = 120000m,
+                            SportType = "Tennis",
+                            StadiumId = 8,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -260,7 +260,7 @@ namespace StadiumAPI.Migrations
                             Id = 13,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân 1",
+                            Name = "Sân 2",
                             PricePerHour = 120000m,
                             SportType = "Tennis",
                             StadiumId = 8,
@@ -271,17 +271,6 @@ namespace StadiumAPI.Migrations
                             Id = 14,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Sân 2",
-                            PricePerHour = 120000m,
-                            SportType = "Tennis",
-                            StadiumId = 8,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
                             Name = "Sân Số 1",
                             PricePerHour = 60000m,
                             SportType = "Cầu lông",
@@ -290,7 +279,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 16,
+                            Id = 15,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Số 2",
@@ -301,7 +290,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 17,
+                            Id = 16,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Đơn",
@@ -312,7 +301,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 17,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Chính",
@@ -323,18 +312,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 19,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Hồ bơi ngoài trời",
-                            PricePerHour = 80000m,
-                            SportType = "Bơi lội",
-                            StadiumId = 12,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 20,
+                            Id = 18,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = false,
                             Name = "Sân Số 3",
@@ -345,40 +323,40 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 19,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người 1",
                             PricePerHour = 280000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 7",
+                            StadiumId = 14,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 5 người A",
+                            PricePerHour = 180000m,
+                            SportType = "Bóng đá sân 5",
+                            StadiumId = 14,
+                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsAvailable = true,
+                            Name = "Sân 5 người B",
+                            PricePerHour = 180000m,
+                            SportType = "Bóng đá sân 5",
                             StadiumId = 14,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 22,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Sân 5 người A",
-                            PricePerHour = 180000m,
-                            SportType = "Bóng đá",
-                            StadiumId = 14,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 23,
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsAvailable = true,
-                            Name = "Sân 5 người B",
-                            PricePerHour = 180000m,
-                            SportType = "Bóng đá",
-                            StadiumId = 14,
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 24,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Công an 1",
@@ -389,7 +367,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 23,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân chính",
@@ -400,7 +378,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 24,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân A",
@@ -411,7 +389,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 25,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân Bóng Chuyền",
@@ -422,29 +400,29 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 28,
+                            Id = 26,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người 1",
                             PricePerHour = 250000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 7",
                             StadiumId = 18,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 27,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 5 người",
                             PricePerHour = 150000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 5",
                             StadiumId = 18,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 30,
+                            Id = 28,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 1",
@@ -455,7 +433,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 31,
+                            Id = 29,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân bóng chuyền",
@@ -466,18 +444,18 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 32,
+                            Id = 30,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
-                            Name = "Hồ bơi",
-                            PricePerHour = 30000m,
-                            SportType = "Bơi lội",
-                            StadiumId = 21,
+                            Name = "Sân Pickleball 1",
+                            PricePerHour = 100000m,
+                            SportType = "Pickleball",
+                            StadiumId = 22,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 33,
+                            Id = 31,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 1",
@@ -488,7 +466,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 34,
+                            Id = 32,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 2",
@@ -499,7 +477,7 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 35,
+                            Id = 33,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân chính",
@@ -510,34 +488,34 @@ namespace StadiumAPI.Migrations
                         },
                         new
                         {
-                            Id = 36,
+                            Id = 34,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 11 người",
                             PricePerHour = 450000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 11",
                             StadiumId = 25,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 37,
+                            Id = 35,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người A",
                             PricePerHour = 300000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 7",
                             StadiumId = 25,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 38,
+                            Id = 36,
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             IsAvailable = true,
                             Name = "Sân 7 người B",
                             PricePerHour = 300000m,
-                            SportType = "Bóng đá",
+                            SportType = "Bóng đá sân 7",
                             StadiumId = 25,
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -676,192 +654,161 @@ namespace StadiumAPI.Migrations
                         new
                         {
                             Id = 16,
-                            ImageUrl = "img/5d9d6396-900d-4f78-84ee-c260d4d91ee9.jpg",
-                            StadiumId = 7,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 17,
-                            ImageUrl = "img/497dc572-6091-4419-bf8c-cafcd3ee9263.jpg",
-                            StadiumId = 7,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 18,
-                            ImageUrl = "img/89da6dac-5053-4870-a3d7-eea22bc3ea67.jpg",
-                            StadiumId = 7,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 19,
                             ImageUrl = "img/b2f0a4aa-c4e1-45c6-90f2-e14faa85c406.png",
                             StadiumId = 8,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 17,
                             ImageUrl = "img/37d7b03f-34cd-441d-ba51-2ae85c88188a.jpg",
                             StadiumId = 9,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 18,
                             ImageUrl = "img/52e1d9bf-2f4f-48fc-a543-7f23e61e1395.jpg",
                             StadiumId = 9,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 19,
                             ImageUrl = "img/9f0dc411-87a2-4a2d-b028-69dcf82fae39.jpg",
                             StadiumId = 10,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 20,
                             ImageUrl = "img/e1b8daf3-81eb-4bf7-b9c0-522dd9f80838.jpg",
                             StadiumId = 11,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 21,
                             ImageUrl = "img/b2c0e10d-5585-46cf-a576-cb24732e1538.jpg",
                             StadiumId = 11,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 25,
-                            ImageUrl = "img/f71d6ced-8fbc-4890-915a-ac2a971a6b19.jpg",
-                            StadiumId = 12,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 26,
-                            ImageUrl = "img/896651d3-9b0f-47c1-bdfb-ec343e259829.jpg",
-                            StadiumId = 12,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 27,
-                            ImageUrl = "img/9f464a6f-62e9-4326-9734-a1ac85a8b74e.jpg",
-                            StadiumId = 12,
-                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 28,
+                            Id = 22,
                             ImageUrl = "img/ba1b77bf-0ae7-4a44-bf2a-e6d9c31fe6e0.jpg",
                             StadiumId = 13,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 23,
                             ImageUrl = "img/2ec2068b-e1d7-48eb-abb6-fd5a1612ec29.jpg",
                             StadiumId = 13,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 30,
+                            Id = 24,
                             ImageUrl = "img/1c002bd0-f1ab-47c9-8871-87aa55f99d15.jpg",
                             StadiumId = 14,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 31,
+                            Id = 25,
                             ImageUrl = "img/7c2f592e-9db8-4ad7-b378-ceb4ee75b3db.jpg",
                             StadiumId = 14,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 32,
+                            Id = 26,
                             ImageUrl = "img/8da36e7f-6699-4da4-9622-da8310ba734b.jpg",
                             StadiumId = 16,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 33,
+                            Id = 27,
                             ImageUrl = "img/a4b0822d-b2cc-4102-9192-056740ea1e11.jpg",
                             StadiumId = 17,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 34,
+                            Id = 28,
                             ImageUrl = "img/21a9b32a-bede-4c9b-984f-db32070b4a22.jpg",
                             StadiumId = 18,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 35,
+                            Id = 29,
                             ImageUrl = "img/364ddf95-6df0-426f-86a1-7923eedc03de.jpg",
                             StadiumId = 19,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 36,
+                            Id = 30,
                             ImageUrl = "img/93d0cd83-6917-4d56-870c-871c4d63e036.jpg",
                             StadiumId = 20,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 37,
-                            ImageUrl = "img/3749c185-1c42-4ead-88a1-e88dcfb23dca.jpg",
-                            StadiumId = 21,
+                            Id = 31,
+                            ImageUrl = "img/41b18406-815d-4f10-9140-5e3a3c9e6d08.jpg",
+                            StadiumId = 22,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 38,
-                            ImageUrl = "img/fc1d6192-449c-4322-bea1-bd8b655d5cdf.jpg",
-                            StadiumId = 21,
-                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 39,
-                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
-                            StadiumId = 21,
-                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 40,
+                            Id = 32,
                             ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
                             StadiumId = 23,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 41,
+                            Id = 33,
                             ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
                             StadiumId = 24,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 42,
+                            Id = 34,
                             ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
                             StadiumId = 25,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("StadiumAPI.Models.StadiumVideos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StadiumId");
+
+                    b.ToTable("StadiumVideos", (string)null);
                 });
 
             modelBuilder.Entity("StadiumAPI.Models.Stadiums", b =>
@@ -873,6 +820,10 @@ namespace StadiumAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressUnsigned")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -895,6 +846,9 @@ namespace StadiumAPI.Migrations
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
                     b.Property<decimal?>("Latitude")
                         .HasColumnType("decimal(9,6)");
 
@@ -905,6 +859,10 @@ namespace StadiumAPI.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("NameUnsigned")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("OpenTime")
                         .HasColumnType("time");
@@ -921,15 +879,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 1,
                             Address = "Đường Cách Mạng Tháng Tám, Bình Thủy, Cần Thơ",
+                            AddressUnsigned = "duong cach mang thang tam, binh thuy, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân bóng đá cỏ nhân tạo chất lượng cao với hệ thống đèn LED hiện đại.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0528m,
                             Longitude = 105.7725m,
                             Name = "Sân Bóng Phi Long",
+                            NameUnsigned = "san bong phi long",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -937,15 +898,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 2,
                             Address = "Số 45 Cách Mạng Tháng Tám, Cái Khế, Bình Thủy, Cần Thơ",
+                            AddressUnsigned = "so 45 cach mang thang tam, cai khe, binh thuy, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Cụm sân cầu lông rộng rãi, có hệ thống ánh sáng tốt và dịch vụ chuyên nghiệp.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0401m,
                             Longitude = 105.7684m,
                             Name = "Sân Cầu Lông Quang Sport",
+                            NameUnsigned = "san cau long quang sport",
                             OpenTime = new TimeSpan(0, 8, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -953,15 +917,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 3,
                             Address = "Đường Nguyễn Đệ, An Hòa, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong nguyen de, an hoa, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân tennis tiêu chuẩn, phù hợp cho người mới bắt đầu và cả vận động viên chuyên nghiệp.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0381m,
                             Longitude = 105.7788m,
                             Name = "Sân Tennis 6 Đời 6",
+                            NameUnsigned = "san tennis 6 doi 6",
                             OpenTime = new TimeSpan(0, 5, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -969,15 +936,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 4,
                             Address = "168 Nguyễn Văn Cừ Nối Dài, An Bình, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "168 nguyen van cu noi dai, an binh, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân bóng rổ rộng rãi với mặt sân và vành rổ đạt chuẩn, thích hợp cho việc tập luyện và thi đấu.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0163m,
                             Longitude = 105.7539m,
                             Name = "Sân bóng rổ DNC",
+                            NameUnsigned = "san bong ro dnc",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -985,15 +955,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 5,
                             Address = "Số 15A/1 Hẻm 51, Đường 3-2, An Khánh, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "so 15a/1 hem 51, duong 3-2, an khanh, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân cầu lông trong nhà với hệ thống chiếu sáng và không gian sạch sẽ.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0249m,
                             Longitude = 105.7687m,
                             Name = "Sân Cầu Lông Tambo",
+                            NameUnsigned = "san cau long tambo",
                             OpenTime = new TimeSpan(0, 5, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1001,31 +974,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 6,
                             Address = "Đường Lê Lợi, Cái Khế, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong le loi, cai khe, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân vận động đa năng lớn nhất khu vực, phù hợp cho nhiều sự kiện thể thao lớn.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0396m,
                             Longitude = 105.7725m,
                             Name = "Sân Vận Động Cần Thơ",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Address = "Số 9 Nguyễn Đệ, An Hoà, Bình Thủy, Cần Thơ",
-                            CloseTime = new TimeSpan(0, 20, 0, 0, 0),
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = 1,
-                            CreatedByUser = 1,
-                            Description = "Hồ bơi đạt chuẩn quốc gia, sạch sẽ và an toàn, phù hợp cho cả người lớn và trẻ em.",
-                            IsApproved = true,
-                            Latitude = 10.0381m,
-                            Longitude = 105.7788m,
-                            Name = "Hồ bơi Ánh Viên",
+                            NameUnsigned = "san van dong can tho",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1033,15 +993,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 8,
                             Address = "Phú Thứ, Cái Răng, Cần Thơ",
+                            AddressUnsigned = "phu thu, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 21, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Cụm sân tennis với mặt sân chất lượng cao, phục vụ luyện tập và thi đấu.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0094m,
                             Longitude = 105.7877m,
                             Name = "Sân Tennis 586",
+                            NameUnsigned = "san tennis 586",
                             OpenTime = new TimeSpan(0, 5, 30, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1049,15 +1012,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 9,
                             Address = "79 Trần Phú, Cái Khế, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "79 tran phu, cai khe, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 2,
                             CreatedByUser = 2,
                             Description = "Sân cầu lông trong nhà với không gian rộng rãi, thoáng mát, thích hợp cho việc tập luyện và thi đấu.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0331m,
                             Longitude = 105.7770m,
                             Name = "Sân Cầu Lông Bưu Điện Cần Thơ",
+                            NameUnsigned = "san cau long buu dien can tho",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1065,15 +1031,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 10,
                             Address = "Cái Khế, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "cai khe, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 23, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 3,
                             CreatedByUser = 3,
                             Description = "Sân tennis thuộc khuôn viên khách sạn Mường Thanh, đạt tiêu chuẩn quốc tế, có đèn chiếu sáng ban đêm.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0347m,
                             Longitude = 105.7761m,
                             Name = "Sân Tennis Mường Thanh",
+                            NameUnsigned = "san tennis muong thanh",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1081,47 +1050,37 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 11,
                             Address = "96 Chu Văn An, An Khánh, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "96 chu van an, an khanh, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân bóng chuyền ngoài trời, là nơi giao lưu của các đội bóng mạnh trong khu vực.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0240m,
                             Longitude = 105.7725m,
                             Name = "Sân bóng chuyền 586",
+                            NameUnsigned = "san bong chuyen 586",
                             OpenTime = new TimeSpan(0, 5, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Address = "209 Đường 30 Tháng 4, Xuân Khánh, Ninh Kiều, Cần Thơ",
-                            CloseTime = new TimeSpan(0, 22, 0, 0, 0),
-                            CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = 4,
-                            CreatedByUser = 4,
-                            Description = "Hồ bơi trong nhà và ngoài trời tại khách sạn 5 sao, phục vụ cả khách lưu trú và khách lẻ.",
-                            IsApproved = true,
-                            Latitude = 10.0343m,
-                            Longitude = 105.7758m,
-                            Name = "Hồ bơi Vinpearl Cần Thơ",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 13,
                             Address = "Hẻm liên tổ 4-5, Hưng Lợi, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "hem lien to 4-5, hung loi, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân cầu lông tư nhân, có nhiều sân con, không gian thoáng đãng.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0152m,
                             Longitude = 105.7629m,
                             Name = "Sân Cầu Lông Hoàng Long",
+                            NameUnsigned = "san cau long hoang long",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1129,15 +1088,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 14,
                             Address = "37 Đường B3, Hưng Lợi, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "37 duong b3, hung loi, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 22, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 2,
                             CreatedByUser = 2,
                             Description = "Sân bóng đá cỏ nhân tạo 7 người, là địa điểm quen thuộc của các đội bóng phong trào.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0195m,
                             Longitude = 105.7620m,
                             Name = "Sân bóng đá Anh Tuấn",
+                            NameUnsigned = "san bong da anh tuan",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1145,15 +1107,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 15,
                             Address = "Đường Trần Phú, Cái Khế, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong tran phu, cai khe, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 3,
                             CreatedByUser = 3,
                             Description = "Sân tennis thuộc khu vực Công an thành phố, chất lượng tốt, có hệ thống đèn.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0315m,
                             Longitude = 105.7765m,
                             Name = "Sân Tennis Công An Cần Thơ",
+                            NameUnsigned = "san tennis cong an can tho",
                             OpenTime = new TimeSpan(0, 5, 30, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1161,15 +1126,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 16,
                             Address = "Khu dân cư Hậu Thạnh Mỹ, Lê Bình, Cái Răng, Cần Thơ",
+                            AddressUnsigned = "khu dan cu hau thanh my, le binh, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 4,
                             CreatedByUser = 4,
                             Description = "Sân bóng rổ ngoài trời, rộng rãi, thường xuyên tổ chức các giải đấu phong trào.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0035m,
                             Longitude = 105.7876m,
                             Name = "Sân bóng rổ WestSide Tây Đô",
+                            NameUnsigned = "san bong ro westside tay do",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1177,15 +1145,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 17,
                             Address = "Quốc lộ 61, Vị Tân, Vị Thanh, Hậu Giang",
+                            AddressUnsigned = "quoc lo 61, vi tan, vi thanh, hau giang",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Nhà thi đấu đa năng, tổ chức các môn thể thao trong nhà như bóng chuyền, cầu lông, bóng rổ.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 9.7761m,
                             Longitude = 105.4746m,
                             Name = "Nhà Thi Đấu Vị Thanh",
+                            NameUnsigned = "nha thi dau vi thanh",
                             OpenTime = new TimeSpan(0, 8, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1193,15 +1164,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 18,
                             Address = "Đường 19/8, Vị Tân, Vị Thanh, Hậu Giang",
+                            AddressUnsigned = "duong 19/8, vi tan, vi thanh, hau giang",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 2,
                             CreatedByUser = 2,
                             Description = "Sân bóng đá cỏ nhân tạo chất lượng cao, thường xuyên tổ chức các giải đấu phong trào tại Hậu Giang.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 9.7825m,
                             Longitude = 105.4851m,
                             Name = "Sân bóng đá Vị Thanh",
+                            NameUnsigned = "san bong da vi thanh",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1209,15 +1183,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 19,
                             Address = "Phường 7, Vị Thanh, Hậu Giang",
+                            AddressUnsigned = "phuong 7, vi thanh, hau giang",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 3,
                             CreatedByUser = 3,
                             Description = "Cụm sân tennis tiêu chuẩn, có đèn chiếu sáng ban đêm.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 9.7912m,
                             Longitude = 105.4820m,
                             Name = "Sân Tennis Phú Hưng",
+                            NameUnsigned = "san tennis phu hung",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1225,47 +1202,56 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 20,
                             Address = "Đường 1/5, Phường 1, Vĩnh Long",
+                            AddressUnsigned = "duong 1/5, phuong 1, vinh long",
                             CloseTime = new TimeSpan(0, 21, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Nhà thi đấu trung tâm tỉnh Vĩnh Long, thường tổ chức các sự kiện thể thao lớn.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.2458m,
                             Longitude = 105.9723m,
                             Name = "Nhà Thi Đấu Vĩnh Long",
+                            NameUnsigned = "nha thi dau vinh long",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 21,
-                            Address = "32P Trương Vĩnh Nguyên, Hưng Phú, Cái Răng, Cần Thơ",
-                            CloseTime = new TimeSpan(0, 20, 0, 0, 0),
+                            Id = 22,
+                            Address = "Đường 3 Tháng 2, Hưng Lợi, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong 3 thang 2, hung loi, ninh kieu, can tho",
+                            CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedBy = 2,
-                            CreatedByUser = 2,
-                            Description = "Hồ bơi ngoài trời sạch sẽ, có khu vực riêng cho trẻ em và người lớn.",
+                            CreatedBy = 4,
+                            CreatedByUser = 4,
+                            Description = "Sân Pickleball mới mở, phù hợp cho mọi lứa tuổi.",
                             IsApproved = true,
-                            Latitude = 10.0165m,
-                            Longitude = 105.7879m,
-                            Name = "Hồ bơi Minh Phương",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
+                            IsLocked = false,
+                            Latitude = 10.0240m,
+                            Longitude = 105.7725m,
+                            Name = "Sân Pickleball Cần Thơ",
+                            NameUnsigned = "san pickleball can tho",
+                            OpenTime = new TimeSpan(0, 8, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 23,
                             Address = "21 Phạm Hùng, Ba Láng, Cái Răng, Cần Thơ",
+                            AddressUnsigned = "21 pham hung, ba lang, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 4,
                             CreatedByUser = 4,
                             Description = "Cụm sân cầu lông hiện đại, hệ thống ánh sáng tốt, có ghế chờ cho người chơi.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0121m,
                             Longitude = 105.7954m,
                             Name = "Sân Cầu Lông Win Sport",
+                            NameUnsigned = "san cau long win sport",
                             OpenTime = new TimeSpan(0, 7, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1273,15 +1259,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 24,
                             Address = "Khu du lịch sinh thái Cồn Ấu, Hưng Phú, Cái Răng, Cần Thơ",
+                            AddressUnsigned = "khu du lich sinh thai con au, hung phu, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 18, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 1,
                             CreatedByUser = 1,
                             Description = "Sân bóng chuyền bãi biển tiêu chuẩn, không gian thoáng đãng.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0289m,
                             Longitude = 105.7997m,
                             Name = "Sân bóng chuyền bãi biển Cần Thơ",
+                            NameUnsigned = "san bong chuyen bai bien can tho",
                             OpenTime = new TimeSpan(0, 8, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -1289,15 +1278,18 @@ namespace StadiumAPI.Migrations
                         {
                             Id = 25,
                             Address = "Đường 3 Tháng 2, Xuân Khánh, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong 3 thang 2, xuan khanh, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 20, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedBy = 2,
                             CreatedByUser = 2,
                             Description = "Sân bóng đá 11 người của Trường Đại học Cần Thơ, phục vụ sinh viên và cộng đồng.",
                             IsApproved = true,
+                            IsLocked = false,
                             Latitude = 10.0299m,
                             Longitude = 105.7702m,
                             Name = "Sân bóng đá Đại học Cần Thơ",
+                            NameUnsigned = "san bong da dai hoc can tho",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
                             UpdatedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -1344,6 +1336,17 @@ namespace StadiumAPI.Migrations
                     b.Navigation("Stadium");
                 });
 
+            modelBuilder.Entity("StadiumAPI.Models.StadiumVideos", b =>
+                {
+                    b.HasOne("StadiumAPI.Models.Stadiums", "Stadium")
+                        .WithMany("StadiumVideos")
+                        .HasForeignKey("StadiumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stadium");
+                });
+
             modelBuilder.Entity("StadiumAPI.Models.Courts", b =>
                 {
                     b.Navigation("ChildRelations");
@@ -1356,6 +1359,8 @@ namespace StadiumAPI.Migrations
                     b.Navigation("Courts");
 
                     b.Navigation("StadiumImages");
+
+                    b.Navigation("StadiumVideos");
                 });
 #pragma warning restore 612, 618
         }

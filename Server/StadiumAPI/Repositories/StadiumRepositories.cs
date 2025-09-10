@@ -42,18 +42,30 @@ namespace StadiumAPI.Repositories
             existingStadium.Longitude = stadiums.Longitude;
             existingStadium.IsApproved = stadiums.IsApproved;
             existingStadium.UpdatedAt = DateTime.UtcNow;
+            existingStadium.IsLocked = stadiums.IsLocked;
             _context.Stadiums.Update(existingStadium);
             await _context.SaveChangesAsync();
             return existingStadium;
         }
         public async Task<bool> DeleteStadiumAsync(int id)
         {
+            _context.ChangeTracker.Clear();
             var stadium = await GetStadiumByIdAsync(id);
             if (stadium == null) return false;
-            _context.Stadiums.Remove(stadium);
+            if (stadium.IsLocked == true)
+            {
+                stadium.IsLocked = false;
+            }
+            else
+            {
+                stadium.IsLocked = true;
+            }
+            _context.Stadiums.Update(stadium);
             await _context.SaveChangesAsync();
             return true;
         }
+
+
         public IQueryable<Stadiums> GetOdataStadiums()
         {
             return _context.Stadiums

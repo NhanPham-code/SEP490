@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using StadiumAPI.DTOs;
+using StadiumAPI.Models;
 using StadiumAPI.Repositories.Interface;
 using StadiumAPI.Service.Interface;
 
@@ -16,32 +17,42 @@ namespace StadiumAPI.Service
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public Task<ReadStadiumImageDTO> AddImageAsync(CreateStadiumImageDTO image, string imgUrl)
+        public async Task<ReadStadiumImageDTO> AddImageAsync(CreateStadiumImageDTO image, string imgUrl)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image));
+
             var stadiumImage = _mapper.Map<Models.StadiumImages>(image);
-            stadiumImage.ImageUrl = imgUrl; // Assuming CreateStadiumImageDTO has a property for the image URL
-            return _stadiumImagesRepositories.AddImageAsync(stadiumImage)
-                .ContinueWith(t => _mapper.Map<ReadStadiumImageDTO>(t.Result));
+            stadiumImage.ImageUrl = imgUrl;
+
+            var savedImage = await _stadiumImagesRepositories.AddImageAsync(stadiumImage);
+            return _mapper.Map<ReadStadiumImageDTO>(savedImage);
         }
 
-        public Task<ReadStadiumImageDTO> UpdateImageAsync(int id, UpdateStadiumImageDTO image, string imageUrl)
+        public async Task<ReadStadiumImageDTO> UpdateImageAsync(int id, UpdateStadiumImageDTO image, string imageUrl)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image));
             var stadiumImage = _mapper.Map<Models.StadiumImages>(image);
             stadiumImage.Id = id; // Ensure the ID is set for the update
             stadiumImage.ImageUrl = imageUrl; // Assuming UpdateStadiumImageDTO has a property for the image URL
-            return _stadiumImagesRepositories.UpdateImageAsync(id, stadiumImage)
+            return await _stadiumImagesRepositories.UpdateImageAsync(id, stadiumImage)
                 .ContinueWith(t => _mapper.Map<ReadStadiumImageDTO>(t.Result));
         }
 
-        public Task<bool> DeleteImageAsync(int id)
+        public async Task<bool> DeleteImageAsync(List<ReadStadiumImageDTO> readStadiumImageDTOs)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid image ID.", nameof(id));
-            return _stadiumImagesRepositories.DeleteImageAsync(id);
+            // Map từ DTO -> List<Entity>
+            var images = _mapper.Map<List<StadiumImages>>(readStadiumImageDTOs);
+
+            return await _stadiumImagesRepositories.DeleteImageAsync(images);
+        }
+
+        public Task<bool> DeleteImageByStadiumIdAsync(int stadiumId)
+        {
+            if (stadiumId <= 0)
+                throw new ArgumentException("Invalid stadium ID.", nameof(stadiumId));
+            return _stadiumImagesRepositories.DeleteImageByStadiumIdAsync(stadiumId);
         }
 
         public Task<IEnumerable<ReadStadiumImageDTO>> GetAllImagesAsync(int stadiumId)
@@ -59,6 +70,5 @@ namespace StadiumAPI.Service
             return _stadiumImagesRepositories.GetImageByIdAsync(id)
                 .ContinueWith(t => _mapper.Map<ReadStadiumImageDTO>(t.Result));
         }
-
     }
 }
