@@ -44,7 +44,7 @@ namespace StadiumManagerUI.Controllers
         {
             var token = _tokenService.GetAccessTokenFromCookie();
             var userId = await _userService.GetMyProfileAsync(token);
-            url += $"CreatedBy eq {userId.UserId}";
+            url += $" CreatedBy eq {userId.UserId}";
             var stadium = await _service.SearchStadiumAsync(url);
             return Content(stadium, "application/json");
         }

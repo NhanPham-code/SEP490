@@ -2621,23 +2621,33 @@ function updateDateTime() {
             state.currentPage = 1;
 
             // Build comprehensive filter query
-            let filters = [`CreatedBy eq 3`]; // Base filter
+                    let filters = []; // Base filter
+                    let count = 0;
 
-            if (searchTerm) {
+            if (searchTerm.length > 0) {
                 filters.push(`(contains(tolower(Name),'${searchTerm}') or contains(tolower(Address),'${searchTerm}') or contains(tolower(Description),'${searchTerm}'))`);
+                        count++;
             }
 
             if (statusFilter !== 'all') {
-                const statusValue = statusFilter === 'approved';
-                filters.push(`IsApproved eq ${statusValue}`);
+                const statusValue = statusFilter;
+                        filters.push(`IsApproved eq ${statusValue}`);
+                                count++;
             }
 
             if (sportFilter !== 'all') {
                 filters.push(`Courts/any(c: contains(tolower(c/SportType), '${sportFilter.toLowerCase()}'))`);
+                        count++;
             }
 
             const filterQuery = filters.length > 1 ? ` and ${filters.slice(1).join(' and ')}` : '';
-            const searchQuery = `&$filter=${filters[0]}${filterQuery}&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}`;
+                    let searchQuery = '';
+            if(count > 0){
+                                     searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=${filters[0]}${filterQuery} and`;
+
+            }else{
+                                             searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=`;
+                    }
 
             console.log('Advanced Search Query:', searchQuery);
             loadDataWithQuery(searchQuery);
@@ -2924,18 +2934,21 @@ function updateDateTime() {
             // Search input with debouncing
             $('#search-input').on('input', function () {
                 state.filters.search = $(this).val();
+                        console.log('Search input changed to:', state.filters.search);
                 debouncedSearch();
             });
 
             // Filter dropdowns
             $('#status-filter').on('change', function () {
                 state.filters.status = $(this).val();
+                        console.log('Status filter changed to:', state.filters.status);
                 state.currentPage = 1;
                 performAdvancedSearch();
             });
 
             $('#sport-type-filter').on('change', function () {
                 state.filters.sportType = $(this).val();
+                        console.log('Sport type filter changed to:', state.filters.sportType);
                 state.currentPage = 1;
                 performAdvancedSearch();
             });
@@ -3115,7 +3128,9 @@ function updateDateTime() {
                 <i class="ri-basketball-line input-icon"></i>
                 <select id="sport-type-filter" class="form-select">
                     <option value="all">Tất cả loại sân</option>
-                    <option value="Bóng đá">Bóng đá</option>
+                    <option value="Bóng đá sân 5">Bóng đá sân 5</option>
+                    <option value="Bóng đá sân 7">Bóng đá sân 7</option>
+                    <option value="Bóng đá sân 11">Bóng đá sân 11</option>
                     <option value="Bóng rổ">Bóng rổ</option>
                     <option value="Cầu lông">Cầu lông</option>
                     <option value="Tennis">Tennis</option>

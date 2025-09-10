@@ -655,6 +655,7 @@ h2 {
     animation: lockCycle 1s linear infinite;
 }
 
+
 @keyframes lockCycle {
     0%, 50%, 100% {
         transform: rotate(0deg);
@@ -1616,6 +1617,7 @@ h2 {
     z-index: 20000 !important;
 }
 
+
 .swal2-popup {
     border-radius: var(--border-radius-lg) !important;
     background: var(--bg-glass) !important;
@@ -1642,6 +1644,7 @@ h2 {
     font-weight: 600 !important;
     border: none !important;
 }
+
 
 .swal2-cancel {
     background: var(--danger-gradient) !important;
