@@ -1,16 +1,11 @@
-﻿using Microsoft.AspNetCore.OData;
+﻿using FavoriteAPI.Data;
+using FavoriteAPI.Model;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using System.Text;
-using UserAPI.Data;
-using UserAPI.DTOs;
-using UserAPI.Model;
-using UserAPI.Repository;
-using UserAPI.Repository.Interface;
-using UserAPI.Service;
-using UserAPI.Service.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,16 +22,14 @@ IEdmModel GetEdmModel()
     var odataBuilder = new ODataConventionModelBuilder();
 
     // Vẫn đăng ký EntitySet cho User (entity gốc từ DB)
-    odataBuilder.EntitySet<User>("ODataUsers"); // <--- Tên EntitySet là "ODataUsers" giống như route của ODataUsersController
+    odataBuilder.EntitySet<Favorite>("ODataFavorites"); // <--- Tên EntitySet là "ODataFavorites" giống như route của ODataFavoritesController
 
     // Rất quan trọng: Đăng ký ReadUserDTO là một EntityType hoặc ComplexType
     // Việc này giúp OData hiểu cấu trúc của DTO cho các phép chiếu và metadata.
     // Nếu ReadUserDTO có một thuộc tính đóng vai trò là key (ví dụ UserId),
     // bạn có thể đăng ký nó là EntityType. Nếu không, là ComplexType.
 
-    odataBuilder.EntityType<PrivateUserProfileDTO>(); // <--- Thêm dòng này
-
-    odataBuilder.EntityType<PublicUserProfileDTO>();
+    //odataBuilder.EntityType<PrivateUserProfileDTO>(); // <--- Thêm dòng này
 
     return odataBuilder.GetEdmModel();
 }
@@ -44,9 +37,9 @@ IEdmModel GetEdmModel()
 // 2. Add OData services
 builder.Services.AddControllers().AddOData(options =>
 {
-    // Đăng ký route components cho ODataUsersController
-    // Tiền tố "odata" phải khớp với [Route("odata/[controller]")] của ODataUsersController
-    options.AddRouteComponents("odata", GetEdmModel()) // route: /odata/ODataUsers
+    // Đăng ký route components cho ODataFavoritesController
+    // Tiền tố "odata" phải khớp với [Route("odata/[controller]")] của ODataFavoritesController
+    options.AddRouteComponents("odata", GetEdmModel()) // route: /odata/ODataFavorites
         .Select()
         .Filter()
         .OrderBy()
@@ -98,19 +91,10 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Inject DB
-builder.Services.AddDbContext<UserDbContext>(options =>
+builder.Services.AddDbContext<FavoriteDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Inject Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
-// Inject Services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
-
-// Inject AutoMapper
+// Inject Mapping Profiles
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
@@ -124,9 +108,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

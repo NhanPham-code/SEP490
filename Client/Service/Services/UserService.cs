@@ -1,5 +1,7 @@
-﻿using DTOs.UserDTO;
+﻿using DTOs.OData;
+using DTOs.UserDTO;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -147,7 +149,7 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
         }
 
-        public async Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId)
+        public async Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(int userId)
         {
             return await _httpClient.GetFromJsonAsync<PublicUserProfileDTO>($"/users/otherProfile/{userId}");
         }
@@ -252,6 +254,55 @@ namespace Service.Services
             // Đọc kết quả trả về, dù thành công hay thất bại
             // API Server sẽ trả về cấu trúc LoginResponseDTO với IsValid = false nếu có lỗi
             return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+        }
+
+        /// <summary>
+        /// Lấy danh sách thông tin công khai của nhiều người dùng dựa trên danh sách ID.
+        /// </summary>
+        /// <param name="userIds">Danh sách các ID của người dùng cần lấy.</param>
+        /// <returns>Một danh sách các PublicUserProfileDTO.</returns>
+        public async Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // 1. Xử lý trường hợp danh sách ID rỗng hoặc null để tránh gọi API không cần thiết
+            if (userIds == null || !userIds.Any())
+            {
+                return new List<PublicUserProfileDTO>();
+            }
+
+            // 1. Chuyển danh sách các số nguyên thành một chuỗi duy nhất, phân cách bằng dấu phẩy.
+            // Ví dụ: [6008, 6009] -> "6008,6009"
+            string commaSeparatedIds = string.Join(",", userIds);
+
+            // 2. Xây dựng câu lệnh $filter sử dụng toán tử 'in'.
+            // Ví dụ: "UserId in (6008,6009)"
+            string odataFilter = $"UserId in ({commaSeparatedIds})";
+
+            // 3. Tạo URL request hoàn chỉnh
+            var requestUrl = $"/users/get?$filter={odataFilter}";
+
+            try
+            {
+                // 4. Gửi request và đọc response
+                var response = await _httpClient.GetAsync(requestUrl);
+                response.EnsureSuccessStatusCode(); // Ném lỗi nếu request thất bại
+
+                string jsonString = await response.Content.ReadAsStringAsync();
+
+                // 5. Deserialize bằng Newtonsoft.Json
+                var odataResponse = JsonConvert.DeserializeObject<ODataResponse<PublicUserProfileDTO>>(jsonString);
+
+                // Trả về danh sách người dùng từ thuộc tính 'Value', hoặc một danh sách rỗng nếu response là null
+                return odataResponse?.Value ?? new List<PublicUserProfileDTO>();
+            }
+            catch (HttpRequestException e)
+            {
+                // (Tùy chọn) Ghi log lỗi ở đây
+                Console.WriteLine($"An error occurred: {e.Message}");
+                // Trả về danh sách rỗng hoặc ném lại lỗi tùy theo yêu cầu của ứng dụng
+                return new List<PublicUserProfileDTO>();
+            }
         }
     }
 }
