@@ -37,12 +37,13 @@ namespace FavoriteAPI.Service
 
         public IQueryable<Favorite> GetFavorites()
         {
-            throw new NotImplementedException();
+            return _favoriteRepository.GetFavorites();
         }
 
-        public Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)
+        public async Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)
         {
-            throw new NotImplementedException();
+           // check if favorite exists by userId and stadiumId
+           return await _favoriteRepository.IsFavoriteExistsAsync(userId, stadiumId);
         }
     }
 }
