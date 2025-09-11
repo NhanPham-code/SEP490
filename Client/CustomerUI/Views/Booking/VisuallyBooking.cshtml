@@ -1,0 +1,1087 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Sân Trực Quan</title>
+    <!-- Font chữ Inter từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="~/css/Booking/VisuallyBooking.css" />
+
+</head>
+<body>
+    <div class="stadium-info" id="stadiumInfo" style="display: none;">
+        <h3 id="stadiumName">Tên sân</h3>
+        <p><strong>Địa chỉ:</strong> <span id="stadiumAddress">Địa chỉ</span></p>
+        <p><strong>Giờ hoạt động:</strong> <span id="stadiumHours">6:00 - 22:00</span></p>
+        <p><strong>Mô tả:</strong> <span id="stadiumDescription">Mô tả sân</span></p>
+    </div>
+
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text mb-4 mt-4">Đặt lịch ngày trực quan</h1>
+    </div>
+    @* Dash board for stat *@
+    <div class="dashboard-layout">
+        <!-- Bên trái: Date picker -->
+        <div class="calendar-section">
+            <label for="date-picker" class="block text-sm font-semibold text-gray-700 mb-2">
+                📅 Chọn ngày
+            </label>
+            <input type="date" id="date-picker"
+                   class="interactive-input w-full bg-white border-2 border-gray-200
+                      hover:border-blue-400 focus:border-blue-500
+                      px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
+        </div>
+
+        <!-- Bên phải: Cụm thống kê -->
+        <div class="stats-wrapper">
+            <div class="stat-item">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-info">
+                    <h3>Tổng số giờ</h3>
+                    <p>0</p>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>Giá tiền</h3>
+                    <p>0 VNĐ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HTML -->
+    <div class="schedule-container mt-3">
+        <!-- fixed column of court names -->
+        <div class="fixed-column" id="fixedColumn">
+            <div class="fixed-header"></div>
+            <!-- court names injected here by createScheduleTable -->
+        </div>
+
+        <!-- scrollable area containing header and grid -->
+        <div class="scrollable-area">
+            <!-- time header wrapper -->
+            <div class="time-header-wrapper">
+                <div class="time-header" id="timeHeader"></div>
+            </div>
+
+            <!-- schedule grid wrapper -->
+            <div class="schedule-body-wrapper">
+                <div class="schedule-grid" id="scheduleGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="legend-container">
+        <div class="legend-item">
+            <div class="legend-color booked" style="background: red"></div>
+            <span class="legend-text">Đã đặt</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color related"></div>
+            <span class="legend-text">Liên quan</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color blocked"></div>
+            <span class="legend-text">Khóa</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color event"></div>
+            <span class="legend-text">Đã chọn</span>
+        </div>
+    </div>
+
+    <!-- Continue Button -->
+    <div class="text-center mb-12">
+        <button id="continue-button" disabled
+                class="continue-btn w-full md:w-auto px-16 py-4 rounded-2xl font-bold text-white text-lg transition-all duration-300 shadow-xl cursor-not-allowed relative overflow-hidden">
+            <span class="relative z-10">🚀 Tiếp tục đặt sân</span>
+        </button>
+    </div>
+
+    @* hidden form for checkout *@
+    <form id="bookingForm" method="post" action="/Booking/Checkout">
+        <input type="hidden" name="Date" />
+        <input type="hidden" name="TotalPrice" />
+        <input type="hidden" name="StadiumId" />
+        <!-- Lưu JSON sang Courts -->
+        <input type="hidden" name="Courts" />
+    </form>
+
+    <script>
+        const stadiumId = '@ViewBag.StadiumId';
+        let openTime;
+        let closeTime;
+        let date = null;
+        let bookedCourtIds = [];
+        let courtBookingStatus = new Map();  // Key: courtId, Value: {status: 'pending'/'accepted', bookingInfo: {...}}
+        const continueButtonEl = $('#continue-button');
+        let courts;
+        let timeSlots;
+        let stadiumData;
+        let bookings = [];
+        let bookingsByCourt = {}; // Key: courtId, Value: array of {startIdx, endIdx, data}
+        const courtRelations = new Map();
+        const relatedSelections = new Map();
+        let isSelecting;
+        let selectedCourts = new Map();
+        let isProcessingClick = false; // Biến mới để khóa xử lý
+        window.addEventListener('load', forceResetToToday);
+        window.addEventListener('pageshow', forceResetToToday);
+        window.addEventListener('focus', forceResetToToday);
+
+        $(document).ready(function() {
+            // Force reset date-picker ngay khi DOM ready
+            forceResetToToday();
+
+            $('#continue-button').on('click', function (e) {
+                e.preventDefault();
+                showCheckoutPage();
+            });
+
+            firstLoadUI();
+        });
+
+
+        // Hàm cập nhật giao diện người dùng
+        async function updateUI() {
+            await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
+            await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
+            renderBookings(bookings); // Rồi mới render bookings
+        }
+
+        async function firstLoadUI() {
+            await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
+            await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
+            // Sau khi có stadiumData, lấy danh sách các courtId
+            const courtIds = stadiumData.Courts.map(court => court.Id);
+
+            // Lặp qua từng courtId để lấy dữ liệu quan hệ
+            for (const courtId of courtIds) {
+                await fetchCourtRelationData(courtId);
+            }
+
+            console.log("📘 Dữ liệu courtRelations:", Object.fromEntries(courtRelations));
+
+            renderBookings(bookings); // Rồi mới render bookings
+        }
+
+        // Thêm hàm clear dữ liệu
+        function clearAllData() {
+            // Clear các biến global
+            bookedCourtIds = [];
+            courtBookingStatus.clear();
+            courtRelations.clear();
+            relatedSelections.clear();
+            selectedCourts.clear();
+            isSelecting = false;
+            isProcessingClick = false;
+
+            // Clear các array và object
+            courts = [];
+            timeSlots = [];
+            stadiumData = null;
+            bookings = [];
+            bookingsByCourt = {};
+
+            forceResetToToday();
+
+            // Reset UI elements
+            $('.grid-cell').removeClass('selected booked booking-related-overlay cdm-pivot unselectable locked-by-booking disabled');
+            $('.star-icon').remove();
+            $('.grid-cell').css({
+                'background-color': '',
+                'pointer-events': '',
+                'color': '',
+                'z-index': '',
+                'opacity': '',
+                'cursor': ''
+            });
+
+            // Reset stats
+            $('.stat-item:contains("Tổng số giờ") p').text('0');
+            $('.stat-item:contains("Giá tiền") p').text('0 VNĐ');
+
+            // Disable continue button
+            $('#continue-button')
+                .prop('disabled', true)
+                .removeClass('bg-blue-500 hover:bg-blue-600 cursor-pointer')
+                .addClass('cursor-not-allowed opacity-50');
+
+            // Clear schedule containers
+            $('#scheduleGrid').empty();
+            $('#fixedColumn').empty();
+            $('#timeHeader').empty();
+        }
+
+        function forceResetToToday() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const currentDate = `${yyyy}-${mm}-${dd}`;
+
+            // Set min và value
+            $("#date-picker").attr("min", currentDate);
+            $("#date-picker").val(currentDate);
+
+            // Trigger change event để update UI nếu cần
+            $("#date-picker").trigger('change');
+
+            date = currentDate;
+            console.log("🔄 Reset date-picker về:", currentDate);
+        }
+
+        $(document).on("change", "#date-picker", function () {
+            date = $(this).val();  // lấy giá trị ngày từ input
+            console.log("Ngày được chọn:", date); // kiểm tra trong console
+            updateUI();
+        });
+
+        // Xử lý click vào time slot
+        $(document).on('click', '.time-slot', function() {
+            $('.time-slot').removeClass('selected');
+            $(this).addClass('selected');
+
+            const start = $(this).data('start');
+            const end = $(this).data('end');
+            console.log(`Đã chọn khung giờ: ${start} - ${end}`);
+        });
+
+        $(document).on('click', '.grid-cell', function(event) {
+            // Nếu đang xử lý một cú click khác, bỏ qua cú click này
+            if (isProcessingClick) {
+                return;
+            }
+            isProcessingClick = true; // Bắt đầu xử lý, khóa lại
+
+            try {
+                const $this = $(this);
+
+                // Bỏ qua nếu ô không thể chọn
+                if ($this.hasClass('unselectable') && !$this.hasClass('selected')) {
+                    return; // Không cần làm gì thêm
+                }
+
+                $this.toggleClass('selected');
+                const timeId = $this.data('time');
+                const courtId = $this.data('court');
+                const isSelected = $this.hasClass('selected');
+
+                console.log(`Court ID: ${courtId}, Time Slot: ${timeId}, Selected: ${isSelected}`);
+
+                // Cập nhật Map selectedCourts *trước tiên*
+                if (isSelected) {
+                    if (!selectedCourts.has(timeId)) {
+                        selectedCourts.set(timeId, []);
+                    }
+                    selectedCourts.get(timeId).push(courtId);
+                } else {
+                    const courtIdsInTime = selectedCourts.get(timeId);
+                    if (courtIdsInTime) {
+                        const index = courtIdsInTime.indexOf(courtId);
+                        if (index > -1) {
+                            courtIdsInTime.splice(index, 1);
+                        }
+                        if (courtIdsInTime.length === 0) {
+                            selectedCourts.delete(timeId);
+                        }
+                    }
+                }
+                console.log("Updated Selected Courts:", Object.fromEntries(selectedCourts));
+
+
+                // Lấy tất cả các sân liên quan đến sân vừa được click
+                const relatedCourtIds = courtRelations.get(courtId) || [];
+
+                // Duyệt qua từng sân liên quan để cập nhật trạng thái của chúng
+                relatedCourtIds.forEach(relatedId => {
+                    const $relatedCell = $(`.grid-cell[data-court="${relatedId}"][data-time="${timeId}"]`);
+                    if (!$relatedCell.length || $relatedCell.hasClass('selected')) {
+                        return; // Bỏ qua nếu ô không tồn tại hoặc chính nó đang được chọn
+                    }
+
+                    // Lấy tất cả các sân "anh em" của sân liên quan này
+                    const siblingsOfRelated = courtRelations.get(relatedId) || [];
+
+                    // Kiểm tra xem có sân "anh em" nào đang được chọn trong khung giờ này không
+                    const isAnySiblingSelected = siblingsOfRelated.some(siblingId =>
+                        selectedCourts.get(timeId)?.includes(siblingId)
+                    );
+
+                    // Cập nhật trạng thái
+                    if (isAnySiblingSelected) {
+                        $relatedCell.addClass('unselectable').addClass('booking-related-overlay');
+                    } else {
+                        // CHỈNH SỬA: Chỉ xóa class nếu ô không có class 'cdm-pivot'
+                        if (!$relatedCell.hasClass('cdm-pivot')) {
+                            $relatedCell.removeClass('unselectable').removeClass('booking-related-overlay');
+                        }
+                    }
+                });
+
+
+                // Cập nhật giao diện và thống kê
+                updateBordersForCell($this);
+                updateStats();
+            } finally {
+                // Sau khi xử lý xong, mở khóa để nhận cú click tiếp theo
+                isProcessingClick = false;
+            }
+        });
+
+
+        // Hàm mới để xử lý cả hai trạng thái thêm/xóa
+        function toggleRelatedBooking(gridId, courtId, startTime, endTime, isSelecting) {
+            const startHour = new Date(startTime).getHours();
+            const endHour = new Date(endTime).getHours();
+            console.log("List court related: ", relatedSelections);
+
+            for (let h = startHour; h < endHour; h++) {
+                const timeSlot = `${String(h).padStart(2, '0')}:00-${String(h + 1).padStart(2, '0')}:00`;
+                const cell = document.querySelector(`.grid-cell[data-court="${courtId}"][data-time="${timeSlot}"]`);
+
+                if (cell) {
+                    if (isSelecting) {
+                        // Thêm thẳng class nếu đang chọn
+                        cell.classList.add('booking-related-overlay', 'unselectable');
+                    } else {
+                        // Xóa class chỉ khi không có court liên quan nào được chọn
+                        const courtHasRelatedSelection = checkRelatedSelections(courtId, timeSlot, gridId);
+                        console.log(`Court ${courtId} at ${timeSlot} has related selection:`, courtHasRelatedSelection);
+                        if (!courtHasRelatedSelection) {
+                            if (!cell.classList.contains('cdm-pivot')) {
+                                cell.classList.remove('booking-related-overlay', 'unselectable');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Checks if any other court in the 'relatedSelections' map is selected at the given time.
+        function checkRelatedSelections(currentCourtId, timeSlot, selectedId) {
+            // Lấy danh sách tất cả các court liên quan đến court hiện tại
+            const relatedCourts = courtRelations.get(currentCourtId) || [];
+            console.log("Related courts for check:", relatedCourts);
+            console.log("current court id: ", selectedId);
+
+            // Filter out the current court from the list to avoid checking itself.
+            const otherRelatedCourts = relatedCourts.filter(id => id !== selectedId);
+            console.log("Other related courts to check:", otherRelatedCourts);
+
+            // Lặp qua từng court liên quan (đã được lọc)
+            for (const relatedCourtId of otherRelatedCourts) {
+                // Tìm kiếm trong mảng 'courts'
+                const foundCourt = courts.find(c => c.courtId === relatedCourtId);
+                console.log(`Checking court ${relatedCourtId}:`, foundCourt);
+
+                // Nếu tìm thấy và nó có khung giờ trùng khớp, trả về true
+                if (foundCourt && foundCourt.times.includes(timeSlot)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateBordersForCell($cell) {
+            if (!$cell.length) {
+                return;
+            }
+
+            const $prevCell = $cell.prev('.grid-cell');
+            const $nextCell = $cell.next('.grid-cell');
+
+            // Get the cell's position
+            const courtId = $cell.data('court');
+            const timeId = $cell.data('time');
+
+            // Find neighbors above and below
+            const $prevCourtRow = $(`[data-court="${courtId}"]`).prev('.court-row');
+            const $nextCourtRow = $(`[data-court="${courtId}"]`).next('.court-row');
+
+            let $topCell = $();
+            let $bottomCell = $();
+
+            if ($prevCourtRow.length) {
+                $topCell = $prevCourtRow.find(`[data-time="${timeId}"]`);
+            }
+            if ($nextCourtRow.length) {
+                $bottomCell = $nextCourtRow.find(`[data-time="${timeId}"]`);
+            }
+
+            // Check horizontal neighbors
+            if ($prevCell.hasClass('selected')) {
+                $cell.addClass('no-border-left');
+            } else {
+                $cell.removeClass('no-border-left');
+            }
+
+            if ($nextCell.hasClass('selected')) {
+                $cell.addClass('no-border-right');
+            } else {
+                $cell.removeClass('no-border-right');
+            }
+
+            // Check vertical neighbors
+            if ($topCell.hasClass('selected')) {
+                $cell.addClass('no-border-top');
+            } else {
+                $cell.removeClass('no-border-top');
+            }
+
+            if ($bottomCell.hasClass('selected')) {
+                $cell.addClass('no-border-bottom');
+            } else {
+                $cell.removeClass('no-border-bottom');
+            }
+        }
+
+        // Hàm fetch dữ liệu sân (giống như code bạn đã có)
+        async function fetchStadiumData(id) {
+            const searchTerm = `&$filter=Id eq ${id}`;
+            try {
+                const data = await $.ajax({
+                    url: `/Home/Stadiums`,
+                    type: 'GET',
+                    data: { searchTerm: searchTerm }
+                });
+
+                if (data.value && data.value.length > 0) {
+                    stadiumData = data.value[0];
+                    console.log('Dữ liệu sân vận động:', stadiumData);
+
+                    openTime = parseHour(stadiumData.OpenTime);
+                    closeTime = parseHour(stadiumData.CloseTime);
+
+                    console.log('Giờ mở cửa:', openTime);
+                    console.log('Giờ đóng cửa:', closeTime);
+
+                    createScheduleTable(openTime, closeTime, stadiumData.Courts);
+
+                } else {
+                    console.error('Không tìm thấy dữ liệu sân vận động.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu sân vận động:', error);
+            }
+        }
+
+        // Get all booking in selected time
+        async function fetchBookedCourts(stadiumId, date) {
+            function safeParseInt(value, defaultValue = null) {
+                const parsed = parseInt(value, 10);
+                return isNaN(parsed) ? defaultValue : parsed;
+            }
+
+            const parsedStadiumId = safeParseInt(stadiumId);
+            if (parsedStadiumId === null) {
+                console.error("Stadium ID không hợp lệ:", stadiumId);
+                alert("ID sân vận động không hợp lệ.");
+                return;
+            }
+            try {
+                // Dùng await cho $.ajax (jqXHR support Promise)
+                const data = await $.ajax({
+                    url: `/Booking/GetBookedCourtsByDay`,
+                    method: "GET",
+                    data: {
+                        stadiumId: parsedStadiumId,
+                        date: date,
+                    }
+                });
+
+                // console.log("Booked courts:", data);
+
+                bookings = data; // Lưu dữ liệu booking
+
+            } catch (err) {
+                console.error("Không thể lấy thông tin sân đã đặt:", err);
+                alert("Không thể lấy thông tin sân đã đặt.");
+            }
+        }
+
+        // Function để tạo time slots dựa trên openTime và closeTime
+        function generateTimeSlots(openHour, closeHour) {
+            const slots = [];
+            for (let i = openHour; i < closeHour; i++) {
+                const startTime = formatHour(i);
+                const endTime = formatHour(i + 1);
+                slots.push({
+                    start: startTime,
+                    end: endTime,
+                    display: `${startTime}-${endTime}`
+                });
+            }
+            return slots;
+        }
+
+        // function tạo bảng lịch
+        function createScheduleTable(openHour, closeHour, courts) {
+          const timeSlots  = generateTimeSlots(openHour, closeHour);
+          const timeLabels = generateTimeLabels(openHour, closeHour);
+
+          // Group courts by sport type
+          const groupedCourts = {};
+          courts.forEach(court => {
+            (groupedCourts[court.SportType] ||= []).push(court);
+          });
+
+          // Render head & body
+          renderScheduleHead(openHour, closeHour, timeSlots, timeLabels);
+          renderScheduleBody(timeSlots, courts, groupedCourts);
+
+          // console.log(`✅ Schedule table created with ${Object.keys(groupedCourts).length} sport groups.`);
+
+          // Sync scroll
+          syncScroll();
+
+          disablePastTimeSlots(date);
+        }
+
+        // Function để tạo time labels
+        function generateTimeLabels(openHour, closeHour) {
+            const labels = [];
+            for (let i = openHour; i <= closeHour; i++) {
+                labels.push(formatHour(i));
+            }
+            return labels;
+        }
+
+        function renderScheduleHead(openHour, closeHour, timeSlots, timeLabels) {
+          const numSlots   = timeSlots.length;
+          const gridWidth  = `${(numSlots + 1) * 100}px`;
+
+          // Set grid widths
+          $('#timeHeader').css({
+            'grid-template-columns': `repeat(${numSlots}, 100px)`,
+            'min-width': gridWidth
+          });
+          $('#scheduleGrid').css({
+            'min-width': gridWidth
+          });
+
+          // Clear old content
+          $('#timeHeader').empty();
+          $('#fixedColumn').empty();
+
+          // Fixed header cell
+          $('#fixedColumn').append(`<div class="fixed-header"></div>`);
+
+          // Time labels
+          timeLabels.forEach((label, i) => {
+            $('#timeHeader').append(`
+              <div class="header-label-container" style="grid-column: ${i + 1}">
+                <div class="time-label" style="padding: 0 10px;">${label}</div>
+              </div>
+            `);
+          });
+        }
+
+        function renderScheduleBody(timeSlots, courts, groupedCourts) {
+            const numSlots = timeSlots.length;
+
+            $('#scheduleGrid').empty();
+            $('#fixedColumn').empty();
+
+            Object.values(groupedCourts).forEach(courtsInGroup => {
+                $('#fixedColumn').append(`<div class="court-name" style="color: #555;"></div>`);
+
+                courtsInGroup.forEach(court => {
+                    $('#fixedColumn').append(`<div class="court-name">${court.Name}</div>`);
+
+                    const $row = $(`<div class="court-row" data-court="${court.Id}"></div>`);
+                    $row.css({
+                        'display': 'grid',
+                        'grid-template-columns': `repeat(${numSlots}, 100px)`
+                    });
+
+                    const isDisabled = !court.IsAvailable;
+
+                    timeSlots.forEach(slot => {
+                        const $cell = $(`
+                            <div class="grid-cell"
+                                 data-time="${slot.display}"
+                                 data-court="${court.Id}">
+                            </div>
+                        `);
+
+                        if (isDisabled) {
+                            $cell.addClass('blocked').css({
+                                "pointer-events": "none",
+                                "background-color": "#a9a9a9",
+                                "color": "#ffffff",
+                                "z-index": "10",
+                                "opacity": "0.7",
+                                "cursor": "not-allowed"
+                            });
+                        }
+
+                        $row.append($cell);
+                    });
+
+                    $('#scheduleGrid').append($row);
+                });
+            });
+        }
+
+        function syncScroll() {
+          const $h = $('.time-header-wrapper');
+          const $b = $('.schedule-body-wrapper');
+
+          $b.off('scroll.sync').on('scroll.sync', () => {
+            $h.scrollLeft($b.scrollLeft());
+          });
+          $h.off('scroll.sync').on('scroll.sync', () => {
+            $b.scrollLeft($h.scrollLeft());
+          });
+        }
+
+        // This code is correct and will work with the updated CSS
+        function addBookingToCell(courtId, startTime, endTime) {
+            const startHour = new Date(startTime).getHours();
+            const endHour = new Date(endTime).getHours();
+            const $courtRow = $(`.court-row[data-court="${courtId}"]`);
+
+            if (!$courtRow.length) {
+                console.warn(`Không tìm thấy dòng cho sân ${courtId} để đánh dấu booking.`);
+                return;
+            }
+
+            for (let h = startHour; h < endHour; h++) {
+                const displayTime = `${h.toString().padStart(2, '0')}:00-${(h + 1).toString().padStart(2, '0')}:00`;
+                const $cell = $courtRow.find(`.grid-cell[data-time="${displayTime}"]`);
+
+                if ($cell.length > 0) {
+                    // Luôn đánh dấu ô này bị khóa vĩnh viễn do booking từ server
+                    $cell.addClass('unselectable locked-by-booking');
+
+                    // Luôn thêm icon ngôi sao vào ô đã đặt, bất kể nó ở quá khứ hay không
+                    if ($cell.find('.star-icon').length === 0) {
+                        $cell.append(`
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="100" height="100" class="star-icon">
+                                <polygon fill="#FFDE00" points="150.0000,40.0000 163.4708,81.4590 207.0634,81.4590 171.7963,107.0820 185.2671,148.5410 150.0000,122.9180 114.7329,148.5410 128.2037,107.0820 92.9366,81.4590 136.5292,81.4590" />
+                            </svg>
+                        `);
+                    }
+
+                    // Thêm class 'booked' để CSS có thể xử lý (ví dụ: làm mờ icon)
+                    $cell.addClass('booked');
+
+                    // Chỉ áp dụng màu đỏ nếu ô không bị disabled
+                    if (!$cell.hasClass('disabled')) {
+                        $cell.css('background-color', '#ff0000'); // Màu đỏ
+                    }
+                } else {
+                    console.error(`Không tìm thấy ô cho thời gian ${displayTime} tại sân ${courtId}`);
+                }
+            }
+        }
+
+        function addRelatedBookingToCell(courtId, startTime, endTime) {
+            const startHour = new Date(startTime).getHours();
+            const endHour = new Date(endTime).getHours();
+
+            for (let h = startHour; h < endHour; h++) {
+                const timeSlot = `${String(h).padStart(2, '0')}:00-${String(h + 1).padStart(2, '0')}:00`;
+                const cell = document.querySelector(`.grid-cell[data-court="${courtId}"][data-time="${timeSlot}"]`);
+
+                if (cell) {
+                    // Luôn đánh dấu ô này bị khóa vĩnh viễn
+                    cell.classList.add('unselectable', 'cdm-pivot', 'locked-by-booking');
+
+                    // Thêm class 'booking-related-overlay' để CSS có thể xử lý
+                    cell.classList.add('booking-related-overlay');
+
+                    // Chỉ áp dụng màu nền 'liên quan' nếu ô không bị disabled
+                    // (Màu này được định nghĩa trong file CSS của bạn)
+                    // Nếu đã disabled, nó sẽ giữ nguyên màu xám.
+                } else {
+                     console.warn(`Không tìm thấy ô cho sân liên quan ${courtId} tại khung giờ ${timeSlot}.`);
+                }
+            }
+        }
+
+        // Sửa hàm renderBookings để xóa cả CSS inline
+        function renderBookings(bookingsData) {
+            // 1. Tìm tất cả các ô đã được đánh dấu là 'booked' từ lần render trước
+            const $previouslyBooked = $('.grid-cell.booked');
+
+            // 2. Xóa màu nền inline (màu đỏ) CHỈ từ những ô đó
+            $previouslyBooked.css('background-color', '');
+
+            // 3. Xóa tất cả các class liên quan đến booking và icon
+            $('.grid-cell').removeClass('booked booking-related-overlay cdm-pivot unselectable locked-by-booking');
+            $('.star-icon').remove();
+
+            if (!bookingsData || bookingsData.length === 0) {
+                console.log("Không có booking nào để render.");
+                return;
+            }
+
+            console.log("Bắt đầu render bookings...", bookingsData);
+
+            bookingsData.forEach(booking => {
+                booking.bookingDetails.forEach(detail => {
+                    const courtId = detail.courtId;
+                    const startTime = detail.startTime;
+                    const endTime = detail.endTime;
+
+                    addBookingToCell(courtId, startTime, endTime);
+
+                    const relatedCourts = courtRelations.get(courtId) || [];
+                    relatedCourts.forEach(relatedCourtId => {
+                        if (relatedCourtId !== courtId) {
+                            addRelatedBookingToCell(relatedCourtId, startTime, endTime);
+                        }
+                    });
+                });
+            });
+        }
+
+        // hàm disable past time
+        function disablePastTimeSlots(selectedDateStr) {
+            const selectedDate = new Date(selectedDateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+
+            if (selectedDate.getTime() === today.getTime()) {
+                const now = new Date();
+
+                $(".grid-cell").each(function () {
+                    const timeRange = $(this).data("time");
+                    const [startStr] = timeRange.split("-");
+                    const [hour, minute] = startStr.split(":").map(Number);
+
+                    const slotStart = new Date();
+                    slotStart.setHours(hour, minute, 0, 0);
+
+                    if (now >= slotStart) {
+                        $(this).addClass("disabled");
+                        $(this).css({
+                            "pointer-events": "none",
+                            "background-color": "#a9a9a9",
+                            "color": "#ffffff",
+                            "z-index": "10", // Set z-index cao lên
+                            "opacity": "0.7", // Thêm độ trong suốt
+                            "cursor": "not-allowed"
+                        });
+                    }
+                });
+
+                // Disable time-label
+                $(".time-label").each(function () {
+                    const labelText = $(this).text().trim();
+                    const [hour, minute] = labelText.split(":").map(Number);
+
+                    const labelTime = new Date();
+                    labelTime.setHours(hour, minute, 0, 0);
+
+                    if (now >= labelTime) {
+                        $(this).addClass("disabled");
+                        $(this).css({
+                            "background": "#654321",
+                            "color": "#ffffff",
+                            "z-index": "10", // Set z-index cao lên
+                            "opacity": "0.7" // Thêm độ trong suốt
+                        });
+                    }
+                });
+
+            } else {
+                // Reset chỉ các ô không bị 'blocked'
+                $(".grid-cell:not(.blocked), .time-label:not(.blocked)").removeClass("disabled").css({
+                    "pointer-events": "",
+                    "background-color": "",
+                    "color": "",
+                    "z-index": "",
+                    "opacity": "",
+                    "cursor": ""
+                });
+            }
+        }
+
+        // Hàm đánh dấu các ô đã được đặt
+        function markBookedSlots(bookings) {
+
+          bookings.forEach(booking => {
+            booking.bookingDetails.forEach(detail => {
+              const courtId = detail.courtId;
+              const start = new Date(detail.startTime);
+              const end = new Date(detail.endTime);
+
+              const startHour = start.getHours();
+              const endHour = end.getHours();
+
+              const startRange = `${formatHour(startHour)}-${formatHour(startHour+1)}`;
+              const endRange   = `${formatHour(endHour-1)}-${formatHour(endHour)}`;
+
+              const $startCell = $(`.grid-cell[data-court="${courtId}"][data-time="${startRange}"]`);
+              const $endCell   = $(`.grid-cell[data-court="${courtId}"][data-time="${endRange}"]`);
+
+              if ($startCell.length && $endCell.length) {
+                const $row = $startCell.closest(".grid-row");
+
+                // Tính vị trí & kích thước overlay
+                const startOffset = $startCell.position().left;
+                const endOffset   = $endCell.position().left + $endCell.outerWidth();
+                const topOffset   = $startCell.position().top;
+                const height      = $startCell.outerHeight();
+                const width       = endOffset - startOffset;
+
+                // Tạo overlay
+                const $overlay = $(`
+                  <div class="booking-overlay">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="80" height="80">
+                      <polygon fill="#FFDE00" points="
+                        150.0000,40.0000
+                        163.4708,81.4590
+                        207.0634,81.4590
+                        171.7963,107.0820
+                        185.2671,148.5410
+                        150.0000,122.9180
+                        114.7329,148.5410
+                        128.2037,107.0820
+                        92.9366,81.4590
+                        136.5292,81.4590" />
+                    </svg>
+                  </div>
+                `).css({
+                  position: "absolute",
+                  left: startOffset,
+                  top: topOffset,
+                  width: width,
+                  height: height,
+                  background: "red",
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "center",
+                  "border-radius": "6px",
+                  color: "white"
+                });
+
+                $row.append($overlay);
+              }
+            });
+          });
+        }
+
+        async function fetchCourtRelationData(courtId) {
+            if (!courtId) {
+                console.error("Court ID is missing.");
+                return;
+            }
+
+            // Initialize an empty array for this court
+            courtRelations.set(courtId, []);
+
+            try {
+                // Use Promise.all to run both AJAX requests in parallel
+                const [parentData, childData] = await Promise.all([
+                    $.ajax({
+                        url: "/Booking/GetAllCourtRelationByParentId",
+                        type: "GET",
+                        data: { parentId: courtId }
+                    }),
+                    $.ajax({
+                        url: "/Booking/GetAllCourtRelationBychildId",
+                        type: "GET",
+                        data: { childId: courtId }
+                    })
+                ]);
+
+                // Process parent data
+                const childCourtIds = parentData.map(item => item.childCourtId);
+                const currentRelations = courtRelations.get(courtId);
+                childCourtIds.forEach(childId => {
+                    if (!currentRelations.includes(childId)) {
+                        currentRelations.push(childId);
+                    }
+                });
+
+                // Process child data
+                const parentCourtIds = childData.map(item => item.parentCourtId);
+                parentCourtIds.forEach(parentId => {
+                    if (!currentRelations.includes(parentId)) {
+                        currentRelations.push(parentId);
+                    }
+                });
+
+
+            } catch (error) {
+                console.error("Error fetching court relation data:", error);
+            }
+        }
+
+        function formatHour(h) {
+          return h.toString().padStart(2, '0') + ":00";
+        }
+
+        // Hàm cập nhật thống kê
+        function updateStats() {
+            // Lấy danh sách sân đã chọn theo cấu trúc mới
+            const selectedTimeSlots = getSelectedCourtsWithTimes();
+            const totalHours = selectedTimeSlots.length; // mỗi đối tượng trong list là 1 giờ
+
+            console.log("Selected cells:", selectedTimeSlots);
+
+            // Chuyển đổi cấu trúc dữ liệu cho calculateTotalPrice
+            const courtsForPriceCalculation = getSelectedCourtsGrouped();
+            const totalPrice = calculateTotalPrice(courtsForPriceCalculation);
+
+            // Cập nhật UI
+            $('.stat-item:contains("Tổng số giờ") p').text(totalHours);
+            $('.stat-item:contains("Giá tiền") p').text(totalPrice.toLocaleString('vi-VN') + ' VNĐ');
+
+            // Enable/disable nút tiếp tục
+            if (totalHours > 0) {
+                $('#continue-button')
+                    .prop('disabled', false)
+                    .removeClass('cursor-not-allowed opacity-50')
+                    .addClass('bg-blue-500 hover:bg-blue-600 cursor-pointer');
+            } else {
+                $('#continue-button')
+                    .prop('disabled', true)
+                    .removeClass('bg-blue-500 hover:bg-blue-600 cursor-pointer')
+                    .addClass('cursor-not-allowed opacity-50');
+            }
+        }
+
+        // Hàm mô phỏng chuyển sang trang checkout
+        function showCheckoutPage() {
+            let dateValue = $("#date-picker").val();
+            let courtsForCheckout = getSelectedCourtsGrouped();
+            let courtsJson = JSON.stringify(courtsForCheckout);
+            let totalPrice = calculateTotalPrice(courtsForCheckout);
+
+            // Set hidden input values
+            $("input[name='Date']").val(dateValue);
+            $("input[name='StadiumId']").val(stadiumId);
+            $("input[name='Courts']").val(courtsJson);
+            $("input[name='TotalPrice']").val(totalPrice);
+
+            // Submit the form
+            $("#bookingForm").submit();
+        }
+
+        // clear bookedCourtIds
+        function clearBookingStatusCache() {
+            courtBookingStatus.clear();
+            bookedCourtIds = [];
+            console.log("Court booking status cache cleared");
+        }
+
+        // Lấy danh sách court + timeslot đã chọn
+        function getSelectedCourtsWithTimes() {
+            const result = [];
+            selectedCourts.forEach((courtIds, timeSlot) => {
+                courtIds.forEach(courtId => {
+                    result.push({
+                        courtId: courtId,
+                        time: timeSlot
+                    });
+                });
+            });
+            return result;
+        }
+
+        // Function để parse thời gian từ format PT6H thành số giờ
+        function parseHour(timeString) {
+            // Format: PT6H hoặc PT22H
+            const match = timeString.match(/PT(\d+)H/);
+            return match ? parseInt(match[1]) : 0;
+        }
+
+        // calculate the original price
+        function calculateTotalPrice(courts) {
+            let total = 0;
+            if (!courts) return 0; // Guard clause
+
+            courts.forEach(court => {
+                const pricePerHour = getPriceForCourt(court.courtId); // Hàm lấy giá theo courtId
+                // The error was here. 'court.times' can be undefined.
+                // It should be checking the length of the 'times' array.
+                if (court.times && court.times.length) {
+                    total += court.times.length * pricePerHour;
+                }
+            });
+            return total;
+        }
+
+        // Hàm này được viết lại hoàn toàn để xử lý các khối thời gian không liền kề
+        function getSelectedCourtsGrouped() {
+            const result = [];
+            const courtsWithTimes = new Map(); // Map<courtId, timeSlot[]>
+
+            // 1. Gom tất cả các khung giờ đã chọn theo từng courtId
+            selectedCourts.forEach((courtIds, timeSlot) => {
+                courtIds.forEach(courtId => {
+                    if (!courtsWithTimes.has(courtId)) {
+                        courtsWithTimes.set(courtId, []);
+                    }
+                    courtsWithTimes.get(courtId).push(timeSlot);
+                });
+            });
+
+            // 2. Xử lý từng sân để tìm các khối thời gian liền kề
+            courtsWithTimes.forEach((timeSlots, courtId) => {
+                // Sắp xếp các khung giờ để đảm bảo chúng theo đúng thứ tự
+                timeSlots.sort();
+
+                if (timeSlots.length === 0) return;
+
+                let currentBlock = {
+                    courtId: courtId,
+                    times: [timeSlots[0]]
+                };
+
+                for (let i = 1; i < timeSlots.length; i++) {
+                    const prevTime = timeSlots[i - 1];
+                    const currentTime = timeSlots[i];
+
+                    // Lấy giờ kết thúc của khung giờ trước và giờ bắt đầu của khung giờ hiện tại
+                    const prevEndTime = prevTime.split('-')[1];
+                    const currentStartTime = currentTime.split('-')[0];
+
+                    if (prevEndTime === currentStartTime) {
+                        // Nếu liền kề, thêm vào khối hiện tại
+                        currentBlock.times.push(currentTime);
+                    } else {
+                        // Nếu không liền kề, đẩy khối hiện tại vào kết quả và bắt đầu một khối mới
+                        result.push(currentBlock);
+                        currentBlock = {
+                            courtId: courtId,
+                            times: [currentTime]
+                        };
+                    }
+                }
+                // Đẩy khối cuối cùng vào kết quả
+                result.push(currentBlock);
+            });
+
+            console.log("Grouped into contiguous blocks:", result);
+            return result;
+        }
+
+        // Hàm lấy giá theo courtId
+        function getPriceForCourt(courtId) {
+            const court = stadiumData.Courts.find(c => c.Id === courtId);
+            return court ? court.PricePerHour : 0;
+        }
+
+        // Function để format giờ thành string (6 -> "6:00", 14 -> "14:00")
+        function formatHour(hour) {
+            return hour.toString().padStart(2, '0') + ':00';
+        }
+    </script>
+</body>
+
+</html>

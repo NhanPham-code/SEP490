@@ -72,15 +72,8 @@ builder.Services.AddAuthentication("Bearer")
             IssuerSigningKey = new SymmetricSecurityKey(key),
 
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-
-            // ✅ Cấu hình này đảm bảo Ocelot đọc được đúng claim gốc
-            NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
-            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            ClockSkew = TimeSpan.Zero
         };
-
-        // ✅ Bắt buộc: Không cho .NET tự ánh xạ claim
-        options.MapInboundClaims = false;
     });
 
 // Authorization policies (cho phép Customer) để dùng trong Controller
@@ -89,6 +82,16 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Customer", policy =>
     {
         policy.RequireRole("Customer");
+    });
+
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("StadiumManager", policy =>
+    {
+        policy.RequireRole("StadiumManager");
     });
 });
 
@@ -103,6 +106,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 // Inject Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 // Inject AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

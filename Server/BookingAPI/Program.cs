@@ -1,13 +1,15 @@
 using BookingAPI.Data;
-using BookingAPI.Repository.Interface;
-using BookingAPI.Repository;
-using BookingAPI.Services.Interface;
-using BookingAPI.Services;
-using Microsoft.EntityFrameworkCore;
-using BookingAPI.Profiles;
 using BookingAPI.Models;
+using BookingAPI.Profiles;
+using BookingAPI.Repository;
+using BookingAPI.Repository.Interface;
+using BookingAPI.Services;
+using BookingAPI.Services.Interface;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,48 @@ builder.Services.AddControllers()
         .SetMaxTop(100)
         .AddRouteComponents("odata", GetEdmModel()));
 
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// Authorization policies (cho phép Customer) ?? dùng trong Controller
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+    {
+        policy.RequireRole("Customer");
+    });
+
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("StadiumManager", policy =>
+    {
+        policy.RequireRole("StadiumManager");
+    });
+});
+
 // Entity Framework
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -63,6 +107,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

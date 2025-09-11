@@ -50,7 +50,9 @@ namespace UserAPI.Data
                     RearCCCDUrl = "https://example.com/cccd/admin_rear.png",
                     IsActive = true,
                     CreatedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc),
-                    UpdatedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc)
+                    UpdatedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc),
+                    GoogleId = null,
+                    Provider = null
                 }
             );
 

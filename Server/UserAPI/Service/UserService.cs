@@ -67,35 +67,32 @@ namespace UserAPI.Service
                 return _mapper.Map<PrivateUserProfileDTO>(user);
             }
 
-            // Lưu file avatar vào thư mục uploads/avatars
-            // Xóa file hình cũ nếu có
-            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
-            Directory.CreateDirectory(uploadFolder); // Tạo thư mục nếu chưa tồn tại
-            if (updateAvatarDTO.Avatar != null && updateAvatarDTO.Avatar.Length > 0)
+            // Tạo thư mục uploads/avatars/{email_sanitized}
+            string safeEmail = user.Email.Replace("@", "_at_").Replace(".", "_dot_");
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars", safeEmail);
+            Directory.CreateDirectory(uploadFolder);
+
+            // Xóa file avatar cũ nếu có (và không phải default avatar)
+            if (!string.IsNullOrEmpty(user.AvatarUrl) && !user.AvatarUrl.Contains("default-avatar.png"))
             {
-                // Xóa file avatar cũ nếu có
-                if (!string.IsNullOrEmpty(user.AvatarUrl))
+                string oldAvatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarUrl.TrimStart('/'));
+                if (File.Exists(oldAvatarPath))
                 {
-                    string oldAvatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarUrl.TrimStart('/'));
-                    if (File.Exists(oldAvatarPath))
-                    {
-                        File.Delete(oldAvatarPath);
-                    }
+                    File.Delete(oldAvatarPath);
                 }
-
-                // Lưu file avatar mới
-                string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(updateAvatarDTO.Avatar.FileName)}";
-                string avatarPath = Path.Combine(uploadFolder, avatarFileName);
-
-                using (var stream = new FileStream(avatarPath, FileMode.Create))
-                {
-                    await updateAvatarDTO.Avatar.CopyToAsync(stream);
-                }
-
-                // Cập nhật URL avatar trong user
-                user.AvatarUrl = $"/uploads/avatars/{avatarFileName}";
             }
 
+            // Lưu file avatar mới
+            string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(updateAvatarDTO.Avatar.FileName)}";
+            string avatarPath = Path.Combine(uploadFolder, avatarFileName);
+
+            using (var stream = new FileStream(avatarPath, FileMode.Create))
+            {
+                await updateAvatarDTO.Avatar.CopyToAsync(stream);
+            }
+
+            // Cập nhật URL avatar trong user
+            user.AvatarUrl = $"/uploads/avatars/{safeEmail}/{avatarFileName}";
 
             // Cập nhật thông tin vào DB
             var updatedUser = await _userRepository.UpdateUserAsync(user);
@@ -103,7 +100,8 @@ namespace UserAPI.Service
             {
                 throw new InvalidOperationException("Failed to update avatar.");
             }
-            // Chuyển đổi sang ReadUserDTO
+
+            // Chuyển đổi sang DTO
             return _mapper.Map<PrivateUserProfileDTO>(updatedUser);
         }
 
@@ -133,7 +131,7 @@ namespace UserAPI.Service
                 return new LoginResponseDTO 
                 {
                     IsValid = false,
-                    Message = "Email and password cannot be empty."
+                    Message = "Email và Password không được để trống! "
                 };
             }
 
@@ -143,7 +141,7 @@ namespace UserAPI.Service
                 return new LoginResponseDTO
                 { 
                     IsValid = false,
-                    Message = "Invalid email or password! "
+                    Message = "Email này chưa từng có tài khoảng! "
                 };
             }
 
@@ -152,7 +150,7 @@ namespace UserAPI.Service
                 return new LoginResponseDTO
                 {
                     IsValid = false,
-                    Message = "Invalid email or password! "
+                    Message = "Email hoặc mật khẩu không chính xác! "
                 };
             }
 
@@ -161,7 +159,7 @@ namespace UserAPI.Service
                 return new LoginResponseDTO
                 {
                     IsValid = false,
-                    Message = "Invalid email or password! "
+                    Message = "Tài khoảng của bạn không được phép vào hệ thống này! "
                 };
             }
 
@@ -170,7 +168,7 @@ namespace UserAPI.Service
                 return new LoginResponseDTO
                 {
                     IsValid = false,
-                    Message = "Your account is banned!"
+                    Message = "Tài khoảng của bạn đã bị khóa!"
                 };
             }
 
@@ -316,40 +314,49 @@ namespace UserAPI.Service
             // 2. Hash password
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            // 3. Lưu file avatar & face video
+            // 3. Chuẩn bị thư mục lưu file (theo email)
+            string safeEmail = registerDto.Email.Replace("@", "_at_").Replace(".", "_dot_");
+
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            string avatarFolder = Path.Combine(uploadFolder, "avatars", safeEmail);
+            string videoFolder = Path.Combine(uploadFolder, "videos", safeEmail);
+
+            Directory.CreateDirectory(avatarFolder);
+            Directory.CreateDirectory(videoFolder);
+
             string? avatarUrl = null;
             string? faceVideoUrl = null;
 
-            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            Directory.CreateDirectory(Path.Combine(uploadFolder, "avatars"));
-            Directory.CreateDirectory(Path.Combine(uploadFolder, "videos"));
-
+            // 3.1 Lưu Avatar
             if (registerDto.Avatar != null && registerDto.Avatar.Length > 0)
             {
                 string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.Avatar.FileName)}";
-                string avatarPath = Path.Combine(uploadFolder, "avatars", avatarFileName);
+                string avatarPath = Path.Combine(avatarFolder, avatarFileName);
 
                 using (var stream = new FileStream(avatarPath, FileMode.Create))
                 {
                     await registerDto.Avatar.CopyToAsync(stream);
                 }
-                avatarUrl = $"/uploads/avatars/{avatarFileName}";
-            } else
+                avatarUrl = $"/uploads/avatars/{safeEmail}/{avatarFileName}";
+            }
+            else
             {
-                avatarUrl = "/uploads/avatars/default-avatar.png"; // Default avatar if not provided
+                avatarUrl = "/uploads/avatars/default-avatar.png";
             }
 
+            // 3.2 Lưu Face Video
             if (registerDto.FaceVideo != null && registerDto.FaceVideo.Length > 0)
             {
                 string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FaceVideo.FileName)}";
-                string facePath = Path.Combine(uploadFolder, "videos", faceFileName);
+                string facePath = Path.Combine(videoFolder, faceFileName);
 
                 using (var stream = new FileStream(facePath, FileMode.Create))
                 {
                     await registerDto.FaceVideo.CopyToAsync(stream);
                 }
-                faceVideoUrl = $"/uploads/videos/{faceFileName}";
-            } else
+                faceVideoUrl = $"/uploads/videos/{safeEmail}/{faceFileName}";
+            }
+            else
             {
                 faceVideoUrl = null;
             }
@@ -361,7 +368,7 @@ namespace UserAPI.Service
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Role = registerDto.Role,
+                Role = "Customer",
                 Address = registerDto.Address,
                 PhoneNumber = registerDto.PhoneNumber,
                 Gender = registerDto.Gender,
@@ -391,35 +398,59 @@ namespace UserAPI.Service
             // 2. Hash password
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            // 3. Lưu file frontCCCD & RearCCCD
+            // 3. Lưu file frontCCCD & RearCCCD theo email
             string? frontCCCDUrl = null;
             string? rearCCCDUrl = null;
+            string? avatarUrl = null;
+
+            // Sanitize email để dùng làm tên thư mục
+            string safeEmail = registerDto.Email.Replace("@", "_at_").Replace(".", "_dot_");
 
             string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            Directory.CreateDirectory(Path.Combine(uploadFolder, "cccd"));
+            string cccdFolder = Path.Combine(uploadFolder, "cccd", safeEmail);
+            string avatarFolder = Path.Combine(uploadFolder, "avatars", safeEmail);
+
+            Directory.CreateDirectory(cccdFolder);
+            Directory.CreateDirectory(avatarFolder);
 
             if (registerDto.FrontCCCDImage != null && registerDto.FrontCCCDImage.Length > 0)
             {
-                string frontFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FrontCCCDImage.FileName)}";
-                string frontPath = Path.Combine(uploadFolder, "cccd", frontFileName);
+                string frontFileName = $"front_{Guid.NewGuid()}{Path.GetExtension(registerDto.FrontCCCDImage.FileName)}";
+                string frontPath = Path.Combine(cccdFolder, frontFileName);
 
                 using (var stream = new FileStream(frontPath, FileMode.Create))
                 {
                     await registerDto.FrontCCCDImage.CopyToAsync(stream);
                 }
-                frontCCCDUrl = $"/uploads/cccd/{frontFileName}";
+                frontCCCDUrl = $"/uploads/cccd/{safeEmail}/{frontFileName}";
             }
 
             if (registerDto.RearCCCDImage != null && registerDto.RearCCCDImage.Length > 0)
             {
-                string rearFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.RearCCCDImage.FileName)}";
-                string rearPath = Path.Combine(uploadFolder, "cccd", rearFileName);
+                string rearFileName = $"rear_{Guid.NewGuid()}{Path.GetExtension(registerDto.RearCCCDImage.FileName)}";
+                string rearPath = Path.Combine(cccdFolder, rearFileName);
 
                 using (var stream = new FileStream(rearPath, FileMode.Create))
                 {
                     await registerDto.RearCCCDImage.CopyToAsync(stream);
                 }
-                rearCCCDUrl = $"/uploads/cccd/{rearFileName}";
+                rearCCCDUrl = $"/uploads/cccd/{safeEmail}/{rearFileName}";
+            }
+
+            if (registerDto.Avatar != null && registerDto.Avatar.Length > 0)
+            {
+                string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.Avatar.FileName)}";
+                string avatarPath = Path.Combine(avatarFolder, avatarFileName);
+
+                using (var stream = new FileStream(avatarPath, FileMode.Create))
+                {
+                    await registerDto.Avatar.CopyToAsync(stream);
+                }
+                avatarUrl = $"/uploads/avatars/{safeEmail}/{avatarFileName}";
+            }
+            else
+            {
+                avatarUrl = "/uploads/avatars/default-avatar.png";
             }
 
             // 4. Tạo entity User
@@ -429,10 +460,12 @@ namespace UserAPI.Service
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Role = registerDto.Role,
+                Role = "StadiumManager",
                 Address = registerDto.Address,
                 PhoneNumber = registerDto.PhoneNumber,
-                AvatarUrl = "/uploads/avartars/default-avatar.png",
+                Gender = registerDto.Gender,
+                DateOfBirth = string.IsNullOrEmpty(registerDto.DateOfBirth) ? null : DateHelper.Parse(registerDto.DateOfBirth),
+                AvatarUrl = avatarUrl,
                 FrontCCCDUrl = frontCCCDUrl,
                 RearCCCDUrl = rearCCCDUrl,
                 IsActive = true,
@@ -473,14 +506,109 @@ namespace UserAPI.Service
             return _mapper.Map<PublicUserProfileDTO>(user);
         }
 
-        public Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetUserByEmailAsync(resetPasswordDTO.Email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            // Cập nhật mật khẩu mới
+            CreatePasswordHash(resetPasswordDTO.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            return await _userRepository.UpdateUserAsync(user) != null;
         }
 
         public async Task<bool> DeleteUserAsync(int id)
         {
             return await _userRepository.DeleteUserAsync(id);
+        }
+
+        public async Task<LoginResponseDTO> LoginOrRegisterWithGoogleAsync(GoogleUserInfoDTO googleUser)
+        {
+            // 1. Tìm người dùng bằng email
+            var user = await _userRepository.GetUserByEmailAsync(googleUser.Email);
+            bool isNewUser = false;
+
+            if (user == null)
+            {
+                // 2. Nếu không có -> Tạo người dùng mới
+                isNewUser = true;
+                user = new User
+                {
+                    FullName = googleUser.FullName,
+                    Email = googleUser.Email,
+                    GoogleId = googleUser.GoogleId,
+                    Provider = "google",
+                    Role = "Customer", // Mặc định là Customer (chỉ Customer mới được dùng Google Login)
+                    IsActive = true, // Kích hoạt tài khoản ngay lập tức
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    AvatarUrl = "/uploads/avatars/default-avatar.png" // Bắt đầu với avatar mặc định
+                };
+
+                // Không cần tạo password hash vì họ sẽ luôn đăng nhập qua Google
+                // Nếu logic yêu cầu password, bạn có thể tạo một chuỗi ngẫu nhiên
+                CreatePasswordHash(Guid.NewGuid().ToString(), out byte[] hash, out byte[] salt);
+                user.PasswordHash = hash;
+                user.PasswordSalt = salt;
+
+                await _userRepository.CreateUserAsync(user);
+            }
+            else
+            {
+                // 3. Nếu có -> Liên kết tài khoản nếu cần
+
+                // Chỉ cho phép đăng nhập nếu là Customer
+                if (user.Role != "Customer")
+                {
+                    return new LoginResponseDTO { IsValid = false, Message = "Tài khoản với vai trò quản trị không được phép đăng nhập bằng Google." };
+                }
+
+                // Kiểm tra nếu tài khoản bị khóa
+                if (user.IsActive == false)
+                {
+                    return new LoginResponseDTO { IsValid = false, Message = "Tài khoản của bạn đã bị khóa." };
+                }
+
+                // Cập nhật GoogleId và Provider nếu chưa có
+                if (string.IsNullOrEmpty(user.GoogleId))
+                {
+                    user.GoogleId = googleUser.GoogleId;
+                    user.Provider = string.IsNullOrEmpty(user.Provider) ? "google" : $"{user.Provider},google";
+                    await _userRepository.UpdateUserAsync(user);
+                }
+            }
+
+            // 4. Tạo Access Token và Refresh Token của hệ thống bạn
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            // 5. Lưu Refresh Token
+            var refreshTokenEntity = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.UserId,
+                ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpiresDays"]!)),
+                CreatedDate = DateTime.UtcNow
+            };
+            await _refreshTokenRepository.CreateRefreshTokenAsync(refreshTokenEntity);
+
+            // 6. Trả về kết quả
+            return new LoginResponseDTO
+            {
+                IsValid = true,
+                Message = isNewUser ? "Đăng ký bằng Google thành công!" : "Đăng nhập bằng Google thành công!",
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                UserId = user.UserId,
+                FullName = user.FullName,
+                AvatarUrl = user.AvatarUrl
+            };
         }
     }
 }

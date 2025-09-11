@@ -18,7 +18,6 @@ namespace Service.Services
         private readonly ITokenService _tokenService;
         private string token = string.Empty;
 
-
         public StadiumService(GatewayHttpClient httpClient, ITokenService tokenService)
         {
             _httpClient = httpClient.Client;
@@ -28,13 +27,13 @@ namespace Service.Services
 
         public void AddBearerAccessToken()
         {
-            
             _httpClient.DefaultRequestHeaders.Authorization = null;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
         public async Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.PostAsJsonAsync("/addStadium", stadiumDto);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadFromJsonAsync<ReadStadiumDTO>();
@@ -42,6 +41,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteStadiumAsync(int id)
         {
+            AddBearerAccessToken();
             var response = await _httpClient.DeleteAsync($"/deleteStadium?id={id}");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync() == "true";
@@ -63,14 +63,17 @@ namespace Service.Services
 
         public async Task<string> SearchStadiumAsync(string searchTerm)
         {
-            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts,StadiumImages&$count=true" + searchTerm);
+            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=StadiumVideos,Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true" + searchTerm);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }
 
         public Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto)
         {
-            throw new NotImplementedException();
+            AddBearerAccessToken();
+            var response = _httpClient.PutAsJsonAsync($"/updateStadium?id={id}", stadiumDto);
+            response.Result.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return response.Result.Content.ReadFromJsonAsync<ReadStadiumDTO>();
         }
     }
 }

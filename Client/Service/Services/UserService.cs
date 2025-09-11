@@ -1,4 +1,5 @@
 ﻿using DTOs.UserDTO;
+using Microsoft.AspNetCore.Http;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -29,11 +30,11 @@ namespace Service.Services
         public async Task<LoginResponseDTO> LoginAsync(LoginRequestDTO loginRequestDTO)
         {
             var response = await _httpClient.PostAsJsonAsync("/users/login", loginRequestDTO);
-            response.EnsureSuccessStatusCode();  // Nếu không 2xx → throw HttpRequestException
+            //response.EnsureSuccessStatusCode();  // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
         }
 
-        public async Task<bool> RegisterAsync(CustomerRegisterRequestDTO dto)
+        public async Task<bool> CustomerRegisterAsync(CustomerRegisterRequestDTO dto)
         {
             using var form = new MultipartFormDataContent();
 
@@ -70,7 +71,56 @@ namespace Service.Services
                 form.Add(faceContent, nameof(dto.FaceVideo), dto.FaceVideo.FileName);
             }
 
-            var response = await _httpClient.PostAsync("/users/register", form);
+            var response = await _httpClient.PostAsync("/users/CustomerRegister", form);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO dto)
+        {
+            using var form = new MultipartFormDataContent();
+
+            form.Add(new StringContent(dto.FullName), nameof(dto.FullName));
+            form.Add(new StringContent(dto.Email), nameof(dto.Email));
+            form.Add(new StringContent(dto.Password), nameof(dto.Password));
+            form.Add(new StringContent(dto.Role ?? "None"), nameof(dto.Role));
+
+            if (!string.IsNullOrEmpty(dto.Address))
+                form.Add(new StringContent(dto.Address), nameof(dto.Address));
+
+            if (!string.IsNullOrEmpty(dto.PhoneNumber))
+                form.Add(new StringContent(dto.PhoneNumber), nameof(dto.PhoneNumber));
+
+            if (!string.IsNullOrEmpty(dto.Gender))
+                form.Add(new StringContent(dto.Gender), nameof(dto.Gender));
+
+            if (!string.IsNullOrEmpty(dto.DateOfBirth))
+                form.Add(new StringContent(dto.DateOfBirth), nameof(dto.DateOfBirth));
+
+            if (dto.FrontCCCDImage != null)
+            {
+                var frontContent = new StreamContent(dto.FrontCCCDImage.OpenReadStream());
+                frontContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(dto.FrontCCCDImage.ContentType);
+                form.Add(frontContent, nameof(dto.FrontCCCDImage), dto.FrontCCCDImage.FileName);
+            }
+
+            if (dto.RearCCCDImage != null)
+            {
+                var rearContent = new StreamContent(dto.RearCCCDImage.OpenReadStream());
+                rearContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(dto.RearCCCDImage.ContentType);
+                form.Add(rearContent, nameof(dto.RearCCCDImage), dto.RearCCCDImage.FileName);
+            }
+
+            if (dto.Avatar != null)
+            {
+                var avatarContent = new StreamContent(dto.Avatar.OpenReadStream());
+                avatarContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(dto.Avatar.ContentType);
+                form.Add(avatarContent, nameof(dto.Avatar), dto.Avatar.FileName);
+            }
+
+            var response = await _httpClient.PostAsync("/users/ManagerRegister", form);
             return response.IsSuccessStatusCode;
         }
 
@@ -181,6 +231,27 @@ namespace Service.Services
             {
                 throw new HttpRequestException($"Error updating face image: {response.ReasonPhrase}");
             }
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+        {
+            if(string.IsNullOrEmpty(resetPasswordDTO.Email) || string.IsNullOrEmpty(resetPasswordDTO.NewPassword) || resetPasswordDTO.NewPassword.Length < 6)
+            {
+                throw new ArgumentException("Invalid email or password");
+            }
+
+            var response = await _httpClient.PutAsJsonAsync("/users/forgot-password", resetPasswordDTO);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest)
+        {
+            // Gọi đến endpoint /users/google-auth của API Server
+            var response = await _httpClient.PostAsJsonAsync("/users/google-auth", googleRequest);
+
+            // Đọc kết quả trả về, dù thành công hay thất bại
+            // API Server sẽ trả về cấu trúc LoginResponseDTO với IsValid = false nếu có lỗi
+            return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
         }
     }
 }

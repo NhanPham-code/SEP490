@@ -6,9 +6,15 @@ namespace StadiumAPI.Service.Interface
     {
         // Define methods for managing stadium images, e.g.:
         Task<IEnumerable<ReadStadiumImageDTO>> GetAllImagesAsync(int stadiumId);
+
         Task<ReadStadiumImageDTO> GetImageByIdAsync(int id);
+
         Task<ReadStadiumImageDTO> AddImageAsync(CreateStadiumImageDTO image, string imgUrl);
+
         Task<ReadStadiumImageDTO> UpdateImageAsync(int id, UpdateStadiumImageDTO image, string imageUrl);
-        Task<bool> DeleteImageAsync(int id);
+
+        Task<bool> DeleteImageAsync(List<ReadStadiumImageDTO> stadiumImages);
+
+        Task<bool> DeleteImageByStadiumIdAsync(int stadiumId);
     }
 }

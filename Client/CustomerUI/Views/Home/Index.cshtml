@@ -579,6 +579,8 @@
                                 console.log(skip);
                                 if (skip + 9 >= count){
                                     $('#loadMoreBtn').hide();
+                                }else{
+                                     $('#loadMoreBtn').show();
                                 }
                                 let html = '';
                                 if (data.value && data.value.length > 0) {
@@ -1190,7 +1192,7 @@
 
         function redirectToBooking(stadiumId) {
             if (stadiumId) {
-                window.location.href = `/Booking/Booking?stadiumId=${stadiumId}`;
+                window.location.href = `/Booking/VisuallyBooking?stadiumId=${stadiumId}`;
             }
         }
     </script>

@@ -1,4 +1,4 @@
-﻿
+using Middlewares;
 using Service.BaseService;
 using Service.Interfaces;
 using Service.Services;
@@ -48,6 +48,7 @@ builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 
 
 
@@ -62,14 +63,23 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ServeUnknownFileTypes = true // Cho phép phục vụ các loại file không xác định
+});
 
 app.UseRouting();
+
+app.UseMiddleware<NoCacheMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+
 app.UseSession();
+
+app.UseMiddleware<TokenRefreshMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+app.UseMiddleware<TokenSessionMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
 
 app.MapControllerRoute(
     name: "default",

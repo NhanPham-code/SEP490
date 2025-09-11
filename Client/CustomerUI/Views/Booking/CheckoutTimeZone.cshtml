@@ -1,0 +1,449 @@
+﻿@{
+    ViewBag.Title = "Thanh Toán";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex items-center justify-center">
+
+    <div id="discount-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center opacity-0">
+        <div class="modal-content bg-white rounded-lg p-6 shadow-xl max-w-lg w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Chọn Mã Giảm Giá</h3>
+            <div id="discount-list" class="space-y-4 max-h-80 overflow-y-auto mb-4">
+            </div>
+            <div class="text-right">
+                <button type="button" id="close-discount-modal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg mr-2">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center opacity-0">
+        <div class="modal-content bg-white rounded-lg p-6 shadow-xl max-w-sm w-full mx-4">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
+            <p id="modal-message" class="text-gray-600 mb-4"></p>
+            <div class="text-right">
+                <button id="modal-close-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <form id="booking-form" action="/Booking/CreateBooking" method="post">
+        <input type="hidden" id="booking-date" name="Date" value="" />
+        <input type="hidden" id="booking-start-time" name="StartTime" value="" />
+        <input type="hidden" id="booking-end-time" name="EndTime" value="" />
+        <input type="hidden" id="booking-original-price" name="OriginalPrice" value="" />
+        <input type="hidden" id="booking-total-price" name="TotalPrice" value="" />
+        <input type="hidden" id="booking-note" name="Note" value="" />
+        <input type="hidden" id="booking-discount-id" name="DiscountId" value="" />
+        <div id="court-ids-container"></div>
+        <input type="hidden" id="payment-method-input" name="PaymentMethod" value="bank_transfer" />
+        <input type="hidden" id="booking-stadium-id" name="StadiumId" value="" />
+
+        <div id="checkout-container" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-xl w-full mx-auto">
+            <h1 class="text-3xl font-bold text-indigo-600 text-center mb-6">Thông Tin Đặt Sân</h1>
+
+            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Chi tiết hóa đơn</h2>
+                <div class="space-y-3 text-gray-700">
+                    <div class="flex justify-between">
+                        <span>Sân vận động:</span>
+                        <span id="checkout-stadium-name" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Sân:</span>
+                        <span id="checkout-court-name" class="font-bold text-indigo-600"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Thời gian:</span>
+                        <span id="checkout-time" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Tổng số giờ:</span>
+                        <span id="checkout-duration" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between border-t pt-3 mt-3 border-gray-200">
+                        <span>Giá gốc:</span>
+                        <span id="checkout-original-price"></span>
+                    </div>
+                    <div class="flex justify-between text-green-600 font-bold hidden" id="discount-amount-row">
+                        <span>Giảm giá:</span>
+                        <span id="checkout-discount-amount"></span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg border-t pt-3 mt-3 border-gray-200 text-gray-900">
+                        <span>Tổng cộng:</span>
+                        <span id="checkout-total-price" class="text-indigo-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6" id="profileForm">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Thông tin người đặt</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Họ và tên</label>
+                        <input type="text" id="customerName" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                        <input type="text" id="customerPhone" value="@ViewBag.CustomerPhone" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="customerEmail" class="mt-1 w-full p-3 rounded-lg border border-gray-300" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Mã giảm giá</h2>
+                <div class="flex gap-2 items-center">
+                    <span id="selected-discount-code" class="flex-grow p-3 rounded-lg bg-white border border-gray-300 text-gray-600">
+                        Chưa có mã giảm giá nào được chọn
+                    </span>
+                    <button type="button" id="select-discount-button" class="px-6 py-3 rounded-lg font-bold text-white bg-indigo-500">
+                        Chọn mã
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Chọn phương thức thanh toán</h2>
+                <div class="space-y-4">
+                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200">
+                        <input type="radio" name="payment-method" value="at_counter" class="form-radio text-indigo-600 h-5 w-5" checked>
+                        <span class="ml-3 text-sm font-medium text-gray-700">Thanh toán tại quầy (0% trả trước)</span>
+                    </label>
+                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200">
+                        <input type="radio" name="payment-method" value="vnpay_50" class="form-radio text-indigo-600 h-5 w-5">
+                        <span class="ml-3 text-sm font-medium text-gray-700">Trả trước 50% qua VNPay</span>
+                    </label>
+                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200">
+                        <input type="radio" name="payment-method" value="vnpay_100" class="form-radio text-indigo-600 h-5 w-5">
+                        <span class="ml-3 text-sm font-medium text-gray-700">Trả trước 100% qua VNPay</span>
+                    </label>
+                </div>
+            </div>
+
+            <input type="hidden" id="payment-amount" name="PaymentAmount" value="" />
+
+            <div class="flex justify-between items-center gap-4 mt-8">
+                <button type="button" id="back-button"
+                        class="min-w-[150px] px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">
+                    Quay lại
+                </button>
+                <button type="submit" id="complete-booking-button"
+                        class="w-full px-12 py-3 rounded-xl font-bold text-white bg-indigo-600">
+                    Hoàn tất đặt sân
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // Lấy dữ liệu từ ViewBag (ASP.NET MVC truyền sang)
+        const bookingData = {
+            stadiumId: parseInt("@ViewBag.StadiumId"),
+            courtIdsString: "@ViewBag.CourtIdsString",
+            date: "@ViewBag.Date",
+            startTime: parseInt("@ViewBag.StartTime"),
+            endTime: parseInt("@ViewBag.EndTime"),
+            totalPrice: parseFloat("@ViewBag.TotalPrice")
+        };
+
+        let stadiumData = null;
+        let subtotalPrice = bookingData.totalPrice;
+        let discountAmount = 0;
+        let totalPrice = subtotalPrice;
+        let discountId = null;
+
+        function showModal(title, message) {
+            $('#modal-title').text(title);
+            $('#modal-message').text(message);
+            $('#custom-modal').removeClass('opacity-0').addClass('open').fadeIn();
+        }
+
+        function hideModal() {
+            $('#custom-modal').removeClass('open').addClass('opacity-0').fadeOut();
+        }
+
+        function showDiscountModal() {
+            $('#discount-modal').removeClass('opacity-0').addClass('open').fadeIn();
+        }
+
+        function hideDiscountModal() {
+            $('#discount-modal').removeClass('open').addClass('opacity-0').fadeOut();
+        }
+
+        function formatCurrency(amount) {
+            return `${amount.toLocaleString('vi-VN')} VNĐ`;
+        }
+
+        function fetchStadiumData(id) {
+            const searchTerm = `&$filter=Id eq ${id}`;
+            $.ajax({
+                url: `/Home/Stadiums`,
+                type: 'GET',
+                data: { searchTerm: searchTerm },
+                success: function(data) {
+                    if (data.value && data.value.length > 0) {
+                        stadiumData = data.value[0];
+                        updateInvoiceDetails();
+                    } else {
+                        console.error('Không tìm thấy dữ liệu sân vận động.');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Lỗi khi tải dữ liệu sân vận động:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        function updateInvoiceDetails() {
+            if (!stadiumData) return;
+
+            // Tên sân vận động
+            $('#checkout-stadium-name').text(stadiumData.Name);
+
+            // Tên sân con
+            let courtNames = "";
+            if (bookingData.courtIdsString) {
+                const courtIdsArray = bookingData.courtIdsString.split(',').map(id => parseInt(id));
+                courtNames = courtIdsArray.map(id => {
+                    const court = stadiumData.Courts.find(c => c.Id === id);
+                    return court ? court.Name : `Sân ${id}`;
+                }).join(', ');
+            }
+            $('#checkout-court-name').text(courtNames);
+
+            // Các thông tin khác
+            $('#checkout-time').text(`${bookingData.startTime}:00 - ${bookingData.endTime}:00`);
+            $('#checkout-duration').text(`${bookingData.endTime - bookingData.startTime} giờ`);
+            $('#checkout-subtotal-price').text(formatCurrency(subtotalPrice));
+            $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
+            $('#checkout-original-price').text(formatCurrency(subtotalPrice)); // Correctly shows the original price (subtotal)
+            $('#checkout-total-price').text(formatCurrency(totalPrice)); // Correctly shows the total price (after discount)
+
+            if (discountAmount > 0) {
+                $('#discount-amount-row').removeClass('hidden');
+                $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
+            } else {
+                $('#discount-amount-row').addClass('hidden');
+            }
+        }
+
+        function updateHiddenFields() {
+            const rawDate = String(bookingData.date).trim();
+            const dateISO = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
+                ? rawDate
+                : (() => {
+                    const [d, m, y] = rawDate.split(/[\/\-\.]/);
+                    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                })();
+
+            const hh = (n) => String(n).padStart(2, "0");
+            const startDateTime = `${dateISO}T${hh(bookingData.startTime)}:00:00`;
+            const endDateTime = `${dateISO}T${hh(bookingData.endTime)}:00:00`;
+
+            $('#booking-date').val(dateISO);
+            // You can remove these single fields as they are not needed for the BookingDetails list
+            // $('#booking-start-time').val(startDateTime);
+            // $('#booking-end-time').val(endDateTime);
+            $('#booking-original-price').val(subtotalPrice);
+            $('#booking-total-price').val(totalPrice);
+            $('#booking-note').val('');
+            $('#booking-discount-id').val(discountId || '');
+            $('#booking-stadium-id').val(bookingData.stadiumId);
+
+            const courtIdsContainer = $('#court-ids-container');
+            courtIdsContainer.empty();
+            if (bookingData.courtIdsString) {
+                const courtIdsArray = bookingData.courtIdsString.split(',');
+                courtIdsArray.forEach((courtId, index) => {
+                    // Create a hidden input for CourtId
+                    const courtInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].CourtId`,
+                        value: courtId.trim()
+                    });
+
+                    // Create a hidden input for StartTime
+                    const startTimeInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].StartTime`,
+                        value: startDateTime
+                    });
+
+                    // Create a hidden input for EndTime
+                    const endTimeInput = $('<input>').attr({
+                        type: 'hidden',
+                        name: `BookingDetails[${index}].EndTime`,
+                        value: endDateTime
+                    });
+
+                    courtIdsContainer.append(courtInput);
+                    courtIdsContainer.append(startTimeInput);
+                    courtIdsContainer.append(endTimeInput);
+                });
+            }
+            $('#payment-method-input').val($('input[name="payment-method"]:checked').val());
+
+            // This part is crucial for the payment amount
+            const paymentMethod = $('input[name="payment-method"]:checked').val();
+            let paymentAmount = 0;
+            const total = parseFloat($('#checkout-total-price').text().replace(/[^0-9]/g, ''));
+            if (paymentMethod === 'vnpay_50') {
+                paymentAmount = total * 0.5;
+            } else if (paymentMethod === 'vnpay_100') {
+                paymentAmount = total;
+            }
+            $('#payment-amount').val(paymentAmount);
+        }
+
+        function loadUserProfile() {
+            $.ajax({
+                url: `/Booking/GetUserProfile`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#customerName').val(response.data.fullName || '');
+                        $('#customerPhone').val(response.data.phoneNumber || '');
+                        $('#customerEmail').val(response.data.email || '');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi lấy thông tin người dùng:', error);
+                },
+            });
+        }
+
+        function fetchDiscounts() {
+            $.ajax({
+                url: `/Booking/GetDiscounts?stadiumId=${bookingData.stadiumId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        renderDiscounts(response);
+                    } else {
+                        $('#discount-list').html('<p class="text-gray-500 italic">Không có mã giảm giá nào cho sân này.</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = xhr.responseJSON?.message || 'Lỗi khi lấy danh sách mã giảm giá.';
+                    $('#discount-list').html(`<p class="text-red-500 italic">${errorMessage}</p>`);
+                }
+            });
+        }
+
+        function renderDiscounts(discounts) {
+            const listContainer = $('#discount-list');
+            listContainer.empty();
+
+            discounts.forEach(discount => {
+                const discountCard = `
+                    <div class="p-4 bg-gray-100 rounded-lg border border-gray-200 flex flex-col hover:bg-gray-200 transition-colors duration-200 cursor-pointer"
+                         data-id="${discount.id}" data-percent="${discount.percentValue}" data-min-amount="${discount.minOrderAmount}" data-max-amount="${discount.maxDiscountAmount}">
+                        <div class="flex justify-between items-start">
+                            <span class="text-lg font-bold text-indigo-600">${discount.code}</span>
+                            <span class="text-sm font-semibold text-green-600">${discount.percentValue}% giảm</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-1">${discount.description || 'Không có mô tả'}</p>
+                        <p class="text-gray-500 text-xs mt-1">Áp dụng cho đơn hàng từ ${formatCurrency(discount.minOrderAmount)}</p>
+                        <p class="text-gray-500 text-xs">Giảm tối đa ${formatCurrency(discount.maxDiscountAmount)}</p>
+                        <button type="button" class="apply-discount-btn mt-2 px-4 py-2 bg-green-500 text-white rounded-lg text-sm self-end">Áp dụng</button>
+                    </div>
+                `;
+                listContainer.append(discountCard);
+            });
+        }
+
+        // --- Event Listeners ---
+        $(document).ready(function() {
+            fetchStadiumData(bookingData.stadiumId);
+            updateHiddenFields();
+            loadUserProfile();
+
+            $('#modal-close-btn').click(hideModal);
+            $('#close-discount-modal').click(hideDiscountModal);
+            $('#back-button').click(() => window.history.back());
+
+            $('#select-discount-button').click(() => {
+                fetchDiscounts();
+                showDiscountModal();
+            });
+
+            $('#discount-list').on('click', '.apply-discount-btn', function() {
+                const card = $(this).closest('[data-id]');
+                const discountIdRaw = card.data('id');
+                const percent = card.data('percent');
+                const minAmount = card.data('min-amount');
+                const maxAmount = card.data('max-amount');
+                const code = card.find('.text-lg').text();
+
+                if (subtotalPrice < minAmount) {
+                    showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
+                    return;
+                }
+
+                const calculatedDiscount = subtotalPrice * (percent / 100);
+                discountAmount = Math.min(calculatedDiscount, maxAmount);
+                totalPrice = subtotalPrice - discountAmount;
+                discountId = discountIdRaw;
+
+                $('#selected-discount-code').text(`Đã chọn mã: ${code}`);
+                updateInvoiceDetails();
+                updateHiddenFields();
+                hideDiscountModal();
+                showModal('Thành công', `Mã giảm giá "${code}" đã được áp dụng. Bạn được giảm ${formatCurrency(discountAmount)}.`);
+            });
+
+            $('input[name="payment-method"]').change(function() {
+                updateHiddenFields();
+            });
+
+            $('#booking-form').submit(function(e) {
+                e.preventDefault();
+                updateHiddenFields();
+                console.log('Form data before submit:');
+                const formData = new FormData(this);
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}: ${value}`);
+                }
+                this.submit();
+            });
+        });
+    </script>
+</body>
+</html>
