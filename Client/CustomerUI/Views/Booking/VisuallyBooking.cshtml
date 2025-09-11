@@ -590,10 +590,11 @@
 
             $('#scheduleGrid').empty();
             $('#fixedColumn').empty();
+            $('#fixedColumn').append(`<div class="court-name" style="color: #555;"></div>`);
+
+            console.log("Court in group: ", groupedCourts);
 
             Object.values(groupedCourts).forEach(courtsInGroup => {
-                $('#fixedColumn').append(`<div class="court-name" style="color: #555;"></div>`);
-
                 courtsInGroup.forEach(court => {
                     $('#fixedColumn').append(`<div class="court-name">${court.Name}</div>`);
 
