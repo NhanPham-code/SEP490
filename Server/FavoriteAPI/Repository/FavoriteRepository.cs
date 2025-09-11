@@ -17,7 +17,7 @@ namespace FavoriteAPI.Repository
         public async Task<Favorite> AddFavoriteAsync(Favorite favorite)
         {
            // add new favorite
-           _context.Favorites.Add(favorite);
+            await _context.Favorites.AddAsync(favorite);
             await _context.SaveChangesAsync();
             return favorite;
         }
@@ -46,10 +46,10 @@ namespace FavoriteAPI.Repository
             return _context.Favorites.AsQueryable();
         }
 
-        public Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)
+        public async Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)
         {
             // check if favorite exists by userId and stadiumId
-            return _context.Favorites.AnyAsync(f => f.UserId == userId && f.StadiumId == stadiumId);
+            return await _context.Favorites.AnyAsync(f => f.UserId == userId && f.StadiumId == stadiumId);
         }
     }
 }

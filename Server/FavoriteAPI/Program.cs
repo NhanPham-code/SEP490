@@ -97,6 +97,10 @@ builder.Services.AddDbContext<FavoriteDbContext>(options =>
 // Inject Mapping Profiles
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
+// Inject Repositories and Services
+builder.Services.AddScoped<FavoriteAPI.Repository.Interface.IFavoriteRepository, FavoriteAPI.Repository.FavoriteRepository>();
+builder.Services.AddScoped<FavoriteAPI.Service.Interface.IFavoriteService, FavoriteAPI.Service.FavoriteService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
