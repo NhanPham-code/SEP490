@@ -1,4 +1,5 @@
-﻿using FindTeamAPI.DTOs;
+﻿using DTOs.FindTeamDTO;
+using FindTeamAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Interfaces;
@@ -33,13 +34,27 @@ namespace CustomerUI.Controllers
         {
             
             var result = await _teamPost.GetOdataTeamPostAsync(url);
-            var teamPost = JsonConvert.DeserializeObject<ReadTeamPostDTO>(result);
+            
+            List<int> userId = result.Value.Select(u => u.CreatedBy).ToList();
+            // get profile by id 
+            var profile = await _userService.GetUsersByIdsAsync(userId , token);
 
-            // lấy userId
-            var userId = teamPost.CreatedBy;
+            FindTeamViewModel findTeamViewModel = new FindTeamViewModel
+            {
+                TeamPosts = result.Value,
+            };
+
+            foreach (var item in findTeamViewModel.TeamPosts)
+            {
+                var user = profile.FirstOrDefault(u => u.UserId == item.CreatedBy);
+                if (user != null)
+                {
+                    findTeamViewModel.UserNames.Add(item.CreatedBy, user);
+                }
+            }
 
 
-            return Content(result, "application/json");
+            return Json(new { message = 200, value = findTeamViewModel });
         }
     }
 }

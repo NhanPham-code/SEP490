@@ -402,7 +402,7 @@
                 success: function(response) {
                     $('#players-grid').html(response);
 
-                    renderPosts(response.value);
+                    renderPosts(response.value.TeamPosts, response.value.UserNames);
                     // Update results count
                     hideLoading();
                     // Hide loading state
@@ -425,13 +425,14 @@
             $('#players-grid').show();
             $('#load-more-section').show();
         }
-        function renderPosts(response){
-             if (!response || response.length === 0) {
+        function renderPosts(post, profile){
+             if (!post || post.length === 0) {
                 $('#players-grid').html('');
                 return;
             }
-            console.log(response);
-            const html = response.map(post => `
+            console.log(profile);
+            console.log(post);
+            const html = post.map(post => `
                <article class="player-card">
                             <div class="player-header">
                                 <div class="player-avatar">

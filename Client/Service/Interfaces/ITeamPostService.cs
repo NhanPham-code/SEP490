@@ -1,4 +1,5 @@
-﻿using FindTeamAPI.DTOs;
+﻿using DTOs.FindTeamDTO;
+using FindTeamAPI.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Service.Interfaces
 {
     public interface ITeamPostService
     {
-        Task<string> GetOdataTeamPostAsync(string url);
+        Task<FindTeamResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url);
         Task<ReadTeamPostDTO> CreateTeamPost(CreateTeamPostDTO createTeamPostDTO);
         Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO);
         Task<bool> DeleteTeamPost(int postId);

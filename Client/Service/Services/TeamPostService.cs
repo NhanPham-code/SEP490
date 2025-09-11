@@ -1,4 +1,6 @@
-﻿using FindTeamAPI.DTOs;
+﻿using DTOs.FindTeamDTO;
+using FindTeamAPI.DTOs;
+using Newtonsoft.Json;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -42,12 +44,13 @@ namespace Service.Services
             return await response.Content.ReadAsStringAsync() == "true";
         }
 
-        public async Task<string> GetOdataTeamPostAsync(string url)
+        public async Task<FindTeamResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url)
         {
             InitializeAsync();
             var response = await _httpClient.GetAsync("/odata/TeamPost" + url);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<FindTeamResponse<ReadTeamPostDTO>>(json);
         }
 
         public async Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO)

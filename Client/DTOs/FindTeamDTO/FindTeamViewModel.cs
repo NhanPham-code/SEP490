@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DTOs.UserDTO;
+using FindTeamAPI.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,7 @@ namespace DTOs.FindTeamDTO
 {
     public class FindTeamViewModel
     {
+        public List<ReadTeamPostDTO> TeamPosts { get; set; } = new List<ReadTeamPostDTO>();
+        public Dictionary<int, PublicUserProfileDTO> UserNames { get; set; } = new Dictionary<int, PublicUserProfileDTO>();
     }
 }
