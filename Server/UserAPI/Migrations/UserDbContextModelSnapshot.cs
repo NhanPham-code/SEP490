@@ -93,6 +93,9 @@ namespace UserAPI.Migrations
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GoogleId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("IdentityNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -110,6 +113,9 @@ namespace UserAPI.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RearCCCDUrl")
                         .HasColumnType("nvarchar(max)");

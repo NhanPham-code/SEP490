@@ -15,11 +15,38 @@ namespace UserAPI.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
+        private readonly IGoogleAuthService _googleAuthService;
 
-        public UsersController(IUserService userService, ITokenService tokenService)
+        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService)
         {
             _userService = userService;
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+            _googleAuthService = googleAuthService;
+        }
+
+        /// <summary>
+        /// Xác thực và Đăng nhập/Đăng ký bằng Google
+        /// api/Users/google-auth
+        /// </summary>
+        [HttpPost("google-auth")]
+        public async Task<IActionResult> GoogleAuth([FromBody] GoogleApiLoginRequestDTO request)
+        {
+            // 1. Xác thực IdToken với Google
+            var googleUser = await _googleAuthService.VerifyGoogleTokenAsync(request);
+            if (googleUser == null || !googleUser.EmailVerified)
+            {
+                return BadRequest(new { message = "Invalid Google Token or email not verified." });
+            }
+
+            // 2. Gọi service để xử lý logic đăng nhập/đăng ký
+            var result = await _userService.LoginOrRegisterWithGoogleAsync(googleUser);
+
+            if (!result.IsValid)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
         }
 
         /// <summary>

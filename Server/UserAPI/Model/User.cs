@@ -53,5 +53,9 @@ namespace UserAPI.Model
         public DateTime? UpdatedDate { get; set; } = DateTime.UtcNow;
 
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
+
+        public string? GoogleId { get; set; } // Lưu ID duy nhất từ Google
+
+        public string? Provider { get; set; } // Lưu nguồn đăng ký: "local", "google"
     }
 }

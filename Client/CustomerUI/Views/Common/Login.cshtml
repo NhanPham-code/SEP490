@@ -13,6 +13,11 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 
     <link href="~/css/common/login.css" rel="stylesheet" />
+    <!-- SỬA TÊN FILE CSS CHO ĐÚNG -->
+    <link href="~/css/common/social-button.css" rel="stylesheet" />
+
+    <!-- 1. THÊM THƯ VIỆN GOOGLE SIGN-IN -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
@@ -48,6 +53,7 @@
                 <div id="login-alert" class="alert-container"></div>
 
                 <form id="loginForm" class="space-y-6">
+                    <!-- ... Các trường input của form đăng nhập ... -->
                     <div class="field-group">
                         <div class="floating-label">
                             <input type="email" id="login-email" placeholder="Email" required />
@@ -86,10 +92,66 @@
                         <div class="loading ml-2 hidden"></div>
                     </button>
                 </form>
+
+                <!-- Social Login Section - ĐÃ SỬA LẠI -->
+                <div class="social-login-section">
+                    <div class="login-divider">
+                        <span class="divider-text">HOẶC</span>
+                    </div>
+
+                    <div class="social-buttons-grid">
+
+                        <!-- Google Sign-In Button -->
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="outline"
+                             data-text="signin_with"
+                             data-logo_alignment="left">
+                        </div>
+
+                        <!-- Biometric Login Button -->
+                        <button type="button" class="social-btn biometric-btn" id="biometric-login-btn">
+                            <div class="social-btn-icon">
+                                <div class="biometric-icon-wrapper">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M9 12C10.1046 12 11 11.1046 11 10C11 8.89543 10.1046 8 9 8C7.89543 8 7 8.89543 7 10C7 11.1046 7.89543 12 9 12Z" fill="currentColor" />
+                                        <path d="M15 12C16.1046 12 17 11.1046 17 10C17 8.89543 16.1046 8 15 8C13.8954 8 13 8.89543 13 10C13 11.1046 13.8954 12 15 12Z" fill="currentColor" />
+                                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="currentColor" />
+                                        <path d="M12 17C14.21 17 16.21 15.79 17.19 14H6.81C7.79 15.79 9.79 17 12 17Z" fill="currentColor" />
+                                    </svg>
+                                    <div class="biometric-pulse"></div>
+                                </div>
+                            </div>
+                            <span class="social-btn-text">Sinh trắc học</span>
+                            <div class="social-btn-loading">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="biometric-info">
+                        <i class="ri-information-line"></i>
+                        <span>Hỗ trợ Face ID, Touch ID và Windows Hello</span>
+                    </div>
+                </div>
+
+                <!-- Hidden Google Sign-In -->
+                <div id="g_id_onload"
+                     data-client_id="@ViewBag.GoogleClientId"
+                     data-use_fedcm_for_prompt="true"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleGoogleSignIn"
+                     data-auto_select="false"
+                     data-itp_support="true"
+                     style="display: none;">
+                </div>
             </div>
         </div>
 
         <!-- Register Form -->
+        <!-- ... Toàn bộ form đăng ký của bạn giữ nguyên ... -->
         <div class="form-container register-container">
             <div class="form-header">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent mb-2">
@@ -173,7 +235,7 @@
                     </div>
 
                     <div class="field-group">
-                        <div class="floating-label">
+                        <div class="floating-label date-input-wrapper">
                             <input type="date" id="register-dob" required />
                             <i class="ri-calendar-line icon text-xl"></i>
                         </div>
@@ -235,6 +297,22 @@
                         <div class="loading ml-2 hidden"></div>
                     </button>
                 </form>
+
+                <!-- Add after register button -->
+                <div class="social-login-divider my-6">
+                    <span>hoặc đăng ký bằng</span>
+                </div>
+
+                <div class="social-login-buttons">
+                    <!-- Google Sign-In Button -->
+                    <div class="g_id_signin google-button"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signup_with"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -255,6 +333,7 @@
         </div>
     </div>
 
+    <!-- ... Toàn bộ JavaScript của bạn giữ nguyên ... -->
     <script>
         // Enhanced utility functions
         function togglePassword(inputId, toggleIcon) {
@@ -285,10 +364,10 @@
 
         // ENHANCED ALERT SYSTEM - ĐÃ CẢI TIẾN
         function showAlert(containerId, message, type = 'error', autoHide = true, isToast = false) {
-            const container = isToast ? 
-                document.getElementById('toast-container') : 
+            const container = isToast ?
+                document.getElementById('toast-container') :
                 document.getElementById(containerId);
-            
+
             if (!container) return;
 
             const alertId = 'alert-' + Date.now();
@@ -299,21 +378,21 @@
                 'warning': 'ri-alert-line'
             };
             const icon = iconMap[type] || 'ri-information-line';
-            
+
             const alertHtml = `
-                <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
-                    <div class="alert-icon">
-                        <i class="${icon}"></i>
-                    </div>
-                    <div class="alert-content">
-                        ${message}
-                    </div>
-                    <div class="alert-close" onclick="closeAlert('${alertId}')">
-                        <i class="ri-close-line"></i>
-                    </div>
-                    ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
-                </div>
-            `;
+                                <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
+                                    <div class="alert-icon">
+                                        <i class="${icon}"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        ${message}
+                                    </div>
+                                    <div class="alert-close" onclick="closeAlert('${alertId}')">
+                                        <i class="ri-close-line"></i>
+                                    </div>
+                                    ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
+                                </div>
+                            `;
 
             if (isToast) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
@@ -332,9 +411,9 @@
                 setTimeout(() => {
                     const alertElement = document.getElementById(alertId);
                     if (alertElement) {
-                        alertElement.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'nearest' 
+                        alertElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
                         });
                     }
                 }, 100);
@@ -353,29 +432,29 @@
 
             const errorList = Array.isArray(errors) ? errors : [errors];
             const errorItems = errorList.map(error => `<li>${error}</li>`).join('');
-            
+
             const alertHtml = `
-                <div class="form-error-summary">
-                    <div class="alert-icon">
-                        <i class="ri-error-warning-line"></i>
-                    </div>
-                    <div class="alert-content">
-                        <strong>Vui lòng kiểm tra các lỗi sau:</strong>
-                        <ul style="margin: 8px 0 0 0; padding-left: 16px;">
-                            ${errorItems}
-                        </ul>
-                    </div>
-                </div>
-            `;
+                                <div class="form-error-summary">
+                                    <div class="alert-icon">
+                                        <i class="ri-error-warning-line"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <strong>Vui lòng kiểm tra các lỗi sau:</strong>
+                                        <ul style="margin: 8px 0 0 0; padding-left: 16px;">
+                                            ${errorItems}
+                                        </ul>
+                                    </div>
+                                </div>
+                            `;
 
             container.innerHTML = alertHtml;
 
             // Auto scroll to error summary on mobile
             if (window.innerWidth <= 768) {
                 setTimeout(() => {
-                    container.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest' 
+                    container.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
                     });
                 }, 100);
             }
@@ -394,7 +473,7 @@
         function clearAlert(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            
+
             const alerts = container.querySelectorAll('.alert, .form-error-summary');
             alerts.forEach(alert => {
                 alert.classList.add('alert-exit');
@@ -505,83 +584,93 @@
             strengthText.textContent = strengthTextContent;
         }
 
-        // CUSTOM SELECT FUNCTIONALITY
+        // CUSTOM SELECT FUNCTIONALITY - ĐÃ SỬA LỖI
         function initCustomSelects() {
             const customSelects = document.querySelectorAll('.custom-select');
-            
+
             customSelects.forEach(selectWrapper => {
                 const trigger = selectWrapper.querySelector('.custom-select-trigger');
                 const dropdown = selectWrapper.querySelector('.custom-select-dropdown');
                 const options = selectWrapper.querySelectorAll('.custom-select-option');
                 const hiddenSelect = selectWrapper.parentElement.querySelector('select[style*="display: none"]');
-                
+
+                // Remove existing event listeners to prevent duplication
+                const newTrigger = trigger.cloneNode(true);
+                trigger.parentNode.replaceChild(newTrigger, trigger);
+
+                const newDropdown = dropdown.cloneNode(true);
+                dropdown.parentNode.replaceChild(newDropdown, dropdown);
+
+                // Get updated references
+                const updatedTrigger = selectWrapper.querySelector('.custom-select-trigger');
+                const updatedDropdown = selectWrapper.querySelector('.custom-select-dropdown');
+                const updatedOptions = selectWrapper.querySelectorAll('.custom-select-option');
+
                 // Toggle dropdown
-                trigger.addEventListener('click', function(e) {
+                updatedTrigger.addEventListener('click', function (e) {
+                    e.preventDefault();
                     e.stopPropagation();
-                    
+
                     // Close other dropdowns
                     document.querySelectorAll('.custom-select-trigger.active').forEach(otherTrigger => {
-                        if (otherTrigger !== trigger) {
+                        if (otherTrigger !== updatedTrigger) {
                             otherTrigger.classList.remove('active');
                             otherTrigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
                         }
                     });
-                    
+
                     // Toggle current dropdown
-                    trigger.classList.toggle('active');
-                    dropdown.classList.toggle('active');
+                    updatedTrigger.classList.toggle('active');
+                    updatedDropdown.classList.toggle('active');
                 });
-                
+
                 // Handle option selection
-                options.forEach(option => {
-                    option.addEventListener('click', function(e) {
+                updatedOptions.forEach(option => {
+                    option.addEventListener('click', function (e) {
+                        e.preventDefault();
                         e.stopPropagation();
-                        
+
                         const value = this.dataset.value;
                         const text = this.textContent;
-                        
+
                         // Update trigger display
-                        const placeholderElement = trigger.querySelector('.placeholder');
+                        const placeholderElement = updatedTrigger.querySelector('.placeholder, .selected-value');
                         placeholderElement.textContent = text;
                         placeholderElement.className = 'selected-value';
-                        
+
                         // Update hidden select
                         if (hiddenSelect) {
                             hiddenSelect.value = value;
-                            hiddenSelect.dispatchEvent(new Event('change'));
+                            // Trigger change event
+                            const changeEvent = new Event('change', { bubbles: true });
+                            hiddenSelect.dispatchEvent(changeEvent);
                         }
-                        
+
                         // Update visual state
-                        options.forEach(opt => opt.classList.remove('selected'));
+                        updatedOptions.forEach(opt => opt.classList.remove('selected'));
                         this.classList.add('selected');
-                        
+
                         // Close dropdown
-                        trigger.classList.remove('active');
-                        dropdown.classList.remove('active');
-                        
+                        updatedTrigger.classList.remove('active');
+                        updatedDropdown.classList.remove('active');
+
                         // Clear any validation errors
                         if (hiddenSelect) {
                             clearFieldError(hiddenSelect.id);
-                            // Also clear trigger error styling
-                            trigger.classList.remove('error');
+                            updatedTrigger.classList.remove('error');
                         }
                     });
                 });
             });
-            
+
             // Close dropdowns when clicking outside
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
-                    trigger.classList.remove('active');
-                    trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
-                });
-            });
-            
-            // Prevent dropdown close when scrolling inside
-            document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
-                dropdown.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
+                        trigger.classList.remove('active');
+                        trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
+                    });
+                }
             });
         }
 
@@ -607,6 +696,31 @@
             const mobileRegisterTab = document.getElementById('mobile-register-tab');
             const loginContainer = document.querySelector('.login-container');
             const registerContainer = document.querySelector('.register-container');
+
+            // Set max date for date input (18 years ago)
+            const dobInput = document.getElementById('register-dob');
+            if (dobInput) {
+                const today = new Date();
+                const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+
+                dobInput.max = maxDate.toISOString().split('T')[0];
+                dobInput.min = minDate.toISOString().split('T')[0];
+
+                // Force date picker to open on click
+                dobInput.addEventListener('click', function () {
+                    if (this.showPicker) {
+                        this.showPicker();
+                    }
+                });
+
+                // Handle focus
+                dobInput.addEventListener('focus', function () {
+                    if (this.showPicker) {
+                        this.showPicker();
+                    }
+                });
+            }
 
             // Initialize custom selects
             initCustomSelects();
@@ -840,5 +954,6 @@
             });
         });
     </script>
+    <script src="~/js/google-login/social-login-handler.js" asp-append-version="true"></script>
 </body>
 </html>

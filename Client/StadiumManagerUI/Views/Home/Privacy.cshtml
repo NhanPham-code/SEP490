@@ -1,956 +1,699 @@
 ﻿@{
-    ViewData["Title"] = "Tổng quan";
+    ViewData["Title"] = "Quản lý Discount";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section Styles {
 <style>
-
-	@@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-		:root {
-				--bg-color: #e4ebfd;
-				--container-bg: #ffffff;
-				--card-blue: #dbeafe;
-				--card-yellow: #fef3c7;
-				--card-green: #d1fae5;
-				--card-teal: #ccfbf1;
-				--text-blue: #1e40af;
-				--text-yellow: #92400e;
-				--text-green: #065f46;
-				--text-teal: #0f766e;
-				--main-text: #1f2937;
-				--sub-text: #6b7280;
-				--positive-change: #10b981;
-				--border-color: #e5e7eb;
-				--hover-color: #f1f5f9;
-				--shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-				--radius-md: 0.5rem;
-				--radius-lg: 0.75rem;
-				--purple-active: #ede9fe;
-				--purple-text: #7c3aed;
-
-	}
-
-		.container {
-				max-width: 1400px;
-				margin: 0 auto;
-				display: flex;
-				flex-direction: column;
-				gap: 2rem;
-
-	}
-
-		.stats-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-				gap: 1.5rem;
-
-	}
-
-		.stat-card {
-				background-color: var(--container-bg);
-				padding: 1.5rem;
-				border-radius: var(--radius-lg);
-				box-shadow: var(--shadow);
-				border-top: 5px solid transparent;
-
-	}
-
-			.stat-card.blue {
-					border-top-color: #60a5fa;
-
-		}
-
-			.stat-card.yellow {
-					border-top-color: #fbbf24;
-
-		}
-
-			.stat-card.green {
-					border-top-color: #34d399;
-
-		}
-
-			.stat-card.teal {
-					border-top-color: #2dd4bf;
-
-		}
-
-		.stat-header {
-				font-size: 0.875rem;
-				font-weight: 500;
-				margin-bottom: 0.5rem;
-				color: var(--sub-text);
-
-	}
-
-		.stat-value {
-				font-size: 2.25rem;
-				font-weight: 700;
-
-	}
-
-		.stat-change {
-				font-size: 0.875rem;
-				margin-top: 0.5rem;
-
-	}
-
-			.stat-change.positive {
-					color: var(--positive-change);
-					font-weight: 600;
-
-		}
-
-		.main-content {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 2rem;
-
-	}
-
-		.section-header {
-				display: flex;
-				flex-direction: column;
-				gap: 1rem;
-				margin-bottom: 1.5rem;
-
-	}
-
-
-	@@media (min-width: 768px) {
-				.section-header
-
-	{
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
-
-	}
-
-
-	}
-
-		.date-nav {
-				display: flex;
-				align-items: center;
-				gap: 0.75rem;
-				background: var(--container-bg);
-				border: 1px solid var(--border-color);
-				border-radius: var(--radius-md);
-				padding: 0.5rem;
-
-	}
-
-		.nav-tabs {
-				display: flex;
-				gap: 0.25rem;
-				padding: 0.25rem;
-				border-radius: 9999px;
-				background-color: var(--hover-color);
-
-	}
-
-		.nav-tab {
-				padding: 0.5rem 1rem;
-				border-radius: 9999px;
-				cursor: pointer;
-				transition: background-color 0.2s ease, color 0.2s ease;
-				color: var(--sub-text);
-
-	}
-
-			.nav-tab:hover {
-					background-color: var(--hover-color);
-
-		}
-
-			.nav-tab.active {
-					background-color: var(--purple-active);
-					color: var(--purple-text);
-					font-weight: 600;
-
-		}
-
-		.date-arrow {
-				cursor: pointer;
-				color: var(--sub-text);
-
-	}
-
-		.date-display {
-				font-weight: 600;
-				white-space: nowrap;
-
-	}
-
-		.search-controls {
-				display: flex;
-				gap: 0.75rem;
-				flex-wrap: wrap;
-
-	}
-
-		.search-input {
-				padding: 0.75rem 1rem;
-				border: 1px solid var(--border-color);
-				border-radius: var(--radius-md);
-				background-color: var(--container-bg);
-				flex-grow: 1;
-
-	}
-
-		.filter-btn {
-				padding: 0.75rem 1rem;
-				border: 1px solid var(--border-color);
-				border-radius: var(--radius-md);
-				background-color: var(--container-bg);
-				cursor: pointer;
-				transition: background-color 0.2s ease;
-				font-weight: 500;
-
-	}
-
-			.filter-btn:hover {
-					background-color: var(--hover-color);
-
-		}
-
-		.booking-table {
-				width: 100%;
-				border-collapse: separate;
-				border-spacing: 0 1rem;
-
-	}
-
-			.booking-table th, .booking-table td {
-					text-align: left;
-					padding: 0.5rem 1rem;
-
-		}
-
-			.booking-table th {
-					color: var(--sub-text);
-					font-weight: 500;
-					text-transform: uppercase;
-					font-size: 0.75rem;
-					padding-bottom: 0.5rem;
-
-		}
-
-			.booking-table tbody tr {
-					background-color: var(--container-bg);
-					border-radius: var(--radius-lg);
-					box-shadow: var(--shadow);
-					transition: transform 0.2s ease;
-
-		}
-
-				.booking-table tbody tr:hover {
-						transform: translateY(-4px);
-
-			}
-
-		.time-slot, .customer-info, .status-badge {
-				display: flex;
-				align-items: center;
-
-	}
-
-		.time-slot {
-				flex-direction: column;
-				align-items: flex-start;
-
-	}
-
-		.time-range {
-				font-weight: 600;
-
-	}
-
-		.date-info {
-				font-size: 0.75rem;
-				color: var(--sub-text);
-
-	}
-
-		.customer-info {
-				display: flex;
-				align-items: center;
-				gap: 0.75rem;
-
-	}
-
-		.customer-avatar {
-				width: 2.5rem;
-				height: 2.5rem;
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				color: white;
-				font-weight: 600;
-				font-size: 0.875rem;
-
-	}
-
-		.customer-name {
-				font-weight: 600;
-
-	}
-
-		.customer-phone {
-				font-size: 0.75rem;
-				color: var(--sub-text);
-
-	}
-
-		.price {
-				font-weight: 600;
-				color: #3b82f6;
-
-	}
-
-		.status-badge {
-				padding: 0.25rem 0.75rem;
-				border-radius: 9999px;
-				font-size: 0.75rem;
-				font-weight: 600;
-
-	}
-
-		.status-pending {
-				background-color: #fef3c7;
-				color: #92400e;
-
-	}
-
-		.status-confirmed {
-				background-color: #dbeafe;
-				color: #1e40af;
-
-	}
-
-		.status-completed {
-				background-color: #d1fae5;
-				color: #065f46;
-
-	}
-
-		.status-cancelled {
-				background-color: #fee2e2;
-				color: #b91c1c;
-
-	}
-
-		.actions {
-				display: flex;
-				gap: 0.5rem;
-
-	}
-
-		.action-btn {
-				background-color: #f3f4f6;
-				border: none;
-				border-radius: 50%;
-				width: 2.25rem;
-				height: 2.25rem;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				color: var(--sub-text);
-				cursor: pointer;
-				transition: background-color 0.2s ease, transform 0.2s ease;
-
-	}
-
-			.action-btn:hover {
-					background-color: #e5e7eb;
-					transform: scale(1.1);
-
-		}
-
-		.pagination {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: 1.5rem;
-				color: var(--sub-text);
-				font-size: 0.875rem;
-
-	}
-
-		.pagination-controls {
-				display: flex;
-				gap: 0.5rem;
-
-	}
-
-		.page-btn {
-				padding: 0.5rem 1rem;
-				border: 1px solid var(--border-color);
-				border-radius: var(--radius-md);
-				background-color: var(--container-bg);
-				cursor: pointer;
-				transition: background-color 0.2s ease;
-
-	}
-
-			.page-btn.active {
-					background-color: #e2e8f0;
-					font-weight: 600;
-
-		}
-
-		.chart-container, .booking-section, .vip-customers {
-				background-color: var(--container-bg);
-				padding: 2rem;
-				border-radius: var(--radius-lg);
-				box-shadow: var(--shadow);
-				display: flex;
-				flex-direction: column;
-
-	}
-
-		.booking-section {
-				grid-column: 1 / span 2;
-
-	}
-
-		.chart-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 1rem;
-
-	}
-
-		.chart-title {
-				font-size: 1.25rem;
-				font-weight: 600;
-				margin: 0;
-
-	}
-
-		.chart-period {
-				font-size: 0.875rem;
-				color: var(--sub-text);
-
-	}
-
-		.dashboard-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-				gap: 2rem;
-
-	}
-
-		.chart-wrapper {
-				position: relative;
-				height: 250px;
-
-	}
-
-		canvas {
-				width: 100% !important;
-				height: 100% !important;
-
-	}
-
-		.vip-customer {
-				display: flex;
-				align-items: center;
-				padding: 1rem;
-				border-bottom: 1px solid var(--border-color);
-
-	}
-
-			.vip-customer:last-child {
-					border-bottom: none;
-
-		}
-
-		.vip-info {
-				flex-grow: 1;
-
-	}
-
-		.vip-rank {
-				font-size: 1.5rem;
-				font-weight: 700;
-				color: #3b82f6;
-				margin-right: 1rem;
-
-	}
-
-		.vip-name {
-				font-weight: 600;
-
-	}
-
-		.vip-bookings {
-				font-size: 0.875rem;
-				color: var(--sub-text);
-
-	}
-
-		.vip-badge {
-				background-color: #fef3c7;
-				color: #d97706;
-				padding: 0.25rem 0.75rem;
-				border-radius: 9999px;
-				font-weight: 600;
-				font-size: 0.75rem;
-
-	}
-
-		.main-content-grid {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 2rem;
-
-	}
-
-
-	@@media (max-width: 1024px) {
-				.main-content-grid
-
-	{
-					grid-template-columns: 1fr;
-
-	}
-
-
-	}
-
-		.two-column-grid {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 2rem;
-
-	}
-
-
-	@@media (max-width: 768px) {
-				.two-column-grid
-
-	{
-					grid-template-columns: 1fr;
-
-	}
-
-
-	}
+    :root {
+        --primary-blue: #3b82f6;
+        --success-green: #10b981;
+        --warning-orange: #f59e0b;
+        --danger-red: #ef4444;
+        --gray-200: #e5e7eb;
+        --gray-600: #6b7280;
+        --gray-900: #111827;
+        --bright-red: #f43f5e;
+    }
+
+    body {
+        background-color: #e4ebfd;
+    }
+
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    .create-btn {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    }
+
+        .create-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+
+    .filters-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background: white;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+    .filter-btn {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        height: fit-content;
+    }
+
+        .filter-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+    .reset-btn {
+        background: var(--gray-600);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        height: fit-content;
+        margin-left: 0.5rem;
+    }
+
+        .reset-btn:hover {
+            background: #374151;
+            transform: translateY(-1px);
+        }
+
+    .discounts-container {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    .results-count {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .discount-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .discount-table th {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-900);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.875rem;
+        }
+
+        .discount-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .discount-table tr:hover {
+            background: #f9fafb;
+        }
+
+    .discount-code {
+        font-weight: 600;
+        color: var(--primary-blue);
+        font-family: 'Courier New', monospace;
+        background: rgba(59, 130, 246, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .discount-description {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .discount-value {
+        font-weight: 600;
+        color: var(--success-green);
+        font-size: 1rem;
+    }
+
+    .discount-amount {
+        color: var(--gray-900);
+        font-size: 0.875rem;
+    }
+
+    .discount-dates {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-green);
+    }
+
+    .status-inactive {
+        background: rgba(107, 114, 128, 0.1);
+        color: var(--gray-600);
+    }
+
+    .status-expired {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-red);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: white;
+        font-size: 0.875rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .edit-btn {
+        background: var(--primary-blue);
+    }
+
+        .edit-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+
+    .delete-btn {
+        background: var(--danger-red);
+    }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+    .view-btn {
+        background: var(--gray-600);
+    }
+
+        .view-btn:hover {
+            background: #374151;
+            transform: scale(1.1);
+        }
+
+    .code-type-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .type-general {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-blue);
+    }
+
+    .type-stadium {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-orange);
+    }
+
+    .pagination {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        border-top: 1px solid var(--gray-200);
+        background: #f8fafc;
+    }
+
+    .pagination-info {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--gray-200);
+        background: white;
+        color: var(--gray-600);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+        .pagination-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--gray-600);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--gray-200);
+        margin-bottom: 1rem;
+    }
+
+    .stadiums-list {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+
+    .stadium-tag {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-green);
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        margin: 0.125rem;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    @@media (max-width: 768px) {
+        .filter-row
+
+    {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .discount-table {
+        font-size: 0.8rem;
+    }
+
+        .discount-table th,
+        .discount-table td {
+            padding: 0.75rem;
+        }
+
+    }
 </style>
+
+<div class="page-header">
+    <a href="@Url.Action("Create", "Discount")" class="create-btn">
+        <i class="fas fa-plus"></i>
+        Tạo discount mới
+    </a>
+</div>
+
+<div class="filters-card">
+    <div class="filter-row">
+        <div class="form-group">
+            <label class="form-label">Tìm kiếm</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mã discount, mô tả...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Sân vận động</label>
+            <select class="form-control" id="stadiumFilter">
+                <option value="">Tất cả sân</option>
+                <option value="1">Sân bóng đá ABC</option>
+                <option value="2">Sân tennis XYZ</option>
+                <option value="3">Sân cầu lông DEF</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Trạng thái</label>
+            <select class="form-control" id="statusFilter">
+                <option value="">Tất cả</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="inactive">Tạm dừng</option>
+                <option value="expired">Hết hạn</option>
+            </select>
+        </div>
+        <div>
+            <button class="filter-btn" onclick="applyFilters()">
+                <i class="fas fa-filter"></i> Lọc
+            </button>
+            <button class="reset-btn" onclick="resetFilters()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="discounts-container">
+    <div class="table-header">
+        <h3 class="table-title">Danh sách Discount</h3>
+        <span class="results-count">Hiển thị 8 trên tổng 24 discount</span>
+    </div>
+
+    <table class="discount-table">
+        <thead>
+            <tr>
+                <th>Mã discount</th>
+                <th>Mô tả</th>
+                <th>Giá trị</th>
+                <th>Số tiền tối đa</th>
+                <th>Đơn tối thiểu</th>
+                <th>Thời gian</th>
+                <th>Loại</th>
+                <th>Sân áp dụng</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="discount-code">SUMMER2024</span></td>
+                <td><span class="discount-description">Giảm giá mùa hè cho tất cả sân</span></td>
+                <td><span class="discount-value">15%</span></td>
+                <td><span class="discount-amount">500,000 VNĐ</span></td>
+                <td><span class="discount-amount">200,000 VNĐ</span></td>
+                <td>
+                    <div class="discount-dates">
+                        <div>Từ: 01/06/2024</div>
+                        <div>Đến: 31/08/2024</div>
+                    </div>
+                </td>
+                <td><span class="code-type-badge type-general">Chung</span></td>
+                <td>
+                    <div class="stadiums-list">
+                        <span class="stadium-tag">Sân ABC</span>
+                        <span class="stadium-tag">Sân XYZ</span>
+                    </div>
+                </td>
+                <td><span class="status-badge status-active">Hoạt động</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view-btn" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="discount-code">NEWUSER50</span></td>
+                <td><span class="discount-description">Ưu đãi cho khách hàng mới</span></td>
+                <td><span class="discount-value">50%</span></td>
+                <td><span class="discount-amount">300,000 VNĐ</span></td>
+                <td><span class="discount-amount">100,000 VNĐ</span></td>
+                <td>
+                    <div class="discount-dates">
+                        <div>Từ: 01/01/2024</div>
+                        <div>Đến: 31/12/2024</div>
+                    </div>
+                </td>
+                <td><span class="code-type-badge type-general">Chung</span></td>
+                <td>
+                    <div class="stadiums-list">
+                        <span class="stadium-tag">Tất cả sân</span>
+                    </div>
+                </td>
+                <td><span class="status-badge status-active">Hoạt động</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view-btn" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="discount-code">WEEKEND20</span></td>
+                <td><span class="discount-description">Giảm giá cuối tuần</span></td>
+                <td><span class="discount-value">20%</span></td>
+                <td><span class="discount-amount">200,000 VNĐ</span></td>
+                <td><span class="discount-amount">150,000 VNĐ</span></td>
+                <td>
+                    <div class="discount-dates">
+                        <div>Từ: 01/03/2024</div>
+                        <div>Đến: 30/06/2024</div>
+                    </div>
+                </td>
+                <td><span class="code-type-badge type-stadium">Sân cụ thể</span></td>
+                <td>
+                    <div class="stadiums-list">
+                        <span class="stadium-tag">Sân tennis XYZ</span>
+                    </div>
+                </td>
+                <td><span class="status-badge status-expired">Hết hạn</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view-btn" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="discount-code">STUDENT30</span></td>
+                <td><span class="discount-description">Ưu đãi sinh viên</span></td>
+                <td><span class="discount-value">30%</span></td>
+                <td><span class="discount-amount">400,000 VNĐ</span></td>
+                <td><span class="discount-amount">120,000 VNĐ</span></td>
+                <td>
+                    <div class="discount-dates">
+                        <div>Từ: 15/02/2024</div>
+                        <div>Đến: 15/05/2024</div>
+                    </div>
+                </td>
+                <td><span class="code-type-badge type-general">Chung</span></td>
+                <td>
+                    <div class="stadiums-list">
+                        <span class="stadium-tag">Sân ABC</span>
+                        <span class="stadium-tag">Sân DEF</span>
+                    </div>
+                </td>
+                <td><span class="status-badge status-inactive">Tạm dừng</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view-btn" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <div class="pagination-info">
+            Hiển thị 1-4 trên tổng 24 kết quả
+        </div>
+        <div class="pagination-controls">
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const stadium = document.getElementById('stadiumFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            // Thực hiện logic filter ở đây
+            console.log('Applying filters:', { searchTerm, stadium, status });
+
+            // Có thể gọi API để lấy dữ liệu mới
+            // filterDiscounts(searchTerm, stadium, status);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stadiumFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+
+            // Reset table data
+            // loadAllDiscounts();
+        }
+
+        // Search on enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+
+        // Confirmation for delete action
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Bạn có chắc chắn muốn xóa discount này?')) {
+                    // Implement delete logic
+                    console.log('Deleting discount...');
+                }
+            });
+        });
+
+        // View discount details
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Implement view logic
+                console.log('Viewing discount details...');
+            });
+        });
+
+        // Edit discount
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Implement edit logic
+                console.log('Editing discount...');
+            });
+        });
+
+        // Pagination
+        document.querySelectorAll('.pagination-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (!this.classList.contains('active')) {
+                    document.querySelector('.pagination-btn.active').classList.remove('active');
+                    this.classList.add('active');
+                    // Load new page data
+                }
+            });
+        });
+    </script>
 }
-<div class="container">
-	<div class="stats-grid">
-		<div class="stat-card blue">
-			<div class="stat-header">Tổng booking hôm nay</div>
-			<div class="stat-value">24</div>
-			<div class="stat-change positive">
-				<i class="fas fa-arrow-up"></i>
-				+12% so với hôm qua
-			</div>
-		</div>
-		<div class="stat-card yellow">
-			<div class="stat-header">Đang chờ xác nhận</div>
-			<div class="stat-value">8</div>
-			<div class="stat-change">
-				Cần xử lý
-			</div>
-		</div>
-		<div class="stat-card green">
-			<div class="stat-header">Đã xác nhận</div>
-			<div class="stat-value">14</div>
-			<div class="stat-change positive">
-				<i class="fas fa-arrow-up"></i>
-				Sẵn sàng
-			</div>
-		</div>
-		<div class="stat-card teal">
-			<div class="stat-header">Sân đang hoạt động</div>
-			<div class="stat-value">3/4</div>
-			<div class="stat-change positive">
-				75% tổng số sân
-			</div>
-		</div>
-	</div>
-
-	<div class="booking-section">
-		<div class="section-header">
-			<div class="date-nav">
-				<div class="nav-tabs">
-					<div class="nav-tab active" data-period="day">Daily</div>
-					<div class="nav-tab" data-period="week">Weekly</div>
-					<div class="nav-tab" data-period="month">Monthly</div>
-				</div>
-				<i class="fas fa-chevron-left date-arrow" id="prevDate"></i>
-				<div class="date-display" id="currentDate">20 Tháng 8, 2025</div>
-				<i class="fas fa-chevron-right date-arrow" id="nextDate"></i>
-			</div>
-			<div class="search-controls">
-				<input type="text" class="search-input" placeholder="Tìm kiếm khách hàng..." id="searchInput">
-				<div class="filter-btn">Tất cả trạng thái</div>
-				<div class="filter-btn">Tất cả sân</div>
-			</div>
-		</div>
-		<table class="booking-table">
-			<thead>
-				<tr>
-					<th>Thời gian</th>
-					<th>Khách hàng</th>
-					<th>Sân</th>
-					<th>Thời lượng</th>
-					<th>Giá tiền</th>
-					<th>Trạng thái</th>
-					<th>Thao tác</th>
-				</tr>
-			</thead>
-			<tbody id="bookingTableBody">
-			</tbody>
-		</table>
-		<div class="pagination">
-			<div class="pagination-info">Hiển thị 1 đến 5 trong tổng số 24 booking</div>
-			<div class="pagination-controls">
-				<div class="page-btn">Trước</div>
-				<div class="page-btn active">1</div>
-				<div class="page-btn">2</div>
-				<div class="page-btn">3</div>
-				<div class="page-btn">Sau</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="main-content-grid">
-		<div class="vip-customers">
-			<div class="chart-header">
-				<h3 class="chart-title">Khách hàng thân thiết</h3>
-			</div>
-			<div class="vip-customer">
-				<div class="vip-rank">1</div>
-				<div class="vip-info">
-					<div class="vip-name">Trần Hoàng Nam</div>
-					<div class="vip-bookings">48 lượt đặt sân</div>
-				</div>
-			</div>
-			<div class="vip-customer">
-				<div class="vip-rank">2</div>
-				<div class="vip-info">
-					<div class="vip-name">Lê Minh Quang</div>
-					<div class="vip-bookings">36 lượt đặt sân</div>
-				</div>
-			</div>
-			<div class="vip-customer">
-				<div class="vip-rank">3</div>
-				<div class="vip-info">
-					<div class="vip-name">Phạm Hữu Đức</div>
-					<div class="vip-bookings">30 lượt đặt sân</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="chart-container">
-			<div class="chart-header">
-				<h3 class="chart-title">Thống kê booking theo ngày</h3>
-				<div class="chart-period">Theo tuần</div>
-			</div>
-			<div class="chart-wrapper">
-				<canvas id="bookingChart"></canvas>
-			</div>
-		</div>
-	</div>
-
-	<div class="dashboard-grid">
-		<div class="chart-container">
-			<div class="chart-header">
-				<h3 class="chart-title">Phân bố booking theo sân</h3>
-				<div class="chart-period">Theo tuần</div>
-			</div>
-			<div class="chart-wrapper">
-				<canvas id="courtChart"></canvas>
-			</div>
-		</div>
-
-		<div class="chart-container">
-			<div class="chart-header">
-				<h3 class="chart-title">Số lượng đặt sân theo khung giờ</h3>
-				<div class="chart-period">Theo tuần</div>
-			</div>
-			<div class="chart-wrapper">
-				<canvas id="timeChart"></canvas>
-			</div>
-		</div>
-	</div>
-
-	@section Scripts {
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-		<script>
-			$(document).ready(function() {
-				// Sample booking data
-				const bookings = [
-					{
-						id: 1,
-						time: "08:00 - 10:00",
-						date: "20/08/2025",
-						customer: { name: "Trần Hoàng Nam", phone: "0912 345 678", initials: "TN", color: "#3b82f6" },
-						court: "Sân A",
-						duration: "2 giờ",
-						price: "400,000đ",
-						status: "pending"
-					},
-					{
-						id: 2,
-						time: "10:30 - 12:30",
-						date: "20/08/2025",
-						customer: { name: "Lê Minh Quang", phone: "0987 654 321", initials: "LQ", color: "#10b981" },
-						court: "Sân B",
-						duration: "2 giờ",
-						price: "400,000đ",
-						status: "confirmed"
-					},
-					{
-						id: 3,
-						time: "14:00 - 16:00",
-						date: "20/08/2025",
-						customer: { name: "Phạm Hữu Đức", phone: "0901 234 567", initials: "PD", color: "#8b5cf6" },
-						court: "Sân C",
-						duration: "2 giờ",
-						price: "400,000đ",
-						status: "completed"
-					},
-					{
-						id: 4,
-						time: "16:30 - 18:30",
-						date: "20/08/2025",
-						customer: { name: "Vũ Thanh Tùng", phone: "0976 543 210", initials: "VT", color: "#f59e0b" },
-						court: "Sân A",
-						duration: "2 giờ",
-						price: "400,000đ",
-						status: "pending"
-					},
-					{
-						id: 5,
-						time: "19:00 - 21:00",
-						date: "20/08/2025",
-						customer: { name: "Đỗ Hải Long", phone: "0965 432 109", initials: "DH", color: "#ef4444" },
-						court: "Sân D",
-						duration: "2 giờ",
-						price: "500,000đ",
-						status: "cancelled"
-					}
-				];
-
-				// Status mapping
-				const statusMap = {
-					pending: { text: "Đang chờ", class: "status-pending" },
-					confirmed: { text: "Đã xác nhận", class: "status-confirmed" },
-					completed: { text: "Đã thanh toán", class: "status-completed" },
-					cancelled: { text: "Đã hủy", class: "status-cancelled" }
-				};
-
-				// Render booking table
-				function renderBookings(bookingData = bookings) {
-					const tbody = $('#bookingTableBody');
-					tbody.empty();
-
-					bookingData.forEach(booking => {
-						const statusInfo = statusMap[booking.status];
-						const row = `
-							<tr>
-								<td>
-									<div class="time-slot">
-										<div class="time-range">${booking.time}</div>
-										<div class="date-info">${booking.date}</div>
-									</div>
-								</td>
-								<td>
-									<div class="customer-info">
-										<div class="customer-details">
-											<div class="customer-name">${booking.customer.name}</div>
-											<div class="customer-phone">${booking.customer.phone}</div>
-										</div>
-									</div>
-								</td>
-								<td>${booking.court}</td>
-								<td>${booking.duration}</td>
-								<td class="price">${booking.price}</td>
-								<td>
-									<span class="status-badge ${statusInfo.class}">
-										${statusInfo.text}
-									</span>
-								</td>
-								<td>
-									<div class="actions">
-										<button class="action-btn view-detail" title="Xem chi tiết">
-											<i class="fas fa-eye"></i>
-										</button>
-										<button class="action-btn accept" title="Chấp nhận booking">
-											<i class="fas fa-check"></i>
-										</button>
-										<button class="action-btn deny" title="Từ chối booking">
-											<i class="fas fa-times"></i>
-										</button>
-									</div>
-								</td>
-							</tr>
-						`;
-						tbody.append(row);
-					});
-				}
-
-				// Tab navigation
-				$('.nav-tab').click(function() {
-					$('.nav-tab').removeClass('active');
-					$(this).addClass('active');
-
-					const period = $(this).data('period');
-					console.log('Selected period:', period);
-				});
-
-				// Date navigation
-				$('#prevDate, #nextDate').click(function() {
-					const isNext = $(this).attr('id') === 'nextDate';
-					console.log('Navigate to:', isNext ? 'next' : 'previous');
-				});
-
-				// Search functionality
-				$('#searchInput').on('input', function() {
-					const searchTerm = $(this).val().toLowerCase();
-					const filtered = bookings.filter(booking =>
-						booking.customer.name.toLowerCase().includes(searchTerm) ||
-						booking.customer.phone.includes(searchTerm) ||
-						booking.court.toLowerCase().includes(searchTerm)
-					);
-					renderBookings(filtered);
-				});
-
-				// Initialize charts
-				function initCharts() {
-					// Bar Chart - Booking by day
-					const bookingCtx = document.getElementById('bookingChart').getContext('2d');
-					new Chart(bookingCtx, {
-						type: 'bar',
-						data: {
-							labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-							datasets: [{
-								data: [12, 18, 16, 22, 28, 35, 24],
-								backgroundColor: '#60a5fa',
-								borderRadius: 6,
-								borderSkipped: false
-							}]
-						},
-						options: {
-							responsive: true,
-							maintainAspectRatio: false,
-							plugins: {
-								legend: { display: false }
-							},
-							scales: {
-								y: {
-									beginAtZero: true,
-									grid: { display: false },
-									ticks: { display: false }
-								},
-								x: {
-									grid: { display: false }
-								}
-							}
-						}
-					});
-
-					// Doughnut Chart - Court distribution
-					const courtCtx = document.getElementById('courtChart').getContext('2d');
-					new Chart(courtCtx, {
-						type: 'doughnut',
-						data: {
-							labels: ['Sân A', 'Sân B', 'Sân C', 'Sân D'],
-							datasets: [{
-								data: [35, 28, 22, 15],
-								backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171'],
-								borderWidth: 0
-							}]
-						},
-						options: {
-							responsive: true,
-							maintainAspectRatio: false,
-							plugins: {
-								legend: {
-									position: 'bottom',
-									labels: { usePointStyle: true }
-								}
-							}
-						}
-					});
-
-					// Line Chart - Hourly bookings
-					const timeCtx = document.getElementById('timeChart').getContext('2d');
-					new Chart(timeCtx, {
-						type: 'line',
-						data: {
-							labels: ['6-8h', '8-10h', '10-12h', '14-16h', '16-18h', '18-20h', '20-22h'],
-							datasets: [{
-								data: [5, 12, 8, 15, 18, 20, 16],
-								borderColor: '#60a5fa',
-								backgroundColor: 'rgba(96, 165, 250, 0.1)',
-								fill: true,
-								tension: 0.4,
-								pointBackgroundColor: '#60a5fa',
-								pointBorderColor: '#ffffff',
-								pointBorderWidth: 2
-							}]
-						},
-						options: {
-							responsive: true,
-							maintainAspectRatio: false,
-							plugins: {
-								legend: { display: false }
-							},
-							scales: {
-								y: {
-									beginAtZero: true,
-									grid: { color: '#f1f5f9' }
-								},
-								x: {
-									grid: { display: false }
-								}
-							}
-						}
-					});
-				}
-
-				// Action handlers
-				$(document).on('click', '.action-btn.view-detail', function() {
-					console.log('Xem chi tiết booking');
-					// Custom modal UI instead of alert()
-					alert('Chức năng xem chi tiết booking sẽ được hiển thị ở đây.');
-				});
-
-				$(document).on('click', '.action-btn.accept', function() {
-					console.log('Chấp nhận booking');
-					// Custom modal UI instead of alert()
-					alert('Chức năng chấp nhận booking sẽ được hiển thị ở đây.');
-				});
-
-				$(document).on('click', '.action-btn.deny', function() {
-					console.log('Từ chối booking');
-					// Custom modal UI instead of alert()
-					alert('Chức năng từ chối booking sẽ được hiển thị ở đây.');
-				});
-
-				// Pagination
-				$('.page-btn').click(function() {
-					if (!$(this).hasClass('active') && !$(this).text().includes('Trước') && !$(this).text().includes('Sau')) {
-						$('.page-btn').removeClass('active');
-						$(this).addClass('active');
-					}
-				});
-
-				// Initialize
-				renderBookings();
-				setTimeout(initCharts, 100);
-			});
-		</script>
-	}

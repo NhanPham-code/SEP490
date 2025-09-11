@@ -256,6 +256,14 @@ namespace CustomerUI.Controllers
 
         public IActionResult Booking(string stadiumId)
         {
+
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
             // Kiểm tra xem stadiumId có hợp lệ không.
             if (string.IsNullOrEmpty(stadiumId))
             {
@@ -346,6 +354,14 @@ namespace CustomerUI.Controllers
 
         public IActionResult VisuallyBooking(string stadiumId)
         {
+
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
             if (string.IsNullOrEmpty(stadiumId))
             {
                 // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu

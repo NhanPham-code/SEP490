@@ -227,7 +227,7 @@ body::before {
         background: rgba(255, 255, 255, 0.95);
     }
 
-/* CUSTOM SELECT DROPDOWN - SOLUTION TO OVERFLOW ISSUE */
+/* CUSTOM SELECT DROPDOWN */
 .custom-select {
     position: relative;
     width: 100%;
@@ -381,6 +381,40 @@ body::before {
         color: #0891b2;
     }
 
+/* Enhanced date input styling */
+.floating-label input[type="date"] {
+    color: #374151;
+    position: relative;
+    padding-right: 50px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+/* Desktop date picker styling */
+@media (min-width: 769px) {
+    .floating-label input[type="date"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        opacity: 1;
+        z-index: 999;
+        background: transparent;
+        color: #64748b;
+        border: none;
+        outline: none;
+    }
+
+        .floating-label input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            color: #0891b2;
+            transform: translateY(-50%) scale(1.1);
+        }
+}
+
 .submit-btn {
     background: linear-gradient(135deg, #1e40af 0%, #0891b2 50%, #059669 100%);
     border: none;
@@ -425,9 +459,7 @@ body::before {
         transform: scale(1.05);
     }
 
-/* ENHANCED ALERT SYSTEM - CẢI TIẾN HOÀN TOÀN */
-
-/* Global Toast Container - luôn hiển thị ở vị trí cố định */
+/* ENHANCED ALERT SYSTEM */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -440,14 +472,12 @@ body::before {
     padding: 0 1rem;
 }
 
-/* Alert container cho form (local alerts) */
 .alert-container {
     position: relative;
     margin-bottom: 1rem;
     pointer-events: none;
 }
 
-/* Base alert styling */
 .alert {
     padding: 16px 20px;
     border-radius: 12px;
@@ -464,7 +494,6 @@ body::before {
     border-left: 4px solid transparent;
 }
 
-    /* Toast alert (global notifications) */
     .alert.toast {
         max-width: 100%;
         margin: 0 0 12px 0;
@@ -472,7 +501,6 @@ body::before {
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Local alert (inline with form) */
     .alert.local {
         margin-bottom: 1rem;
         border: 1px solid rgba(0, 0, 0, 0.1);
@@ -820,51 +848,205 @@ body::before {
         transform: translateY(0);
     }
 
-/* Enhanced date input styling */
-.floating-label input[type="date"] {
-    color: #374151;
-    position: relative;
-    padding-right: 50px;
+/* ==================== SOCIAL LOGIN SECTION - FIXED ==================== */
+
+/* Social login divider */
+.social-login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 20px 0 16px 0;
 }
 
-    .floating-label input[type="date"]::-webkit-calendar-picker-indicator {
+    .social-login-divider span {
+        padding: 0 12px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        white-space: nowrap;
+    }
+
+    .social-login-divider::before,
+    .social-login-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+/* IMPROVED Social login buttons container - Side by side layout */
+.social-login-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Google button container - FIXED */
+.google-button-container {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 4px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+    .google-button-container:hover {
+        border-color: #4285f4;
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
+        transform: translateY(-1px);
+    }
+
+    .google-button-container:focus-within {
+        outline: 2px solid #4285f4;
+        outline-offset: 2px;
+    }
+
+    /* Override Google's default styling */
+    .google-button-container .g_id_signin {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+        .google-button-container .g_id_signin > div {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+
+/* Face ID Button - IMPROVED */
+.face-id-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 48px;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    color: #334155;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .face-id-button::before {
+        content: '';
         position: absolute;
-        right: 16px;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .face-id-button:hover::before {
+        left: 100%;
+    }
+
+    .face-id-button:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(14, 165, 233, 0.08) 100%);
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        transform: translateY(-1px);
+    }
+
+    .face-id-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+    .face-id-button:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+
+/* Face ID icon */
+.face-id-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 50%, #06b6d4 100%);
+    border-radius: 50%;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.face-id-button:active .face-id-icon {
+    transform: scale(0.95);
+}
+
+.face-id-icon i {
+    font-size: 12px;
+    z-index: 1;
+}
+
+/* Loading states */
+.google-button-container.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+    .google-button-container.loading::after {
+        content: '';
+        position: absolute;
         top: 50%;
-        transform: translateY(-50%);
+        left: 50%;
+        transform: translate(-50%, -50%);
         width: 20px;
         height: 20px;
-        cursor: pointer;
-        opacity: 0;
-        z-index: 999;
+        border: 2px solid #ccc;
+        border-top-color: #4285f4;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
     }
 
-    .floating-label input[type="date"]::-webkit-inner-spin-button {
-        display: none;
-    }
-
-    .floating-label input[type="date"]::-webkit-clear-button {
-        display: none;
-    }
-
-/* Custom date icon */
-.date-input-wrapper::after {
-    content: '';
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 20px;
+.face-id-button.loading {
     pointer-events: none;
-    color: #6b7280;
+    opacity: 0.7;
 }
 
-/* Responsive */
+    .face-id-button.loading .face-id-icon {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
 @media (max-width: 768px) {
     body {
         padding: 0.5rem;
@@ -876,7 +1058,7 @@ body::before {
         padding: 8px 12px;
         font-size: 12px;
         gap: 4px;
-        z-index: 10001; /* Higher than toast */
+        z-index: 10001;
     }
 
         .back-btn span {
@@ -1037,15 +1219,28 @@ body::before {
         margin-bottom: 0.75rem;
     }
 
-    /* Mobile date input */
-    .floating-label input[type="date"] {
-        padding-right: 48px;
-    }
-
     /* Form error summary mobile */
     .form-error-summary {
         padding: 12px 16px;
         margin-bottom: 1rem;
+    }
+
+    /* MOBILE Social login buttons - Stack vertically */
+    .social-login-buttons {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .google-button-container,
+    .face-id-button {
+        height: 44px;
+        border-radius: 10px;
+    }
+
+    .face-id-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
     }
 }
 
@@ -1120,6 +1315,20 @@ body::before {
         height: 22px;
         font-size: 14px;
     }
+
+    /* Small mobile social buttons */
+    .google-button-container,
+    .face-id-button {
+        height: 42px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .face-id-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
 }
 
 /* High contrast mode support */
@@ -1156,5 +1365,41 @@ body::before {
 
     .alert-progress {
         animation: none;
+    }
+
+    .gradientShift {
+        animation: none;
+    }
+
+    .show {
+        animation: none;
+    }
+
+    .face-id-button::before {
+        display: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .face-id-button {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.95) 100%);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+    }
+
+        .face-id-button:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            border-color: #3b82f6;
+        }
+
+    .google-button-container {
+        background: rgba(30, 41, 59, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .social-login-divider span {
+        background: rgba(30, 41, 59, 0.95);
+        color: #94a3b8;
     }
 }

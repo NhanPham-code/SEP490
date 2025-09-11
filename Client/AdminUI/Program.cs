@@ -62,6 +62,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseMiddleware<ErrorHandlingMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+
 app.UseSession();
 
 app.UseMiddleware<TokenRefreshMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
