@@ -20,8 +20,15 @@ namespace Service.Services
             _tokenService = tokenService;
         }
 
+        public void InitializeAsync()
+        {
+            var token = _tokenService.GetAccessTokenFromCookie();
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
         public async Task<ReadTeamPostDTO> CreateTeamPost(CreateTeamPostDTO createTeamPostDTO)
         {
+            InitializeAsync();
             var response = await _httpClient.PostAsJsonAsync("/CreateTeamPost", createTeamPostDTO);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<ReadTeamPostDTO>();
@@ -29,6 +36,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteTeamPost(int postId)
         {
+            InitializeAsync();
             var response = await _httpClient.DeleteAsync($"/DeleteTeamPost?postId={postId}");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync() == "true";
@@ -36,6 +44,7 @@ namespace Service.Services
 
         public async Task<string> GetOdataTeamPostAsync(string url)
         {
+            InitializeAsync();
             var response = await _httpClient.GetAsync("/odata/TeamPost" + url);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
@@ -43,6 +52,7 @@ namespace Service.Services
 
         public async Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO)
         {
+            InitializeAsync();
             var response = await _httpClient.PutAsJsonAsync("/UpdateTeamPost", updateTeamPostDTO);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<ReadTeamPostDTO>();

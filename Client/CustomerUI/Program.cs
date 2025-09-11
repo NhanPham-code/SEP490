@@ -46,6 +46,8 @@ builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
+builder.Services.AddScoped<ITeamPostService, TeamPostService>();
+builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
 
 
 var app = builder.Build();
