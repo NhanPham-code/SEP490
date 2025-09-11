@@ -33,13 +33,12 @@ namespace CustomerUI.Controllers
         {
             
             var result = await _teamPost.GetOdataTeamPostAsync(url);
-            //var teamPost = JsonConvert.DeserializeObject<ReadTeamPostDTO>(result);
+            var teamPost = JsonConvert.DeserializeObject<ReadTeamPostDTO>(result);
 
-            //// lấy userId
-            //var userId = teamPost.CreatedBy;
+            // lấy userId
+            var userId = teamPost.CreatedBy;
 
-            //// gọi API lấy profile
-            //var profile = await _userService.GetOtherUserByIdAsync("" + userId);
+
             return Content(result, "application/json");
         }
     }
