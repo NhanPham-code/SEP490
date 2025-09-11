@@ -1,0 +1,373 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Discount";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="~/css/Discount/discount.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="page-container">
+        <!-- Header và Filters giữ nguyên cấu trúc HTML -->
+        <div class="page-header">
+            <h1 class="page-title">Quản lý Discount</h1>
+            <button class="create-btn" onclick="openDiscountModal()">
+                <i class="fas fa-plus"></i> Tạo discount mới
+            </button>
+        </div>
+
+        <div class="filters-card">
+            <div class="filter-row">
+                <div class="form-group">
+                    <label class="form-label">Tìm kiếm discount</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mã discount...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sân vận động</label>
+                    <select class="form-control" id="stadiumFilter">
+                        <option value="">Tất cả sân</option>
+                        <!-- Options sẽ được thêm bằng JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-control" id="statusFilter">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                    </select>
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn" onclick="applyFilters()">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    <button class="reset-btn" onclick="resetFilters()">
+                        <i class="fas fa-refresh"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng dữ liệu (phần body sẽ được JS điền vào) -->
+        <div class="discounts-container">
+            <div class="table-header">
+                <h3 class="table-title">Danh sách Discount</h3>
+                <span class="results-count" id="resultsCount">Đang tải...</span>
+            </div>
+            <table class="discount-table">
+                <thead>
+                    <tr>
+                        <th>Mã discount</th>
+                        <th>Giá trị</th>
+                        <th>Thời gian áp dụng</th>
+                        <th>Loại</th>
+                        <th>Sân áp dụng</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="discountTableBody">
+                    <!-- Dữ liệu sẽ được JS render ở đây -->
+                </tbody>
+            </table>
+            <!-- Pagination (sẽ được xử lý sau) -->
+        </div>
+    </div>
+
+    <!-- Modal (giữ nguyên cấu trúc HTML) -->
+    <div class="modal-overlay" id="discountModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Tạo Discount Mới</h2>
+                <button class="modal-close" onclick="closeDiscountModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="discountForm">
+                <div class="form-section">
+                    <h3 class="section-title">Thông tin cơ bản</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label class="form-label">Mã Discount *</label><input type="text" class="form-control" id="discountCode" required></div>
+                        <div class="form-group"><label class="form-label">Loại Discount *</label><select class="form-control" id="codeType" required onchange="toggleStadiumSelection()"><option value="">Chọn loại</option><option value="System">System</option><option value="Stadium">Stadium</option><option value="Unique">Unique</option></select></div>
+                        <div class="form-group"><label class="form-label">Giá trị giảm (%) *</label><input type="number" class="form-control" id="percentValue" required></div>
+                        <div class="form-group"><label class="form-label">Số tiền giảm tối đa</label><input type="number" class="form-control" id="maxDiscountAmount"></div>
+                        <div class="form-group"><label class="form-label">Giá trị đơn hàng tối thiểu</label><input type="number" class="form-control" id="minOrderAmount"></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group"><label class="form-label">Ngày bắt đầu *</label><input type="date" class="form-control" id="startDate" required></div>
+                        <div class="form-group"><label class="form-label">Ngày kết thúc *</label><input type="date" class="form-control" id="endDate" required></div>
+                    </div>
+                    <div class="form-group form-group-full"><label class="form-label">Mô tả</label><textarea class="form-control" id="description"></textarea></div>
+                </div>
+                <div class="form-section" id="stadiumSelectionSection" style="display:none;">
+                    <h3 class="section-title">Danh sách sân vận động</h3>
+                    <div class="stadium-grid" id="stadiumSelectionGroup">
+                        <!-- Stadiums sẽ được thêm bằng JS -->
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeDiscountModal()">Hủy</button>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> <span id="saveButtonText">Lưu</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // === STATE MANAGEMENT ===
+            let allDiscounts = [];
+            let allStadiums = [];
+            let currentEditingCode = null;
+
+            // === INITIALIZATION ===
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchDataAndRender();
+                document.getElementById('discountForm').addEventListener('submit', handleFormSubmit);
+            });
+
+            // === DATA FETCHING & RENDERING ===
+            function fetchDataAndRender() {
+                fetch('/Discount/GetDiscountPageData')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        allDiscounts = data.discounts;
+                        allStadiums = data.stadiums;
+                        renderTable(allDiscounts);
+                        renderFilterOptions(allStadiums);
+                        renderStadiumSelectionModal(allStadiums);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        document.getElementById('discountTableBody').innerHTML = `<tr><td colspan="7" class="text-center">Lỗi tải dữ liệu. Vui lòng thử lại.</td></tr>`;
+                    });
+            }
+
+            function renderTable(discounts) {
+                const tableBody = document.getElementById('discountTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+                if (discounts.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Không tìm thấy discount nào.</td></tr>`;
+                } else {
+                    discounts.forEach(d => tableBody.appendChild(createTableRow(d)));
+                }
+                document.getElementById('resultsCount').textContent = `${discounts.length} trên tổng ${discounts.length} discount`;
+            }
+
+            function createTableRow(discount) {
+                const tr = document.createElement('tr');
+                tr.id = `discount-row-${discount.id}`; // Add ID for easy targeting
+
+                const isExpired = new Date() > new Date(discount.endDate);
+                const isActive = discount.isActive && !isExpired;
+                const statusClass = isActive ? 'status-active' : 'status-inactive';
+                const statusText = isActive ? 'Active' : 'Inactive';
+                const remainingDays = Math.ceil((new Date(discount.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+
+                tr.innerHTML = `
+                    <td><span class="discount-code">${discount.code}</span></td>
+                    <td><span class="discount-value">${discount.percentValue}%</span></td>
+                    <td>
+                        <div class="discount-dates">
+                            <div><strong>${new Date(discount.startDate).toLocaleDateString('vi-VN')} - ${new Date(discount.endDate).toLocaleDateString('vi-VN')}</strong></div>
+                            <div style="font-size: 0.8rem; color: ${isExpired ? 'var(--danger-red)' : 'var(--text-muted)'};">
+                                ${isExpired ? 'Đã hết hạn' : `Còn ${remainingDays} ngày`}
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="code-type-badge type-${discount.codeType.toLowerCase()}">${discount.codeType}</span></td>
+                    <td>
+                        ${discount.codeType === 'System' ? '<span class="stadium-tag">Tất cả</span>' :
+                          (discount.stadiumIds && discount.stadiumIds.length > 0) ? `<span class="stadium-tag">${discount.stadiumIds.length} sân</span>` :
+                          '<span class="stadium-tag">Chưa áp dụng</span>'}
+                    </td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" title="Chỉnh sửa" onclick="openDiscountModal('${discount.code}')"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn toggle-btn" title="${isActive ? 'Khóa' : 'Mở khóa'}" onclick="openToggleStatusConfirm('${discount.code}')">
+                                <i class="fas ${isActive ? 'fa-lock' : 'fa-lock-open'}"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                return tr;
+            }
+
+            function renderFilterOptions(stadiums) {
+                const stadiumFilter = document.getElementById('stadiumFilter');
+                stadiums.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = s.name;
+                    stadiumFilter.appendChild(option);
+                });
+            }
+
+            function renderStadiumSelectionModal(stadiums) {
+                const container = document.getElementById('stadiumSelectionGroup');
+                container.innerHTML = '';
+                stadiums.forEach(s => {
+                    container.innerHTML += `
+                        <div class="stadium-card">
+                            <div class="stadium-card-header">
+                                <div class="stadium-info">
+                                    <i class="fas fa-futbol stadium-icon"></i>
+                                    <div><h4>${s.name}</h4><p>${s.address}</p></div>
+                                </div>
+                                <label class="custom-checkbox"><input type="checkbox" name="stadiumIds" value="${s.id}"><span class="checkmark"></span></label>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            // === FORM & MODAL HANDLING ===
+            function openDiscountModal(discountCode = null) {
+                document.getElementById('discountForm').reset();
+                const modalTitle = document.getElementById('modalTitle');
+                const saveBtnText = document.getElementById('saveButtonText');
+                document.getElementById('discountCode').readOnly = false;
+
+                if (discountCode) {
+                    currentEditingCode = discountCode;
+                    modalTitle.textContent = 'Chỉnh sửa Discount';
+                    saveBtnText.textContent = 'Cập nhật';
+                    const data = allDiscounts.find(d => d.code === discountCode);
+                    if (data) {
+                        document.getElementById('discountCode').value = data.code;
+                        document.getElementById('discountCode').readOnly = true;
+                        document.getElementById('description').value = data.description || '';
+                        document.getElementById('percentValue').value = data.percentValue;
+                        document.getElementById('maxDiscountAmount').value = data.maxDiscountAmount;
+                        document.getElementById('minOrderAmount').value = data.minOrderAmount;
+                        document.getElementById('startDate').value = new Date(data.startDate).toISOString().split('T')[0];
+                        document.getElementById('endDate').value = new Date(data.endDate).toISOString().split('T')[0];
+                        document.getElementById('codeType').value = data.codeType;
+
+                        document.querySelectorAll('#stadiumSelectionGroup input[type="checkbox"]').forEach(cb => cb.checked = false);
+                        if (data.stadiumIds) {
+                            data.stadiumIds.forEach(id => {
+                                const checkbox = document.querySelector(`#stadiumSelectionGroup input[value="${id}"]`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                    }
+                } else {
+                    currentEditingCode = null;
+                    modalTitle.textContent = 'Tạo Discount Mới';
+                    saveBtnText.textContent = 'Lưu';
+                }
+                toggleStadiumSelection();
+                document.getElementById('discountModal').classList.add('active');
+            }
+
+            function closeDiscountModal() {
+                document.getElementById('discountModal').classList.remove('active');
+            }
+
+            function toggleStadiumSelection() {
+                const section = document.getElementById('stadiumSelectionSection');
+                section.style.display = document.getElementById('codeType').value === 'Stadium' ? 'block' : 'none';
+            }
+
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                const stadiumIds = Array.from(document.querySelectorAll('#stadiumSelectionGroup input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
+
+                let url, payload;
+                if (currentEditingCode) {
+                    url = '/Discount/UpdateDiscount';
+                    const original = allDiscounts.find(d => d.code === currentEditingCode);
+                    payload = { ...original, ...getFormData(), stadiumIds }; // Merge original with form data
+                } else {
+                    url = '/Discount/CreateDiscount';
+                    payload = { ...getFormData(), stadiumIds };
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        // Update UI without reloading
+                        updateOrAddDiscountInState(result.data);
+                        renderTable(allDiscounts);
+                        closeDiscountModal();
+                        alert(currentEditingCode ? 'Cập nhật thành công!' : 'Tạo mới thành công!');
+                    } else {
+                        alert('Lỗi: ' + (result.message || 'Thao tác thất bại.'));
+                    }
+                }).catch(err => alert('Lỗi kết nối.'));
+            }
+
+            function getFormData() {
+                return {
+                    code: document.getElementById('discountCode').value,
+                    description: document.getElementById('description').value,
+                    percentValue: parseFloat(document.getElementById('percentValue').value),
+                    maxDiscountAmount: parseFloat(document.getElementById('maxDiscountAmount').value) || 0,
+                    minOrderAmount: parseFloat(document.getElementById('minOrderAmount').value) || 0,
+                    startDate: new Date(document.getElementById('startDate').value).toISOString(),
+                    endDate: new Date(document.getElementById('endDate').value).toISOString(),
+                    codeType: document.getElementById('codeType').value,
+                };
+            }
+
+            // === TOGGLE STATUS ===
+            function openToggleStatusConfirm(code) {
+                const discount = allDiscounts.find(d => d.code === code);
+                const isExpired = new Date() > new Date(discount.endDate);
+                if(isExpired) {
+                    alert("Discount đã hết hạn, không thể thay đổi trạng thái.");
+                    return;
+                }
+                const currentStatus = discount.isActive;
+                const actionText = currentStatus ? 'Khóa (Block)' : 'Mở khóa (Unblock)';
+
+                if (confirm(`Bạn có chắc muốn ${actionText} discount "${code}" không?`)) {
+                    const payload = { ...discount, isActive: !currentStatus };
+                    fetch('/Discount/ToggleDiscountStatus', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if(result.success) {
+                            updateOrAddDiscountInState(result.data);
+                            renderTable(allDiscounts);
+                            alert('Thay đổi trạng thái thành công!');
+                        } else {
+                            alert('Lỗi: ' + (result.message || 'Thao tác thất bại.'));
+                        }
+                    }).catch(err => alert('Lỗi kết nối.'));
+                }
+            }
+
+            // === UTILITY / STATE HELPERS ===
+            function updateOrAddDiscountInState(discount) {
+                const index = allDiscounts.findIndex(d => d.id === discount.id);
+                if (index > -1) {
+                    allDiscounts[index] = discount; // Update
+                } else {
+                    allDiscounts.push(discount); // Add
+                }
+            }
+
+            // TODO: Implement filter functions
+            function applyFilters() { alert('Chức năng tìm kiếm chưa được cài đặt.'); }
+            function resetFilters() { document.getElementById('searchInput').value = ''; document.getElementById('stadiumFilter').value = ''; document.getElementById('statusFilter').value = ''; renderTable(allDiscounts); }
+
+        </script>
+    }
+</body>
+</html>

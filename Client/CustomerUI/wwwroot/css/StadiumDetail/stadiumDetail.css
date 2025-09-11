@@ -1,0 +1,69 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
+using System.Text.Json; // Vẫn cần dùng để trích xuất JSON
+
+namespace CustomerUI.Controllers {
+    public class StadiumController : Controller
+
+{
+    private readonly IStadiumService _stadiumService;
+    private readonly ITokenService _tokenService;
+    public StadiumController(IStadiumService stadiumService, ITokenService tokenService)
+
+{
+    _stadiumService = stadiumService;
+    _tokenService = tokenService;
+}
+
+public IActionResult Index() {
+    return View();
+}
+
+public async Task<IActionResult > StadiumDetail(int stadiumId) {
+    if (stadiumId <= 0)
+
+{
+    return RedirectToAction("Index", "Home");
+}
+
+// Tạo searchTerm để lọc theo Id
+var searchTerm = $"&$filter=Id eq {stadiumId}";
+
+// Gọi service để lấy dữ liệu dưới dạng chuỗi JSON
+var odataResponse = await _stadiumService.SearchStadiumAsync(searchTerm);
+
+if (string.IsNullOrEmpty(odataResponse)) {
+    return NotFound();
+}
+
+string stadiumJson = null;
+try {
+    // Phân tích chuỗi JSON của OData để lấy ra JSON của đối tượng stadium using (var jsonDoc = JsonDocument.Parse(odataResponse))
+
+{
+    var firstStadium = jsonDoc.RootElement.GetProperty("value").EnumerateArray().FirstOrDefault();
+    if (firstStadium.ValueKind != JsonValueKind.Undefined)
+
+{
+    // Lấy chuỗi JSON của đối tượng stadium đầu tiên stadiumJson = firstStadium.GetRawText();
+}
+
+}
+}
+
+catch (JsonException ex) {
+    // Ghi lại lỗi và trả về trang lỗi nếu cần // logger.LogError(ex, "Error parsing OData response for StadiumDetail.");
+    return View("Error");
+}
+
+if (stadiumJson == null) {
+    return NotFound();
+}
+
+// Truyền chuỗi JSON vào View thông qua ViewBag
+ViewBag.StadiumJson = stadiumJson;
+
+return View("StadiumDetail");
+}
+}
+}

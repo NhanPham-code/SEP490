@@ -1,5 +1,6 @@
 ﻿using DiscountAPI.DTO;
 using DiscountAPI.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -57,6 +58,7 @@ namespace DiscountAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "StadiumManager,Admin")] // Chỉ StadiumManager hoặc Admin được truy cập
         public async Task<IActionResult> Create([FromBody] CreateDiscountDTO dto)
         {
             try
@@ -77,6 +79,7 @@ namespace DiscountAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "StadiumManager,Admin")] // Chỉ StadiumManager hoặc Admin được truy cập
         public async Task<IActionResult> Update([FromBody] UpdateDiscountDTO dto)
         {
             try
