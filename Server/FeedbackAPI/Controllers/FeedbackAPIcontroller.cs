@@ -39,10 +39,10 @@ namespace FeedbackAPI.Controllers
         }
 
         /// <summary>
-        /// Tạo feedback mới
+        /// Tạo feedback mới (cho phép upload ảnh)
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateFeedback dto)
+        public async Task<IActionResult> Create([FromForm] CreateFeedback dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -52,10 +52,10 @@ namespace FeedbackAPI.Controllers
         }
 
         /// <summary>
-        /// Cập nhật feedback
+        /// Cập nhật feedback (có thể cập nhật ảnh hoặc giữ nguyên)
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateFeedback dto)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateFeedback dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -79,13 +79,15 @@ namespace FeedbackAPI.Controllers
 
             return Ok(new { message = "Deleted successfully" });
         }
+
+        /// <summary>
+        /// Lấy feedback theo StadiumId
+        /// </summary>
         [HttpGet("stadium/{stadiumId}")]
         public async Task<IActionResult> GetByStadiumId(int stadiumId)
         {
             var feedbacks = await _service.GetByStadiumIdAsync(stadiumId);
             return Ok(feedbacks);
         }
-
-
     }
 }

@@ -8,7 +8,7 @@ namespace FindTeamAPI.Service.Interface
         Task<ReadTeamMemberDTO> GetTeamMemberByIdAsync(int teamId, int memberId);
         Task<ReadTeamMemberDTO> CreateTeamMemberAsync(CreateTeamMemberDTO createTeamMemberDto);
         Task<ReadTeamMemberDTO> UpdateTeamMemberAsync(UpdateTeamMemberDTO updateTeamMemberDto);
+        Task<bool> DeleteMemberByMemberId(int teamMemberId, int teamPostID, int userId);
         Task<bool> DeleteTeamMemberAsync(int teamId, int memberId);
-        Task<bool> IsTeamMemberExistsAsync(int teamId, int memberId);
     }
 }

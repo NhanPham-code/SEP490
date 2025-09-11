@@ -1,4 +1,5 @@
 ﻿using FeedbackAPI.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System;
@@ -13,7 +14,7 @@ namespace CustomerUI.Controllers
         private readonly IFeedbackService _feedbackService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
-        private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
+         private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
         public FeedbackController(IFeedbackService feedbackService, ITokenService tokenService, IUserService userService)
         {
             _feedbackService = feedbackService;
@@ -357,47 +358,28 @@ namespace CustomerUI.Controllers
             {
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
 
-                var feedbackWithUser = new List<object>();
+                var feedbackList = new List<object>();
 
                 if (stadiumFeedbacks != null)
                 {
                     foreach (var fb in stadiumFeedbacks)
                     {
-                        var userProfile = await _userService.GetOtherUserByIdAsync(fb.UserId.ToString());
-                        feedbackWithUser.Add(new
+                        feedbackList.Add(new
                         {
                             fb.Id,
                             fb.Rating,
                             fb.Comment,
                             fb.StadiumId,
-                            fb.UserId,
-                            User = userProfile != null ? new
-                            {
-                                userProfile.FullName,
-                                AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
-        ? $"{BASE_URL}{userProfile.AvatarUrl}"
-        : "/images/default-avatar.png"
-                            } : null
-
+                            fb.UserId
                         });
                     }
-                }
-
-                var accessToken = GetAccessToken();
-                int? currentUserId = null;
-                if (!string.IsNullOrEmpty(accessToken))
-                {
-                    var userProfile = await _userService.GetMyProfileAsync(accessToken);
-                    if (userProfile != null)
-                        currentUserId = userProfile.UserId;
                 }
 
                 return Json(new
                 {
                     success = true,
-                    data = feedbackWithUser,
-                    count = feedbackWithUser.Count,
-                    currentUserId
+                    data = feedbackList,
+                    count = feedbackList.Count
                 });
             }
             catch (Exception ex)
@@ -405,6 +387,7 @@ namespace CustomerUI.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetMyFeedbackForStadium(int stadiumId)
@@ -430,6 +413,7 @@ namespace CustomerUI.Controllers
             }
         }
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetOtherUserProfile(int userId)
         {
             try

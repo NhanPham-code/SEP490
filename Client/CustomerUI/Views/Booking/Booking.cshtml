@@ -851,7 +851,22 @@
             window.onload = function() {
                 fetchStadiumData(stadiumId);
 
-                
+                continueButtonEl.onclick = showCheckoutPage;
+
+                document.getElementById('modal-close-btn').onclick = hideModal;
+
+                feedbackFormEl.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const feedbackText = document.getElementById('feedback-textarea').value;
+                    if (feedbackText.trim() !== '') {
+                        showModal('Gửi phản hồi thành công', 'Cảm ơn bạn đã gửi phản hồi. Chúng tôi sẽ ghi nhận và cải thiện!');
+                        document.getElementById('feedback-textarea').value = '';
+                    } else {
+                        showModal('Lỗi', 'Vui lòng nhập nội dung phản hồi.');
+                    }
+                });
+
+                showSlides();
 
 
 
@@ -996,7 +1011,7 @@
                 }
             }
 
-                       // Load danh sách feedback
+            // Load danh sách feedback
             async function loadFeedbacks(stadiumId) {
                 try {
                     const response = await fetch(`/Feedback/GetFeedbacksByStadiumDirect?stadiumId=${stadiumId}`, {
@@ -1009,26 +1024,20 @@
                     const result = await response.json();
                     const listContainer = document.getElementById("feedback-list");
                     const countContainer = document.getElementById("feedback-count");
-
+                    console.log(result);
                     listContainer.innerHTML = "";
                     countContainer.innerText = `Tổng số feedback: ${result.count}`;
 
                     if (result.success && result.data.length > 0) {
                         result.data.forEach(fb => {
                             const item = document.createElement("div");
-                            item.className = "feedback-item border p-3 mb-2 rounded flex items-start space-x-3";
+                            item.className = "feedback-item border p-3 mb-2 rounded";
                             item.id = `feedback-${fb.id}`;
 
-                            const avatarUrl = fb.user?.avatarUrl || "/images/default-avatar.png";
-                            const fullName = fb.user?.fullName || "Người dùng ẩn danh";
-
                             item.innerHTML = `
-                                <img src="${avatarUrl}" class="w-12 h-12 rounded-full object-cover" alt="avatar"/>
-                                <div>
-                                    <strong>${fullName}</strong><br>
-                                    <span>Rating: ${fb.rating} ⭐</span><br>
-                                    <span>${fb.comment ?? "Không có bình luận"}</span>
-                                </div>
+                                <strong>Rating:</strong> ${fb.rating} ⭐ <br>
+                                <strong>Bình luận:</strong> ${fb.comment ?? "Không có"} <br>
+                                <small>Stadium: ${fb.stadiumId}, User: ${fb.userId}</small>
                             `;
                             listContainer.appendChild(item);
                         });
@@ -1041,7 +1050,6 @@
                         "<p class='text-red-500'>Có lỗi xảy ra khi tải feedback.</p>";
                 }
             }
-
 
             // Kiểm tra feedback của user hiện tại
             async function checkMyFeedback(stadiumId) {

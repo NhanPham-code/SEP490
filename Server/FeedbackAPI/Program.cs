@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.Edm;
-
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container
 builder.Services.AddControllers()
     .AddOData(options =>
@@ -21,35 +19,29 @@ builder.Services.AddControllers()
                .SetMaxTop(100)
                .AddRouteComponents("api", GetEdmModel()); // Thêm route OData + EDM model
     });
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 // Đăng ký DbContext
 builder.Services.AddDbContext<FeedbackDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Đăng ký Repository & Service
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
-
 // Đăng ký AutoMapper
 builder.Services.AddAutoMapper(typeof(FeedbackProfile));
-
 var app = builder.Build();
-
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
+// Cho phép truy cập file tĩnh trong wwwroot
+app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
 // Tạo EDM model cho OData
 IEdmModel GetEdmModel()
 {

@@ -8,30 +8,30 @@ namespace StadiumAPI.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [ForeignKey("Stadium")]
+        [Required, ForeignKey("Stadium")]
         public int StadiumId { get; set; }
 
-
-        [Required]
-        [MaxLength(255)]
+        [Required, MaxLength(255)]
         public string Name { get; set; }
 
-        [Required]
-        [MaxLength(50)]
+        /// <summary>
+        /// Loại sân: "5", "7", "11", "Futsal" ...
+        /// </summary>
+        [Required, MaxLength(50)]
         public string SportType { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(10,2)")]
+        [Required, Column(TypeName = "decimal(10,2)")]
         public decimal PricePerHour { get; set; }
 
-        public bool IsAvailable { get; set; } 
+        public bool IsAvailable { get; set; } = true;
 
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime UpdatedAt { get; set; }
-        public virtual Stadiums Stadium { get; set; }
-
+        // Navigation
+        public Stadiums Stadium { get; set; }
+        public virtual ICollection<CourtRelations> ParentRelations { get; set; } // Sân này là con của
+        public virtual ICollection<CourtRelations> ChildRelations { get; set; }
 
     }
 }
