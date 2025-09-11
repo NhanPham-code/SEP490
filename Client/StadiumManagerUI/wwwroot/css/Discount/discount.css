@@ -1,0 +1,898 @@
+﻿/* Cập nhật biến màu sắc theo tone xanh biển/xanh dương/tím với độ bão hòa cao hơn */
+:root {
+    --primary-blue: #4A90E2;
+    --primary-indigo: #6366F1;
+    --primary-purple: #8B5CF6;
+    --primary-teal: #14B8A6;
+    --accent-sky: #0EA5E9;
+    --accent-violet: #A855F7;
+    --bg-cream: #faf8f5;
+    --bg-light-blue: #eff6ff;
+    --bg-light-indigo: #eef2ff;
+    --bg-light-purple: #faf5ff;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-light: #e2e8f0;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --success-green: #10B981;
+    --danger-red: #EF4444;
+}
+
+body {
+    background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-light-blue) 100%);
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    background: linear-gradient(135deg, white 0%, var(--bg-light-indigo) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.create-btn {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-soft);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+    .create-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+        color: white;
+        text-decoration: none;
+    }
+
+.filters-card {
+    background: linear-gradient(135deg, white 0%, var(--bg-light-purple) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-soft);
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.form-control {
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-indigo);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        transform: translateY(-1px);
+    }
+
+.filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.filter-btn {
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    font-size: 1rem;
+}
+
+    .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.reset-btn {
+    background: linear-gradient(135deg, var(--text-secondary), var(--text-muted));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    font-size: 1rem;
+}
+
+    .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.discounts-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-soft);
+    overflow: auto;
+}
+
+.table-header {
+    background: linear-gradient(135deg, var(--bg-light-blue), var(--bg-light-indigo));
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.results-count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+    font-weight: 600;
+}
+
+.discount-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+    /* Điều chỉnh lại width của các cột */
+    .discount-table th {
+        background: var(--bg-light-blue);
+        padding: 1rem 1.25rem;
+        text-align: center;
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-light);
+        font-size: 0.95rem;
+    }
+
+        .discount-table th:nth-child(1) {
+            width: 14%;
+        }
+        /* Mã discount */
+        .discount-table th:nth-child(2) {
+            width: 10%;
+        }
+        /* Giá trị */
+        .discount-table th:nth-child(3) {
+            width: 26%;
+        }
+        /* Thời gian */
+        .discount-table th:nth-child(4) {
+            width: 12%;
+        }
+        /* Loại */
+        .discount-table th:nth-child(5) {
+            width: 16%;
+        }
+        /* Sân áp dụng */
+        .discount-table th:nth-child(6) {
+            width: 12%;
+        }
+        /* Trạng thái */
+        .discount-table th:nth-child(7) {
+            width: 10%;
+        }
+    /* Thao tác */
+
+    .discount-table td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: middle;
+        word-wrap: break-word;
+        text-align: center;
+    }
+
+    .discount-table tr:hover {
+        background: linear-gradient(135deg, var(--bg-light-blue) 0%, var(--bg-light-purple) 100%);
+    }
+
+.discount-code {
+    font-weight: 800;
+    color: var(--primary-indigo);
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(74, 144, 226, 0.15));
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: inline-block;
+}
+
+.discount-value {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--primary-teal);
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.discount-dates {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-weight: 500;
+    min-width: 200px;
+}
+
+/* Đơn giản hóa status badge - chỉ còn 2 trạng thái */
+.status-badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    color: white;
+    display: inline-block;
+}
+
+.status-active {
+    background: var(--success-green);
+}
+
+.status-inactive {
+    background: var(--danger-red);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 0.6rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
+}
+
+.edit-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-indigo));
+}
+
+    .edit-btn:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.delete-btn {
+    background: linear-gradient(135deg, var(--danger-red), #DC2626);
+}
+
+    .delete-btn:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.view-btn {
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+}
+
+    .view-btn:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.code-type-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: white;
+    display: inline-block;
+}
+
+.type-general {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+}
+
+.type-stadium {
+    background: linear-gradient(135deg, var(--accent-violet), var(--primary-purple));
+}
+
+.type-system {
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+}
+
+.pagination {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-light);
+    background: linear-gradient(135deg, var(--bg-light-purple), var(--bg-light-blue));
+}
+
+.pagination-info {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.pagination-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-light);
+    background: white;
+    color: var(--text-secondary);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+}
+
+    .pagination-btn:hover {
+        background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+        color: white;
+        border-color: var(--primary-indigo);
+        transform: translateY(-2px);
+    }
+
+    .pagination-btn.active {
+        background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+        color: white;
+        border-color: var(--primary-indigo);
+    }
+
+.stadiums-list {
+    font-size: 0.85rem;
+}
+
+.stadium-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    margin: 0.15rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+}
+
+/* Modal Styles - UPDATED FOR WIDER MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    visibility: hidden;
+    opacity: 0;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+    .modal-overlay.active {
+        visibility: visible;
+        opacity: 1;
+    }
+
+.modal {
+    display: block;
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-hover);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 10000;
+}
+
+/* Wide Modal for Create/Edit */
+.modal-wide {
+    max-width: 1100px;
+    width: 95%;
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+    .modal-close:hover {
+        background: var(--bg-light-blue);
+        color: var(--danger-red);
+        transform: rotate(90deg);
+    }
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+    .form-section:last-of-type {
+        margin-bottom: 0;
+    }
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--bg-light-blue);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+    .section-title i {
+        color: var(--primary-indigo);
+    }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 cột thay vì 2 */
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.form-group-half {
+    grid-column: span 2;
+}
+
+.form-control-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Stadium Selection Styles */
+.stadium-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stadium-card {
+    background: linear-gradient(135deg, white 0%, var(--bg-light-blue) 100%);
+    border: 2px solid var(--border-light);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+    .stadium-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--primary-indigo);
+    }
+
+    .stadium-card.selected {
+        background: linear-gradient(135deg, var(--bg-light-indigo) 0%, var(--bg-light-purple) 100%);
+        border-color: var(--primary-indigo);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.stadium-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.stadium-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+}
+
+.stadium-icon {
+    font-size: 2rem;
+    color: var(--primary-indigo);
+    margin-top: 0.25rem;
+}
+
+.stadium-info h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.stadium-info p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+}
+
+.stadium-type {
+    background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .custom-checkbox input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+.checkmark {
+    height: 24px;
+    width: 24px;
+    background: white;
+    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-checkbox:hover .checkmark {
+    border-color: var(--primary-indigo);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    border-color: var(--primary-indigo);
+}
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+        content: "✓";
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+/* Stadium Actions */
+.stadium-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--bg-light-purple) 0%, var(--bg-light-blue) 100%);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+
+.btn-select-all, .btn-deselect-all {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    font-size: 0.9rem;
+}
+
+.btn-deselect-all {
+    background: linear-gradient(135deg, var(--text-secondary), var(--text-muted));
+}
+
+    .btn-select-all:hover, .btn-deselect-all:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.selected-count {
+    font-weight: 700;
+    color: var(--primary-indigo);
+    background: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow-soft);
+    font-size: 0.95rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-light);
+}
+
+.btn-cancel {
+    background: linear-gradient(135deg, var(--text-secondary), var(--text-muted));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+.btn-save {
+    background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+/* Confirm Delete Modal */
+.confirm-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: var(--shadow-hover);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    text-align: center;
+    position: relative;
+    z-index: 10000;
+}
+
+.modal-overlay.active .confirm-modal {
+    transform: scale(1);
+}
+
+.confirm-icon {
+    font-size: 4rem;
+    color: var(--danger-red);
+    margin-bottom: 1rem;
+}
+
+.confirm-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.confirm-message {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-confirm-delete {
+    background: linear-gradient(135deg, var(--danger-red), #DC2626);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+    .btn-confirm-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+/* MEDIA QUERIES */
+@media (max-width: 1200px) {
+    .discount-table {
+        font-size: 0.95rem;
+    }
+
+    .form-grid-wide {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stadium-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-buttons {
+        grid-column: auto;
+        justify-content: center;
+    }
+
+    .discount-table th,
+    .discount-table td {
+        padding: 1rem 0.75rem;
+    }
+
+    .discount-table {
+        font-size: 0.9rem;
+    }
+
+    .form-grid-wide {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-wide {
+        width: 95%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+        padding: 1.5rem
