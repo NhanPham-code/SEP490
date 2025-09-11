@@ -35,6 +35,12 @@ namespace FavoriteAPI.Repository
             return true;
         }
 
+        public async Task<Favorite?> GetFavoriteByIdAsync(int favoriteId)
+        {
+            // get favorite by id
+            return await _context.Favorites.FirstOrDefaultAsync(f => f.FavoriteId == favoriteId);
+        }
+
         public IQueryable<Favorite> GetFavorites()
         {
             return _context.Favorites.AsQueryable();
