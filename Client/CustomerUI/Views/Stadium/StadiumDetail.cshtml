@@ -31,7 +31,6 @@
 
 		.glass-effect {
 			backdrop-filter: blur(20px);
-			background: rgba(255, 255, 255, 0.25);
 			border: 1px solid rgba(255, 255, 255, 0.2);
 		}
 
@@ -348,7 +347,7 @@
 						foreach (var image in Model.StadiumImages)
 						{
 							<div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
-								<img src="@image.ImageUrl" class="slider-image object-cover w-full h-full" alt="Hình ảnh sân @Model.Name">
+								<img src="https://localhost:7280/@image.ImageUrl" class="slider-image object-cover w-full h-full" alt="Hình ảnh sân @Model.Name">
 								<div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
 									<p class="text-sm">Hình ảnh sân vận động.</p>
 								</div>
@@ -386,20 +385,20 @@
 					</div>
 				</div>
 
-				@* <div class="info-card glass-effect p-6 rounded-2xl shadow-lg"> *@
-				@* 	<div class="flex items-center gap-4"> *@
-				@* 		<div class="icon-circle"> *@
-				@* 			<svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20"> *@
-				@* 				<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" /> *@
-				@* 				<path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 6a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 6a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm7 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" /> *@
-				@* 			</svg> *@
-				@* 		</div> *@
-				@* 		<div class="text-left"> *@
-				@* 			<p class="text-sm text-gray-500 font-medium">Giá thuê sân</p> *@
-				@* 			<p id="stadiumPrice" class="font-semibold text-gray-800 text-lg">@priceRange</p> *@
-				@* 		</div> *@
-				@* 	</div> *@
-				@* </div> *@
+				 <div class="info-card glass-effect p-6 rounded-2xl shadow-lg"> 
+				 	<div class="flex items-center gap-4"> 
+				 		<div class="icon-circle"> 
+				 			<svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20"> 
+				 				<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" /> 
+				 				<path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 6a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 6a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm7 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" /> 
+				 			</svg> 
+				 		</div> 
+				 		<div class="text-left">
+				 			<p class="text-sm text-gray-500 font-medium">Giá thuê sân</p> 
+							<p id="stadiumPrice" class="font-semibold text-gray-800 text-lg">@priceRange</p> 
+						</div> 
+				 	</div> 
+				 </div> 
 			</div>
 		</div>
 

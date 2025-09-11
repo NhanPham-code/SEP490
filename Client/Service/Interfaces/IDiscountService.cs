@@ -21,6 +21,13 @@ namespace Service.Interfaces
         // Corrected DTO type for Update
         Task<bool> UpdateDiscountAsync(string accessToken, UpdateDiscountDTO dto);
 
-        Task<List<ReadDiscountDTO>?> GetDiscountsByUserAsync(string accessToken);
+        Task<List<ReadDiscountDTO>?> GetDiscountsByUserAsync(
+            string accessToken,
+            string userId,
+            int page = 1,
+            int pageSize = 5,
+            string? searchByCode = null,
+            int? stadiumId = null,
+            bool? isActive = null);
     }
 }

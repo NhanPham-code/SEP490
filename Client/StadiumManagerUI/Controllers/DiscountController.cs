@@ -15,7 +15,6 @@ namespace StadiumManagerUI.Controllers
         private readonly IDiscountService _discountService;
         private readonly IStadiumService _stadiumService;
         private readonly ITokenService _tokenService;
-        private readonly IUserService _userService;
 
         public DiscountController(
             IDiscountService discountService,
@@ -26,7 +25,6 @@ namespace StadiumManagerUI.Controllers
             _discountService = discountService;
             _stadiumService = stadiumService;
             _tokenService = tokenService;
-            _userService = userService;
         }
 
         // Action này CHỈ trả về View rỗng
@@ -45,10 +43,15 @@ namespace StadiumManagerUI.Controllers
                 return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
             }
 
-            var userProfile = await _userService.GetMyProfileAsync(accessToken);
-            var discountsTask = _discountService.GetDiscountsByUserAsync(accessToken);
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Nếu không có UserId trong session, coi như phiên không hợp lệ
+                return Unauthorized(new { message = "Phiên làm việc không hợp lệ hoặc đã hết hạn." });
+            }
 
-            string filter = $"&$filter=CreatedBy eq {userProfile.UserId}";
+            var discountsTask = _discountService.GetDiscountsByUserAsync(accessToken, userId);
+            string filter = $"&$filter=CreatedBy eq {userId}";
             var stadiumsJsonTask = _stadiumService.SearchStadiumAsync(filter);
 
             await Task.WhenAll(discountsTask, stadiumsJsonTask);
@@ -71,7 +74,11 @@ namespace StadiumManagerUI.Controllers
                         }
                     }
                 }
-                catch (JsonException ex) { Debug.WriteLine($"JSON Error: {ex.Message}"); }
+                catch (JsonException ex)
+                {
+                    Debug.WriteLine($"JSON Error: {ex.Message}");
+                    // Có thể xem xét trả về lỗi cho client nếu cần
+                }
             }
 
             return Json(new { discounts, stadiums });
@@ -88,8 +95,8 @@ namespace StadiumManagerUI.Controllers
                 return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ hoặc chưa đăng nhập." });
             }
 
-            var userProfile = await _userService.GetMyProfileAsync(accessToken);
-            dto.UserId = userProfile.UserId.ToString();
+            var userId = HttpContext.Session.GetString("UserId");
+            dto.UserId = userId;
 
             var createdDiscount = await _discountService.CreateDiscountAsync(accessToken, dto);
 
