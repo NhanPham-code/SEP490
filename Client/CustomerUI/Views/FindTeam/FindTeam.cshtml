@@ -402,7 +402,8 @@
                 success: function(response) {
                     $('#players-grid').html(response);
 
-                    renderPosts(response.value.TeamPosts, response.value.UserNames);
+                  renderPosts(response.teamPosts, response.userNames, response.stadium);
+
                     // Update results count
                     hideLoading();
                     // Hide loading state
@@ -413,33 +414,36 @@
                 }
             });
         }
-
+        // Show loading state
         function showLoading(){
             $('#loading-state').show();
             $('#players-grid').hide();
             $('#empty-state').hide();
             $('#load-more-section').hide();
         }
+        // Hide loading state
         function hideLoading(){
             $('#loading-state').hide();
             $('#players-grid').show();
             $('#load-more-section').show();
         }
-        function renderPosts(post, profile){
+        // Render posts dynamically
+        function renderPosts(post, profile, stadium){
              if (!post || post.length === 0) {
                 $('#players-grid').html('');
                 return;
             }
             console.log(profile);
             console.log(post);
+            console.log(post[0].createdBy);
             const html = post.map(post => `
                <article class="player-card">
                             <div class="player-header">
                                 <div class="player-avatar">
-                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face" alt="Nguyễn Văn An">
+                                    <img src="https://localhost:7136/${profile[post.createdBy].avatarUrl}" alt="${profile[post.createdBy].fullName}">
                                 </div>
                                 <div class="player-info">
-                                    <h3 class="player-name">Nguyễn Văn An</h3>
+                                    <h3 class="player-name">${profile[post.createdBy].fullName}</h3>
                                     <div class="player-level intermediate">
                                         <i class="ri-star-fill"></i>
                                         Trung Bình
@@ -450,11 +454,11 @@
                             <div class="game-details">
                                 <div class="detail-item">
                                     <i class="ri-basketball-line"></i>
-                                    <span>${post.Sport}</span>
+                                    <span>${post.sportType}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-calendar-line"></i>
-                                    <span>12 Th8, 2025 - 18:00</span>
+                                    <span>${post.playDate} - 18:00</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-map-pin-line"></i>
@@ -462,11 +466,11 @@
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-group-line"></i>
-                                    <span>Cần ${post.NeededPlayers} người chơi</span>
+                                    <span>Cần ${post.neededPlayers} người chơi</span>
                                 </div>
                             </div>
 
-                            <p class="game-description">${post.Description}</p>
+                            <p class="game-description">${post.description}</p>
 
                             <div class="card-footer">
                                 <div class="price-info">
@@ -483,8 +487,6 @@
 
             $('#players-grid').html(html);
         }
-
-
 
     </script>
 
