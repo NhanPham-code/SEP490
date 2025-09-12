@@ -20,7 +20,7 @@ namespace FindTeamAPI.Controllers
             return Ok((await _teamMemberService.GetAllTeamMembersAsync(postId)).ToList());
         }
         [HttpGet]
-        [Route("GetTeamMemberByPostId")]
+        [Route("GetTeamMemberByPostIdAndId")]
         public async Task<IActionResult> GetTeamMemberByIdTeam([FromQuery] int teamId, [FromQuery] int postId)
         {
             var team = await _teamMemberService.GetTeamMemberByIdAsync(teamId, postId);

@@ -223,11 +223,12 @@
       "System.Text.Encodings.Web/8.0.0": {},
       "DTOs/1.0.0": {
         "dependencies": {
-          "Microsoft.AspNetCore.Http.Abstractions": "2.3.0"
+          "Microsoft.AspNetCore.Http.Abstractions": "2.3.0",
+          "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
           "DTOs.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -239,7 +240,7 @@
         },
         "runtime": {
           "Middlewares.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -254,7 +255,7 @@
         },
         "runtime": {
           "Service.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
