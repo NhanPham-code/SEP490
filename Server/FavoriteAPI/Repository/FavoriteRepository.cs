@@ -46,6 +46,13 @@ namespace FavoriteAPI.Repository
             return _context.Favorites.AsQueryable();
         }
 
+        public async Task<IEnumerable<Favorite>> GetFavoritesByUserIdAsync(int userId)
+        {
+            return await _context.Favorites
+                .Where(f => f.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)
         {
             // check if favorite exists by userId and stadiumId

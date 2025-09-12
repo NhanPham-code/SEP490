@@ -9,5 +9,6 @@ namespace FavoriteAPI.Repository.Interface
         Task<bool> DeleteFavoriteAsync(int favoriteId);
         Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId);
         Task<Favorite?> GetFavoriteByIdAsync(int favoriteId);
+        Task<IEnumerable<Favorite>> GetFavoritesByUserIdAsync(int userId);
     }
 }

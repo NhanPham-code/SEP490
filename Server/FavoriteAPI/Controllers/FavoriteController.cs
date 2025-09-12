@@ -2,6 +2,7 @@
 using FavoriteAPI.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FavoriteAPI.Controllers
 {
@@ -11,16 +12,49 @@ namespace FavoriteAPI.Controllers
     {
         private readonly IFavoriteService _favoriteService;
 
+        // 2. Property tiện ích để lấy UserId, tránh lặp code
+        private int? CurrentUserId =>
+            int.TryParse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value, out var id) ? id : null;
+
         public FavoriteController(IFavoriteService favoriteService)
         {
             _favoriteService = favoriteService ?? throw new ArgumentNullException(nameof(favoriteService));
         }
 
+        // 3. Sửa lại Get để chỉ lấy favorite của người dùng hiện tại
         [HttpGet]
-        public IActionResult GetFavorites()
+        public async Task<IActionResult> GetUserFavoritesByAccessToken()
         {
-            var favorites = _favoriteService.GetFavorites();
+            var userId = CurrentUserId;
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Invalid user identity." });
+            }
+
+            var favorites = await _favoriteService.GetFavoritesByUserIdAsync(userId.Value);
             return Ok(favorites);
+        }
+
+        [HttpGet("exists")]
+        public async Task<IActionResult> CheckIfFavoriteExists([FromQuery] int userId, [FromQuery] int stadiumId)
+        {
+            // 1. Xác thực quyền: người dùng chỉ được kiểm tra cho chính họ
+            var currentUserId = CurrentUserId;
+            if (currentUserId == null || currentUserId.Value != userId)
+            {
+                return Forbid(); // Người dùng đã đăng nhập nhưng không có quyền
+            }
+
+            // 2. Gọi service để kiểm tra
+            var isExists = await _favoriteService.IsFavoriteExistsAsync(userId, stadiumId);
+
+            // 3. Trả về kết quả theo chuẩn REST
+            if (isExists)
+            {
+                return Ok(); // 200 OK - Có tồn tại
+            }
+
+            return NotFound(); // 404 Not Found - Không tồn tại
         }
 
         [HttpPost]
@@ -31,7 +65,19 @@ namespace FavoriteAPI.Controllers
                 return BadRequest("Favorite data is null.");
             }
 
-            // check if favorite already exists
+            var userId = CurrentUserId;
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Invalid user identity." });
+            }
+
+            // 4. So sánh userId trong DTO với userId từ token
+            if (createFavoriteDTO.UserId != userId.Value)
+            {
+                // 403 Forbidden là phù hợp hơn, vì người dùng đã được xác thực nhưng không có quyền thực hiện hành động này.
+                return Forbid();
+            }
+
             var isExists = await _favoriteService.IsFavoriteExistsAsync(createFavoriteDTO.UserId, createFavoriteDTO.StadiumId);
             if (isExists)
             {
@@ -39,15 +85,38 @@ namespace FavoriteAPI.Controllers
             }
 
             var favorite = await _favoriteService.AddFavoriteAsync(createFavoriteDTO);
-            return CreatedAtAction(nameof(GetFavorites), new { id = favorite.FavoriteId }, favorite);
+
+            // Trả về route để lấy một favorite cụ thể sẽ tốt hơn là get list
+            // Bạn cần có một phương thức GetFavoriteById(int id) để route này hoạt động
+            return CreatedAtAction(nameof(GetUserFavoritesByAccessToken), new { id = favorite.FavoriteId }, favorite);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFavorite(int id)
+        public async Task<IActionResult> DeleteFavorite(int favoriteId)
         {
-            var isDeleted = await _favoriteService.DeleteFavoriteAsync(id);
+            var userId = CurrentUserId;
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Invalid user identity." });
+            }
+
+            var favorite = await _favoriteService.GetFavoritesByIdAsync(favoriteId);
+
+            if (favorite == null)
+            {
+                return NotFound("Favorite not found.");
+            }
+
+            // 5. Xác thực quyền sở hữu trước khi xóa
+            if (favorite.UserId != userId.Value)
+            {
+                return Forbid(); // Người dùng này không sở hữu favorite này
+            }
+
+            var isDeleted = await _favoriteService.DeleteFavoriteAsync(favoriteId);
             if (!isDeleted)
             {
+                // Logic này có thể hơi thừa vì đã check ở trên, nhưng không sao
                 return NotFound("Favorite not found.");
             }
             return NoContent();
