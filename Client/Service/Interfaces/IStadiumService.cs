@@ -1,15 +1,17 @@
-﻿using System;
+﻿using DTOs.OData;
+using DTOs.StadiumDTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DTOs.StadiumDTO;
 
 namespace Service.Interfaces
 {
     public interface IStadiumService
     {
         Task<string> GetAllStadiumsAsync();
+        Task<ODataResponse<ReadStadiumDTO>> GetStadiumById(List<int> stadiumId);
         Task<ReadStadiumDTO> GetStadiumByIdAsync(int id);
         Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto);
         Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto);

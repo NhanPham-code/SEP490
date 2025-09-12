@@ -903,7 +903,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/GetTeamMemberByPostId",
+      "DownstreamPathTemplate": "/GetTeamMemberByPostIdAndId",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -911,7 +911,7 @@
           "Port": 7028
         }
       ],
-      "UpstreamPathTemplate": "/GetTeamMemberByPostId",
+      "UpstreamPathTemplate": "/GetTeamMemberByPostIdAndId",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
