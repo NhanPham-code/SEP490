@@ -3,6 +3,7 @@ using FavoriteAPI.DTOs;
 using FavoriteAPI.Model;
 using FavoriteAPI.Repository.Interface;
 using FavoriteAPI.Service.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace FavoriteAPI.Service
 {
@@ -38,6 +39,21 @@ namespace FavoriteAPI.Service
         public IQueryable<Favorite> GetFavorites()
         {
             return _favoriteRepository.GetFavorites();
+        }
+
+        public async Task<Favorite?> GetFavoritesByIdAsync(int favoriteId)
+        {
+            var favorite = await _favoriteRepository.GetFavoriteByIdAsync(favoriteId);
+            if (favorite == null)
+            {
+                return null;
+            }
+            return favorite;
+        }
+
+        public async Task<IEnumerable<Favorite>> GetFavoritesByUserIdAsync(int userId)
+        {
+            return await _favoriteRepository.GetFavoritesByUserIdAsync(userId);
         }
 
         public async Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId)

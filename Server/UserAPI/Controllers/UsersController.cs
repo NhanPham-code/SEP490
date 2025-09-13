@@ -218,7 +218,6 @@ namespace UserAPI.Controllers
         /// Lấy thông tin người dùng khác
         /// </summary>
         [HttpGet("{userId}")]
-        [Authorize(Roles = "Customer,StadiumManager,Admin")]
         public async Task<IActionResult> GetOtherUserProfile(int userId)
         {
             if (userId <= 0)
