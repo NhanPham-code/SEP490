@@ -11,7 +11,7 @@ namespace Service.Interfaces
     public interface IStadiumService
     {
         Task<string> GetAllStadiumsAsync();
-        Task<ODataResponse<ReadStadiumDTO>> GetStadiumById(List<int> stadiumId);
+        Task<OdataHaveCountResponse<ReadStadiumDTO>> GetAllStadiumByListId(List<int> stadiumId);
         Task<ReadStadiumDTO> GetStadiumByIdAsync(int id);
         Task<ReadStadiumDTO> CreateStadiumAsync(CreateStadiumDTO stadiumDto);
         Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto);

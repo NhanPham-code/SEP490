@@ -336,12 +336,12 @@
                             <p class="section-subtitle">Kết nối với các vận động viên và tham gia các trận đấu thú vị</p>
                         </div>
                         <div class="section-actions">
-                            <a asp-controller="MyPost" asp-action="MyPosts" class="btn btn-secondary" aria-label="Quản lý bài viết của tôi">
+                            <a href="/FindTeam/TeamPostManage" class="btn btn-secondary" aria-label="Quản lý bài viết của tôi">
                                 <i class="ri-file-list-3-line" aria-hidden="true"></i>
                                 Bài Viết Của Tôi
                             </a>
 
-                            <button id="create-post" class="btn btn-primary" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
+                            <button id="create-post" onclick="openCreate()" class="btn btn-primary" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
                                 <i class="ri-add-line" aria-hidden="true"></i>
                                 Tạo Bài Viết
                             </button>
@@ -458,23 +458,25 @@
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-calendar-line"></i>
-                                    <span>${post.playDate} - 18:00</span>
+                                    <span>${formatDate(post.playDate)} - ${formatTimeForDisplay(post.timePlay)}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-map-pin-line"></i>
-                                    <span>Sân Victory Court</span>
+                                    <span>${post.location}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="ri-group-line"></i>
-                                    <span>Cần ${post.neededPlayers} người chơi</span>
+                                    <span>Cần <span class="needed-players">${post.neededPlayers}</span> / <span class="max-players">${post.maxPlayers}</span> người chơi</span>
+                                    
                                 </div>
+
                             </div>
 
                             <p class="game-description">${post.description}</p>
 
                             <div class="card-footer">
                                 <div class="price-info">
-                                    <span class="price">50.000đ</span>
+                                    <span id="perPrice" class="price">${updatePriceDisplay(post.pricePerPerson)}</span>
                                     <span class="price-label">mỗi người</span>
                                 </div>
                                 <button class="btn btn-primary btn-join">
@@ -487,7 +489,435 @@
 
             $('#players-grid').html(html);
         }
+               function openCreate() {
+            Swal.fire({
+                title: `
+                    <div class="modal-header">
+                        <div class="modal-icon">
+                            <i class="ri-add-circle-line"></i>
+                        </div>
+                        <div class="modal-title-text">Tạo Bài Đăng Tìm Đội</div>
+                    </div>
+                `,
+                html: generateCreateTeamPostModalHTML(),
+                showCancelButton: true,
+                confirmButtonText: '<i class="ri-save-line mr-1"></i>Tạo Bài Đăng',
+                cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy Bỏ',
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#6b7280',
+                width: '900px',
+                customClass: {
+                    confirmButton: 'enhanced-confirm-btn',
+                    cancelButton: 'enhanced-cancel-btn',
+                    popup: 'enhanced-popup'
+                },
+                didOpen: () => {
+                    // Add time and date preview functionality
+                    const timePlayInput = document.getElementById('newTimePlay');
+                    const playDateInput = document.getElementById('newPlayDate');
+                    const schedulePreview = document.getElementById('schedulePreview');
 
+                    function updateSchedulePreview() {
+                        const timePlay = timePlayInput.value || '00:00';
+                        const playDate = playDateInput.value || new Date().toISOString().split('T')[0];
+                        const formattedDate = new Date(playDate).toLocaleDateString('vi-VN');
+                        schedulePreview.textContent = `${formattedDate} lúc ${timePlay}`;
+                    }
+
+                    timePlayInput.addEventListener('change', updateSchedulePreview);
+                    playDateInput.addEventListener('change', updateSchedulePreview);
+                    updateSchedulePreview();
+
+                    // Update needed players based on max players
+                    const maxPlayersInput = document.getElementById('newMaxPlayers');
+                    const neededPlayersInput = document.getElementById('newNeededPlayers');
+
+                    maxPlayersInput.addEventListener('change', () => {
+                        const maxPlayers = parseInt(maxPlayersInput.value) || 0;
+                        neededPlayersInput.max = maxPlayers;
+                        if (parseInt(neededPlayersInput.value) > maxPlayers) {
+                            neededPlayersInput.value = maxPlayers;
+                        }
+                    });
+                },
+                preConfirm: () => {
+                    // Clear any existing validation messages
+                    Swal.resetValidationMessage();
+
+                    try {
+                        const title = document.getElementById('newTitle').value.trim();
+                        const location = document.getElementById('newLocation').value.trim();
+                        const sport = document.getElementById('newSport').value.trim();
+                        const maxPlayers = parseInt(document.getElementById('newMaxPlayers').value);
+                        const neededPlayers = parseInt(document.getElementById('newNeededPlayers').value);
+                        const pricePerPerson = parseFloat(document.getElementById('newPricePerPerson').value) || 0;
+                        const description = document.getElementById('newDescription').value.trim();
+                        const timePlay = document.getElementById('newTimePlay').value;
+                        const playDate = document.getElementById('newPlayDate').value;
+                        const bookingId = parseInt(document.getElementById('newBookingId').value);
+
+                        // Validation với error handling
+                        const validations = [
+                            { condition: !title, message: 'Vui lòng nhập tiêu đề bài đăng' },
+                            { condition: !location, message: 'Vui lòng nhập địa điểm' },
+                            { condition: !sport, message: 'Vui lòng chọn môn thể thao' },
+                            { condition: !maxPlayers || maxPlayers < 2, message: 'Số lượng thành viên tối đa phải ít nhất 2 người' },
+                            { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' },
+                            { condition: neededPlayers > maxPlayers, message: 'Số lượng cần tìm không thể lớn hơn số lượng tối đa' },
+                            { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
+                            { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
+                            { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
+                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' }
+                        ];
+
+                        for (const validation of validations) {
+                            if (validation.condition) {
+                                Swal.showValidationMessage(`<i class="ri-error-warning-line mr-1"></i>${validation.message}`);
+                                return false;
+                            }
+                        }
+
+                        // Build data object matching CreateTeamPostDTO
+                        const teamPostData = {
+                            title: title,
+                            location: location,
+                            sport: sport,
+                            maxPlayers: maxPlayers,
+                            neededPlayers: neededPlayers,
+                            pricePerPerson: pricePerPerson,
+                            description: description,
+                            timePlay: timePlay,
+                            playDate: playDate,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                            createdBy: getCurrentUserId(), // You'll need to implement this function
+                            bookingId: bookingId
+                        };
+
+                        return teamPostData;
+
+                    } catch (error) {
+                        console.error('Validation error:', error);
+                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Có lỗi xảy ra, vui lòng thử lại');
+                        return false;
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    createNewTeamPost(result.value);
+                }
+            });
+        }
+
+        function generateCreateTeamPostModalHTML() {
+            return `
+                <div class="enhanced-modal-content">
+                    <form id="newTeamPostForm" class="team-post-form">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-information-line"></i>
+                                <h3>Thông Tin Cơ Bản</h3>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-edit-line"></i>
+                                        Tiêu đề bài đăng
+                                    </label>
+                                    <input type="text" id="newTitle" class="form-input"
+                                           placeholder="Nhập tiêu đề thu hút cho bài đăng">
+                                    <div class="input-helper">Tiêu đề sẽ hiển thị công khai để thu hút thành viên</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-map-pin-2-line"></i>
+                                        Địa điểm
+                                    </label>
+                                    <input type="text" id="newLocation" class="form-input"
+                                           placeholder="Nhập địa điểm chơi">
+                                    <div class="input-helper">Địa điểm cụ thể nơi diễn ra hoạt động</div>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-football-line"></i>
+                                        Môn thể thao
+                                    </label>
+                                    <select id="newSport" class="form-input">
+                                        <option value="">Chọn môn thể thao</option>
+                                        <option value="football">Bóng đá</option>
+                                        <option value="basketball">Bóng rổ</option>
+                                        <option value="volleyball">Bóng chuyền</option>
+                                        <option value="badminton">Cầu lông</option>
+                                        <option value="tennis">Quần vợt</option>
+                                        <option value="table-tennis">Bóng bàn</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                    <div class="input-helper">Chọn môn thể thao sẽ chơi</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-money-dollar-circle-line"></i>
+                                        Giá mỗi người (VNĐ)
+                                    </label>
+                                    <input type="number" id="newPricePerPerson" class="form-input"
+                                           placeholder="0" min="0" step="1000">
+                                    <div class="input-helper">Chi phí mỗi người tham gia (để trống nếu miễn phí)</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label">
+                                    <i class="ri-file-text-line"></i>
+                                    Mô tả
+                                </label>
+                                <textarea id="newDescription" rows="3" class="form-textarea"
+                                          placeholder="Mô tả về hoạt động, yêu cầu kỹ năng, lưu ý đặc biệt..."></textarea>
+                                <div class="input-helper">Mô tả chi tiết giúp tìm được thành viên phù hợp</div>
+                            </div>
+                        </div>
+
+                        <!-- Team Size Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-team-line"></i>
+                                <h3>Thông Tin Đội</h3>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-group-line"></i>
+                                        Số thành viên tối đa
+                                    </label>
+                                    <input type="number" id="newMaxPlayers" class="form-input"
+                                           placeholder="10" min="2" max="50">
+                                    <div class="input-helper">Tổng số thành viên tối đa của đội (ít nhất 2 người)</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-user-add-line"></i>
+                                        Số thành viên cần tìm
+                                    </label>
+                                    <input type="number" id="newNeededPlayers" class="form-input"
+                                           placeholder="5" min="1">
+                                    <div class="input-helper">Số lượng thành viên còn thiếu cần tìm thêm</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-calendar-event-line"></i>
+                                <h3>Lịch Trình</h3>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-calendar-line"></i>
+                                        Ngày chơi
+                                    </label>
+                                    <input type="date" id="newPlayDate" class="form-input"
+                                           min="${new Date().toISOString().split('T')[0]}">
+                                    <div class="input-helper">Ngày diễn ra hoạt động</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-time-line"></i>
+                                        Thời gian chơi
+                                    </label>
+                                    <input type="time" id="newTimePlay" class="form-input">
+                                    <div class="input-helper">Giờ bắt đầu hoạt động</div>
+                                </div>
+                            </div>
+
+                            <div class="schedule-preview">
+                                <i class="ri-calendar-event-line"></i>
+                                <span>Hoạt động sẽ diễn ra vào <strong id="schedulePreview">ngày được chọn</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Booking Information Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-bookmark-line"></i>
+                                <h3>Thông Tin Đặt Sân</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="ri-hashtag"></i>
+                                    ID Đặt Sân
+                                </label>
+                                <input type="number" id="newBookingId" class="form-input"
+                                       placeholder="Nhập ID của booking đã đặt" min="1">
+                                <div class="input-helper">ID của booking sân đã được đặt trước</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        // Helper function to get current user ID (implement based on your authentication system)
+        function getCurrentUserId() {
+            // This should return the current logged-in user's ID
+            // You'll need to implement this based on your authentication system
+            return 1; // Placeholder - replace with actual implementation
+        }
+
+        // Function to handle creating the team post
+        function createNewTeamPost(teamPostData) {
+            // Show loading state
+            Swal.fire({
+                title: 'Đang tạo bài đăng...',
+                html: 'Vui lòng đợi trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Make API call to create team post
+            fetch('/api/teamposts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add authentication headers if needed
+                },
+                body: JSON.stringify(teamPostData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Bài đăng tìm đội đã được tạo thành công',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    // Refresh the page or update the team posts list
+                    location.reload(); // or call a function to refresh the data
+                });
+            })
+            .catch(error => {
+                console.error('Error creating team post:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        }
+
+
+        // Hàm định dạng giá tiền
+        window.updatePriceDisplay = function(value) {
+            const priceDisplay = document.getElementById('perPrice');
+            if (priceDisplay && value && !isNaN(value)) {
+                const formattedPrice = Number(value).toLocaleString('vi-VN');
+                priceDisplay.textContent = `${formattedPrice} VND`;
+                priceDisplay.style.color = '#10b981';
+            } else if (priceDisplay) {
+                priceDisplay.textContent = '';
+            }
+        };
+
+        // Hàm định dạng ngày tháng
+                function formatDate(dateString) {
+            const date = new Date(dateString);
+
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+
+            return `${day}/${month}/${year}`;
+        }
+
+        // Sử dụng
+        const originalDate = "2025-08-18T11:08:41.513+07:00";
+        console.log(formatDate(originalDate)); // 18/08/2025 11:08
+         function formatTimeForDisplay(time) {
+            if (!time) return '--:--';
+
+            try {
+                if (typeof time === 'string') {
+                    if (time.startsWith('PT')) {
+                        const hoursMatch = time.match(/PT(\d+)H/);
+                        if (hoursMatch && hoursMatch[1]) {
+                            const hours = parseInt(hoursMatch[1]).toString().padStart(2, '0');
+                            return `${hours}:00`;
+                        }
+                    } else if (time.includes(':')) {
+                        const parts = time.split(':');
+                        if (parts.length >= 2) {
+                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
+                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
+                            return `${hours}:${minutes}`;
+                        }
+                    }
+                }
+
+                if (time instanceof Date) {
+                    const hours = time.getHours().toString().padStart(2, '0');
+                    const minutes = time.getMinutes().toString().padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+
+                return '--:--';
+            } catch (error) {
+                console.warn('Error formatting time for display:', error);
+                return '--:--';
+            }
+        }
+                        function formatTimeForInput(timeString) {
+            if (!timeString) return '';
+
+            try {
+                if (typeof timeString === 'string') {
+                    // Handle ISO 8601 Duration format (e.g., PT6H)
+                    if (timeString.startsWith('PT')) {
+                        const match = timeString.match(/PT(\d+)H/);
+                        if (match && match[1]) {
+                            const hours = match[1].padStart(2, '0');
+                            return `${hours}:00`;
+                        }
+                    }
+
+                    // Handle HH:mm:ss format
+                    if (timeString.includes(':')) {
+                        const parts = timeString.split(':');
+                        if (parts.length >= 2) {
+                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
+                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
+                            return `${hours}:${minutes}`;
+                        }
+                    }
+                }
+
+                return timeString.toString();
+            } catch (error) {
+                console.warn('Error formatting time for input:', error);
+                return '';
+            }
+        }
     </script>
 
     <!-- Filter Overlay for Mobile -->

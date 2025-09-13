@@ -85,7 +85,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7725m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -104,7 +103,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7684m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -123,7 +121,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7788m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -142,7 +139,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7539m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -161,7 +157,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7687m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -180,7 +175,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7725m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -199,7 +193,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7877m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -218,7 +211,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7770m,
                     IsApproved = true,
                     CreatedBy = 2,
-                    CreatedByUser = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -237,7 +229,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7761m,
                     IsApproved = true,
                     CreatedBy = 3,
-                    CreatedByUser = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -256,7 +247,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7725m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -275,7 +265,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7629m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -294,7 +283,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7620m,
                     IsApproved = true,
                     CreatedBy = 2,
-                    CreatedByUser = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -313,7 +301,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7765m,
                     IsApproved = true,
                     CreatedBy = 3,
-                    CreatedByUser = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -332,7 +319,7 @@ namespace StadiumAPI.Data
                     Longitude = 105.7876m,
                     IsApproved = true,
                     CreatedBy = 4,
-                    CreatedByUser = 4,
+      
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -351,7 +338,7 @@ namespace StadiumAPI.Data
                     Longitude = 105.4746m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
+            
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -370,7 +357,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.4851m,
                     IsApproved = true,
                     CreatedBy = 2,
-                    CreatedByUser = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -389,7 +375,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.4820m,
                     IsApproved = true,
                     CreatedBy = 3,
-                    CreatedByUser = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -408,7 +393,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.9723m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -427,7 +411,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7725m,
                     IsApproved = true,
                     CreatedBy = 4,
-                    CreatedByUser = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -446,7 +429,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7954m,
                     IsApproved = true,
                     CreatedBy = 4,
-                    CreatedByUser = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -465,7 +447,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7997m,
                     IsApproved = true,
                     CreatedBy = 1,
-                    CreatedByUser = 1,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -484,7 +465,6 @@ namespace StadiumAPI.Data
                     Longitude = 105.7702m,
                     IsApproved = true,
                     CreatedBy = 2,
-                    CreatedByUser = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
