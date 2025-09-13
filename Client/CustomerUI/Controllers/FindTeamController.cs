@@ -14,17 +14,27 @@ namespace CustomerUI.Controllers
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
         private readonly IStadiumService _stadiumService;
+        private readonly IBookingService _bookingService;
         private string token = string.Empty;
-        public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember, ITokenService tokenService, IUserService userService, IStadiumService stadiumService)
+        public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
+            ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
+            IBookingService bookingService)
         {
             _teamPost = teamPost;
             _teamMember = teamMember;
             _tokenService = tokenService;
             _userService = userService;
             _stadiumService = stadiumService;
+            _bookingService = bookingService;
         }
 
         public IActionResult FindTeam()
+        {
+            token = _tokenService.GetAccessTokenFromCookie();
+
+            return View();
+        }
+        public IActionResult TeamPostManage()
         {
             token = _tokenService.GetAccessTokenFromCookie();
             return View();
@@ -41,7 +51,7 @@ namespace CustomerUI.Controllers
             // get profile by id 
             var tokes = _tokenService.GetAccessTokenFromCookie();
             var profile = await _userService.GetUsersByIdsAsync(userId , tokes);
-            var stadiums = await _stadiumService.GetStadiumById(stadiumId);
+            var stadiums = await _stadiumService.GetAllStadiumByListId(stadiumId);
 
             FindTeamViewModel findTeamViewModel = new FindTeamViewModel
             {
@@ -51,16 +61,22 @@ namespace CustomerUI.Controllers
             foreach (var item in findTeamViewModel.TeamPosts)
             {
                 var user = profile.FirstOrDefault(u => u.UserId.Equals(item.CreatedBy));
-                var stadium = stadiums.Value.FirstOrDefault(s => s.Id.Equals(item.StadiumId));
                 if (user != null)
                 {
                     findTeamViewModel.UserNames.Add(item.CreatedBy, user);
-                    findTeamViewModel.Stadiums.Add(item.StadiumId, stadium);
                 }
             }
 
 
             return Json(findTeamViewModel);
         }
+
+
+        public async Task<IActionResult> GetBookByUserId()
+        {
+            var booking = await _bookingService.GetBookingHistoryAsync(token);
+            return Json(booking);
+        }
+
     }
 }

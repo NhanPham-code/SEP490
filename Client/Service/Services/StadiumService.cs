@@ -70,14 +70,14 @@ namespace Service.Services
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }
-        public async Task<ODataResponse<ReadStadiumDTO>> GetStadiumById(List<int> stadiumId)
+        public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetAllStadiumByListId(List<int> stadiumId)
         {
             var ids = string.Join(",", stadiumId);
 
-            var response = await _httpClient.GetAsync($"/odata/Stadium?$count=true&$filter=Id in ({ids})");
+            var response = await _httpClient.GetAsync($"/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true&$filter=Id in ({ids})");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             var stadium = await response.Content.ReadAsStringAsync();
-            var newResponse = JsonConvert.DeserializeObject<ODataResponse<ReadStadiumDTO>>(stadium);
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);
             return newResponse;
         }
 

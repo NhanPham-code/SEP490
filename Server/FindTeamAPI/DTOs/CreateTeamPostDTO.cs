@@ -14,6 +14,7 @@ namespace FindTeamAPI.DTOs
         [Required(ErrorMessage = "NeededPlayers is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "NeededPlayers must be at least 1.")]
         public int NeededPlayers { get; set; } // Number of players still needed to complete the team
+        public decimal PricePerPerson { get; set; }
         public string Description { get; set; } = string.Empty; // Description of the team
         public TimeSpan TimePlay { get; set; } // Time when the team plays
         public DateTime PlayDate { get; set; } // Date when the team plays
