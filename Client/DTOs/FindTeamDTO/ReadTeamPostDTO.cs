@@ -2,6 +2,7 @@
 {
     using global::DTOs.ConvertTime;
     using Newtonsoft.Json;
+    using System.Runtime.ConstrainedExecution;
 
     public class ReadTeamPostDTO
     {
@@ -11,6 +12,7 @@
         public string SportType { get; set; } = string.Empty;
         public int MaxPlayers { get; set; }
         public int NeededPlayers { get; set; }
+        public decimal PricePerPerson { get; set; }
         public string Description { get; set; } = string.Empty;
 
         [JsonConverter(typeof(Iso8601TimeSpanConverter))]

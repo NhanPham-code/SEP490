@@ -835,7 +835,11 @@
         }
       ],
       "UpstreamPathTemplate": "/odata/TeamPost",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     },
     {
       "DownstreamPathTemplate": "/CreateTeamPost",
