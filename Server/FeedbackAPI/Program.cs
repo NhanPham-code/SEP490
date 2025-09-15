@@ -2,11 +2,55 @@
 using FeedbackAPI.Mapper;
 using FeedbackAPI.Repository;
 using FeedbackAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using System.Text;
 var builder = WebApplication.CreateBuilder(args);
+
+
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// Authorization policies (cho phép Customer) để dùng trong Controller
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+    {
+        policy.RequireRole("Customer");
+    });
+
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("StadiumManager", policy =>
+    {
+        policy.RequireRole("StadiumManager");
+    });
+});
 // Add services to the container
 builder.Services.AddControllers()
     .AddOData(options =>

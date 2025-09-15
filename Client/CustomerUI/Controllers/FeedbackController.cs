@@ -14,7 +14,8 @@ namespace CustomerUI.Controllers
         private readonly IFeedbackService _feedbackService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
-         private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
+        private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
+
         public FeedbackController(IFeedbackService feedbackService, ITokenService tokenService, IUserService userService)
         {
             _feedbackService = feedbackService;
@@ -78,54 +79,107 @@ namespace CustomerUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int stadiumId, int rating, string? comment)
+        public async Task<IActionResult> Create([FromForm] int stadiumId, [FromForm] int rating, [FromForm] string? comment, [FromForm] IFormFile? image)
         {
             try
             {
+                // Add debug logging
+                Console.WriteLine($"[Feedback] Received request - StadiumId: {stadiumId}, Rating: {rating}, Comment: {comment}");
+
                 var accessToken = GetAccessToken();
                 if (string.IsNullOrEmpty(accessToken))
+                {
+                    Console.WriteLine("[Feedback] No access token found");
                     return Unauthorized(new { message = "Bạn chưa đăng nhập hoặc phiên đã hết hạn." });
+                }
 
                 var userProfile = await _userService.GetMyProfileAsync(accessToken);
                 if (userProfile == null)
+                {
+                    Console.WriteLine("[Feedback] Could not get user profile");
                     return Unauthorized(new { message = "Không thể lấy thông tin người dùng." });
+                }
 
-                // ✅ Check nếu user đã feedback sân này chưa
+                Console.WriteLine($"[Feedback] User profile retrieved - UserId: {userProfile.UserId}");
+
+                // ✅ Validate input parameters first
+                if (stadiumId <= 0)
+                {
+                    Console.WriteLine($"[Feedback] Invalid stadiumId: {stadiumId}");
+                    return BadRequest(new { message = "Stadium ID không hợp lệ." });
+                }
+
+                if (rating < 1 || rating > 5)
+                {
+                    Console.WriteLine($"[Feedback] Invalid rating: {rating}");
+                    return BadRequest(new { message = "Đánh giá phải từ 1 đến 5 sao." });
+                }
+
+                if (!string.IsNullOrEmpty(comment) && comment.Length > 1000)
+                {
+                    Console.WriteLine($"[Feedback] Comment too long: {comment.Length} characters");
+                    return BadRequest(new { message = "Bình luận không được vượt quá 1000 ký tự." });
+                }
+
+                // ✅ Check if user already gave feedback for this stadium
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
                 var existingFeedback = stadiumFeedbacks?.FirstOrDefault(f => f.UserId == userProfile.UserId);
 
                 if (existingFeedback != null)
                 {
+                    Console.WriteLine($"[Feedback] User {userProfile.UserId} already has feedback for stadium {stadiumId}");
                     return BadRequest(new { message = "Bạn đã gửi feedback cho sân này. Vui lòng chỉnh sửa thay vì gửi mới." });
                 }
 
+                // ✅ Validate image file if provided
+                if (image != null)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        Console.WriteLine($"[Feedback] Invalid file extension: {fileExtension}");
+                        return BadRequest(new { message = "Chỉ cho phép upload ảnh định dạng JPG, JPEG, PNG, GIF." });
+                    }
+
+                    if (image.Length > 5 * 1024 * 1024) // 5MB
+                    {
+                        Console.WriteLine($"[Feedback] File too large: {image.Length} bytes");
+                        return BadRequest(new { message = "Kích thước ảnh không được vượt quá 5MB." });
+                    }
+                }
+
+                // ✅ Create feedback DTO
                 var feedbackDto = new CreateFeedback
                 {
                     UserId = userProfile.UserId,
                     StadiumId = stadiumId,
                     Rating = rating,
-                    Comment = comment
+                    Comment = comment,
+                    Image = image
                 };
 
-                if (!ModelState.IsValid)
-                    return BadRequest(new { message = "Thông tin phản hồi không hợp lệ." });
+                Console.WriteLine($"[Feedback] Creating feedback DTO - UserId: {feedbackDto.UserId}, StadiumId: {feedbackDto.StadiumId}, Rating: {feedbackDto.Rating}");
 
                 var createdFeedback = await _feedbackService.CreateAsync(feedbackDto, accessToken);
 
                 if (createdFeedback == null)
+                {
+                    Console.WriteLine("[Feedback] CreateAsync returned null");
                     return StatusCode(500, new { message = "Không thể tạo phản hồi." });
+                }
 
+                Console.WriteLine("[Feedback] Feedback created successfully");
                 return Ok(new { success = true, message = "Gửi phản hồi thành công!" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[Feedback] Lỗi khi tạo feedback: " + ex.Message);
+                Console.WriteLine($"[Feedback] Exception occurred: {ex.Message}");
+                Console.WriteLine($"[Feedback] Stack trace: {ex.StackTrace}");
                 return StatusCode(500, new { message = "Có lỗi xảy ra khi tạo feedback." });
             }
         }
-
-
-
 
         // GET: Feedback/MyFeedbacks
         public async Task<IActionResult> MyFeedbacks()
@@ -231,6 +285,7 @@ namespace CustomerUI.Controllers
 
                 ViewBag.FeedbackId = id;
                 ViewBag.StadiumId = feedback.StadiumId;
+                ViewBag.CurrentImagePath = feedback.ImagePath; // ✅ Truyền đường dẫn ảnh hiện tại
                 return View(updateDto);
             }
             catch (Exception ex)
@@ -241,16 +296,12 @@ namespace CustomerUI.Controllers
             }
         }
 
-
         // POST: Feedback/Edit/5
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, UpdateFeedback updateDto)
+        public async Task<IActionResult> Edit(int id, [FromForm] int rating, [FromForm] string? comment, [FromForm] IFormFile? image)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return Json(new { success = false, message = "Thông tin cập nhật không hợp lệ." });
-
                 var accessToken = GetAccessToken();
                 if (string.IsNullOrEmpty(accessToken))
                     return Unauthorized(new { success = false, message = "Bạn chưa đăng nhập hoặc phiên đã hết hạn." });
@@ -260,6 +311,34 @@ namespace CustomerUI.Controllers
 
                 if (feedback == null || userProfile == null || feedback.UserId != userProfile.UserId)
                     return Unauthorized(new { success = false, message = "Bạn không có quyền chỉnh sửa feedback này." });
+
+                // ✅ Validate dữ liệu
+                if (rating < 1 || rating > 5)
+                    return BadRequest(new { success = false, message = "Đánh giá phải từ 1 đến 5 sao." });
+
+                if (!string.IsNullOrEmpty(comment) && comment.Length > 1000)
+                    return BadRequest(new { success = false, message = "Bình luận không được vượt quá 1000 ký tự." });
+
+                // ✅ Validate file ảnh nếu có
+                if (image != null)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+                    if (!allowedExtensions.Contains(fileExtension))
+                        return BadRequest(new { success = false, message = "Chỉ cho phép upload ảnh định dạng JPG, JPEG, PNG, GIF." });
+
+                    if (image.Length > 5 * 1024 * 1024) // 5MB
+                        return BadRequest(new { success = false, message = "Kích thước ảnh không được vượt quá 5MB." });
+                }
+
+                // ✅ Tạo DTO với ảnh
+                var updateDto = new UpdateFeedback
+                {
+                    Rating = rating,
+                    Comment = comment,
+                    Image = image // ✅ Bổ sung field ảnh
+                };
 
                 // ✅ Luôn update (không bao giờ create mới)
                 var isUpdated = await _feedbackService.UpdateAsync(accessToken, id, updateDto);
@@ -271,11 +350,10 @@ namespace CustomerUI.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("[Feedback Edit] Lỗi khi update feedback: " + ex.Message);
                 return StatusCode(500, new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
-
-
 
         // POST: Feedback/Delete/5
         [HttpPost]
@@ -322,7 +400,6 @@ namespace CustomerUI.Controllers
         }
 
         // GET: API endpoint để lấy feedbacks theo stadiumId
-
         [HttpGet]
         public async Task<IActionResult> GetFeedbacksByStadium(int stadiumId)
         {
@@ -350,45 +427,145 @@ namespace CustomerUI.Controllers
             }
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetFeedbacksByStadiumDirect(int stadiumId)
+        public async Task<IActionResult> GetFeedbacksByStadiumDirect(int stadiumId, int page = 1, int pageSize = 5)
         {
             try
             {
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
-
                 var feedbackList = new List<object>();
 
-                if (stadiumFeedbacks != null)
+                if (stadiumFeedbacks != null && stadiumFeedbacks.Any())
                 {
-                    foreach (var fb in stadiumFeedbacks)
+                    var userIds = stadiumFeedbacks.Select(f => f.UserId.ToString()).Distinct().ToList();
+                    var userDict = new Dictionary<string, object>();
+
+                    Console.WriteLine($"[GetFeedbacksByStadiumDirect] Processing {userIds.Count} unique users");
+
+                    foreach (var userId in userIds)
                     {
-                        feedbackList.Add(new
+                        try
                         {
-                            fb.Id,
-                            fb.Rating,
-                            fb.Comment,
-                            fb.StadiumId,
-                            fb.UserId
-                        });
+                            Console.WriteLine($"[GetFeedbacksByStadiumDirect] Getting user info for userId: {userId}");
+
+                            var userInfo = await _userService.GetOtherUserByIdAsync(userId);
+
+                            if (userInfo != null)
+                            {
+                                // ✅ Tạo full URL avatar giống session
+                                var avatarFullUrl = !string.IsNullOrEmpty(userInfo.AvatarUrl)
+                                    ? $"{BASE_URL}{userInfo.AvatarUrl}"
+                                    : $"{BASE_URL}/avatars/default-avatar.png";
+
+                                userDict[userId] = new
+                                {
+                                    FullName = userInfo.FullName ?? "Anonymous",
+                                    AvatarUrl = avatarFullUrl
+                                };
+
+                                Console.WriteLine($"[GetFeedbacksByStadiumDirect] User {userId}: Name={userInfo.FullName}, Avatar={avatarFullUrl}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"[GetFeedbacksByStadiumDirect] User {userId}: NULL response from API");
+                                userDict[userId] = new
+                                {
+                                    FullName = "Anonymous",
+                                    AvatarUrl = $"{BASE_URL}/avatars/default-avatar.png"
+                                };
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[GetFeedbacksByStadiumDirect] Error getting user {userId}: {ex.Message}");
+                            userDict[userId] = new
+                            {
+                                FullName = "Anonymous",
+                                AvatarUrl = $"{BASE_URL}/avatars/default-avatar.png"
+                            };
+                        }
                     }
+
+                    // ✅ Build feedback với user info và xử lý imagePath
+                    var allFeedbacks = new List<object>();
+                    foreach (var fb in stadiumFeedbacks.OrderByDescending(f => f.CreatedAt))
+                    {
+                        var userInfo = userDict.GetValueOrDefault(fb.UserId.ToString());
+
+                        // ✅ Xử lý imagePath - chỉ tạo full URL nếu có imagePath
+                        string imageFullUrl = null;
+                        if (!string.IsNullOrEmpty(fb.ImagePath))
+                        {
+                            imageFullUrl = $"https://localhost:7221{fb.ImagePath}";
+                        }
+
+                        var feedbackItem = new
+                        {
+                            id = fb.Id,
+                            rating = fb.Rating,
+                            comment = fb.Comment,
+                            stadiumId = fb.StadiumId,
+                            userId = fb.UserId,
+                            imagePath = imageFullUrl, // ✅ Full URL hoặc null
+                            createdAt = fb.CreatedAt,
+                            userName = ((dynamic)userInfo).FullName,
+                            userAvatar = ((dynamic)userInfo).AvatarUrl
+                        };
+
+                        Console.WriteLine($"[GetFeedbacksByStadiumDirect] Feedback {fb.Id}: User={feedbackItem.userName}, Image={imageFullUrl}");
+
+                        allFeedbacks.Add(feedbackItem);
+                    }
+
+                    // ✅ Phân trang
+                    var totalCount = allFeedbacks.Count;
+                    var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                    var skip = (page - 1) * pageSize;
+
+                    feedbackList = allFeedbacks.Skip(skip).Take(pageSize).ToList();
+
+                    Console.WriteLine($"[GetFeedbacksByStadiumDirect] Page {page}/{totalPages}, Returning {feedbackList.Count}/{totalCount} feedbacks");
+
+                    return Json(new
+                    {
+                        success = true,
+                        data = feedbackList,
+                        pagination = new
+                        {
+                            currentPage = page,
+                            pageSize = pageSize,
+                            totalCount = totalCount,
+                            totalPages = totalPages,
+                            hasNextPage = page < totalPages,
+                            hasPreviousPage = page > 1
+                        }
+                    });
                 }
+
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] No feedbacks found");
 
                 return Json(new
                 {
                     success = true,
-                    data = feedbackList,
-                    count = feedbackList.Count
+                    data = new List<object>(),
+                    pagination = new
+                    {
+                        currentPage = 1,
+                        pageSize = pageSize,
+                        totalCount = 0,
+                        totalPages = 0,
+                        hasNextPage = false,
+                        hasPreviousPage = false
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Exception: {ex.Message}");
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Stack trace: {ex.StackTrace}");
+                return Json(new { success = false, message = ex.Message, data = new List<object>() });
             }
         }
-
-
         [HttpGet]
         public async Task<IActionResult> GetMyFeedbackForStadium(int stadiumId)
         {
@@ -405,11 +582,188 @@ namespace CustomerUI.Controllers
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
                 var myFeedback = stadiumFeedbacks?.FirstOrDefault(f => f.UserId == userProfile.UserId);
 
-                return Json(new { success = true, data = myFeedback });
+                if (myFeedback != null)
+                {
+                    // ✅ Xử lý imagePath - chỉ tạo full URL nếu có imagePath
+                    string imageFullUrl = null;
+                    if (!string.IsNullOrEmpty(myFeedback.ImagePath))
+                    {
+                        imageFullUrl = $"https://localhost:7221{myFeedback.ImagePath}";
+                    }
+
+                    Console.WriteLine($"[GetMyFeedbackForStadium] Found feedback {myFeedback.Id} with image: {imageFullUrl}");
+
+                    return Json(new
+                    {
+                        success = true,
+                        data = new
+                        {
+                            id = myFeedback.Id,
+                            rating = myFeedback.Rating,
+                            comment = myFeedback.Comment,
+                            imagePath = imageFullUrl, // ✅ Full URL hoặc null
+                            createdAt = myFeedback.CreatedAt,
+                            stadiumId = myFeedback.StadiumId,
+                            userId = myFeedback.UserId
+                        }
+                    });
+                }
+
+                return Json(new { success = false, message = "Bạn chưa có feedback cho sân này." });
             }
             catch (Exception ex)
             {
+                Console.WriteLine("[GetMyFeedbackForStadium] Lỗi: " + ex.Message);
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditFeedback([FromForm] int feedbackId, [FromForm] int rating, [FromForm] string? comment, [FromForm] IFormFile? image)
+        {
+            try
+            {
+                Console.WriteLine($"[EditFeedback] START - FeedbackId: {feedbackId}, Rating: {rating}");
+                Console.WriteLine($"[EditFeedback] Comment: '{comment}'");
+                Console.WriteLine($"[EditFeedback] Image: {(image != null ? $"{image.FileName} ({image.Length} bytes)" : "null")}");
+
+                var accessToken = GetAccessToken();
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    Console.WriteLine("[EditFeedback] No access token");
+                    return Json(new { success = false, message = "Bạn chưa đăng nhập hoặc phiên đã hết hạn." });
+                }
+
+                var feedback = await _feedbackService.GetByIdAsync(accessToken, feedbackId);
+                var userProfile = await _userService.GetMyProfileAsync(accessToken);
+
+                Console.WriteLine($"[EditFeedback] Feedback found: {feedback != null}");
+                Console.WriteLine($"[EditFeedback] User profile: {userProfile != null}");
+
+                if (feedback == null)
+                {
+                    Console.WriteLine("[EditFeedback] Feedback not found");
+                    return Json(new { success = false, message = "Không tìm thấy feedback." });
+                }
+
+                if (userProfile == null)
+                {
+                    Console.WriteLine("[EditFeedback] User profile not found");
+                    return Json(new { success = false, message = "Không thể lấy thông tin người dùng." });
+                }
+
+                if (feedback.UserId != userProfile.UserId)
+                {
+                    Console.WriteLine($"[EditFeedback] Permission denied - Feedback UserId: {feedback.UserId}, Current UserId: {userProfile.UserId}");
+                    return Json(new { success = false, message = "Bạn không có quyền chỉnh sửa feedback này." });
+                }
+
+                // Validate
+                if (rating < 1 || rating > 5)
+                {
+                    Console.WriteLine($"[EditFeedback] Invalid rating: {rating}");
+                    return Json(new { success = false, message = "Đánh giá phải từ 1 đến 5 sao." });
+                }
+
+                if (!string.IsNullOrEmpty(comment) && comment.Length > 500)
+                {
+                    Console.WriteLine($"[EditFeedback] Comment too long: {comment.Length}");
+                    return Json(new { success = false, message = "Bình luận không được vượt quá 500 ký tự." });
+                }
+
+                // Validate image
+                if (image != null)
+                {
+                    Console.WriteLine($"[EditFeedback] Validating image: {image.FileName}");
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        Console.WriteLine($"[EditFeedback] Invalid file extension: {fileExtension}");
+                        return Json(new { success = false, message = "Chỉ cho phép upload ảnh định dạng JPG, JPEG, PNG, GIF." });
+                    }
+
+                    if (image.Length > 5 * 1024 * 1024)
+                    {
+                        Console.WriteLine($"[EditFeedback] File too large: {image.Length}");
+                        return Json(new { success = false, message = "Kích thước ảnh không được vượt quá 5MB." });
+                    }
+                }
+
+                var updateDto = new UpdateFeedback
+                {
+                    Rating = rating,
+                    Comment = comment,
+                    Image = image
+                };
+
+                Console.WriteLine($"[EditFeedback] Calling UpdateAsync with DTO - Rating: {updateDto.Rating}");
+
+                var isUpdated = await _feedbackService.UpdateAsync(accessToken, feedbackId, updateDto);
+
+                Console.WriteLine($"[EditFeedback] UpdateAsync result: {isUpdated}");
+
+                if (!isUpdated)
+                {
+                    Console.WriteLine("[EditFeedback] Update failed");
+                    return Json(new { success = false, message = "Không thể cập nhật phản hồi. Vui lòng thử lại." });
+                }
+
+                // Get updated feedback
+                var updatedFeedback = await _feedbackService.GetByIdAsync(accessToken, feedbackId);
+
+                Console.WriteLine($"[EditFeedback] SUCCESS - Updated feedback retrieved");
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Cập nhật phản hồi thành công!",
+                    data = new
+                    {
+                        id = updatedFeedback.Id,
+                        rating = updatedFeedback.Rating,
+                        comment = updatedFeedback.Comment,
+                        imagePath = updatedFeedback.ImagePath,
+                        createdAt = updatedFeedback.CreatedAt,
+                        userName = userProfile.FullName ?? "Anonymous"
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EditFeedback] EXCEPTION: {ex.Message}");
+                Console.WriteLine($"[EditFeedback] Stack trace: {ex.StackTrace}");
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteFeedback(int feedbackId)
+        {
+            try
+            {
+                var accessToken = GetAccessToken();
+                if (string.IsNullOrEmpty(accessToken))
+                    return Json(new { success = false, message = "Bạn chưa đăng nhập hoặc phiên đã hết hạn." });
+
+                var feedback = await _feedbackService.GetByIdAsync(accessToken, feedbackId);
+                var userProfile = await _userService.GetMyProfileAsync(accessToken);
+
+                if (feedback == null || userProfile == null || feedback.UserId != userProfile.UserId)
+                    return Json(new { success = false, message = "Bạn không có quyền xóa feedback này." });
+
+                var isDeleted = await _feedbackService.DeleteAsync(accessToken, feedbackId);
+
+                if (!isDeleted)
+                    return Json(new { success = false, message = "Không thể xóa phản hồi. Vui lòng thử lại." });
+
+                return Json(new { success = true, message = "Xóa phản hồi thành công!" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[DeleteFeedback] Lỗi: " + ex.Message);
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
         [HttpGet]
@@ -433,8 +787,5 @@ namespace CustomerUI.Controllers
                 return StatusCode(500, new { success = false, message = "Có lỗi xảy ra khi lấy thông tin user." });
             }
         }
-
-
-
     }
 }

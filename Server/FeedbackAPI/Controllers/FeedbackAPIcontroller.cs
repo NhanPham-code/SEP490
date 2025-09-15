@@ -1,5 +1,6 @@
 ﻿using FeedbackAPI.DTOs;
 using FeedbackAPI.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -42,6 +43,7 @@ namespace FeedbackAPI.Controllers
         /// Tạo feedback mới (cho phép upload ảnh)
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> Create([FromForm] CreateFeedback dto)
         {
             if (!ModelState.IsValid)
@@ -71,6 +73,7 @@ namespace FeedbackAPI.Controllers
         /// Xóa feedback
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteAsync(id);

@@ -138,7 +138,7 @@ namespace FeedbackAPI.Service
         public IQueryable<FeedbackResponse> GetAllAsQueryable()
         {
             var query = _repository.GetAllAsQueryable();
-            return _mapper.ProjectTo<FeedbackResponse>(query);
+            return _mapper.ProjectTo<FeedbackResponse>(query);                              
         }
 
         public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId)

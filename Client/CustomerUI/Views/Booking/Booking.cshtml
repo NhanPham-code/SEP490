@@ -258,7 +258,6 @@
         function getCourtTypes() {
             return [...new Set((stadiumData?.Courts || []).map(c => c.SportType))];
         }
->>>>>>> cd7488a4760bc9ad5a0c8ce5b295c563a2f10038
 
         let allHours = [];
 
@@ -277,7 +276,7 @@
             const continueButtonEl = document.getElementById('continue-button');
             const feedbackFormEl = document.getElementById('feedback-form');
             const priceEl = document.getElementById('stadiumPrice');
-=======
+
         // Lấy các element cần tương tác
         const courtTypeSelectEl = document.getElementById('court-type-select');
         const datePickerEl = document.getElementById('date-picker');
@@ -342,7 +341,6 @@
         }
 
 
-<<<<<<< HEAD
             // Hàm cập nhật giao diện người dùng
             function updateUI() {
                 // Cập nhật các nút giờ
@@ -352,7 +350,7 @@
                 let filteredCourts = stadiumData.Courts;
                 if (selectedCourtType) {
                     filteredCourts = filteredCourts.filter(court => court.SportType === selectedCourtType);
-=======
+
         function parseHour(isoDuration) {
             // VD: "PT6H" => 6
             const match = isoDuration.match(/PT(\d+)H/);
