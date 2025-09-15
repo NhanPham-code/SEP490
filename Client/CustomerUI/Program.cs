@@ -51,6 +51,7 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<ITeamPostService, TeamPostService>();
 builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
+builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
 
 
 
@@ -65,23 +66,25 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Đặt middleware NoCache ở đây, trước khi phục vụ bất kỳ file nào
+app.UseMiddleware<NoCacheMiddleware>();
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    ServeUnknownFileTypes = true // Cho phép phục vụ các loại file không xác định
+    ServeUnknownFileTypes = true
 });
 
 app.UseRouting();
 
-app.UseMiddleware<NoCacheMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
-
 app.UseSession();
 
-app.UseMiddleware<TokenRefreshMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+app.UseMiddleware<TokenRefreshMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<TokenSessionMiddleware>(); // <-- ĐĂNG KÝ MIDDLEWARE CỦA BẠN
+app.UseMiddleware<TokenSessionMiddleware>();
 
 app.MapControllerRoute(
     name: "default",

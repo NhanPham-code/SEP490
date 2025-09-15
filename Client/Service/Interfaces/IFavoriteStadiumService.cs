@@ -1,9 +1,4 @@
 ﻿using DTOs.FavoriteStadiumDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.Interfaces
 {
@@ -16,21 +11,28 @@ namespace Service.Interfaces
         /// Lấy danh sách các sân vận động yêu thích của một người dùng cụ thể.
         /// </summary>
         /// <returns>Danh sách các Favorite DTO.</returns>
-        Task<IEnumerable<FavoriteDTO>> GetMyFavoritesAsync(string accessToken);
+        Task<IEnumerable<ReadFavoriteDTO>> GetMyFavoritesAsync(string accessToken);
+
+        /// <summary>
+        /// Lấy danh sách các sân vận động yêu thích của một người dùng cụ thể với ViewModel. (bao gồm thông tin chi tiết về sân vận động)
+        /// </summary>
+        /// <returns>Danh sách các sân vận động yêu thích của user</returns>
+        Task<string> GetMyFavoritesForUIAsync(string accessToken);
 
         /// <summary>
         /// Thêm một sân vận động vào danh sách yêu thích.
         /// </summary>
         /// <param name="createFavoriteDTO">Dữ liệu để tạo mới một Favorite.</param>
         /// <returns>Favorite DTO vừa được tạo.</returns>
-        Task<FavoriteDTO> AddFavoriteAsync(CreateFavoriteDTO createFavoriteDTO, string accessToken);
+        Task<bool> AddFavoriteAsync(CreateFavoriteDTO createFavoriteDTO, string accessToken);
 
         /// <summary>
         /// Xóa một sân vận động khỏi danh sách yêu thích.
         /// </summary>
-        /// <param name="favoriteId">ID của Favorite cần xóa.</param>
+        /// <param name="userId">ID của người dùng.</param>
+        /// <param name="stadiumId">ID của sân vận động.</param>
         /// <returns>Trả về true nếu xóa thành công, false nếu không tìm thấy.</returns>
-        Task<bool> DeleteFavoriteAsync(int favoriteId, string accessToken);
+        Task<bool> DeleteFavoriteAsync(int userId, int stadiumId, string accessToken);
 
         /// <summary>
         /// Kiểm tra xem một người dùng đã yêu thích một sân vận động hay chưa.

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.FavoriteStadiumDTO
 {
-    public class FavoriteDTO
+    public class ReadFavoriteDTO
     {
         public int FavoriteId { get; set; }
         public int UserId { get; set; }

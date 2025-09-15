@@ -1112,7 +1112,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/api/Favorite/{favoriteId}",
+      "DownstreamPathTemplate": "/api/Favorite/{userId}/{stadiumId}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -1120,7 +1120,7 @@
           "Port": 7139
         }
       ],
-      "UpstreamPathTemplate": "/favoriteStadium/{favoriteId}",
+      "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
       "UpstreamHttpMethod": [ "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
