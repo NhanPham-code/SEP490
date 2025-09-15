@@ -1438,6 +1438,51 @@
         window.removeCurrentImage = removeCurrentImage;
         window.cancelEdit = cancelEdit;
         window.deleteFeedback = deleteFeedback;
+
+
+        const bookingModalEl = document.getElementById('booking-modal');
+
+
+        function showModal(title, message) {
+			document.getElementById('modal-title').textContent = title;
+			document.getElementById('modal-message').textContent = message;
+			modalEl.style.display = 'flex';
+		}
+
+		function hideModal() {
+			modalEl.style.display = 'none';
+		}
+
+		function showBookingModal() {
+			bookingModalEl.style.display = 'flex';
+		}
+
+		function hideBookingModal() {
+			bookingModalEl.style.display = 'none';
+		}
+
+		function bookingVisually() {
+			window.location.href = `/Booking/VisuallyBooking?stadiumId=${stadiumId}`;
+		}
+
+		function bookingTraditional() {
+			window.location.href = `/Booking/Booking?stadiumId=${stadiumId}`;
+		}
+                // Event listeners
+        document.getElementById('modal-close-btn').onclick = hideModal;
+        document.getElementById('booking-modal-close-btn').onclick = hideBookingModal;
+        document.getElementById('booking-btn').onclick = showBookingModal;
+        document.getElementById('floating-chat-btn').onclick = chatWithOwner;
+
+        // Click outside modal to close
+        window.onclick = function(event) {
+            if (event.target === modalEl) {
+                hideModal();
+            }
+            if (event.target === bookingModalEl) {
+                hideBookingModal();
+            }
+        }
     </script>
 
 </body>

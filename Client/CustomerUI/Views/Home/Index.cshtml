@@ -985,6 +985,12 @@
         mapView.classList.remove('bg-primary', 'text-white');
         });
         });
+                document.getElementById("map-view").addEventListener("click", () => {
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 300);
+        });
+
     </script>
 
     <script id="comparison-functionality">
@@ -1167,7 +1173,6 @@
               let places = snapshot.val();
               if (!places) return;
 
-<<<<<<< HEAD
               Object.values(places).forEach(place => {
                 if (place.lat && place.lng) {
                   let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
@@ -1178,40 +1183,9 @@
               });
             })
             .catch(e => console.error('Lỗi Firebase:', e));
-=======
-                            if (tag.includes('Bóng đá')) icon = '⚽';
-                            else if (tag.includes('Tennis')) icon = '🎾';
-                            else if (tag.includes('Bóng rổ')) icon = '🏀';
-                            else if (tag.includes('Bơi lội')) icon = '🏊‍♂️';
-                            else if (tag.includes('Bóng chuyền')) icon = '🏐';
-
-                            addMarker(lat, lon, name, icon);
-                        }
-                    });
-                })
-                .catch(e => console.error("Lỗi khi lấy dữ liệu Overpass:", e));
-            });
-
-            // Load custom places Firebase
-            db.ref("customPlaces").once("value")
-                .then(snapshot => {
-                    let places = snapshot.val();
-                    if (!places) return;
-
-                    Object.values(places).forEach(place => {
-                        if (place.lat && place.lng) {
-                            let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
-                            if (dist <= radius) {
-                                addMarker(place.lat, place.lng, place.name, "📍");
-                            }
-                        }
-                    });
-                })
-                .catch(e => console.error("Lỗi khi lấy dữ liệu Firebase:", e));
-
         }
 
-        
+
 
         function updateRadius(newRadius) {
           radius = newRadius;
@@ -1229,22 +1203,22 @@
 
           loadOverpassData();
           loadFirebaseData();
-          loadGooglePlacesData();
+          
         }
 
-        function init(lat, lng, label="📍 Vị trí của bạn") {
+                        function init(lat, lng, label="📍 Vị trí của bạn") {
           userLat = lat;
           userLng = lng;
           map.setView([userLat, userLng], 13);
 
-          // ❌ Xóa tất cả marker cũ trừ circle
+          // ❌ Xóa marker/circle cũ
           map.eachLayer(layer => {
             if (layer instanceof L.Marker || layer instanceof L.Circle) {
               map.removeLayer(layer);
             }
           });
 
-          // ✅ Thêm lại marker user
+          // ✅ Thêm marker user
           L.marker([userLat, userLng], {
             icon: L.icon({
               iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
@@ -1252,7 +1226,7 @@
             })
           }).addTo(map).bindTooltip(label, {permanent:true, direction:'top', className:'marker-label'});
 
-          // ✅ Thêm lại circle mới
+          // ✅ Thêm circle mới
           radiusCircle = L.circle([userLat, userLng], {
             color: "#2980b9",
             fillColor: "#2980b9",
@@ -1260,11 +1234,21 @@
             radius: radius
           }).addTo(map);
 
-          // ✅ Load lại dữ liệu theo vị trí mới
+          // ✅ Load data
           loadOverpassData();
           loadFirebaseData();
-          loadGooglePlacesData();
+
+          // 🔥 Fix lỗi phải F12 mới load
+          refreshMap();
         }
+
+                function refreshMap() {
+          // buộc Leaflet vẽ lại map
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 200);
+        }
+
 
         // Tìm theo địa chỉ nhập
         function searchAddress() {
@@ -1331,7 +1315,7 @@
         radiusControl.addTo(map);
 
         // Nếu có geolocation thì lấy ban đầu
-                // Nếu có geolocation thì lấy ban đầu
+              
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(pos => {
             currentLat = pos.coords.latitude; // Lưu vị trí hiện tại
@@ -1342,6 +1326,7 @@
           });
         }
     </script>
+
 
 
     <script>

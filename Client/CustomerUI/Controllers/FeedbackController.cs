@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace CustomerUI.Controllers
 {
@@ -434,11 +435,13 @@ namespace CustomerUI.Controllers
             {
                 var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
                 var feedbackList = new List<object>();
-
+                const string BASE_URL= "https://localhost:7221"; // Sửa lại base URL nếu khác
+                const string Profile = "https://localhost:7295";
                 if (stadiumFeedbacks != null && stadiumFeedbacks.Any())
                 {
-                    var userIds = stadiumFeedbacks.Select(f => f.UserId.ToString()).Distinct().ToList();
-                    var userDict = new Dictionary<string, object>();
+                    // Lấy userId dạng int, không chuyển sang string
+                    var userIds = stadiumFeedbacks.Select(f => f.UserId).Distinct().ToList();
+                    var userDict = new Dictionary<int, object>();
 
                     Console.WriteLine($"[GetFeedbacksByStadiumDirect] Processing {userIds.Count} unique users");
 
@@ -448,14 +451,14 @@ namespace CustomerUI.Controllers
                         {
                             Console.WriteLine($"[GetFeedbacksByStadiumDirect] Getting user info for userId: {userId}");
 
+                            // Sử dụng int, không phải string
                             var userInfo = await _userService.GetOtherUserByIdAsync(userId);
 
                             if (userInfo != null)
                             {
-                                // ✅ Tạo full URL avatar giống session
                                 var avatarFullUrl = !string.IsNullOrEmpty(userInfo.AvatarUrl)
-                                    ? $"{BASE_URL}{userInfo.AvatarUrl}"
-                                    : $"{BASE_URL}/avatars/default-avatar.png";
+                                    ? $"{Profile}{userInfo.AvatarUrl}"
+                                    : $"{Profile}/avatars/default-avatar.png";
 
                                 userDict[userId] = new
                                 {
@@ -471,7 +474,7 @@ namespace CustomerUI.Controllers
                                 userDict[userId] = new
                                 {
                                     FullName = "Anonymous",
-                                    AvatarUrl = $"{BASE_URL}/avatars/default-avatar.png"
+                                    AvatarUrl = $"{Profile}/avatars/default-avatar.png"
                                 };
                             }
                         }
@@ -481,22 +484,21 @@ namespace CustomerUI.Controllers
                             userDict[userId] = new
                             {
                                 FullName = "Anonymous",
-                                AvatarUrl = $"{BASE_URL}/avatars/default-avatar.png"
+                                AvatarUrl = $"{Profile}/avatars/default-avatar.png"
                             };
                         }
                     }
 
-                    // ✅ Build feedback với user info và xử lý imagePath
                     var allFeedbacks = new List<object>();
                     foreach (var fb in stadiumFeedbacks.OrderByDescending(f => f.CreatedAt))
                     {
-                        var userInfo = userDict.GetValueOrDefault(fb.UserId.ToString());
+                        // Lấy theo int userId
+                        var userInfo = userDict.GetValueOrDefault(fb.UserId);
 
-                        // ✅ Xử lý imagePath - chỉ tạo full URL nếu có imagePath
                         string imageFullUrl = null;
                         if (!string.IsNullOrEmpty(fb.ImagePath))
                         {
-                            imageFullUrl = $"https://localhost:7221{fb.ImagePath}";
+                            imageFullUrl = $"{BASE_URL}{fb.ImagePath}";
                         }
 
                         var feedbackItem = new
@@ -506,7 +508,7 @@ namespace CustomerUI.Controllers
                             comment = fb.Comment,
                             stadiumId = fb.StadiumId,
                             userId = fb.UserId,
-                            imagePath = imageFullUrl, // ✅ Full URL hoặc null
+                            imagePath = imageFullUrl,
                             createdAt = fb.CreatedAt,
                             userName = ((dynamic)userInfo).FullName,
                             userAvatar = ((dynamic)userInfo).AvatarUrl
@@ -517,7 +519,7 @@ namespace CustomerUI.Controllers
                         allFeedbacks.Add(feedbackItem);
                     }
 
-                    // ✅ Phân trang
+                    // Phân trang
                     var totalCount = allFeedbacks.Count;
                     var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
                     var skip = (page - 1) * pageSize;
@@ -775,7 +777,7 @@ namespace CustomerUI.Controllers
                 if (userId <= 0)
                     return BadRequest(new { success = false, message = "UserId không hợp lệ." });
 
-                var otherUser = await _userService.GetOtherUserByIdAsync(userId.ToString());
+                var otherUser = await _userService.GetOtherUserByIdAsync(userId);
                 if (otherUser == null)
                     return NotFound(new { success = false, message = "Không tìm thấy thông tin người dùng." });
 
