@@ -12,6 +12,7 @@ namespace DTOs.FindTeamDTO
     {
         public List<BookingReadDto> Bookings { get; set; }
         public Dictionary<int, ReadStadiumDTO> Stadiums { get; set; } = new Dictionary<int, ReadStadiumDTO>();
+        public Dictionary<int, TimeSpan> Times { get; set; } = new Dictionary<int, TimeSpan>();
 
     }
 }

@@ -699,11 +699,13 @@
                                     </label>
                                     <select id="newSport" class="form-input">
                                         <option value="">Chọn môn thể thao</option>
-                                        <option value="football">Bóng đá</option>
-                                        <option value="basketball">Bóng rổ</option>
-                                        <option value="volleyball">Bóng chuyền</option>
-                                        <option value="badminton">Cầu lông</option>
-                                        <option value="tennis">Quần vợt</option>
+                                        <option value="Bóng đá sân 11">Bóng đá sân 11</option>
+                                        <option value="Bóng đá sân 7">Bóng đá sân 7</option>
+                                        <option value="Bóng đá sân 5">Bóng đá sân 5</option>
+                                        <option value="Bóng rổ">Bóng rổ</option>
+                                        <option value="Bóng chuyền">Bóng chuyền</option>
+                                        <option value="Cầu lông">Cầu lông</option>
+                                        <option value="Tennis">Tennis</option>
                                         <option value="table-tennis">Bóng bàn</option>
                                         <option value="other">Khác</option>
                                     </select>
@@ -800,9 +802,11 @@
             `;
         }
 
-        function getSportType(courts, staidumId){
+
+              function getSportType(courts, staidumId){
             return courts?.find(court => court.stadiumId === staidumId)?.sportType || 'Thể thao';
         }
+
 
         // New function to generate booking cards
         function generateBookingCards(bookings) {
@@ -822,8 +826,10 @@
                 const address = bookings.stadiums[booking.stadiumId]?.address || 'Địa chỉ không xác định';
                 const name = bookings.stadiums[booking.stadiumId]?.name || 'Sân không xác định';
                 const sportType = getSportType(bookings.stadiums[booking.stadiumId]?.courts, bookings.stadiums[booking.stadiumId]?.id) || 'Thể thao';
+                const stadium = bookings.stadiums[booking.stadiumId];
                 return `
-                    <div class="booking-card" data-booking-id="${booking.id}" data-booking='${JSON.stringify(booking)}'>
+                          <div class="booking-card" data-booking-id="${booking.id}"   data-booking='${JSON.stringify(booking)}'
+                                                                                      data-stadium='${JSON.stringify(stadium)}'>
                         <div class="booking-card-header">
                             <div class="booking-id">
                                 <i class="ri-hashtag"></i>
@@ -848,7 +854,7 @@
                                 <i class="ri-calendar-line"></i>
                                 <span>${sportType}</span>
                             </div>
-                            <div class="booking-detail">
+                            <div class="booking-detail-map">
                                 <i class="ri-map-pin-line"></i>
                                 <span>${address}</span>
                             </div>
@@ -919,12 +925,13 @@
 
             // Get booking data
             const bookingData = JSON.parse(bookingCard.dataset.booking);
+            const stadium = JSON.parse(bookingCard.dataset.stadium);
 
             // Update hidden input with selected booking ID
             document.getElementById('selectedBookingId').value = bookingData.id;
 
             // Auto-fill form fields based on selected booking
-            fillFormFromBooking(bookingData);
+            fillFormFromBooking(bookingData, stadium);
 
             // Show selected booking info
             showSelectedBookingInfo(bookingData);
@@ -941,13 +948,16 @@
         }
 
         // Function to auto-fill form from selected booking
-        function fillFormFromBooking(booking) {
+        function fillFormFromBooking(booking, stadium) {
             // Set date
             const bookingDate = new Date(booking.date);
             document.getElementById('newPlayDate').value = bookingDate.toISOString().split('T')[0];
 
             // Set location (you might need to adjust this based on your stadium data structure)
-            document.getElementById('newLocation').value = `Sân ${booking.stadiumId}`;
+            document.getElementById('newLocation').value = `${stadium.address}`;
+            // set sport type
+        
+            document.getElementById('newSport').value = getSportType(stadium.courts, booking.stadiumId);
 
             // Calculate price per person suggestion (total price divided by estimated team size)
             if (booking.totalPrice) {

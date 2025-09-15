@@ -1900,6 +1900,17 @@ body {
     font-size: 14px;
     line-height: 1.4;
 }
+.booking-detail-map {
+    display: flex;
+    align-items: start;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
+}
+    .booking-detail-map span {
+        padding-left: 11.5px;
+    }
 
     .booking-detail i {
         margin-right: 10px;
