@@ -1,4 +1,5 @@
 ﻿using DTOs.FindTeamDTO;
+using DTOs.StadiumDTO;
 using FindTeamAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -31,8 +32,15 @@ namespace CustomerUI.Controllers
         public IActionResult FindTeam()
         {
             token = _tokenService.GetAccessTokenFromCookie();
-
-            return View();
+            if (token != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Common");
+            }
+            
         }
         public IActionResult TeamPostManage()
         {
@@ -74,8 +82,21 @@ namespace CustomerUI.Controllers
 
         public async Task<IActionResult> GetBookByUserId()
         {
-            var booking = await _bookingService.GetBookingHistoryAsync(token);
-            return Json(booking);
+            var booking = await _bookingService.GetBookingHistoryAsync(_tokenService.GetAccessTokenFromCookie());
+            
+            List<int> stadiumId = booking.Select(s => s.StadiumId).ToList();
+            BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();
+            bookingAndStadiumViewModel.Bookings = booking;
+          
+            var s = await _stadiumService.GetAllStadiumByListId(stadiumId);
+            foreach (var item in s.Value)
+            {
+                var bookingDetail = await _bookingService.GetBookingDetailAsync(_tokenService.GetAccessTokenFromCookie(), item.Id);
+                Console.WriteLine(JsonConvert.SerializeObject(bookingDetail));
+                bookingAndStadiumViewModel.Stadiums.Add(item.Id, item);
+            }
+
+            return Json(bookingAndStadiumViewModel);
         }
 
     }
