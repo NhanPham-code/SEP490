@@ -36,7 +36,6 @@ namespace StadiumAPI.Models
 
         public int CreatedBy { get; set; }
 
-        public int CreatedByUser { get; set; } // Navigation property
 
         public DateTime CreatedAt { get; set; }
 

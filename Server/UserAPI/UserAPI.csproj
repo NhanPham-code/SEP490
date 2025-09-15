@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\uploads\avatars\" />
     <Folder Include="wwwroot\uploads\cccd\" />
     <Folder Include="wwwroot\uploads\videos\" />
   </ItemGroup>

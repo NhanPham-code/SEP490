@@ -84,12 +84,19 @@ namespace FindTeamAPI.Migrations
                     b.Property<DateTime>("PlayDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("PricePerPerson")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("SportType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StadiumId")
                         .HasColumnType("int");
+
+                    b.Property<string>("StadiumName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("TimePlay")
                         .HasColumnType("time");

@@ -123,9 +123,6 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer|Admin|StadiumManager"
       }
     },
     {
@@ -142,7 +139,7 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
+      }
     },
     {
       "DownstreamPathTemplate": "/api/Users/{userId}",
@@ -849,7 +846,11 @@
         }
       ],
       "UpstreamPathTemplate": "/odata/TeamPost",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     },
     {
       "DownstreamPathTemplate": "/CreateTeamPost",
@@ -917,7 +918,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/GetTeamMemberByPostId",
+      "DownstreamPathTemplate": "/GetTeamMemberByPostIdAndId",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -925,7 +926,7 @@
           "Port": 7028
         }
       ],
-      "UpstreamPathTemplate": "/GetTeamMemberByPostId",
+      "UpstreamPathTemplate": "/GetTeamMemberByPostIdAndId",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -1044,6 +1045,87 @@
       ],
       "UpstreamPathTemplate": "/deleteStadiumVideosByStadiumId",
       "UpstreamHttpMethod": [ "DELETE" ]
+    },
+    // Favorite
+    {
+      "DownstreamPathTemplate": "/api/Favorite",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
+        }
+      ],
+      "UpstreamPathTemplate": "/favoriteStadium",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/odata/ODataFavorites",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
+        }
+      ],
+      "UpstreamPathTemplate": "/favoriteStadium",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Favorite",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
+        }
+      ],
+      "UpstreamPathTemplate": "/myFavoriteStadium",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Favorite/exists",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
+        }
+      ],
+      "UpstreamPathTemplate": "/favoriteStadium/exists",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Favorite/{favoriteId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
+        }
+      ],
+      "UpstreamPathTemplate": "/favoriteStadium/{favoriteId}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     }
   ],
   "GlobalConfiguration": {

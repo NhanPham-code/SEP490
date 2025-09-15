@@ -49,6 +49,8 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
+builder.Services.AddScoped<ITeamPostService, TeamPostService>();
+builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
 
 
 

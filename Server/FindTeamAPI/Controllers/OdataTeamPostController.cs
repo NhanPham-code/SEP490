@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FindTeamAPI.Models;
 using FindTeamAPI.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -21,6 +22,7 @@ namespace FindTeamAPI.Controllers
         }
 
         [EnableQuery]
+        [Authorize(Roles = "Customer")]
         public IQueryable<TeamPost> Get()
         {
             var TeamPost = _teamPostService.GetAllTeamPostsQueryableAsync(); // Assuming 0 is the teamId for all posts

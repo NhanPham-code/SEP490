@@ -36,6 +36,8 @@ IEdmModel GetEdmModel()
 
     odataBuilder.EntityType<PrivateUserProfileDTO>(); // <--- Thêm dòng này
 
+    odataBuilder.EntityType<PublicUserProfileDTO>();
+
     return odataBuilder.GetEdmModel();
 }
 

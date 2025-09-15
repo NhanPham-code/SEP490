@@ -25,7 +25,7 @@ namespace UserAPI.Controllers
         }
 
         // /odata/ODataUsers
-        public IQueryable<PrivateUserProfileDTO> Get(ODataQueryOptions<User> queryOptions) // <--- Kiểu tham số là User, kiểu trả về là IQueryable<ReadUserDTO>
+        public IQueryable<PublicUserProfileDTO> Get(ODataQueryOptions<User> queryOptions) // <--- Kiểu tham số là User, kiểu trả về là IQueryable<ReadUserDTO>
         {
             // 1. Lấy IQueryable<User> từ Service/Repository
             IQueryable<User> users = _userService.GetAllUsersForOData();
@@ -37,7 +37,7 @@ namespace UserAPI.Controllers
 
             // 3. Chiếu kết quả (hiện đang là IQueryable<User>) sang IQueryable<ReadUserDTO>
             // Đảm bảo bạn có cấu hình AutoMapper để ánh xạ từ User sang ReadUserDTO
-            IQueryable<PrivateUserProfileDTO> projectedResults = results.ProjectTo<PrivateUserProfileDTO>(_mapper.ConfigurationProvider);
+            IQueryable<PublicUserProfileDTO> projectedResults = results.ProjectTo<PublicUserProfileDTO>(_mapper.ConfigurationProvider);
 
             // 4. Trả về kết quả đã được chiếu. OData sẽ định dạng nó.
             return projectedResults;

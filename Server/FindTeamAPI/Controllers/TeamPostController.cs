@@ -1,5 +1,6 @@
 ﻿using FindTeamAPI.DTOs;
 using FindTeamAPI.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FindTeamAPI.Controllers
@@ -13,6 +14,7 @@ namespace FindTeamAPI.Controllers
         }
 
         [HttpPost("CreateTeamPost")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> CreateTeamPost([FromBody] CreateTeamPostDTO teamPost)
         {
             if (teamPost == null)
@@ -24,6 +26,7 @@ namespace FindTeamAPI.Controllers
         }
 
         [HttpPut("UpdateTeamPost")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> UpdateTeamPost([FromBody] UpdateTeamPostDTO teamPost)
         {
             if (teamPost == null)
@@ -35,6 +38,7 @@ namespace FindTeamAPI.Controllers
         }
 
         [HttpDelete("DeleteTeamPost")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> DeleteTeamPost([FromQuery] int postId)
         {
             var result = await _teamPostService.DeleteTeamPostAsync(postId);

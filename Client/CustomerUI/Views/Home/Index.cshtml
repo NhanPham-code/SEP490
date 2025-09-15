@@ -9,14 +9,16 @@
 
     </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/css/Home/home.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="js/app.js"></script>
+    <script src="js/Home/Home.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <style>
+
         
         body, html {
             margin: 0;
@@ -36,12 +38,110 @@
         }
 
       
+
+        .circle{
+            border-radius: 50%;
+            max-height: 40px;
+        }
+        /* Custom checkbox style */
+
         input[type="checkbox"] {
             accent-color: #2563eb; /* Blue-600 */
             cursor: pointer;
         }
 
-       
+        /* Thêm vào file CSS hiện tại của bạn */
+
+        @@keyframes pulse {
+            0%, 100%
+
+        {
+            transform: scale(1);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+        }
+
+        }
+
+        @@keyframes heartBeat {
+            0%, 100%
+
+        {
+            transform: scale(1);
+        }
+
+        25% {
+            transform: scale(1.3);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        75% {
+            transform: scale(1.2);
+        }
+
+        }
+
+        @@keyframes floatUp {
+            0%
+
+        {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(-40px) scale(0.3);
+        }
+
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        .heart-beat {
+            animation: heartBeat 0.6s ease-in-out;
+        }
+
+        .floating-heart {
+            position: fixed;
+            pointer-events: none;
+            animation: floatUp 1.5s ease-out forwards;
+            z-index: 9999;
+            font-size: 16px;
+        }
+
+        .favorite-btn {
+            position: relative;
+            z-index: 20;
+        }
+
+            .favorite-btn.favorited {
+                background: rgba(254, 242, 242, 0.95) !important;
+                border-color: rgb(252, 165, 165) !important;
+                color: rgb(220, 38, 38) !important;
+                transform: scale(1.1) !important;
+            }
+
+                .favorite-btn.favorited .heart-icon {
+                    color: rgb(220, 38, 38) !important;
+                }
+
+        /* Đảm bảo backdrop blur hoạt động */
+        .favorite-btn {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        /* Custom time slot styles */
+
         .time-slot {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -440,24 +540,45 @@
                             </button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <!-- Grid -->
-                        <button type="button" id="grid-view"
-                                class="p-2 rounded-xl border border-gray-300 text-gray-600 hover:border-primary hover:text-primary transition-all duration-200 active-btn">
-                            <i class="ri-grid-line text-xl"></i>
-                        </button>
+                    <div class="flex items-center gap-4 mb-6">
+                        <!-- Grid View Card -->
+                        <div class="group perspective-1000">
+                            <button type="button" id="grid-view"
+                                    class="relative w-32 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 active-btn">
+                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
+                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                                    <i class="ri-grid-line text-3xl mb-1"></i>
+                                    <span class="text-xs font-bold">DANH SÁCH</span>
+                                </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                            </button>
+                        </div>
 
-                        <!-- Map -->
-                        <button type="button" id="map-view"
-                                class="p-2 rounded-xl border border-gray-300 text-gray-600 hover:border-primary hover:text-primary transition-all duration-200">
-                            <i class="ri-map-line text-xl"></i>
-                        </button>
+                        <!-- Map View Card -->
+                        <div class="group perspective-1000">
+                            <button type="button" id="map-view"
+                                    class="relative w-32 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 opacity-70 hover:opacity-100">
+                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
+                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                                    <i class="ri-map-line text-3xl mb-1"></i>
+                                    <span class="text-xs font-bold">BẢN ĐỒ</span>
+                                </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                            </button>
+                        </div>
 
-                        <!-- Compare -->
-                        <button type="button" id="compare-view"
-                                class="p-2 rounded-xl border border-gray-300 text-gray-600 hover:border-primary hover:text-primary transition-all duration-200">
-                            <i class="ri-scales-line text-xl"></i>
-                        </button>
+                        <!-- Favorites Card -->
+                        <div class="group perspective-1000">
+                            <button type="button" id="compare-view"
+                                    class="relative w-32 h-24 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 opacity-70 hover:opacity-100">
+                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
+                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                                    <i class="ri-heart-line text-3xl mb-1"></i>
+                                    <span class="text-xs font-bold">YÊU THÍCH</span>
+                                </div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -479,10 +600,7 @@
                           });
                         });
 
-                        $(document).ready(function() {
-                                //get all by ajax
-
-                        });
+                        
                                                 // Get the form element
                                                                                             $(document).ready(function() {
                                                                                                 sessionStorage.setItem('searchTerm', "")
@@ -597,61 +715,71 @@
                                         }).format(price);
                                         let address = item.Address ?? '';
 
-                                        html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                                            <div class="relative h-48">
-                                                <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
+                                                                // Thay thế đoạn code HTML của bạn bằng đoạn này:
+                        html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div class="relative h-48">
+                                <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
-                                                <!-- Hot badge -->
-                                                <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                                    Hot
-                                                </div>
+                                <!-- Hot badge - Fixed positioning -->
+                                <div class="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold z-10 pulse-animation shadow-lg">
+                                    🔥 Hot
+                                </div>
 
-                                                <!-- Sport type badge -->
-                                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
-                                                    ${item.Courts[0].SportType}
-                                                </div>
-                                            </div>
+                                <!-- Favorite Button - Positioned correctly -->
+                                <div class="absolute top-3 left-3 z-20">
+                                    <button class="favorite-btn bg-white/90 backdrop-blur-sm hover:bg-white border border-white/20 text-gray-600 hover:text-red-500 p-2.5 circle transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
+                                            data-stadium-id="${item.Id}"
+                                            data-stadium-name="${item.Name}">
+                                        <i class="heart-icon far fa-heart text-lg"></i>
+                                    </button>
+                                </div>
 
-                                            <div class="p-4 ">
-                                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
+                                <!-- Sport type badge -->
+                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
+                                    ${item.Courts[0].SportType}
+                                </div>
+                            </div>
 
-                                                <div class="flex items-center text-gray-500 text-sm mb-2">
-                                                    <i class="ri-map-pin-line text-gray-400 mr-1"></i>
-                                                    <span>${address}</span>
-                                                </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
 
-                                                <div class="flex items-center text-sm mb-3">
-                                                    <i class="ri-star-fill text-yellow-400 mr-1"></i>
-                                                    <span class="font-semibold text-gray-800">4.7</span>
-                                                    <span class="text-gray-500 ml-1">(124 đánh giá)</span>
-                                                </div>
+                                <div class="flex items-center text-gray-500 text-sm mb-2">
+                                    <i class="ri-map-pin-line text-gray-400 mr-1"></i>
+                                    <span>${address}</span>
+                                </div>
 
-                                                <!-- Available time slots -->
-                                                <div class="mb-4">
-                                                    <div class="flex items-center text-sm text-gray-600 mb-2">
-                                                        <i class="ri-time-line mr-1"></i>
-                                                        <span>Khung giờ trống hôm nay:</span>
-                                                    </div>
-                                                    <div class="grid grid-cols-4 gap-1">
-                                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">09:00</span>
-                                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">11:00</span>
-                                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">14:00</span>
-                                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium">17:00</span>
-                                                    </div>
-                                                </div>
+                                <div class="flex items-center text-sm mb-3">
+                                    <i class="ri-star-fill text-yellow-400 mr-1"></i>
+                                    <span class="font-semibold text-gray-800">4.7</span>
+                                    <span class="text-gray-500 ml-1">(124 đánh giá)</span>
+                                </div>
 
-                                                <div class=" items-center justify-end">
-                                                    <div class="text-2xl font-bold text-blue-600">
-                                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
-                                                    </div>
-                                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
-                                                    onclick="redirectToBooking('${item.Id}')">
-                                                        Đặt ngay
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>`;
-                                    });
+                                <!-- Available time slots -->
+                                <div class="mb-4">
+                                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                                        <i class="ri-time-line mr-1"></i>
+                                        <span>Khung giờ trống hôm nay:</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-1">
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time">${formatTimeForDisplay(item.OpenTime)}</span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time"><i class="ri-arrow-right-line" style="transform: scaleX(1.3);"></i></span>
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time">${formatTimeForDisplay(item.CloseTime)}</span>
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="items-center justify-end">
+                                    <div class="text-2xl font-bold text-blue-600">
+                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
+                                    </div>
+                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                                            onclick="redirectToBooking('${item.Id}')">
+                                        Đặt ngay
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                        });
                                             if (skip === 0) {
                             $('#stadium-grid').html(html).show();
                         } else {
@@ -667,7 +795,39 @@
                             }
                         });
                         }
+                                        function formatTimeForDisplay(time) {
+                            if (!time) return '--:--';
 
+                            try {
+                                if (typeof time === 'string') {
+                                    if (time.startsWith('PT')) {
+                                        const hoursMatch = time.match(/PT(\d+)H/);
+                                        if (hoursMatch && hoursMatch[1]) {
+                                            const hours = parseInt(hoursMatch[1]).toString().padStart(2, '0');
+                                            return `${hours}:00`;
+                                        }
+                                    } else if (time.includes(':')) {
+                                        const parts = time.split(':');
+                                        if (parts.length >= 2) {
+                                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
+                                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
+                                            return `${hours}:${minutes}`;
+                                        }
+                                    }
+                                }
+
+                                if (time instanceof Date) {
+                                    const hours = time.getHours().toString().padStart(2, '0');
+                                    const minutes = time.getMinutes().toString().padStart(2, '0');
+                                    return `${hours}:${minutes}`;
+                                }
+
+                                return '--:--';
+                            } catch (error) {
+                                console.warn('Error formatting time for display:', error);
+                                return '--:--';
+                            }
+                        }
 
 
 
@@ -686,6 +846,9 @@
                         <button class="btn btn-primary" onclick="searchAddress()">Tìm</button>
                         <button class="btn btn-secondary" onclick="getCurrentLocation()" title="Quay lại vị trí hiện tại">📍 Vị trí hiện tại</button>
                     </div>
+                </div>
+                <div id="favorite-container" class="hidden bg-white rounded-lg shadow-sm overflow-hidden relative map-container">
+                    <div id="favorite-list"  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
                 </div>
 
                 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -708,7 +871,8 @@
     <script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/array/phc_t9tkQZJiyi2ps9zUYm8TDsL6qXo4YmZx0Ot5rBlAlEd/config.js"></script>
     <script type="text/javascript" crossorigin="anonymous" src="https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.259.0"></script>
     <script id="filter-functionality">
-                // Lấy các phần tử DOM
+             // yêu thích
+
 
                         // Lấy các phần tử DOM
         const priceRange = document.querySelector('input[name="price"]');
@@ -773,24 +937,46 @@
         const compareView = document.getElementById('compare-view');
         const stadiumGrid = document.getElementById('stadium-grid');
         const mapContainer = document.getElementById('map-container');
-        const comparisonTable = document.getElementById('comparison-table');
+        const comparisonTable = document.getElementById('favorite-container');
         gridView.addEventListener('click', function() {
-        stadiumGrid.classList.remove('hidden');
-        mapContainer.classList.add('hidden');
+            // remove
+        stadiumGrid.classList.remove('active');
+        mapContainer.classList.remove('active');
         comparisonTable.classList.remove('active');
+        stadiumGrid.classList.remove('hidden');
+        mapContainer.classList.remove('hidden');
+        comparisonTable.classList.remove('hidden');
+
+        stadiumGrid.classList.add('active');
+        mapContainer.classList.add('hidden');
+        comparisonTable.classList.add('active');
         gridView.classList.add('bg-primary', 'text-white');
         mapView.classList.remove('bg-primary', 'text-white');
         compareView.classList.remove('bg-primary', 'text-white');
         });
         mapView.addEventListener('click', function() {
-        stadiumGrid.classList.add('hidden');
-        mapContainer.classList.remove('hidden');
+        stadiumGrid.classList.remove('active');
+        mapContainer.classList.remove('active');
         comparisonTable.classList.remove('active');
+        stadiumGrid.classList.remove('hidden');
+        mapContainer.classList.remove('hidden');
+        comparisonTable.classList.remove('hidden');
+
+        stadiumGrid.classList.add('hidden');
+        mapContainer.classList.add('active');
+        comparisonTable.classList.add('hidden');
         mapView.classList.add('bg-primary', 'text-white');
         gridView.classList.remove('bg-primary', 'text-white');
         compareView.classList.remove('bg-primary', 'text-white');
         });
         compareView.addEventListener('click', function() {
+        stadiumGrid.classList.remove('active');
+        mapContainer.classList.remove('active');
+        comparisonTable.classList.remove('active');
+        stadiumGrid.classList.remove('hidden');
+        mapContainer.classList.remove('hidden');
+        comparisonTable.classList.remove('hidden');
+
         stadiumGrid.classList.add('hidden');
         mapContainer.classList.add('hidden');
         comparisonTable.classList.add('active');
@@ -800,22 +986,7 @@
         });
         });
     </script>
-    <script id="wishlist-functionality">
-        document.addEventListener('DOMContentLoaded', function() {
-        const heartButtons = document.querySelectorAll('[class*="ri-heart"]');
-        heartButtons.forEach(button => {
-        button.addEventListener('click', function() {
-        if (this.classList.contains('ri-heart-line')) {
-        this.classList.remove('ri-heart-line');
-        this.classList.add('ri-heart-fill', 'text-red-500');
-        } else {
-        this.classList.remove('ri-heart-fill', 'text-red-500');
-        this.classList.add('ri-heart-line');
-        }
-        });
-        });
-        });
-    </script>
+
     <script id="comparison-functionality">
         document.addEventListener('DOMContentLoaded', function() {
         const compareCheckboxes = document.querySelectorAll('.compare-checkbox');
@@ -996,6 +1167,7 @@
               let places = snapshot.val();
               if (!places) return;
 
+<<<<<<< HEAD
               Object.values(places).forEach(place => {
                 if (place.lat && place.lng) {
                   let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
@@ -1006,6 +1178,37 @@
               });
             })
             .catch(e => console.error('Lỗi Firebase:', e));
+=======
+                            if (tag.includes('Bóng đá')) icon = '⚽';
+                            else if (tag.includes('Tennis')) icon = '🎾';
+                            else if (tag.includes('Bóng rổ')) icon = '🏀';
+                            else if (tag.includes('Bơi lội')) icon = '🏊‍♂️';
+                            else if (tag.includes('Bóng chuyền')) icon = '🏐';
+
+                            addMarker(lat, lon, name, icon);
+                        }
+                    });
+                })
+                .catch(e => console.error("Lỗi khi lấy dữ liệu Overpass:", e));
+            });
+
+            // Load custom places Firebase
+            db.ref("customPlaces").once("value")
+                .then(snapshot => {
+                    let places = snapshot.val();
+                    if (!places) return;
+
+                    Object.values(places).forEach(place => {
+                        if (place.lat && place.lng) {
+                            let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
+                            if (dist <= radius) {
+                                addMarker(place.lat, place.lng, place.name, "📍");
+                            }
+                        }
+                    });
+                })
+                .catch(e => console.error("Lỗi khi lấy dữ liệu Firebase:", e));
+
         }
 
         
