@@ -22,10 +22,10 @@ namespace FavoriteAPI.Repository
             return favorite;
         }
 
-        public async Task<bool> DeleteFavoriteAsync(int favoriteId)
+        public async Task<bool> DeleteFavoriteAsync(int userId, int stadiumId)
         {
             // delete favorite by id
-            var favorite = await _context.Favorites.FindAsync(favoriteId);
+            var favorite = await _context.Favorites.FirstOrDefaultAsync(f => f.UserId == userId && f.StadiumId == stadiumId);
             if (favorite == null)
             {
                 return false;
@@ -35,10 +35,10 @@ namespace FavoriteAPI.Repository
             return true;
         }
 
-        public async Task<Favorite?> GetFavoriteByIdAsync(int favoriteId)
+        public async Task<Favorite?> GetFavoriteByIdAsync(int userId, int stadiumId)
         {
             // get favorite by id
-            return await _context.Favorites.FirstOrDefaultAsync(f => f.FavoriteId == favoriteId);
+            return await _context.Favorites.FirstOrDefaultAsync(f => f.UserId == userId && f.StadiumId == stadiumId);
         }
 
         public IQueryable<Favorite> GetFavorites()

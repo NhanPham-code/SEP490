@@ -828,59 +828,68 @@
         });
     </script>
     <script id="view-toggle-functionality">
-        document.addEventListener('DOMContentLoaded', function() {
-        const gridView = document.getElementById('grid-view');
-        const mapView = document.getElementById('map-view');
-        const compareView = document.getElementById('compare-view');
-        const stadiumGrid = document.getElementById('stadium-grid');
-        const mapContainer = document.getElementById('map-container');
-        const comparisonTable = document.getElementById('favorite-container');
-        gridView.addEventListener('click', function() {
-            // remove
-        stadiumGrid.classList.remove('active');
-        mapContainer.classList.remove('active');
-        comparisonTable.classList.remove('active');
-        stadiumGrid.classList.remove('hidden');
-        mapContainer.classList.remove('hidden');
-        comparisonTable.classList.remove('hidden');
+        document.addEventListener('DOMContentLoaded', function () {
+            const gridViewBtn = document.getElementById('grid-view');
+            const mapViewBtn = document.getElementById('map-view');
+            const favoriteViewBtn = document.getElementById('compare-view'); // Nút Yêu thích
 
-        stadiumGrid.classList.add('active');
-        mapContainer.classList.add('hidden');
-        comparisonTable.classList.add('active');
-        gridView.classList.add('bg-primary', 'text-white');
-        mapView.classList.remove('bg-primary', 'text-white');
-        compareView.classList.remove('bg-primary', 'text-white');
-        });
-        mapView.addEventListener('click', function() {
-        stadiumGrid.classList.remove('active');
-        mapContainer.classList.remove('active');
-        comparisonTable.classList.remove('active');
-        stadiumGrid.classList.remove('hidden');
-        mapContainer.classList.remove('hidden');
-        comparisonTable.classList.remove('hidden');
+            const stadiumGridContainer = document.getElementById('stadium-grid');
+            const mapContainer = document.getElementById('map-container');
+            const favoriteContainer = document.getElementById('favorite-container');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
 
-        stadiumGrid.classList.add('hidden');
-        mapContainer.classList.add('active');
-        comparisonTable.classList.add('hidden');
-        mapView.classList.add('bg-primary', 'text-white');
-        gridView.classList.remove('bg-primary', 'text-white');
-        compareView.classList.remove('bg-primary', 'text-white');
-        });
-        compareView.addEventListener('click', function() {
-        stadiumGrid.classList.remove('active');
-        mapContainer.classList.remove('active');
-        comparisonTable.classList.remove('active');
-        stadiumGrid.classList.remove('hidden');
-        mapContainer.classList.remove('hidden');
-        comparisonTable.classList.remove('hidden');
+            // Mảng chứa các nút và container tương ứng để dễ quản lý
+            const views = [
+                { btn: gridViewBtn, container: stadiumGridContainer },
+                { btn: mapViewBtn, container: mapContainer },
+                { btn: favoriteViewBtn, container: favoriteContainer }
+            ];
 
-        stadiumGrid.classList.add('hidden');
-        mapContainer.classList.add('hidden');
-        comparisonTable.classList.add('active');
-        compareView.classList.add('bg-primary', 'text-white');
-        gridView.classList.remove('bg-primary', 'text-white');
-        mapView.classList.remove('bg-primary', 'text-white');
-        });
+            function setActiveView(activeView) {
+                // Lặp qua tất cả các view
+                views.forEach(view => {
+                    // Nếu là view đang được kích hoạt
+                    if (view === activeView) {
+                        view.container.classList.remove('hidden');
+                        view.btn.classList.add('active-btn'); // Sử dụng class 'active-btn' bạn đã định nghĩa
+                    } else { // Nếu là các view khác
+                        view.container.classList.add('hidden');
+                        view.btn.classList.remove('active-btn');
+                    }
+                });
+
+                // Xử lý riêng cho nút "Load More"
+                // Chỉ hiển thị nút này khi ở chế độ xem danh sách (grid view)
+                if (activeView.container === stadiumGridContainer) {
+                    loadMoreBtn.classList.remove('hidden');
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
+
+                // Xử lý riêng cho bản đồ Leaflet
+                if (activeView.container === mapContainer) {
+                    // Cần gọi invalidateSize để bản đồ render đúng kích thước sau khi được hiển thị
+                    setTimeout(() => {
+                        if (window.leafletMap) {
+                            window.leafletMap.invalidateSize();
+                        }
+                    }, 10);
+                }
+            }
+
+            // Gán sự kiện click cho các nút
+            gridViewBtn.addEventListener('click', () => setActiveView(views[0]));
+            mapViewBtn.addEventListener('click', () => setActiveView(views[1]));
+            favoriteViewBtn.addEventListener('click', () => {
+                setActiveView(views[2]);
+                // Luôn làm mới danh sách yêu thích khi người dùng bấm vào
+                if (window.displayMyFavorites) {
+                    window.displayMyFavorites();
+                }
+            });
+
+            // Thiết lập trạng thái ban đầu khi tải trang
+            setActiveView(views[0]);
         });
     </script>
 

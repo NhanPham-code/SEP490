@@ -1,4 +1,7 @@
 ﻿using DTOs.FavoriteStadiumDTO;
+using DTOs.OData;
+using DTOs.StadiumDTO;
+using Newtonsoft.Json;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -15,11 +18,13 @@ namespace Service.Services
     public class FavoriteStadiumService : IFavoriteStadiumService
     {
         private readonly HttpClient _httpClient;
+        private readonly IStadiumService _stadiumService;
 
         // Giả sử GatewayHttpClient đã được cấu hình với BaseAddress của Ocelot Gateway
-        public FavoriteStadiumService(HttpClient httpClient)
+        public FavoriteStadiumService(GatewayHttpClient httpClient, IStadiumService stadiumService)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient.Client;
+            _stadiumService = stadiumService;
         }
 
         /// <summary>
@@ -35,35 +40,27 @@ namespace Service.Services
             }
         }
 
-        public async Task<FavoriteDTO> AddFavoriteAsync(CreateFavoriteDTO createFavoriteDTO, string accessToken)
+        public async Task<bool> AddFavoriteAsync(CreateFavoriteDTO createFavoriteDTO, string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
             // Gửi request POST đến Gateway với DTO trong body
             var response = await _httpClient.PostAsJsonAsync("/favoriteStadium", createFavoriteDTO);
-
-            response.EnsureSuccessStatusCode();
-
-            var createdFavorite = await response.Content.ReadFromJsonAsync<FavoriteDTO>();
-            if (createdFavorite == null)
-            {
-                throw new Exception("Failed to deserialize the created favorite from API response.");
-            }
-            return createdFavorite;
+            return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> DeleteFavoriteAsync(int favoriteId, string accessToken)
+        public async Task<bool> DeleteFavoriteAsync(int userId, int stadiumId, string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
             // Gửi request DELETE đến Gateway
-            var response = await _httpClient.DeleteAsync($"/favoriteStadium/{favoriteId}");
+            var response = await _httpClient.DeleteAsync($"/favoriteStadium/{userId}/{stadiumId}");
 
-            // Trả về true nếu status code là 2xx (ví dụ 204 No Content), false nếu thất bại.
+            // Trả về true nếu status code là 2xx (ví dụ 204 No Content), false nếu thất bại
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<IEnumerable<FavoriteDTO>> GetMyFavoritesAsync(string accessToken)
+        public async Task<IEnumerable<ReadFavoriteDTO>> GetMyFavoritesAsync(string accessToken)
         {
             AddBearerAccessToken(accessToken);
 
@@ -74,8 +71,8 @@ namespace Service.Services
             response.EnsureSuccessStatusCode();
 
             // Đọc và deserialize JSON từ response body
-            var favorites = await response.Content.ReadFromJsonAsync<IEnumerable<FavoriteDTO>>();
-            return favorites ?? new List<FavoriteDTO>();
+            var favorites = await response.Content.ReadFromJsonAsync<IEnumerable<ReadFavoriteDTO>>();
+            return favorites ?? new List<ReadFavoriteDTO>();
         }
 
         public async Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId, string accessToken)
@@ -87,5 +84,53 @@ namespace Service.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<string> GetMyFavoritesForUIAsync(string accessToken)
+        {
+            // Chuyển tiếp việc gọi API sang phương thức GetMyFavoritesAsync
+            try
+            {
+                // 1. Lấy danh sách ID sân yêu thích từ DB/API
+                var favorites = await GetMyFavoritesAsync(accessToken);
+                var stadiumIds = favorites.Select(f => f.StadiumId).Distinct().ToList();
+
+                if (!stadiumIds.Any())
+                {
+                    var emptyResponse = new { value = new List<FavoriteStadiumViewModel>(), count = 0 };
+                    return JsonConvert.SerializeObject(emptyResponse);
+                }
+
+                // 2. Lấy thông tin chi tiết các sân từ StadiumService
+                var stadiumsResponse = await _stadiumService.GetAllStadiumByListId(stadiumIds);
+
+                // 3. Chuyển đổi ReadStadiumDTO thành FavoriteStadiumViewModel
+                //    Sử dụng AutoMapper sẽ giúp bước này gọn hơn, nhưng làm thủ công cũng không sao.
+                var favoriteStadiums = stadiumsResponse.Value.Select(stadium => new FavoriteStadiumViewModel
+                {
+                    // Sao chép các thuộc tính từ ReadStadiumDTO
+                    Id = stadium.Id,
+                    Name = stadium.Name,
+                    Address = stadium.Address,
+                    OpenTime = stadium.OpenTime,
+                    CloseTime = stadium.CloseTime,
+                    Courts = stadium.Courts,
+                    StadiumImages = stadium.StadiumImages,
+                    // IsFavorite sẽ mặc định là true
+                }).ToList();
+
+                // 4. Tạo đối tượng trả về cuối cùng và serialize thành JSON
+                var finalResponse = new
+                {
+                    value = favoriteStadiums
+                };
+
+                return JsonConvert.SerializeObject(finalResponse);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi (sử dụng một logger thực tế)
+                Console.WriteLine($"Error in GetMyFavoritesForUIAsync: {ex.Message}");
+                throw; // Ném lại exception để controller xử lý
+            }
+        }
     }
 }

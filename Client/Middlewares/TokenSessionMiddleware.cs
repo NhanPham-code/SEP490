@@ -75,7 +75,7 @@ namespace Middlewares
                     ? $"{BASE_URL}{userProfile.AvatarUrl}"
                     : $"{BASE_URL}/avatars/default-avatar.png";
 
-                context.Session.SetString("UserId", userProfile.UserId.ToString());
+                context.Session.SetInt32("UserId", userProfile.UserId);
                 context.Session.SetString("FullName", userProfile.FullName ?? "User");
                 context.Session.SetString("AvatarUrl", avatarFullUrl);
             }
