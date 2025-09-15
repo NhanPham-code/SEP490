@@ -36,9 +36,9 @@
                 <h1 class="hero-title">Khám Phá Các Sân Thể Thao Cao Cấp</h1>
                 <p class="hero-subtitle">Kết nối với các vận động viên, đặt sân thể thao đẳng cấp thế giới và nâng tầm trò chơi của bạn với nền tảng thể thao toàn diện.</p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary btn-large" type="button" aria-label="Khám phá danh sách sân thể thao">
+                    <a class="btn btn-primary btn-large" href="#players-grid" aria-label="Khám phá danh sách sân thể thao">
                         Khám Phá Sân
-                    </button>
+                    </a>
                     <button class="btn btn-secondary btn-large" type="button" aria-label="Xem video hướng dẫn cách hoạt động">
                         <i class="ri-play-circle-line" aria-hidden="true"></i>
                         Cách Hoạt Động
@@ -402,7 +402,7 @@
                 success: function(response) {
                     $('#players-grid').html(response);
 
-                  renderPosts(response.teamPosts, response.userNames, response.stadium);
+                  renderPosts(response.teamPosts, response.userNames);
 
                     // Update results count
                     hideLoading();
@@ -428,7 +428,7 @@
             $('#load-more-section').show();
         }
         // Render posts dynamically
-        function renderPosts(post, profile, stadium){
+        function renderPosts(post, profile){
              if (!post || post.length === 0) {
                 $('#players-grid').html('');
                 return;
@@ -490,7 +490,13 @@
             $('#players-grid').html(html);
         }
                function openCreate() {
-            Swal.fire({
+            $.ajax({
+                url: '/FindTeam/GetBookByUserId',
+                type: 'GET',
+                success: function(reponse) {
+                    console.log("booking: ", reponse);
+                           
+                    Swal.fire({
                 title: `
                     <div class="modal-header">
                         <div class="modal-icon">
@@ -499,7 +505,7 @@
                         <div class="modal-title-text">Tạo Bài Đăng Tìm Đội</div>
                     </div>
                 `,
-                html: generateCreateTeamPostModalHTML(),
+                html: generateCreateTeamPostModalHTML(reponse),
                 showCancelButton: true,
                 confirmButtonText: '<i class="ri-save-line mr-1"></i>Tạo Bài Đăng',
                 cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy Bỏ',
@@ -607,12 +613,55 @@
                     createNewTeamPost(result.value);
                 }
             });
+                },
+                error: function() {
+                    console.error('Error fetching bookings');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Không thể tải thông tin đặt sân. Vui lòng thử lại sau.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            });
         }
 
-        function generateCreateTeamPostModalHTML() {
+                // Update the generateCreateTeamPostModalHTML function
+        function generateCreateTeamPostModalHTML(bookings) {
             return `
                 <div class="enhanced-modal-content">
                     <form id="newTeamPostForm" class="team-post-form">
+                        <!-- Booking Information Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-bookmark-line"></i>
+                                <h3>Chọn Booking Đã Đặt</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="ri-list-check"></i>
+                                    Danh sách booking của bạn
+                                </label>
+                                <div class="booking-list-container">
+                                    ${generateBookingCards(bookings)}
+                                </div>
+                                <div class="input-helper">Chọn một booking đã đặt để tạo bài đăng tìm đội</div>
+                                <input type="hidden" id="selectedBookingId" value="">
+                            </div>
+
+                            <!-- Selected Booking Info Display -->
+                            <div id="selectedBookingInfo" class="selected-booking-info" style="display: none;">
+                                <div class="booking-info-header">
+                                    <i class="ri-information-line"></i>
+                                    <span>Thông tin booking đã chọn</span>
+                                </div>
+                                <div id="bookingInfoContent" class="booking-info-content">
+                                    <!-- Will be populated when a booking is selected -->
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Basic Information Section -->
                         <div class="form-section">
                             <div class="section-header">
@@ -637,8 +686,8 @@
                                         Địa điểm
                                     </label>
                                     <input type="text" id="newLocation" class="form-input"
-                                           placeholder="Nhập địa điểm chơi">
-                                    <div class="input-helper">Địa điểm cụ thể nơi diễn ra hoạt động</div>
+                                           placeholder="Nhập địa điểm chơi" readonly>
+                                    <div class="input-helper">Địa điểm sẽ được tự động điền từ booking đã chọn</div>
                                 </div>
                             </div>
 
@@ -727,8 +776,8 @@
                                         Ngày chơi
                                     </label>
                                     <input type="date" id="newPlayDate" class="form-input"
-                                           min="${new Date().toISOString().split('T')[0]}">
-                                    <div class="input-helper">Ngày diễn ra hoạt động</div>
+                                           min="${new Date().toISOString().split('T')[0]}" readonly>
+                                    <div class="input-helper">Ngày sẽ được tự động điền từ booking đã chọn</div>
                                 </div>
 
                                 <div class="form-group">
@@ -746,28 +795,215 @@
                                 <span>Hoạt động sẽ diễn ra vào <strong id="schedulePreview">ngày được chọn</strong></span>
                             </div>
                         </div>
-
-                        <!-- Booking Information Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-bookmark-line"></i>
-                                <h3>Thông Tin Đặt Sân</h3>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label required">
-                                    <i class="ri-hashtag"></i>
-                                    ID Đặt Sân
-                                </label>
-                                <input type="number" id="newBookingId" class="form-input"
-                                       placeholder="Nhập ID của booking đã đặt" min="1">
-                                <div class="input-helper">ID của booking sân đã được đặt trước</div>
-                            </div>
-                        </div>
                     </form>
                 </div>
             `;
         }
+
+        function getSportType(courts, staidumId){
+            return courts?.find(court => court.stadiumId === staidumId)?.sportType || 'Thể thao';
+        }
+
+        // New function to generate booking cards
+        function generateBookingCards(bookings) {
+            if (!bookings || bookings.length === 0) {
+                return `
+                    <div class="no-bookings">
+                        <i class="ri-calendar-line"></i>
+                        <p>Bạn chưa có booking nào. Vui lòng đặt sân trước khi tạo bài đăng tìm đội.</p>
+                    </div>
+                `;
+            }
+
+            return bookings.bookings.map(booking => {
+                const formattedDate = new Date(booking.date).toLocaleDateString('vi-VN');
+                const statusClass = getStatusClass(booking.status);
+                const statusText = getStatusText(booking.status);
+                const address = bookings.stadiums[booking.stadiumId]?.address || 'Địa chỉ không xác định';
+                const name = bookings.stadiums[booking.stadiumId]?.name || 'Sân không xác định';
+                const sportType = getSportType(bookings.stadiums[booking.stadiumId]?.courts, bookings.stadiums[booking.stadiumId]?.id) || 'Thể thao';
+                return `
+                    <div class="booking-card" data-booking-id="${booking.id}" data-booking='${JSON.stringify(booking)}'>
+                        <div class="booking-card-header">
+                            <div class="booking-id">
+                                <i class="ri-hashtag"></i>
+                                <span>Booking #${booking.id}</span>
+                            </div>
+                            <div class="booking-status ${statusClass}">
+                                <i class="ri-circle-fill"></i>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-card-body">
+                        <div class="booking-detail">
+                                <i class="ri-calendar-line"></i>
+                                <span>${name}</span>
+                            </div>
+                            <div class="booking-detail">
+                                <i class="ri-calendar-line"></i>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <div class="booking-detail">
+                                <i class="ri-calendar-line"></i>
+                                <span>${sportType}</span>
+                            </div>
+                            <div class="booking-detail">
+                                <i class="ri-map-pin-line"></i>
+                                <span>${address}</span>
+                            </div>
+
+                            <div class="booking-detail">
+                                <i class="ri-money-dollar-circle-line"></i>
+                                <span>${formatPrice(booking.totalPrice)}</span>
+                            </div>
+
+                            ${booking.note ? `
+                                <div class="booking-detail">
+                                    <i class="ri-file-text-line"></i>
+                                    <span>${booking.note}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="booking-card-footer">
+                            <button type="button" class="select-booking-btn" onclick="selectBooking(this)">
+                                <i class="ri-check-line"></i>
+                                Chọn booking này
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper functions
+        function getStatusClass(status) {
+            switch (status?.toLowerCase()) {
+                case 'confirmed': return 'status-confirmed';
+                case 'pending': return 'status-pending';
+                case 'cancelled': return 'status-cancelled';
+                case 'completed': return 'status-completed';
+                default: return 'status-unknown';
+            }
+        }
+
+        function getStatusText(status) {
+            switch (status?.toLowerCase()) {
+                case 'confirmed': return 'Đã xác nhận';
+                case 'pending': return 'Chờ xác nhận';
+                case 'cancelled': return 'Đã hủy';
+                case 'completed': return 'Hoàn thành';
+                default: return 'Không xác định';
+            }
+        }
+
+        function formatPrice(price) {
+            if (!price) return 'Miễn phí';
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        // Function to handle booking selection
+        function selectBooking(button) {
+            // Remove selection from all booking cards
+            document.querySelectorAll('.booking-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked booking card
+            const bookingCard = button.closest('.booking-card');
+            bookingCard.classList.add('selected');
+
+            // Get booking data
+            const bookingData = JSON.parse(bookingCard.dataset.booking);
+
+            // Update hidden input with selected booking ID
+            document.getElementById('selectedBookingId').value = bookingData.id;
+
+            // Auto-fill form fields based on selected booking
+            fillFormFromBooking(bookingData);
+
+            // Show selected booking info
+            showSelectedBookingInfo(bookingData);
+
+            // Update button text for all cards
+            document.querySelectorAll('.select-booking-btn').forEach(btn => {
+                btn.innerHTML = '<i class="ri-check-line"></i>Chọn booking này';
+                btn.classList.remove('selected');
+            });
+
+            // Update selected button
+            button.innerHTML = '<i class="ri-check-double-line"></i>Đã chọn';
+            button.classList.add('selected');
+        }
+
+        // Function to auto-fill form from selected booking
+        function fillFormFromBooking(booking) {
+            // Set date
+            const bookingDate = new Date(booking.date);
+            document.getElementById('newPlayDate').value = bookingDate.toISOString().split('T')[0];
+
+            // Set location (you might need to adjust this based on your stadium data structure)
+            document.getElementById('newLocation').value = `Sân ${booking.stadiumId}`;
+
+            // Calculate price per person suggestion (total price divided by estimated team size)
+            if (booking.totalPrice) {
+                const suggestedPricePerPerson = Math.ceil(booking.totalPrice / 10); // Assuming average team of 10
+                document.getElementById('newPricePerPerson').value = suggestedPricePerPerson;
+            }
+
+            // Update schedule preview
+            updateSchedulePreview();
+        }
+
+        // Function to show selected booking info
+        function showSelectedBookingInfo(booking) {
+            const infoContainer = document.getElementById('selectedBookingInfo');
+            const contentContainer = document.getElementById('bookingInfoContent');
+
+            const formattedDate = new Date(booking.date).toLocaleDateString('vi-VN');
+            const formattedTime = new Date(booking.createdAt).toLocaleTimeString('vi-VN');
+
+            contentContainer.innerHTML = `
+                <div class="booking-info-grid">
+                    <div class="booking-info-item">
+                        <span class="label">ID Booking:</span>
+                        <span class="value">#${booking.id}</span>
+                    </div>
+                    <div class="booking-info-item">
+                        <span class="label">Ngày đặt:</span>
+                        <span class="value">${formattedDate}</span>
+                    </div>
+                    <div class="booking-info-item">
+                        <span class="label">Sân:</span>
+                        <span class="value">Sân ${booking.stadiumId}</span>
+                    </div>
+                    <div class="booking-info-item">
+                        <span class="label">Tổng giá:</span>
+                        <span class="value">${formatPrice(booking.totalPrice)}</span>
+                    </div>
+                    <div class="booking-info-item">
+                        <span class="label">Trạng thái:</span>
+                        <span class="value ${getStatusClass(booking.status)}">${getStatusText(booking.status)}</span>
+                    </div>
+                    ${booking.note ? `
+                        <div class="booking-info-item full-width">
+                            <span class="label">Ghi chú:</span>
+                            <span class="value">${booking.note}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            infoContainer.style.display = 'block';
+        }
+
+        // Update the validation in preConfirm to check for selected booking
+        // Add this to the validations array in the preConfirm function:
+        // { condition: !document.getElementById('selectedBookingId').value, message: 'Vui lòng chọn một booking đã đặt' },
 
         // Helper function to get current user ID (implement based on your authentication system)
         function getCurrentUserId() {
