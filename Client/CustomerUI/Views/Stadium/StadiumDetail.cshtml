@@ -894,31 +894,18 @@
                 success: function(response) {
                     console.log('Success response:', response);
 
-                    if (response.success) {
-                        showModal('Thành công!', response.message);
+                          if (response.success) {
+            showModal('Thành công!', response.message);
 
-                        // ✅ Reload feedback list để cập nhật phân trang
-                        if (isEditMode) {
-                            // Stay on current page for edit
-                            loadFeedbacks(stadiumId, currentPage);
-                            // ✅ Reload user feedback để cập nhật ảnh mới
-                            setTimeout(() => {
-                                checkUserFeedback(stadiumId);
-                            }, 500);
-                        } else {
-                            // Go to first page for new feedback
-                            loadFeedbacks(stadiumId, 1);
-                            // ✅ Load new feedback data
-                            setTimeout(() => {
-                                checkUserFeedback(stadiumId);
-                            }, 500);
-                        }
-
-                        // Clear new image preview after successful submit
-                        clearImagePreview();
-                    } else {
-                        showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
-                    }
+            // Chỉ cần load lại danh sách feedback, kiểm tra user feedback sau khi load xong
+            const pageToLoad = isEditMode ? currentPage : 1;
+                    loadFeedbacks(stadiumId, pageToLoad);
+        setTimeout(() => {
+            checkUserFeedback(stadiumId);
+        }, 500);
+        } else {
+            showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
+        }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', {status, error, response: xhr.responseText});
@@ -956,11 +943,8 @@
                         showModal('Thành công!', response.message);
 
                         // Reset form to create mode
-                        resetFeedbackForm();
                         setCreateMode();
-
-                        // ✅ Reload feedback list
-                        loadFeedbacks(stadiumId, currentPage);
+loadFeedbacks(stadiumId, currentPage);
                     } else {
                         showModal('Lỗi', response.message || 'Có lỗi xảy ra khi xóa feedback.');
                     }
@@ -1019,6 +1003,7 @@
                     stadiumId: stadiumId,
                     page: page,
                     pageSize: pageSize
+
                 },
                 success: function (res) {
                     console.log("Load feedbacks response:", res);
@@ -1442,12 +1427,7 @@
 
         const bookingModalEl = document.getElementById('booking-modal');
 
-
-        function showModal(title, message) {
-			document.getElementById('modal-title').textContent = title;
-			document.getElementById('modal-message').textContent = message;
-			modalEl.style.display = 'flex';
-		}
+    
 
 		function hideModal() {
 			modalEl.style.display = 'none';
