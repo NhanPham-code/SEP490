@@ -25,15 +25,9 @@ namespace FavoriteAPI.Service
             return  await _favoriteRepository.AddFavoriteAsync(favorite);
         }
 
-        public async Task<bool> DeleteFavoriteAsync(int favoriteId)
+        public async Task<bool> DeleteFavoriteAsync(int userId, int stadiumId)
         {
-            // check if favorite exists
-            var existingFavorite = await _favoriteRepository.GetFavoriteByIdAsync(favoriteId);
-            if (existingFavorite == null)
-            {
-                return false;
-            }
-            return await _favoriteRepository.DeleteFavoriteAsync(favoriteId);
+            return await _favoriteRepository.DeleteFavoriteAsync(userId, stadiumId);
         }
 
         public IQueryable<Favorite> GetFavorites()
@@ -41,9 +35,9 @@ namespace FavoriteAPI.Service
             return _favoriteRepository.GetFavorites();
         }
 
-        public async Task<Favorite?> GetFavoritesByIdAsync(int favoriteId)
+        public async Task<Favorite?> GetFavoritesByIdAsync(int userId, int stadiumId)
         {
-            var favorite = await _favoriteRepository.GetFavoriteByIdAsync(favoriteId);
+            var favorite = await _favoriteRepository.GetFavoriteByIdAsync(userId, stadiumId);
             if (favorite == null)
             {
                 return null;

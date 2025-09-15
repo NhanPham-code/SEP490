@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace CustomerUI.Controllers
 {
-    [Route("Favorite")] // Định tuyến cho controller
     public class FavoriteStadiumController : Controller
     {
         private readonly IFavoriteStadiumService _favoriteStadiumService;
@@ -29,18 +28,18 @@ namespace CustomerUI.Controllers
         /// <summary>
         /// Lấy UserId từ Session của người dùng đã đăng nhập.
         /// </summary>
-        private string? GetCurrentUserId()
+        private int? GetCurrentUserId()
         {
             // *** ĐÃ THAY ĐỔI THEO YÊU CẦU ***
             // Lấy UserId từ Session. 
             // Giả sử bạn lưu nó với key là "UserId" và kiểu là int.
-            return HttpContext?.Session.GetString("UserId");
+            return HttpContext?.Session.GetInt32("UserId");
         }
 
         /// <summary>
         /// Endpoint để thêm một sân vận động vào danh sách yêu thích.
         /// </summary>
-        [HttpPost("Add")]
+        [HttpPost]
         public async Task<IActionResult> AddFavorite([FromBody] CreateFavoriteDTO createDto)
         {
             var token = GetAccessToken();
@@ -50,6 +49,8 @@ namespace CustomerUI.Controllers
             {
                 return Unauthorized(new { message = "Vui lòng đăng nhập để thực hiện chức năng này." });
             }
+
+            createDto.UserId = userId.Value;
 
             try
             {
@@ -67,8 +68,8 @@ namespace CustomerUI.Controllers
         /// <summary>
         /// Endpoint để xóa một sân vận động khỏi danh sách yêu thích.
         /// </summary>
-        [HttpDelete("Delete/{favoriteId}")]
-        public async Task<IActionResult> DeleteFavorite(int favoriteId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteFavorite(int stadiumId)
         {
             var token = GetAccessToken();
             if (string.IsNullOrEmpty(token))
@@ -76,9 +77,11 @@ namespace CustomerUI.Controllers
                 return Unauthorized(new { message = "Vui lòng đăng nhập." });
             }
 
+            var userId = GetCurrentUserId();
+
             try
             {
-                var isSuccess = await _favoriteStadiumService.DeleteFavoriteAsync(favoriteId, token);
+                var isSuccess = await _favoriteStadiumService.DeleteFavoriteAsync(userId.Value, stadiumId, token);
                 if (isSuccess)
                 {
                     return Ok(new { message = "Đã xóa khỏi danh sách yêu thích." });
@@ -95,7 +98,7 @@ namespace CustomerUI.Controllers
         /// <summary>
         /// Endpoint để lấy danh sách các sân vận động yêu thích của người dùng hiện tại.
         /// </summary>
-        [HttpGet("MyFavorites")]
+        [HttpGet]
         public async Task<IActionResult> GetMyFavorites()
         {
             var token = GetAccessToken();
@@ -106,13 +109,14 @@ namespace CustomerUI.Controllers
 
             try
             {
-                var favorites = await _favoriteStadiumService.GetMyFavoritesAsync(token);
-                return Ok(favorites);
+                var jsonResult = await _favoriteStadiumService.GetMyFavoritesForUIAsync(token);
+                // Trả về Content với kiểu "application/json"
+                return Content(jsonResult, "application/json");
             }
-            catch (Exception ex)
+            catch (System.Exception)
             {
-                Console.WriteLine($"Error in GetMyFavorites: {ex.Message}");
-                return BadRequest(new { message = "Không thể tải danh sách yêu thích." });
+                // Service đã log lỗi, ở đây chỉ cần trả về lỗi cho client
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
     }

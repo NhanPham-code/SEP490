@@ -36,7 +36,7 @@ namespace FavoriteAPI.Controllers
         }
 
         [HttpGet("exists")]
-        public async Task<IActionResult> CheckIfFavoriteExists([FromQuery] int userId, [FromQuery] int stadiumId)
+        public async Task<IActionResult> CheckIfFavoriteExists(int userId, int stadiumId)
         {
             // 1. Xác thực quyền: người dùng chỉ được kiểm tra cho chính họ
             var currentUserId = CurrentUserId;
@@ -91,33 +91,32 @@ namespace FavoriteAPI.Controllers
             return CreatedAtAction(nameof(GetUserFavoritesByAccessToken), new { id = favorite.FavoriteId }, favorite);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFavorite(int favoriteId)
+        [HttpDelete("{userId}/{stadiumId}")]
+        public async Task<IActionResult> DeleteFavorite(int userId, int stadiumId)
         {
-            var userId = CurrentUserId;
-            if (userId == null)
+            var currentUserId = CurrentUserId;
+            if (currentUserId == null)
             {
                 return Unauthorized(new { message = "Invalid user identity." });
             }
 
-            var favorite = await _favoriteService.GetFavoritesByIdAsync(favoriteId);
+            // Security check - chỉ cho phép người dùng xóa favorites của chính họ
+            if (userId != currentUserId.Value)
+            {
+                return Forbid();
+            }
 
-            if (favorite == null)
+            // Kiểm tra favorite có tồn tại không
+            var exists = await _favoriteService.IsFavoriteExistsAsync(userId, stadiumId);
+            if (!exists)
             {
                 return NotFound("Favorite not found.");
             }
 
-            // 5. Xác thực quyền sở hữu trước khi xóa
-            if (favorite.UserId != userId.Value)
-            {
-                return Forbid(); // Người dùng này không sở hữu favorite này
-            }
-
-            var isDeleted = await _favoriteService.DeleteFavoriteAsync(favoriteId);
+            var isDeleted = await _favoriteService.DeleteFavoriteAsync(userId, stadiumId);
             if (!isDeleted)
             {
-                // Logic này có thể hơi thừa vì đã check ở trên, nhưng không sao
-                return NotFound("Favorite not found.");
+                return StatusCode(500, "Failed to delete favorite.");
             }
             return NoContent();
         }
