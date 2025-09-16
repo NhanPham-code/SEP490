@@ -1,0 +1,632 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thành Viên Đội - Nền Tảng FindTeam</title>
+    <link href="~/css/FindTeam/MemberManage.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#3b82f6",
+                secondary: "#10b981",
+                accent: "#f59e0b",
+                danger: "#ef4444",
+                dark: "#1f2937",
+              },
+              fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+              },
+              borderRadius: {
+                '2xl': '16px',
+                '3xl': '24px',
+              },
+              boxShadow: {
+                'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                'medium': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                'large': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              },
+            },
+          },
+        };
+    </script>
+</head>
+<body class="min-h-screen">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="glass-card rounded-3xl shadow-soft p-8">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center">
+                                <i class="ri-team-line text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">Quản Lý Đội</h1>
+                                <p class="text-gray-600 text-lg">Quản lý thành viên đội và vai trò của họ</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 mt-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 px-4 py-2 rounded-xl">
+                                <span class="text-sm font-medium text-blue-700">Tổng Thành Viên: <span id="total-members">5</span></span>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 px-4 py-2 rounded-xl">
+                                <span class="text-sm font-medium text-green-700">Hoạt Động: <span id="active-members">4</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="add-member-btn" class="btn-primary text-white px-6 py-3 rounded-2xl text-sm font-semibold inline-flex items-center gap-2">
+                            <i class="ri-user-add-line text-lg"></i>
+                            Thêm Thành Viên
+                        </button>
+                        <button id="export-btn" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-200 transition-colors inline-flex items-center gap-2">
+                            <i class="ri-download-line text-lg"></i>
+                            Xuất File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="mb-8">
+            <div class="glass-card rounded-3xl shadow-soft p-6">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <div class="flex-1">
+                        <div class="relative">
+                            <i class="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                            <input type="text"
+                                   id="search-input"
+                                   placeholder="Tìm kiếm thành viên theo tên hoặc ID..."
+                                   class="search-input w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-gray-700">
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <select id="role-filter" class="search-input px-4 py-3 rounded-2xl outline-none text-gray-700 min-w-[150px]">
+                            <option value="">Tất Cả Vai Trò</option>
+                            <option value="captain">Đội Trưởng</option>
+                            <option value="member">Thành Viên</option>
+                            <option value="substitute">Dự Bị</option>
+                        </select>
+                        <select id="sort-filter" class="search-input px-4 py-3 rounded-2xl outline-none text-gray-700 min-w-[150px]">
+                            <option value="newest">Mới Nhất</option>
+                            <option value="oldest">Cũ Nhất</option>
+                            <option value="name">Tên A-Z</option>
+                            <option value="role">Theo Vai Trò</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Grid -->
+        <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Member cards will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16">
+            <div class="glass-card rounded-3xl shadow-soft p-12 max-w-md mx-auto">
+                <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="ri-team-line text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Không Tìm Thấy Thành Viên</h3>
+                <p class="text-gray-500 mb-6">Bắt đầu xây dựng đội của bạn bằng cách thêm thành viên</p>
+                <button class="btn-primary text-white px-6 py-3 rounded-2xl text-sm font-semibold inline-flex items-center gap-2">
+                    <i class="ri-user-add-line"></i>
+                    Thêm Thành Viên Đầu Tiên
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Member Modal -->
+    <div id="member-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="modal-content glass-card rounded-3xl shadow-2xl max-w-md w-full p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="modal-title" class="text-2xl font-bold text-gray-900">Thêm Thành Viên Mới</h2>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+
+            <form id="member-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ID Người Dùng</label>
+                    <input type="number"
+                           id="user-id"
+                           name="userId"
+                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                           placeholder="Nhập ID người dùng"
+                           required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ID Bài Đăng Đội</label>
+                    <input type="number"
+                           id="team-post-id"
+                           name="teamPostId"
+                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                           placeholder="Nhập ID bài đăng đội"
+                           required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vai Trò</label>
+                    <select id="member-role"
+                            name="role"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                            required>
+                        <option value="">Chọn vai trò</option>
+                        <option value="captain">Đội Trưởng</option>
+                        <option value="member">Thành Viên</option>
+                        <option value="substitute">Dự Bị</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button"
+                            id="cancel-btn"
+                            class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-colors">
+                        Hủy
+                    </button>
+                    <button type="submit"
+                            class="flex-1 btn-primary text-white px-6 py-3 rounded-2xl font-semibold">
+                        <span id="submit-text">Thêm Thành Viên</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="delete-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="modal-content glass-card rounded-3xl shadow-2xl max-w-md w-full p-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ri-delete-bin-line text-2xl text-red-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Xóa Thành Viên Đội</h3>
+                <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa thành viên này khỏi đội? Hành động này không thể hoàn tác.</p>
+                <div class="flex gap-3">
+                    <button id="cancel-delete" class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-colors">
+                        Hủy
+                    </button>
+                    <button id="confirm-delete" class="flex-1 btn-danger text-white px-6 py-3 rounded-2xl font-semibold">
+                        Xóa Thành Viên
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Sample data based on ReadTeamMemberDTO - Vietnamese names
+        let teamMembers = [
+            {
+                id: 1,
+                teamPostId: 101,
+                userId: 1001,
+                userName: "Nguyễn Văn An",
+                userAvatar: "NVA",
+                joinedAt: "2025-01-15T10:30:00Z",
+                role: "captain"
+            },
+            {
+                id: 2,
+                teamPostId: 101,
+                userId: 1002,
+                userName: "Trần Thị Bình",
+                userAvatar: "TTB",
+                joinedAt: "2025-02-01T14:20:00Z",
+                role: "member"
+            },
+            {
+                id: 3,
+                teamPostId: 101,
+                userId: 1003,
+                userName: "Lê Hoàng Cường",
+                userAvatar: "LHC",
+                joinedAt: "2025-02-10T09:15:00Z",
+                role: "member"
+            },
+            {
+                id: 4,
+                teamPostId: 101,
+                userId: 1004,
+                userName: "Phạm Thị Dung",
+                userAvatar: "PTD",
+                joinedAt: "2025-03-01T16:45:00Z",
+                role: "substitute"
+            },
+            {
+                id: 5,
+                teamPostId: 101,
+                userId: 1005,
+                userName: "Vũ Minh Đức",
+                userAvatar: "VMD",
+                joinedAt: "2025-03-15T11:30:00Z",
+                role: "member"
+            }
+        ];
+
+        let editingMemberId = null;
+        let memberToDelete = null;
+
+        // DOM Elements
+        const membersContainer = document.getElementById('members-container');
+        const emptyState = document.getElementById('empty-state');
+        const memberModal = document.getElementById('member-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const searchInput = document.getElementById('search-input');
+        const roleFilter = document.getElementById('role-filter');
+        const sortFilter = document.getElementById('sort-filter');
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function getRoleIcon(role) {
+            switch(role) {
+                case 'captain': return 'ri-crown-line';
+                case 'member': return 'ri-user-line';
+                case 'substitute': return 'ri-user-received-line';
+                default: return 'ri-user-line';
+            }
+        }
+
+        function getRoleClass(role) {
+            switch(role) {
+                case 'captain': return 'role-captain';
+                case 'member': return 'role-member';
+                case 'substitute': return 'role-substitute';
+                default: return 'role-member';
+            }
+        }
+
+        function getRoleText(role) {
+            switch(role) {
+                case 'captain': return 'Đội Trưởng';
+                case 'member': return 'Thành Viên';
+                case 'substitute': return 'Dự Bị';
+                default: return 'Thành Viên';
+            }
+        }
+
+        // Render Functions
+        function renderMemberCard(member) {
+            return `
+                <div class="member-card glass-card rounded-3xl shadow-soft p-6" data-member-id="${member.id}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                ${member.userAvatar}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">${member.userName}</h3>
+                                <p class="text-sm text-gray-600">ID: ${member.userId}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="edit-member text-gray-400 hover:text-primary transition-colors" data-member-id="${member.id}">
+                                <i class="ri-edit-line text-lg"></i>
+                            </button>
+                            <button class="delete-member text-gray-400 hover:text-red-500 transition-colors" data-member-id="${member.id}">
+                                <i class="ri-delete-bin-line text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Vai Trò</span>
+                            <span class="role-badge ${getRoleClass(member.role)} px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1">
+                                <i class="${getRoleIcon(member.role)}"></i>
+                                ${getRoleText(member.role)}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Bài Đăng</span>
+                            <span class="text-sm font-medium text-gray-900">#${member.teamPostId}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Tham Gia</span>
+                            <span class="text-sm font-medium text-gray-900">${formatDate(member.joinedAt)}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}">
+                            <i class="ri-edit-line mr-1"></i>
+                            Sửa
+                        </button>
+                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 delete-member" data-member-id="${member.id}">
+                            <i class="ri-delete-bin-line mr-1"></i>
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMembers(members) {
+            if (members.length === 0) {
+                membersContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            membersContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            membersContainer.innerHTML = members.map(renderMemberCard).join('');
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('total-members').textContent = teamMembers.length;
+            document.getElementById('active-members').textContent = teamMembers.filter(m => m.role !== 'substitute').length;
+        }
+
+        // Filter and Search Functions
+        function filterMembers() {
+            let filtered = [...teamMembers];
+
+            // Search filter
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(member =>
+                    member.userName.toLowerCase().includes(searchTerm) ||
+                    member.userId.toString().includes(searchTerm) ||
+                    member.id.toString().includes(searchTerm)
+                );
+            }
+
+            // Role filter
+            const roleFilterValue = roleFilter.value;
+            if (roleFilterValue) {
+                filtered = filtered.filter(member => member.role === roleFilterValue);
+            }
+
+            // Sort
+            const sortValue = sortFilter.value;
+            switch(sortValue) {
+                case 'newest':
+                    filtered.sort((a, b) => new Date(b.joinedAt) - new Date(a.joinedAt));
+                    break;
+                case 'oldest':
+                    filtered.sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt));
+                    break;
+                case 'name':
+                    filtered.sort((a, b) => a.userName.localeCompare(b.userName));
+                    break;
+                case 'role':
+                    const roleOrder = { captain: 0, member: 1, substitute: 2 };
+                    filtered.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
+                    break;
+            }
+
+            renderMembers(filtered);
+        }
+
+        // Modal Functions
+        function openModal(title, submitText, member = null) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('submit-text').textContent = submitText;
+
+            if (member) {
+                document.getElementById('user-id').value = member.userId;
+                document.getElementById('team-post-id').value = member.teamPostId;
+                document.getElementById('member-role').value = member.role;
+                editingMemberId = member.id;
+            } else {
+                document.getElementById('member-form').reset();
+                editingMemberId = null;
+            }
+
+            memberModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            memberModal.classList.add('hidden');
+            document.getElementById('member-form').reset();
+            editingMemberId = null;
+        }
+
+        function openDeleteModal(memberId) {
+            memberToDelete = memberId;
+            deleteModal.classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            memberToDelete = null;
+        }
+
+        // CRUD Operations
+        function addMember(memberData) {
+            const newMember = {
+                id: Math.max(...teamMembers.map(m => m.id), 0) + 1,
+                teamPostId: parseInt(memberData.teamPostId),
+                userId: parseInt(memberData.userId),
+                userName: `Người dùng ${memberData.userId}`, // In real app, fetch from API
+                userAvatar: `U${memberData.userId.toString().slice(-2)}`,
+                joinedAt: new Date().toISOString(),
+                role: memberData.role
+            };
+
+            teamMembers.push(newMember);
+            filterMembers();
+
+            // Show success message
+            showNotification('Thêm thành viên thành công!', 'success');
+        }
+
+        function updateMember(memberId, memberData) {
+            const memberIndex = teamMembers.findIndex(m => m.id === memberId);
+            if (memberIndex !== -1) {
+                teamMembers[memberIndex] = {
+                    ...teamMembers[memberIndex],
+                    teamPostId: parseInt(memberData.teamPostId),
+                    userId: parseInt(memberData.userId),
+                    role: memberData.role
+                };
+                filterMembers();
+                showNotification('Cập nhật thành viên thành công!', 'success');
+            }
+        }
+
+        function deleteMember(memberId) {
+            teamMembers = teamMembers.filter(m => m.id !== memberId);
+            filterMembers();
+            showNotification('Xóa thành viên thành công!', 'success');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-2xl shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="ri-check-line text-xl"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMembers(teamMembers);
+
+            // Search and filter events
+            searchInput.addEventListener('input', filterMembers);
+            roleFilter.addEventListener('change', filterMembers);
+            sortFilter.addEventListener('change', filterMembers);
+
+            // Modal events
+            document.getElementById('add-member-btn').addEventListener('click', () => {
+                openModal('Thêm Thành Viên Mới', 'Thêm Thành Viên');
+            });
+
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            document.getElementById('cancel-btn').addEventListener('click', closeModal);
+
+            // Form submission
+            document.getElementById('member-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const memberData = {
+                    userId: formData.get('userId'),
+                    teamPostId: formData.get('teamPostId'),
+                    role: formData.get('role')
+                };
+
+                if (editingMemberId) {
+                    updateMember(editingMemberId, memberData);
+                } else {
+                    addMember(memberData);
+                }
+
+                closeModal();
+            });
+
+            // Delete modal events
+            document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirm-delete').addEventListener('click', function() {
+                if (memberToDelete) {
+                    deleteMember(memberToDelete);
+                    closeDeleteModal();
+                }
+            });
+
+            // Export functionality
+            document.getElementById('export-btn').addEventListener('click', function() {
+                const csvContent = "data:text/csv;charset=utf-8," +
+                    "ID,ID Người Dùng,ID Bài Đăng,Vai Trò,Ngày Tham Gia\n" +
+                    teamMembers.map(m => `${m.id},${m.userId},${m.teamPostId},${getRoleText(m.role)},${m.joinedAt}`).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "danh_sach_thanh_vien.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('Xuất danh sách thành viên thành công!', 'success');
+            });
+        });
+
+        // Delegate events for dynamically created elements
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.edit-member')) {
+                const memberId = parseInt(e.target.closest('.edit-member').dataset.memberId);
+                const member = teamMembers.find(m => m.id === memberId);
+                if (member) {
+                    openModal('Sửa Thành Viên', 'Cập Nhật', member);
+                }
+            }
+
+            if (e.target.closest('.delete-member')) {
+                const memberId = parseInt(e.target.closest('.delete-member').dataset.memberId);
+                openDeleteModal(memberId);
+            }
+
+            // Close modals when clicking outside
+            if (e.target === memberModal) {
+                closeModal();
+            }
+
+            if (e.target === deleteModal) {
+                closeDeleteModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (!memberModal.classList.contains('hidden')) {
+                    closeModal();
+                }
+                if (!deleteModal.classList.contains('hidden')) {
+                    closeDeleteModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

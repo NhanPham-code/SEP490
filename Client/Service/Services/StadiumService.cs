@@ -1,4 +1,7 @@
-﻿using DTOs.StadiumDTO;
+﻿using DTOs.OData;
+using DTOs.StadiumDTO;
+using FindTeamAPI.DTOs;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Service.BaseService;
 using Service.Interfaces;
@@ -66,6 +69,16 @@ namespace Service.Services
             var response = await _httpClient.GetAsync("/odata/Stadium?$expand=StadiumVideos,Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true" + searchTerm);
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
+        }
+        public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetAllStadiumByListId(List<int> stadiumId)
+        {
+            var ids = string.Join(",", stadiumId);
+
+            var response = await _httpClient.GetAsync($"/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true&$filter=Id in ({ids})");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            var stadium = await response.Content.ReadAsStringAsync();
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);
+            return newResponse;
         }
 
         public Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto)

@@ -17,7 +17,7 @@ namespace Service.Interfaces
 
         Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
 
-        Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(string userId);
+        Task<PublicUserProfileDTO?> GetOtherUserByIdAsync(int userId);
 
         Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO);
 
@@ -34,5 +34,7 @@ namespace Service.Interfaces
         Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
 
         Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest);
+
+        Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken);
     }
 }
