@@ -110,6 +110,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
+builder.Services.AddHttpClient<IAiService, AIService>(client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:9999");
+});
+
 // Inject AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

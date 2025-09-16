@@ -101,16 +101,6 @@
                 <div id="register-alert" class="alert-container"></div>
 
                 <form id="registerForm" class="space-y-4">
-                    <div class="field-group">
-                        <div class="floating-label">
-                            <input type="text" id="register-fullname" placeholder="Họ và tên" required />
-                            <i class="ri-user-3-line icon text-xl"></i>
-                        </div>
-                        <div id="register-fullname-error" class="field-error">
-                            <i class="ri-error-warning-line"></i>
-                            <span></span>
-                        </div>
-                    </div>
 
                     <div class="field-group">
                         <div class="floating-label">
@@ -125,59 +115,10 @@
 
                     <div class="field-group">
                         <div class="floating-label">
-                            <input type="text" id="register-address" placeholder="Địa chỉ" required />
-                            <i class="ri-home-line icon text-xl"></i>
-                        </div>
-                        <div id="register-address-error" class="field-error">
-                            <i class="ri-error-warning-line"></i>
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <div class="field-group">
-                        <div class="floating-label">
                             <input type="tel" id="register-phone" placeholder="Số điện thoại" required pattern="[0-9]{10,15}" />
                             <i class="ri-phone-line icon text-xl"></i>
                         </div>
                         <div id="register-phone-error" class="field-error">
-                            <i class="ri-error-warning-line"></i>
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <div class="field-group">
-                        <div class="floating-label">
-                            <div class="custom-select" id="gender-select-wrapper">
-                                <div class="custom-select-trigger" id="gender-trigger">
-                                    <span class="placeholder">Chọn giới tính</span>
-                                    <i class="ri-arrow-down-s-line custom-select-arrow"></i>
-                                </div>
-                                <div class="custom-select-dropdown" id="gender-dropdown">
-                                    <div class="custom-select-option" data-value="Nam">👨 Nam</div>
-                                    <div class="custom-select-option" data-value="Nữ">👩 Nữ</div>
-                                    <div class="custom-select-option" data-value="Khác">🏳️‍⚧️ Khác</div>
-                                </div>
-                            </div>
-                            <select id="register-gender" required style="display: none;">
-                                <option value="">Chọn giới tính</option>
-                                <option value="Nam">👨 Nam</option>
-                                <option value="Nữ">👩 Nữ</option>
-                                <option value="Khác">🏳️‍⚧️ Khác</option>
-                            </select>
-                            <i class="ri-user-heart-line icon text-xl"></i>
-                        </div>
-                        <div id="register-gender-error" class="field-error">
-                            <i class="ri-error-warning-line"></i>
-                            <span></span>
-                        </div>
-                    </div>
-
-                    <div class="field-group">
-                        <div class="floating-label date-input-wrapper">
-                            <input type="date" id="register-dob" required />
-                            <i class="ri-calendar-line icon text-xl"></i>
-                        </div>
-                        <div id="register-dob-error" class="field-error">
                             <i class="ri-error-warning-line"></i>
                             <span></span>
                         </div>
@@ -243,12 +184,12 @@
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
                     <h1 class="text-3xl font-bold mb-4">Chào mừng trở lại! ⚽</h1>
-                    <p class="text-lg mb-6">Đã có tài khoản? Đăng nhập để tiếp tục hành trình thể thao của bạn.</p>
+                    <p class="text-lg mb-6">Đã có tài khoản? Đăng nhập để truy cập vào hệ thống quản lý sân vận động của bạn.</p>
                     <button class="overlay-btn" id="signIn">Đăng nhập</button>
                 </div>
                 <div class="overlay-panel overlay-right">
-                    <h1 class="text-3xl font-bold mb-4">Xin chào, vận động viên! 🏆</h1>
-                    <p class="text-lg mb-6">Tạo tài khoản để bắt đầu hành trình thể thao tuyệt vời.</p>
+                    <h1 class="text-3xl font-bold mb-4">Xin chào, nhà quản lý sân vận động! 🏆</h1>
+                    <p class="text-lg mb-6">Tạo tài khoản để bắt đầu cho hệ thống quản lý sân vận động của bạn.</p>
                     <button class="overlay-btn" id="signUp">Đăng ký</button>
                 </div>
             </div>
@@ -301,19 +242,19 @@
             const icon = iconMap[type] || 'ri-information-line';
 
             const alertHtml = `
-                                <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
-                                    <div class="alert-icon">
-                                        <i class="${icon}"></i>
-                                    </div>
-                                    <div class="alert-content">
-                                        ${message}
-                                    </div>
-                                    <div class="alert-close" onclick="closeAlert('${alertId}')">
-                                        <i class="ri-close-line"></i>
-                                    </div>
-                                    ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
-                                </div>
-                            `;
+                                        <div class="alert ${alertClass} ${isToast ? 'toast' : 'local'}" id="${alertId}">
+                                            <div class="alert-icon">
+                                                <i class="${icon}"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                ${message}
+                                            </div>
+                                            <div class="alert-close" onclick="closeAlert('${alertId}')">
+                                                <i class="ri-close-line"></i>
+                                            </div>
+                                            ${autoHide && type === 'success' ? '<div class="alert-progress"></div>' : ''}
+                                        </div>
+                                    `;
 
             if (isToast) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
@@ -355,18 +296,18 @@
             const errorItems = errorList.map(error => `<li>${error}</li>`).join('');
 
             const alertHtml = `
-                                <div class="form-error-summary">
-                                    <div class="alert-icon">
-                                        <i class="ri-error-warning-line"></i>
-                                    </div>
-                                    <div class="alert-content">
-                                        <strong>Vui lòng kiểm tra các lỗi sau:</strong>
-                                        <ul style="margin: 8px 0 0 0; padding-left: 16px;">
-                                            ${errorItems}
-                                        </ul>
-                                    </div>
-                                </div>
-                            `;
+                                        <div class="form-error-summary">
+                                            <div class="alert-icon">
+                                                <i class="ri-error-warning-line"></i>
+                                            </div>
+                                            <div class="alert-content">
+                                                <strong>Vui lòng kiểm tra các lỗi sau:</strong>
+                                                <ul style="margin: 8px 0 0 0; padding-left: 16px;">
+                                                    ${errorItems}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    `;
 
             container.innerHTML = alertHtml;
 
@@ -466,10 +407,6 @@
             return /^\d{10,15}$/.test(phone);
         }
 
-        function validateFullName(name) {
-            return /^[a-zA-ZÀ-ỹ\s]{2,}$/.test(name);
-        }
-
         function getPasswordStrength(password) {
             let strength = 0;
             if (password.length >= 8) strength++;
@@ -505,96 +442,6 @@
             strengthText.textContent = strengthTextContent;
         }
 
-        // CUSTOM SELECT FUNCTIONALITY - ĐÃ SỬA LỖI
-        function initCustomSelects() {
-            const customSelects = document.querySelectorAll('.custom-select');
-
-            customSelects.forEach(selectWrapper => {
-                const trigger = selectWrapper.querySelector('.custom-select-trigger');
-                const dropdown = selectWrapper.querySelector('.custom-select-dropdown');
-                const options = selectWrapper.querySelectorAll('.custom-select-option');
-                const hiddenSelect = selectWrapper.parentElement.querySelector('select[style*="display: none"]');
-
-                // Remove existing event listeners to prevent duplication
-                const newTrigger = trigger.cloneNode(true);
-                trigger.parentNode.replaceChild(newTrigger, trigger);
-
-                const newDropdown = dropdown.cloneNode(true);
-                dropdown.parentNode.replaceChild(newDropdown, dropdown);
-
-                // Get updated references
-                const updatedTrigger = selectWrapper.querySelector('.custom-select-trigger');
-                const updatedDropdown = selectWrapper.querySelector('.custom-select-dropdown');
-                const updatedOptions = selectWrapper.querySelectorAll('.custom-select-option');
-
-                // Toggle dropdown
-                updatedTrigger.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Close other dropdowns
-                    document.querySelectorAll('.custom-select-trigger.active').forEach(otherTrigger => {
-                        if (otherTrigger !== updatedTrigger) {
-                            otherTrigger.classList.remove('active');
-                            otherTrigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
-                        }
-                    });
-
-                    // Toggle current dropdown
-                    updatedTrigger.classList.toggle('active');
-                    updatedDropdown.classList.toggle('active');
-                });
-
-                // Handle option selection
-                updatedOptions.forEach(option => {
-                    option.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        const value = this.dataset.value;
-                        const text = this.textContent;
-
-                        // Update trigger display
-                        const placeholderElement = updatedTrigger.querySelector('.placeholder, .selected-value');
-                        placeholderElement.textContent = text;
-                        placeholderElement.className = 'selected-value';
-
-                        // Update hidden select
-                        if (hiddenSelect) {
-                            hiddenSelect.value = value;
-                            // Trigger change event
-                            const changeEvent = new Event('change', { bubbles: true });
-                            hiddenSelect.dispatchEvent(changeEvent);
-                        }
-
-                        // Update visual state
-                        updatedOptions.forEach(opt => opt.classList.remove('selected'));
-                        this.classList.add('selected');
-
-                        // Close dropdown
-                        updatedTrigger.classList.remove('active');
-                        updatedDropdown.classList.remove('active');
-
-                        // Clear any validation errors
-                        if (hiddenSelect) {
-                            clearFieldError(hiddenSelect.id);
-                            updatedTrigger.classList.remove('error');
-                        }
-                    });
-                });
-            });
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!e.target.closest('.custom-select')) {
-                    document.querySelectorAll('.custom-select-trigger.active').forEach(trigger => {
-                        trigger.classList.remove('active');
-                        trigger.parentElement.querySelector('.custom-select-dropdown').classList.remove('active');
-                    });
-                }
-            });
-        }
-
         // Enhanced field error function for custom select
         function showFieldErrorForSelect(fieldId, message) {
             const hiddenSelect = document.getElementById(fieldId);
@@ -617,34 +464,6 @@
             const mobileRegisterTab = document.getElementById('mobile-register-tab');
             const loginContainer = document.querySelector('.login-container');
             const registerContainer = document.querySelector('.register-container');
-
-            // Set max date for date input (18 years ago)
-            const dobInput = document.getElementById('register-dob');
-            if (dobInput) {
-                const today = new Date();
-                const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-                const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
-
-                dobInput.max = maxDate.toISOString().split('T')[0];
-                dobInput.min = minDate.toISOString().split('T')[0];
-
-                // Force date picker to open on click
-                dobInput.addEventListener('click', function () {
-                    if (this.showPicker) {
-                        this.showPicker();
-                    }
-                });
-
-                // Handle focus
-                dobInput.addEventListener('focus', function () {
-                    if (this.showPicker) {
-                        this.showPicker();
-                    }
-                });
-            }
-
-            // Initialize custom selects
-            initCustomSelects();
 
             // Tab switching
             function switchToLogin() {
@@ -762,12 +581,8 @@
                 clearAllFieldErrors('registerForm');
 
                 const formData = {
-                    fullname: document.getElementById('register-fullname').value.trim(),
                     email: document.getElementById('register-email').value.trim(),
-                    address: document.getElementById('register-address').value.trim(),
                     phoneNumber: document.getElementById('register-phone').value.trim(),
-                    gender: document.getElementById('register-gender').value,
-                    dateOfBirth: document.getElementById('register-dob').value,
                     password: document.getElementById('register-password').value
                 };
 
@@ -777,13 +592,6 @@
                 let hasError = false;
 
                 // Validation with field-level errors
-                if (!formData.fullname) {
-                    showFieldError('register-fullname', 'Họ tên không được để trống');
-                    hasError = true;
-                } else if (!validateFullName(formData.fullname)) {
-                    showFieldError('register-fullname', 'Họ tên phải có ít nhất 2 ký tự và không chứa số');
-                    hasError = true;
-                }
 
                 if (!formData.email) {
                     showFieldError('register-email', 'Email không được để trống');
@@ -793,29 +601,11 @@
                     hasError = true;
                 }
 
-                if (!formData.address) {
-                    showFieldError('register-address', 'Địa chỉ không được để trống');
-                    hasError = true;
-                } else if (formData.address.length < 5) {
-                    showFieldError('register-address', 'Địa chỉ phải có ít nhất 5 ký tự');
-                    hasError = true;
-                }
-
                 if (!formData.phoneNumber) {
                     showFieldError('register-phone', 'Số điện thoại không được để trống');
                     hasError = true;
                 } else if (!validatePhone(formData.phoneNumber)) {
                     showFieldError('register-phone', 'Số điện thoại phải có từ 10-15 chữ số');
-                    hasError = true;
-                }
-
-                if (!formData.gender) {
-                    showFieldErrorForSelect('register-gender', 'Vui lòng chọn giới tính');
-                    hasError = true;
-                }
-
-                if (!formData.dateOfBirth) {
-                    showFieldError('register-dob', 'Vui lòng chọn ngày sinh');
                     hasError = true;
                 }
 

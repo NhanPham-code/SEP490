@@ -81,22 +81,11 @@ namespace Service.Services
         {
             using var form = new MultipartFormDataContent();
 
-            form.Add(new StringContent(dto.FullName), nameof(dto.FullName));
             form.Add(new StringContent(dto.Email), nameof(dto.Email));
             form.Add(new StringContent(dto.Password), nameof(dto.Password));
-            form.Add(new StringContent(dto.Role ?? "None"), nameof(dto.Role));
-
-            if (!string.IsNullOrEmpty(dto.Address))
-                form.Add(new StringContent(dto.Address), nameof(dto.Address));
 
             if (!string.IsNullOrEmpty(dto.PhoneNumber))
                 form.Add(new StringContent(dto.PhoneNumber), nameof(dto.PhoneNumber));
-
-            if (!string.IsNullOrEmpty(dto.Gender))
-                form.Add(new StringContent(dto.Gender), nameof(dto.Gender));
-
-            if (!string.IsNullOrEmpty(dto.DateOfBirth))
-                form.Add(new StringContent(dto.DateOfBirth), nameof(dto.DateOfBirth));
 
             if (dto.FrontCCCDImage != null)
             {

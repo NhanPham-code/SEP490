@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTOs.UserDTO
 {
-    public class TempRegistrationData
+    public class StadiumManagerTempRegistrationData
     {
-        public CustomerRegisterRequestDTO RegisterData { get; set; }
+        public StadiumManagerRegisterRequestDTO RegisterData { get; set; }
         public string VerificationCode { get; set; }
         public DateTime VerificationCodeTimestamp { get; set; }
     }

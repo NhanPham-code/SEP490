@@ -147,20 +147,14 @@ namespace StadiumManagerUI.Controllers
 
         // Action xử lý đăng ký người dùng mới
         [HttpPost]
-        public async Task<IActionResult> Register(string fullname, string email, string password, string address,
-            string phoneNumber, string gender, string dateOfBirth)
+        public async Task<IActionResult> Register(string email, string password, string phoneNumber)
         {
             // Tạo DTO
-            var registerRequestDTO = new CustomerRegisterRequestDTO
+            var registerRequestDTO = new StadiumManagerRegisterRequestDTO
             {
-                FullName = fullname,
                 Email = email,
                 Password = password,
-                Address = address,
-                PhoneNumber = phoneNumber,
-                Role = ROLE_DEFAULT,
-                Gender = gender,
-                DateOfBirth = dateOfBirth
+                PhoneNumber = phoneNumber
             };
 
             // Server-side validation
@@ -194,7 +188,7 @@ namespace StadiumManagerUI.Controllers
                 var verificationCode = new Random().Next(100000, 999999).ToString();
 
                 // Lưu vào session
-                var tempRegisterData = new TempRegistrationData
+                var tempRegisterData = new StadiumManagerTempRegistrationData
                 {
                     RegisterData = registerRequestDTO,
                     VerificationCode = verificationCode,
@@ -207,7 +201,7 @@ namespace StadiumManagerUI.Controllers
                 await _emailService.SendEmailAsync(
                     registerRequestDTO.Email,
                     "Mã Xác Thực Đăng Ký - Sportivey",
-                    $"Xin chào {registerRequestDTO.FullName},\n\nMã xác thực của bạn là: {verificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
+                    $"Xin chào nhà quản lý sân mới,\n\nMã xác thực của bạn là: {verificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
 
                 return Json(new
                 {
@@ -232,7 +226,7 @@ namespace StadiumManagerUI.Controllers
         public IActionResult Verify()
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<StadiumManagerTempRegistrationData>("TempRegisterData");
 
             // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
             if (tempRegisterData == null)
@@ -249,7 +243,7 @@ namespace StadiumManagerUI.Controllers
         public async Task<IActionResult> Verify(string email, string code)
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<StadiumManagerTempRegistrationData>("TempRegisterData");
 
             // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
             if (tempRegisterData == null)
@@ -282,7 +276,7 @@ namespace StadiumManagerUI.Controllers
         public async Task<IActionResult> ResendCode()
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<StadiumManagerTempRegistrationData>("TempRegisterData");
 
             if (tempRegisterData == null)
             {
@@ -298,7 +292,7 @@ namespace StadiumManagerUI.Controllers
             await _emailService.SendEmailAsync(
                     registerRequestDTO.Email,
                     "Mã Xác Thực Đăng Ký - Sportivey",
-                    $"Xin chào {registerRequestDTO.FullName},\n\nMã xác thực của bạn là: {newVerificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
+                    $"Xin chào nhà quản lý sân mới,\n\nMã xác thực của bạn là: {newVerificationCode}\n\nMã này có hiệu lực trong 60 giây.\n\nTrân trọng,\nĐội ngũ Sportivey");
 
             // Cập nhật lại session với mã mới
             tempRegisterData.VerificationCode = newVerificationCode;
@@ -322,25 +316,19 @@ namespace StadiumManagerUI.Controllers
         {
 
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<dynamic>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<StadiumManagerTempRegistrationData>("TempRegisterData");
 
             if (tempRegisterData == null)
             {
-                ViewBag.ErrorMessage = "Không tìm thấy dữ liệu đăng ký tạm thời.";
-                return View("Verify");
+                return BadRequest(new { success = false, message = "Phiên đăng ký đã hết hạn. Vui lòng thử lại từ đầu." });
             }
 
             // Tạo một DTO từ dữ liệu tạm
             var registerRequestDTO = new StadiumManagerRegisterRequestDTO
             {
-                FullName = tempRegisterData.RegisterData.FullName,
                 Email = tempRegisterData.RegisterData.Email,
                 Password = tempRegisterData.RegisterData.Password,
-                Address = tempRegisterData.RegisterData.Address,
                 PhoneNumber = tempRegisterData.RegisterData.PhoneNumber,
-                Role = tempRegisterData.RegisterData.Role,
-                Gender = tempRegisterData.RegisterData.Gender,
-                DateOfBirth = tempRegisterData.RegisterData.DateOfBirth,
                 Avatar = avatar,
                 FrontCCCDImage = frontCccdImage // nhận dạng IFormFile chuẩn
             };
@@ -350,8 +338,7 @@ namespace StadiumManagerUI.Controllers
 
             if (!isRegistered)
             {
-                ViewBag.ErrorMessage = "Đăng ký không thành công. Vui lòng thử lại.";
-                return View("Login");
+                return BadRequest(new { success = false, message = "Hình CCCD bạn cung cấp không chính xác. Vui lòng thử lại." });
             }
 
             // Xóa dữ liệu tạm sau khi đăng ký thành công
@@ -367,8 +354,7 @@ namespace StadiumManagerUI.Controllers
 
             if (loginResponse == null || string.IsNullOrEmpty(loginResponse.AccessToken))
             {
-                ViewBag.ErrorMessage = "Đăng nhập sau đăng ký không thành công.";
-                return View("Verify");
+                return StatusCode(500, new { success = false, message = "Đăng ký thành công nhưng không thể tự động đăng nhập. Vui lòng thử đăng nhập thủ công." });
             }
 
             // Lưu token vào cookie (HttpOnly để bảo mật)
@@ -377,7 +363,7 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin người dùng vào session
             UpdateUserSession(loginResponse);
 
-            return RedirectToAction("Index", "Home");
+            return Ok(new { success = true, redirectUrl = Url.Action("Index", "Home") });
         }
 
         // lấy profile của người dùng
