@@ -163,7 +163,7 @@ namespace StadiumManagerUI.Controllers
                             );
                             await _courtRelationService.CreateCourtRelation(
                                 court7Relation.childCourtIds,
-                                court7Relation.parentCourtId
+                                courtParentId
                             );
                         }
                     }
