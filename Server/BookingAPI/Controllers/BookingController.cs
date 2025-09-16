@@ -74,6 +74,74 @@ namespace BookingAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("filterbydateandhour")]
+        public async Task<ActionResult<IEnumerable<BookingReadDto>>> GetBookingsByDateRangeAndHour([FromQuery] int year, [FromQuery] int month, [FromQuery] List<int> days, [FromQuery] string startTime, [FromQuery] string endTime)
+        {
+            try
+            {
+                // Chuyển đổi chuỗi thời gian (ví dụ: "15:00") sang TimeSpan
+                if (!TimeSpan.TryParse(startTime, out var startTs) || !TimeSpan.TryParse(endTime, out var endTs))
+                {
+                    return BadRequest("Invalid time format. Use HH:mm.");
+                }
+
+                var bookings = await _bookingService.GetBookingsByDateRangeAndHourAsync(year, month, days, startTs, endTs);
+
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("filterbycourtandhour")]
+        public async Task<ActionResult<IEnumerable<BookingReadDto>>> GetBookingsByCourtAndHour([FromQuery] List<int> courtIds, [FromQuery] int year, [FromQuery] int month, [FromQuery] string startTime, [FromQuery] string endTime)
+        {
+            try
+            {
+                if (courtIds == null || !courtIds.Any())
+                {
+                    return BadRequest("Court IDs must be provided.");
+                }
+
+                if (!TimeSpan.TryParse(startTime, out var startTs) || !TimeSpan.TryParse(endTime, out var endTs))
+                {
+                    return BadRequest("Invalid time format. Use HH:mm.");
+                }
+
+                var bookings = await _bookingService.GetBookingsByCourtIdsAndHourAsync(courtIds, year, month, startTs, endTs);
+
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPost("monthly")]
+        //[Authorize(Roles = "Customer")] 
+        public async Task<ActionResult<MonthlyBookingReadDto>> CreateMonthlyBooking(MonthlyBookingCreateDto monthlyBookingCreateDto)
+        {
+            try
+            {
+                var createdMonthlyBooking = await _bookingService.CreateMonthlyBookingAsync(monthlyBookingCreateDto);
+                // We can't use CreatedAtAction here as there's no "GetMonthlyBooking" endpoint yet.
+                // Returning Ok with the created object is a good alternative.
+                return Ok(createdMonthlyBooking);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating monthly booking: {ex.Message}");
+            }
+        }
+
     }
 }
 

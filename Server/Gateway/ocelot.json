@@ -142,7 +142,7 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
+      }
     },
     {
       "DownstreamPathTemplate": "/api/Users/{userId}",
@@ -330,6 +330,30 @@
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
       }
     },
+    {
+      "DownstreamPathTemplate": "/api/booking/filterbydateandhour",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/filterbydateandhour",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/filterbycourtandhour",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/filterbycourtandhour",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
     // === STADIUM API ===
     {
       "DownstreamPathTemplate": "/odata/OdataStadium",
@@ -492,10 +516,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       }
-      //"RouteClaimsRequirement": {
-      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-      //}
     },
     {
       "DownstreamPathTemplate": "/api/DeleteImagesByImgId",

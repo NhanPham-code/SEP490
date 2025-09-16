@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\uploads\avatars\" />
-    <Folder Include="wwwroot\uploads\cccd\" />
-    <Folder Include="wwwroot\uploads\videos\" />
+    <Folder Include="wwwroot\uploads\avatars\tienhnce181633_at_fpt_dot_edu_dot_vn\" />
   </ItemGroup>
 
 </Project>

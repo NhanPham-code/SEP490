@@ -17,7 +17,7 @@ namespace CustomerUI.Controllers
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
         private readonly IDiscountService _discountService;
-        private readonly IStadiumService _stadiumService; 
+        private readonly IStadiumService _stadiumService;
         private readonly ICourtRelationService _courtRelationService;
         public BookingController(
             IBookingService bookingService,
@@ -25,13 +25,13 @@ namespace CustomerUI.Controllers
             IUserService userService,
             IDiscountService discountService,
             IStadiumService stadiumService,
-            ICourtRelationService courtRelationService) 
+            ICourtRelationService courtRelationService)
         {
             _bookingService = bookingService;
             _tokenService = tokenService;
             _userService = userService;
             _discountService = discountService;
-            _stadiumService = stadiumService; 
+            _stadiumService = stadiumService;
             _courtRelationService = courtRelationService;
         }
 
@@ -82,6 +82,24 @@ namespace CustomerUI.Controllers
 
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MonthlyCheckout(MonthlyBookingFormViewModel model)
+        {
+            // Chuyển dữ liệu nhận được từ form sang ViewBag để view MonthlyCheckout.cshtml có thể sử dụng
+            ViewBag.Year = model.Year;
+            ViewBag.Month = model.Month;
+            ViewBag.SelectedDays = model.SelectedDays;
+            ViewBag.StartTime = model.StartTime;
+            ViewBag.EndTime = model.EndTime;
+            ViewBag.SelectedCourtIds = model.SelectedCourtIds;
+            ViewBag.TotalPrice = model.TotalPrice;
+            ViewBag.StadiumId = model.StadiumId;
+
+            // Trả về view cho trang checkout hàng tháng
+            return View();
+        }
+
 
         public async Task<IActionResult> BookingHistory()
         {
@@ -270,6 +288,31 @@ namespace CustomerUI.Controllers
                 // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
                 // hoặc trả về một trang lỗi.
                 return RedirectToAction("Booking");
+            }
+
+            // Truyền stadiumId vào ViewBag để View có thể sử dụng.
+            ViewBag.StadiumId = stadiumId;
+
+            // Trả về cùng một View "Booking.cshtml".
+            return View();
+        }
+
+        public IActionResult MonthlyBooking(string stadiumId)
+        {
+
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
+            // Kiểm tra xem stadiumId có hợp lệ không.
+            if (string.IsNullOrEmpty(stadiumId))
+            {
+                // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
+                // hoặc trả về một trang lỗi.
+                return RedirectToAction("MonthlyBooking");
             }
 
             // Truyền stadiumId vào ViewBag để View có thể sử dụng.
@@ -476,5 +519,47 @@ namespace CustomerUI.Controllers
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime)
+        {
+            try
+            {
+                var result = await _bookingService.FilterByDateAndHour(year, month, days, startTime, endTime);
+
+                // Debug logging
+                Console.WriteLine($"Service returned: {result?.GetType().Name}");
+
+                // Make sure we're returning the correct JSON structure
+                return Ok(result); // Use Ok() instead of Json() to ensure proper serialization
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in FilterByDateAndHour: {ex.Message}");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterByCourtAndHour([FromQuery] List<int> courtIds, int year, int month, int startTime, int endTime)
+        {
+            try
+            {
+                if (courtIds == null || !courtIds.Any())
+                {
+                    return BadRequest(new { error = "Cần cung cấp ít nhất một Court ID." });
+                }
+
+                var result = await _bookingService.FilterByCourtAndHour(courtIds, year, month, startTime, endTime);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in FilterByCourtAndHour: {ex.Message}");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
