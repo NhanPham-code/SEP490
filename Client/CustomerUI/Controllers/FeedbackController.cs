@@ -1,6 +1,7 @@
 ﻿using FeedbackAPI.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Service.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -433,17 +434,20 @@ namespace CustomerUI.Controllers
         {
             try
             {
-                var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
+                // ✅ Dùng method mới với phân trang - chỉ lấy records cần thiết
+                var (stadiumFeedbacks, totalCount) = await _feedbackService.GetByStadiumIdPagedAsync(stadiumId, page, pageSize);
+
                 var feedbackList = new List<object>();
-                const string BASE_URL= "https://localhost:7221"; // Sửa lại base URL nếu khác
+                const string BASE_URL = "https://localhost:7221"; // Sửa lại base URL nếu khác
                 const string Profile = "https://localhost:7295";
+
                 if (stadiumFeedbacks != null && stadiumFeedbacks.Any())
                 {
-                    // Lấy userId dạng int, không chuyển sang string
+                    // ✅ Chỉ xử lý user info cho records trong page hiện tại
                     var userIds = stadiumFeedbacks.Select(f => f.UserId).Distinct().ToList();
                     var userDict = new Dictionary<int, object>();
 
-                    Console.WriteLine($"[GetFeedbacksByStadiumDirect] Processing {userIds.Count} unique users");
+                    Console.WriteLine($"[GetFeedbacksByStadiumDirect] Processing {userIds.Count} unique users for page {page}");
 
                     foreach (var userId in userIds)
                     {
@@ -451,7 +455,6 @@ namespace CustomerUI.Controllers
                         {
                             Console.WriteLine($"[GetFeedbacksByStadiumDirect] Getting user info for userId: {userId}");
 
-                            // Sử dụng int, không phải string
                             var userInfo = await _userService.GetOtherUserByIdAsync(userId);
 
                             if (userInfo != null)
@@ -489,10 +492,9 @@ namespace CustomerUI.Controllers
                         }
                     }
 
-                    var allFeedbacks = new List<object>();
-                    foreach (var fb in stadiumFeedbacks.OrderByDescending(f => f.CreatedAt))
+                    // ✅ Process feedbacks - đã được sắp xếp và phân trang từ API
+                    foreach (var fb in stadiumFeedbacks)
                     {
-                        // Lấy theo int userId
                         var userInfo = userDict.GetValueOrDefault(fb.UserId);
 
                         string imageFullUrl = null;
@@ -516,39 +518,38 @@ namespace CustomerUI.Controllers
 
                         Console.WriteLine($"[GetFeedbacksByStadiumDirect] Feedback {fb.Id}: User={feedbackItem.userName}, Image={imageFullUrl}");
 
-                        allFeedbacks.Add(feedbackItem);
+                        feedbackList.Add(feedbackItem);
                     }
-
-                    // Phân trang
-                    var totalCount = allFeedbacks.Count;
-                    var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-                    var skip = (page - 1) * pageSize;
-
-                    feedbackList = allFeedbacks.Skip(skip).Take(pageSize).ToList();
-
-                    Console.WriteLine($"[GetFeedbacksByStadiumDirect] Page {page}/{totalPages}, Returning {feedbackList.Count}/{totalCount} feedbacks");
-
-                    return Json(new
-                    {
-                        success = true,
-                        data = feedbackList,
-                        pagination = new
-                        {
-                            currentPage = page,
-                            pageSize = pageSize,
-                            totalCount = totalCount,
-                            totalPages = totalPages,
-                            hasNextPage = page < totalPages,
-                            hasPreviousPage = page > 1
-                        }
-                    });
                 }
 
-                Console.WriteLine($"[GetFeedbacksByStadiumDirect] No feedbacks found");
+                // ✅ Tính toán pagination từ totalCount đã có
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Page {page}/{totalPages}, Returning {feedbackList.Count}/{totalCount} feedbacks");
 
                 return Json(new
                 {
                     success = true,
+                    data = feedbackList,
+                    pagination = new
+                    {
+                        currentPage = page,
+                        pageSize = pageSize,
+                        totalCount = totalCount, // ✅ Từ API OData $count=true
+                        totalPages = totalPages,
+                        hasNextPage = page < totalPages,
+                        hasPreviousPage = page > 1
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Exception: {ex.Message}");
+                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Stack trace: {ex.StackTrace}");
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message,
                     data = new List<object>(),
                     pagination = new
                     {
@@ -560,12 +561,6 @@ namespace CustomerUI.Controllers
                         hasPreviousPage = false
                     }
                 });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Exception: {ex.Message}");
-                Console.WriteLine($"[GetFeedbacksByStadiumDirect] Stack trace: {ex.StackTrace}");
-                return Json(new { success = false, message = ex.Message, data = new List<object>() });
             }
         }
         [HttpGet]
@@ -789,5 +784,6 @@ namespace CustomerUI.Controllers
                 return StatusCode(500, new { success = false, message = "Có lỗi xảy ra khi lấy thông tin user." });
             }
         }
+       
     }
 }

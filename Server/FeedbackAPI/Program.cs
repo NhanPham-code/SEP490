@@ -8,9 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-
+// ===== JWT Authentication =====
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -33,7 +34,26 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
-// Authorization policies (cho phép Customer) để dùng trong Controller
+// ===== CORS ===== (Cập nhật)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:7128", "http://localhost:7128") // Thêm cả http
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Thêm dòng này
+    });
+
+    // Hoặc dùng policy rộng hơn để test
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+// ===== Authorization Policies =====
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Customer", policy =>
@@ -51,7 +71,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("StadiumManager");
     });
 });
-// Add services to the container
+
+// ===== OData + Controllers =====
 builder.Services.AddControllers()
     .AddOData(options =>
     {
@@ -61,35 +82,51 @@ builder.Services.AddControllers()
                .Expand()
                .Count()
                .SetMaxTop(100)
-               .AddRouteComponents("api", GetEdmModel()); // Thêm route OData + EDM model
+               .AddRouteComponents("odata", GetEdmModel());
+        // route là "/odata"
     });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// Đăng ký DbContext
+
+// ===== DbContext =====
 builder.Services.AddDbContext<FeedbackDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-// Đăng ký Repository & Service
+
+// ===== Repository & Service =====
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
-// Đăng ký AutoMapper
+
+// ===== AutoMapper =====
 builder.Services.AddAutoMapper(typeof(FeedbackProfile));
+
 var app = builder.Build();
-// Configure the HTTP request pipeline
+
+// ===== Middleware Pipeline =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseHttpsRedirection();
-// Cho phép truy cập file tĩnh trong wwwroot
 app.UseStaticFiles();
+
+// ⚡ Thêm CORS ở đây (phải trước Authentication/Authorization)
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
-// Tạo EDM model cho OData
+
+// ===== EDM Model for OData =====
 IEdmModel GetEdmModel()
 {
     var modelBuilder = new ODataConventionModelBuilder();
-    modelBuilder.EntitySet<FeedbackAPI.Models.Feedback>("Feedback");
+    // EntitySet phải trùng với Controller: FeedbackODataController
+    modelBuilder.EntitySet<FeedbackAPI.Models.Feedback>("FeedbackOData");
     return modelBuilder.GetEdmModel();
 }

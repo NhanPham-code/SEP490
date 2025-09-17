@@ -1,4 +1,5 @@
-﻿using FeedbackAPI.DTOs;
+﻿using DTOs.OData;
+using FeedbackAPI.DTOs;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -6,9 +7,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Service.Services
 {
@@ -167,8 +168,9 @@ namespace Service.Services
 
         public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId)
         {
-            var response = await _httpClient.GetAsync($"feedback/stadium/{stadiumId}");
-            Console.WriteLine($"[FeedbackService] GET feedback/stadium/{stadiumId} => {response.StatusCode}");
+            // Use OData endpoint with $filter query
+            var response = await _httpClient.GetAsync($"odata/FeedbackOData?$filter=stadiumId eq {stadiumId}&$count=true");
+            Console.WriteLine($"[FeedbackService] GET odata/FeedbackOData?$filter=stadiumId eq {stadiumId} => {response.StatusCode}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -177,10 +179,31 @@ namespace Service.Services
                 return new List<FeedbackResponse>();
             }
 
-            return await response.Content.ReadFromJsonAsync<IEnumerable<FeedbackResponse>>()
-                   ?? new List<FeedbackResponse>();
+            // OData returns data in a wrapper object with "value" property
+            var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<FeedbackResponse>>();
+            return odataResponse?.Value ?? new List<FeedbackResponse>();
         }
+        public async Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetByStadiumIdPagedAsync(int stadiumId, int page, int pageSize)
+        {
+            var skip = (page - 1) * pageSize;
 
+            // ✅ Thêm $skip, $top, $orderby vào OData query
+            var response = await _httpClient.GetAsync($"odata/FeedbackOData?$filter=stadiumId eq {stadiumId}&$skip={skip}&$top={pageSize}&$count=true&$orderby=createdAt desc");
+
+            Console.WriteLine($"[FeedbackService] GET with pagination => {response.StatusCode}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[FeedbackService] Error content: {errorContent}");
+                return (new List<FeedbackResponse>(), 0);
+            }
+
+            // ✅ Parse OData response để lấy data + count
+            var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<FeedbackResponse>>();
+
+            return (odataResponse?.Value ?? new List<FeedbackResponse>(), odataResponse?.Count ?? 0);
+        }
         public async Task<IEnumerable<FeedbackResponse>> GetByStadiumIdWithAuthAsync(int stadiumId, string accessToken)
         {
             AddBearerAccessToken(accessToken);
