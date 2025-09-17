@@ -1,4 +1,4 @@
-﻿namespace DTOs.DiscountDTO
+﻿namespace DiscountAPI.DTO
 {
     public class ReadDiscountDTO
     {
@@ -14,6 +14,8 @@
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string UserId { get; set; } = null!;
-        public List<int>? StadiumIds { get; set; } = new();
+
+        // Trả về danh sách stadium áp dụng
+        public List<int> StadiumIds { get; set; } = new();
     }
 }

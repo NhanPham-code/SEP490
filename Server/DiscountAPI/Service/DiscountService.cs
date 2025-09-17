@@ -36,10 +36,8 @@ namespace DiscountAPI.Service
             return _mapper.Map<ReadDiscountDTO>(discount);
         }
 
-        // Phương thức đã được thêm vào để lấy các mã giảm giá theo ID sân
         public IQueryable<ReadDiscountDTO> GetByStadiumId(int stadiumId)
         {
-            // Gọi phương thức từ Repository và ánh xạ kết quả sang DTO
             return _repository.GetByStadiumId(stadiumId)
                               .ProjectTo<ReadDiscountDTO>(_mapper.ConfigurationProvider);
         }
@@ -61,9 +59,7 @@ namespace DiscountAPI.Service
         {
             var entity = await _repository.GetByIdAsync(dto.Id);
             if (entity == null)
-            {
                 throw new KeyNotFoundException($"Discount with ID {dto.Id} not found.");
-            }
 
             if (!string.Equals(entity.Code, dto.Code, StringComparison.OrdinalIgnoreCase))
             {
@@ -74,17 +70,21 @@ namespace DiscountAPI.Service
                 }
             }
 
+            // Map các trường đơn lẻ
             _mapper.Map(dto, entity);
-            await _repository.UpdateAsync(entity);
+
+            // Log các stadiumIds
+            Console.WriteLine("DTO stadiumIds: " + string.Join(", ", dto.StadiumIds ?? new List<int>()));
+
+            // Gọi repository update, truyền riêng stadiumIds
+            await _repository.UpdateAsync(entity, dto.StadiumIds ?? new List<int>());
         }
 
         public async Task DeleteAsync(int id)
         {
             var discount = await _repository.GetByIdAsync(id);
             if (discount == null)
-            {
                 throw new KeyNotFoundException($"Discount with ID {id} not found.");
-            }
             await _repository.DeleteAsync(id);
         }
     }
