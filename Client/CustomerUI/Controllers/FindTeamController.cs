@@ -82,7 +82,8 @@ namespace CustomerUI.Controllers
 
         public async Task<IActionResult> GetBookByUserId()
         {
-            var booking = await _bookingService.GetBookingHistoryAsync(_tokenService.GetAccessTokenFromCookie());
+            var queryString = "";
+            var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), queryString);
             
             List<int> stadiumId = booking.Select(s => s.StadiumId).ToList();
             BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();

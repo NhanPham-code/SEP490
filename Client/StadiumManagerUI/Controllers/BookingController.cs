@@ -32,7 +32,8 @@ namespace StadiumManagerUI.Controllers
             List<BookingReadDto> bookings;
             try
             {
-                bookings = await _bookingService.GetBookingHistoryAsync(accessToken);
+                var queryString = "";
+                bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
 
                 if (bookings != null && bookings.Count > 0)
                 {
