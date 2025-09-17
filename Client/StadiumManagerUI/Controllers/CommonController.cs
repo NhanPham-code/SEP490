@@ -45,7 +45,7 @@ namespace StadiumManagerUI.Controllers
                 ? $"{BASE_URL}{response.AvatarUrl}"
                 : $"{BASE_URL}/avatars/default-avatar.png";
 
-            HttpContext.Session.SetString("UserId", response.UserId.ToString());
+            HttpContext.Session.SetInt32("UserId", response.UserId);
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
@@ -58,7 +58,7 @@ namespace StadiumManagerUI.Controllers
                 ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
                 : $"{BASE_URL}/avatars/default-avatar.png";
 
-            HttpContext.Session.SetString("UserId", userProfileDTO.UserId.ToString());
+            HttpContext.Session.SetInt32("UserId", userProfileDTO.UserId);
             HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
