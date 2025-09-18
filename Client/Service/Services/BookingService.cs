@@ -30,7 +30,7 @@ namespace Service.Services
         public async Task<List<BookingReadDto>> GetBookingAsync(string accessToken, string queryString)
         {
             // Sử dụng HttpRequestMessage để set token thủ công
-            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/" + queryString);
+            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history" + queryString);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _httpClient.SendAsync(request);
