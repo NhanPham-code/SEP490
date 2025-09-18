@@ -4,8 +4,8 @@ namespace BookingAPI.DTOs
 {
     public class MonthlyBookingCreateDto
     {
-        [Required]
-        public int UserId { get; set; }
+        // [Required]
+        // public int UserId { get; set; }
 
         [Required]
         public int StadiumId { get; set; }

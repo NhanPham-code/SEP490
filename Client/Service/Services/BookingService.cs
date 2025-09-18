@@ -177,11 +177,18 @@ namespace Service.Services
 
         public async Task<List<BookingReadDto>> FilterByCourtAndHour(List<int> courtIds, int year, int month, int startTime, int endTime)
         {
-            // Chuyển đổi giờ (int) sang định dạng chuỗi "HH:mm"
-            string startTimeStr = $"{startTime:D2}:00"; // ví dụ: 13 -> "13:00"
-            string endTimeStr = $"{endTime:D2}:00";   // ví dụ: 15 -> "15:00"
+            // Check if courtIds is null or empty.
+            if (courtIds == null || !courtIds.Any())
+            {
+                // Return an empty list to indicate no results, without making an API call.
+                return new List<BookingReadDto>();
+            }
 
-            // Xây dựng các tham số truy vấn
+            // Convert hours (int) to "HH:mm" string format.
+            string startTimeStr = $"{startTime:D2}:00"; // e.g., 13 -> "13:00"
+            string endTimeStr = $"{endTime:D2}:00";   // e.g., 15 -> "15:00"
+
+            // Build query parameters.
             var queryParams = new List<string>
             {
                 $"year={year}",
@@ -190,7 +197,7 @@ namespace Service.Services
                 $"endTime={Uri.EscapeDataString(endTimeStr)}"
             };
 
-            // Thêm từng courtId vào danh sách tham số
+            // Add each courtId to the parameter list.
             foreach (var id in courtIds)
             {
                 queryParams.Add($"courtIds={id}");
@@ -198,16 +205,35 @@ namespace Service.Services
 
             var queryString = string.Join("&", queryParams);
 
-            // Sử dụng _httpClient đã được inject thay vì tạo mới
-            // Endpoint này sẽ được Ocelot điều hướng đến 'https://localhost:7136/booking/filterbycourtandhour'
+            // Use the injected _httpClient instead of creating a new one.
+            // This endpoint will be routed by Ocelot to 'https://localhost:7136/booking/filterbycourtandhour'.
             var url = $"/booking/filterbycourtandhour?{queryString}";
 
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();
 
-            // Deserialize dữ liệu JSON trả về
+            // Deserialize the JSON data returned.
             return JsonConvert.DeserializeObject<List<BookingReadDto>>(data);
+        }
+
+        public async Task<BookingReadDto?> CreateMonthlyBookingAsync(MonthlyBookingCreateDto bookingDto, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // Gọi đến endpoint của Ocelot API Gateway
+            var response = await _httpClient.PostAsJsonAsync("/booking/monthly", bookingDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                // Log lỗi hoặc throw exception để Controller có thể bắt được
+                Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Tạo booking hàng tháng thất bại. Lỗi từ API: {errorContent}");
+            }
+
+            // Đọc và deserialize kết quả trả về nếu thành công
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
     }
 }

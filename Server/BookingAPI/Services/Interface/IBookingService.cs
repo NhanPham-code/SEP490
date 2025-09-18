@@ -14,7 +14,6 @@ namespace BookingAPI.Services.Interface
         IQueryable<Booking> GetAllBookingsAsQueryable();
         Task<IEnumerable<BookingReadDto>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime);
         Task<IEnumerable<BookingReadDto>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime);
-        Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync(MonthlyBookingCreateDto monthlyBookingCreateDto);
-
+        Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync(int userId, MonthlyBookingCreateDto monthlyBookingCreateDto);
     }
 }

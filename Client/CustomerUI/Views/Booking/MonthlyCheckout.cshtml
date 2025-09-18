@@ -61,18 +61,20 @@
     </div>
 
     <!-- Main Form -->
-    <form id="booking-form" action="/Booking/CreateBooking" method="post">
-        <!-- Hidden fields for submission -->
-        <input type="hidden" name="IsMonthlyBooking" value="true" />
-        <input type="hidden" name="OriginalPrice" id="booking-original-price" />
-        <input type="hidden" name="TotalPrice" id="booking-total-price" />
-        <input type="hidden" name="Note" id="booking-note" />
-        <input type="hidden" name="DiscountId" id="booking-discount-id" />
-        <input type="hidden" name="PaymentMethod" id="payment-method-input" />
-        <input type="hidden" name="StadiumId" id="booking-stadium-id" />
-        <input type="hidden" name="PaymentAmount" id="payment-amount" />
-        <!-- Container for dynamically generated BookingDetails -->
-        <div id="booking-details-container"></div>
+    <form id="booking-form" action="/Booking/CreateMonthlyBooking" method="post">
+        <!-- Hidden fields for submission matching MonthlyBookingCreateDto -->
+        <input type="hidden" name="StadiumId" id="StadiumId" />
+        <input type="hidden" name="DiscountId" id="DiscountId" />
+        <input type="hidden" name="OriginalPrice" id="OriginalPrice" />
+        <input type="hidden" name="TotalPrice" id="TotalPrice" />
+        <input type="hidden" name="PaymentMethod" id="PaymentMethod" />
+        <input type="hidden" name="StartTime" id="StartTime" />
+        <input type="hidden" name="EndTime" id="EndTime" />
+        <input type="hidden" name="Month" id="Month" />
+        <input type="hidden" name="Year" id="Year" />
+        <!-- Hidden inputs for lists (Dates and CourtIds) -->
+        <div id="dates-container"></div>
+        <div id="courtids-container"></div>
 
         <div id="checkout-container" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-2xl w-full mx-auto">
             <h1 class="text-3xl font-bold text-indigo-600 text-center mb-6">Thông Tin Đặt Sân Hàng Tháng</h1>
@@ -118,9 +120,8 @@
             <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Chọn phương thức thanh toán</h2>
                 <div class="space-y-4">
-                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200"><input type="radio" name="payment-method" value="at_counter" class="form-radio text-indigo-600 h-5 w-5" checked><span class="ml-3 text-sm font-medium text-gray-700">Thanh toán tại quầy (0% trả trước)</span></label>
-                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200"><input type="radio" name="payment-method" value="vnpay_50" class="form-radio text-indigo-600 h-5 w-5"><span class="ml-3 text-sm font-medium text-gray-700">Trả trước 50% qua VNPay</span></label>
-                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200"><input type="radio" name="payment-method" value="vnpay_100" class="form-radio text-indigo-600 h-5 w-5"><span class="ml-3 text-sm font-medium text-gray-700">Trả trước 100% qua VNPay</span></label>
+                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200"><input type="radio" name="payment-method" value="at_counter" class="form-radio text-indigo-600 h-5 w-5" checked><span class="ml-3 text-sm font-medium text-gray-700">Thanh toán tại quầy</span></label>
+                    <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200"><input type="radio" name="payment-method" value="vnpay" class="form-radio text-indigo-600 h-5 w-5"><span class="ml-3 text-sm font-medium text-gray-700">Thanh toán qua VNPay</span></label>
                 </div>
             </div>
 
@@ -213,7 +214,6 @@
                 return court ? court.Name : `Sân #${id}`;
             }).join(', ');
 
-            // *** UPDATED SCRIPT: Populate the list of days ***
             $('#checkout-stadium-name').text(stadiumData.Name);
             $('#checkout-court-names').text(courtNames);
             $('#checkout-time').text(`${bookingData.startTime}:00 - ${bookingData.endTime}:00`);
@@ -256,34 +256,28 @@
         // Form and Data Handling
         function updateHiddenFields() {
             // Update simple fields
-            $('#booking-original-price').val(originalPrice);
-            $('#booking-total-price').val(finalPrice);
-            $('#booking-discount-id').val(selectedDiscountId || '');
-            $('#booking-stadium-id').val(bookingData.stadiumId);
-            $('#payment-method-input').val($('input[name="payment-method"]:checked').val());
+            $('#StadiumId').val(bookingData.stadiumId);
+            $('#DiscountId').val(selectedDiscountId || '');
+            $('#OriginalPrice').val(originalPrice);
+            $('#TotalPrice').val(finalPrice);
+            $('#PaymentMethod').val($('input[name="payment-method"]:checked').val());
+            $('#StartTime').val(`${pad(bookingData.startTime)}:00`);
+            $('#EndTime').val(`${pad(bookingData.endTime)}:00`);
+            $('#Month').val(bookingData.month);
+            $('#Year').val(bookingData.year);
 
-            // Update payment amount
-            const paymentMethod = $('input[name="payment-method"]:checked').val();
-            let paymentAmount = 0;
-            if (paymentMethod === 'vnpay_50') paymentAmount = finalPrice * 0.5;
-            else if (paymentMethod === 'vnpay_100') paymentAmount = finalPrice;
-            $('#payment-amount').val(paymentAmount);
+            // Generate hidden inputs for Dates list
+            const datesContainer = $('#dates-container');
+            datesContainer.empty();
+            bookingData.selectedDays.forEach((day, index) => {
+                datesContainer.append(`<input type="hidden" name="Dates[${index}]" value="${day}" />`);
+            });
 
-            // *** CRITICAL PART: Generate BookingDetails for each booking day and each court ***
-            const container = $('#booking-details-container');
-            container.empty();
-            let detailIndex = 0;
-            bookingData.selectedDays.forEach(day => {
-                const dateISO = `${bookingData.year}-${pad(bookingData.month)}-${pad(day)}`;
-                const startDateTime = `${dateISO}T${pad(bookingData.startTime)}:00:00`;
-                const endDateTime = `${dateISO}T${pad(bookingData.endTime)}:00:00`;
-
-                bookingData.selectedCourtIds.forEach(courtId => {
-                    container.append(`<input type="hidden" name="BookingDetails[${detailIndex}].CourtId" value="${courtId}">`);
-                    container.append(`<input type="hidden" name="BookingDetails[${detailIndex}].StartTime" value="${startDateTime}">`);
-                    container.append(`<input type="hidden" name="BookingDetails[${detailIndex}].EndTime" value="${endDateTime}">`);
-                    detailIndex++;
-                });
+            // Generate hidden inputs for CourtIds list
+            const courtIdsContainer = $('#courtids-container');
+            courtIdsContainer.empty();
+            bookingData.selectedCourtIds.forEach((id, index) => {
+                courtIdsContainer.append(`<input type="hidden" name="CourtIds[${index}]" value="${id}" />`);
             });
         }
 
@@ -292,7 +286,7 @@
             // Initial setup
             fetchStadiumData(bookingData.stadiumId);
             loadUserProfile();
-            updateHiddenFields();
+            updateHiddenFields(); // Call on load to set initial values
 
             // Modal and navigation buttons
             $('#modal-close-btn').click(hideModal);
@@ -326,7 +320,7 @@
             // Form submission
             $('#booking-form').submit(function(e) {
                 e.preventDefault();
-                updateHiddenFields();
+                updateHiddenFields(); // Ensure data is up-to-date before submitting
                 console.log('Dữ liệu form được gửi đi:');
                 new FormData(this).forEach((value, key) => console.log(`${key}: ${value}`));
                 this.submit();

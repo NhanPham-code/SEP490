@@ -11,7 +11,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/google-auth",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/login",
@@ -23,7 +23,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/login",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/logout",
@@ -35,7 +35,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/logout",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/checkEmailExits",
@@ -47,7 +47,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/checkEmail",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/CustomerRegister",
@@ -59,7 +59,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/CustomerRegister",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/ManagerRegister",
@@ -71,7 +71,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/ManagerRegister",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/register",
@@ -83,7 +83,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/register",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/refresh-token",
@@ -95,7 +95,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/refreshToken",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/{everything}",
@@ -107,7 +107,7 @@
         }
       ],
       "UpstreamPathTemplate": "/{everything}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/odata/ODataUsers",
@@ -119,7 +119,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/get",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -135,7 +135,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/me",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -151,7 +151,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/otherProfile/{userId}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Users/update-profile",
@@ -163,7 +163,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/update-profile",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -182,7 +182,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/update-avatar",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -201,7 +201,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/update-face-image",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -220,7 +220,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/{userId}",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -242,7 +242,7 @@
         }
       ],
       "UpstreamPathTemplate": "/users/forgot-password",
-      "UpstreamHttpMethod": [ "PUT" ]
+      "UpstreamHttpMethod": ["PUT"]
     },
     // === BOOKING API ===
     {
@@ -255,7 +255,7 @@
           "Port": 7015
         }
       ],
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -277,7 +277,7 @@
         }
       ],
       "UpstreamPathTemplate": "/bookings/history",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -299,14 +299,13 @@
         }
       ],
       "UpstreamPathTemplate": "/bookings/booked",
-      "UpstreamHttpMethod": [ "GET" ]
-      //"AuthenticationOptions": {
+      "UpstreamHttpMethod": ["GET"]
+      // "AuthenticationOptions": {
       //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //}
-      //"RouteClaimsRequirement": {
+      // }
+      // "RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-      //}
+      // }
     },
     {
       "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
@@ -318,7 +317,7 @@
         }
       ],
       "UpstreamPathTemplate": "/bookings/{bookingId}",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -337,7 +336,7 @@
         }
       ],
       "UpstreamPathTemplate": "/booking/filterbydateandhour",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/booking/filterbycourtandhour",
@@ -349,7 +348,29 @@
         }
       ],
       "UpstreamPathTemplate": "/booking/filterbycourtandhour",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/monthly/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/monthly",
+      "UpstreamHttpMethod": ["POST"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
     },
     // === STADIUM API ===
     {
@@ -362,7 +383,7 @@
         }
       ],
       "UpstreamPathTemplate": "/odata/Stadium",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Stadium",
@@ -374,7 +395,7 @@
         }
       ],
       "UpstreamPathTemplate": "/getByIdStadium",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Stadium",
@@ -386,7 +407,7 @@
         }
       ],
       "UpstreamPathTemplate": "/addStadium",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -408,7 +429,7 @@
         }
       ],
       "UpstreamPathTemplate": "/updateStadium",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -427,7 +448,7 @@
         }
       ],
       "UpstreamPathTemplate": "/deleteStadium",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -447,7 +468,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/getAllByStadiumId",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/StadiumImages",
@@ -459,7 +480,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/getById",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/AddStadiumImages",
@@ -471,7 +492,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/upload",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -490,7 +511,7 @@
         }
       ],
       "UpstreamPathTemplate": "/img/{everything}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/UpdateStadiumImage",
@@ -502,7 +523,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/update",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -521,7 +542,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/delete",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -540,7 +561,7 @@
         }
       ],
       "UpstreamPathTemplate": "/images/deleteById",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -560,7 +581,7 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/getByIdStadium",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/courtsById",
@@ -572,7 +593,7 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/getById",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Courts",
@@ -584,7 +605,7 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/addCourt",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -603,7 +624,7 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/updateCourt",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -622,7 +643,7 @@
         }
       ],
       "UpstreamPathTemplate": "/courts/Delete",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -642,7 +663,7 @@
         }
       ],
       "UpstreamPathTemplate": "/GetAllCourtRelationParent",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/GetAllCourtRelationByChildId",
@@ -654,7 +675,7 @@
         }
       ],
       "UpstreamPathTemplate": "/GetAllCourtRelationChild",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/AddCourtRelation",
@@ -666,7 +687,7 @@
         }
       ],
       "UpstreamPathTemplate": "/AddCourtRelation",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -685,7 +706,7 @@
         }
       ],
       "UpstreamPathTemplate": "/UpdateCourtRelation",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -704,7 +725,7 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteCourtRelation",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -724,7 +745,7 @@
         }
       ],
       "UpstreamPathTemplate": "/feedback",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Feedback/{id}",
@@ -736,7 +757,7 @@
         }
       ],
       "UpstreamPathTemplate": "/feedback/{id}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/Feedback",
@@ -748,7 +769,7 @@
         }
       ],
       "UpstreamPathTemplate": "/feedback",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -764,7 +785,7 @@
         }
       ],
       "UpstreamPathTemplate": "/feedback/{id}",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -780,7 +801,7 @@
         }
       ],
       "UpstreamPathTemplate": "/feedback/{id}",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -797,7 +818,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/discounts",
@@ -809,7 +830,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/discounts/{id}",
@@ -821,7 +842,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts/{id}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/discounts",
@@ -833,7 +854,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts",
-      "UpstreamHttpMethod": [ "PUT" ]
+      "UpstreamHttpMethod": ["PUT"]
     },
     {
       "DownstreamPathTemplate": "/api/discounts/code/{code}",
@@ -845,7 +866,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts/code/{code}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/discounts/stadium/{stadiumId}",
@@ -857,7 +878,7 @@
         }
       ],
       "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     // === FIND TEAM API ===
     // Team Post
@@ -871,7 +892,7 @@
         }
       ],
       "UpstreamPathTemplate": "/odata/TeamPost",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -887,7 +908,7 @@
         }
       ],
       "UpstreamPathTemplate": "/CreateTeamPost",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -903,7 +924,7 @@
         }
       ],
       "UpstreamPathTemplate": "/UpdateTeamPost",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -919,7 +940,7 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteTeamPost",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -936,7 +957,7 @@
         }
       ],
       "UpstreamPathTemplate": "/GetAllTeamMember",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -952,7 +973,7 @@
         }
       ],
       "UpstreamPathTemplate": "/GetTeamMemberByPostIdAndId",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -968,7 +989,7 @@
         }
       ],
       "UpstreamPathTemplate": "/AddNewTeamMember",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -984,7 +1005,7 @@
         }
       ],
       "UpstreamPathTemplate": "/UpdateTeamMember",
-      "UpstreamHttpMethod": [ "PUT" ],
+      "UpstreamHttpMethod": ["PUT"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1000,7 +1021,7 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteTeamMember",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1017,7 +1038,7 @@
         }
       ],
       "UpstreamPathTemplate": "/AllStadiumVideos",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/api/StadiumVideoById",
@@ -1029,7 +1050,7 @@
         }
       ],
       "UpstreamPathTemplate": "/StadiumVideoById",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": ["GET"]
     },
     {
       "DownstreamPathTemplate": "/AddStadiumVideo",
@@ -1041,7 +1062,7 @@
         }
       ],
       "UpstreamPathTemplate": "/AddStadiumVideo",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": ["POST"]
     },
     {
       "DownstreamPathTemplate": "/api/DeleteStadiumVideoById",
@@ -1053,7 +1074,7 @@
         }
       ],
       "UpstreamPathTemplate": "/DeleteStadiumVideoById",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1069,7 +1090,7 @@
         }
       ],
       "UpstreamPathTemplate": "/deleteStadiumVideosByStadiumId",
-      "UpstreamHttpMethod": [ "DELETE" ]
+      "UpstreamHttpMethod": ["DELETE"]
     },
     // Favorite
     {
@@ -1082,7 +1103,7 @@
         }
       ],
       "UpstreamPathTemplate": "/favoriteStadium",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1098,7 +1119,7 @@
         }
       ],
       "UpstreamPathTemplate": "/favoriteStadium",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1114,7 +1135,7 @@
         }
       ],
       "UpstreamPathTemplate": "/myFavoriteStadium",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1130,7 +1151,7 @@
         }
       ],
       "UpstreamPathTemplate": "/favoriteStadium/exists",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
@@ -1146,7 +1167,7 @@
         }
       ],
       "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
-      "UpstreamHttpMethod": [ "DELETE" ],
+      "UpstreamHttpMethod": ["DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true

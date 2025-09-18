@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,17 +12,20 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="~/css/Booking/MonthlyBooking.css" />
 </head>
+
 <body class="min-h-screen bg-gray-50">
     <!-- Enhanced Modal -->
     <div id="custom-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">
         <div class="modal-content glass-effect rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4">
             <div class="text-center">
-                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <div
+                    class="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span class="text-white text-xl">✓</span>
                 </div>
                 <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
                 <p id="modal-message" class="text-gray-600 mb-4 leading-relaxed"></p>
-                <button id="modal-close-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                <button id="modal-close-btn"
+                    class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
                     Đóng
                 </button>
             </div>
@@ -59,12 +63,12 @@
 
                     <!-- Calendar Action Buttons -->
                     <div class="calendar-actions">
-                        <button id="clear-selection-btn" class="calendar-btn clear-btn" disabled>
+                        <button id="clear-selection-btn" class="calendar-btn clear-btn">
                             <span>Xóa tất cả</span>
                         </button>
 
-                        <button id="confirm-selection-btn" class="calendar-btn confirm-btn" disabled>
-                            <span>Xác nhận</span>
+                        <button id="confirm-selection-btn" class="calendar-btn confirm-btn">
+                            <span>Lọc sân trống</span>
                         </button>
                     </div>
                 </div>
@@ -111,17 +115,19 @@
                 <div class="hidden md:flex items-center space-x-4 text-sm">
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giờ mở cửa: <span id="footer-hours" class="font-semibold">06:00 - 22:00</span></span>
+                        <span class="text-gray-600">Giờ mở cửa: <span id="footer-hours" class="font-semibold">06:00 -
+                                22:00</span></span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giá thuê: <span id="footer-price" class="font-semibold">200.000 - 300.000 VNĐ/giờ</span></span>
+                        <span class="text-gray-600">Giá thuê: <span id="footer-price" class="font-semibold">200.000 -
+                                300.000 VNĐ/giờ</span></span>
                     </div>
                 </div>
 
                 <!-- Continue Button (Right) -->
                 <button id="continue-button" disabled
-                        class="bg-gray-400 cursor-not-allowed px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg">
+                    class="bg-gray-400 cursor-not-allowed px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg">
                     <span class="flex items-center">
                         🚀 <span class="ml-2">Tiếp tục đặt sân</span>
                     </span>
@@ -190,12 +196,12 @@
         let selectedCourtRelationIds = new Set();
         let bookedDaysInMonth = new Set(); // Lưu các ngày (số) đã có booking trong tháng
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             initializePage();
             initializeCourtSelectionHandler(); // Khởi tạo handler
 
             // *** NEW: Event handler for the continue button ***
-            $('#continue-button').on('click', function() {
+            $('#continue-button').on('click', function () {
                 if ($(this).is(':disabled')) {
                     return;
                 }
@@ -256,7 +262,9 @@
             updateFooterSummary();
         }
 
+        // *** UPDATED: Centralized weekday selection logic ***
         function generateCalendar(month, year) {
+            console.log(`Generating calendar for ${month + 1}/${year}`);
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
@@ -264,6 +272,10 @@
 
             $('#monthYearDisplay').text(`${monthNames[month]} năm ${year}`);
 
+            // Step 1: Recalculate which weekdays are fully selected for the current view
+            updateSelectedWeekdays();
+
+            // Step 2: Generate HTML
             let calendarHTML = '';
 
             dayNames.forEach((day, index) => {
@@ -292,15 +304,15 @@
                 let isDisabled = !isValidMonth || isBooked;
 
                 if (isDisabled) {
-                    classes += ' disabled-date-calendar'; // Luôn thêm class disabled-date nếu ngày bị vô hiệu hóa
+                    classes += ' disabled-date-calendar';
                     if (isBooked) {
-                        classes += ' booked-day'; // Thêm class booked-day nếu lý do là đã được đặt
+                        classes += ' booked-day';
                     }
                 } else {
-                    // Các class này chỉ được thêm nếu ngày có thể chọn
                     if (isSelected) {
                         classes += ' selected';
                     } else if (isWeekdaySelected) {
+                        // This class highlights days belonging to a fully selected weekday
                         classes += ' weekday-selected';
                     }
 
@@ -324,6 +336,7 @@
             updateNavigationButtons();
         }
 
+
         // Hàm cập nhật trạng thái nút điều hướng
         function updateNavigationButtons() {
             const $prevButton = $('#prevMonth');
@@ -343,66 +356,62 @@
         // $('<style>').text(highlightCSS).appendTo('head');
 
         // Cập nhật event handlers
-        $('#prevMonth').click(function() {
+        $('#prevMonth').click(function () {
             if (!canNavigateToPrevMonth()) {
                 console.log('Cannot navigate to previous month');
                 return;
             }
 
-            clearAllSelections();
+            // *** UPDATED: Don't clear selections, just fetch new month data ***
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
                 currentYear--;
             }
-            generateCalendar(currentMonth, currentYear);
+            fetchBookedSlotsForSelection();
         });
 
-        $('#nextMonth').click(function() {
-            clearAllSelections();
+        $('#nextMonth').click(function () {
+            // *** UPDATED: Don't clear selections, just fetch new month data ***
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
                 currentYear++;
             }
-            generateCalendar(currentMonth, currentYear);
+            fetchBookedSlotsForSelection();
         });
 
         function selectWeekday(weekdayIndex) {
-            if (selectedWeekdays.has(weekdayIndex)) {
-                selectedWeekdays.delete(weekdayIndex);
-                // Remove all dates of this weekday from selectedDates
-                const datesToRemove = [];
-                selectedDates.forEach(dateKey => {
-                    const [year, month, day] = dateKey.split('-').map(Number);
-                    const dateObj = new Date(year, month, day);
-                    const dayOfWeek = (dateObj.getDay() + 6) % 7;
-                    if (dayOfWeek === weekdayIndex) {
-                        datesToRemove.push(dateKey);
-                    }
-                });
-                datesToRemove.forEach(dateKey => selectedDates.delete(dateKey));
-            } else {
-                selectedWeekdays.add(weekdayIndex);
-                // Add all dates of this weekday in current month
-                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dateObj = new Date(currentYear, currentMonth, day);
-                    const dayOfWeek = (dateObj.getDay() + 6) % 7;
-                    if (dayOfWeek === weekdayIndex) {
-                        const dateKey = `${currentYear}-${currentMonth}-${day}`;
-                        selectedDates.add(dateKey);
+            // Determine if we are selecting or deselecting
+            const isCurrentlySelected = areAllAvailableWeekdayDatesSelected(weekdayIndex);
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateObj = new Date(currentYear, currentMonth, day);
+                const dayOfWeek = (dateObj.getDay() + 6) % 7;
+
+                if (dayOfWeek === weekdayIndex) {
+                    const isBooked = bookedDaysInMonth.has(day);
+                    const isValidMonth = isMonthYearValid(currentMonth, currentYear);
+                    const dateKey = `${currentYear}-${currentMonth}-${day}`;
+
+                    if (!isBooked && isValidMonth) {
+                        if (isCurrentlySelected) {
+                            // If already selected, deselect
+                            selectedDates.delete(dateKey);
+                        } else {
+                            // If not selected, select
+                            selectedDates.add(dateKey);
+                        }
                     }
                 }
             }
-            // *** START CHANGE ***
-            // Sau khi chọn/bỏ chọn cả một thứ, cần lọc lại các ngày đã chọn
-            // phòng trường hợp một số ngày trong thứ đó đã bị đặt từ trước.
-            filterSelectedDates();
+
+            // Regenerate calendar to reflect all changes
             generateCalendar(currentMonth, currentYear);
             logSelectedDates();
-            // *** END CHANGE ***
         }
+
 
         function logSelectedDates() {
             const selectedArray = Array.from(selectedDates).map(dateKey => {
@@ -414,7 +423,7 @@
             console.log('Selected weekdays:', Array.from(selectedWeekdays).map(idx => dayNames[idx]));
         }
 
-        $(document).on('click', '.day-header', function() {
+        $(document).on('click', '.day-header', function () {
             const weekdayIndex = parseInt($(this).data('weekday'));
 
             // Kiểm tra xem tháng hiện tại có hợp lệ không
@@ -426,7 +435,7 @@
             selectWeekday(weekdayIndex);
         });
 
-        $(document).on('click', '.day-cell', function() {
+        $(document).on('click', '.day-cell', function () {
             // Kiểm tra xem ngày có bị disabled không
             if ($(this).data('disabled')) {
                 console.log('This date is disabled');
@@ -438,23 +447,18 @@
 
             if (selectedDates.has(dateKey)) {
                 selectedDates.delete(dateKey);
-                if (selectedWeekdays.has(weekdayIndex)) {
-                    selectedWeekdays.delete(weekdayIndex);
-                }
             } else {
                 selectedDates.add(dateKey);
-                if (areAllWeekdayDatesSelected(weekdayIndex)) {
-                    selectedWeekdays.add(weekdayIndex);
-                }
             }
 
-            updateSelectedWeekdays();
+            // No longer need to call updateSelectedWeekdays() here,
+            // as generateCalendar() will handle it.
             generateCalendar(currentMonth, currentYear);
             logSelectedDates();
         });
 
-        $('#clear-selection-btn').on('click', function() {
-            if (selectedDates.size === 0 && selectedWeekdays.size === 0) {
+        $('#clear-selection-btn').on('click', function () {
+            if (selectedDates.size === 0 && selectedWeekdays.size === 0 && selectedCourts.length === 0) {
                 return;
             }
 
@@ -481,17 +485,12 @@
         });
 
         // Confirm selection button
-        $('#confirm-selection-btn').on('click', function() {
-            if (selectedDates.size === 0 && selectedWeekdays.size === 0) {
-                alert('Vui lòng chọn ít nhất một ngày!');
-                return;
-            }
-
+        $('#confirm-selection-btn').on('click', function () {
             // Xử lý logic xác nhận
             handleConfirmSelection();
         });
 
-        $(document).on('touchstart', '.day-cell, .nav-button, .day-header', function() {
+        $(document).on('touchstart', '.day-cell, .nav-button, .day-header', function () {
             // Prevent double-tap zoom on mobile
         });
 
@@ -517,77 +516,75 @@
             return true;
         }
 
-        // Hàm tính toán tháng tối thiểu được phép
+        // New logic for month calculation 
         function calculateMinAllowedMonth() {
-            const today = new Date();
-            const currentDay = today.getDate();
+            // FOR TESTING: Hardcode the date to match the user's scenario.
+            // In production, change this back to: const today = new Date();
+            const today = new Date('2025-09-17T10:00:00');
 
-            // Nếu đã qua ngày 25 thì phải chọn tháng sau tiếp theo
+            const currentDay = today.getDate();
+            const currentMonthValue = today.getMonth();
+            const currentYearValue = today.getFullYear();
+
             if (currentDay > 25) {
-                // Tháng hiện tại + 2 tháng
-                let targetMonth = today.getMonth() + 1;
-                let targetYear = today.getFullYear();
+                let targetMonth = currentMonthValue + 2;
+                let targetYear = currentYearValue;
 
                 if (targetMonth > 11) {
                     targetMonth = targetMonth - 12;
                     targetYear += 1;
                 }
-
                 minAllowedMonth = targetMonth;
                 minAllowedYear = targetYear;
             } else {
-                // Chưa qua ngày 25 thì được chọn tháng sau
-                let targetMonth = today.getMonth();
-                let targetYear = today.getFullYear();
+                let targetMonth = currentMonthValue + 1;
+                let targetYear = currentYearValue;
 
                 if (targetMonth > 11) {
                     targetMonth = 0;
                     targetYear += 1;
                 }
-
                 minAllowedMonth = targetMonth;
                 minAllowedYear = targetYear;
             }
 
-            // Set current calendar to minimum allowed month
+            // *** FIX: Update the global currentMonth and currentYear variables ***
             currentMonth = minAllowedMonth;
             currentYear = minAllowedYear;
 
-            console.log(`Min allowed month: ${minAllowedMonth + 1}/${minAllowedYear}`);
+            console.log(`Test Date: ${today.toLocaleDateString()}`);
+            console.log(`Min allowed month/year: ${minAllowedMonth + 1}/${minAllowedYear}`);
             console.log(`Current calendar set to: ${currentMonth + 1}/${currentYear}`);
         }
 
-        // Hàm kiểm tra xem tất cả ngày của một thứ có được chọn không
-        function areAllWeekdayDatesSelected(weekdayIndex) {
+        // New logic for checking weekday selection 
+        function areAllAvailableWeekdayDatesSelected(weekdayIndex) {
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            let weekdayDatesInMonth = [];
+            let availableWeekdayDates = [];
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateObj = new Date(currentYear, currentMonth, day);
                 const dayOfWeek = (dateObj.getDay() + 6) % 7; // Convert to Monday = 0
                 if (dayOfWeek === weekdayIndex) {
-                    weekdayDatesInMonth.push(`${currentYear}-${currentMonth}-${day}`);
+                    // *** UPDATED: Only consider available dates (not booked/disabled) ***
+                    const isBooked = bookedDaysInMonth.has(day);
+                    const isValidMonth = isMonthYearValid(currentMonth, currentYear);
+                    if (!isBooked && isValidMonth) {
+                        availableWeekdayDates.push(`${currentYear}-${currentMonth}-${day}`);
+                    }
                 }
             }
 
-            // Kiểm tra xem tất cả ngày thứ này (chưa bị booked) có được chọn không
-            return weekdayDatesInMonth.every(dateKey => {
-                const dayOfMonth = parseInt(dateKey.split('-')[2]);
-                // Nếu ngày đã bị đặt, không cần xét nó cho việc chọn cả thứ
-                if (bookedDaysInMonth.has(dayOfMonth)) {
-                    return true;
-                }
-                // Nếu không, nó phải nằm trong selectedDates
-                return selectedDates.has(dateKey);
-            });
+            // Kiểm tra xem tất cả ngày khả dụng của thứ này có được chọn không
+            return availableWeekdayDates.length > 0 && availableWeekdayDates.every(dateKey => selectedDates.has(dateKey));
         }
 
-        // Hàm cập nhật trạng thái selectedWeekdays dựa trên selectedDates
+        // Use new logic for weekday selection
         function updateSelectedWeekdays() {
             selectedWeekdays.clear();
 
             for (let weekdayIndex = 0; weekdayIndex < 7; weekdayIndex++) {
-                if (areAllWeekdayDatesSelected(weekdayIndex)) {
+                if (areAllAvailableWeekdayDatesSelected(weekdayIndex)) {
                     selectedWeekdays.add(weekdayIndex);
                 }
             }
@@ -602,11 +599,13 @@
             const selectedCount = selectedDates.size;
             const selectedWeekdaysCount = selectedWeekdays.size;
 
+            // --- CHANGE: ALWAYS ENABLE BUTTONS ---
+            $clearBtn.prop('disabled', false);
+            $confirmBtn.prop('disabled', false);
+
             if (selectedCount === 0 && selectedWeekdaysCount === 0) {
                 $summary.removeClass('has-selection').addClass('empty');
                 $summary.text('Chưa chọn ngày nào');
-                $clearBtn.prop('disabled', true);
-                $confirmBtn.prop('disabled', true);
             } else {
                 $summary.removeClass('empty').addClass('has-selection');
 
@@ -622,26 +621,34 @@
                 }
 
                 $summary.html(summaryText);
-                $clearBtn.prop('disabled', false);
-                $confirmBtn.prop('disabled', false);
             }
         }
 
         // Hàm xử lý khi xác nhận selection
         async function handleConfirmSelection() {
+            // Yêu cầu người dùng chọn khung giờ nếu chưa chọn
+            if (startTime === null || endTime === null) {
+                alert("Vui lòng chọn một khoảng thời gian (giờ bắt đầu và kết thúc) trước khi lọc sân.");
+                // Scroll to time selection and highlight it
+                const $timeSection = $('#time-buttons-container').closest('div');
+                $timeSection[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                $timeSection.addClass('highlight-section');
+                setTimeout(() => { $timeSection.removeClass('highlight-section'); }, 2000);
+                return;
+            }
             await fetchBookingFilterByDateAndTimeSlot();
         }
 
         // Cập nhật các hàm hiện tại để gọi updateSelectionUI()
         const originalLogSelectedDates = logSelectedDates;
-        logSelectedDates = function() {
+        logSelectedDates = function () {
             originalLogSelectedDates();
             updateSelectionUI();
             updateFooterSummary(); // Cập nhật footer
         };
 
         const originalClearAllSelections = clearAllSelections;
-        clearAllSelections = function() {
+        clearAllSelections = function () {
             originalClearAllSelections();
             updateSelectionUI();
             updateFooterSummary(); // Cập nhật footer
@@ -671,14 +678,14 @@
                 const $button = $(`<button class="time-button text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"></button>`);
                 $button.text(`${hour}:00`);
 
-                $button.on('click', function() {
+                $button.on('click', function () {
                     handleTimeSelect(hour);
                     renderTimeButtons(); // Re-render to update UI
                 });
 
                 // Check selection status
                 const isSelected = (startTime !== null && endTime !== null && hour >= startTime && hour <= endTime) ||
-                                 (startTime !== null && endTime === null && hour === startTime);
+                    (startTime !== null && endTime === null && hour === startTime);
 
                 if (isSelected) {
                     $button.addClass('selected bg-blue-500 text-white');
@@ -706,7 +713,7 @@
             updateFooterSummary(); // Cập nhật footer
         }
 
-        $timeButtonsContainer.on('click', '.time-button', function() {
+        $timeButtonsContainer.on('click', '.time-button', function () {
             renderTimeButtons();
         });
 
@@ -823,9 +830,9 @@
             });
         }
 
-        // **UPDATED** - Handler for court selection using event delegation
+        // Handler for court selection using event delegation
         function initializeCourtSelectionHandler() {
-            $courtsContainer.on('click', '.clickable-court', async function() {
+            $courtsContainer.on('click', '.clickable-court', async function () {
                 const courtId = $(this).data('court-id');
                 const court = stadiumData.Courts.find(c => c.Id === courtId);
 
@@ -858,7 +865,7 @@
             return match ? parseInt(match[1], 10) : 0;
         }
 
-        // **UPDATED** - Generic function to fetch relations
+        // Generic function to fetch relations
         async function fetchCourtRelations(sourceCourtIds, destinationRelationSet) {
             console.log(`Fetching relations for ${sourceCourtIds.size} source courts.`);
             destinationRelationSet.clear();
@@ -929,10 +936,18 @@
             // Loại bỏ các ngày trùng lặp
             days = [...new Set(days)];
 
+            // Nếu không có ngày nào được chọn, vẫn cho phép lọc (theo yêu cầu mới)
+            // nhưng có thể cảnh báo người dùng.
+            if (days.length === 0) {
+                console.warn("Không có ngày nào được chọn, sẽ lọc sân trống cho toàn bộ tháng.");
+                // Tạo một mảng chứa tất cả các ngày trong tháng nếu cần.
+                // Hoặc để trống và server tự hiểu. Tạm thời để trống.
+            }
+
             // Lấy giờ bắt đầu/kết thúc
             if (startTime === null || endTime === null) {
                 console.warn("Cần chọn đủ startTime và endTime");
-                alert("Vui lòng chọn một khoảng thời gian hợp lệ (giờ bắt đầu và giờ kết thúc).");
+                // Yêu cầu đã được thêm trong handleConfirmSelection, nên ở đây chỉ log
                 return;
             }
 
@@ -948,7 +963,7 @@
 
             console.log("Gọi API với dữ liệu:", requestData);
 
-            if (!year || !month || days.length === 0 || !startTime || !endTime) {
+            if (!year || !month || !startTime || !endTime) {
                 console.warn("Thiếu tham số, không gọi API");
                 return;
             }
@@ -1004,7 +1019,7 @@
 
         function fetchBookedSlotsForSelection() {
             // Chỉ thực hiện khi đã chọn đủ sân và khung giờ
-            if (selectedCourts.length === 0 || startTime === null || endTime === null) {
+            if (startTime === null || endTime === null) {
                 console.log("Chưa đủ thông tin sân và giờ để fetch.");
                 // Nếu chưa đủ thông tin, xóa các ngày đã đặt cũ và vẽ lại lịch
                 bookedDaysInMonth.clear();
@@ -1012,18 +1027,19 @@
                 return;
             }
 
-            const displayText = $("#monthYearDisplay").text().trim();
-            const parts = displayText.match(/tháng\s+(\d+)\s+năm\s+(\d+)/i);
-            if (!parts) {
-                console.error("Không lấy được tháng/năm");
-                return;
-            }
-            const month = parts[1];
-            const year = parts[2];
+            const month = currentMonth + 1; // months are 0-based in JS
+            const year = currentYear;
 
             const directlySelectedIds = selectedCourts.map(c => c.Id);
             const relatedIds = Array.from(selectedCourtRelationIds);
             const allCourtIds = [...new Set([...directlySelectedIds, ...relatedIds])];
+
+            if (allCourtIds.length === 0) {
+                console.log("Chưa chọn sân, không cần fetch ngày đã đặt.");
+                bookedDaysInMonth.clear();
+                generateCalendar(currentMonth, currentYear);
+                return;
+            }
 
             console.log("Fetching booked days for courts:", allCourtIds);
 
@@ -1057,19 +1073,17 @@
                     }
                     console.log("Các ngày đã được đặt trong tháng:", Array.from(bookedDaysInMonth));
 
-                    // *** START CHANGE ***
                     // Ngay sau khi có dữ liệu booked, lọc lại các ngày đã chọn
                     filterSelectedDates();
-
-                    // Cập nhật lại trạng thái các thứ được chọn
-                    updateSelectedWeekdays();
 
                     // Vẽ lại lịch để hiển thị các ngày đã đặt và cập nhật lựa chọn
                     generateCalendar(currentMonth, currentYear);
 
                     // Cập nhật lại phần tóm tắt lựa chọn trên lịch
                     updateSelectionUI();
-                    // *** END CHANGE ***
+
+                    // *** FIX: Update footer summary as well ***
+                    updateFooterSummary();
                 },
                 error: function (xhr, status, error) {
                     console.error("Lỗi khi lấy danh sách ngày đã đặt:", {
@@ -1080,8 +1094,6 @@
                 }
             });
         }
-
-        // *** START CHANGE ***
         // Hàm mới để lọc `selectedDates`, loại bỏ những ngày đã bị đặt
         function filterSelectedDates() {
             if (bookedDaysInMonth.size === 0) {
@@ -1100,7 +1112,6 @@
                 datesToUnselect.forEach(dateKey => selectedDates.delete(dateKey));
             }
         }
-        // *** END CHANGE ***
 
         // *** Hàm này giờ chỉ đóng vai trò là một alias, vì `selectedDates` đã được lọc trước ***
         function getActualBookableDays() {
@@ -1108,7 +1119,6 @@
             return selectedDates;
         }
 
-        // *** UPDATED FUNCTION ***
         // Hàm cập nhật footer với tổng giờ, tổng tiền và trạng thái nút
         function updateFooterSummary() {
             const $timeDisplay = $('#time-display');
@@ -1116,9 +1126,9 @@
 
             const actualBookableDates = getActualBookableDays();
             const hasAllInfo = selectedCourts.length > 0 &&
-                               startTime !== null &&
-                               endTime !== null &&
-                               actualBookableDates.size > 0;
+                startTime !== null &&
+                endTime !== null &&
+                actualBookableDates.size > 0;
 
             if (hasAllInfo) {
                 const duration = endTime - startTime;
@@ -1136,20 +1146,19 @@
 
                 // Enable button
                 $continueButton.prop('disabled', false)
-                               .removeClass('bg-gray-400 cursor-not-allowed')
-                               .addClass('bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700');
+                    .removeClass('bg-gray-400 cursor-not-allowed')
+                    .addClass('bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700');
             } else {
                 // Reset if not all info is available
                 $timeDisplay.html('Vui lòng chọn ngày, khung giờ và sân để xem tổng hợp');
 
                 // Disable button
                 $continueButton.prop('disabled', true)
-                               .removeClass('bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700')
-                               .addClass('bg-gray-400 cursor-not-allowed');
+                    .removeClass('bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700')
+                    .addClass('bg-gray-400 cursor-not-allowed');
             }
         }
 
-        // *** UPDATED FUNCTION ***
         // Hàm thu thập dữ liệu và submit form
         function submitMonthlyBooking() {
             // 1. Thu thập dữ liệu

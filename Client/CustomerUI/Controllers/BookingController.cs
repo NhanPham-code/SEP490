@@ -100,7 +100,6 @@ namespace CustomerUI.Controllers
             return View();
         }
 
-
         public async Task<IActionResult> BookingHistory()
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -545,10 +544,10 @@ namespace CustomerUI.Controllers
         {
             try
             {
-                if (courtIds == null || !courtIds.Any())
-                {
-                    return BadRequest(new { error = "Cần cung cấp ít nhất một Court ID." });
-                }
+                // if (courtIds == null || !courtIds.Any())
+                // {
+                //     return BadRequest(new { error = "Cần cung cấp ít nhất một Court ID." });
+                // }
 
                 var result = await _bookingService.FilterByCourtAndHour(courtIds, year, month, startTime, endTime);
 
@@ -561,5 +560,50 @@ namespace CustomerUI.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateMonthlyBooking([FromForm] MonthlyBookingCreateDto bookingDto)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Common");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Log lỗi validation để dễ debug
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                }
+
+                TempData["ErrorMessage"] = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.";
+                // Chuyển hướng người dùng trở lại trang trước đó, lý tưởng nhất là trang form với dữ liệu đã nhập
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            try
+            {
+                var createdBooking = await _bookingService.CreateMonthlyBookingAsync(bookingDto, accessToken);
+
+                if (createdBooking != null)
+                {
+                    TempData["SuccessMessage"] = "Chúc mừng bạn đã đặt sân hàng tháng thành công!";
+                    return RedirectToAction("BookingHistory");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Tạo booking thất bại. Vui lòng thử lại.";
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
     }
 }

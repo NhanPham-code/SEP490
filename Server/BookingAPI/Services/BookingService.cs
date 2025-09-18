@@ -63,13 +63,13 @@ namespace BookingAPI.Services
             _mapper.Map(bookingUpdateDto, existingBooking);
 
             // Update booking details
-/*            existingBooking.BookingDetails.Clear();
-            foreach (var detailDto in bookingUpdateDto.BookingDetails)
-            {
-                var bookingDetail = _mapper.Map<BookingDetail>(detailDto);
-                bookingDetail.BookingId = id;
-                existingBooking.BookingDetails.Add(bookingDetail);
-            }*/
+            /*            existingBooking.BookingDetails.Clear();
+                        foreach (var detailDto in bookingUpdateDto.BookingDetails)
+                        {
+                            var bookingDetail = _mapper.Map<BookingDetail>(detailDto);
+                            bookingDetail.BookingId = id;
+                            existingBooking.BookingDetails.Add(bookingDetail);
+                        }*/
 
             var updatedBooking = await _bookingRepository.UpdateBookingAsync(existingBooking);
             return _mapper.Map<BookingUpdateDto>(updatedBooking);
@@ -105,7 +105,7 @@ namespace BookingAPI.Services
             return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
         }
 
-        public async Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync([FromForm] MonthlyBookingCreateDto monthlyBookingCreateDto)
+        public async Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync(int userId, MonthlyBookingCreateDto monthlyBookingCreateDto)
         {
             if (!TimeSpan.TryParseExact(monthlyBookingCreateDto.StartTime, "hh\\:mm", CultureInfo.InvariantCulture, out var startTime) ||
                 !TimeSpan.TryParseExact(monthlyBookingCreateDto.EndTime, "hh\\:mm", CultureInfo.InvariantCulture, out var endTime))
@@ -114,9 +114,11 @@ namespace BookingAPI.Services
             }
 
             var monthlyBooking = _mapper.Map<MonthlyBooking>(monthlyBookingCreateDto);
+            monthlyBooking.UserId = userId; // gán từ tham số
             monthlyBooking.StartTime = startTime;
             monthlyBooking.EndTime = endTime;
-            monthlyBooking.TotalHour = (int)(endTime - startTime).TotalHours;
+            var hoursPerDay = (endTime - startTime).TotalHours;
+            monthlyBooking.TotalHour = (int)(hoursPerDay * monthlyBookingCreateDto.Dates.Count);
 
             foreach (var day in monthlyBookingCreateDto.Dates)
             {
@@ -124,12 +126,12 @@ namespace BookingAPI.Services
 
                 var booking = new Booking
                 {
-                    UserId = monthlyBooking.UserId,
+                    UserId = userId,
                     StadiumId = monthlyBooking.StadiumId,
                     DiscountId = monthlyBooking.DiscountId,
                     Date = bookingDate,
-                    OriginalPrice = monthlyBooking.OriginalPrice / monthlyBookingCreateDto.Dates.Count, // Example price calculation
-                    TotalPrice = monthlyBooking.TotalPrice / monthlyBookingCreateDto.Dates.Count, // Example price calculation
+                    OriginalPrice = monthlyBooking.OriginalPrice / monthlyBookingCreateDto.Dates.Count,
+                    TotalPrice = monthlyBooking.TotalPrice / monthlyBookingCreateDto.Dates.Count,
                     PaymentMethod = monthlyBooking.PaymentMethod,
                     Note = monthlyBooking.Note,
                     Status = "pending",

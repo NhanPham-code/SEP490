@@ -121,15 +121,13 @@ namespace BookingAPI.Controllers
             }
         }
 
-        [HttpPost("monthly")]
-        //[Authorize(Roles = "Customer")] 
-        public async Task<ActionResult<MonthlyBookingReadDto>> CreateMonthlyBooking(MonthlyBookingCreateDto monthlyBookingCreateDto)
+        [HttpPost("monthly/{userId}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<MonthlyBookingReadDto>> CreateMonthlyBooking(int userId, MonthlyBookingCreateDto monthlyBookingCreateDto)
         {
             try
             {
-                var createdMonthlyBooking = await _bookingService.CreateMonthlyBookingAsync(monthlyBookingCreateDto);
-                // We can't use CreatedAtAction here as there's no "GetMonthlyBooking" endpoint yet.
-                // Returning Ok with the created object is a good alternative.
+                var createdMonthlyBooking = await _bookingService.CreateMonthlyBookingAsync(userId, monthlyBookingCreateDto);
                 return Ok(createdMonthlyBooking);
             }
             catch (ArgumentException ex)
@@ -141,7 +139,6 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, $"Error creating monthly booking: {ex.Message}");
             }
         }
-
     }
 }
 

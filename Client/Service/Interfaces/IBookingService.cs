@@ -17,5 +17,6 @@ namespace Service.Interfaces
         Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime date);
         Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime);
         Task<List<BookingReadDto>> FilterByCourtAndHour(List<int> courtIds, int year, int month, int startTime, int endTime);
+        Task<BookingReadDto?> CreateMonthlyBookingAsync(MonthlyBookingCreateDto bookingDto, string accessToken);
     }
 }

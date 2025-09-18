@@ -1,0 +1,156 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch BookingAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/BookingAPI/bin/Debug/net8.0/BookingAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/BookingAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch DiscountAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/DiscountAPI/bin/Debug/net8.0/DiscountAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/DiscountAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch FavoriteAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/FavoriteAPI/bin/Debug/net8.0/FavoriteAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/FavoriteAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch FeedbackAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/FeedbackAPI/bin/Debug/net8.0/FeedbackAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/FeedbackAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch FindTeamAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/FindTeamAPI/bin/Debug/net8.0/FindTeamAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/FindTeamAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch Gateway",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Gateway/bin/Debug/net8.0/Gateway.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Gateway",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch StadiumAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/StadiumAPI/bin/Debug/net8.0/StadiumAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/StadiumAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Launch UserAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/UserAPI/bin/Debug/net8.0/UserAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/UserAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch All APIs",
+            "configurations": [
+                "Launch BookingAPI",
+                "Launch DiscountAPI",
+                "Launch FavoriteAPI",
+                "Launch FeedbackAPI",
+                "Launch FindTeamAPI",
+                "Launch Gateway",
+                "Launch StadiumAPI",
+                "Launch UserAPI"
+            ]
+        }
+    ]
+}
