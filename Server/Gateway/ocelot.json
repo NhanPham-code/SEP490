@@ -806,6 +806,30 @@
     },
     // === DISCOUNT API ===
     {
+      "DownstreamPathTemplate": "/odata/ODataDiscount",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/odata/discounts",
+      "UpstreamHttpMethod": ["GET"]
+    },
+    {
+      "DownstreamPathTemplate": "/odata/ODataDiscount/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/odata/discounts/{everything}",
+      "UpstreamHttpMethod": ["GET"]
+    },
+    {
       "DownstreamPathTemplate": "/api/discounts",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
