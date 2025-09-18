@@ -276,7 +276,7 @@
                     "Port": 7015
                 }
             ],
-            "UpstreamPathTemplate": "/bookings/{everything}",
+            "UpstreamPathTemplate": "/bookings/history{everything}",
             "UpstreamHttpMethod": [ "GET" ],
             "AuthenticationOptions": {
                 "AuthenticationProviderKey": "Bearer",
