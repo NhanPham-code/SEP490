@@ -1,9 +1,11 @@
 ﻿using DTOs.FindTeamDTO;
 using DTOs.StadiumDTO;
 using FindTeamAPI.DTOs;
+using MailKit;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CustomerUI.Controllers
 {
@@ -29,6 +31,9 @@ namespace CustomerUI.Controllers
             _bookingService = bookingService;
         }
 
+        [BindProperty]
+        public CreateTeamPostDTO CreateTeamPostDTO { get; set; }
+
         public IActionResult FindTeam()
         {
             token = _tokenService.GetAccessTokenFromCookie();
@@ -42,36 +47,68 @@ namespace CustomerUI.Controllers
             }
             
         }
+        public IActionResult JoinedTeam()
+        {
+            token = _tokenService.GetAccessTokenFromCookie();
+            if (token != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Common");
+            }
+
+        }
         public IActionResult TeamPostManage()
         {
             token = _tokenService.GetAccessTokenFromCookie();
-            return View();
+            if (token != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Common");
+            }
         }
 
 
         public async Task<IActionResult> GetAllAndSearch(string url)
         {
-            
-            var result = await _teamPost.GetOdataTeamPostAsync(url);
-            
+            var dateNow = DateTime.UtcNow;
+            var formatted = dateNow.ToString("o");
+            //2025-08-18 11:08:41.5130000
+            var result = await _teamPost.GetOdataTeamPostAsync(url + $"&$filter=PlayDate gt {formatted}");
+            // my user id
+            int myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
             List<int> userId = result.Value.Select(u => u.CreatedBy).ToList();
-            List<int> stadiumId = result.Value.Select(s => s.StadiumId).ToList();
+
             // get profile by id 
             var tokes = _tokenService.GetAccessTokenFromCookie();
             var profile = await _userService.GetUsersByIdsAsync(userId , tokes);
-            var stadiums = await _stadiumService.GetAllStadiumByListId(stadiumId);
+            // add vào view model để biết có phải người tạo bài đăng hay không mà hiện nút xóa nút tham gia
 
             FindTeamViewModel findTeamViewModel = new FindTeamViewModel
             {
                 TeamPosts = result.Value,
             };
 
-            foreach (var item in findTeamViewModel.TeamPosts)
+            foreach (var item in findTeamViewModel.TeamPosts)   
             {
                 var user = profile.FirstOrDefault(u => u.UserId.Equals(item.CreatedBy));
-                if (user != null)
+                if (user != null && findTeamViewModel.UserNames.Keys.Contains(item.CreatedBy) != true)
                 {
                     findTeamViewModel.UserNames.Add(item.CreatedBy, user);
+                }   
+                if (myUserId == item.CreatedBy && findTeamViewModel.Hidden.Keys.Contains(item.CreatedBy) != true )
+                {
+                    findTeamViewModel.Hidden.Add(item.CreatedBy, 1);
+                }
+                else if (item.TeamMembers.Any(t => t.UserId.Equals(myUserId)))
+                {
+                    findTeamViewModel.Hidden.Add(item.CreatedBy, 2);
                 }
             }
 
@@ -82,21 +119,119 @@ namespace CustomerUI.Controllers
 
         public async Task<IActionResult> GetBookByUserId()
         {
+            //get booking by user id
             var booking = await _bookingService.GetBookingHistoryAsync(_tokenService.GetAccessTokenFromCookie());
-            
-            List<int> stadiumId = booking.Select(s => s.StadiumId).ToList();
+            var myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
+            // get team post by user id and role is leader
+            var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader')");
+            List<int> ints = post.Value.Select(p => p.BookingId).ToList();
             BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();
-            bookingAndStadiumViewModel.Bookings = booking;
-          
+            bookingAndStadiumViewModel.Bookings = booking.Where(b => !ints.Contains(b.Id)).ToList();
+
+            List<int> stadiumId = booking.Select(s => s.StadiumId).ToList();
+            
             var s = await _stadiumService.GetAllStadiumByListId(stadiumId);
             foreach (var item in s.Value)
             {
-                var bookingDetail = await _bookingService.GetBookingDetailAsync(_tokenService.GetAccessTokenFromCookie(), item.Id);
-                Console.WriteLine(JsonConvert.SerializeObject(bookingDetail));
+                
                 bookingAndStadiumViewModel.Stadiums.Add(item.Id, item);
+
             }
 
             return Json(bookingAndStadiumViewModel);
+        }
+        public async Task<IActionResult> CreateNewPost()
+        {
+            CreateTeamPostDTO.CreatedBy = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var result = await _teamPost.CreateTeamPost(CreateTeamPostDTO);
+            if (result == null)
+            {
+                return Json(new { Message = 500, value = "Create team post failed" });
+            }
+            var teamMember = new CreateTeamMemberDTO
+            {
+                TeamPostId = result.Id,
+                UserId = CreateTeamPostDTO.CreatedBy,
+                JoinedAt = DateTime.UtcNow,
+                role = "Leader"
+            };
+            var res = await _teamMember.AddTeamMember(teamMember);
+            if (res == null)
+            {
+                await _teamPost.DeleteTeamPost(result.Id);
+                return Json(new { Message = 500, value = "Create team member failed" });
+            }
+
+            return Json(new { Message = 200, value = result });
+        }
+
+        // get my team post
+        public async Task<IActionResult> GetMyTeamPost()
+        {
+            int myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
+            var result = await _teamPost.GetOdataTeamPostAsync(
+                $"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader')"
+            );
+            List<int> userId = result.Value.Select(u => u.CreatedBy).ToList();
+
+            // get profile by id 
+            var tokes = _tokenService.GetAccessTokenFromCookie();
+            var profile = await _userService.GetUsersByIdsAsync(userId, tokes);
+            // add vào view model để biết có phải người tạo bài đăng hay không mà hiện nút xóa nút tham gia
+
+            FindTeamViewModel findTeamViewModel = new FindTeamViewModel
+            {
+                TeamPosts = result.Value,
+            };
+
+            // Chuyển danh sách profile thành Dictionary để tra cứu nhanh hơn.
+            // Key là UserId, Value là đối tượng user.
+            var profileDict = profile.ToDictionary(u => u.UserId);
+
+            foreach (var item in findTeamViewModel.TeamPosts)
+            {
+                // Sử dụng TryGetValue để tra cứu user một cách hiệu quả và an toàn.
+                if (!findTeamViewModel.UserNames.ContainsKey(item.CreatedBy) && profileDict.TryGetValue(item.CreatedBy, out var user))
+                {
+                    findTeamViewModel.UserNames.Add(item.CreatedBy, user);
+                }
+
+                // Sử dụng ContainsKey để kiểm tra key đã tồn tại hay chưa.
+                if (myUserId == item.CreatedBy && !findTeamViewModel.Hidden.ContainsKey(item.CreatedBy))
+                {
+                    findTeamViewModel.Hidden.Add(item.CreatedBy, 1);
+                }
+            }
+
+
+            return Json(findTeamViewModel);
+        }
+
+        // join team post
+        public async Task<IActionResult> JoinTeamPost(int postId)
+        {
+            int myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var teamMember = new CreateTeamMemberDTO
+            {
+                TeamPostId = postId,
+                UserId = myUserId,
+                JoinedAt = DateTime.UtcNow,
+                role = "Waiting"
+            };
+            var res = await _teamMember.AddTeamMember(teamMember);
+            if (res == null)
+            {
+                return Json(new { Message = 500, value = "Join team post failed" });
+            }
+            return Json(new { Message = 200, value = res });
+        }
+
+        // chuyển đổi từ datetime sang timespan
+        public TimeSpan ConvertToTimeSpan(DateTime dateTime)
+        {
+            return dateTime.TimeOfDay;
         }
 
     }

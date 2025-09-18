@@ -50,5 +50,10 @@ namespace FindTeamAPI.Repositories
         {
             return _context.TeamPosts.AsQueryable();
         }
+        public IQueryable<TeamPost> GetAllTeamPostsQueryableByIdAsync(int userId)
+        {
+            return _context.TeamPosts.Include(tp => tp.TeamMembers.Where(p => p.UserId == userId))
+                .AsQueryable();
+        }
     }
 }

@@ -33,7 +33,7 @@ namespace FindTeamAPI.Controllers
         [HttpPost]
         [Route("AddNewTeamMember")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> AddTeamMember(CreateTeamMemberDTO createTeamMemberDTO)
+        public async Task<IActionResult> AddTeamMember([FromBody] CreateTeamMemberDTO createTeamMemberDTO)
         {
             var member = await _teamMemberService.CreateTeamMemberAsync(createTeamMemberDTO);
             return Ok(member);

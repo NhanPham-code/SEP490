@@ -41,12 +41,12 @@ namespace Service.Services
             return await response.Content.ReadAsStringAsync() == "true";
         }
 
-        public async Task<ReadTeamMemberDTO> GetAllTeamMemberByPostId(int postId)
+        public async Task<IEnumerable<ReadTeamMemberDTO>> GetAllTeamMemberByPostId(int postId)
         {
             InitializeAsync();
             var response = await _httpClient.GetAsync($"/GetAllTeamMember?postId={postId}");
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<ReadTeamMemberDTO>();
+            return await response.Content.ReadFromJsonAsync<IEnumerable<ReadTeamMemberDTO>>();
         }
 
         public async Task<ReadTeamMemberDTO> GetTeamMemberById(int postId, int teamId)

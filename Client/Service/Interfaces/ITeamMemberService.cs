@@ -9,7 +9,7 @@ namespace Service.Interfaces
 {
     public interface ITeamMemberService
     {
-        Task<ReadTeamMemberDTO> GetAllTeamMemberByPostId(int postId);
+        Task<IEnumerable<ReadTeamMemberDTO>> GetAllTeamMemberByPostId(int postId);
         Task<ReadTeamMemberDTO> GetTeamMemberById(int postId, int teamId);
         Task<ReadTeamMemberDTO> AddTeamMember(CreateTeamMemberDTO createTeamMemberDTO);
         Task<ReadTeamMemberDTO> UpdateTeamMember(UpdateTeamMemberDTO updateTeamMemberDTO);

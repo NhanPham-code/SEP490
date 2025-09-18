@@ -24,6 +24,7 @@
         public int CreatedBy { get; set; }
         public int StadiumId { get; set; }
         public int BookingId { get; set; }
+        public List<ReadTeamMemberDTO> TeamMembers { get; set; } = new List<ReadTeamMemberDTO>();
     }
 
 }

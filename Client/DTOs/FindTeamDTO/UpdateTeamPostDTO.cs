@@ -8,7 +8,7 @@ namespace FindTeamAPI.DTOs
         [Required(ErrorMessage = "Name is required.")]
         public string Title { get; set; } = string.Empty; // Name of the team
         public string Location { get; set; } = string.Empty; // Location of the team
-        public string Sport { get; set; } = string.Empty; // Sport type of the team
+        public string SportType { get; set; } = string.Empty; // Sport type of the team
         [Required(ErrorMessage = "MaxPlayers is required.")]
         [Range(2, int.MaxValue, ErrorMessage = "MaxPlayers must be at least 2.")]
         public int MaxPlayers { get; set; } // Maximum number of players allowed in the team

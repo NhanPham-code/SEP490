@@ -15,13 +15,13 @@ namespace FindTeamAPI.Controllers
 
         [HttpPost("CreateTeamPost")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> CreateTeamPost([FromBody] CreateTeamPostDTO teamPost)
+        public async Task<IActionResult> CreateTeamPost([FromBody] CreateTeamPostDTO createTeamPostDTO)
         {
-            if (teamPost == null)
+            if (createTeamPostDTO == null)
             {
                 return BadRequest("Invalid team post data.");
             }
-            var createdPost = await _teamPostService.CreateTeamPostAsync(teamPost);
+            var createdPost = await _teamPostService.CreateTeamPostAsync(createTeamPostDTO);
             return Ok(createdPost);
         }
 

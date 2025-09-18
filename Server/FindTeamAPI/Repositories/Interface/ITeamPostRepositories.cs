@@ -11,5 +11,6 @@ namespace FindTeamAPI.Repositories.Interface
         Task<bool> DeleteTeamPostAsync(int postId);
         Task<bool> IsTeamPostExistsAsync(int postId);
         IQueryable<TeamPost> GetAllTeamPostsQueryableAsync();
+        IQueryable<TeamPost> GetAllTeamPostsQueryableByIdAsync(int userId);
     }
 }

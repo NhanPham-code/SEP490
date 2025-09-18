@@ -8,6 +8,7 @@ namespace FindTeamAPI.Service.Interface
         Task<ReadTeamPostDTO> CreateTeamPostAsync(CreateTeamPostDTO createTeamPostDto);
         Task<ReadTeamPostDTO> UpdateTeamPostAsync(UpdateTeamPostDTO updateTeamPostDto);
         Task<bool> DeleteTeamPostAsync(int postId);
+        IQueryable<TeamPost> GetAllTeamPostsQueryableByIdAsync(int userId);
         IQueryable<TeamPost> GetAllTeamPostsQueryableAsync();
     }
 }

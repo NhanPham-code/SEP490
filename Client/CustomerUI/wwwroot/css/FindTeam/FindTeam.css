@@ -2110,3 +2110,6 @@ body {
 .booking-card:hover::before {
     opacity: 1;
 }
+   #editor-container {
+            height: 100px;
+        }

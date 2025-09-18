@@ -1,4 +1,8 @@
 ﻿<!DOCTYPE html>
+
+@{
+    var postId = ViewBag.PostId;
+}
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +12,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
           theme: {
@@ -288,52 +294,62 @@
 
         function getRoleIcon(role) {
             switch(role) {
-                case 'captain': return 'ri-crown-line';
-                case 'member': return 'ri-user-line';
-                case 'substitute': return 'ri-user-received-line';
+                case 'Leader': return 'ri-crown-line';
+                case 'Member': return 'ri-user-line';
+                case 'Waiting': return 'ri-user-received-line';
                 default: return 'ri-user-line';
             }
         }
 
         function getRoleClass(role) {
             switch(role) {
-                case 'captain': return 'role-captain';
-                case 'member': return 'role-member';
-                case 'substitute': return 'role-substitute';
+                case 'Leader': return 'role-captain';
+                case 'Member': return 'role-member';
+                case 'Waiting': return 'role-substitute';
                 default: return 'role-member';
             }
         }
 
         function getRoleText(role) {
             switch(role) {
-                case 'captain': return 'Đội Trưởng';
-                case 'member': return 'Thành Viên';
-                case 'substitute': return 'Dự Bị';
+                case 'Leader': return 'Đội Trưởng';
+                case 'Member': return 'Thành Viên';
+                case 'Waiting': return 'Chờ duyệt';
                 default: return 'Thành Viên';
             }
         }
 
         // Render Functions
-        function renderMemberCard(member) {
-            return `
+        function renderMemberCard(members, profile, leader) {
+            console.log(profile);
+            console.log(members);
+      
+            if (members.length === 0) {
+                membersContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            membersContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            
+
+            membersContainer.innerHTML = members.map(member => `
                 <div class="member-card glass-card rounded-3xl shadow-soft p-6" data-member-id="${member.id}">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                ${member.userAvatar}
+                            <div >
+                               <img class="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold"
+                               src="https://localhost:7136/${profile[member.userId].avatarUrl}" alt="${profile[member.userId].fullName}">
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900">${member.userName}</h3>
+                                <h3 class="font-semibold text-gray-900">${profile[member.userId].fullName}</h3>
                                 <p class="text-sm text-gray-600">ID: ${member.userId}</p>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button class="edit-member text-gray-400 hover:text-primary transition-colors" data-member-id="${member.id}">
-                                <i class="ri-edit-line text-lg"></i>
-                            </button>
-                            <button class="delete-member text-gray-400 hover:text-red-500 transition-colors" data-member-id="${member.id}">
-                                <i class="ri-delete-bin-line text-lg"></i>
-                            </button>
+                            ${renderEditBtn(member, leader)}
                         </div>
                     </div>
 
@@ -356,77 +372,46 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}">
+                    ${renderBtn(member, leader)}
+                        
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderEditBtn(member, leader){
+            if(leader > 0){
+                return `<button class="edit-member text-gray-400 hover:text-primary transition-colors" data-member-id="${member.id}">
+                                <i class="ri-edit-line text-lg"></i>
+                            </button>
+                            <button class="delete-member text-gray-400 hover:text-red-500 transition-colors" data-member-id="${member.id}">
+                                <i class="ri-delete-bin-line text-lg"></i>
+                            </button>`;
+            }else{
+                return ``;
+            }
+        }
+
+        function renderBtn(member, leader){
+            if(leader > 0){
+                return `<button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}">
                             <i class="ri-edit-line mr-1"></i>
                             Sửa
                         </button>
                         <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 delete-member" data-member-id="${member.id}">
                             <i class="ri-delete-bin-line mr-1"></i>
                             Xóa
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderMembers(members) {
-            if (members.length === 0) {
-                membersContainer.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
+                        </button>`;
+            }else{
+                return ``;
             }
-
-            membersContainer.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-
-            membersContainer.innerHTML = members.map(renderMemberCard).join('');
-            updateStats();
         }
 
-        function updateStats() {
-            document.getElementById('total-members').textContent = teamMembers.length;
-            document.getElementById('active-members').textContent = teamMembers.filter(m => m.role !== 'substitute').length;
-        }
+
 
         // Filter and Search Functions
         function filterMembers() {
-            let filtered = [...teamMembers];
-
-            // Search filter
-            const searchTerm = searchInput.value.toLowerCase();
-            if (searchTerm) {
-                filtered = filtered.filter(member =>
-                    member.userName.toLowerCase().includes(searchTerm) ||
-                    member.userId.toString().includes(searchTerm) ||
-                    member.id.toString().includes(searchTerm)
-                );
-            }
-
-            // Role filter
-            const roleFilterValue = roleFilter.value;
-            if (roleFilterValue) {
-                filtered = filtered.filter(member => member.role === roleFilterValue);
-            }
-
-            // Sort
-            const sortValue = sortFilter.value;
-            switch(sortValue) {
-                case 'newest':
-                    filtered.sort((a, b) => new Date(b.joinedAt) - new Date(a.joinedAt));
-                    break;
-                case 'oldest':
-                    filtered.sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt));
-                    break;
-                case 'name':
-                    filtered.sort((a, b) => a.userName.localeCompare(b.userName));
-                    break;
-                case 'role':
-                    const roleOrder = { captain: 0, member: 1, substitute: 2 };
-                    filtered.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
-                    break;
-            }
-
-            renderMembers(filtered);
+           
         }
 
         // Modal Functions
@@ -465,18 +450,7 @@
 
         // CRUD Operations
         function addMember(memberData) {
-            const newMember = {
-                id: Math.max(...teamMembers.map(m => m.id), 0) + 1,
-                teamPostId: parseInt(memberData.teamPostId),
-                userId: parseInt(memberData.userId),
-                userName: `Người dùng ${memberData.userId}`, // In real app, fetch from API
-                userAvatar: `U${memberData.userId.toString().slice(-2)}`,
-                joinedAt: new Date().toISOString(),
-                role: memberData.role
-            };
 
-            teamMembers.push(newMember);
-            filterMembers();
 
             // Show success message
             showNotification('Thêm thành viên thành công!', 'success');
@@ -527,9 +501,32 @@
             }, 3000);
         }
 
+        function loadMember(){
+            $.ajax({
+                url: '/TeamMember/GetTeamMemberDetail?postId=@postId',
+                type: 'GET',
+                data: { page: 1, pageSize: 10 },
+                success: function(response) {
+                    $('#post-list').html(response);
+                    console.log(response);
+                    renderMemberCard(response.teamMembers, response.users, response.leaderId);
+
+                    // Update results count
+                    // hideLoading();
+                    // Hide loading state
+
+                },
+                error: function() {
+                    console.error('Error loading posts');
+                }
+            });
+        }
+
         // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            renderMembers(teamMembers);
+        $(document).ready(function() {
+
+
+          loadMember();
 
             // Search and filter events
             searchInput.addEventListener('input', filterMembers);
@@ -549,17 +546,7 @@
                 e.preventDefault();
 
                 const formData = new FormData(this);
-                const memberData = {
-                    userId: formData.get('userId'),
-                    teamPostId: formData.get('teamPostId'),
-                    role: formData.get('role')
-                };
-
-                if (editingMemberId) {
-                    updateMember(editingMemberId, memberData);
-                } else {
-                    addMember(memberData);
-                }
+                
 
                 closeModal();
             });
