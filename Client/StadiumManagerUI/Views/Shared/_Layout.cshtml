@@ -362,51 +362,49 @@
 
         <div class="sidebar-nav">
             <div class="nav-item">
-                <a href="@Url.Action("Index", "Home")" class="nav-link active">
+                <a href="@Url.Action("Index", "Home")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
                     <i class="nav-icon fas fa-chart-pie"></i>
                     Tổng quan
                 </a>
             </div>
             <div class="nav-item">
-
-                <a href="@Url.Action("Stadium", "StadiumManager")" class="nav-link">
-
+                <a href="@Url.Action("Stadium", "StadiumManager")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "StadiumManager" && ViewContext.RouteData.Values["action"].ToString() == "Stadium" ? "active" : "")">
                     <i class="nav-icon fas fa-futbol"></i>
                     Quản lý Sân
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Bookings", "Management")" class="nav-link">
+                <a href="@Url.Action("Bookings", "Management")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Management" && ViewContext.RouteData.Values["action"].ToString() == "Bookings" ? "active" : "")">
                     <i class="nav-icon fas fa-calendar-alt"></i>
                     Quản lý Đặt sân
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Inventory", "Management")" class="nav-link">
+                <a href="@Url.Action("Inventory", "Management")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Management" && ViewContext.RouteData.Values["action"].ToString() == "Inventory" ? "active" : "")">
                     <i class="nav-icon fas fa-boxes"></i>
                     Quản lý Kho
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Revenue", "Management")" class="nav-link">
+                <a href="@Url.Action("Revenue", "Management")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Management" && ViewContext.RouteData.Values["action"].ToString() == "Revenue" ? "active" : "")">
                     <i class="nav-icon fas fa-chart-line"></i>
                     Quản lý Doanh thu
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("DiscountList", "Discount")" class="nav-link">
+                <a href="@Url.Action("DiscountList", "Discount")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Discount" && ViewContext.RouteData.Values["action"].ToString() == "DiscountList" ? "active" : "")">
                     <i class="nav-icon fas fa-tags"></i>
                     Mã giảm giá
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Support", "Customer")" class="nav-link">
+                <a href="@Url.Action("Support", "Customer")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Customer" && ViewContext.RouteData.Values["action"].ToString() == "Support" ? "active" : "")">
                     <i class="nav-icon fas fa-headset"></i>
                     Chat & Hỗ trợ
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Settings", "Account")" class="nav-link">
+                <a href="@Url.Action("Settings", "Account")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Settings" ? "active" : "")">
                     <i class="nav-icon fas fa-cog"></i>
                     Cài đặt
                 </a>

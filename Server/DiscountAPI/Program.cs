@@ -7,9 +7,11 @@ using DiscountAPI.Service.Interface;
 using DiscountAPI.Service;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.OData;
-using DiscountAPI.DTO;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Models;
+using DiscountAPI.DTO;
+using Microsoft.OData.Edm;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,23 +40,12 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
-// Authorization policies (cho phép Customer) để dùng trong Controller
+// Authorization policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Customer", policy =>
-    {
-        policy.RequireRole("Customer");
-    });
-
-    options.AddPolicy("Admin", policy =>
-    {
-        policy.RequireRole("Admin");
-    });
-
-    options.AddPolicy("StadiumManager", policy =>
-    {
-        policy.RequireRole("StadiumManager");
-    });
+    options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("StadiumManager", policy => policy.RequireRole("StadiumManager"));
 });
 
 // DbContext
@@ -69,18 +60,54 @@ builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<IDiscountService, DiscountAPI.Service.DiscountService>();
 
 // OData Model configuration
-var odataBuilder = new ODataConventionModelBuilder();
-odataBuilder.EntitySet<ReadDiscountDTO>("Discounts");
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EntitySet<ReadDiscountDTO>("ODataDiscount")
+           .EntityType.HasKey(d => d.Id);
+    return builder.GetEdmModel();
+}
 
-// Add Controllers + OData
-builder.Services.AddControllers()
-    .AddOData(options => options
-        .EnableQueryFeatures() // Enable $filter, $orderby, etc.
-        .AddRouteComponents("api", odataBuilder.GetEdmModel())); // Use OData on "api"
 
-// Swagger
+builder.Services.AddControllers().AddOData(options =>
+{
+    options.AddRouteComponents("odata", GetEdmModel())
+        .Select()
+        .Filter()
+        .OrderBy()
+        .Expand()
+        .Count()
+        .SetMaxTop(100);
+});
+
+// Swagger + JWT config
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // ==================== Build & Run ====================
 var app = builder.Build();
@@ -94,6 +121,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); // 👈 thêm dòng này
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

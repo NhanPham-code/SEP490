@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DTOs.DiscountDTO;
 using DTOs.StadiumDTO;
 using StadiumManagerUI.Helpers;
+using DiscountAPI.DTO;
 
 namespace StadiumManagerUI.Controllers
 {
@@ -33,9 +34,9 @@ namespace StadiumManagerUI.Controllers
             return View();
         }
 
-        // Action này được JavaScript gọi để LẤY TẤT CẢ DỮ LIỆU
+        // Action này được JavaScript gọi để LẤY TẤT CẢ DỮ LIỆU discount VỚI PHÂN TRANG
         [HttpGet]
-        public async Task<IActionResult> GetDiscountPageData()
+        public async Task<IActionResult> GetDiscountPageData(int page = 1, int pageSize = 5, string? searchByCode = null, int? stadiumId = null, bool? isActive = null)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(accessToken))
@@ -43,23 +44,33 @@ namespace StadiumManagerUI.Controllers
                 return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
             }
 
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Nếu không có UserId trong session, coi như phiên không hợp lệ
-                return Unauthorized(new { message = "Phiên làm việc không hợp lệ hoặc đã hết hạn." });
-            }
+            var userId = HttpContext.Session.GetInt32("UserId");
 
-            var discountsTask = _discountService.GetDiscountsByUserAsync(accessToken, userId);
+            // Gọi service để lấy discount (OData)
+            var discountsResponseTask = _discountService.GetDiscountsByUserAsync(
+                accessToken,
+                userId,
+                page,
+                pageSize,
+                searchByCode,
+                stadiumId,
+                isActive
+            );
+
+            // Lấy danh sách stadium của user
             string filter = $"&$filter=CreatedBy eq {userId}";
             var stadiumsJsonTask = _stadiumService.SearchStadiumAsync(filter);
 
-            await Task.WhenAll(discountsTask, stadiumsJsonTask);
+            await Task.WhenAll(discountsResponseTask, stadiumsJsonTask);
 
-            var discounts = discountsTask.Result ?? new List<ReadDiscountDTO>();
+            // Xử lý discount
+            var discountsResponse = discountsResponseTask.Result;
+            var discounts = discountsResponse?.Value ?? new List<ReadDiscountDTO>();
+            var totalCount = discountsResponse?.Count ?? 0;
+
+            // Xử lý stadium
             var stadiumsJson = stadiumsJsonTask.Result;
             var stadiums = new List<ReadStadiumDTO>();
-
             if (!string.IsNullOrEmpty(stadiumsJson))
             {
                 try
@@ -76,16 +87,14 @@ namespace StadiumManagerUI.Controllers
                 }
                 catch (JsonException ex)
                 {
-                    Debug.WriteLine($"JSON Error: {ex.Message}");
-                    // Có thể xem xét trả về lỗi cho client nếu cần
+                    Debug.WriteLine($"JSON Error parsing stadiums: {ex.Message}");
                 }
             }
 
-            return Json(new { discounts, stadiums });
+            // Trả về cho client: discounts, stadiums, count
+            return Json(new { discounts, stadiums, count = totalCount });
         }
 
-
-        // === CÁC ACTION CREATE, UPDATE, TOGGLESTATUS GIỮ NGUYÊN NHƯ TRƯỚC ===
         [HttpPost]
         public async Task<IActionResult> CreateDiscount([FromBody] CreateDiscountDTO dto)
         {
@@ -117,6 +126,9 @@ namespace StadiumManagerUI.Controllers
                 return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ hoặc chưa đăng nhập." });
             }
 
+            // Log Id, IsActive, StartDate, EndDate
+            Console.WriteLine($"[CONTROLLER] UpdateDiscount - Id: {dto.Id}, IsActive: {dto.IsActive}, StartDate: {dto.StartDate:yyyy-MM-dd HH:mm:ss}, EndDate: {dto.EndDate:yyyy-MM-dd HH:mm:ss}");
+
             bool success = await _discountService.UpdateDiscountAsync(accessToken, dto);
 
             if (!success)
@@ -124,7 +136,6 @@ namespace StadiumManagerUI.Controllers
                 return StatusCode(500, new { success = false, message = "Cập nhật discount thất bại." });
             }
 
-            // Trả về discount đã cập nhật để client có thể render lại
             var updatedDiscount = await _discountService.GetDiscountByIdAsync(dto.Id);
             return Json(new { success = true, data = updatedDiscount });
         }
@@ -137,6 +148,9 @@ namespace StadiumManagerUI.Controllers
             {
                 return BadRequest(new { success = false, message = "Yêu cầu không hợp lệ." });
             }
+
+            // Log Id, IsActive, StartDate, EndDate
+            Console.WriteLine($"[CONTROLLER] ToggleDiscountStatus - Id: {dto.Id}, IsActive: {dto.IsActive}, StartDate: {dto.StartDate:yyyy-MM-dd HH:mm:ss}, EndDate: {dto.EndDate:yyyy-MM-dd HH:mm:ss}");
 
             bool success = await _discountService.UpdateDiscountAsync(accessToken, dto);
 

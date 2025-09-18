@@ -28,10 +28,10 @@ namespace Service.Services
         }
 
         // Lấy lịch sử booking của user hiện tại qua route gateway đã giấu userId
-        public async Task<List<BookingReadDto>> GetBookingHistoryAsync(string accessToken)
+        public async Task<List<BookingReadDto>> GetBookingAsync(string accessToken, string queryString)
         {
             // Sử dụng HttpRequestMessage để set token thủ công
-            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history");
+            var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history" + queryString);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var response = await _httpClient.SendAsync(request);

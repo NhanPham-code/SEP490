@@ -19,6 +19,11 @@ namespace StadiumManagerUI.Controllers
 
         public IActionResult Index()
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null || userId == 0)
+            {
+                return RedirectToAction("Login", "Common");
+            }
             return View();
         }
 

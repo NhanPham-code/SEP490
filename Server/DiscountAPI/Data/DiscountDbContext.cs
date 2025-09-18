@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models;
 
 namespace DiscountService.Data
@@ -8,6 +6,7 @@ namespace DiscountService.Data
     public class DiscountDbContext : DbContext
     {
         public DbSet<Discount> Discounts { get; set; }
+        public DbSet<DiscountStadium> DiscountStadiums { get; set; }
 
         public DiscountDbContext(DbContextOptions<DiscountDbContext> options)
             : base(options)
@@ -16,18 +15,18 @@ namespace DiscountService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Định nghĩa một Value Converter để chuyển đổi List<int> <--> string
-            var converter = new ValueConverter<List<int>, string>(
-                // Biểu thức để chuyển từ List<int> sang chuỗi (lưu vào DB)
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                // Biểu thức để chuyển từ chuỗi sang List<int> (đọc từ DB)
-                v => JsonSerializer.Deserialize<List<int>>(v, (JsonSerializerOptions)null)
-            );
+            base.OnModelCreating(modelBuilder);
 
-            // Áp dụng Value Converter này cho thuộc tính StadiumIds của entity Discount
-            modelBuilder.Entity<Discount>()
-                .Property(e => e.StadiumIds)
-                .HasConversion(converter);
+            // Cấu hình quan hệ 1-nhiều giữa Discount và DiscountStadium
+            modelBuilder.Entity<DiscountStadium>()
+                .HasOne(ds => ds.Discount)
+                .WithMany(d => d.DiscountStadiums)
+                .HasForeignKey(ds => ds.DiscountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Index để query nhanh hơn (tìm discount theo StadiumId)
+            modelBuilder.Entity<DiscountStadium>()
+                .HasIndex(ds => ds.StadiumId);
         }
     }
 }
