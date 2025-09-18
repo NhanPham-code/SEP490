@@ -12,11 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiscountAPI.Migrations
 {
     [DbContext(typeof(DiscountDbContext))]
-<<<<<<<< HEAD:Server/DiscountAPI/Migrations/20250916092806_init.Designer.cs
-    [Migration("20250916092806_init")]
-========
-    [Migration("20250916080240_init")]
->>>>>>>> ad6ba58f8d9d1cdc88f95bea874716fc8951f4d0:Server/DiscountAPI/Migrations/20250916080240_init.Designer.cs
+    [Migration("20250918095819_init")]
     partial class init
     {
         /// <inheritdoc />

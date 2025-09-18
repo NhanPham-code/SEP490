@@ -1,4 +1,4 @@
-using DTOs.BookingDTO;
+﻿using DTOs.BookingDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System;
@@ -279,69 +279,6 @@ namespace CustomerUI.Controllers
             return View();
         }
 
-        public async Task<IActionResult> BookingHistory()
-        {
-            var accessToken = _tokenService.GetAccessTokenFromCookie();
-
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
-                return RedirectToAction("Login", "Common");
-            }
-
-            List<BookingReadDto> bookings;
-            try
-            {
-                bookings = await _bookingService.GetBookingHistoryAsync(accessToken);
-
-                if (bookings != null && bookings.Count > 0)
-                {
-                    var stadiumIds = bookings.Select(b => b.StadiumId).Distinct().ToList();
-                    var stadiumNames = new Dictionary<int, string>();
-                    foreach (var id in stadiumIds)
-                    {
-                        var stadium = await _stadiumService.GetStadiumByIdAsync(id);
-                        if (stadium != null)
-                        {
-                            stadiumNames[id] = stadium.Name;
-                        }
-                    }
-                    ViewBag.StadiumNames = stadiumNames;
-
-                    // Tạo dictionary để lưu thông tin giảm giá
-                    var discountInfo = new Dictionary<int, string>();
-                    foreach (var booking in bookings)
-                    {
-                        if (booking.DiscountId.HasValue)
-                        {
-                            // Gọi API để lấy thông tin chi tiết mã giảm giá
-                            var discount = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
-                            if (discount != null)
-                            {
-                                discountInfo[booking.Id] = $"Giảm {discount.PercentValue}%";
-                            }
-                            else
-                            {
-                                discountInfo[booking.Id] = "Mã không hợp lệ";
-                            }
-                        }
-                        else
-                        {
-                            discountInfo[booking.Id] = "Không áp dụng";
-                        }
-                    }
-                    ViewBag.DiscountInfo = discountInfo;
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Lỗi khi lấy lịch sử booking.";
-                bookings = new List<BookingReadDto>();
-            }
-
-            return View(bookings);
-        }
-
         public async Task<IActionResult> BookingDetail(int id)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -498,44 +435,6 @@ namespace CustomerUI.Controllers
 
             // Trả về cùng một View "Booking.cshtml".
             return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateBooking(BookingCreateDto bookingDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    TempData["ErrorMessage"] = "Thông tin đặt sân không hợp lệ. Vui lòng thử lại.";
-                    return RedirectToAction("Checkout");
-                }
-
-                var accessToken = GetAccessToken();
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    return RedirectToAction("Login", "Common");
-                }
-
-                var createdBooking = await _bookingService.CreateBookingAsync(bookingDto, accessToken);
-
-                if (createdBooking == null)
-                {
-                    TempData["ErrorMessage"] = "Không thể tạo booking. Vui lòng thử lại.";
-                    return RedirectToAction("Checkout");
-                }
-
-                TempData["BookingSuccess"] = true;
-                TempData["SuccessMessage"] = "Đặt sân thành công!";
-
-                // Thay vì chỉ RedirectToAction, hãy thêm tham số truy vấn
-                return RedirectToAction("BookingHistory");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                return RedirectToAction("Checkout");
-            }
         }
 
         [HttpGet]
