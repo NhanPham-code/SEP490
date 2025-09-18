@@ -2,6 +2,7 @@
 using DTOs.StadiumDTO;
 using FindTeamAPI.DTOs;
 using MailKit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Interfaces;
@@ -119,13 +120,15 @@ namespace CustomerUI.Controllers
 
         public async Task<IActionResult> GetBookByUserId()
         {
+
             //get booking by user id
-            var booking = await _bookingService.GetBookingHistoryAsync(_tokenService.GetAccessTokenFromCookie());
+            var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), "");
             var myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
             // get team post by user id and role is leader
             var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader')");
             List<int> ints = post.Value.Select(p => p.BookingId).ToList();
+
             BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();
             bookingAndStadiumViewModel.Bookings = booking.Where(b => !ints.Contains(b.Id)).ToList();
 

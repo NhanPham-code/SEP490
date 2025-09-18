@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiscountAPI.Migrations
 {
     [DbContext(typeof(DiscountDbContext))]
-    [Migration("20250815130954_init")]
+    [Migration("20250916080240_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -63,9 +63,6 @@ namespace DiscountAPI.Migrations
                     b.Property<double>("PercentValue")
                         .HasColumnType("float");
 
-                    b.Property<string>("StadiumIds")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -76,6 +73,45 @@ namespace DiscountAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Discounts");
+                });
+
+            modelBuilder.Entity("Models.DiscountStadium", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("StadiumId");
+
+                    b.ToTable("DiscountStadiums");
+                });
+
+            modelBuilder.Entity("Models.DiscountStadium", b =>
+                {
+                    b.HasOne("Models.Discount", "Discount")
+                        .WithMany("DiscountStadiums")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Discount");
+                });
+
+            modelBuilder.Entity("Models.Discount", b =>
+                {
+                    b.Navigation("DiscountStadiums");
                 });
 #pragma warning restore 612, 618
         }

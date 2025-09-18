@@ -2,7 +2,7 @@
     margin: 0;
     padding: 20px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #08089E 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
 }
@@ -71,7 +71,7 @@
 .stats-wrapper {
     display: flex;
     flex-direction: row;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #08089E 0%, #764ba2 100%);
     border-radius: 18px;
     box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
     overflow: hidden;
@@ -154,19 +154,69 @@ CSS for booking schedule*/
     .schedule-container::-webkit-scrollbar {
         display: none;
     }
-
-.fixed-column {
-    width: 180px;
+/* Sport Type Column Styling */
+.sport-type-column {
+    width: 150px;
     flex-shrink: 0;
     position: sticky;
     left: 0;
     z-index: 2;
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    background: linear-gradient(135deg, #08089E 0%, #764ba2 100%);
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
 }
 
+    .sport-type-column .fixed-header {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        color: #ffffff;
+        font-size: 15px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .sport-type-column .sport-type {
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #ffffff;
+        text-align: center;
+        width: 100%;
+        background: transparent;
+        position: relative;
+        transition: all 0.3s ease;
+        font-size: 13px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+.fixed-column {
+    width: 150px;
+    flex-shrink: 0;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: linear-gradient(135deg, #08089E 0%, #764ba2 100%);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+    .fixed-column .court-header {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        color: #ffffff;
+        font-size: 15px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
     .fixed-column .court-name {
         border: none;
         border-top: none;
@@ -180,7 +230,7 @@ CSS for booking schedule*/
         background: transparent;
         position: relative;
         transition: all 0.3s ease;
-        font-size: 15px;
+        font-size: 13px;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         letter-spacing: 0.5px;
     }
@@ -214,7 +264,6 @@ CSS for booking schedule*/
 
         .fixed-column .court-name:first-of-type {
             height: 50px;
-            border-top-left-radius: 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
             font-size: 16px;
@@ -223,8 +272,7 @@ CSS for booking schedule*/
         }
 
         .fixed-column .court-name:last-of-type {
-            height: 100px;
-            border-bottom-left-radius: 20px;
+            height: 80px;
         }
 
 .scrollable-area {
@@ -257,7 +305,7 @@ CSS for booking schedule*/
     }
 
 .time-header {
-    background: #9333ea;
+    background: #4437A8;
     height: 50px;
     position: relative;
     display: grid;
@@ -322,13 +370,13 @@ CSS for booking schedule*/
     font-weight: bold;
     font-size: 14px;
     color: #ffffff;
-    background-color: rgba(147, 51, 234, 0.9);
+    background-color: #188894;
     padding: 2px 6px;
     border-radius: 4px;
     white-space: nowrap;
     transform: translateX(-50%);
     z-index: 20;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .schedule-grid {
@@ -354,8 +402,8 @@ CSS for booking schedule*/
     color: #555;
     font-size: 10px;
     text-align: center;
-    height: 100px;
-    width: 100px;
+    height: 80px;
+    width: 80px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
     position: relative;
@@ -363,7 +411,7 @@ CSS for booking schedule*/
 
     /* Enhanced hover effect - only for non-disabled cells */
     .grid-cell:not(.disabled):not(.blocked):not(.booked):not(.unselectable):hover {
-        background-color: rgba(102, 126, 234, 0.1);
+
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
         z-index: 10;
@@ -519,7 +567,7 @@ CSS for booking schedule*/
     }
 
 .court-name {
-    height: 100px;
+    height: 80px;
     width: fit-content;
     display: flex;
     align-items: center;
@@ -701,6 +749,7 @@ CSS for booking schedule*/
     margin-top: 1rem;
 }
 
+
 @media (max-width: 768px) {
     .dashboard-layout {
         flex-direction: column;
@@ -710,9 +759,11 @@ CSS for booking schedule*/
     }
 
     .fixed-column {
-        width: 150px;
+        width: 50px;
     }
-
+    .sport-type-column {
+        width: 50px;
+    }
     .legend-container {
         flex-wrap: wrap;
         gap: 20px;

@@ -351,11 +351,12 @@
                 });
             }
 
+            // Thay thế hàm handleSubmit cũ của bạn bằng phiên bản này
+
             async handleSubmit() {
                 const submitBtn = document.getElementById('submitBtn');
                 const submitText = document.getElementById('submitText');
 
-                // Kiểm tra xem đã upload đủ file chưa
                 if (!this.uploadedFiles.avatar || !this.uploadedFiles.cccd) {
                     this.showToast('Vui lòng tải lên đầy đủ ảnh đại diện và CCCD', 'error');
                     return;
@@ -364,25 +365,11 @@
                 submitBtn.disabled = true;
                 submitText.innerHTML = '<i class="ri-loader-line animate-spin"></i>Đang xử lý...';
 
+                const formData = new FormData();
+                formData.append('avatar', this.uploadedFiles.avatar);
+                formData.append('frontCccdImage', this.uploadedFiles.cccd);
+
                 try {
-                    // Tạo FormData để gửi file
-                    const formData = new FormData();
-
-                    // Thêm các file vào FormData với tên parameter đúng theo method CompleteRegistration
-                    if (this.uploadedFiles.avatar) {
-                        formData.append('avatar', this.uploadedFiles.avatar);
-                    }
-
-                    if (this.uploadedFiles.cccd) {
-                        formData.append('frontCccdImage', this.uploadedFiles.cccd); // Map cccd -> frontCccdImage
-                    }
-
-                    // Debug log để kiểm tra
-                    console.log('Submitting files:');
-                    console.log('Avatar:', this.uploadedFiles.avatar ? this.uploadedFiles.avatar.name : 'None');
-                    console.log('CCCD:', this.uploadedFiles.cccd ? this.uploadedFiles.cccd.name : 'None');
-
-                    // Gửi request đến CompleteRegistration action
                     const response = await fetch('/Common/CompleteRegistration', {
                         method: 'POST',
                         body: formData,
@@ -391,114 +378,34 @@
                         }
                     });
 
+                    // Luôn cố gắng đọc response dưới dạng JSON
+                    const data = await response.json();
+
+                    // response.ok kiểm tra xem mã trạng thái có phải là 2xx (thành công) hay không
                     if (response.ok) {
-                        // Kiểm tra xem response có redirect không
-                        if (response.redirected) {
-                            submitText.innerHTML = '<i class="ri-check-double-line"></i>Hoàn thành!';
-                            this.showToast('Đăng ký thành công! Đang chuyển hướng...', 'success');
+                        // THÀNH CÔNG
+                        submitText.innerHTML = '<i class="ri-check-double-line"></i>Hoàn thành!';
+                        this.showToast('Đăng ký thành công! Đang chuyển hướng...', 'success');
 
-                            setTimeout(() => {
-                                window.location.href = response.url;
-                            }, 1500);
-                            return;
-                        }
-
-                        // Xử lý response text
-                        const responseText = await response.text();
-
-                        // Kiểm tra xem có phải là HTML response không (có thể là View với error)
-                        if (responseText.includes('<!DOCTYPE html>')) {
-                            // Response là HTML, kiểm tra có error không
-                            if (responseText.includes('ViewBag.ErrorMessage')) {
-                                // Tìm error message trong HTML
-                                const errorMatch = responseText.match(/ViewBag\.ErrorMessage[^"]*"([^"]+)"/);
-                                const errorMessage = errorMatch ?
-                                    errorMatch[1] :
-                                    'Có lỗi xảy ra trong quá trình đăng ký.';
-
-                                throw new Error(errorMessage);
-                            } else {
-                                // HTML response không có error, có thể là success page
-                                submitText.innerHTML = '<i class="ri-check-double-line"></i>Hoàn thành!';
-                                this.showToast('Đăng ký thành công! Đang chuyển hướng...', 'success');
-
-                                setTimeout(() => {
-                                    window.location.href = '/Home/Index';
-                                }, 1500);
-                            }
-                        } else {
-                            // Response không phải HTML, có thể là JSON hoặc text khác
-                            try {
-                                const jsonResponse = JSON.parse(responseText);
-                                if (jsonResponse.success) {
-                                    submitText.innerHTML = '<i class="ri-check-double-line"></i>Hoàn thành!';
-                                    this.showToast('Đăng ký thành công! Đang chuyển hướng...', 'success');
-
-                                    setTimeout(() => {
-                                        window.location.href = jsonResponse.redirectUrl || '/Home/Index';
-                                    }, 1500);
-                                } else {
-                                    throw new Error(jsonResponse.message || 'Đăng ký không thành công.');
-                                }
-                            } catch (parseError) {
-                                // Không parse được JSON, coi như success
-                                submitText.innerHTML = '<i class="ri-check-double-line"></i>Hoàn thành!';
-                                this.showToast('Đăng ký thành công! Đang chuyển hướng...', 'success');
-
-                                setTimeout(() => {
-                                    window.location.href = '/Home/Index';
-                                }, 1500);
-                            }
-                        }
+                        setTimeout(() => {
+                            // Chuyển hướng đến URL mà server đã chỉ định
+                            window.location.href = data.redirectUrl || '/Home/Index';
+                        }, 1500);
                     } else {
-                        // Xử lý lỗi HTTP
-                        let errorMessage = 'Có lỗi xảy ra trong quá trình đăng ký.';
-
-                        try {
-                            const errorText = await response.text();
-                            console.log('Error response:', errorText);
-
-                            // Thử tìm error message trong response
-                            if (errorText.includes('ViewBag.ErrorMessage')) {
-                                const errorMatch = errorText.match(/ViewBag\.ErrorMessage[^"]*"([^"]+)"/);
-                                if (errorMatch) {
-                                    errorMessage = errorMatch[1];
-                                }
-                            } else {
-                                // Thử parse JSON error
-                                try {
-                                    const errorData = JSON.parse(errorText);
-                                    errorMessage = errorData.message || errorData.error || errorMessage;
-                                } catch {
-                                    // Không parse được, dùng status text
-                                    errorMessage = `Lỗi ${response.status}: ${response.statusText || 'Unknown error'}`;
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Error parsing error response:', e);
-                            errorMessage = `Lỗi ${response.status}: ${response.statusText || 'Network error'}`;
-                        }
-
-                        throw new Error(errorMessage);
+                        // THẤT BẠI (mã 4xx hoặc 5xx)
+                        // Ném lỗi với thông báo nhận được từ server
+                        throw new Error(data.message || 'Có lỗi không xác định xảy ra.');
                     }
                 } catch (error) {
+                    // Bắt tất cả các loại lỗi: lỗi mạng, lỗi server (4xx, 5xx), lỗi parse JSON...
                     console.error('Submit error:', error);
 
-                    let errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại.';
+                    // Hiển thị chính xác thông báo lỗi cho người dùng
+                    this.showToast(error.message, 'error');
 
-                    if (error.message) {
-                        errorMessage = error.message;
-                    } else if (error.name === 'NetworkError') {
-                        errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.';
-                    } else if (error.name === 'TypeError') {
-                        errorMessage = 'Lỗi kỹ thuật. Vui lòng thử lại sau.';
-                    }
-
-                    this.showToast(errorMessage, 'error');
-
-                    // Reset button state
+                    // Khôi phục lại trạng thái nút bấm
                     submitBtn.disabled = false;
-                    submitText.innerHTML = '<i class="ri-shield-check-line"></i>Hoàn tất đăng ký';
+                    submitText.innerHTML = '<i class="ri-shield-check-line"></i>Hoàn tất xác thực';
                 }
             }
 

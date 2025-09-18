@@ -1,5 +1,6 @@
 using AdminUI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
 using System.Diagnostics;
 
 namespace AdminUI.Controllers
@@ -15,6 +16,11 @@ namespace AdminUI.Controllers
 
         public IActionResult Index()
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if(userId == null || userId == 0)
+            {
+                return RedirectToAction("Login", "Account");
+            }
             return View();
         }
 
