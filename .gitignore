@@ -417,4 +417,4 @@ FodyWeavers.xsd
 
 # Ignore logs and temp files
 **/*.log
-**/*.tmp
+**/*.tmpValidateSolutionConfiguration:
