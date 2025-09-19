@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using BookingAPI.DTOs;
 using BookingAPI.Models;
+using BookingAPI.Repository;
 using BookingAPI.Repository.Interface;
 using BookingAPI.Services.Interface;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace BookingAPI.Services
 {
@@ -10,15 +13,18 @@ namespace BookingAPI.Services
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailRepository _bookingDetailRepository;
+        private readonly IMonthlyBookingRepository _monthlyBookingRepository;
         private readonly IMapper _mapper;
 
         public BookingService(
             IBookingRepository bookingRepository,
             IBookingDetailRepository bookingDetailRepository,
+            IMonthlyBookingRepository monthlyBookingRepository,
             IMapper mapper)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailRepository = bookingDetailRepository;
+            _monthlyBookingRepository = monthlyBookingRepository;
             _mapper = mapper;
         }
 
@@ -57,13 +63,13 @@ namespace BookingAPI.Services
             _mapper.Map(bookingUpdateDto, existingBooking);
 
             // Update booking details
-/*            existingBooking.BookingDetails.Clear();
-            foreach (var detailDto in bookingUpdateDto.BookingDetails)
-            {
-                var bookingDetail = _mapper.Map<BookingDetail>(detailDto);
-                bookingDetail.BookingId = id;
-                existingBooking.BookingDetails.Add(bookingDetail);
-            }*/
+            /*            existingBooking.BookingDetails.Clear();
+                        foreach (var detailDto in bookingUpdateDto.BookingDetails)
+                        {
+                            var bookingDetail = _mapper.Map<BookingDetail>(detailDto);
+                            bookingDetail.BookingId = id;
+                            existingBooking.BookingDetails.Add(bookingDetail);
+                        }*/
 
             var updatedBooking = await _bookingRepository.UpdateBookingAsync(existingBooking);
             return _mapper.Map<BookingUpdateDto>(updatedBooking);
@@ -84,5 +90,73 @@ namespace BookingAPI.Services
         {
             return _bookingRepository.GetAllBookingsAsQueryable();
         }
+
+        public async Task<IEnumerable<BookingReadDto>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime)
+        {
+            var bookings = await _bookingRepository.GetBookingsByDateRangeAndHourAsync(year, month, days, startTime, endTime);
+
+            return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
+        }
+
+        public async Task<IEnumerable<BookingReadDto>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime)
+        {
+            var bookings = await _bookingRepository.GetBookingsByCourtIdsAndHourAsync(courtIds, year, month, startTime, endTime);
+
+            return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
+        }
+
+        public async Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync(int userId, MonthlyBookingCreateDto monthlyBookingCreateDto)
+        {
+            if (!TimeSpan.TryParseExact(monthlyBookingCreateDto.StartTime, "hh\\:mm", CultureInfo.InvariantCulture, out var startTime) ||
+                !TimeSpan.TryParseExact(monthlyBookingCreateDto.EndTime, "hh\\:mm", CultureInfo.InvariantCulture, out var endTime))
+            {
+                throw new ArgumentException("Invalid time format. Use HH:mm.");
+            }
+
+            var monthlyBooking = _mapper.Map<MonthlyBooking>(monthlyBookingCreateDto);
+            monthlyBooking.UserId = userId; // gán từ tham số
+            monthlyBooking.StartTime = startTime;
+            monthlyBooking.EndTime = endTime;
+            var hoursPerDay = (endTime - startTime).TotalHours;
+            monthlyBooking.TotalHour = (int)(hoursPerDay * monthlyBookingCreateDto.Dates.Count);
+
+            foreach (var day in monthlyBookingCreateDto.Dates)
+            {
+                var bookingDate = new DateTime(monthlyBookingCreateDto.Year, monthlyBookingCreateDto.Month, day);
+
+                var booking = new Booking
+                {
+                    UserId = userId,
+                    StadiumId = monthlyBooking.StadiumId,
+                    DiscountId = monthlyBooking.DiscountId,
+                    Date = bookingDate,
+                    OriginalPrice = monthlyBooking.OriginalPrice / monthlyBookingCreateDto.Dates.Count,
+                    TotalPrice = monthlyBooking.TotalPrice / monthlyBookingCreateDto.Dates.Count,
+                    PaymentMethod = monthlyBooking.PaymentMethod,
+                    Note = monthlyBooking.Note,
+                    Status = "pending",
+                };
+
+                foreach (var courtId in monthlyBookingCreateDto.CourtIds)
+                {
+                    booking.BookingDetails.Add(new BookingDetail
+                    {
+                        CourtId = courtId,
+                        StartTime = bookingDate.Add(startTime),
+                        EndTime = bookingDate.Add(endTime)
+                    });
+                }
+
+                monthlyBooking.Bookings.Add(booking);
+            }
+
+            var createdMonthlyBooking = await _monthlyBookingRepository.CreateMonthlyBookingAsync(monthlyBooking);
+
+            var readDto = _mapper.Map<MonthlyBookingReadDto>(createdMonthlyBooking);
+            readDto.BookingIds = createdMonthlyBooking.Bookings.Select(b => b.Id).ToList();
+
+            return readDto;
+        }
+
     }
 }

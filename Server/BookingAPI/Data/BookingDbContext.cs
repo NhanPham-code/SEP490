@@ -11,6 +11,7 @@ namespace BookingAPI.Data
 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
+        public DbSet<MonthlyBooking> MonthlyBookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

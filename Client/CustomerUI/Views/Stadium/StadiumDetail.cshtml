@@ -310,6 +310,19 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingMonthly()">
+					<div class="flex items-center space-x-4">
+						<div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+							<span class="text-2xl">📋</span>
+						</div>
+						<div class="flex-1">
+							<h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân theo tháng</h4>
+							<p class="text-gray-600 text-sm">Phương thức truyền thống, ổn định và quen thuộc</p>
+							<span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Ổn định</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<div class="text-center">
@@ -550,6 +563,10 @@
 
 		function bookingTraditional() {
 			window.location.href = `/Booking/Booking?stadiumId=${stadiumId}`;
+		}
+
+		function bookingMonthly() {
+			window.location.href = `/Booking/MonthlyBooking?stadiumId=${stadiumId}`;
 		}
 
 		function chatWithOwner() {

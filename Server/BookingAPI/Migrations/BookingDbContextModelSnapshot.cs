@@ -17,7 +17,7 @@ namespace BookingAPI.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,6 +39,9 @@ namespace BookingAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MonthlyBookingId")
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
@@ -73,6 +76,8 @@ namespace BookingAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MonthlyBookingId");
+
                     b.ToTable("Bookings");
                 });
 
@@ -103,6 +108,73 @@ namespace BookingAPI.Migrations
                     b.ToTable("BookingDetails");
                 });
 
+            modelBuilder.Entity("BookingAPI.Models.MonthlyBooking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("OriginalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("TotalHour")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MonthlyBookings");
+                });
+
+            modelBuilder.Entity("BookingAPI.Models.Booking", b =>
+                {
+                    b.HasOne("BookingAPI.Models.MonthlyBooking", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("MonthlyBookingId");
+                });
+
             modelBuilder.Entity("BookingAPI.Models.BookingDetail", b =>
                 {
                     b.HasOne("BookingAPI.Models.Booking", "Booking")
@@ -117,6 +189,11 @@ namespace BookingAPI.Migrations
             modelBuilder.Entity("BookingAPI.Models.Booking", b =>
                 {
                     b.Navigation("BookingDetails");
+                });
+
+            modelBuilder.Entity("BookingAPI.Models.MonthlyBooking", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

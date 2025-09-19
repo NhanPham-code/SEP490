@@ -104,8 +104,8 @@ namespace StadiumManagerUI.Controllers
                 return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ hoặc chưa đăng nhập." });
             }
 
-            var userId = HttpContext.Session.GetString("UserId");
-            dto.UserId = userId;
+            var userId = HttpContext.Session.GetInt32("UserId");
+            dto.UserId = userId + "";
 
             var createdDiscount = await _discountService.CreateDiscountAsync(accessToken, dto);
 

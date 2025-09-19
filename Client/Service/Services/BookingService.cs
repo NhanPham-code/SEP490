@@ -1,13 +1,14 @@
-﻿using System;
+﻿using DTOs.BookingDTO;
+using Newtonsoft.Json;
+using Service.BaseService;
+using Service.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DTOs.BookingDTO;
-using Service.BaseService;
-using Service.Interfaces;
 
 namespace Service.Services
 {
@@ -43,7 +44,7 @@ namespace Service.Services
             var jsonString = await response.Content.ReadAsStringAsync();
 
             // Deserialize theo kiểu DTO bao ngoài chứa 'value'
-            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(jsonString, new JsonSerializerOptions
+            var result = System.Text.Json.JsonSerializer.Deserialize<BookingHistoryResponseDto>(jsonString, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
@@ -108,7 +109,7 @@ namespace Service.Services
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
+            var result = System.Text.Json.JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             return result?.Value ?? new List<BookingReadDto>();
@@ -137,10 +138,102 @@ namespace Service.Services
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
+            var result = System.Text.Json.JsonSerializer.Deserialize<BookingHistoryResponseDto>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             return result?.Value ?? new List<BookingReadDto>();
+        }
+
+        public async Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime)
+        {
+            // Convert int thành "HH:mm"
+            string startTimeStr = $"{startTime:D2}:00"; // 13 -> "13:00"
+            string endTimeStr = $"{endTime:D2}:00";   // 17 -> "17:00"
+
+            var query = new List<string>
+            {
+                $"year={year}",
+                $"month={month}",
+                $"startTime={Uri.EscapeDataString(startTimeStr)}",
+                $"endTime={Uri.EscapeDataString(endTimeStr)}"
+            };
+
+            foreach (var d in days)
+                query.Add($"days={d}");
+
+            var queryString = string.Join("&", query);
+            var url = $"https://localhost:7136/booking/filterbydateandhour?{queryString}";
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var data = await response.Content.ReadAsStringAsync();
+
+                // Fix: Deserialize to the correct type instead of object
+                return JsonConvert.DeserializeObject<List<BookingReadDto>>(data);
+            }
+        }
+
+        public async Task<List<BookingReadDto>> FilterByCourtAndHour(List<int> courtIds, int year, int month, int startTime, int endTime)
+        {
+            // Check if courtIds is null or empty.
+            if (courtIds == null || !courtIds.Any())
+            {
+                // Return an empty list to indicate no results, without making an API call.
+                return new List<BookingReadDto>();
+            }
+
+            // Convert hours (int) to "HH:mm" string format.
+            string startTimeStr = $"{startTime:D2}:00"; // e.g., 13 -> "13:00"
+            string endTimeStr = $"{endTime:D2}:00";   // e.g., 15 -> "15:00"
+
+            // Build query parameters.
+            var queryParams = new List<string>
+            {
+                $"year={year}",
+                $"month={month}",
+                $"startTime={Uri.EscapeDataString(startTimeStr)}",
+                $"endTime={Uri.EscapeDataString(endTimeStr)}"
+            };
+
+            // Add each courtId to the parameter list.
+            foreach (var id in courtIds)
+            {
+                queryParams.Add($"courtIds={id}");
+            }
+
+            var queryString = string.Join("&", queryParams);
+
+            // Use the injected _httpClient instead of creating a new one.
+            // This endpoint will be routed by Ocelot to 'https://localhost:7136/booking/filterbycourtandhour'.
+            var url = $"/booking/filterbycourtandhour?{queryString}";
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var data = await response.Content.ReadAsStringAsync();
+
+            // Deserialize the JSON data returned.
+            return JsonConvert.DeserializeObject<List<BookingReadDto>>(data);
+        }
+
+        public async Task<BookingReadDto?> CreateMonthlyBookingAsync(MonthlyBookingCreateDto bookingDto, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // Gọi đến endpoint của Ocelot API Gateway
+            var response = await _httpClient.PostAsJsonAsync("/booking/monthly", bookingDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                // Log lỗi hoặc throw exception để Controller có thể bắt được
+                Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Tạo booking hàng tháng thất bại. Lỗi từ API: {errorContent}");
+            }
+
+            // Đọc và deserialize kết quả trả về nếu thành công
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
     }
 }
