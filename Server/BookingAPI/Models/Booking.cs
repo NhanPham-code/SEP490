@@ -39,6 +39,10 @@ namespace BookingAPI.Models
         [ForeignKey("Stadium")]
         public int StadiumId { get; set; }
 
+        [ForeignKey("BookingMonthly")]
+        public int? MonthlyBookingId { get; set; }
+        public virtual MonthlyBooking? MonthlyBooking { get; set; }
+
         // Navigation properties
         public virtual ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
     }

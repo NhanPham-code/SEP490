@@ -26,11 +26,11 @@ namespace DTOs.DiscountDTO
         public DateTime EndDate { get; set; }
 
         [Required]
-        public string CodeType { get; set; } = null!; // System / Stadium / Unique
+        public string CodeType { get; set; } = null!;
 
         public bool IsActive { get; set; }
 
-        // Nếu null hoặc rỗng => áp dụng toàn hệ thống
+        // Cập nhật danh sách stadium
         public List<int>? StadiumIds { get; set; } = new();
     }
 }

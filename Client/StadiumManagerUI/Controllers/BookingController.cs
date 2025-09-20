@@ -1,5 +1,9 @@
-﻿using DTOs.BookingDTO;
+﻿using System.Drawing.Printing;
+using System.Text.Json;
+using DTOs.BookingDTO;
+using DTOs.StadiumDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Service.Interfaces;
 
 namespace StadiumManagerUI.Controllers
@@ -19,66 +23,72 @@ namespace StadiumManagerUI.Controllers
             _discountService = discountService;
         }
 
-        public async Task<IActionResult> BookingManager()
+        // Action để hiển thị trang quản lý booking
+        [HttpGet]
+        public async Task<IActionResult> Bookings()
         {
+            // 1. Xác thực người dùng
             var accessToken = _tokenService.GetAccessTokenFromCookie();
-
             if (string.IsNullOrEmpty(accessToken))
             {
-                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
-                return RedirectToAction("Login", "Common");
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Account");
             }
 
-            List<BookingReadDto> bookings;
-            try
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                bookings = await _bookingService.GetBookingHistoryAsync(accessToken);
+                return RedirectToAction("Login", "Account");
+            }
 
-                if (bookings != null && bookings.Count > 0)
+            // 2. Lấy tất cả sân vận động của người dùng
+            string stadiumFilter = $"&$filter=CreatedBy eq {userId}";
+            var stadiumsJson = await _stadiumService.SearchStadiumAsync(stadiumFilter);
+
+            var stadiums = new List<ReadStadiumDTO>();
+            if (!string.IsNullOrEmpty(stadiumsJson))
+            {
+                try
                 {
-                    var stadiumIds = bookings.Select(b => b.StadiumId).Distinct().ToList();
-                    var stadiumNames = new Dictionary<int, string>();
-                    foreach (var id in stadiumIds)
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    // Giả sử service trả về JSON có dạng { "value": [...] }
+                    using (JsonDocument doc = JsonDocument.Parse(stadiumsJson))
                     {
-                        var stadium = await _stadiumService.GetStadiumByIdAsync(id);
-                        if (stadium != null)
+                        if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement))
                         {
-                            stadiumNames[id] = stadium.Name;
+                            stadiums = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(valueElement.GetRawText(), options) ?? new List<ReadStadiumDTO>();
                         }
                     }
-                    ViewBag.StadiumNames = stadiumNames;
-
-                    // Tạo dictionary để lưu thông tin giảm giá
-                    var discountInfo = new Dictionary<int, string>();
-                    foreach (var booking in bookings)
-                    {
-                        if (booking.DiscountId.HasValue)
-                        {
-                            // Gọi API để lấy thông tin chi tiết mã giảm giá
-                            var discount = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
-                            if (discount != null)
-                            {
-                                discountInfo[booking.Id] = $"Giảm {discount.PercentValue}%";
-                            }
-                            else
-                            {
-                                discountInfo[booking.Id] = "Mã không hợp lệ";
-                            }
-                        }
-                        else
-                        {
-                            discountInfo[booking.Id] = "Không áp dụng";
-                        }
-                    }
-                    ViewBag.DiscountInfo = discountInfo;
+                }
+                catch (JsonException ex)
+                {
+                    // Xử lý lỗi nếu có, ví dụ hiển thị trang lỗi
+                    ViewBag.ErrorMessage = $"Lỗi khi lấy dữ liệu sân vận động: {ex.Message}";
+                    return View("Error");
                 }
             }
-            catch (Exception ex)
+
+            var bookings = new List<BookingReadDto>();
+            if (stadiums.Any())
             {
-                TempData["ErrorMessage"] = "Lỗi khi lấy lịch sử booking.";
-                bookings = new List<BookingReadDto>();
+                // 3. Tạo câu truy vấn OData để lấy booking
+                var stadiumIds = stadiums.Select(s => s.Id);
+                var filterClauses = stadiumIds.Select(id => $"StadiumId eq {id}");
+                string bookingFilter = string.Join(" or ", filterClauses);
+
+                // Thêm $expand để lấy chi tiết đặt sân
+                string odataQueryString = $"?$filter={bookingFilter}&$expand=BookingDetails";
+
+                // 4. Gọi API để lấy danh sách booking
+                bookings = await _bookingService.GetBookingAsync(accessToken, odataQueryString);
             }
 
+            // 5. Chuẩn bị ViewModel để truyền dữ liệu cho View
+            // Thay đổi ở đây:
+            // 1. Lưu danh sách stadiums vào ViewBag
+            ViewBag.Stadiums = stadiums;
+
+            // 2. Truyền trực tiếp danh sách bookings làm Model cho View
             return View(bookings);
         }
     }

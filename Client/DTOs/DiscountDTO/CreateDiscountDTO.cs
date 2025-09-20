@@ -2,7 +2,6 @@
 
 namespace DTOs.DiscountDTO
 {
-    // CreateDiscountDTO
     public class CreateDiscountDTO
     {
         [Required]
@@ -29,7 +28,7 @@ namespace DTOs.DiscountDTO
         [Required]
         public string UserId { get; set; } = null!;
 
-        // Nếu null hoặc rỗng => áp dụng toàn hệ thống
+        // Danh sách Stadium áp dụng (nếu có)
         public List<int>? StadiumIds { get; set; } = new();
     }
 }
