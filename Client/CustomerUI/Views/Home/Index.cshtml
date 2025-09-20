@@ -1176,22 +1176,35 @@
           });
         }
 
-        function loadFirebaseData() {
-          db.ref("customPlaces").once("value")
-            .then(snapshot => {
-              let places = snapshot.val();
-              if (!places) return;
-
-              Object.values(places).forEach(place => {
-                if (place.lat && place.lng) {
-                  let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
-                  if (dist <= radius) {
-                    addMarker(place.lat, place.lng, place.name, "📍");
+                function loadFirebaseData() {
+          db.ref("customPlaces").on("value", snapshot => {
+            // Xóa tất cả marker Firebase cũ (không xóa marker vị trí user)
+            map.eachLayer(layer => {
+              if (layer instanceof L.Marker) {
+                let latLng = layer.getLatLng();
+                // Không xóa marker vị trí user (blue-dot)
+                if (!(latLng.lat === userLat && latLng.lng === userLng)) {
+                  // Chỉ xóa marker có tooltip chứa "📍" (Firebase markers)
+                  if (layer.getTooltip() && layer.getTooltip().getContent().includes("📍")) {
+                    map.removeLayer(layer);
                   }
                 }
-              });
-            })
-            .catch(e => console.error('Lỗi Firebase:', e));
+              }
+            });
+
+            let places = snapshot.val();
+            if (!places) return;
+
+            Object.values(places).forEach(place => {
+              // Chỉ hiển thị những sân có isLocked = false (hoặc không có field isLocked)
+              if (place.lat && place.lng && (place.isLocked === false || place.isLocked === undefined)) {
+                let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
+                if (dist <= radius) {
+                  addMarker(place.lat, place.lng, place.name, "📍");
+                }
+              }
+            });
+          }, e => console.error('Lỗi Firebase:', e));
         }
 
 

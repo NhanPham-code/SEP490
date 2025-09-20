@@ -238,7 +238,7 @@ namespace CustomerUI.Controllers
                 var verificationCode = new Random().Next(100000, 999999).ToString();
 
                 // Lưu vào session
-                var tempRegisterData = new TempRegistrationData
+                var tempRegisterData = new CustomerTempRegistrationData
                 {
                     RegisterData = registerRequestDTO,
                     VerificationCode = verificationCode,
@@ -276,7 +276,7 @@ namespace CustomerUI.Controllers
         public IActionResult Verify()
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<CustomerTempRegistrationData>("TempRegisterData");
 
             // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
             if (tempRegisterData == null)
@@ -293,7 +293,7 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> Verify(string email, string code)
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<CustomerTempRegistrationData>("TempRegisterData");
 
             // Trường hợp 1: Session không tồn tại hoặc đã hết hạn
             if (tempRegisterData == null)
@@ -326,7 +326,7 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> ResendCode()
         {
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<TempRegistrationData>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<CustomerTempRegistrationData>("TempRegisterData");
 
             if (tempRegisterData == null)
             {
@@ -366,12 +366,11 @@ namespace CustomerUI.Controllers
         {
 
             // Lấy dữ liệu tạm từ session
-            var tempRegisterData = HttpContext.Session.GetObjectFromJson<dynamic>("TempRegisterData");
+            var tempRegisterData = HttpContext.Session.GetObjectFromJson<CustomerTempRegistrationData>("TempRegisterData");
 
             if (tempRegisterData == null)
             {
-                ViewBag.ErrorMessage = "Không tìm thấy dữ liệu đăng ký tạm thời.";
-                return View("Verify");
+                return BadRequest(new { success = false, message = "Phiên đăng ký đã hết hạn. Vui lòng thử lại từ đầu." });
             }
 
             // Tạo một DTO từ dữ liệu tạm
@@ -394,8 +393,7 @@ namespace CustomerUI.Controllers
 
             if (!isRegistered)
             {
-                ViewBag.ErrorMessage = "Đăng ký không thành công. Vui lòng thử lại.";
-                return View("Login");
+                return BadRequest(new { success = false, message = "Đăng ký không thành công. Vui lòng thử lại." });
             }
 
             // Xóa dữ liệu tạm sau khi đăng ký thành công
@@ -411,8 +409,7 @@ namespace CustomerUI.Controllers
 
             if (loginResponse == null || string.IsNullOrEmpty(loginResponse.AccessToken))
             {
-                ViewBag.ErrorMessage = "Đăng nhập sau đăng ký không thành công.";
-                return View("Verify");
+                return StatusCode(500, new { success = false, message = "Đăng ký thành công nhưng không thể tự động đăng nhập. Vui lòng thử đăng nhập thủ công." });
             }
 
             // Lưu token vào cookie (HttpOnly để bảo mật)
@@ -421,7 +418,7 @@ namespace CustomerUI.Controllers
             // Lưu thông tin người dùng vào session
             UpdateUserSession(loginResponse);
 
-            return RedirectToAction("Index", "Home");
+            return Ok(new { success = true, redirectUrl = Url.Action("Index", "Home") });
         }
 
         // lấy profile của người dùng

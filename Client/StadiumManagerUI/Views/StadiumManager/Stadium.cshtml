@@ -1296,7 +1296,7 @@ function updateDateTime() {
 
             // Handle relative URLs
             if (imageUrl.startsWith('/') || imageUrl.startsWith('uploads/')) {
-                return `https://localhost:7280/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+                return `https://localhost:7136/img/img/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
             }
 
             // Handle full URLs
@@ -1304,7 +1304,7 @@ function updateDateTime() {
                 return imageUrl;
             }
 
-            return `https://localhost:7280/${imageUrl}`;
+            return `https://localhost:7136/img/${imageUrl}`;
         }
 
         function buildFilterQuery() {
@@ -1590,6 +1590,12 @@ function updateDateTime() {
                             // Update approval status display
                             const statusSelect = document.getElementById('editIsApproved');
                             statusSelect.addEventListener('change', updateApprovalStatusDisplay);
+         initializeLocationMap();
+                            initializeAddressSearch();
+                        },
+                        willClose: () => {
+                            // ===== THÊM MỚI: CLEANUP MAP =====
+                            onModalClose();
                         },
                         preConfirm: () => {
                             const name = document.getElementById('editName').value.trim();
@@ -3099,7 +3105,7 @@ function updateDateTime() {
                         ${videos.map((video, index) => `
                             <div class="video-item" data-video-id="${video.Id || index}">
                                 <video controls class="preview-video">
-                                            <source src="https://localhost:7280/${video.VideoUrl}" type="video/mp4">
+                                            <source src="https://localhost:7136/img/${video.VideoUrl}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
                                 <div class="video-info">
@@ -3145,14 +3151,14 @@ function updateDateTime() {
             let videoUrl = video.VideoUrl;
 
             if (videoUrl.startsWith('/') || videoUrl.startsWith('uploads/')) {
-                return `https://localhost:7280/${videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl}`;
+                return `https://localhost:7136/img/${videoUrl.startsWith('/') ? videoUrl.substring(1) : videoUrl}`;
             }
 
             if (videoUrl.startsWith('http')) {
                 return videoUrl;
             }
 
-            return `https://localhost:7280/${videoUrl}`;
+            return `https://localhost:7136/img/${videoUrl}`;
         }
 
         // Append videos to form data

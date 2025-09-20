@@ -17,15 +17,20 @@ namespace UserAPI.Service
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IMapper _mapper;
-        private ITokenService _tokenService;
+        private readonly ITokenService _tokenService;
+        private readonly IAiService _aiService;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IConfiguration config, IUserRepository userRepository,  IMapper mapper, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository)
+        public UserService(IConfiguration config, IUserRepository userRepository,  IMapper mapper, ITokenService tokenService, 
+            IRefreshTokenRepository refreshTokenRepository, IAiService aiService, ILogger<UserService> logger)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _tokenService = tokenService;
             _refreshTokenRepository = refreshTokenRepository;
+            _aiService = aiService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO)
@@ -392,7 +397,60 @@ namespace UserAPI.Service
             // 1. Check email tồn tại
             if (await IsEmailExistsAsync(registerDto.Email))
             {
-                throw new InvalidOperationException("Email already exists.");
+                throw new InvalidOperationException("Email đã tồn tại.");
+            }
+
+            // 2. Gọi AI Server để xác thực CCCD
+            if (registerDto.FrontCCCDImage == null || registerDto.FrontCCCDImage.Length == 0)
+            {
+                throw new InvalidOperationException("Cần cung cấp ảnh CCCD mặt trước để đăng ký.");
+            }
+
+            // 2. Gọi AI cho ảnh MẶT TRƯỚC
+            AiResponseModel? aiData;
+            try
+            {
+                _logger.LogInformation("Đang gửi ảnh CCCD của email {Email} đến AI Service để xác thực.", registerDto.Email);
+                aiData = await _aiService.ExtractInfoFromFrontCCCDImage(registerDto.FrontCCCDImage);
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi hệ thống từ AIService (mất kết nối, server AI lỗi 500...)
+                _logger.LogError(ex, "AIService đã ném ra một lỗi hệ thống trong quá trình đăng ký của email {Email}.", registerDto.Email);
+                throw new Exception("Hệ thống xác thực đang gặp sự cố. Vui lòng thử lại sau.");
+            }
+
+            // Kiểm tra kết quả trả về từ AI Service
+            if (aiData == null)
+            {
+                // Trường hợp này xảy ra khi AIService xác định ảnh không hợp lệ (ví dụ: AI trả về JSON rỗng)
+                _logger.LogWarning("AI Service không thể trích xuất dữ liệu từ ảnh CCCD của email {Email}.", registerDto.Email);
+                throw new InvalidOperationException("Không thể xác thực thông tin từ ảnh CCCD. Vui lòng sử dụng ảnh rõ nét và hợp lệ.");
+            }
+            _logger.LogInformation("Xác thực CCCD qua AI thành công cho email {Email}.", registerDto.Email);
+
+            // Kiểm tra các thông tin quan trọng từ AI
+            var idFromAI = aiData.Id?.FirstOrDefault();
+            var fullNameFromAI = aiData.Name?.FirstOrDefault();
+            var dobFromAI = aiData.DateOfBirth?.FirstOrDefault();
+            var genderFromAI = aiData.Gender?.FirstOrDefault();
+            var originPlaceFromAI = aiData.OriginPlace?.FirstOrDefault();
+            var currentPlaceFromAI = aiData.CurrentPlace?.FirstOrDefault();
+
+            var fullAddress = string.Join(", ", aiData.CurrentPlace ?? new List<string>());
+
+
+            // Kiểm tra các trường thông tin quan trọng
+            if (string.IsNullOrWhiteSpace(fullNameFromAI) || string.IsNullOrWhiteSpace(dobFromAI))
+            {
+                throw new InvalidOperationException("Thông tin trích xuất từ CCCD không đầy đủ (thiếu tên hoặc ngày sinh).");
+            }
+
+            // Kiểm tra tuổi (ví dụ: phải trên 18 tuổi)
+            var dateOfBirth = DateHelper.Parse(dobFromAI, "dd/MM/yyyy"); // Giả sử bạn có một hàm helper để parse ngày tháng
+            if (dateOfBirth == null || (DateTime.UtcNow.Year - dateOfBirth.Year) < 18)
+            {
+                throw new InvalidOperationException("Người dùng phải từ 18 tuổi trở lên.");
             }
 
             // 2. Hash password
@@ -456,16 +514,17 @@ namespace UserAPI.Service
             // 4. Tạo entity User
             var user = new User
             {
-                FullName = registerDto.FullName,
+                FullName = fullNameFromAI,
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 Role = "StadiumManager",
-                Address = registerDto.Address,
+                Address = fullAddress,
                 PhoneNumber = registerDto.PhoneNumber,
-                Gender = registerDto.Gender,
-                DateOfBirth = string.IsNullOrEmpty(registerDto.DateOfBirth) ? null : DateHelper.Parse(registerDto.DateOfBirth),
+                Gender = genderFromAI,
+                DateOfBirth = dateOfBirth,
                 AvatarUrl = avatarUrl,
+                IdentityNumber = idFromAI,
                 FrontCCCDUrl = frontCCCDUrl,
                 RearCCCDUrl = rearCCCDUrl,
                 IsActive = true,

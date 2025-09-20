@@ -1,4 +1,4 @@
-﻿﻿﻿
+﻿﻿
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -59,12 +59,19 @@
 
     <!-- HTML -->
     <div class="schedule-container mt-3">
+        
+        <!-- Add this after the fixed-column div -->
+        <div class="sport-type-column" id="sportTypeColumn">
+            <div class="fixed-header">Sport Type</div>
+            <!-- sport types will be injected here by JavaScript -->
+        </div>
+
         <!-- fixed column of court names -->
         <div class="fixed-column" id="fixedColumn">
             <div class="fixed-header"></div>
             <!-- court names injected here by createScheduleTable -->
         </div>
-
+        
         <!-- scrollable area containing header and grid -->
         <div class="scrollable-area">
             <!-- time header wrapper -->
@@ -137,8 +144,38 @@
         window.addEventListener('pageshow', forceResetToToday);
         window.addEventListener('focus', forceResetToToday);
 
+        //         function adjustMobileLayout() {
+        //     if (window.innerWidth <= 768) {
+        //         Reduce padding for mobile
+        //         $('#scheduleGrid').css({
+        //             'padding-left': '20px',
+        //             'padding-right': '20px'
+        //         });
+
+        //         $('#timeHeader').css({
+        //             'padding-left': '20px',
+        //             'padding-right': '20px'
+        //         });
+        //     } else {
+        //         Reset to original padding for desktop
+        //         $('#scheduleGrid').css({
+        //             'padding-left': '50px',
+        //             'padding-right': '50px'
+        //         });
+
+        //         $('#timeHeader').css({
+        //             'padding-left': '50px',
+        //             'padding-right': '50px'
+        //         });
+        //     }
+        // }
+
         $(document).ready(function() {
             // Force reset date-picker ngay khi DOM ready
+
+            // adjustMobileLayout();
+            // $(window).resize(adjustMobileLayout);
+
             forceResetToToday();
 
             $('#continue-button').on('click', function (e) {
@@ -557,11 +594,11 @@
 
         function renderScheduleHead(openHour, closeHour, timeSlots, timeLabels) {
           const numSlots   = timeSlots.length;
-          const gridWidth  = `${(numSlots + 1) * 100}px`;
+          const gridWidth  = `${(numSlots + 1) * 85}px`;
 
           // Set grid widths
           $('#timeHeader').css({
-            'grid-template-columns': `repeat(${numSlots}, 100px)`,
+            'grid-template-columns': `repeat(${numSlots}, 80px)`,
             'min-width': gridWidth
           });
           $('#scheduleGrid').css({
@@ -590,18 +627,27 @@
 
             $('#scheduleGrid').empty();
             $('#fixedColumn').empty();
-            $('#fixedColumn').append(`<div class="court-name" style="color: #555;"></div>`);
+            $('#sportTypeColumn').empty();
+            $('#fixedColumn').append(`<div class="court-header">Sân</div>`);
+            $('#sportTypeColumn').append(`<div class="fixed-header">Loại</div>`);
+                    Object.entries(groupedCourts).forEach(([sportType, courtsInGroup]) => {
+                // Tạo một ô sportType kéo dài cho tất cả các sân thuộc loại này
+                const rowSpan = courtsInGroup.length; // Số sân thuộc loại sportType này
+                const height = 80 * rowSpan;
+                $('#sportTypeColumn').append(`
+                    <div class="sport-type" style="grid-row: span ${rowSpan}; height: ${height}px ;">
+                        ${sportType}
+                    </div>
+                `);
 
-            Object.values(groupedCourts).forEach(courtsInGroup => {
-                
-
+                // Render từng sân trong nhóm
                 courtsInGroup.forEach(court => {
                     $('#fixedColumn').append(`<div class="court-name">${court.Name}</div>`);
 
                     const $row = $(`<div class="court-row" data-court="${court.Id}"></div>`);
                     $row.css({
                         'display': 'grid',
-                        'grid-template-columns': `repeat(${numSlots}, 100px)`
+                        'grid-template-columns': `repeat(${numSlots}, 80px)`
                     });
 
                     const isDisabled = !court.IsAvailable;
@@ -667,7 +713,7 @@
                     // Luôn thêm icon ngôi sao vào ô đã đặt, bất kể nó ở quá khứ hay không
                     if ($cell.find('.star-icon').length === 0) {
                         $cell.append(`
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="100" height="100" class="star-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="80" height="80" class="star-icon">
                                 <polygon fill="#FFDE00" points="150.0000,40.0000 163.4708,81.4590 207.0634,81.4590 171.7963,107.0820 185.2671,148.5410 150.0000,122.9180 114.7329,148.5410 128.2037,107.0820 92.9366,81.4590 136.5292,81.4590" />
                             </svg>
                         `);
@@ -777,6 +823,33 @@
                         });
                     }
                 });
+                $(".grid-cell").each(function () {
+            const timeRange = $(this).data("time");
+            const [startStr] = timeRange.split("-");
+            const [hour, minute] = startStr.split(":").map(Number);
+            const slotStart = new Date();
+            slotStart.setHours(hour, minute, 0, 0);
+
+            if (now >= slotStart) {
+                // Tạo và thêm lớp phủ nếu chưa có
+                if (!$(this).find(".time-overlay").length) {
+                    const overlay = $("<div></div>")
+                        .addClass("time-overlay")
+                        .css({
+                            "position": "absolute",
+                            "top": "0",
+                            "left": "0",
+                            "width": "100%",
+                            "height": "100%",
+                            "background-color": "#a9a9a9", // Màu xám của lớp phủ
+                            "opacity": "0.7", // Độ trong suốt
+                            "z-index": "100" // Z-index cao hơn nút bấm bên dưới
+                        });
+                    // Đặt position cho phần tử cha để position: absolute hoạt động
+                    $(this).css("position", "relative").append(overlay);
+                }
+            }
+        });
 
                 // Disable time-label
                 $(".time-label").each(function () {
@@ -789,7 +862,7 @@
                     if (now >= labelTime) {
                         $(this).addClass("disabled");
                         $(this).css({
-                            "background": "#654321",
+                            "background": "#9e5308",
                             "color": "#ffffff",
                             "z-index": "10", // Set z-index cao lên
                             "opacity": "0.7" // Thêm độ trong suốt

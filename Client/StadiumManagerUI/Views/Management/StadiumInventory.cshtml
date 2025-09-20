@@ -1,0 +1,1145 @@
+﻿@{
+    ViewData["Title"] = "Quản lý thiết bị sân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Thêm jQuery và Bootstrap CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<div class="container-fluid p-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                           
+                            <p class="text-muted mb-0" id="stadium-info">Đang tải thông tin sân...</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary" onclick="goBackToInventory()">
+                                <i class="ri-arrow-left-line me-1"></i>
+                                Quay lại
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="openCreateModal()">
+                                <i class="ri-add-line me-1"></i>
+                                Thêm thiết bị
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Tìm kiếm theo tên</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên thiết bị...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">Tất cả</option>
+                                <option value="Active">Hoạt động</option>
+                                <option value="Inactive">Không hoạt động</option>
+                                <option value="Maintenance">Bảo trì</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Số lượng/trang</label>
+                            <select class="form-select" id="pageSizeSelect">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                                <i class="ri-refresh-line me-1"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên thiết bị</th>
+                                    <th>Mô tả</th>
+                                    <th>Số lượng</th>
+                                    <th>Có sẵn</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipmentTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="loading-spinner mx-auto mb-2"></div>
+                                        <p class="text-muted mb-0">Đang tải dữ liệu...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <span class="text-muted" id="paginationInfo">Hiển thị 0 - 0 của 0 kết quả</span>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination">
+                                <!-- Pagination will be generated here -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Modal -->
+<div class="modal fade" id="equipmentModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm thiết bị mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="equipmentForm">
+                    <input type="hidden" id="equipmentId" name="id">
+                    <input type="hidden" id="stadiumId" name="stadiumId">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="equipmentName" class="form-label">Tên thiết bị <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="equipmentName" name="name" required>
+                            <div class="invalid-feedback">Vui lòng nhập tên thiết bị</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="equipmentStatus" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="equipmentStatus" name="status">
+                                <option value="Active">Hoạt động</option>
+                                <option value="Inactive">Không hoạt động</option>
+                                <option value="Maintenance">Bảo trì</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="equipmentDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="equipmentDescription" name="description" rows="3" placeholder="Nhập mô tả thiết bị..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="quantityTotal" class="form-label">Tổng số lượng <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantityTotal" name="quantityTotal" min="1" required>
+                            <div class="invalid-feedback">Vui lòng nhập số lượng hợp lệ (tối thiểu 1)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="quantityAvailable" class="form-label">Số lượng có sẵn <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantityAvailable" name="quantityAvailable" min="0" required>
+                            <div class="invalid-feedback">Vui lòng nhập số lượng có sẵn hợp lệ</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="equipmentImageFile" class="form-label">Hình ảnh</label>
+                            <input type="file" class="form-control" id="equipmentImageFile" name="image" accept="image/*" onchange="previewNewImageFile(this)">
+                            <small class="form-text text-muted">Chọn file ảnh (jpg, png, webp). Tối đa 5MB.</small>
+
+                            <div class="form-check mt-2" id="keepImageFileDiv" style="display: none;">
+                                <input class="form-check-input" type="checkbox" id="keepCurrentImageFile" name="keepCurrentImageFile">
+                                <label class="form-check-label" for="keepCurrentImageFile">
+                                    Giữ hình ảnh hiện tại
+                                </label>
+                            </div>
+
+                            <div id="currentImageFilePreview" class="mt-2" style="display: none;">
+                                <label class="form-label">Hình ảnh hiện tại:</label>
+                                <br>
+                                <img id="currentImageFile" src="" alt="Current ImageFile" style="max-width: 200px; max-height: 150px;" class="img-thumbnail">
+                            </div>
+
+                            <div id="newImageFilePreview" class="mt-2" style="display: none;">
+                                <label class="form-label">Hình ảnh mới:</label>
+                                <br>
+                                <img id="newImageFile" src="" alt="New ImageFile" style="max-width: 200px; max-height: 150px;" class="img-thumbnail">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i>
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-primary" id="submitBtn" onclick="saveEquipment()">
+                    <i class="ri-save-line me-1"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="text-center text-white">
+        <div class="loading-spinner mb-3"></div>
+        <p>Đang xử lý...</p>
+    </div>
+</div>
+
+<style>
+    .equipment-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-Active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-Inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-Maintenance {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .quantity-total {
+        color: #6c757d;
+    }
+
+    .quantity-available {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+
+    .invalid-feedback {
+        display: none;
+    }
+
+    .is-invalid .invalid-feedback {
+        display: block;
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        min-width: 300px;
+        padding: 15px;
+        border-radius: 8px;
+        color: white;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+</style>
+
+<!-- Thêm jQuery và Bootstrap JS trước khi load script chính -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Đảm bảo jQuery đã load trước khi chạy code
+    (function() {
+        'use strict';
+
+        // Biến global
+        let currentPage = 1;
+        let currentPageSize = 5;
+        let currentStadiumId = null;
+        let isEditing = false;
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const debouncedSearch = debounce(() => {
+            currentPage = 1;
+            loadEquipmentData();
+        }, 500);
+
+        // Đợi DOM và jQuery sẵn sàng
+        $(document).ready(function() {
+            console.log('StadiumInventory page loaded, jQuery version:', $.fn.jquery);
+
+            // Get stadium ID from sessionStorage
+            currentStadiumId = sessionStorage.getItem("currentStadiumId");
+            console.log("Stadium ID from sessionStorage:", currentStadiumId);
+
+            if (!currentStadiumId) {
+                console.error("No stadium ID found in sessionStorage");
+                showNotification('Không tìm thấy thông tin sân. Vui lòng chọn sân trước.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/Management/Inventory';
+                }, 2000);
+                return;
+            }
+
+            // Convert to integer
+            currentStadiumId = parseInt(currentStadiumId);
+            console.log("Stadium ID converted to integer:", currentStadiumId);
+
+            if (isNaN(currentStadiumId) || currentStadiumId <= 0) {
+                console.error("Invalid stadium ID:", currentStadiumId);
+                showNotification('ID sân không hợp lệ.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/Management/Inventory';
+                }, 2000);
+                return;
+            }
+
+            // Set stadium ID in session
+            $.ajax({
+                url: '/Equipment/SetCurrentStadiumId',
+                type: 'POST',
+                data: { stadiumId: currentStadiumId },
+                success: function(response) {
+                    console.log("Stadium ID set in server session successfully:", response);
+                    loadEquipmentData();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error setting stadium ID in session:", xhr.responseText);
+                    loadEquipmentData();
+                }
+            });
+
+            // Bind event listeners
+            bindEventListeners();
+        });
+
+        function bindEventListeners() {
+            // Search input
+            $('#searchInput').on('input', debouncedSearch);
+
+            // Status filter
+            $('#statusFilter').on('change', function() {
+                currentPage = 1;
+                loadEquipmentData();
+            });
+
+            // Page size selector
+            $('#pageSizeSelect').on('change', function() {
+                currentPageSize = parseInt($(this).val());
+                currentPage = 1;
+                loadEquipmentData();
+            });
+
+            // ImageFile preview handling
+            $('#keepCurrentImageFile').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#newImageFilePreview').hide();
+                    $('#equipmentImageFile').val('');
+                }
+            });
+
+            // Quantity validation
+            $('#quantityTotal, #quantityAvailable').on('input', function() {
+                validateQuantities();
+            });
+        }
+
+        function validateQuantities() {
+            const total = parseInt($('#quantityTotal').val()) || 0;
+            const available = parseInt($('#quantityAvailable').val()) || 0;
+
+            if (available > total) {
+                $('#quantityAvailable').val(total);
+                showNotification('Số lượng có sẵn không thể lớn hơn tổng số lượng', 'info');
+            }
+        }
+
+        function loadEquipmentData() {
+            console.log("Loading equipment data for stadium ID:", currentStadiumId);
+
+            if (!currentStadiumId) {
+                console.error("Cannot load data: No stadium ID available");
+                showNotification('Không có thông tin sân để tải dữ liệu.', 'error');
+                return;
+            }
+
+            const searchByName = $('#searchInput').val().trim();
+            const status = $('#statusFilter').val();
+
+            const params = {
+                page: currentPage,
+                pageSize: currentPageSize,
+                stadiumId: currentStadiumId
+            };
+
+            if (searchByName) params.searchByName = searchByName;
+            if (status) params.status = status;
+
+            console.log("Request parameters:", params);
+
+            $.ajax({
+                url: '/Equipment/GetStadiumEquipmentPageData',
+                type: 'GET',
+                data: params,
+                timeout: 15000,
+                success: function(response) {
+                    console.log("Equipment data received:", response);
+
+                    if (response) {
+                        renderEquipmentTable(response.equipments || []);
+                        updatePagination(response.count || 0);
+                        updateStadiumInfo(response.stadiums || []);
+                    } else {
+                        console.error("Empty response received");
+                        showNotification('Không nhận được dữ liệu từ server.', 'error');
+                        renderEquipmentTable([]);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading equipment data:', {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText,
+                        statusCode: xhr.status
+                    });
+
+                    let errorMessage = 'Lỗi khi tải dữ liệu thiết bị.';
+                    if (xhr.status === 401) {
+                        errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'Bạn không có quyền truy cập vào dữ liệu này.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Không tìm thấy dữ liệu sân.';
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                    }
+
+                    showNotification(errorMessage, 'error');
+                    renderEquipmentTable([]);
+                }
+            });
+        }
+
+        function renderEquipmentTable(equipments) {
+            const tbody = $('#equipmentTableBody');
+            tbody.empty();
+
+            if (!equipments || equipments.length === 0) {
+                tbody.html(`
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="ri-inbox-line text-muted" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2 mb-0">Không có thiết bị nào</p>
+                            <small class="text-muted">Nhấn "Thêm thiết bị" để thêm thiết bị mới</small>
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            equipments.forEach((equipment, index) => {
+                const row = `
+                    <tr class="animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                        <td>
+                            ${equipment.imagePath ?
+                                `<img src="https://localhost:7262${equipment.imagePath}" alt="${escapeHtml(equipment.name)}" class="equipment-image"
+     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                                 <div class="equipment-image bg-light d-none align-items-center justify-content-center" style="display: none;">
+                                    <i class="ri-image-line text-muted"></i>
+                                 </div>` :
+                                `<div class="equipment-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="ri-image-line text-muted"></i>
+                                 </div>`
+                            }
+                        </td>
+                        <td>
+                            <strong>${escapeHtml(equipment.name)}</strong>
+                        </td>
+                        <td>
+                            <span class="text-muted">${escapeHtml(equipment.description) || 'Không có mô tả'}</span>
+                        </td>
+                        <td>
+                            <span class="quantity-total">${equipment.quantityTotal}</span>
+                        </td>
+                        <td>
+                            <span class="quantity-available">${equipment.quantityAvailable}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-${equipment.status}">
+                                ${getStatusText(equipment.status)}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">${formatDate(equipment.createdAt)}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary" onclick="editEquipment(${equipment.id})" title="Chỉnh sửa">
+                                    <i class="ri-edit-line"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="deleteEquipment(${equipment.id}, '${escapeHtml(equipment.name)}')" title="Xóa">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        function updatePagination(totalCount) {
+            const totalPages = Math.ceil(totalCount / currentPageSize);
+            const startItem = totalCount > 0 ? (currentPage - 1) * currentPageSize + 1 : 0;
+            const endItem = Math.min(currentPage * currentPageSize, totalCount);
+
+            $('#paginationInfo').text(`Hiển thị ${startItem} - ${endItem} của ${totalCount} kết quả`);
+
+            const pagination = $('#pagination');
+            pagination.empty();
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            pagination.append(`
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                </li>
+            `);
+
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                pagination.append(`
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                    </li>
+                `);
+            }
+
+            // Next button
+            pagination.append(`
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                </li>
+            `);
+        }
+
+        function updateStadiumInfo(stadiums) {
+            if (stadiums && stadiums.length > 0) {
+                const stadium = stadiums.find(s => s.id == currentStadiumId);
+                if (stadium) {
+                    $('#stadium-info').html(`
+                        <i class="ri-map-pin-2-line me-1"></i>
+                        Sân: <strong>${escapeHtml(stadium.name)}</strong> - ${escapeHtml(stadium.address) || 'Chưa cập nhật địa chỉ'}
+                    `);
+                } else {
+                    $('#stadium-info').text(`ID Sân: ${currentStadiumId} - Đang tải thông tin...`);
+                }
+            } else {
+                $('#stadium-info').text(`ID Sân: ${currentStadiumId} - Không tìm thấy thông tin`);
+            }
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+          
+            $('#equipmentForm .is-invalid').removeClass('is-invalid');
+
+           
+            const name = $('#equipmentName').val().trim();
+            if (!name) {
+                $('#equipmentName').addClass('is-invalid');
+                isValid = false;
+            }
+
+           
+            const quantityTotal = parseInt($('#quantityTotal').val());
+            const quantityAvailable = parseInt($('#quantityAvailable').val());
+
+            if (!quantityTotal || quantityTotal < 1) {
+                $('#quantityTotal').addClass('is-invalid');
+                isValid = false;
+            }
+
+            if (isNaN(quantityAvailable) || quantityAvailable < 0) {
+                $('#quantityAvailable').addClass('is-invalid');
+                isValid = false;
+            }
+
+            if (quantityAvailable > quantityTotal) {
+                $('#quantityAvailable').addClass('is-invalid');
+                showNotification('Số lượng có sẵn không thể lớn hơn tổng số lượng', 'error');
+                isValid = false;
+            }
+
+            // Validate stadium ID
+            if (!currentStadiumId) {
+                showNotification('Không tìm thấy thông tin sân', 'error');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'Active': 'Hoạt động',
+                'Inactive': 'Không hoạt động',
+                'Maintenance': 'Bảo trì'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            try {
+                return new Date(dateString).toLocaleDateString('vi-VN');
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            $('.notification').remove();
+
+            const notification = $(`
+                <div class="notification ${type}">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-${type === 'success' ? 'check-line' : type === 'error' ? 'error-warning-line' : 'information-line'} me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close btn-close-white ms-auto" onclick="$(this).parent().parent().remove()"></button>
+                    </div>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            // Show notification
+            setTimeout(() => {
+                notification.addClass('show');
+            }, 100);
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.removeClass('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        function showLoadingOverlay(show) {
+            if (show) {
+                $('#loadingOverlay').show();
+            } else {
+                $('#loadingOverlay').hide();
+            }
+        }
+
+        // Global functions (accessible from onclick events)
+        window.openCreateModal = function() {
+            console.log('Opening create modal for stadium ID:', currentStadiumId);
+
+            isEditing = false;
+            $('#modalTitle').text('Thêm thiết bị mới');
+            $('#submitBtn').html('<i class="ri-save-line me-1"></i> Thêm mới');
+
+            // Reset form
+            $('#equipmentForm')[0].reset();
+            $('#equipmentForm .is-invalid').removeClass('is-invalid');
+
+            // Set hidden fields
+            $('#equipmentId').val('');
+            $('#stadiumId').val(currentStadiumId);
+
+            // Hide image previews
+            $('#keepImageFileDiv, #currentImageFilePreview, #newImageFilePreview').hide();
+
+            // Show modal
+            $('#equipmentModal').modal('show');
+        };
+
+            // Sửa lại phần editEquipment function để lưu thông tin ảnh hiện tại
+    window.editEquipment = function(id) {
+        isEditing = true;
+        $('#modalTitle').text('Chỉnh sửa thiết bị');
+        $('#submitBtn').html('<i class="ri-save-line me-1"></i> Cập nhật');
+
+        showLoadingOverlay(true);
+
+        $.ajax({
+            url: `/Equipment/GetEquipmentById?id=${id}`,
+            type: 'GET',
+            success: function(response) {
+                if (response.success && response.data) {
+                    const equipment = response.data;
+
+                    // Reset form validation
+                    $('#equipmentForm .is-invalid').removeClass('is-invalid');
+
+                    // Fill form data
+                    $('#equipmentId').val(equipment.id);
+                    $('#stadiumId').val(currentStadiumId);
+                    $('#equipmentName').val(equipment.name);
+                    $('#equipmentDescription').val(equipment.description || '');
+                    $('#quantityTotal').val(equipment.quantityTotal);
+                    $('#quantityAvailable').val(equipment.quantityAvailable);
+                    $('#equipmentStatus').val(equipment.status);
+
+                    // Handle image preview và lưu thông tin ảnh hiện tại
+                    $('#newImageFilePreview').hide();
+                    if (equipment.imagePath) {
+                        const fullImageUrl = `https://localhost:7262/${equipment.imagePath.replace(/^\/+/, '')}`;
+
+                        $('#currentImageFile').attr('src', fullImageUrl);
+                        $('#currentImageFilePreview').show();
+                        $('#keepImageFileDiv').show();
+                        $('#keepCurrentImageFile').prop('checked', true);
+
+                        // LUU THÔNG TIN ẢNH HIỆN TẠI VÀO HIDDEN FIELD
+                        // Thêm hidden field để lưu đường dẫn ảnh hiện tại
+                        if ($('#currentImagePath').length === 0) {
+                            $('#equipmentForm').append('<input type="hidden" id="currentImagePath" name="currentImagePath">');
+                        }
+                        $('#currentImagePath').val(equipment.imagePath);
+                    } else {
+                        $('#currentImageFilePreview').hide();
+                        $('#keepImageFileDiv').hide();
+                        $('#currentImagePath').val('');
+                    }
+
+                    $('#equipmentModal').modal('show');
+                } else {
+                    showNotification(response.message || 'Không thể tải thông tin thiết bị', 'error');
+                }
+            },
+            error: function(xhr) {
+                console.error('Error loading equipment:', xhr);
+                showNotification('Lỗi khi tải thông tin thiết bị', 'error');
+            },
+            complete: function() {
+                showLoadingOverlay(false);
+            }
+        });
+    };
+
+    // Sửa lại phần saveEquipment function
+    window.saveEquipment = function() {
+        console.log('Saving equipment, editing mode:', isEditing);
+
+        // Validate form
+        if (!validateForm()) {
+            return;
+        }
+
+        // Create FormData object
+        const formData = new FormData();
+
+        // Add all form fields to FormData
+        const equipmentId = $('#equipmentId').val();
+        const stadiumId = $('#stadiumId').val() || currentStadiumId;
+        const name = $('#equipmentName').val().trim();
+        const description = $('#equipmentDescription').val().trim();
+        const quantityTotal = parseInt($('#quantityTotal').val());
+        const quantityAvailable = parseInt($('#quantityAvailable').val());
+        const status = $('#equipmentStatus').val();
+        const imageFile = $('#equipmentImageFile')[0].files[0];
+        const keepCurrentImageFile = $('#keepCurrentImageFile').is(':checked');
+        const currentImagePath = $('#currentImagePath').val(); // Lấy đường dẫn ảnh hiện tại
+
+        // Log data being sent
+        console.log('Form data:', {
+            equipmentId,
+            stadiumId,
+            name,
+            description,
+            quantityTotal,
+            quantityAvailable,
+            status,
+            hasImageFile: !!imageFile,
+            keepCurrentImageFile,
+            currentImagePath
+        });
+
+        // Add data to FormData
+        if (isEditing && equipmentId) {
+            formData.append('Id', equipmentId);
+        }
+        formData.append('StadiumId', stadiumId);
+        formData.append('Name', name);
+        formData.append('Description', description);
+        formData.append('QuantityTotal', quantityTotal);
+        formData.append('QuantityAvailable', quantityAvailable);
+        formData.append('Status', status);
+
+        // Handle image - QUAN TRỌNG: Xử lý logic ảnh
+        if (isEditing) {
+            if (keepCurrentImageFile && currentImagePath) {
+                // Nếu giữ ảnh hiện tại, gửi đường dẫn ảnh hiện tại
+                formData.append('KeepCurrentImage', 'true');
+                formData.append('CurrentImagePath', currentImagePath);
+            } else if (imageFile) {
+                // Nếu có ảnh mới, gửi ảnh mới
+                formData.append('ImageFile', imageFile);
+                formData.append('KeepCurrentImage', 'false');
+            } else {
+                // Nếu không giữ ảnh cũ và không có ảnh mới -> xóa ảnh
+                formData.append('KeepCurrentImage', 'false');
+            }
+        } else {
+            // Tạo mới - chỉ gửi ảnh nếu có
+            if (imageFile) {
+                formData.append('ImageFile', imageFile);
+            }
+        }
+
+        // Determine URL
+        const url = isEditing ?
+            `/Equipment/UpdateEquipment?id=${equipmentId}` :
+            '/Equipment/CreateEquipment';
+
+        console.log('Sending request to:', url);
+
+        // Disable submit button
+        const submitBtn = $('#submitBtn');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="ri-loader-line spin me-1"></i> Đang lưu...');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            timeout: 30000,
+            success: function(response) {
+                console.log('Save response:', response);
+
+                if (response && response.success) {
+                    $('#equipmentModal').modal('hide');
+                    showNotification(
+                        isEditing ? 'Cập nhật thiết bị thành công!' : 'Thêm thiết bị thành công!',
+                        'success'
+                    );
+                    loadEquipmentData();
+                } else {
+                    const errorMessage = response && response.message ?
+                        response.message : 'Có lỗi xảy ra khi lưu thiết bị';
+                    showNotification(errorMessage, 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error saving equipment:', {
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText,
+                    statusCode: xhr.status
+                });
+
+                let errorMessage = 'Lỗi khi lưu thiết bị';
+
+                if (xhr.status === 400) {
+                    errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.';
+                } else if (xhr.status === 401) {
+                    errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+                } else if (xhr.status === 413) {
+                    errorMessage = 'File ảnh quá lớn. Vui lòng chọn file nhỏ hơn 5MB.';
+                } else if (xhr.status === 500) {
+                    errorMessage = 'Lỗi server. Vui lòng thử lại sau.';
+                }
+
+                try {
+                    const responseObj = JSON.parse(xhr.responseText);
+                    if (responseObj && responseObj.message) {
+                        errorMessage = responseObj.message;
+                    }
+                } catch (e) {
+                    // Ignore parsing error
+                }
+
+                showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                // Re-enable submit button
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    };
+
+    // Sửa lại phần openCreateModal để reset hidden field
+    window.openCreateModal = function() {
+        console.log('Opening create modal for stadium ID:', currentStadiumId);
+
+        isEditing = false;
+        $('#modalTitle').text('Thêm thiết bị mới');
+        $('#submitBtn').html('<i class="ri-save-line me-1"></i> Thêm mới');
+
+        // Reset form
+        $('#equipmentForm')[0].reset();
+        $('#equipmentForm .is-invalid').removeClass('is-invalid');
+
+        // Set hidden fields
+        $('#equipmentId').val('');
+        $('#stadiumId').val(currentStadiumId);
+        $('#currentImagePath').val(''); // Reset đường dẫn ảnh hiện tại
+
+        // Hide image previews
+        $('#keepImageFileDiv, #currentImageFilePreview, #newImageFilePreview').hide();
+
+        // Show modal
+        $('#equipmentModal').modal('show');
+    };
+
+    // Thêm event listener cho checkbox
+    $('#keepCurrentImageFile').on('change', function() {
+        if ($(this).is(':checked')) {
+            // Khi tích giữ ảnh hiện tại, ẩn preview ảnh mới và clear input file
+            $('#newImageFilePreview').hide();
+            $('#equipmentImageFile').val('');
+        }
+    });
+
+    // Sửa lại hàm previewNewImageFile
+    window.previewNewImageFile = function(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('File ảnh quá lớn. Vui lòng chọn file nhỏ hơn 5MB.', 'error');
+                input.value = '';
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.match('image.*')) {
+                showNotification('Vui lòng chọn file ảnh hợp lệ.', 'error');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#newImageFile').attr('src', e.target.result);
+                $('#newImageFilePreview').show();
+                // Khi chọn ảnh mới, tự động bỏ tích "giữ ảnh hiện tại"
+                $('#keepCurrentImageFile').prop('checked', false);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+        window.deleteEquipment = function(id, name) {
+            if (confirm(`Bạn có chắc chắn muốn xóa thiết bị "${name}"?\n\nThao tác này không thể hoàn tác.`)) {
+                showLoadingOverlay(true);
+
+                $.ajax({
+                    url: `/Equipment/DeleteEquipment?id=${id}`,
+                    type: 'DELETE',
+                    success: function(response) {
+                        if (response && response.success) {
+                            showNotification('Xóa thiết bị thành công!', 'success');
+                            loadEquipmentData();
+                        } else {
+                            showNotification(response && response.message ? response.message : 'Có lỗi xảy ra khi xóa thiết bị', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error deleting equipment:', xhr);
+                        showNotification('Lỗi khi xóa thiết bị', 'error');
+                    },
+                    complete: function() {
+                        showLoadingOverlay(false);
+                    }
+                });
+            }
+        };
+
+        window.resetFilters = function() {
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            $('#pageSizeSelect').val('5');
+            currentPage = 1;
+            currentPageSize = 5;
+            loadEquipmentData();
+        };
+
+        window.previewNewImageFile = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File ảnh quá lớn. Vui lòng chọn file nhỏ hơn 5MB.', 'error');
+                    input.value = '';
+                    return;
+                }
+
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    showNotification('Vui lòng chọn file ảnh hợp lệ.', 'error');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#newImageFile').attr('src', e.target.result);
+                    $('#newImageFilePreview').show();
+                    $('#keepCurrentImageFile').prop('checked', false);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.changePage = function(page) {
+            if (page >= 1) {
+                currentPage = page;
+                loadEquipmentData();
+            }
+        };
+
+        window.goBackToInventory = function() {
+            window.location.href = '/Management/Inventory';
+        };
+
+    })();
+</script>

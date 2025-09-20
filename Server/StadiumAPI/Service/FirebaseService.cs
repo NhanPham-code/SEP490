@@ -23,7 +23,8 @@ namespace StadiumAPI.Services
                 id = stadium.Id,
                 lat = stadium.Latitude,
                 lng = stadium.Longitude,
-                name = stadium.Name
+                name = stadium.Name,
+                isLocked = stadium.IsLocked,
             };
 
             var json = JsonSerializer.Serialize(data);
@@ -34,11 +35,53 @@ namespace StadiumAPI.Services
             var response = await _httpClient.PutAsync(url, content);
             response.EnsureSuccessStatusCode();
         }
+       
+        public async Task UpdateStadiumLockStatusAsync(int stadiumId, bool isLocked)
+{
+    var data = new
+    {
+        isLocked = isLocked
+    };
 
+    var json = JsonSerializer.Serialize(data);
+
+    var url = $"{_firebaseUrl}/customPlaces/{stadiumId}.json";
+    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
+    var response = await _httpClient.SendAsync(request);
+
+    response.EnsureSuccessStatusCode();
+}
+
+        // Thay đổi method DeleteStadiumAsync trong FirebaseService
         public async Task DeleteStadiumAsync(int stadiumId)
         {
+            // Đầu tiên lấy giá trị hiện tại của isLocked
+            var getUrl = $"{_firebaseUrl}/customPlaces/{stadiumId}/isLocked.json";
+            var getResponse = await _httpClient.GetAsync(getUrl);
+            getResponse.EnsureSuccessStatusCode();
+
+            var currentValueJson = await getResponse.Content.ReadAsStringAsync();
+            bool currentIsLocked = false; // Mặc định là false nếu không tồn tại
+
+            if (!string.IsNullOrEmpty(currentValueJson) && currentValueJson != "null")
+            {
+                currentIsLocked = JsonSerializer.Deserialize<bool>(currentValueJson);
+            }
+
+            // Toggle giá trị: false -> true, true -> false
+            var newIsLocked = !currentIsLocked;
+
+            var data = new
+            {
+                isLocked = newIsLocked
+            };
+            var json = JsonSerializer.Serialize(data);
             var url = $"{_firebaseUrl}/customPlaces/{stadiumId}.json";
-            var response = await _httpClient.DeleteAsync(url);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
+            var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
         }
     }

@@ -4,9 +4,38 @@ namespace UserAPI.Helper
 {
     public static class DateHelper
     {
-        private const string DateFormat = "yyyy-MM-dd";
+        // Giữ nguyên định dạng mặc định cho các chức năng cũ
+        private const string DefaultDateFormat = "yyyy-MM-dd";
+
+        // === HÀM CŨ (Không thay đổi) ===
+        // Hàm này sẽ tiếp tục hoạt động cho các chức năng cũ của bạn
+        public static DateOnly Parse(string input)
+        {
+            return Parse(input, DefaultDateFormat); // Gọi phiên bản mới với định dạng mặc định
+        }
+
+        // === HÀM MỚI (Nạp chồng) ===
+        // Phiên bản mới này linh hoạt hơn, cho phép truyền vào định dạng bất kỳ
+        public static DateOnly Parse(string input, string format)
+        {
+            if (DateOnly.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
+            {
+                return result;
+            }
+            // Ném ra lỗi với thông báo cụ thể để dễ dàng gỡ lỗi
+            throw new FormatException($"Chuỗi '{input}' không hợp lệ. Định dạng ngày tháng mong đợi là '{format}'.");
+        }
+
+        // === CÁC HÀM KHÁC (Cập nhật để nhất quán) ===
 
         public static bool TryParse(string? input, out DateOnly result)
+        {
+            // Mặc định vẫn thử parse theo định dạng cũ
+            return TryParse(input, DefaultDateFormat, out result);
+        }
+
+        // Phiên bản TryParse nạp chồng
+        public static bool TryParse(string? input, string format, out DateOnly result)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -16,19 +45,10 @@ namespace UserAPI.Helper
 
             return DateOnly.TryParseExact(
                 input,
-                DateFormat,
+                format,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out result
-            );
-        }
-
-        public static DateOnly Parse(string input)
-        {
-            return DateOnly.ParseExact(
-                input,
-                DateFormat,
-                CultureInfo.InvariantCulture
             );
         }
 
@@ -43,7 +63,7 @@ namespace UserAPI.Helper
 
         public static string ToString(DateOnly date)
         {
-            return date.ToString(DateFormat, CultureInfo.InvariantCulture);
+            return date.ToString(DefaultDateFormat, CultureInfo.InvariantCulture);
         }
     }
 }

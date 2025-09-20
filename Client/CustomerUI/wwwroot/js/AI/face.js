@@ -1005,14 +1005,21 @@
                 body: formData
             });
 
-            if (response.redirected) {
+            // Luôn cố gắng đọc response dưới dạng JSON
+            const data = await response.json();
+
+            // response.ok kiểm tra mã trạng thái có phải là 2xx (thành công) không
+            if (response.ok) {
+                // THÀNH CÔNG
                 showEncouragement('Thành công! Đang chuyển hướng...', 'success');
-                window.location.href = response.url;
+                setTimeout(() => {
+                    // Chuyển hướng đến URL mà server đã chỉ định
+                    window.location.href = data.redirectUrl || '/Home/Index';
+                }, 1500);
             } else {
-                const html = await response.text();
-                document.open();
-                document.write(html);
-                document.close();
+                // THẤT BẠI (mã 4xx hoặc 5xx)
+                // Ném lỗi với thông báo nhận được từ server
+                throw new Error(data.message || 'Có lỗi không xác định xảy ra.');
             }
         } catch (error) {
             console.error('Submit error:', error);

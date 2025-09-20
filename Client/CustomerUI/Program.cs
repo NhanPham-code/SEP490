@@ -15,15 +15,17 @@ builder.Services.AddAuthentication("CookieAuth")
     {
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        // THAY ĐỔI: Chuyển từ Strict sang Lax để cho phép redirect từ VNPay
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Login"; // Redirect khi chưa login
         options.AccessDeniedPath = "/AccessDenied";
     });
 
-// Session
+// CẤU HÌNH SESSION CHO VIỆC TÍCH HỢP VNPAY
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(24);
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

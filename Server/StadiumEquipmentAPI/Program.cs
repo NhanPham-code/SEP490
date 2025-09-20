@@ -9,6 +9,23 @@ using StadiumEquipmentAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+    {
+        policy.RequireRole("Customer");
+    });
+
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("StadiumManager", policy =>
+    {
+        policy.RequireRole("StadiumManager");
+    });
+});
 // ===== Controllers + OData =====
 builder.Services.AddControllers()
     .AddOData(options =>

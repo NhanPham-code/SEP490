@@ -36,11 +36,10 @@ namespace Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // ID của người tạo discount
         [Required]
         public string UserId { get; set; }
 
-        // Nếu null hoặc rỗng => áp dụng toàn hệ thống
-        public List<int>? StadiumIds { get; set; } = new();
+        // Quan hệ 1-nhiều tới bảng trung gian
+        public ICollection<DiscountStadium> DiscountStadiums { get; set; } = new List<DiscountStadium>();
     }
 }
