@@ -464,19 +464,32 @@
                     </div>
                 </div>
 
-                <div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingTraditional()">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
-                            <span class="text-2xl">📋</span>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân theo danh sách</h4>
-                            <p class="text-gray-600 text-sm">Phương thức truyền thống, ổn định và quen thuộc</p>
-                            <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Ổn định</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingTraditional()">
+					<div class="flex items-center space-x-4">
+						<div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+							<span class="text-2xl">📋</span>
+						</div>
+						<div class="flex-1">
+							<h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân theo danh sách</h4>
+							<p class="text-gray-600 text-sm">Phương thức truyền thống, ổn định và quen thuộc</p>
+							<span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Ổn định</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="booking-option bg-white rounded-2xl p-6 cursor-pointer" onclick="bookingMonthly()">
+					<div class="flex items-center space-x-4">
+						<div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
+							<span class="text-2xl">📋</span>
+						</div>
+						<div class="flex-1">
+							<h4 class="text-xl font-bold text-gray-800 mb-2">Đặt sân theo tháng</h4>
+							<p class="text-gray-600 text-sm">Phương thức truyền thống, ổn định và quen thuộc</p>
+							<span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Ổn định</span>
+						</div>
+					</div>
+				</div>
+			</div>
 
             <div class="text-center">
                 <button id="booking-modal-close-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300">
@@ -494,7 +507,78 @@
             </svg>
         </button>
     </div>
+    <div class="glass-effect rounded-3xl shadow-2xl p-8 md:p-12 max-w-6xl w-full mx-auto">
 
+        <div class="mb-10 text-center">
+            <h1 id="stadium-name" class="text-4xl md:text-5xl font-bold gradient-text mb-4 mt-4">@Model.Name</h1>
+            <div class="flex items-center justify-center mb-6">
+                <svg class="w-5 h-5 text-gray-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                <p id="stadium-address" class="text-gray-600">@Model.Address</p>
+            </div>
+
+            <div class="slider-container mb-10">
+                <div class="relative w-full h-80 overflow-hidden rounded-2xl">
+                    @if (Model.StadiumImages != null && Model.StadiumImages.Any())
+                    {
+                        foreach (var image in Model.StadiumImages)
+                        {
+                            <div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+                                <img src="https://localhost:7280/@image.ImageUrl" class="slider-image object-cover w-full h-full" alt="Hình ảnh sân @Model.Name">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+                                    <p class="text-sm">Hình ảnh sân vận động.</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        // Ảnh mặc định nếu không có ảnh nào
+                        <div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100">
+                            <img src="https://images.unsplash.com/photo-1541252260770-cefd4f3d2a7c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="slider-image object-cover w-full h-full" alt="Sân banh cỏ tự nhiên">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+                                <p class="text-sm">Sân cỏ chất lượng cao.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <a class="slider-prev absolute top-1/2 left-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-r-lg" onclick="plusSlides(-1)">❮</a>
+                <a class="slider-next absolute top-1/2 right-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-l-lg" onclick="plusSlides(1)">❯</a>
+            </div>
+            </br>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="info-card glass-effect p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="icon-circle">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" />
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm text-gray-500 font-medium">Giờ mở cửa</p>
+                            <p id="stadium-hours" class="font-semibold text-gray-800 text-lg">@operatingHours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-effect p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="icon-circle">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 6a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-4 6a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm7 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" />
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm text-gray-500 font-medium">Giá thuê sân</p>
+                            <p id="stadiumPrice" class="font-semibold text-gray-800 text-lg">@priceRange</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     <div class="glass-effect rounded-3xl shadow-2xl p-8 md:p-12 max-w-6xl w-full mx-auto">
         <!-- Booking Action Section -->
         <div class="action-section rounded-3xl shadow-lg p-8 mb-12 backdrop-filter backdrop-blur-sm">
@@ -619,14 +703,14 @@
 
                 <div id="feedback-count" class="text-center text-gray-600 mb-4"></div>
 
-                <!-- Feedback List -->
+            
                 <div id="feedbackList">
-                    <!-- Feedback items sẽ được load tại đây -->
+                   
                 </div>
 
-                <!-- ✅ Pagination Container -->
+             
                 <div id="pagination-container">
-                    <!-- Pagination controls sẽ được render tại đây -->
+                  
                 </div>
 
                 <div id="pagination-container" class="flex justify-center items-center space-x-2 mt-8"></div>
@@ -650,8 +734,9 @@
         let isEditMode = false;
         let currentFeedbackId = null;
         let currentUserId = null;
-
-        // ✅ Biến phân trang
+                    let slideIndex = 0;
+                    let slideTimer;
+     
         let currentPage = 1;
         let totalPages = 1;
         let totalCount = 0;
@@ -672,9 +757,9 @@
             getCurrentLocation(stadiumId);
         });
 
-        // ================================
-        // ✅ CHECK USER FEEDBACK (Updated)
-        // ================================
+      
+        //CHECK USER FEEDBACK 
+ 
         function checkUserFeedback(stadiumId) {
             $.ajax({
                 url: '/Feedback/GetMyFeedbackForStadium',
@@ -700,9 +785,9 @@
             });
         }
 
-        // ================================
-        // ✅ LOAD EXISTING FEEDBACK (Updated with Image Handling)
-        // ================================
+
+        //LOAD EXISTING FEEDBACK 
+
         function loadExistingFeedback(feedback) {
             console.log("Loading existing feedback:", feedback);
 
@@ -774,9 +859,7 @@
             }
         }
 
-        // ================================
-        // FORM FUNCTIONS
-        // ================================
+        
         function initializeFeedbackForm() {
             $('#feedback-form').on('submit', handleFeedbackSubmit);
 
@@ -897,7 +980,7 @@
                           if (response.success) {
             showModal('Thành công!', response.message);
 
-            // Chỉ cần load lại danh sách feedback, kiểm tra user feedback sau khi load xong
+          
             const pageToLoad = isEditMode ? currentPage : 1;
                     loadFeedbacks(stadiumId, pageToLoad);
         setTimeout(() => {
@@ -982,10 +1065,16 @@ loadFeedbacks(stadiumId, currentPage);
             $('#feedback-textarea').removeClass('border-red-500');
             $('#char-counter').removeClass('text-red-500');
         }
+		function bookingMonthly() {
+			window.location.href = `/Booking/MonthlyBooking?stadiumId=${stadiumId}`;
+		}
 
-        // ================================
-        // ✅ FEEDBACK LIST FUNCTIONS WITH PAGINATION
-        // ================================
+		function chatWithOwner() {
+			
+			window.location.href = `/Chat/Stadium/${stadiumId}`;
+		}
+
+       //Feedback List
         function loadFeedbacks(stadiumId, page = 1) {
             console.log("Loading feedbacks for stadium:", stadiumId, "page:", page);
 
@@ -1137,13 +1226,13 @@ loadFeedbacks(stadiumId, currentPage);
             $("#pagination-container").html(paginationHtml);
         }
 
-        // ✅ CREATE FEEDBACK HTML WITH IMAGE HANDLING
+        // CREATE FEEDBACK 
         function createFeedbackHtml(feedback) {
             const isMyFeedback = currentUserId && feedback.userId === currentUserId;
 
-            // ✅ Xử lý user info
+          
             const userName = feedback.userName || 'Anonymous';
-            const userAvatar = feedback.userAvatar; // Full URL từ Controller
+            const userAvatar = feedback.userAvatar; 
             const userInitial = userName.charAt(0).toUpperCase();
 
             return `
@@ -1209,9 +1298,7 @@ loadFeedbacks(stadiumId, currentPage);
                 </div>`;
         }
 
-        // ================================
-        // RATING FUNCTIONS
-        // ================================
+ 
         function initializeRatingStars() {
             document.querySelectorAll('#rating-stars .star').forEach(star => {
                 star.addEventListener('click', () => {
@@ -1250,9 +1337,7 @@ loadFeedbacks(stadiumId, currentPage);
             }
             return `<div class="flex items-center space-x-0.5">${stars}</div>`;
         }
-        // ================================
-        // UTILITY FUNCTIONS
-        // ================================
+       
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleString('vi-VN', {
@@ -1286,9 +1371,7 @@ loadFeedbacks(stadiumId, currentPage);
             }
         }
 
-        // ================================
-        // ✅ ENHANCED IMAGE MODAL WITH ERROR HANDLING
-        // ================================
+      
         window.openImageModal = function(imagePath) {
             // Kiểm tra imagePath trước khi mở modal
             if (!imagePath || imagePath.trim() === '') {
@@ -1331,9 +1414,7 @@ loadFeedbacks(stadiumId, currentPage);
             console.log('Failed to load modal image');
         };
 
-        // ================================
-        // FIREBASE CONFIGURATION
-        // ================================
+      
         const firebaseConfig = {
             apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
             authDomain: "chatbox-993b2.firebaseapp.com",
@@ -1346,9 +1427,7 @@ loadFeedbacks(stadiumId, currentPage);
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ================================
-        // MAP VARIABLES AND INITIALIZATION
-        // ================================
+       
         let userLat, userLng;
         let routingControl = null;
         const map = L.map('map').setView([0, 0], 13);
@@ -1358,9 +1437,7 @@ loadFeedbacks(stadiumId, currentPage);
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // ================================
-        // MAP FUNCTIONS
-        // ================================
+     //Map
         function addMarker(lat, lng, name, icon = "📍") {
             return L.marker([lat, lng]).addTo(map)
                 .bindTooltip(`${icon} ${name}`, { permanent: true, direction: 'top' })
@@ -1463,6 +1540,37 @@ loadFeedbacks(stadiumId, currentPage);
                 hideBookingModal();
             }
         }
+                    function showSlides() {
+                        let slides = document.getElementsByClassName("slider-item");
+                        if (slides.length === 0) return;
+
+                        for (let i = 0; i < slides.length; i++) {
+                            slides[i].style.opacity = "0";
+                        }
+                        slideIndex++;
+                        if (slideIndex > slides.length) { slideIndex = 1 }
+                        slides[slideIndex - 1].style.opacity = "1";
+                        slideTimer = setTimeout(showSlides, 4000);
+                    }
+
+                    function plusSlides(n) {
+                        let slides = document.getElementsByClassName("slider-item");
+                        if (slides.length === 0) return;
+                        clearTimeout(slideTimer);
+                        slideIndex += n;
+                        if (slideIndex > slides.length) {slideIndex = 1}
+                        if (slideIndex < 1) {slideIndex = slides.length}
+
+                        for (let i = 0; i < slides.length; i++) {
+                            slides[i].style.opacity = "0";
+                        }
+                        slides[slideIndex - 1].style.opacity = "1";
+                        slideTimer = setTimeout(showSlides, 4000); // Restart timer
+                    }
+                window.onload = function() {
+                        showSlides();
+                      
+                    };
     </script>
 
 </body>

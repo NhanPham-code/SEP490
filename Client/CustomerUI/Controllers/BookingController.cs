@@ -261,6 +261,24 @@ namespace CustomerUI.Controllers
 
             return View();
         }
+
+        [HttpPost]
+        public IActionResult MonthlyCheckout(MonthlyBookingFormViewModel model)
+        {
+            // Chuyển dữ liệu nhận được từ form sang ViewBag để view MonthlyCheckout.cshtml có thể sử dụng
+            ViewBag.Year = model.Year;
+            ViewBag.Month = model.Month;
+            ViewBag.SelectedDays = model.SelectedDays;
+            ViewBag.StartTime = model.StartTime;
+            ViewBag.EndTime = model.EndTime;
+            ViewBag.SelectedCourtIds = model.SelectedCourtIds;
+            ViewBag.TotalPrice = model.TotalPrice;
+            ViewBag.StadiumId = model.StadiumId;
+
+            // Trả về view cho trang checkout hàng tháng
+            return View();
+        }
+
         public async Task<IActionResult> BookingDetail(int id)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -393,6 +411,32 @@ namespace CustomerUI.Controllers
             // Trả về cùng một View "Booking.cshtml".
             return View();
         }
+
+        public IActionResult MonthlyBooking(string stadiumId)
+        {
+
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
+            // Kiểm tra xem stadiumId có hợp lệ không.
+            if (string.IsNullOrEmpty(stadiumId))
+            {
+                // Nếu không có ID, có thể chuyển hướng về action Booking() ban đầu
+                // hoặc trả về một trang lỗi.
+                return RedirectToAction("MonthlyBooking");
+            }
+
+            // Truyền stadiumId vào ViewBag để View có thể sử dụng.
+            ViewBag.StadiumId = stadiumId;
+
+            // Trả về cùng một View "Booking.cshtml".
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetBookedCourts(int stadiumId, DateTime date, int startHour, int endHour)
         {
@@ -550,6 +594,93 @@ namespace CustomerUI.Controllers
                 // _logger.LogError(ex, "Error occurred while getting court relations for parentId: {ParentId}", parentId);
 
                 return StatusCode(500, "An error occurred while processing your request");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime)
+        {
+            try
+            {
+                var result = await _bookingService.FilterByDateAndHour(year, month, days, startTime, endTime);
+
+                // Debug logging
+                Console.WriteLine($"Service returned: {result?.GetType().Name}");
+
+                // Make sure we're returning the correct JSON structure
+                return Ok(result); // Use Ok() instead of Json() to ensure proper serialization
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in FilterByDateAndHour: {ex.Message}");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterByCourtAndHour([FromQuery] List<int> courtIds, int year, int month, int startTime, int endTime)
+        {
+            try
+            {
+                // if (courtIds == null || !courtIds.Any())
+                // {
+                //     return BadRequest(new { error = "Cần cung cấp ít nhất một Court ID." });
+                // }
+
+                var result = await _bookingService.FilterByCourtAndHour(courtIds, year, month, startTime, endTime);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in FilterByCourtAndHour: {ex.Message}");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMonthlyBooking([FromForm] MonthlyBookingCreateDto bookingDto)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Common");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Log lỗi validation để dễ debug
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                }
+
+                TempData["ErrorMessage"] = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.";
+                // Chuyển hướng người dùng trở lại trang trước đó, lý tưởng nhất là trang form với dữ liệu đã nhập
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            try
+            {
+                var createdBooking = await _bookingService.CreateMonthlyBookingAsync(bookingDto, accessToken);
+
+                if (createdBooking != null)
+                {
+                    TempData["SuccessMessage"] = "Chúc mừng bạn đã đặt sân hàng tháng thành công!";
+                    return RedirectToAction("BookingHistory");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Tạo booking thất bại. Vui lòng thử lại.";
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+                return Redirect(Request.Headers["Referer"].ToString());
             }
         }
     }

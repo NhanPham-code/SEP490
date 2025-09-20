@@ -88,6 +88,7 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
+builder.Services.AddScoped<IMonthlyBookingRepository, MonthlyBookingRepository>();
 
 // Services
 builder.Services.AddScoped<IBookingService, BookingService>();

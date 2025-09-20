@@ -1,5 +1,4 @@
-
-{
+﻿{
   "Routes": [
     // === USER API ===
     {
@@ -277,7 +276,7 @@
           "Port": 7015
         }
       ],
-      "UpstreamPathTemplate": "/bookings/{everything}",
+      "UpstreamPathTemplate": "/bookings/history{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -298,13 +297,12 @@
       ],
       "UpstreamPathTemplate": "/bookings/booked",
       "UpstreamHttpMethod": [ "GET" ]
-      //"AuthenticationOptions": {
+      // "AuthenticationOptions": {
       //  "AuthenticationProviderKey": "Bearer",
-      //  "RequireAuthentication": true
-      //}
-      //"RouteClaimsRequirement": {
+      // }
+      // "RouteClaimsRequirement": {
       //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-      //}
+      // }
     },
     {
       "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
@@ -323,6 +321,52 @@
       },
       "RouteClaimsRequirement": {
         "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/filterbydateandhour",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/filterbydateandhour",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/filterbycourtandhour",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/filterbycourtandhour",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/monthly/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/monthly",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
       }
     },
     // === STADIUM API ===
@@ -455,6 +499,18 @@
       //}
     },
     {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7280
+        }
+      ],
+      "UpstreamPathTemplate": "/img/{everything}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/UpdateStadiumImage",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -487,10 +543,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
       }
-      //"RouteClaimsRequirement": {
-      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin|StadiumManager"
-      //}
     },
     {
       "DownstreamPathTemplate": "/api/DeleteImagesByImgId",
@@ -760,7 +816,6 @@
       "UpstreamPathTemplate": "/odata/FeedbackOData",
       "UpstreamHttpMethod": [ "Get" ]
     },
-
     // === DISCOUNT API ===
     {
       "DownstreamPathTemplate": "/odata/ODataDiscount",
@@ -786,7 +841,6 @@
       "UpstreamPathTemplate": "/odata/discounts/{everything}",
       "UpstreamHttpMethod": [ "GET" ]
     },
-
     {
       "DownstreamPathTemplate": "/api/discounts",
       "DownstreamScheme": "https",
@@ -859,7 +913,6 @@
       "UpstreamPathTemplate": "/discounts/stadium/{stadiumId}",
       "UpstreamHttpMethod": [ "GET" ]
     },
-
     // === FIND TEAM API ===
     // Team Post
     {
