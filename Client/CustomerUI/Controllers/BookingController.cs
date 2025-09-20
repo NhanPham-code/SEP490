@@ -1,5 +1,5 @@
-
-﻿using DTOs.BookingDTO;
+﻿
+using DTOs.BookingDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System;
@@ -235,6 +235,20 @@ namespace CustomerUI.Controllers
             ViewBag.StadiumId = request.StadiumId;
             ViewBag.Courts = request.Courts;
 
+            return View();
+        }
+
+        public IActionResult BookingSchedule()
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
+
+            // Trả về cùng một View "Booking.cshtml".
             return View();
         }
 
@@ -685,12 +699,41 @@ namespace CustomerUI.Controllers
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBookingsForWeek(DateTime startDate, DateTime endDate)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn." });
+            }
+
+            try
+            {
+                // Định dạng ngày theo chuẩn ISO 8601 UTC (yyyy-MM-ddTHH:mm:ssZ) mà API Ocelot cần
+                // Đặt endDate đến cuối ngày để bao gồm tất cả booking trong ngày đó
+                var startDateIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
+                var endDateIso = endDate.ToString("yyyy-MM-ddT23:59:59Z");
+
+                // Build query string dựa trên URL Postman bạn cung cấp
+                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso}&$expand=BookingDetails&$orderby=Date asc";
+
+                var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
+
+                if (bookings == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy booking nào." });
+                }
+
+                // Trả về dữ liệu dạng JSON
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetBookingsForWeek] Lỗi: {ex.Message}");
+                return StatusCode(500, new { message = "Lỗi server khi lấy dữ liệu booking." });
+            }
+        }
     }
 }
-
-﻿
-
-        // --- CreateBooking và các action khác giữ nguyên ---
-        
-        
-        

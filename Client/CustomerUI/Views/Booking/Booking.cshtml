@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,18 +12,21 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="~/css/Booking/Booking.css" />
 </head>
+
 <body class="min-h-screen bg-gray-50">
 
     <!-- Enhanced Modal -->
     <div id="custom-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">
         <div class="modal-content glass-effect rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4">
             <div class="text-center">
-                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <div
+                    class="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span class="text-white text-xl">✓</span>
                 </div>
                 <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
                 <p id="modal-message" class="text-gray-600 mb-4 leading-relaxed"></p>
-                <button id="modal-close-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                <button id="modal-close-btn"
+                    class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
                     Đóng
                 </button>
             </div>
@@ -46,7 +50,8 @@
                         📅 <span class="ml-2">Chọn ngày</span>
                     </label>
                     <div class="relative">
-                    <input type="date" id="date-picker" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
+                        <input type="date" id="date-picker"
+                            class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -54,11 +59,14 @@
                         🏟️ <span class="ml-2">Chọn loại sân</span>
                     </label>
                     <div class="relative">
-                        <select id="court-type-select" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 pr-10 rounded-xl shadow-sm text-gray-700 font-medium appearance-none">
+                        <select id="court-type-select"
+                            class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 pr-10 rounded-xl shadow-sm text-gray-700 font-medium appearance-none">
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                <path
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                             </svg>
                         </div>
                     </div>
@@ -112,17 +120,19 @@
                 <div class="hidden md:flex items-center space-x-4 text-sm">
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giờ mở cửa: <span id="footer-hours" class="font-semibold">06:00 - 22:00</span></span>
+                        <span class="text-gray-600">Giờ mở cửa: <span id="footer-hours" class="font-semibold">06:00 -
+                                22:00</span></span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giá thuê: <span id="footer-price" class="font-semibold">200.000 - 300.000 VNĐ/giờ</span></span>
+                        <span class="text-gray-600">Giá thuê: <span id="footer-price" class="font-semibold">200.000 -
+                                300.000 VNĐ/giờ</span></span>
                     </div>
                 </div>
 
                 <!-- Continue Button (Right) -->
                 <button id="continue-button" disabled
-                        class="bg-gray-400 cursor-not-allowed px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg">
+                    class="bg-gray-400 cursor-not-allowed px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg">
                     <span class="flex items-center">
                         🚀 <span class="ml-2">Tiếp tục đặt sân</span>
                     </span>
@@ -141,682 +151,208 @@
         <input type="hidden" name="StadiumId" />
     </form>
 
+    <!-- Các phần HTML và CSS giữ nguyên -->
     <script>
-        // Biến trạng thái toàn cục của ứng dụng
-        let stadiumData = null;
-        let startTime = null;
-        let endTime = null;
-        let selectedCourts = [];
-        let selectedCourtType = null;
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let bookedCourtIds = [];
-        let openTime;
-        let closeTime;
-        const now = new Date();
-        let isToday = selectedDate &&
-            now.toDateString() === new Date(selectedDate).toDateString();
-        let courtRelations = new Map();
-        let courtBookingStatus = new Map();
+        $(document).ready(function () {
+            // --- CÁC BIẾN VÀ HÀM CŨ ---
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            // Cập nhật slots để bao gồm start/end hour, giúp cho việc map dữ liệu
+            const slots = [
+                { id: 1, name: "Slot 1 (7:00 - 9:00)", startHour: 7, endHour: 9 },
+                { id: 2, name: "Slot 2 (9:00 - 11:00)", startHour: 9, endHour: 11 },
+                { id: 3, name: "Slot 3 (13:00 - 15:00)", startHour: 13, endHour: 15 },
+                { id: 4, name: "Slot 4 (15:00 - 17:00)", startHour: 15, endHour: 17 },
+                { id: 5, name: "Slot 5 (17:00 - 19:00)", startHour: 17, endHour: 19 },
+                { id: 6, name: "Slot 6 (19:00 - 21:00)", startHour: 19, endHour: 21 }
+            ];
 
-        // Lấy danh sách các loại sân duy nhất
-        function getCourtTypes() {
-            return [...new Set((stadiumData?.Courts || []).map(c => c.SportType))];
-        }
-
-        let allHours = [];
-
-        // get stadium data from server
-        const stadiumId = '@ViewBag.StadiumId';
-        console.log("StadiumId:", stadiumId);
-
-        // Lấy các element cần tương tác
-        const courtTypeSelectEl = document.getElementById('court-type-select');
-        const datePickerEl = document.getElementById('date-picker');
-        const timeButtonsContainerEl = document.getElementById('time-buttons-container');
-        const courtsContainerEl = document.getElementById('courts-container');
-        const timeDisplayEl = document.getElementById('time-display');
-        const continueButtonEl = document.getElementById('continue-button');
-        const footerHoursEl = document.getElementById('footer-hours');
-        const footerPriceEl = document.getElementById('footer-price');
-        const floatingInfoEl = document.getElementById('floating-info');
-        const bookingSummaryEl = document.getElementById('booking-summary');
-        let hasEnabledTime = false;
-
-        // Hàm hiển thị modal thông báo tùy chỉnh
-        function showModal(title, message) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
-            document.getElementById('custom-modal').style.display = 'flex';
-        }
-
-        // Hàm ẩn modal
-        function hideModal() {
-            document.getElementById('custom-modal').style.display = 'none';
-        }
-
-        // Hàm render thông tin sân vận động (simplified)
-        function renderStadiumInfo() {
-            // Convert OpenTime/CloseTime từ dạng ISO8601
-            const formatTime = (timeStr) => {
-                if (!timeStr) return '';
-                const match = timeStr.match(/PT(\d+)H/);
-                if (match) {
-                    let hour = parseInt(match[1], 10);
-                    return `${hour.toString().padStart(2, '0')}:00`;
-                }
-                return timeStr;
-            };
-
-            if (stadiumData) {
-                footerHoursEl.textContent = `${formatTime(stadiumData.OpenTime)} - ${formatTime(stadiumData.CloseTime)}`;
-                showPrice();
-            }
-        }
-
-        function showPrice() {
-            // Lấy tất cả giá theo giờ từ Courts
-            const prices = (stadiumData?.Courts || []).map(c => c.PricePerHour);
-            let priceText = '';
-
-            if (prices.length > 0) {
-                const minPrice = Math.min(...prices);
-                const maxPrice = Math.max(...prices);
-
-                if (minPrice === maxPrice) {
-                    priceText = `${minPrice.toLocaleString('vi-VN')} VNĐ/giờ`;
-                } else {
-                    priceText = `${minPrice.toLocaleString('vi-VN')} - ${maxPrice.toLocaleString('vi-VN')} VNĐ/giờ`;
+            function populateYears() {
+                const $yearSelect = $('#year');
+                for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                    $yearSelect.append($('<option>', { value: year, text: year, selected: year === currentYear }));
                 }
             }
 
-            footerPriceEl.textContent = priceText;
-        }
-
-        function parseHour(isoDuration) {
-            // VD: "PT6H" => 6
-            const match = isoDuration.match(/PT(\d+)H/);
-            return match ? parseInt(match[1], 10) : 0;
-        }
-
-        function handleTimeSelect(hour) {
-            if (startTime === null || (startTime !== null && endTime !== null)) {
-                startTime = hour;
-                endTime = null;
-            } else if (hour > startTime) {
-                endTime = hour;
-            } else {
-                startTime = hour;
-                endTime = null;
-            }
-            // Reset sân đã chọn khi thay đổi thời gian
-            selectedCourts = [];
-
-            // GỌI FETCH CHỈ KHI ĐỦ KHOẢNG GIỜ
-            if (startTime !== null && endTime !== null && endTime > startTime && stadiumData?.id) {
-                maybeFetchBookedCourts();
-            }
-            updateUI();
-        }
-
-        // Hàm cập nhật giao diện người dùng
-        function updateUI() {
-            // Cập nhật các nút giờ
-            renderTimeButtons();
-
-            // Lọc sân theo loại sân đã chọn
-            let filteredCourts = stadiumData.Courts;
-            if (selectedCourtType) {
-                filteredCourts = filteredCourts.filter(court => court.SportType === selectedCourtType);
+            function getWeeksInYear(year) {
+                const weeks = [];
+                const firstDayOfYear = new Date(year, 0, 1);
+                let firstMonday = new Date(firstDayOfYear);
+                const dayOfWeek = firstMonday.getDay() || 7;
+                if (dayOfWeek !== 1) {
+                    firstMonday.setDate(firstMonday.getDate() + (8 - dayOfWeek) % 7);
+                }
+                let currentMonday = new Date(firstMonday);
+                let weekNum = 1;
+                while (currentMonday.getFullYear() === year || (currentMonday.getFullYear() === year + 1 && currentMonday.getMonth() === 0 && currentMonday.getDate() <= 7)) {
+                    const endOfWeek = new Date(currentMonday);
+                    endOfWeek.setDate(currentMonday.getDate() + 6);
+                    weeks.push({
+                        weekNum: weekNum,
+                        startDate: new Date(currentMonday),
+                        endDate: new Date(endOfWeek),
+                        label: `${formatDate(currentMonday)} đến ${formatDate(endOfWeek)}`
+                    });
+                    currentMonday.setDate(currentMonday.getDate() + 7);
+                    weekNum++;
+                }
+                return weeks;
             }
 
-            let isContinueButtonEnabled = false;
+            function formatDate(date) {
+                return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+            }
 
-            if (startTime !== null && endTime !== null && endTime > startTime) {
-                const duration = endTime - startTime;
-
-                // Tính tổng giá từ danh sách sân được chọn
-                let totalPrice = 0;
-                selectedCourts.forEach(court => {
-                    totalPrice += court.PricePerHour * duration;
+            function populateWeeks(year) {
+                const weeks = getWeeksInYear(year);
+                const $weekSelect = $('#week');
+                $weekSelect.empty();
+                weeks.forEach((week, index) => {
+                    $weekSelect.append($('<option>', {
+                        value: index,
+                        text: `Tuần ${week.weekNum}: ${week.label}`,
+                        'data-start': week.startDate.toISOString(),
+                        'data-end': week.endDate.toISOString()
+                    }));
                 });
-
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const formattedDate = new Date(selectedDate).toLocaleDateString('vi-VN', dateOptions);
-
-                const totalDisplayPrice = totalPrice.toLocaleString('vi-VN');
-
-                // Update time display
-                timeDisplayEl.innerHTML = `
-                    <div class="flex flex-col md:flex-row items-center justify-center gap-2 text-center">
-                        <span class="text-gray-800 font-semibold">${formattedDate}</span>
-                        <span class="text-blue-600 font-bold">Từ ${startTime}:00 đến ${endTime}:00 (${duration} giờ)</span>
-                        <span class="text-green-600 text-lg font-bold">Tổng: ${totalDisplayPrice} VNĐ</span>
-                    </div>
-                `;
-
-                // Update floating info
-                updateFloatingInfo(formattedDate, startTime, endTime, duration, totalDisplayPrice);
-
-                // Nút Tiếp tục chỉ được bật nếu đã có ít nhất một sân được chọn
-                isContinueButtonEnabled = selectedCourts.length > 0;
-            } else {
-                timeDisplayEl.innerHTML = '<p class="text-gray-500">Vui lòng chọn khung giờ để xem thông tin</p>';
-                updateFloatingInfo();
-            }
-
-            // Cập nhật danh sách sân
-            renderCourts(filteredCourts);
-
-            // Cập nhật trạng thái nút "Tiếp tục"
-            if (isContinueButtonEnabled) {
-                continueButtonEl.disabled = false;
-                continueButtonEl.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                continueButtonEl.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-purple-600', 'hover:from-blue-700', 'hover:to-purple-700');
-            } else {
-                continueButtonEl.disabled = true;
-                continueButtonEl.classList.add('bg-gray-400', 'cursor-not-allowed');
-                continueButtonEl.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-purple-600', 'hover:from-blue-700', 'hover:to-purple-700');
-            }
-        }
-
-        function updateFloatingInfo(date = null, startTime = null, endTime = null, duration = null, total = null) {
-            if (date && startTime && endTime && duration && total) {
-                bookingSummaryEl.innerHTML = `
-                    <p class="font-medium text-gray-800">${date}</p>
-                    <p class="text-blue-600">${startTime}:00 - ${endTime}:00 (${duration}h)</p>
-                    <p class="text-green-600 font-bold">${total} VNĐ</p>
-                `;
-
-            } else {
-                bookingSummaryEl.innerHTML = '<p>Chưa có thông tin</p>';  
-            }
-        }
-
-        // Hàm render danh sách sân (grouped by sport type)
-        function renderCourts(courts) {
-            courtsContainerEl.innerHTML = '';
-
-            if (courts.length === 0) {
-                courtsContainerEl.innerHTML = `<p class="text-center text-gray-500 italic py-8">Không có sân nào phù hợp</p>`;
-                return;
-            }
-
-            const selectedCourtIds = selectedCourts.map(court => court.Id);
-
-            // Group courts by SportType
-            const groupedCourts = courts.reduce((acc, court) => {
-                if (!acc[court.SportType]) {
-                    acc[court.SportType] = [];
+                const currentWeekIndex = findCurrentWeekIndex(weeks);
+                if (currentWeekIndex >= 0) {
+                    $weekSelect.val(currentWeekIndex);
                 }
-                acc[court.SportType].push(court);
-                return acc;
-            }, {});
+                // Trigger change để load dữ liệu lần đầu
+                $weekSelect.trigger('change');
+            }
 
-            // Render each sport type group
-            Object.entries(groupedCourts).forEach(([sportType, courtsOfType]) => {
-                // Sport type header
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'mb-4 mt-6 first:mt-0';
-                headerDiv.innerHTML = `<h4 class="text-lg font-bold text-gray-800 mb-3">${sportType}</h4>`;
-                courtsContainerEl.appendChild(headerDiv);
+            function findCurrentWeekIndex(weeks) {
+                const today = new Date();
+                for (let i = 0; i < weeks.length; i++) {
+                    if (today >= weeks[i].startDate && today <= weeks[i].endDate) return i;
+                }
+                return 0;
+            }
 
-                // Courts grid for this sport type
-                const gridDiv = document.createElement('div');
-                gridDiv.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4';
+            // --- CÁC HÀM MỚI VÀ HÀM ĐƯỢC CẬP NHẬT ---
 
-                courtsOfType.forEach(court => {
-                    const isBlocked = !court.IsAvailable;
-                    const isBooked = bookedCourtIds.includes(parseInt(court.Id));
-                    const isAvailable = (startTime !== null && endTime !== null && endTime > startTime) && !isBooked;
-                    const isSelected = selectedCourts.some(selected => selected.Id === court.Id);
-                    const isRelated = isRelatedCourt(court.Id, selectedCourtIds);
-
-                    const courtDiv = document.createElement('div');
-                    let courtStatusClass = 'border-gray-200';
-                    let backgroundClass = 'bg-white';
-                    let textColorClass = 'text-gray-800';
-
-                    // Xác định màu sắc dựa trên trạng thái
-                    if (isBlocked) {
-                        courtStatusClass = 'border-gray-400';
-                        backgroundClass = 'bg-gray-100';
-                        textColorClass = 'text-gray-500';
-                    } else if (isSelected) {
-                        courtStatusClass = 'border-blue-500';
-                        backgroundClass = 'bg-blue-50';
-                        textColorClass = 'text-blue-800';
-                    } else if (isRelated) {
-                        courtStatusClass = 'border-orange-400';
-                        backgroundClass = 'bg-orange-50';
-                        textColorClass = 'text-orange-800';
-                    } else if (isAvailable) {
-                        courtStatusClass = 'border-green-400';
-                        textColorClass = 'text-green-800';
-                    } else if (isBooked) {
-                        courtStatusClass = 'border-red-400';
-                        textColorClass = 'text-red-800';
+            // 1. Cập nhật hàm generateTableRows để tạo ID cho từng ô
+            function generateTableRows() {
+                const $tbody = $('#booking-table tbody');
+                $tbody.empty();
+                slots.forEach(slot => {
+                    const $row = $('<tr>');
+                    $row.append($('<td>').text(slot.name).addClass('slot-cell'));
+                    for (let i = 0; i < 7; i++) {
+                        const dayIndex = (i + 1) % 7; // Thứ 2=1, ... CN=0
+                        // Tạo ID duy nhất cho mỗi ô: slotId-dayIndex (e.g., "1-1" for Slot 1, Monday)
+                        const cellId = `cell-${slot.id}-${dayIndex}`;
+                        $row.append($('<td>').attr('id', cellId).addClass('booking-cell').text('-'));
                     }
+                    $tbody.append($row);
+                });
+            }
 
-                    courtDiv.className = `court-card ${backgroundClass} rounded-lg border-2 ${courtStatusClass} p-3 cursor-pointer`;
+            // 2. Hàm mới để gọi AJAX và lấy dữ liệu
+            function fetchAndDisplayBookings(startDate, endDate) {
+                console.log(`Đang tải dữ liệu từ ${startDate} đến ${endDate}`);
+                $('#no-data-message').hide(); // Ẩn thông báo cũ
+                $('.booking-cell').html('<div class="loader"></div>'); // Hiển thị loader
 
-                    // Xác định xem có thể click được không
-                    const canClick = isAvailable && !isBlocked && (!isRelated || isSelected);
+                $.ajax({
+                    url: '@Url.Action("GetBookingsForWeek", "Booking")',
+                    type: 'GET',
+                    data: {
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString()
+                    },
+                    success: function (bookings) {
+                        console.log("Dữ liệu nhận được:", bookings);
+                        displayBookingsOnTable(bookings);
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi khi tải dữ liệu:", xhr.responseText);
+                        $('.booking-cell').text('-').removeClass('booked');
+                        $('#no-data-message').show();
+                    }
+                });
+            }
 
-                    if (canClick) {
-                        courtDiv.addEventListener('click', () => {
-                            const courtId = court.Id;
-                            let courtIndex = selectedCourts.findIndex(selected => selected.Id === court.Id);
+            // 3. Hàm mới để hiển thị dữ liệu lên bảng
+            function displayBookingsOnTable(bookings) {
+                // Reset bảng về trạng thái ban đầu
+                $('.booking-cell').text('-').removeClass('booked');
 
-                            if (courtIndex !== -1) {
-                                selectedCourts.splice(courtIndex, 1);
-                                updateUI();
-                            } else {
-                                fetchCourtRelationData(courtId, () => {
-                                    selectedCourts.push(court);
-                                    updateUI();
-                                });
+                if (!bookings || bookings.length === 0) {
+                    $('#no-data-message').show();
+                    return;
+                }
+
+                bookings.forEach(booking => {
+                    const bookingDate = new Date(booking.date);
+                    const dayOfWeek = bookingDate.getDay(); // CN=0, T2=1, ..., T7=6
+
+                    if (booking.bookingDetails && booking.bookingDetails.length > 0) {
+                        booking.bookingDetails.forEach(detail => {
+                            const startHour = detail.startTime.hour;
+                            const endHour = detail.endTime.hour;
+
+                            // Tìm slot tương ứng
+                            const slot = slots.find(s => s.startHour === startHour && s.endHour === endHour);
+                            if (slot) {
+                                const cellId = `#cell-${slot.id}-${dayOfWeek}`;
+                                const $cell = $(cellId);
+
+                                if ($cell.length) {
+                                    // Nếu ô vẫn là '-' thì cập nhật, ngược lại thì thêm vào
+                                    if ($cell.text() === '-') {
+                                        $cell.html(''); // Xóa dấu '-'
+                                    }
+                                    // Thêm thông tin sân đã đặt
+                                    $cell.append(`<div class="court-chip">Sân ${detail.courtId}</div>`);
+                                    $cell.addClass('booked');
+                                }
                             }
                         });
-                    } else {
-                        courtDiv.classList.add('opacity-60', 'cursor-not-allowed');
-                    }
-
-                    if (isSelected) {
-                        courtDiv.classList.add('ring-2', 'ring-blue-500', 'ring-offset-1');
-                    }
-
-                    courtDiv.innerHTML = `
-                        <div class="text-center">
-                            <h5 class="font-bold ${textColorClass} mb-1">${court.Name}</h5>
-                            <p class="text-xs font-semibold ${textColorClass} mb-2">${court.PricePerHour.toLocaleString()}đ/giờ</p>
-                            ${getCourtStatusBadge(isBooked, startTime, endTime, isRelated, isSelected, court.Id, isBlocked)}
-                        </div>
-                    `;
-
-                    gridDiv.appendChild(courtDiv);
-                });
-
-                courtsContainerEl.appendChild(gridDiv);
-            });
-        }
-
-        function getCourtStatusBadge(isBooked, startTime, endTime, isRelated, isSelected, courtId, isBlocked) {
-            const hasRange = (startTime !== null && endTime !== null && endTime > startTime);
-
-            if (isBlocked) {
-                return '<span class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">Không khả dụng</span>';
-            } else if (!hasRange) {
-                return '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">Chọn giờ</span>';
-            } else if (isSelected) {
-                return '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Đã chọn</span>';
-            } else if (isRelated) {
-                return '<span class="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full">Liên quan</span>';
-            } else if (isBooked) {
-                return '<span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full">Đã đặt</span>';
-            } else {
-                return '<span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Có thể đặt</span>';
-            }
-        }
-
-        // Hàm render các nút giờ (compact)
-        function renderTimeButtons() {
-            timeButtonsContainerEl.innerHTML = '';
-
-            allHours.forEach(hour => {
-                const button = document.createElement('button');
-                button.textContent = `${hour}:00`;
-                button.className = `time-button px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300`;
-                button.onclick = () => handleTimeSelect(hour);
-
-                if (isToday) {
-                    if (
-                        hour < now.getHours() ||
-                        (hour === now.getHours() && now.getMinutes() > 0) ||
-                        hour > closeTime
-                    ) {
-                        button.disabled = true;
-                        button.classList.add('opacity-50', 'cursor-not-allowed');
-                        button.classList.remove('hover:bg-gray-300');
-                    } else {
-                        hasEnabledTime = true;
-                    }
-                }
-
-                if (startTime !== null && endTime !== null && hour >= startTime && hour < endTime) {
-                    button.classList.add('bg-blue-200', 'text-blue-800');
-                    button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                }
-
-                if (hour === startTime || hour === endTime) {
-                    button.classList.add('selected', 'bg-blue-600', 'text-white');
-                    button.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                }
-
-                timeButtonsContainerEl.appendChild(button);
-            });
-        }
-
-        // Simplified court relation and booking functions
-        function fetchCourtRelationData(courtId, callback) {
-            if (!courtId) {
-                console.error("Court ID is missing.");
-                return;
-            }
-
-            if (courtRelations.has(courtId)) {
-                if (callback) callback();
-                return;
-            }
-
-            courtRelations.set(courtId, []);
-            let completedRequests = 0;
-            const totalRequests = 2;
-
-            function checkComplete() {
-                completedRequests++;
-                if (completedRequests === totalRequests) {
-                    if (callback) callback();
-                }
-            }
-
-            $.ajax({
-                url: "/Booking/GetAllCourtRelationByParentId",
-                type: "GET",
-                data: { parentId: courtId },
-                success: function (parentData) {
-                    const childCourtIds = parentData.map(item => item.childCourtId);
-                    const currentRelations = courtRelations.get(courtId);
-                    childCourtIds.forEach(childId => {
-                        if (!currentRelations.includes(childId)) {
-                            currentRelations.push(childId);
-                        }
-                    });
-                    checkComplete();
-                },
-                error: function () {
-                    checkComplete();
-                }
-            });
-
-            $.ajax({
-                url: "/Booking/GetAllCourtRelationBychildId",
-                type: "GET",
-                data: { childId: courtId },
-                success: function (childData) {
-                    const parentCourtIds = childData.map(item => item.parentCourtId);
-                    const currentRelations = courtRelations.get(courtId);
-                    parentCourtIds.forEach(parentId => {
-                        if (!currentRelations.includes(parentId)) {
-                            currentRelations.push(parentId);
-                        }
-                    });
-                    checkComplete();
-                },
-                error: function () {
-                    checkComplete();
-                }
-            });
-        }
-
-        function getRelatedCourts(courtId) {
-            return courtRelations.get(courtId) || [];
-        }
-
-        function isRelatedCourt(courtId, selectedCourtIds) {
-            if (selectedCourtIds.includes(courtId)) {
-                return false;
-            }
-
-            for (let selectedCourtId of selectedCourtIds) {
-                const relatedCourts = getRelatedCourts(selectedCourtId);
-                if (relatedCourts.includes(courtId)) {
-                    return true;
-                }
-
-                const currentCourtRelations = getRelatedCourts(courtId);
-                if (currentCourtRelations.includes(selectedCourtId)) {
-                    return true;
-                }
-            }
-
-            for (let bookedId of bookedCourtIds) {
-                if (selectedCourtIds.includes(bookedId)) {
-                    continue;
-                }
-                const relatedToBooked = getRelatedCourts(bookedId);
-                if (relatedToBooked.includes(courtId)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        function setupCourtTypeSelection() {
-            const types = getCourtTypes();
-            courtTypeSelectEl.innerHTML = '';
-            const allOption = document.createElement('option');
-            allOption.value = '';
-            allOption.textContent = 'Tất cả các sân';
-            courtTypeSelectEl.appendChild(allOption);
-
-            types.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                courtTypeSelectEl.appendChild(option);
-            });
-
-            courtTypeSelectEl.addEventListener('change', (e) => {
-                selectedCourtType = e.target.value || null;
-                selectedCourts = [];
-                startTime = null;
-                endTime = null;
-                updateUI();
-            });
-        }
-
-        function setupDatePicker() {
-            datePickerEl.value = selectedDate;
-            datePickerEl.min = selectedDate;
-
-            datePickerEl.addEventListener('change', (e) => {
-                selectedDate = e.target.value;
-                startTime = null;
-                endTime = null;
-                selectedCourts = [];
-                updateUI();
-            });
-        }
-
-        function fetchBookedCourts(stadiumId, date, startHour, endHour) {
-            function safeParseInt(value, defaultValue = null) {
-                const parsed = parseInt(value, 10);
-                return isNaN(parsed) ? defaultValue : parsed;
-            }
-
-            const parsedStadiumId = safeParseInt(stadiumId);
-            if (parsedStadiumId === null) {
-                console.error("Stadium ID không hợp lệ:", stadiumId);
-                return;
-            }
-
-            $.ajax({
-                url: `/Booking/GetBookedCourts`,
-                method: "GET",
-                data: {
-                    stadiumId: parsedStadiumId,
-                    date: date,
-                    startHour: startHour,
-                    endHour: endHour
-                },
-                success: function (data) {
-                    clearBookingStatusCache();
-
-                    if (data && data.length > 0) {
-                        const bookedCourtsTemp = [];
-                        data.forEach(booking => {
-                            if (booking.bookingDetails && booking.bookingDetails.length > 0) {
-                                booking.bookingDetails.forEach(detail => {
-                                    bookedCourtsTemp.push(detail.courtId);
-                                    updateCourtBookingStatus(detail.courtId, booking.status, {
-                                        bookingId: booking.id,
-                                        userId: booking.userId,
-                                        date: booking.date,
-                                        startTime: booking.startTime,
-                                        endTime: booking.endTime,
-                                        totalAmount: booking.totalAmount
-                                    });
-                                });
-                            }
-                        });
-
-                        const uniqueBookedCourtIds = [...new Set(bookedCourtsTemp)];
-                        bookedCourtIds = uniqueBookedCourtIds;
-
-                        const relationPromises = uniqueBookedCourtIds.map(courtId => {
-                            return new Promise(resolve => {
-                                fetchCourtRelationData(courtId, () => {
-                                    const relatedCourts = getRelatedCourts(courtId);
-                                    relatedCourts.forEach(relatedCourtId => {
-                                        if (!getCourtBookingStatus(relatedCourtId)) {
-                                            updateCourtBookingStatus(relatedCourtId, 'accepted', null);
-                                        }
-                                        if (!bookedCourtIds.includes(relatedCourtId)) {
-                                            bookedCourtIds.push(relatedCourtId);
-                                        }
-                                    });
-                                    resolve();
-                                });
-                            });
-                        });
-
-                        Promise.all(relationPromises).then(() => {
-                            updateUI();
-                        }).catch(() => {
-                            updateUI();
-                        });
-                    } else {
-                        updateUI();
-                    }
-                },
-                error: function () {
-                    showModal('Lỗi', 'Không thể lấy thông tin sân đã đặt.');
-                }
-            });
-        }
-
-        function maybeFetchBookedCourts() {
-            if (
-                stadiumData?.Id &&
-                selectedDate &&
-                startTime !== null &&
-                endTime !== null &&
-                endTime > startTime
-            ) {
-                fetchBookedCourts(stadiumData.Id, selectedDate, startTime, endTime);
-            }
-        }
-
-        function clearBookingStatusCache() {
-            courtBookingStatus.clear();
-            bookedCourtIds = [];
-        }
-
-        function updateCourtBookingStatus(courtId, status, bookingInfo = null) {
-            courtBookingStatus.set(courtId, {
-                status: status,
-                bookingInfo: bookingInfo,
-                updatedAt: new Date().toISOString()
-            });
-        }
-
-        function getCourtBookingStatus(courtId) {
-            return courtBookingStatus.get(courtId) || null;
-        }
-
-        function showCheckoutPage() {
-            if (selectedCourts.length === 0 || startTime === null || endTime === null) {
-                showModal('Thông báo', 'Vui lòng chọn đầy đủ thông tin: ngày, giờ và ít nhất một sân.');
-                return;
-            }
-
-            const duration = endTime - startTime;
-
-            let totalPrice = 0;
-            const courtIds = selectedCourts.map(court => {
-                totalPrice += court.PricePerHour * duration;
-                return court.Id;
-            }).join(',');
-
-            const form = document.getElementById('bookingForm');
-            form.Date.value = selectedDate;
-            form.StartTime.value = startTime;
-            form.EndTime.value = endTime;
-            form.TotalPrice.value = totalPrice;
-            form.CourtId.value = courtIds;
-            form.StadiumId.value = stadiumData.Id;
-
-            form.submit();
-        }
-
-        function fetchStadiumData(id) {
-            const searchTerm = `&$filter=Id eq ${id}`;
-
-            $.ajax({
-                url: `/Home/Stadiums`,
-                type: 'GET',
-                data: { searchTerm: searchTerm },
-                success: function(data) {
-                    if (data.value && data.value.length > 0) {
-                        stadiumData = data.value[0];
-                        openTime = parseHour(stadiumData.OpenTime);
-                        closeTime = parseHour(stadiumData.CloseTime);
-                        allHours = Array.from(
-                            { length: closeTime - openTime + 1 },
-                            (_, i) => i + openTime
-                        );
-                        renderStadiumInfo();
-                        setupCourtTypeSelection();
-                        setupDatePicker();
-                        updateUI();
-                    } else {
-                        console.error('Không tìm thấy dữ liệu sân vận động.');
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Lỗi khi tải dữ liệu sân vận động:', textStatus, errorThrown);
-                }
-            });
-        }
-
-        // Khởi tạo ứng dụng
-        window.onload = function() {
-            fetchStadiumData(stadiumId);
-            continueButtonEl.onclick = showCheckoutPage;
-            document.getElementById('modal-close-btn').onclick = hideModal;
-
-            if (datePickerEl) {
-                datePickerEl.addEventListener("change", function () {
-                    selectedDate = this.value;
-                    isToday = selectedDate && now.toDateString()
-                            === new Date(selectedDate).toDateString();
-                    renderTimeButtons();
-                    updateUI();
-
-                    if (startTime !== null && endTime !== null && stadiumData?.Id) {
-                        selectedDate = this.value;
-                        maybeFetchBookedCourts();
                     }
                 });
+                // Xóa loader khỏi các ô không có booking
+                $('.booking-cell:not(.booked)').text('-');
             }
 
-            timeButtonsContainerEl.addEventListener('click', function(e) {
-                if (e.target.classList.contains('time-button')) {
-                    maybeFetchBookedCourts();
-                }
+            // 4. Cập nhật hàm này để gọi fetchAndDisplayBookings
+            function updateTableDates() {
+                const selectedOption = $('#week option:selected');
+                if (selectedOption.length === 0) return;
+
+                const startDate = new Date(selectedOption.data('start'));
+                const endDate = new Date(selectedOption.data('end'));
+
+                // Cập nhật header ngày
+                $('.day-header').each(function () {
+                    const dayIndex = parseInt($(this).data('day'));
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + (dayIndex - 1 + 7) % 7);
+                    $(this).find('.date-display').text(formatDate(date));
+                });
+
+                // Gọi hàm lấy dữ liệu
+                fetchAndDisplayBookings(startDate, endDate);
+            }
+
+            // --- EVENT HANDLERS ---
+            $('#year').on('change', function () {
+                const selectedYear = parseInt($(this).val());
+                populateWeeks(selectedYear);
             });
-        };
+
+            $('#week').on('change', function () {
+                updateTableDates();
+            });
+
+            // --- KHỞI TẠO ---
+            generateTableRows();
+            populateYears();
+            populateWeeks(currentYear); // Hàm này sẽ tự động trigger 'change' và load dữ liệu
+        });
     </script>
 </body>
+
 </html>
