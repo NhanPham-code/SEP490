@@ -1,5 +1,5 @@
-﻿using DiscountAPI.DTO;
-using DTOs.DiscountDTO;
+﻿using DTOs.DiscountDTO;
+using DTOs.OData;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,7 +22,7 @@ namespace Service.Interfaces
         // Corrected DTO type for Update
         Task<bool> UpdateDiscountAsync(string accessToken, UpdateDiscountDTO dto);
 
-        Task<ODataResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
+        Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
             string accessToken,
             int? userId,
             int page = 1,
