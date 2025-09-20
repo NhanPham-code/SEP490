@@ -2,6 +2,7 @@
 using DTOs.UserDTO;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Service.BaseService;
 using Service.Interfaces;
 using System;
@@ -292,6 +293,103 @@ namespace Service.Services
                 // Trả về danh sách rỗng hoặc ném lại lỗi tùy theo yêu cầu của ứng dụng
                 return new List<PublicUserProfileDTO>();
             }
+        }
+
+        public async Task<OdataHaveCountResponse<AdminUserProfileDTO>> GetUsersForAdmin(string accessToken, UserSearchRequestDTO request)
+        {
+            var odataFilter = BuildODataFilter(request); // Giữ nguyên logic này
+            var skip = (request.Page - 1) * request.PageSize;
+            var top = request.PageSize;
+
+            var requestUrl = $"/adminUsers/get?$filter={odataFilter}&$skip={skip}&$top={top}&$orderby=CreatedDate desc&$count=true";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                response.EnsureSuccessStatusCode();
+
+                string jsonString = await response.Content.ReadAsStringAsync();
+
+                var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<AdminUserProfileDTO>>(jsonString);
+
+                return result ?? new OdataHaveCountResponse<AdminUserProfileDTO>();
+            } catch (HttpRequestException e)
+            {
+                // (Tùy chọn) Ghi log lỗi ở đây
+                Console.WriteLine($"An error occurred: {e.Message}");
+                return new OdataHaveCountResponse<AdminUserProfileDTO>();
+            }
+            
+        }
+
+        private string BuildODataFilter(UserSearchRequestDTO request)
+        {
+            var filters = new List<string>();
+
+            // Filter theo SearchTerm (email hoặc SĐT)
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var term = request.SearchTerm.Trim().ToLower();
+                filters.Add($"(contains(tolower(email), '{term}') or contains(phoneNumber, '{term}'))");
+            }
+
+            // Filter theo tháng đăng ký
+            if (!string.IsNullOrWhiteSpace(request.Month) && request.Month.Contains('-'))
+            {
+                var parts = request.Month.Split('-');
+                if (int.TryParse(parts[0], out int year) && int.TryParse(parts[1], out int month))
+                {
+                    filters.Add($"(year(CreatedDate) eq {year} and month(CreatedDate) eq {month})");
+                }
+            }
+
+            // Filter theo trạng thái
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                if (request.Status.ToLower() == "active")
+                {
+                    filters.Add($"IsActive eq true");
+                } else if (request.Status.ToLower() == "banned")
+                {
+                    filters.Add($"IsActive eq false");
+                }
+            }
+
+            // Filter theo vai trò
+            if (!string.IsNullOrWhiteSpace(request.Role))
+            {
+                filters.Add($"Role eq '{request.Role}'");
+            }
+
+            return string.Join(" and ", filters);
+        }
+
+        public async Task<AdminUserStatsDTO> GetUserStats(string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await _httpClient.GetAsync("/adminUsers/stats");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<AdminUserStatsDTO>();
+        }
+
+        public async Task<bool> BanUserAsync(int userId, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await  _httpClient.PutAsJsonAsync($"/adminUsers/ban/{userId}", userId);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> UnbanUserAsync(int userId, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await _httpClient.PutAsJsonAsync($"/adminUsers/unban/{userId}", userId);
+
+            return response.IsSuccessStatusCode;
         }
     }
 }

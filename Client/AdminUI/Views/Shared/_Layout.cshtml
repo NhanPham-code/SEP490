@@ -11,8 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <link href="~/css/admin-dashboard.css" rel="stylesheet" />
-
+    <link href="~/css/layout_admin-dashboard.css" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
@@ -98,7 +97,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Admin/Users" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" data-section="users">
+                        <a asp-controller="Account" asp-action="UserManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" data-section="users">
                             <i class="ri-user-line"></i>
                             <span>Quản Lý Người Dùng</span>
                             @if (ViewContext.RouteData.Values["action"]?.ToString() == "Users")

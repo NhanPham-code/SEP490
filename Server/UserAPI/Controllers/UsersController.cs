@@ -358,5 +358,65 @@ namespace UserAPI.Controllers
                 return StatusCode(500, new { message = "An error occurred while resetting password.", error = ex.Message });
             }
         }
+
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetAdminUserStats()
+        {
+            try
+            {
+                var stats = await _userService.GetAdminUserStatsAsync();
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching user statistics.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("ban/{userId}")]
+        public async Task<IActionResult> BanUser(int userId)
+        {
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID." });
+            }
+
+            try
+            {
+                await _userService.BanUserAsync(userId);
+                return Ok(new { message = "User banned successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while banning the user.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("unban/{userId}")]
+        public async Task<IActionResult> UnbanUser(int userId)
+        {
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID." });
+            }
+
+            try
+            {
+                await _userService.UnbanUserAsync(userId);
+                return Ok(new { message = "User unbanned successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while unbanning the user.", error = ex.Message });
+            }
+        }
     }
 }

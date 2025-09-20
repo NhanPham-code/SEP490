@@ -29,6 +29,8 @@ IEdmModel GetEdmModel()
     // Vẫn đăng ký EntitySet cho User (entity gốc từ DB)
     odataBuilder.EntitySet<User>("ODataUsers"); // <--- Tên EntitySet là "ODataUsers" giống như route của ODataUsersController
 
+    odataBuilder.EntitySet<User>("ODataAdminUsers");
+
     // Rất quan trọng: Đăng ký ReadUserDTO là một EntityType hoặc ComplexType
     // Việc này giúp OData hiểu cấu trúc của DTO cho các phép chiếu và metadata.
     // Nếu ReadUserDTO có một thuộc tính đóng vai trò là key (ví dụ UserId),
@@ -37,6 +39,8 @@ IEdmModel GetEdmModel()
     odataBuilder.EntityType<PrivateUserProfileDTO>(); // <--- Thêm dòng này
 
     odataBuilder.EntityType<PublicUserProfileDTO>();
+
+    odataBuilder.EntityType<AdminUserProfileDTO>();
 
     return odataBuilder.GetEdmModel();
 }

@@ -18,6 +18,8 @@ namespace UserAPI.Mapper
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
 
+            CreateMap<User, AdminUserProfileDTO>();
+
             CreateMap<CustomerRegisterRequestDTO, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());

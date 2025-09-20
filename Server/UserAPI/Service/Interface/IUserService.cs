@@ -33,5 +33,11 @@ namespace UserAPI.Service.Interface
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO);
 
         Task<LoginResponseDTO> LoginOrRegisterWithGoogleAsync(GoogleUserInfoDTO googleUser);
+
+        Task<AdminUserStatsDTO> GetAdminUserStatsAsync();
+
+        Task BanUserAsync(int userId);
+
+        Task UnbanUserAsync(int userId);
     }
 }

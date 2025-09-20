@@ -126,6 +126,66 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/odata/ODataAdminUsers",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/get",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/stats",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/stats",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/ban/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/ban/{userId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/unban/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/unban/{userId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/profile",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

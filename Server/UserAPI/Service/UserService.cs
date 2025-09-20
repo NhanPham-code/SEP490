@@ -669,5 +669,34 @@ namespace UserAPI.Service
                 AvatarUrl = user.AvatarUrl
             };
         }
+
+        public async Task<AdminUserStatsDTO> GetAdminUserStatsAsync()
+        {
+            return await _userRepository.GetAdminUserStatsAsync();
+        }
+
+        public async Task BanUserAsync(int userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            user.IsActive = false;
+            await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task UnbanUserAsync(int userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            user.IsActive = true;
+            await _userRepository.UpdateUserAsync(user);
+        }
     }
 }

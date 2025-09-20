@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UserAPI.Data;
+using UserAPI.DTOs;
 using UserAPI.Model;
 using UserAPI.Repository.Interface;
 namespace UserAPI.Repository
@@ -68,6 +69,26 @@ namespace UserAPI.Repository
                 return null;
             }
             return user;
+        }
+
+        public async Task<AdminUserStatsDTO> GetAdminUserStatsAsync()
+        {
+            // Query DB với Entity Framework hoặc Dapper...
+            var now = DateTime.UtcNow;
+            var monthStart = new DateTime(now.Year, now.Month, 1);
+
+            var totalUsers = await _context.Users.CountAsync();
+            var activeUsers = await _context.Users.CountAsync(u => u.IsActive);
+            var bannedUsers = await _context.Users.CountAsync(u => !u.IsActive);
+            var newUsersThisMonth = await _context.Users.CountAsync(u => u.CreatedDate >= monthStart);
+
+            return new AdminUserStatsDTO
+            {
+                TotalUsers = totalUsers,
+                ActiveUsers = activeUsers,
+                BannedUsers = bannedUsers,
+                NewUsersThisMonth = newUsersThisMonth
+            };
         }
     }
 }
