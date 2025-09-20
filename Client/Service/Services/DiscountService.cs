@@ -5,8 +5,8 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DiscountAPI.DTO;
 using DTOs.DiscountDTO;
+using DTOs.OData;
 using Service.BaseService;
 using Service.Interfaces;
 
@@ -67,7 +67,10 @@ namespace Service.Services
         public async Task<ReadDiscountDTO?> CreateDiscountAsync(string accessToken, CreateDiscountDTO dto)
         {
             AddBearerAccessToken(accessToken);
+
             var response = await _httpClient.PostAsJsonAsync("/discounts", dto);
+            var userId = dto.UserId;
+            Console.WriteLine($"------------------------------------------------{userId}");
             if (!response.IsSuccessStatusCode) return null;
 
             return await response.Content.ReadFromJsonAsync<ReadDiscountDTO>();
@@ -88,7 +91,7 @@ namespace Service.Services
         /// <summary>
         /// Lấy danh sách discount qua OData với lọc, phân trang, count
         /// </summary>
-        public async Task<ODataResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
+        public async Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
             string accessToken,
             int? userId,
             int page = 1,
@@ -98,7 +101,7 @@ namespace Service.Services
             bool? isActive = null)
         {
             AddBearerAccessToken(accessToken);
-
+            Console.WriteLine($"------------------------------------------------{userId}");
             var filters = new List<string> { $"userId eq '{userId}'" };
 
             if (!string.IsNullOrEmpty(searchByCode))
@@ -124,7 +127,7 @@ namespace Service.Services
             var response = await _httpClient.GetAsync(requestUrl);
             if (!response.IsSuccessStatusCode) return null;
 
-            return await response.Content.ReadFromJsonAsync<ODataResponse<ReadDiscountDTO>>();
+            return await response.Content.ReadFromJsonAsync<OdataHaveCountResponse<ReadDiscountDTO>>();
         }
     }
 }
