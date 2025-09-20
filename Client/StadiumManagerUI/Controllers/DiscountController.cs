@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using DTOs.DiscountDTO;
 using DTOs.StadiumDTO;
 using StadiumManagerUI.Helpers;
-using DiscountAPI.DTO;
+
 
 namespace StadiumManagerUI.Controllers
 {
@@ -45,6 +45,12 @@ namespace StadiumManagerUI.Controllers
             }
 
             var userId = HttpContext.Session.GetInt32("UserId");
+            Console.WriteLine($"------------------------------------------------{userId}");
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
 
             // Gọi service để lấy discount (OData)
             var discountsResponseTask = _discountService.GetDiscountsByUserAsync(
@@ -105,6 +111,7 @@ namespace StadiumManagerUI.Controllers
             }
 
             var userId = HttpContext.Session.GetInt32("UserId");
+
             dto.UserId = userId + "";
 
             var createdDiscount = await _discountService.CreateDiscountAsync(accessToken, dto);
