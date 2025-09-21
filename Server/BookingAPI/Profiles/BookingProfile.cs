@@ -18,6 +18,15 @@ namespace BookingAPI.Profiles
             CreateMap<BookingDetailCreateDto, BookingDetail>();
             CreateMap<BookingDetail, BookingDetailReadDto>();
             CreateMap<BookingDetailUpdateDto, BookingDetail>();
+
+            CreateMap<MonthlyBookingCreateDto, MonthlyBooking>();
+            // For reading a MonthlyBooking
+            CreateMap<MonthlyBooking, MonthlyBookingReadDto>();
+
+            // For updating a MonthlyBooking
+            CreateMap<MonthlyBookingUpdateDto, MonthlyBooking>();
+            CreateMap<MonthlyBooking, MonthlyBookingUpdateDto>();
+
         }
     }
 }

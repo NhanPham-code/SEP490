@@ -1,4 +1,4 @@
-﻿namespace DiscountAPI.DTO
+﻿namespace DTOs.DiscountDTO
 {
     public class ReadDiscountDTO
     {

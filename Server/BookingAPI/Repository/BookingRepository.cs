@@ -68,5 +68,40 @@ namespace BookingAPI.Repository
                 .Include(b => b.BookingDetails)
                 .AsQueryable();
         }
+
+        // Trong BookingRepository.cs
+        public async Task<IEnumerable<Booking>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime)
+        {
+            var query = _context.Bookings
+                .Include(b => b.BookingDetails)
+                .Where(b => b.Date.Year == year && b.Date.Month == month);
+
+            // Lọc theo danh sách ngày
+            if (days != null && days.Any())
+            {
+                query = query.Where(b => days.Contains(b.Date.Day));
+            }
+
+            // Lọc theo khung giờ trùng lặp trên BookingDetails
+            query = query.Where(b =>
+                b.BookingDetails.Any(bd =>
+                    startTime < bd.EndTime.TimeOfDay && endTime > bd.StartTime.TimeOfDay));
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Booking>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime)
+        {
+            var query = _context.Bookings
+                .Include(b => b.BookingDetails)
+                .Where(b => b.Date.Year == year && b.Date.Month == month);
+
+            query = query.Where(b => b.BookingDetails.Any(bd =>
+                courtIds.Contains(bd.CourtId) &&
+                startTime < bd.EndTime.TimeOfDay &&
+                endTime > bd.StartTime.TimeOfDay));
+
+            return await query.ToListAsync();
+        }
     }
 }

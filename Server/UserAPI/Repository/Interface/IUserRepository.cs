@@ -1,4 +1,5 @@
-﻿using UserAPI.Model;
+﻿using UserAPI.DTOs;
+using UserAPI.Model;
 
 namespace UserAPI.Repository.Interface
 {
@@ -15,5 +16,7 @@ namespace UserAPI.Repository.Interface
         Task<bool> DeleteUserAsync(int id);
 
         IQueryable<User> GetAllUsers();
+
+        Task<AdminUserStatsDTO> GetAdminUserStatsAsync();
     }
 }

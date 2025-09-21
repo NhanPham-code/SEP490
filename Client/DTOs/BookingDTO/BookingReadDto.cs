@@ -14,6 +14,7 @@
         public DateTime UpdatedAt { get; set; }
         public int? DiscountId { get; set; }
         public int StadiumId { get; set; }
+        public int? MonthlyBookingId { get; set; }
         public List<BookingDetailReadDto> BookingDetails { get; set; } = new List<BookingDetailReadDto>();
     }
 }

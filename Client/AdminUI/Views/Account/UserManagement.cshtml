@@ -1,0 +1,661 @@
+﻿@{
+    ViewData["Title"] = "Quản Lý Người Dùng";
+}
+
+@section Styles {
+    <link href="~/css/user_management.css" rel="stylesheet" />
+}
+
+<div class="user-management-container">
+    <div class="content-wrapper">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Quản Lý Người Dùng</h1>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="exportUsers()">
+                    <i class="ri-download-line"></i>
+                    Xuất Excel
+                </button>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <i class="ri-refresh-line"></i>
+                    Làm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Tổng người dùng</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="activeUsers">0</div>
+                <div class="stat-label">Đang hoạt động</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="bannedUsers">0</div>
+                <div class="stat-label">Bị cấm</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="newUsersThisMonth">0</div>
+                <div class="stat-label">Mới tháng này</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="search-filter-section">
+                <div class="form-group">
+                    <label class="form-label">Tìm kiếm theo Email hoặc SĐT</label>
+                    <div class="search-input">
+                        <input type="text" class="form-input" id="searchInput" placeholder="Nhập email hoặc số điện thoại...">
+                        <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tháng đăng ký</label>
+                    <input type="month" class="form-input" id="monthFilter">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-input" id="statusFilter">
+                        <option value="">Tất cả</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="banned">Bị cấm</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Vai trò</label>
+                    <select class="form-input" id="roleFilter">
+                        <option value="">Tất cả</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Customer">Customer</option>
+                        <option value="StadiumManager">StadiumManager</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="searchUsers()">
+                        <i class="ri-search-line"></i>
+                        Tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3 class="table-title">Danh sách người dùng</h3>
+            </div>
+
+            <div id="loadingState" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="tableContent">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Người dùng</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Trạng thái</th>
+                            <th>Vai trò</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Data will be loaded here via AJAX -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">
+                    <i class="ri-user-search-line"></i>
+                </div>
+                <h3>Không tìm thấy người dùng</h3>
+                <p>Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+            </div>
+
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Hiển thị <span id="showingFrom">0</span> - <span id="showingTo">0</span> trong tổng số <span id="totalRecords">0</span> người dùng
+                </div>
+                <div class="pagination" id="paginationContainer">
+                    <!-- Pagination will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Thông tin người dùng</h3>
+            <button class="modal-close" onclick="closeModal('profileModal')">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="profileModalBody">
+            <!-- Profile content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Ban Confirmation Modal -->
+<div class="modal-overlay ban-modal" id="banModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Xác nhận cấm người dùng</h3>
+            <button class="modal-close" onclick="closeModal('banModal')">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;">
+                    <i class="ri-error-warning-line"></i>
+                </div>
+                <h4 style="margin-bottom: 1rem; color: #1f2937;">Bạn có chắc chắn muốn cấm người dùng này?</h4>
+                <p style="color: #6b7280; margin-bottom: 2rem;">Hành động này sẽ vô hiệu hóa tài khoản và người dùng sẽ không thể đăng nhập.</p>
+                <div class="form-group" style="text-align: left; margin-bottom: 2rem;">
+                    <label class="form-label">Lý do cấm (tùy chọn)</label>
+                    <textarea class="form-input" id="banReason" rows="3" placeholder="Nhập lý do cấm người dùng..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('banModal')">Hủy</button>
+            <button class="btn btn-danger" onclick="confirmBanUser()">
+                <i class="ri-forbid-line"></i>
+                Xác nhận cấm
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentUserId = null;
+        let totalPages = 0;
+        let _renderedUsers = []; // Lưu danh sách user đã render cho profile
+
+        $(document).ready(function () {
+            initializePage();
+            setupEventListeners();
+            loadUsers();
+            loadStats();
+        });
+
+        // ===== PAGE INIT & EVENTS =====
+        function initializePage() {
+            const now = new Date();
+            const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            $('#monthFilter').val(currentMonth);
+            showToast('Trang quản lý người dùng đã sẵn sàng!', 'success');
+        }
+
+        function setupEventListeners() {
+            // Search on Enter
+            $('#searchInput').on('keypress', function (e) {
+                if (e.which === 13) searchUsers();
+            });
+
+            // Debounced search
+            let searchTimeout;
+            $('#searchInput').on('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if ($(this).val().length >= 3 || $(this).val().length === 0) searchUsers();
+                }, 500);
+            });
+
+            // Filter change
+            $('#monthFilter, #statusFilter').on('change', function () {
+                searchUsers();
+            });
+
+            // Modal overlay click
+            $('.modal-overlay').on('click', function (e) {
+                if (e.target === this) closeModal(this.id);
+            });
+
+            $('#roleFilter').on('change', function () {
+                searchUsers();
+            });
+        }
+
+        // ===== ODATA ESCAPE FUNCTION =====
+        // Escape dấu nháy đơn cho OData, sau đó encodeURIComponent toàn bộ filter
+        function escapeODataValue(value) {
+            if (!value) return '';
+            return value.replace(/'/g, "''");
+        }
+
+        // ===== LOAD DATA =====
+        function loadUsers(page = 1) {
+            currentPage = page;
+            showLoading(true);
+
+            // Escape và encode đầu vào nếu dùng OData hoặc có thể gây lỗi với ký tự đặc biệt
+            let searchTerm = $('#searchInput').val();
+            searchTerm = escapeODataValue(searchTerm);
+
+            const searchData = {
+                page: currentPage,
+                pageSize: pageSize,
+                searchTerm: searchTerm,
+                month: $('#monthFilter').val(),
+                status: $('#statusFilter').val(),
+                role: $('#roleFilter').val()
+            };
+
+            $.ajax({
+                url: '/Account/GetUsers',
+                type: 'GET',
+                data: searchData,
+                success: function (response) {
+                    if (response.success) {
+                        renderUsersTable(response.data);
+                        renderPagination(response.totalPages, response.totalRecords);
+                        updatePaginationInfo(response.totalRecords);
+                    } else {
+                        showError('Không thể tải danh sách người dùng: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showError('Lỗi kết nối: ' + error);
+                },
+                complete: function () {
+                    showLoading(false);
+                }
+            });
+        }
+
+        function loadStats() {
+            $.ajax({
+                url: '/Account/GetUserStats',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        animateCounter('#totalUsers', response.data.totalUsers);
+                        animateCounter('#activeUsers', response.data.activeUsers);
+                        animateCounter('#bannedUsers', response.data.bannedUsers);
+                        animateCounter('#newUsersThisMonth', response.data.newUsersThisMonth);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Không thể tải thống kê:', error);
+                }
+            });
+        }
+
+        // ===== RENDER TABLE & PROFILE =====
+        function renderUsersTable(users) {
+            _renderedUsers = users; // Lưu lại để truy xuất profile nhanh
+            const tbody = $('#usersTableBody');
+            tbody.empty();
+
+            if (!users || users.length === 0) {
+                $('#tableContent').hide();
+                $('#emptyState').show();
+                return;
+            }
+
+            $('#emptyState').hide();
+            $('#tableContent').show();
+
+            users.forEach(user => {
+                const row = `
+                            <tr onclick="showUserProfile(${user.userId})" data-user-id="${user.userId}">
+                                <td>
+                                    <div class="user-info">
+                                        <img src="${user.avatarUrl || '/images/default-avatar.png'}"
+                                             alt="${user.fullName}" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>${user.fullName || 'N/A'}</h4>
+                                            <p>ID: ${user.userId}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${user.email}</td>
+                                <td>${user.phoneNumber || 'Chưa cập nhật'}</td>
+                                <td>${formatDate(user.createdDate)}</td>
+                                <td>
+                                    <span class="status-badge ${getStatusClass(user.isActive)}">
+                                        ${getStatusText(user.isActive)}
+                                    </span>
+                                </td>
+                                <td><span class="role-badge">${user.role || 'N/A'}</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showUserProfile(${user.userId})" title="Xem chi tiết">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        ${user.isActive
+                        ? `<button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); showBanModal(${user.userId}, '${user.fullName.replace(/'/g, "\\'")}')" title="Khóa người dùng">
+                                                    <i class="ri-forbid-line"></i>
+                                                </button>`
+                        : `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); unbanUser(${user.userId})" title="Mở khóa">
+                                                    <i class="ri-checkbox-circle-line"></i>
+                                                </button>`
+                    }
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                tbody.append(row);
+            });
+
+            tbody.find('tr').each(function (index) {
+                $(this).css({
+                    'animation': `fadeInUp 0.4s ease ${index * 0.05}s both`
+                });
+            });
+        }
+
+        // ===== PROFILE MODAL =====
+        function showUserProfile(userId) {
+            const user = _renderedUsers.find(u => u.userId === userId);
+            if (user) {
+                renderUserProfile(user);
+                showModal('profileModal');
+            }
+        }
+
+        function renderUserProfile(user) {
+            const modalBody = $('#profileModalBody');
+            modalBody.html(`
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <img src="${user.avatarUrl || '/images/default-avatar.png'}"
+                                 alt="${user.fullName}" class="profile-avatar-large">
+                            <h3 style="margin: 1rem 0 0.5rem 0; color: #1f2937;">${user.fullName || 'N/A'}</h3>
+                            <span class="status-badge ${getStatusClass(user.isActive)}">
+                                ${getStatusText(user.isActive)}
+                            </span>
+                        </div>
+                        <div class="profile-section">
+                            <h4>Thông tin cơ bản</h4>
+                            <div class="profile-grid">
+                                <div class="profile-item">
+                                    <span class="profile-label">Email</span>
+                                    <span class="profile-value">${user.email}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Số điện thoại</span>
+                                    <span class="profile-value">${user.phoneNumber || 'Chưa cập nhật'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Ngày sinh</span>
+                                    <span class="profile-value">${user.dateOfBirth ? formatDate(user.dateOfBirth) : 'Chưa cập nhật'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Giới tính</span>
+                                    <span class="profile-value">${user.gender || 'Chưa cập nhật'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Vai trò</span>
+                                    <span class="profile-value">${user.role || 'None'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">CCCD/CMND</span>
+                                    <span class="profile-value">${user.identityNumber || 'Chưa cập nhật'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-section">
+                            <h4>Thông tin tài khoản</h4>
+                            <div class="profile-grid">
+                                <div class="profile-item">
+                                    <span class="profile-label">Ngày đăng ký</span>
+                                    <span class="profile-value">${formatDate(user.createdDate)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${user.address ? `
+                        <div class="profile-section">
+                            <h4>Địa chỉ</h4>
+                            <div class="profile-item">
+                                <span class="profile-value">${user.address}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${user.frontCCCDUrl ? `
+                        <div class="profile-section">
+                            <h4>Ảnh CCCD/CMND (mặt trước)</h4>
+                            <div class="profile-item">
+                                <img src="${user.frontCCCDUrl}" style="max-width: 100%; border-radius: 8px;"/>
+                            </div>
+                        </div>
+                        ` : ''}
+                    `);
+        }
+
+        // ===== BAN & UNBAN =====
+        function showBanModal(userId, userName) {
+            currentUserId = userId;
+            $('#banModal .modal-title').text(`Khóa người dùng: ${userName}`);
+            $('#banReason').val('');
+            showModal('banModal');
+        }
+
+        function confirmBanUser() {
+            if (!currentUserId) return;
+            const reason = $('#banReason').val();
+            // Lấy email user từ biến _renderedUsers
+            const user = _renderedUsers.find(u => u.userId === currentUserId);
+            const email = user ? user.email : "";
+
+            $.ajax({
+                url: `/Account/BanUser`,
+                type: 'POST',
+                data: {
+                    userId: currentUserId,
+                    email: email
+                },
+                success: function (response) {
+                    if (response.success) {
+                        showSuccess('Đã khóa người dùng thành công!');
+                        closeModal('banModal');
+                        loadUsers(currentPage);
+                        loadStats();
+                    } else {
+                        showError('Không thể khóa người dùng: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showError('Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        function unbanUser(userId) {
+            if (!confirm('Bạn có chắc chắn muốn mở khóa người dùng này?')) return;
+            const user = _renderedUsers.find(u => u.userId === userId);
+            const email = user ? user.email : "";
+
+            $.ajax({
+                url: `/Account/UnbanUser`,
+                type: 'POST',
+                data: {
+                    userId: userId,
+                    email: email
+                },
+                success: function (response) {
+                    if (response.success) {
+                        showSuccess('Đã mở khóa người dùng thành công!');
+                        loadUsers(currentPage);
+                        loadStats();
+                    } else {
+                        showError('Không thể mở khóa người dùng: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showError('Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        // ===== PAGINATION =====
+        function renderPagination(totalPagesCount, totalRecords) {
+            totalPages = totalPagesCount;
+            const container = $('#paginationContainer');
+            container.empty();
+
+            if (totalPages <= 1) return;
+
+            if (currentPage > 1) {
+                container.append(`<a href="#" class="page-btn" onclick="loadUsers(${currentPage - 1})">←</a>`);
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                container.append(`<a href="#" class="page-btn" onclick="loadUsers(1)">1</a>`);
+                if (startPage > 2) container.append(`<span class="page-btn">...</span>`);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                container.append(`<a href="#" class="page-btn ${activeClass}" onclick="loadUsers(${i})">${i}</a>`);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) container.append(`<span class="page-btn">...</span>`);
+                container.append(`<a href="#" class="page-btn" onclick="loadUsers(${totalPages})">${totalPages}</a>`);
+            }
+
+            if (currentPage < totalPages) {
+                container.append(`<a href="#" class="page-btn" onclick="loadUsers(${currentPage + 1})">→</a>`);
+            }
+        }
+
+        function updatePaginationInfo(totalRecords) {
+            const from = (currentPage - 1) * pageSize + 1;
+            const to = Math.min(currentPage * pageSize, totalRecords);
+            $('#showingFrom').text(totalRecords === 0 ? 0 : from);
+            $('#showingTo').text(to);
+            $('#totalRecords').text(totalRecords);
+        }
+
+        // ===== UTILITY =====
+        function searchUsers() {
+            currentPage = 1;
+            loadUsers(currentPage);
+        }
+
+        function refreshData() {
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            const now = new Date();
+            const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            $('#monthFilter').val(currentMonth);
+            currentPage = 1;
+            loadUsers(currentPage);
+            loadStats();
+            showSuccess('Đã làm mới dữ liệu!');
+        }
+
+        function exportUsers() {
+            const searchData = {
+                searchTerm: $('#searchInput').val(),
+                month: $('#monthFilter').val(),
+                status: $('#statusFilter').val()
+            };
+            const queryString = $.param(searchData);
+            window.open(`/Admin/ExportUsers?${queryString}`, '_blank');
+        }
+
+        function showModal(modalId) {
+            $(`#${modalId}`).addClass('show');
+            $('body').css('overflow', 'hidden');
+        }
+
+        function closeModal(modalId) {
+            $(`#${modalId}`).removeClass('show');
+            $('body').css('overflow', 'auto');
+            currentUserId = null;
+        }
+
+        function showLoading(show) {
+            if (show) {
+                $('#loadingState').show();
+                $('#tableContent').hide();
+                $('#emptyState').hide();
+            } else {
+                $('#loadingState').hide();
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                const [year, month, day] = dateString.split("-");
+                return `${day}/${month}/${year}`;
+            }
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusText(isActive) {
+            return isActive ? 'Hoạt động' : 'Bị khóa';
+        }
+
+        function getStatusClass(isActive) {
+            return isActive ? 'status-active' : 'status-banned';
+        }
+
+        function animateCounter(selector, targetValue) {
+            $({ value: 0 }).animate({ value: targetValue }, {
+                duration: 1000,
+                easing: 'swing',
+                step: function () {
+                    $(selector).text(Math.floor(this.value).toLocaleString());
+                },
+                complete: function () {
+                    $(selector).text(targetValue.toLocaleString());
+                }
+            });
+        }
+
+        function showToast(message, type = 'info', duration = 3000) {
+            // Implementation depends on your toast library
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
+
+        function showError(message) {
+            showToast(message, 'error');
+        }
+
+        // ===== Animations =====
+        const style = document.createElement('style');
+        style.textContent = `
+                @@keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px);}
+                    to { opacity: 1; transform: translateY(0);}
+                }
+                `;
+        document.head.appendChild(style);
+    </script>
+}
