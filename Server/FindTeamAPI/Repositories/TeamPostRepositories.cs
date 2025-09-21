@@ -23,13 +23,21 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<TeamPost> CreateTeamPostAsync(TeamPost teamPost)
         {
+            teamPost.CreatedAt = DateTime.UtcNow;
             _context.TeamPosts.Add(teamPost);
             await _context.SaveChangesAsync();
             return teamPost;
         }
         public async Task<TeamPost> UpdateTeamPostAsync(TeamPost teamPost)
         {
-            _context.TeamPosts.Update(teamPost);
+            var existingPost = await GetTeamPostByIdAsync(teamPost.Id);
+            if (existingPost == null) return null;
+            existingPost.Title = teamPost.Title;
+            existingPost.Description = teamPost.Description;
+            existingPost.JoinedPlayers = teamPost.JoinedPlayers;
+            existingPost.PricePerPerson = teamPost.PricePerPerson;
+            existingPost.UpdatedAt = DateTime.UtcNow;
+            _context.TeamPosts.Update(existingPost);
             await _context.SaveChangesAsync();
             return teamPost;
         }

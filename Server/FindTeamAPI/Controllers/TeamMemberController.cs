@@ -42,7 +42,7 @@ namespace FindTeamAPI.Controllers
         [HttpPut]
         [Route("UpdateTeamMember")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> UpdateTeamMember(UpdateTeamMemberDTO updateTeamMemberDTO)
+        public async Task<IActionResult> UpdateTeamMember([FromBody] UpdateTeamMemberDTO updateTeamMemberDTO)
         {
             var teamMemberUpdate = await _teamMemberService.UpdateTeamMemberAsync(updateTeamMemberDTO);
             return Ok(teamMemberUpdate);

@@ -16,15 +16,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-
-
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.css">
+    <script src="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.js"></script>
+
+
     <!-- SEO and Meta -->
     <meta name="robots" content="index, follow">
     <meta name="author" content="Sports Platform Team">
@@ -33,7 +34,7 @@
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-link">Chuyển đến nội dung chính</a>
 
-
+   
     <!-- Main Content -->
     <main class="main-content" id="main-content">
         <div class="container">
@@ -41,7 +42,7 @@
             <div class="search-header">
                 <div class="search-info">
                     <h2 class="page-title">Tìm Kiếm Đồng Đội</h2>
-                    <p class="results-count" id="results-count">Hiển thị <span class="current-count">0</span> kết quả</p>
+                    <p class="results-count" id="results-count">Hiển thị <span class="current-count" id="post-count"></span> kết quả</p>
                 </div>
 
                 <!-- Quick Search Bar -->
@@ -83,225 +84,226 @@
 
             <div class="content-grid">
                 <!-- Filter Sidebar -->
-                <aside class="sidebar" id="filter-sidebar" role="complementary" aria-label="Bộ lọc tìm kiếm">
-                    <div class="sidebar-header">
-                        <h3 class="sidebar-title">
-                            <i class="ri-filter-3-line" aria-hidden="true"></i>
-                            Bộ Lọc Kết Quả
-                        </h3>
-                        <div class="sidebar-actions">
-                            <button class="clear-filters" type="button" aria-label="Xóa tất cả bộ lọc">
-                                <i class="ri-refresh-line" aria-hidden="true"></i>
-                                Xóa Tất Cả
-                            </button>
-                            <button class="close-filter" id="close-filter" type="button" aria-label="Đóng bộ lọc">
-                                <i class="ri-close-line" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Loại Thể Thao -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="sport-filter"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="sport-filter">
-                            <h4 class="filter-title">Loại Thể Thao</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
-                            <div class="filter-options">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Bóng Đá</span>
-                                    <span class="count" aria-label="45 bài viết">(45)</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Bóng Rổ">
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Bóng Rổ</span>
-                                    <span class="count" aria-label="32 bài viết">(32)</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Tennis">
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Tennis</span>
-                                    <span class="count" aria-label="28 bài viết">(28)</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Cầu Lông">
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Cầu Lông</span>
-                                    <span class="count" aria-label="19 bài viết">(19)</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Bóng Chuyền">
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Bóng Chuyền</span>
-                                    <span class="count" aria-label="15 bài viết">(15)</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox sport-filter" value="Đa Môn">
-                                    <span class="checkmark" aria-hidden="true"></span>
-                                    <span class="label-text">Đa Môn</span>
-                                    <span class="count" aria-label="22 bài viết">(22)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chọn Ngày -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="date-filter"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="date-filter">
-                            <h4 class="filter-title">Chọn Ngày</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content active" id="date-filter">
-                            <div class="date-input-wrapper">
-                                <i class="ri-calendar-line" aria-hidden="true"></i>
-                                <input type="date"
-                                       class="date-input"
-                                       id="play-date-filter"
-                                       aria-label="Chọn ngày chơi"
-                                       min="2025-09-11">
-                            </div>
-
-                            <!-- Quick Date Options -->
-                            <div class="quick-date-options">
-                                <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
-                                <button type="button" class="quick-date-btn" data-days="1">Mai</button>
-                                <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
-                                <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thời Gian -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="time-filter"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="time-filter">
-                            <h4 class="filter-title">Thời Gian Chơi</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
-                            <div class="time-grid">
-                                <input type="time" class="time-slot" name="name" value="" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Khoảng Giá -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="price-filter"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="price-filter">
-                            <h4 class="filter-title">Khoảng Giá</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content active" id="price-filter">
-                            <div class="price-range">
-                                <input type="range"
-                                       min="0"
-                                       max="500000"
-                                       value="250000"
-                                       step="10000"
-                                       class="range-slider"
-                                       id="price-range-slider"
-                                       aria-label="Khoảng giá từ 0 đến 500.000 VNĐ">
-                                <div class="price-labels">
-                                    <span>0đ</span>
-                                    <span class="current-price" id="current-price">250.000đ/giờ</span>
-                                    <span>500.000đ</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Số Người Cần -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="players-filter"
-                                type="button"
-                                aria-expanded="false"
-                                aria-controls="players-filter">
-                            <h4 class="filter-title">Số Người Cần</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content" id="players-filter">
-                            <div class="players-range">
-                                <label for="min-players" class="range-label">Tối thiểu:</label>
-                                <input type="number" id="min-players" min="1" max="20" value="1" class="number-input">
-
-                                <label for="max-players" class="range-label">Tối đa:</label>
-                                <input type="number" id="max-players" min="1" max="20" value="10" class="number-input">
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Địa Điểm -->
-                    <div class="filter-section">
-                        <button class="filter-header"
-                                data-target="location-filter"
-                                type="button"
-                                aria-expanded="false"
-                                aria-controls="location-filter">
-                            <h4 class="filter-title">Địa Điểm</h4>
-                            <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                        </button>
-                        <div class="filter-content" id="location-filter">
-                            <div class="location-input-wrapper">
-                                <i class="ri-map-pin-line" aria-hidden="true"></i>
-                                <input type="text"
-                                       placeholder="Nhập địa điểm"
-                                       class="location-input"
-                                       id="location-search"
-                                       aria-label="Tìm kiếm địa điểm"
-                                       autocomplete="off">
-                                <button type="button" class="location-clear" aria-label="Xóa địa điểm">
+                <form id="filter-form">
+                    <aside class="sidebar" id="filter-sidebar" role="complementary" aria-label="Bộ lọc tìm kiếm">
+                        <div class="sidebar-header">
+                            <h3 class="sidebar-title">
+                                <i class="ri-filter-3-line" aria-hidden="true"></i>
+                                Bộ Lọc Kết Quả
+                            </h3>
+                            <div class="sidebar-actions">
+                                <button class="clear-filters" type="button" aria-label="Xóa tất cả bộ lọc">
+                                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                                    Xóa Tất Cả
+                                </button>
+                                <button class="close-filter" id="close-filter" type="button" aria-label="Đóng bộ lọc">
                                     <i class="ri-close-line" aria-hidden="true"></i>
                                 </button>
                             </div>
+                        </div>
 
-                            <!-- Popular Locations -->
-                            <div class="popular-locations">
-                                <h5 class="popular-title">Địa điểm phổ biến:</h5>
-                                <div class="location-tags">
-                                    <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
-                                    <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
-                                    <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
-                                    <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
+                        <!-- Loại Thể Thao -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="sport-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="sport-filter">
+                                <h4 class="filter-title">Loại Thể Thao</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
+                                <div class="filter-options">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng Đá</span>
+                                        <span class="count" aria-label="45 bài viết">(45)</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Rổ">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng Rổ</span>
+                                        <span class="count" aria-label="32 bài viết">(32)</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Tennis">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Tennis</span>
+                                        <span class="count" aria-label="28 bài viết">(28)</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu Lông">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Cầu Lông</span>
+                                        <span class="count" aria-label="19 bài viết">(19)</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Chuyền">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng Chuyền</span>
+                                        <span class="count" aria-label="15 bài viết">(15)</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Đa Môn">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Đa Môn</span>
+                                        <span class="count" aria-label="22 bài viết">(22)</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Apply Filters Button -->
-                    <div class="filter-actions">
-                        <button class="btn btn-primary btn-full" type="button" id="apply-filters">
-                            <i class="ri-check-line" aria-hidden="true"></i>
-                            Áp Dụng Bộ Lọc
-                        </button>
-                        <button class="btn btn-secondary btn-outline btn-full" type="button" id="reset-filters">
-                            <i class="ri-refresh-line" aria-hidden="true"></i>
-                            Đặt Lại
-                        </button>
-                    </div>
-                </aside>
+                        <!-- Chọn Ngày -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="date-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="date-filter">
+                                <h4 class="filter-title">Chọn Ngày</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="date-filter">
+                                <div class="date-input-wrapper">
+                                    <i class="ri-calendar-line" aria-hidden="true"></i>
+                                    <input type="date"
+                                           name="play_date"
+                                           class="date-input"
+                                           id="play-date-filter"
+                                           aria-label="Chọn ngày chơi"
+                                           min="2025-09-11">
+                                </div>
+                                <div class="quick-date-options">
+                                    <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
+                                    <button type="button" class="quick-date-btn" data-days="1">Mai</button>
+                                    <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
+                                    <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thời Gian -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="time-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="time-filter">
+                                <h4 class="filter-title">Thời Gian Chơi</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
+                                <div class="time-grid">
+                                    <input type="time" class="time-slot" name="play_time" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khoảng Giá -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="price-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="price-filter">
+                                <h4 class="filter-title">Khoảng Giá</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="price-filter">
+                                <div class="price-range">
+                                    <input type="range"
+                                           name="price_max"
+                                           min="0"
+                                           max="500000"
+                                           value="250000"
+                                           step="10000"
+                                           class="range-slider"
+                                           id="price-range-slider"
+                                           aria-label="Khoảng giá từ 0 đến 500.000 VNĐ">
+                                    <div class="price-labels">
+                                        <span>0đ</span>
+                                        <span class="current-price" id="current-price">250.000đ/giờ</span>
+                                        <span>500.000đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Số Người Cần -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="players-filter"
+                                    type="button"
+                                    aria-expanded="false"
+                                    aria-controls="players-filter">
+                                <h4 class="filter-title">Số Người Cần</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content" id="players-filter">
+                                <div class="players-range">
+                                    <label for="min-players" class="range-label">Tối thiểu:</label>
+                                    <input type="number" id="min-players" name="min_players" min="1" max="20" value="1" class="number-input">
+
+                                    <label for="max-players" class="range-label">Tối đa:</label>
+                                    <input type="number" id="max-players" name="max_players" min="1" max="20" value="10" class="number-input">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Địa Điểm -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="location-filter"
+                                    type="button"
+                                    aria-expanded="false"
+                                    aria-controls="location-filter">
+                                <h4 class="filter-title">Địa Điểm</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content" id="location-filter">
+                                <div class="location-input-wrapper">
+                                    <i class="ri-map-pin-line" aria-hidden="true"></i>
+                                    <input type="text"
+                                           name="location"
+                                           placeholder="Nhập địa điểm"
+                                           class="location-input"
+                                           id="location-search"
+                                           aria-label="Tìm kiếm địa điểm"
+                                           autocomplete="off">
+                                    <button type="button" class="location-clear" aria-label="Xóa địa điểm">
+                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="popular-locations">
+                                    <h5 class="popular-title">Địa điểm phổ biến:</h5>
+                                    <div class="location-tags">
+                                        <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
+                                        <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
+                                        <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
+                                        <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút hành động của Form -->
+                        <div class="filter-actions">
+                            <button class="btn btn-primary btn-full" type="submit">
+                                <i class="ri-check-line" aria-hidden="true"></i>
+                                Áp Dụng Bộ Lọc
+                            </button>
+                            <button class="btn btn-secondary btn-outline btn-full" type="reset">
+                                <i class="ri-refresh-line" aria-hidden="true"></i>
+                                Đặt Lại
+                            </button>
+                        </div>
+                    </aside>
+                </form>
 
                 <!-- Find Players Section -->
-                <section class="players-section" role="main" aria-label="Danh sách tìm đồng đội">
+                <section class="players-section" id="main-list" role="main" aria-label="Danh sách tìm đồng đội">
                     <div class="section-header">
                         <div class="section-info">
                             <h2 class="section-title">Tìm Đồng Đội</h2>
@@ -312,12 +314,8 @@
                                 <i class="ri-file-list-3-line" aria-hidden="true"></i>
                                 Bài Viết Của Tôi
                             </a>
-                            <a href="/FindTeam/JoinedTeam" class="btn btn-secondary" aria-label="Quản lý bài viết của tôi">
-                                <i class="ri-file-list-3-line" aria-hidden="true"></i>
-                                Nhóm đã tham gia
-                            </a>
 
-                            <button id="create-post" onclick="openCreate()" class="btn btn-primary" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
+                            <button id="create-post" onclick="openCreate()" class="btn btn-create-post" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
                                 <i class="ri-add-line" aria-hidden="true"></i>
                                 Tạo Bài Viết
                             </button>
@@ -338,12 +336,8 @@
                     </div>
 
                     <!-- Load More -->
-                    <div class="load-more" id="load-more-section">
-                        <button class="btn btn-secondary" type="button" id="load-more-btn" aria-label="Tải thêm bài viết">
-                            <i class="ri-refresh-line" aria-hidden="true"></i>
-                            Tải Thêm Người Chơi
-                        </button>
-                    </div>
+                    <div id="load-more-render"></div>
+
 
                     <!-- Empty State -->
                     <div class="empty-state" id="empty-state" style="display: none;">
@@ -364,20 +358,238 @@
 
 
     <script>
+        let skip = 0;
+        let pageSize = 0;
+
+        //main
         $(document).ready(function() {
+
+            sessionStorage.clear();
             showLoading();
+
             loadPost();
+
+            setupSearchListener();
+
+        });
+                 // SỬA LẠI THEO CÁCH NÀY
+        // Gắn sự kiện vào #load-more-render, là phần tử cha không bị xóa.
+        // Phần tử này sẽ lắng nghe sự kiện click từ phần tử con có id là #load-more-btn.
+        $('#load-more-render').on('click', '#load-more-btn', function() {
+            console.log('Sự kiện click đã được nhận!');
+            showLoading();
+            loadMoreLogic();
+            window.scrollTo(0, document.body.scrollHeight);
         });
 
 
+
+        // logic cho loadmore
+        function loadMoreLogic(){
+
+                            console.log('Button clicked!');
+
+                            var count = sessionStorage.getItem('count') || 0;
+                            var minTop = 0;
+                            skip += 6;
+
+                            if (skip + 6 > count ){
+                                minTop = skip - count; // Giảm skip nếu vượt quá số lượng
+                                renderLoadMore(0)
+                            }else if(skip == count){
+                                renderLoadMore(0);
+                            }
+                            sessionStorage.setItem('skip', skip);
+                            sessionStorage.setItem('currentUrl', `&top = 6 &skip = ${skip}`);
+                            console.log('URL:', count);
+                            loadPost();
+        }
+
+        // filter and search
+                function setupSearchListener() {
+            const filterForm = document.getElementById('filter-form');
+
+            if (filterForm) {
+                filterForm.addEventListener('submit', function (event) {
+                    // Ngăn chặn hành vi gửi form mặc định
+                    event.preventDefault();
+
+                    // Hiển thị trạng thái tải (nếu có)
+                    // showLoading();
+
+                    // Thu thập dữ liệu từ các trường của form
+                    const formData = new FormData(filterForm);
+                    const searchParams = {};
+
+                    // Lấy tất cả các checkbox 'sports' đã chọn
+                    searchParams.sports = formData.getAll('sports');
+
+                    // Lặp qua các trường còn lại và thêm vào đối tượng searchParams
+                    formData.forEach((value, key) => {
+                        // Bỏ qua 'sports' vì đã được xử lý và chỉ thêm các trường có giá trị
+                        if (key !== 'sports' && value) {
+                            searchParams[key] = value;
+                        }
+                    });
+
+                    // tạo seach cho odata
+                    let url = ''; // Mặc định lấy 6 bản ghi đầu tiên
+
+                    if (searchParams.sports && searchParams.sports.length > 0) {
+                        const sportsFilter = searchParams.sports.map(sport => `SportType eq '${sport}'`).join(' or ');
+                        url += `and ${sportsFilter} `
+                    }
+                    if (searchParams.play_date) {
+                        url += `and PlayDate eq ${searchParams.play_date} `;
+                    }
+                    if (searchParams.play_time) {
+                        url += `and TimePlay eq ${searchParams.play_time} `;
+                    }
+                    if (searchParams.price_max) {
+                        url += `and PricePerPerson le ${searchParams.price_max} `;
+                    }
+                    if (searchParams.min_players) {
+                        url += `and NeededPlayers ge ${searchParams.min_players} `;
+                    }
+                    if (searchParams.max_players) {
+                        url += `and NeededPlayers le ${searchParams.max_players} `;
+                    }
+                    if (searchParams.location) {
+                        url += `and contains(Location, '${searchParams.location} ')`;
+                    }
+
+                    url += '&top=6&skip=0';
+
+                    console.log('Đang gửi dữ liệu tìm kiếm đến server:', searchParams);
+
+                    // Gửi yêu cầu AJAX với dữ liệu đã được sửa
+                    $.ajax({
+                        url: '/FindTeam/GetAllAndSearch',
+                        type: 'GET',
+                        data: { url: url },
+
+                        success: function(response) {
+                            // Ẩn trạng thái tải
+                            hideLoading();
+
+                            // Xử lý trường hợp không có kết quả
+                            if (response.message === 404 || !response.teamPosts || response.teamPosts.length === 0) {
+                                $('#players-grid').html(''); // Xóa kết quả cũ
+                                $('#empty-state').show();    // Hiển thị thông báo rỗng
+                                renderLoadMore(0);           // Ẩn nút "Xem thêm"
+                                $('#post-count').text('0');  // Cập nhật số lượng
+                                return;
+                            }
+
+                            // Nếu có kết quả, ẩn thông báo rỗng
+                            $('#empty-state').hide();
+
+                            // Cập nhật số lượng kết quả
+                            $('#post-count').text(response.totalCount || 0);
+
+                            // Hiển thị hoặc ẩn nút "Xem thêm"
+                            if (response.totalCount > 6) { // Giả sử mỗi trang có 6 bài
+                                renderLoadMore(1);
+                            } else {
+                                renderLoadMore(0);
+                            }
+
+                            // Lưu tổng số lượng vào sessionStorage
+                            sessionStorage.setItem('count', response.totalCount || 0);
+
+                            // Vẽ lại danh sách bài đăng
+                            renderPosts(response.teamPosts, response.userNames, response.hidden);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            hideLoading();
+                            console.error('Lỗi khi tải bài đăng:', textStatus, errorThrown);
+                            // Hiển thị thông báo lỗi cho người dùng tại đây
+                            $('#empty-state').show();
+                        }
+                    });
+                });
+            }
+
+            // Xử lý nút "Đặt Lại"
+            const resetButton = filterForm.querySelector('button[type="reset"]');
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    console.log('Biểu mẫu đã được đặt lại.');
+                    // Tùy chọn: có thể kích hoạt lại một tìm kiếm trống để hiển thị tất cả kết quả
+                    // filterForm.submit();
+                });
+            }
+        }
+
+        // xem thanh cuộn đang ở post nào
+        function getCurrentScrollPosition() {
+                    const sections = document.querySelectorAll("div[id]");
+
+        window.addEventListener("scroll", () => {
+          let currentId = "";
+
+          sections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            // Nếu phần tử này chiếm từ trên xuống ít nhất 100px trong viewport thì coi như đang active
+            if (rect.top <= 100 && rect.bottom >= 100) {
+              currentId = section.id;
+            }
+          });
+
+          if (currentId) {
+            console.log("Đang ở:", currentId);
+            // Bạn có thể update menu active ở đây
+            // document.querySelector(".menu .active")?.classList.remove("active");
+            // document.querySelector(`[href="#${currentId}"]`).classList.add("active");
+          }
+        });
+
+        }
+
+        //render load more
+        function renderLoadMore(status){
+            const html = `
+                <div class="load-more" id="load-more-section">
+                    <button class="btn btn-outline-primary btn-load-more"id="load-more-btn" type="button" aria-label="Tải thêm bài viết">
+                        <i class="ri-loader-2-line" aria-hidden="true"></i>
+                        Tải Thêm
+                    </button>
+                </div>
+            `;
+            if(status === 1){
+                            $('#load-more-render').html(html);
+            }else if(status === 0){
+                            $('#load-more-render').remove();
+            }
+        }
+
+
         function loadPost(){
+            let url = sessionStorage.getItem('currentUrl');
+            console.log('Load URL:', url);
+            if(url == null){
+                url = `&top = 6 &skip = 0`;
+            }
             $.ajax({
                 url: '/FindTeam/GetAllAndSearch',
                 type: 'GET',
-                data: { page: 1, pageSize: 10 },
+                data: { url: url },
                 success: function(response) {
-                    $('#players-grid').html(response);
-
+                    // kiểm tra xem có data không
+                    if(response.message === 404){
+                        $('#players-grid').html('');
+                        $('#empty-state').show();
+                        renderLoadMore(0);
+                        hideLoading();
+                        return;
+                    }
+                    $('#post-count').text(response.totalCount || 0);
+                    if(response.totalCount > 6){
+                        console.log("dax");
+                        renderLoadMore(1);
+                    }
+                    // count session
+                    sessionStorage.setItem('count', response.totalCount || 0);
                   renderPosts(response.teamPosts, response.userNames, response.hidden);
 
                     // Update results count
@@ -395,17 +607,41 @@
             $('#loading-state').show();
             $('#players-grid').hide();
             $('#empty-state').hide();
-            $('#load-more-section').hide();
+
         }
         // Hide loading state
         function hideLoading(){
             $('#loading-state').hide();
             $('#players-grid').show();
-            $('#load-more-section').show();
+
         }
         // Render posts dynamically
-        function renderPosts(post, profile, hidden){
-             if (!post || post.length === 0) {
+                 // hiện nút xem thêm khi quá dài
+        function setupSeeMoreButtons(id) {
+            // Sửa lỗi: Sử dụng backticks (`) cho template string để nội suy biến `id`
+            const gameDesc = document.getElementById(`gameDesc-${id}`);
+            const seeMore = document.getElementById(`seeMore-${id}`);
+
+            // Kiểm tra xem các element có tồn tại không trước khi thao tác
+            if (!gameDesc || !seeMore) {
+                return;
+            }
+
+            // Check nếu có text bị cắt thì mới hiện "xem thêm"
+            if (gameDesc.scrollHeight > gameDesc.clientHeight) {
+                seeMore.style.display = "inline";
+            }
+
+            seeMore.addEventListener("click", () => {
+                gameDesc.style.display = "block"; // bỏ -webkit-box
+                gameDesc.style.webkitLineClamp = "unset";
+                gameDesc.style.overflow = "visible";
+                seeMore.style.display = "none"; // ẩn "xem thêm" sau khi bấm
+            });
+        }
+
+        function renderPosts(post, profile, hidden) {
+            if (!post || post.length === 0) {
                 $('#players-grid').html('');
                 return;
             }
@@ -413,61 +649,95 @@
             console.log(post);
             console.log(post[0].createdBy);
             console.log(hidden);
-            const html = post.map(post => `
+              // Giả sử các hàm này đã được định nghĩa ở nơi khác trong code của bạn
+            const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('vi-VN');
+                     const formatDateTimeWithDay = (dateTime) => {
+          const d = new Date(dateTime);
 
-               <article class="player-card">
+          const day = String(d.getDate()).padStart(2, '0');        // 01–31
+          const month = String(d.getMonth() + 1).padStart(2, '0'); // 01–12
+          const year = d.getFullYear();
 
-                            <div class="player-header">
-                                <div class="player-avatar">
-                                    <img src="https://localhost:7136/${profile[post.createdBy].avatarUrl}" alt="${profile[post.createdBy].fullName}">
-                                </div>
-                                <div class="player-info">
-                                    <h3 class="player-name">${profile[post.createdBy].fullName}</h3>
-                                    <div class="player-level intermediate">
-                                        <i class="ri-star-fill"></i>
-                                        Trung Bình
-                                    </div>
-                                </div>
-                            </div>
+          const hours = String(d.getHours()).padStart(2, '0');     // 00–23
+          const minutes = String(d.getMinutes()).padStart(2, '0'); // 00–59
 
-                            <div class="game-details">
-                                <div class="detail-item">
-                                    <i class="ri-basketball-line"></i>
-                                    <span>${post.sportType}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="ri-calendar-line"></i>
-                                    <span>${formatDate(post.playDate)} - ${formatTimeForDisplay(post.timePlay)}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="ri-map-pin-line"></i>
-                                    <span>${post.location}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="ri-group-line"></i>
-                                    <span>Cần <span class="needed-players">${post.neededPlayers}</span> / <span class="max-players">${post.maxPlayers}</span> người chơi</span>
+          // Map ngày trong tuần
+          const daysOfWeek = [
+            "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư",
+            "Thứ Năm", "Thứ Sáu", "Thứ Bảy"
+          ];
+          const weekday = daysOfWeek[d.getDay()]; // 0=CN, 1=Thứ 2, ...
 
-                                </div>
+          return `${day}/${month}/${year} ${hours}:${minutes}-${weekday}`;
+        };
+            const html = post.map(p => `
+                <article class="player-card" id="post-mum-${p.id}">
+                     <div class="player-header">
+                         <div class="player-avatar">
+                             <img src="https://localhost:7136/${profile[p.createdBy].avatarUrl}" alt="${profile[p.createdBy].fullName}">
 
-                            </div>
+                         </div>
+                         <div class="player-info">
+                             <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
+                                <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
+                         </div>
+                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
+                     </div>
+                     <div class="game-details">
+                         <div class="detail-item">
+                             <i class="ri-basketball-line"></i>
+                             <span>${p.sportType}</span>
+                         </div>
+                         <div class="detail-item">
+                             <i class="ri-calendar-line"></i>
+                             <span>${formatDate(p.playDate)} - ${formatTimeForDisplay(p.timePlay)}</span>
+                         </div>
+                         <div class="detail-item">
+                             <i class="ri-map-pin-line"></i>
+                             <span>${p.location}</span>
+                         </div>
+                         <div class="player-item">
+                             <div class="">
+                                <i class="ri-group-line"></i>
+                                <span>Cần <span class="needed-players">${p.joinedPlayers}</span> / <span class="max-players">${p.neededPlayers}</span> người chơi</span>
+                             </div>
+                             <a class="view-member" href="/TeamMember/TeamManage?postId=${p.id}"> Xem thành viên   </a>
+                         </div>
+                     </div>
+                     <div class="game-description" id="gameDesc-${p.id}">${p.description || 'Không có mô tả thêm cho bài đăng này.'}</div>
+                     <span class="see-more" id="seeMore-${p.id}">xem thêm</span>
+                     <div class="card-footer">
+                         <div class="price-info">
+                             <span id="perPrice-${p.id}" class="price">${formatVND(p.pricePerPerson)}</span>
+                             <span class="price-label">mỗi người</span>
+                         </div>
+                         ${renderJoinButton(p, hidden)}
+                     </div>
+                 </article>
+             `).join('');
 
-                            <p class="game-description">${post.description || 'Không có mô tả thêm cho bài đăng này.'}</p>
-                             <a  href="/TeamMember/TeamManage?postId=${post.id}"> Xem thành viên   </a>
-                            <div class="card-footer">
-                                <div class="price-info">
-                                    <span id="perPrice" class="price">${formatVND(post.pricePerPerson)}</span>
-                                    <span class="price-label">mỗi người</span>
-                                </div>
-                                ${renderJoinButton(post, hidden)}
+            // Lấy giá trị từ sessionStorage và chuyển sang kiểu số.
+            // Nếu không có giá trị, mặc định là 0.
+            const skipPage = parseInt(sessionStorage.getItem('skip') || '0', 10);
 
-                            </div>
+            if (skipPage === 0) {
+                console.log('Trang đầu, thay thế nội dung.');
+                $('#players-grid').html(html);
+            } else {
+                // Từ trang thứ 2 trở đi, nối thêm nội dung.
+                console.log('Trang tiếp theo, nối thêm nội dung. skipPage:', skipPage);
+                $('#players-grid').append(html);
+            }
 
-                        </article>
-
-            `).join('');
-
-            $('#players-grid').html(html);
+            // Sửa lỗi: Gọi setupSeeMoreButtons cho MỖI bài đăng sau khi chúng được render
+            // Dùng forEach để lặp qua mảng post và gọi hàm cho từng post.id
+            post.forEach(p => {
+                setupSeeMoreButtons(p.id);
+            });
         }
+
+
+
 
         function joindTeam(postId){
 
@@ -479,11 +749,10 @@
                     type: 'POST',
                     data: { postId: postId },
                     success: function(response) {
-                        if (response.success) {
+                        if (response.message === 200) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Tham gia thành công!',
-                                text: response.message,
                                 confirmButtonColor: '#3b82f6'
                             });
                             // Cập nhật lại danh sách bài đăng sau khi tham gia
@@ -513,17 +782,17 @@
                 // Hàm helper đặt bên ngoài vòng lặp .map()
         function renderJoinButton(post, hidden) {
             // Giả sử bạn có biến currentUserId chứa ID người dùng đang đăng nhập
-            if (hidden[post.createdBy] === 1 && post.neededPlayers < post.maxPlayers) {
-                return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-secondary" >Bạn là chủ bài đăng</a>`;
+            if (hidden[post.id] === 1 && post.joinedPlayers < post.neededPlayers) {
+                return `<a href="/FindTeam/TeamPostManage#post-${post.id}" class="btn btn-secondary btn-post-owner" >Bạn là chủ bài đăng</a>`;
             }
 
-            if (post.neededPlayers >= post.maxPlayers) {
+            if (post.joinedPlayers >= post.neededPlayers) {
                 return `<button class="btn btn-warning" disabled>Đã đủ người</button>`;
             }
-            if (hidden[post.createdBy] === 2) {
-                return `<button class="btn btn-warning" disabled>Đã Tham gia</button>`;
+            if (hidden[post.id] === 2) {
+                return `<button class="btn btn-warning btn-joined">Đã Tham gia</button>`;
             }
-            if (hidden[post.createdBy] === 0 || post.neededPlayers < post.maxPlayers) {
+            if (hidden[post.id] === 0 || post.joinedPlayers < post.neededPlayers) {
                 return `
                 <button onClick="joindTeam(${post.id})" class="btn btn-primary btn-join">
                     <i class="ri-user-add-line"></i>
@@ -534,7 +803,8 @@
 
         }
 
-                            function openCreate() {
+
+                             function openCreate() {
             $.ajax({
                 url: '/FindTeam/GetBookByUserId',
                 type: 'GET',
@@ -595,13 +865,16 @@
             ];
 
             // Khởi tạo Quill editor
-            quill = new Quill('#editor-container', {
-                modules: {
-                    toolbar: toolbarOptions
-                },
-                theme: 'snow', // 'snow' là giao diện phổ biến với thanh công cụ ở trên
-                placeholder: 'Mô tả về hoạt động, yêu cầu kỹ năng, lưu ý đặc biệt...'
-            });
+                    quill = new Quill('#editor-container', {
+          modules: {
+            toolbar: toolbarOptions,
+            'emoji-toolbar': true,
+            'emoji-textarea': false,
+            'emoji-shortname': true
+          },
+          theme: 'snow'
+        });
+
 
             // Lấy thẻ textarea ẩn
             const hiddenTextarea = document.querySelector('#newDescription');
@@ -623,26 +896,21 @@
                     updateSchedulePreview(timePlayInput, playDateInput, schedulePreview);
 
                     // Update needed players based on max players
-                    const maxPlayersInput = document.getElementById('newMaxPlayers');
-                    const neededPlayersInput = document.getElementById('newNeededPlayers');
 
-                    maxPlayersInput.addEventListener('change', () => {
-                        const maxPlayers = parseInt(maxPlayersInput.value) || 0;
-                        neededPlayersInput.max = maxPlayers;
-                        if (parseInt(neededPlayersInput.value) > maxPlayers) {
-                            neededPlayersInput.value = maxPlayers;
-                        }
-                    });
+
+
                 },
                 preConfirm: () => {
                     // Clear any existing validation messages
                     Swal.resetValidationMessage();
-    
+
+
+
                     try {
                         const title = document.getElementById('newTitle').value.trim();
                         const location = document.getElementById('newLocation').value.trim();
                         const sport = document.getElementById('newSport').value.trim();
-                        const maxPlayers = parseInt(document.getElementById('newMaxPlayers').value);
+
                         const neededPlayers = parseInt(document.getElementById('newNeededPlayers').value);
                         const pricePerPerson = parseFloat(document.getElementById('newPricePerPerson').value) || 0;
                         const description = quill.root.innerHTML;
@@ -651,14 +919,14 @@
                         const bookingId = parseInt(document.getElementById('newBookingId').value);
                         const stadiumId = parseInt(document.getElementById('stadiumId').value);
 
+
+
                         // Validation với error handling
                         const validations = [
                             { condition: !title, message: 'Vui lòng nhập tiêu đề bài đăng' },
                             { condition: !location, message: 'Vui lòng nhập địa điểm' },
                             { condition: !sport, message: 'Vui lòng chọn môn thể thao' },
-                            { condition: !maxPlayers || maxPlayers < 2, message: 'Số lượng thành viên tối đa phải ít nhất 2 người' },
                             { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' },
-                            { condition: neededPlayers > maxPlayers, message: 'Số lượng cần tìm không thể lớn hơn số lượng tối đa' },
                             { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
@@ -678,7 +946,7 @@
                         formData.append('title', title);
                         formData.append('location', location);
                         formData.append('sportType', sport);
-                        formData.append('maxPlayers', maxPlayers);
+                        formData.append('joinedPlayers', 0);
                         formData.append('neededPlayers', neededPlayers);
                         formData.append('pricePerPerson', pricePerPerson);
                         formData.append('description', description);
@@ -715,16 +983,8 @@
             });
         }
 
-
-                // Hàm này sẽ khởi tạo Quill trên modal của bạn
-        function initializeQuillEditor() {
-            // Kiểm tra xem trình soạn thảo đã được khởi tạo chưa để tránh lỗi
-            // nếu hàm này vô tình được gọi nhiều lần.
-            
-        }
                 // Update the generateCreateTeamPostModalHTML function
         function generateCreateTeamPostModalHTML(bookings) {
-
             return `
                 <div class="enhanced-modal-content">
                     <form id="newTeamPostForm" class="team-post-form">
@@ -820,7 +1080,7 @@
                                 </div>
                             </div>
 
-                              <div class="form-group full-width">
+                             <div class="form-group full-width">
                         <label class="form-label">
                             <i class="ri-file-text-line"></i>
                             Mô tả
@@ -841,16 +1101,6 @@
                             </div>
 
                             <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-group-line"></i>
-                                        Số thành viên tối đa
-                                    </label>
-                                    <input type="number" id="newMaxPlayers" class="form-input"
-                                           placeholder="10" min="2" max="50">
-                                    <div class="input-helper">Tổng số thành viên tối đa của đội (ít nhất 2 người)</div>
-                                </div>
-
                                 <div class="form-group">
                                     <label class="form-label required">
                                         <i class="ri-user-add-line"></i>
@@ -876,8 +1126,7 @@
                                         <i class="ri-calendar-line"></i>
                                         Ngày chơi
                                     </label>
-                                    <input type="date" id="newPlayDate" class="form-input"
-                                           min="${new Date().toISOString().split('T')[0]}" readonly>
+                                    <input type="date" id="newPlayDate" class="form-input" readonly>
                                     <div class="input-helper">Ngày sẽ được tự động điền từ booking đã chọn</div>
                                 </div>
 
@@ -886,8 +1135,8 @@
                                         <i class="ri-time-line"></i>
                                         Thời gian chơi
                                     </label>
-                                    <input type="time" id="newTimePlay" class="form-input">
-                                    <div class="input-helper">Giờ bắt đầu hoạt động</div>
+                                        <select id="newTimePlay" class="form-select"></select>
+                                        <div class="input-helper">Giờ bắt đầu hoạt động</div>
                                 </div>
                             </div>
 
@@ -899,9 +1148,19 @@
                     </form>
                 </div>
             `;
-
-
         }
+
+        //date format
+                 function formatDateLocal(date = new Date()) {
+          if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+
+          const year  = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day   = String(date.getDate()).padStart(2, '0');
+
+          return `${year}-${month}-${day}`;
+        }
+
 
 
               function getSportType(courts, staidumId){
@@ -944,12 +1203,12 @@
 
                         <div class="booking-card-body">
                         <div class="booking-detail">
-                                <i class="ri-calendar-line"></i>
+                                <i class="ri-id-card-line"></i>
                                 <span>${name}</span>
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
-                                <span>${formattedDate}</span>
+                                <span>Ngày chơi: ${formattedDate}</span>
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
@@ -1052,8 +1311,11 @@
         // Function to auto-fill form from selected booking
         function fillFormFromBooking(booking, stadium) {
             // Set date
-            const bookingDate = new Date(booking.date);
-            document.getElementById('newPlayDate').value = bookingDate.toISOString().split('T')[0];
+                        const dateForInput = booking.date.substring(0, 10);
+
+        document.getElementById("newPlayDate").value = dateForInput;
+
+
 
             // Set location (you might need to adjust this based on your stadium data structure)
             document.getElementById('newLocation').value = `${stadium.address}`;
@@ -1061,7 +1323,15 @@
 
             document.getElementById('newSport').value = getSportType(stadium.courts, booking.stadiumId);
             // Set play time
-            document.getElementById('newTimePlay').value = formatTimeForInput(booking.bookingDetails.startTime);
+                   // Lấy list giờ từ bookingDetails
+        const timeList = booking.bookingDetails.map(detail => {
+          // Nếu startTime là ISO thì cắt phần giờ phút
+          return new Date(detail.startTime).toISOString().substring(11, 16);
+        });
+
+        // Render tất cả giờ vào select
+        renderTimeOptions(timeList);
+
 
             // Calculate price per person suggestion (total price divided by estimated team size)
             if (booking.totalPrice) {
@@ -1078,7 +1348,22 @@
                         const formattedDate = new Date(playDate).toLocaleDateString('vi-VN');
                         schedulePreview.textContent = `${formattedDate} lúc ${timePlay}`;
                     }
+        function renderTimeOptions(list, selected = null) {
+          const select = document.getElementById("newTimePlay");
+          select.innerHTML = "";
 
+          list.forEach(time => {
+            const option = document.createElement("option");
+            option.value = time;
+            option.textContent = time;
+
+            if (selected && selected === time) {
+              option.selected = true;
+            }
+
+            select.appendChild(option);
+          });
+        }
 
 
         // Function to show selected booking info
@@ -1163,9 +1448,7 @@
                     text: 'Bài đăng tìm đội đã được tạo thành công',
                     confirmButtonColor: '#3b82f6'
                 }).then(() => {
-                    // Refresh page hoặc cập nhật danh sách
-                    // location.reload();
-                    // hoặc viết hàm refresh list
+                    loadPost(); // Reload posts to show the new one
                 });
             },
             error: function (xhr, status, error) {
@@ -1260,56 +1543,23 @@
                 return '--:--';
             }
         }
-                        function formatTimeForInput(timeString) {
-            if (!timeString) return '';
 
-            try {
-                if (typeof timeString === 'string') {
-                    // Handle ISO 8601 Duration format (e.g., PT6H)
-                    if (timeString.startsWith('PT')) {
-                        const match = timeString.match(/PT(\d+)H/);
-                        if (match && match[1]) {
-                            const hours = match[1].padStart(2, '0');
-                            return `${hours}:00`;
-                        }
-                    }
 
-                    // Handle HH:mm:ss format
-                    if (timeString.includes(':')) {
-                        const parts = timeString.split(':');
-                        if (parts.length >= 2) {
-                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
-                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
-                            return `${hours}:${minutes}`;
-                        }
-                    }
-                }
-
-                return timeString.toString();
-            } catch (error) {
-                console.warn('Error formatting time for input:', error);
-                return '';
-            }
-        }
-
-                function formatTimeForInput(dateObject) {
-          // 1. Kiểm tra xem đầu vào có phải là một đối tượng Date hợp lệ không.
+                      function formatTimeForInput(dateObject) {
+          // 1. Kiểm tra xem đầu vào có phải Date hợp lệ không
           if (!(dateObject instanceof Date) || isNaN(dateObject.getTime())) {
             console.error("Đầu vào không phải là một đối tượng Date hợp lệ.");
-            return ''; // Trả về chuỗi rỗng để tránh lỗi
+            return '';
           }
 
-          // 2. Lấy giờ và phút từ đối tượng Date.
-          const hours = dateObject.getHours();
-          const minutes = dateObject.getMinutes();
+          // 2. Lấy giờ và phút
+          let hours = dateObject.getHours().toString().padStart(2, '0');
+          let minutes = dateObject.getMinutes().toString().padStart(2, '0');
 
-          // 3. Dùng padStart để đảm bảo giờ và phút luôn có 2 chữ số (ví dụ: 8 -> "08").
-          const paddedHours = String(hours).padStart(2, '0');
-          const paddedMinutes = String(minutes).padStart(2, '0');
-
-          // 4. Kết hợp lại thành chuỗi kết quả và trả về.
-          return `${paddedHours}:${paddedMinutes}`;
+          // 3. Trả về chuỗi dạng "HH:mm"
+          return `${hours}:${minutes}`;
         }
+
     </script>
 
     <!-- Filter Overlay for Mobile -->

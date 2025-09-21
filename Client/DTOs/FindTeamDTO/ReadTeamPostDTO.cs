@@ -10,7 +10,7 @@
         public string Title { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public string SportType { get; set; } = string.Empty;
-        public int MaxPlayers { get; set; }
+        public int JoinedPlayers { get; set; }
         public int NeededPlayers { get; set; }
         public decimal PricePerPerson { get; set; }
         public string Description { get; set; } = string.Empty;

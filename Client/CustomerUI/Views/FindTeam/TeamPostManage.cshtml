@@ -13,19 +13,29 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill-emoji@latest/dist/quill-emoji.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/quill-emoji@latest/dist/quill-emoji.js"></script>
+
     
 </head>
 <body class="min-h-screen">
     <!-- Floating Background Elements -->
-    <div class="floating-elements"></div>
+    <div class="floating-elements">
+
+    </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="shadow-soft p-8">
+                <a class="back-btn" href="/FindTeam/FindTeam"><i class="ri-arrow-left-line"></i> Quay lại</a>
+            </div>
+        </div>
         <div class="mb-8">
             <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-soft border border-white/20 p-8">
                 <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
@@ -120,6 +130,37 @@
             // Initialize any required jQuery plugins here
             showLoading();
             loadMyPost();
+                    // Lắng nghe sự kiện click trên toàn bộ #post-list
+        $('#post-list').on('click', function(event) {
+
+            // Tìm phần tử gần nhất có class 'btn-edit' hoặc 'btn-delete' so với nơi đã click
+            const editButton = event.target.closest('.btn-edit');
+            const deleteButton = event.target.closest('.btn-delete');
+
+            if (editButton) {
+                // Ngăn thẻ <a> cha hoạt động
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Lấy ID từ data-attribute
+                const postId = $(editButton).data('post-id');
+
+                console.log('Chỉnh sửa bài đăng ID:', postId);
+                openEdit(postId); // Gọi hàm của bạn
+            }
+
+            if (deleteButton) {
+                // Ngăn thẻ <a> cha hoạt động
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Lấy ID từ data-attribute
+                const postId = $(deleteButton).data('post-id');
+
+                console.log('Xóa bài đăng ID:', postId);
+                // openDeleteModal(postId); // Gọi hàm xóa của bạn
+            }
+        });
         });
 
         function loadMyPost(){
@@ -169,9 +210,10 @@
             console.log(hidden);
 
             let html = post.map(post => `
-               <a href="/TeamMember/TeamManage?postId=${post.id}" class="post-card bg-white/90 backdrop-blur-sm rounded-3xl shadow-soft border border-white/20 p-6 hover:shadow-large transition-all">
+               <a href="/TeamMember/TeamManage?postId=${post.id}" id="post-${post.id}" class="post-card bg-white/90 backdrop-blur-sm rounded-3xl shadow-soft border border-white/20 p-6 hover:shadow-large transition-all">
                 <!-- Post Header -->
-                <div class="flex items-start gap-4 mb-6">
+                <div class="card-header card">
+                <div class=" flex items-start gap-4 mb-6">
                     <div class="player-avatar">
                                     <img src="https://localhost:7136/${profile[post.createdBy].avatarUrl}" alt="${profile[post.createdBy].fullName}">
                                 </div>
@@ -192,7 +234,7 @@
                         <span class="font-semibold text-gray-900">${post.sportType}</span>
                     </div>
 
-                    <div class="space-y-3 card-info">
+                    <div class="card-content space-y-3 card-info">
                         <div class="flex items-center text-sm text-gray-700">
                             <i class="ri-calendar-2-line mr-3 text-primary"></i>
                             <span class="font-medium">${formatDate(post.playDate)}<span> Vào lúc </span>${formatTimeForDisplay(post.timePlay)}</span>
@@ -203,26 +245,25 @@
                         </div>
                         <div class="flex items-center text-sm text-gray-700">
                             <i class="ri-group-line mr-3 text-accent"></i>
-                            <span class="font-medium">Tìm ${post.neededPlayers}/${post.maxPlayers} người chơi</span>
+                            <span class="font-medium">Tìm ${post.joinedPlayers}/${post.neededPlayers} người chơi</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Description -->
-                <p class="text-gray-600 mb-6 leading-relaxed">
-                    ${post.description || 'Không có mô tả thêm cho bài đăng này.'}
-                </p>
-
+                <div id="preview" class="text-gray-600 leading-relaxed truncate-html pb-2"> ${post.description}</div>
+           
                 <!-- Action Buttons -->
-                <div class="flex gap-3">
-                    <button class="btn-secondary text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex-1 inline-flex items-center justify-center gap-2">
-                        <i class="ri-edit-2-line"></i>
-                        Chỉnh Sửa
-                    </button>
-                    <button class="btn-danger text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex-1 inline-flex items-center justify-center gap-2 delete-post">
-                        <i class="ri-delete-bin-line"></i>
-                        Xóa
-                    </button>
+                        <div class="card-footer flex gap-3">
+            <button data-post-id="${post.id}" class="btn-edit btn-secondary text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex-1 inline-flex items-center justify-center gap-2">
+                <i class="ri-edit-2-line"></i>
+                Chỉnh Sửa
+            </button>
+            <button data-post-id="${post.id}" class="btn-delete btn-danger text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex-1 inline-flex items-center justify-center gap-2">
+                <i class="ri-delete-bin-line"></i>
+                Xóa
+            </button>
+        </div>
                 </div>
             </a>
             `).join('');
@@ -348,6 +389,19 @@
         });
 
 
+        // render description
+        function renderDescription(description){ 
+
+            let quill = new Quill('#editor-container', {});
+            quill.root.innerHTML = description || "";
+
+        document.getElementById("newDescription").value = quill.root.innerHTML;
+
+
+                
+        }
+
+
                    function openCreate() {
             $.ajax({
                 url: '/FindTeam/GetBookByUserId',
@@ -377,6 +431,10 @@
                     popup: 'enhanced-popup'
                 },
                 didOpen: () => {
+
+  
+
+
                     // Add time and date preview functionality
                     const timePlayInput = document.getElementById('newTimePlay');
                     const playDateInput = document.getElementById('newPlayDate');
@@ -387,35 +445,33 @@
                 return;
             }
 
-            // Cấu hình thanh công cụ (bạn có thể tùy chỉnh)
-            const toolbarOptions = [
-                ['bold', 'italic', 'underline', 'strike'],        // Nút bật/tắt
-                ['blockquote', 'code-block'],
+           // Cấu hình thanh công cụ (bạn có thể tùy chỉnh)
+              const toolbarOptions = [
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{ 'header': 1 }, { 'header': 2 }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
+          [{ 'direction': 'rtl' }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+          ['clean'],
+          ['emoji']
+        ];
+         quill = new Quill('#editor-container', {
+          modules: {
+            toolbar: toolbarOptions,
+            'emoji-toolbar': true,
+            'emoji-textarea': false,
+            'emoji-shortname': true
+          },
+          theme: 'snow'
+        });
 
-                [{ 'header': 1 }, { 'header': 2 }],               // Nút tiêu đề
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-                [{ 'script': 'sub'}, { 'script': 'super' }],      // Chữ nhỏ trên/dưới
-                [{ 'indent': '-1'}, { 'indent': '+1' }],          // Tăng/giảm thụt lề
-                [{ 'direction': 'rtl' }],                         // Hướng văn bản
-
-                [{ 'size': ['small', false, 'large', 'huge'] }],  // Dropdown chọn kích thước chữ
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-                [{ 'color': [] }, { 'background': [] }],          // Dropdown chọn màu chữ, màu nền
-                [{ 'font': [] }],
-                [{ 'align': [] }],                                // Dropdown căn lề
-
-                ['clean']                                         // Nút xóa định dạng
-            ];
-
-            // Khởi tạo Quill editor
-            quill = new Quill('#editor-container', {
-                modules: {
-                    toolbar: toolbarOptions
-                },
-                theme: 'snow', // 'snow' là giao diện phổ biến với thanh công cụ ở trên
-                placeholder: 'Mô tả về hoạt động, yêu cầu kỹ năng, lưu ý đặc biệt...'
-            });
 
             // Lấy thẻ textarea ẩn
             const hiddenTextarea = document.querySelector('#newDescription');
@@ -436,27 +492,16 @@
                     // Gọi một lần để hiển thị giá trị ban đầu
                     updateSchedulePreview(timePlayInput, playDateInput, schedulePreview);
 
-                    // Update needed players based on max players
-                    const maxPlayersInput = document.getElementById('newMaxPlayers');
-                    const neededPlayersInput = document.getElementById('newNeededPlayers');
-
-                    maxPlayersInput.addEventListener('change', () => {
-                        const maxPlayers = parseInt(maxPlayersInput.value) || 0;
-                        neededPlayersInput.max = maxPlayers;
-                        if (parseInt(neededPlayersInput.value) > maxPlayers) {
-                            neededPlayersInput.value = maxPlayers;
-                        }
-                    });
                 },
                 preConfirm: () => {
                     // Clear any existing validation messages
                     Swal.resetValidationMessage();
 
                     try {
-                        const title = document.getElementById('newTitle').value.trim();
+                         const title = document.getElementById('newTitle').value.trim();
                         const location = document.getElementById('newLocation').value.trim();
                         const sport = document.getElementById('newSport').value.trim();
-                        const maxPlayers = parseInt(document.getElementById('newMaxPlayers').value);
+
                         const neededPlayers = parseInt(document.getElementById('newNeededPlayers').value);
                         const pricePerPerson = parseFloat(document.getElementById('newPricePerPerson').value) || 0;
                         const description = quill.root.innerHTML;
@@ -465,14 +510,14 @@
                         const bookingId = parseInt(document.getElementById('newBookingId').value);
                         const stadiumId = parseInt(document.getElementById('stadiumId').value);
 
+
+
                         // Validation với error handling
                         const validations = [
                             { condition: !title, message: 'Vui lòng nhập tiêu đề bài đăng' },
                             { condition: !location, message: 'Vui lòng nhập địa điểm' },
                             { condition: !sport, message: 'Vui lòng chọn môn thể thao' },
-                            { condition: !maxPlayers || maxPlayers < 2, message: 'Số lượng thành viên tối đa phải ít nhất 2 người' },
                             { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' },
-                            { condition: neededPlayers > maxPlayers, message: 'Số lượng cần tìm không thể lớn hơn số lượng tối đa' },
                             { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
@@ -492,7 +537,7 @@
                         formData.append('title', title);
                         formData.append('location', location);
                         formData.append('sportType', sport);
-                        formData.append('maxPlayers', maxPlayers);
+                        formData.append('joinedPlayers', 0);
                         formData.append('neededPlayers', neededPlayers);
                         formData.append('pricePerPerson', pricePerPerson);
                         formData.append('description', description);
@@ -529,8 +574,186 @@
             });
         }
 
+
+        //edit post
+        function openEdit(id) {
+            $.ajax({
+                url: `/FindTeam/GetPostById?postId=${id}`,
+                type: 'GET',
+                success: function(response) {
+                    console.log("booking: ", response);
+                    let quill;
+                    Swal.fire({
+                title: `
+                    <div class="modal-header">
+                        <div class="modal-icon">
+                            <i class="ri-add-circle-line"></i>
+                        </div>
+                        <div class="modal-title-text">Tạo Bài Đăng Tìm Đội</div>
+                    </div>
+                `,
+                html: generateEditTeamPostModalHTML(response),
+                showCancelButton: true,
+                confirmButtonText: '<i class="ri-save-line mr-1"></i>Tạo Bài Đăng',
+                cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy Bỏ',
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#6b7280',
+                width: '900px',
+                customClass: {
+                    confirmButton: 'enhanced-confirm-btn',
+                    cancelButton: 'enhanced-cancel-btn',
+                    popup: 'enhanced-popup'
+                },
+                didOpen: () => {
+                    // Add time and date preview functionality
+                        const priceInput = document.getElementById('editPricePerPerson');
+
+        // 1. Gọi hàm một lần để định dạng giá trị ban đầu
+        updateFormattedPrice('editPricePerPerson', 'priceFormat');
+
+        // 2. Thêm sự kiện 'input' để cập nhật mỗi khi người dùng gõ
+        // Sự kiện 'input' tốt hơn 'change' vì nó cập nhật ngay lập tức
+        if (priceInput) {
+            priceInput.addEventListener('input', () => {
+                updateFormattedPrice('editPricePerPerson', 'priceFormat');
+            });
+        }
+
+
+                    const timePlayInput = document.getElementById('editTimePlay');
+                    const playDateInput = document.getElementById('editPlayDate');
+                    const schedulePreview = document.getElementById('schedulePreview');
+
+                    const editorExists = document.querySelector('#editor-container .ql-editor');
+            if (editorExists) {
+                return;
+            }
+
+             // Cấu hình thanh công cụ (bạn có thể tùy chỉnh)
+              const toolbarOptions = [
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{ 'header': 1 }, { 'header': 2 }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
+          [{ 'direction': 'rtl' }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+          ['clean'],
+          ['emoji']
+        ];
+          quill = new Quill('#editor-container', {
+          modules: {
+            toolbar: toolbarOptions,
+            'emoji-toolbar': true,
+            'emoji-textarea': true,
+            'emoji-shortname': true
+          },
+          theme: 'snow'
+        });
+
+            // Lấy thẻ textarea ẩn
+      
+             const hiddenTextarea = document.querySelector('#editDescription');
+
+                    // 2. Lấy nội dung HTML từ textarea đó.
+                    const initialContent = hiddenTextarea.value;
+
+                    // 3. "Dán" nội dung HTML này vào trình soạn thảo Quill.
+                    if (initialContent) {
+                        quill.pasteHTML(initialContent);
+                    }
+            // Cập nhật giá trị của textarea ẩn mỗi khi nội dung trong Quill thay đổi.
+            // Điều này đảm bảo khi bạn gửi form, dữ liệu luôn là mới nhất.
+            quill.on('text-change', function() {
+                if (hiddenTextarea) {
+                    // Chúng ta lưu nội dung HTML để giữ lại định dạng (in đậm, in nghiêng,...)
+                    hiddenTextarea.value = quill.root.innerHTML;
+                }
+            });
+
+                    // Sửa lỗi: Bọc lệnh gọi hàm trong một hàm ẩn danh để nó chỉ được thực thi khi có sự kiện 'change'
+                    timePlayInput.addEventListener('change', () => updateSchedulePreview(timePlayInput, playDateInput, schedulePreview));
+                    playDateInput.addEventListener('change', () => updateSchedulePreview(timePlayInput, playDateInput, schedulePreview));
+
+                    // Gọi một lần để hiển thị giá trị ban đầu
+                    updateSchedulePreview(timePlayInput, playDateInput, schedulePreview);
+
+
+                },
+                preConfirm: () => {
+                    // Clear any existing validation messages
+                    Swal.resetValidationMessage();
+
+                    try {
+                        const id =document.getElementById('editPostId').value;
+                        const title = document.getElementById('editTitle').value.trim();
+                        const neededPlayers = parseInt(document.getElementById('editNeededPlayers').value);
+                        const pricePerPerson = parseFloat(document.getElementById('editPricePerPerson').value) || 0;
+                        console.log(quill.getText());
+                        const description = quill.root.innerHTML;
+           
+
+                        // Validation với error handling
+                        const validations = [
+                            { condition: !title, message: 'Vui lòng nhập tiêu đề bài đăng' },
+                            { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' }
+
+                        ];
+                        console.log("validations: ", validations);
+                        console.log('value', );
+
+                        for (const validation of validations) {
+                            if (validation.condition) {
+                                Swal.showValidationMessage(`<i class="ri-error-warning-line mr-1"></i>${validation.message}`);
+                                return false;
+                            }
+                        }
+
+                        // Validation với error handling
+                        const formData = new FormData();
+                        formData.append('Id', id);
+                        formData.append('Title', title);
+                        formData.append('NeededPlayers', neededPlayers);
+                        formData.append('Description', description);
+                        formData.append('PricePerPerson', pricePerPerson);
+   
+
+                        console.log("formData: ", formData.values);
+
+                        return formData;
+
+                    } catch (error) {
+                        console.error('Validation error:', error);
+                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Có lỗi xảy ra, vui lòng thử lại');
+                        return false;
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    editTeamPost(result.value);
+                }
+            });
+                },
+                error: function() {
+                    console.error('Error fetching bookings');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Không thể tải thông tin đặt sân. Vui lòng thử lại sau.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            });
+        }
+
+
                 // Update the generateCreateTeamPostModalHTML function
-        function generateCreateTeamPostModalHTML(bookings) {
+         function generateCreateTeamPostModalHTML(bookings) {
             return `
                 <div class="enhanced-modal-content">
                     <form id="newTeamPostForm" class="team-post-form">
@@ -631,12 +854,13 @@
                             <i class="ri-file-text-line"></i>
                             Mô tả
                         </label>
+              
                         <!-- Vùng chứa cho Quill Editor -->
                         <div id="editor-container"></div>
                         <!-- Textarea gốc được ẩn đi để lưu trữ dữ liệu HTML cho form -->
                         <textarea id="newDescription" name="description" style="display:none;"></textarea>
                         <div class="input-helper">Mô tả chi tiết giúp tìm được thành viên phù hợp</div>
-                    </div>
+                        </div>
                         </div>
 
                         <!-- Team Size Section -->
@@ -647,16 +871,6 @@
                             </div>
 
                             <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-group-line"></i>
-                                        Số thành viên tối đa
-                                    </label>
-                                    <input type="number" id="newMaxPlayers" class="form-input"
-                                           placeholder="10" min="2" max="50">
-                                    <div class="input-helper">Tổng số thành viên tối đa của đội (ít nhất 2 người)</div>
-                                </div>
-
                                 <div class="form-group">
                                     <label class="form-label required">
                                         <i class="ri-user-add-line"></i>
@@ -682,8 +896,7 @@
                                         <i class="ri-calendar-line"></i>
                                         Ngày chơi
                                     </label>
-                                    <input type="date" id="newPlayDate" class="form-input"
-                                           min="${new Date().toISOString().split('T')[0]}" readonly>
+                                    <input type="date" id="newPlayDate" class="form-input" readonly>
                                     <div class="input-helper">Ngày sẽ được tự động điền từ booking đã chọn</div>
                                 </div>
 
@@ -692,7 +905,153 @@
                                         <i class="ri-time-line"></i>
                                         Thời gian chơi
                                     </label>
-                                    <input type="time" id="newTimePlay" class="form-input">
+                                        <select id="newTimePlay" class="form-select"></select>
+                                        <div class="input-helper">Giờ bắt đầu hoạt động</div>
+                                </div>
+                            </div>
+
+                            <div class="schedule-preview">
+                                <i class="ri-calendar-event-line"></i>
+                                <span>Hoạt động sẽ diễn ra vào <strong id="schedulePreview">ngày được chọn</strong></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+
+        function generateEditTeamPostModalHTML(response) {
+            return `
+                <div class="enhanced-modal-content">
+                    <form id="newTeamPostForm" class="team-post-form">
+                        <!-- Booking Information Section -->
+                        
+
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-information-line"></i>
+                                <input id="editPostId" hidden value="${response.teamPost.id}">
+                                <input id="editStadiumId" hidden value="${response.teamPost.stadiumId}">
+                                <input id="editBookingId" hidden value="${response.teamPost.bookingId}">
+                                <h3>Thông Tin Cơ Bản</h3>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-edit-line"></i>
+                                        Tiêu đề bài đăng
+                                    </label>
+                                    <input type="text" id="editTitle" class="form-input"
+                                           placeholder="Nhập tiêu đề thu hút cho bài đăng" value="${response.teamPost.title}">
+                                    <div class="input-helper">Tiêu đề sẽ hiển thị công khai để thu hút thành viên</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-map-pin-2-line"></i>
+                                        Địa điểm
+                                    </label>
+                                    <input type="text" id="editLocation" class="form-input" value="${response.teamPost.location}"
+                                           placeholder="Nhập địa điểm chơi" readonly>
+                                    <div class="input-helper">Địa điểm sẽ được tự động điền từ booking đã chọn</div>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-football-line"></i>
+                                        Môn thể thao
+                                    </label>
+                                            <select id="editSport" class="form-input">
+          <option value="">Chọn môn thể thao</option>
+          <option value="Bóng đá sân 11" ${response.teamPost.sportType === "Bóng đá sân 11" ? "selected" : ""}>Bóng đá sân 11</option>
+          <option value="Bóng đá sân 7"  ${response.teamPost.sportType === "Bóng đá sân 7" ? "selected" : ""}>Bóng đá sân 7</option>
+          <option value="Bóng đá sân 5"  ${response.teamPost.sportType === "Bóng đá sân 5" ? "selected" : ""}>Bóng đá sân 5</option>
+          <option value="Bóng rổ"        ${response.teamPost.sportType === "Bóng rổ" ? "selected" : ""}>Bóng rổ</option>
+          <option value="Bóng chuyền"    ${response.teamPost.sportType === "Bóng chuyền" ? "selected" : ""}>Bóng chuyền</option>
+          <option value="Cầu lông"       ${response.teamPost.sportType === "Cầu lông" ? "selected" : ""}>Cầu lông</option>
+          <option value="Tennis"         ${response.teamPost.sportType === "Tennis" ? "selected" : ""}>Tennis</option>
+          <option value="table-tennis"   ${response.teamPost.sportType === "table-tennis" ? "selected" : ""}>Bóng bàn</option>
+          <option value="other"          ${response.teamPost.sportType === "other" ? "selected" : ""}>Khác</option>
+        </select>
+
+                                    <div class="input-helper">Chọn môn thể thao sẽ chơi</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-money-dollar-circle-line"></i>
+                                                Giá mỗi người (VNĐ) | <span class="price" id="priceFormat"> </span>
+                                    </label>
+                                    
+                                    <input type="number" id="editPricePerPerson" class="form-input" value="${response.teamPost.pricePerPerson}"
+                                           placeholder="0" min="0" max="9999999" step="1000">
+                                    <div class="input-helper">Chi phí mỗi người tham gia (để trống nếu miễn phí)</div>
+                                </div>
+                            </div>
+
+                             <div class="form-group full-width">
+                        <label class="form-label">
+                            <i class="ri-file-text-line"></i>
+                            Mô tả
+                        </label>
+                        <!-- Vùng chứa cho Quill Editor -->
+                        <div id="editor-container"></div>
+                        <!-- Textarea gốc được ẩn đi để lưu trữ dữ liệu HTML cho form -->
+                        <textarea id="editDescription" name="description" style="display:none;">${response.teamPost.description}</textarea>
+                        <div class="input-helper">Mô tả chi tiết giúp tìm được thành viên phù hợp</div>
+                    </div>
+                        </div>
+
+                        <!-- Team Size Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-team-line"></i>
+                                <h3>Thông Tin Đội</h3>
+                            </div>
+
+                            <div class="form-grid">
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-user-add-line"></i>
+                                        Số thành viên cần tìm
+                                    </label>
+                                    <input type="number" id="editNeededPlayers" class="form-input" value="${response.teamPost.neededPlayers}"
+                                           placeholder="5" min="1">
+                                    <div class="input-helper">Số lượng thành viên còn thiếu cần tìm thêm</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-calendar-event-line"></i>
+                                <h3>Lịch Trình</h3>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-calendar-line"></i>
+                                        Ngày chơi
+                                    </label>
+                                    <input type="date" id="editPlayDate" class="form-input" value="${response.teamPost.playDate.substring(0, 10)}"
+                                          readonly>
+                                    <div class="input-helper">Ngày sẽ được tự động điền từ booking đã chọn</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">
+                                        <i class="ri-time-line"></i>
+                                        Thời gian chơi
+                                    </label>
+                                    <input type="time" id="editTimePlay" class="form-input" value="${response.teamPost.timePlay}">
                                     <div class="input-helper">Giờ bắt đầu hoạt động</div>
                                 </div>
                             </div>
@@ -706,6 +1065,34 @@
                 </div>
             `;
         }
+
+
+        function updateFormattedPrice(inputId, spanId) {
+            // Lấy các phần tử từ DOM
+            const priceInput = document.getElementById(inputId);
+            const priceFormatSpan = document.getElementById(spanId);
+
+            // Kiểm tra xem các phần tử có tồn tại không
+            if (!priceInput || !priceFormatSpan) {
+                console.error("Không tìm thấy phần tử input hoặc span.");
+                return;
+            }
+
+            // Lấy giá trị số từ input, nếu không hợp lệ thì mặc định là 0
+            const priceValue = parseFloat(priceInput.value) || 0;
+
+            // Tạo một đối tượng để định dạng số theo chuẩn Việt Nam (vi-VN)
+            // style: 'currency' và currency: 'VND' sẽ tự động thêm dấu chấm và ký hiệu "₫"
+            const formatter = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0 // Không hiển thị phần thập phân (ví dụ: ,00)
+            });
+
+            // Cập nhật nội dung của thẻ span với giá trị đã được định dạng
+            priceFormatSpan.textContent = formatter.format(priceValue);
+        }
+
 
 
               function getSportType(courts, staidumId){
@@ -856,12 +1243,14 @@
         // Function to auto-fill form from selected booking
         function fillFormFromBooking(booking, stadium) {
             // Set date
-            const bookingDate = new Date(booking.date);
-            document.getElementById('newPlayDate').value = bookingDate.toISOString().split('T')[0];
+                       const dateForInput = booking.date.substring(0, 10);
+
+        document.getElementById("newPlayDate").value = dateForInput;
 
             // Set location (you might need to adjust this based on your stadium data structure)
             document.getElementById('newLocation').value = `${stadium.address}`;
             // set sport type
+            const player = document.getElementById('newMaxPlayers').value || 10;
 
             document.getElementById('newSport').value = getSportType(stadium.courts, booking.stadiumId);
             // Set play time
@@ -869,13 +1258,21 @@
 
             // Calculate price per person suggestion (total price divided by estimated team size)
             if (booking.totalPrice) {
-                const suggestedPricePerPerson = Math.ceil(booking.totalPrice / 10); // Assuming average team of 10
+                const suggestedPricePerPerson = Math.ceil(booking.totalPrice / player); // Assuming average team of 10
                 document.getElementById('newPricePerPerson').value = suggestedPricePerPerson;
             }
 
             // Update schedule preview
             // updateSchedulePreview(booking.a);
         }
+        // update price for post 
+        function updatePrice(booking){
+
+            const player = document.getElementById('newMaxPlayers').value || 10;
+            const suggestedPricePerPerson = Math.ceil(booking.totalPrice / player); // Assuming average team of 10
+                document.getElementById('newPricePerPerson').value = suggestedPricePerPerson;
+        }
+
         function updateSchedulePreview(timePlayInput, playDateInput, schedulePreview) {
                         const timePlay = timePlayInput.value || '00:00';
                         const playDate = playDateInput.value || new Date().toISOString().split('T')[0];
@@ -957,6 +1354,50 @@
             // Make API call to create team post
                     $.ajax({
             url: '/FindTeam/CreateNewPost',
+            type: 'POST',
+            processData: false,
+                contentType: false,
+            data: teamPostData,
+            success: function (data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Bài đăng tìm đội đã được tạo thành công',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    // Refresh page hoặc cập nhật danh sách
+                    // location.reload();
+                    // hoặc viết hàm refresh list
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error creating team post:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        });
+
+        }
+
+        // update post
+         function editTeamPost(teamPostData) {
+            // Show loading state
+            Swal.fire({
+                title: 'Đang tạo bài đăng...',
+                html: 'Vui lòng đợi trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Make API call to create team post
+                    $.ajax({
+            url: '/FindTeam/UpdateTeamPost',
             type: 'POST',
             processData: false,
                 contentType: false,

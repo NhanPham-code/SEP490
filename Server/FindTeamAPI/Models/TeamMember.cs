@@ -1,7 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FindTeamAPI.Models
 {
+    [Index(nameof(TeamPostId))]
+    [Index(nameof(UserId))]
+    [Index(nameof(TeamPostId), nameof(UserId), IsUnique = true)] // 1 user chỉ được join 1 lần
     public class TeamMember
     {
         public int Id { get; set; } // Unique identifier for the team member

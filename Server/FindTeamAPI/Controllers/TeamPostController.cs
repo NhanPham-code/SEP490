@@ -27,13 +27,13 @@ namespace FindTeamAPI.Controllers
 
         [HttpPut("UpdateTeamPost")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> UpdateTeamPost([FromBody] UpdateTeamPostDTO teamPost)
+        public async Task<IActionResult> UpdateTeamPost([FromBody] UpdateTeamPostDTO updateTeamPostDTO)
         {
-            if (teamPost == null)
+            if (updateTeamPostDTO == null)
             {
                 return BadRequest("Invalid team post data.");
             }
-            var updatedPost = await _teamPostService.UpdateTeamPostAsync(teamPost);
+            var updatedPost = await _teamPostService.UpdateTeamPostAsync(updateTeamPostDTO);
             return Ok(updatedPost);
         }
 

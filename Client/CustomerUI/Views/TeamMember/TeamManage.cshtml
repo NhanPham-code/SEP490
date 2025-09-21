@@ -2,6 +2,7 @@
 
 @{
     var postId = ViewBag.PostId;
+    var oldUrl = ViewBag.OldUrl ?? "/FindTeam/FindTeam"; // Default URL if OldUrl is not provided
 }
 <html lang="vi">
 <head>
@@ -12,10 +13,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <script>
         tailwind.config = {
           theme: {
@@ -46,77 +52,32 @@
 </head>
 <body class="min-h-screen">
     <!-- Floating Background Elements -->
-    <div class="floating-elements"></div>
+    <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+        <div class="floating-circle circle-4"></div>
+        <div class="floating-circle circle-5"></div>
+    </div>
+
+    <div class="back max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-8">
+        <div class="shadow-soft p-8">
+            <a class="back-btn" href="@oldUrl"><i class="ri-arrow-left-line"></i> Quay lại</a>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header Section -->
         <div class="mb-8">
             <div class="glass-card rounded-3xl shadow-soft p-8">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center">
-                                <i class="ri-team-line text-2xl text-white"></i>
-                            </div>
-                            <div>
-                                <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">Quản Lý Đội</h1>
-                                <p class="text-gray-600 text-lg">Quản lý thành viên đội và vai trò của họ</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4 mt-4">
-                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 px-4 py-2 rounded-xl">
-                                <span class="text-sm font-medium text-blue-700">Tổng Thành Viên: <span id="total-members">5</span></span>
-                            </div>
-                            <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 px-4 py-2 rounded-xl">
-                                <span class="text-sm font-medium text-green-700">Hoạt Động: <span id="active-members">4</span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex gap-3">
-                        <button id="add-member-btn" class="btn-primary text-white px-6 py-3 rounded-2xl text-sm font-semibold inline-flex items-center gap-2">
-                            <i class="ri-user-add-line text-lg"></i>
-                            Thêm Thành Viên
-                        </button>
-                        <button id="export-btn" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-200 transition-colors inline-flex items-center gap-2">
-                            <i class="ri-download-line text-lg"></i>
-                            Xuất File
-                        </button>
-                    </div>
+                <div id="post-detail" class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    
                 </div>
             </div>
         </div>
 
-        <!-- Search and Filter Section -->
-        <div class="mb-8">
-            <div class="glass-card rounded-3xl shadow-soft p-6">
-                <div class="flex flex-col lg:flex-row gap-4">
-                    <div class="flex-1">
-                        <div class="relative">
-                            <i class="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
-                            <input type="text"
-                                   id="search-input"
-                                   placeholder="Tìm kiếm thành viên theo tên hoặc ID..."
-                                   class="search-input w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-gray-700">
-                        </div>
-                    </div>
-                    <div class="flex gap-3">
-                        <select id="role-filter" class="search-input px-4 py-3 rounded-2xl outline-none text-gray-700 min-w-[150px]">
-                            <option value="">Tất Cả Vai Trò</option>
-                            <option value="captain">Đội Trưởng</option>
-                            <option value="member">Thành Viên</option>
-                            <option value="substitute">Dự Bị</option>
-                        </select>
-                        <select id="sort-filter" class="search-input px-4 py-3 rounded-2xl outline-none text-gray-700 min-w-[150px]">
-                            <option value="newest">Mới Nhất</option>
-                            <option value="oldest">Cũ Nhất</option>
-                            <option value="name">Tên A-Z</option>
-                            <option value="role">Theo Vai Trò</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
         <!-- Members Grid -->
         <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -222,54 +183,7 @@
     <!-- JavaScript -->
     <script>
         // Sample data based on ReadTeamMemberDTO - Vietnamese names
-        let teamMembers = [
-            {
-                id: 1,
-                teamPostId: 101,
-                userId: 1001,
-                userName: "Nguyễn Văn An",
-                userAvatar: "NVA",
-                joinedAt: "2025-01-15T10:30:00Z",
-                role: "captain"
-            },
-            {
-                id: 2,
-                teamPostId: 101,
-                userId: 1002,
-                userName: "Trần Thị Bình",
-                userAvatar: "TTB",
-                joinedAt: "2025-02-01T14:20:00Z",
-                role: "member"
-            },
-            {
-                id: 3,
-                teamPostId: 101,
-                userId: 1003,
-                userName: "Lê Hoàng Cường",
-                userAvatar: "LHC",
-                joinedAt: "2025-02-10T09:15:00Z",
-                role: "member"
-            },
-            {
-                id: 4,
-                teamPostId: 101,
-                userId: 1004,
-                userName: "Phạm Thị Dung",
-                userAvatar: "PTD",
-                joinedAt: "2025-03-01T16:45:00Z",
-                role: "substitute"
-            },
-            {
-                id: 5,
-                teamPostId: 101,
-                userId: 1005,
-                userName: "Vũ Minh Đức",
-                userAvatar: "VMD",
-                joinedAt: "2025-03-15T11:30:00Z",
-                role: "member"
-            }
-        ];
-
+       
         let editingMemberId = null;
         let memberToDelete = null;
 
@@ -349,7 +263,7 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            ${renderEditBtn(member, leader)}
+     
                         </div>
                     </div>
 
@@ -379,40 +293,72 @@
             `).join("");
         }
 
-        function renderEditBtn(member, leader){
-            if(leader > 0){
-                return `<button class="edit-member text-gray-400 hover:text-primary transition-colors" data-member-id="${member.id}">
-                                <i class="ri-edit-line text-lg"></i>
-                            </button>
-                            <button class="delete-member text-gray-400 hover:text-red-500 transition-colors" data-member-id="${member.id}">
-                                <i class="ri-delete-bin-line text-lg"></i>
-                            </button>`;
-            }else{
-                return ``;
-            }
-        }
 
         function renderBtn(member, leader){
-            if(leader > 0){
+            if (member.role === "Waiting" && leader > 0){
+                  return `
+        <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
+                id="btn-confirm"
+                data-member-id="${member.id}">
+            <i class="ri-check-line mr-1"></i>
+            Chấp Nhận
+        </button>
+        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
+                id="btn-cancel"
+                data-member-id="${member.id}">
+            <i class="ri-close-line"></i>
+            Từ chối
+        </button>`;
+
+            }
+            else if(leader > 0 && member.role === "Member"){
                 return `<button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}">
                             <i class="ri-edit-line mr-1"></i>
                             Sửa
                         </button>
-                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 delete-member" data-member-id="${member.id}">
+                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1" id="btn-removed" data-member-id="${member.id}">
                             <i class="ri-delete-bin-line mr-1"></i>
-                            Xóa
+                            Xóa thành viên
                         </button>`;
-            }else{
-                return ``;
+            } else{
+                return`<button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
+                id="btn-leave"
+                data-member-id="${member.id}">
+            <i class="ri-logout-box-line"></i>
+            Thoát nhóm
+        </button>`;
             }
         }
 
+        // chấp nhận, từ chối hoặc xóa thành viên
+        function changeMemberStatus(memberId, newStatus) {
+            console.log("memberId: ", memberId);
+            const postId = @postId; // Lấy postId từ ViewBag hoặc Model
+            $.ajax({
+                url: `/TeamMember/ChangeStatusMember?memberId=${memberId}&postId=${postId}&status=${newStatus}`,
+                type: 'GET',
+                success: function(response) {
+                    if(response.message === 500){
 
+                        showNotification("Lỗi hệ thống, vui lòng thử lại sau!");
+                        return;
+                    }
+                    $('#post-list').html(response);
+                    console.log(response);
+                    if(response.message == 200){
+                        showNotification(response.value.toString(), 'success');
+                        loadMember();
+                    }
 
-        // Filter and Search Functions
-        function filterMembers() {
-           
+                },
+                error: function() {
+                    console.error('Error loading posts');
+                }
+            });
         }
+
+
+
 
         // Modal Functions
         function openModal(title, submitText, member = null) {
@@ -457,23 +403,11 @@
         }
 
         function updateMember(memberId, memberData) {
-            const memberIndex = teamMembers.findIndex(m => m.id === memberId);
-            if (memberIndex !== -1) {
-                teamMembers[memberIndex] = {
-                    ...teamMembers[memberIndex],
-                    teamPostId: parseInt(memberData.teamPostId),
-                    userId: parseInt(memberData.userId),
-                    role: memberData.role
-                };
-                filterMembers();
-                showNotification('Cập nhật thành viên thành công!', 'success');
-            }
+            
         }
 
         function deleteMember(memberId) {
-            teamMembers = teamMembers.filter(m => m.id !== memberId);
-            filterMembers();
-            showNotification('Xóa thành viên thành công!', 'success');
+           
         }
 
         // Notification System
@@ -507,8 +441,14 @@
                 type: 'GET',
                 data: { page: 1, pageSize: 10 },
                 success: function(response) {
+                    if(response.message === 500){
+            
+                        document.getElementById('members-container').innerHTML = `<div class="member-card glass-card rounded-3xl shadow-soft p-6">Không có thành viên nào</div>`;
+                        return;
+                    }
                     $('#post-list').html(response);
                     console.log(response);
+                    
                     renderMemberCard(response.teamMembers, response.users, response.leaderId);
 
                     // Update results count
@@ -525,95 +465,195 @@
         // Event Listeners
         $(document).ready(function() {
 
+            displayPostDetail();
+            loadMember();
 
-          loadMember();
 
-            // Search and filter events
-            searchInput.addEventListener('input', filterMembers);
-            roleFilter.addEventListener('change', filterMembers);
-            sortFilter.addEventListener('change', filterMembers);
 
-            // Modal events
-            document.getElementById('add-member-btn').addEventListener('click', () => {
-                openModal('Thêm Thành Viên Mới', 'Thêm Thành Viên');
-            });
+          
 
-            document.getElementById('close-modal').addEventListener('click', closeModal);
-            document.getElementById('cancel-btn').addEventListener('click', closeModal);
-
-            // Form submission
-            document.getElementById('member-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-                
-
-                closeModal();
-            });
-
-            // Delete modal events
-            document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
-            document.getElementById('confirm-delete').addEventListener('click', function() {
-                if (memberToDelete) {
-                    deleteMember(memberToDelete);
-                    closeDeleteModal();
-                }
-            });
-
-            // Export functionality
-            document.getElementById('export-btn').addEventListener('click', function() {
-                const csvContent = "data:text/csv;charset=utf-8," +
-                    "ID,ID Người Dùng,ID Bài Đăng,Vai Trò,Ngày Tham Gia\n" +
-                    teamMembers.map(m => `${m.id},${m.userId},${m.teamPostId},${getRoleText(m.role)},${m.joinedAt}`).join("\n");
-
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "danh_sach_thanh_vien.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                showNotification('Xuất danh sách thành viên thành công!', 'success');
-            });
         });
 
-        // Delegate events for dynamically created elements
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.edit-member')) {
-                const memberId = parseInt(e.target.closest('.edit-member').dataset.memberId);
-                const member = teamMembers.find(m => m.id === memberId);
-                if (member) {
-                    openModal('Sửa Thành Viên', 'Cập Nhật', member);
-                }
-            }
-
-            if (e.target.closest('.delete-member')) {
-                const memberId = parseInt(e.target.closest('.delete-member').dataset.memberId);
-                openDeleteModal(memberId);
-            }
-
-            // Close modals when clicking outside
-            if (e.target === memberModal) {
-                closeModal();
-            }
-
-            if (e.target === deleteModal) {
-                closeDeleteModal();
-            }
+               $(document).on("click", "#btn-confirm", function(e) {
+            const memberId = parseInt(this.dataset.memberId);
+            changeMemberStatus(memberId, "Member");
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (!memberModal.classList.contains('hidden')) {
-                    closeModal();
-                }
-                if (!deleteModal.classList.contains('hidden')) {
-                    closeDeleteModal();
-                }
-            }
+
+            // nut tu choi
+                         $(document).on("click", "#btn-cancel", function(e) {
+            const memberId = parseInt(this.dataset.memberId);
+            changeMemberStatus(memberId, "Cancel");
         });
+
+         $(document).on("click", "#btn-leave", function(e) {
+            const memberId = parseInt(this.dataset.memberId);
+            changeMemberStatus(memberId, "Leave");
+        });
+        $(document).on("click", "#btn-removed", function(e) {
+            const memberId = parseInt(this.dataset.memberId);
+            changeMemberStatus(memberId, "Delete");
+        });
+
+
+
+                // 1. Truyền postId vào hàm để tạo URL động
+        function displayPostDetail() {
+            let postId = @postId; // Lấy postId từ ViewBag hoặc Model
+            // Kiểm tra xem postId có hợp lệ không
+            if (!postId) {
+                console.error('Post ID is missing.');
+                $('#post-detail').html('<p class="text-red-500">Không thể tải chi tiết bài đăng. ID bài đăng không hợp lệ.</p>');
+                return;
+            }
+
+            $.ajax({
+                // Sử dụng template literal để chèn postId vào URL
+                url: `/TeamMember/GetTeamPostDetail?postId=${postId}`,
+                type: 'GET',
+                success: function(response) {
+                    console.log("detail: ", response);
+                    // 2. Chuyển `response` cho hàm render và hiển thị kết quả
+                    $('#post-detail').html(renderPostDetail(response));
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Error loading post detail:', textStatus, errorThrown);
+                    // 3. Hiển thị thông báo lỗi thân thiện cho người dùng
+                    $('#post-detail').html('<p class="text-red-500">Đã xảy ra lỗi khi tải chi tiết bài đăng. Vui lòng thử lại sau.</p>');
+                }
+            });
+        }
+
+        // 4. Bỏ `async` vì không cần thiết
+        function renderPostDetail(response) {
+            // Helper để tránh lỗi XSS bằng cách escape các ký tự HTML đặc biệt
+            const escapeHtml = (unsafe) => {
+                if (unsafe === null || unsafe === undefined) return '';
+                return unsafe
+                    .toString()
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            };
+
+            // Giả sử các hàm này đã được định nghĩa ở nơi khác trong code của bạn
+            const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('vi-VN');
+                     const formatDateTimeWithDay = (dateTime) => {
+          const d = new Date(dateTime);
+
+          const day = String(d.getDate()).padStart(2, '0');        // 01–31
+          const month = String(d.getMonth() + 1).padStart(2, '0'); // 01–12
+          const year = d.getFullYear();
+
+          const hours = String(d.getHours()).padStart(2, '0');     // 00–23
+          const minutes = String(d.getMinutes()).padStart(2, '0'); // 00–59
+
+          // Map ngày trong tuần
+          const daysOfWeek = [
+            "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư",
+            "Thứ Năm", "Thứ Sáu", "Thứ Bảy"
+          ];
+          const weekday = daysOfWeek[d.getDay()]; // 0=CN, 1=Thứ 2, ...
+
+          return `${day}/${month}/${year} ${hours}:${minutes} - ${weekday}`;
+        };
+
+        // Test
+        console.log(formatDateTimeWithDay("2025-09-17T14:30:00"));
+        // 👉 17/09/2025 14:30 - Thứ Tư
+
+
+
+            const formatTimeForDisplay = (timeStr) => timeStr.substring(0, 5); // Ví dụ: "14:30:00" -> "14:30"
+
+            // 5. Sử dụng escapeHtml cho các dữ liệu văn bản để bảo mật
+            // Giả sử `response.teamPost.description` được phép chứa HTML an toàn, nếu không cũng cần được làm sạch
+            return `<div class="card-header card">
+                <div class=" flex items-start gap-4 mb-6">
+                    <div class="player-avatar">
+                        <img src="https://localhost:7136/${escapeHtml(response.user.avatarUrl)}" alt="${escapeHtml(response.user.fullName)}">
+                        
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-900 text-lg">${escapeHtml(response.user.fullName)}</h3>
+                        <span>Tạo ngày: ${formatDateTimeWithDay(response.teamPost.createdAt)}</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <!-- Dữ liệu này nên lấy từ response -->
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">${response.interestedCount || 0} Quan Tâm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sport Info -->
+                <div class="card-detail-info bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 mb-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="sport-icon">
+                            <i class="ri-basketball-line text-lg"></i>
+                        </div>
+                        <span class="font-semibold text-gray-900">${escapeHtml(response.teamPost.sportType)}</span>
+                    </div>
+
+                    <div class="card-content space-y-3 card-info">
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="ri-calendar-2-line mr-3 text-primary"></i>
+                            <span class="font-medium">${formatDate(response.teamPost.playDate)}<span> Vào lúc </span>${formatTimeForDisplay(response.teamPost.timePlay)}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="ri-map-pin-2-line mr-3 text-secondary"></i>
+                            <span class="font-medium">${escapeHtml(response.teamPost.location)}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="ri-group-line mr-3 text-accent"></i>
+                            <span class="font-medium">Tìm ${escapeHtml(response.teamPost.joinedPlayers)}/${escapeHtml(response.teamPost.neededPlayers)} người chơi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <!-- Chú ý: Nếu description chứa HTML, cần một thư viện để làm sạch (như DOMPurify) thay vì chèn trực tiếp -->
+                <div id="preview" class="text-gray-600 leading-relaxed truncate-html">${response.teamPost.description}</div>
+            </div>`;
+        }
+
+        // Cách sử dụng:
+        // Giả sử bạn lấy được postId từ URL, ví dụ: https://yoursite.com/posts/123
+        // const postId = 123;
+        // displayPostDetail(postId);
+        function formatTimeForDisplay(time) {
+            if (!time) return '--:--';
+
+            try {
+                if (typeof time === 'string') {
+                    if (time.startsWith('PT')) {
+                        const hoursMatch = time.match(/PT(\d+)H/);
+                        if (hoursMatch && hoursMatch[1]) {
+                            const hours = parseInt(hoursMatch[1]).toString().padStart(2, '0');
+                            return `${hours}:00`;
+                        }
+                    } else if (time.includes(':')) {
+                        const parts = time.split(':');
+                        if (parts.length >= 2) {
+                            const hours = parseInt(parts[0]).toString().padStart(2, '0');
+                            const minutes = parseInt(parts[1]).toString().padStart(2, '0');
+                            return `${hours}:${minutes}`;
+                        }
+                    }
+                }
+
+                if (time instanceof Date) {
+                    const hours = time.getHours().toString().padStart(2, '0');
+                    const minutes = time.getMinutes().toString().padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+
+                return '--:--';
+            } catch (error) {
+                console.warn('Error formatting time for display:', error);
+                return '--:--';
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,15 +1,21 @@
-﻿using Microsoft.OData;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OData;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FindTeamAPI.Models
 {
+    [Index(nameof(PlayDate))]
+    [Index(nameof(CreatedBy))]
+    [Index(nameof(StadiumId), nameof(PlayDate))]
     public class TeamPost
     {
         public int Id { get; set; } // Unique identifier for the team post
         public string Title { get; set; } = string.Empty; // Name of the team
         public string Location { get; set; } = string.Empty; // Location of the team
         public string SportType { get; set; } = string.Empty; // Sport type of the team
-        public int MaxPlayers { get; set; } // Maximum number of players allowed in the team
+        public int JoinedPlayers { get; set; } // Number of players who have already joined the team
         public int NeededPlayers { get; set; } // Number of players still needed to complete the team
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PricePerPerson { get; set; }
         public string? Description { get; set; } = string.Empty; // Description of the teams
         public TimeSpan TimePlay { get; set; } // Time when the team plays
