@@ -414,7 +414,8 @@ body {
     align-items: start;
 }
 #filter-form {
-    padding-top: 15%;
+    padding-top: 17%;
+
     position: sticky;
     top: 0;
 }
@@ -425,11 +426,21 @@ body {
         padding-top: 0 !important;
     }
 }
+@media(min-width: 1008px) {
+    #filter-form {
+        padding-top: 20%;
+       
+    }
+    .sidebar {
 
-/* Khi sidebar mở thì ẩn luôn */
-.hidden {
-    display: none !important;
+        max-height: calc(90vh - 2rem) !important;
+
+        
+    }
+
 }
+
+
 /* ===== SIDEBAR FILTERS ===== */
 .sidebar {
     background: white;
@@ -439,11 +450,13 @@ body {
     border: 1px solid var(--gray-100);
     position: sticky;
     top: var(--space-xl);
-    max-height: calc(90vh - 2rem);
+    max-height: calc(80vh - 2rem);
     overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--gray-300) transparent;
 }
+
 
     .sidebar::-webkit-scrollbar {
         width: 6px;
@@ -1046,7 +1059,7 @@ body {
 
 /* ===== GAME DETAILS ===== */
 .game-details {
-    margin-bottom: var(--space-lg);
+ 
 }
 
 .detail-item {
@@ -1098,26 +1111,55 @@ body {
     font-weight: 600;
     color: var(--gray-800);
 }
+.description-content {
+    display: flex;
+    flex-direction: column; /* Mặc định: ngang */
+    transition: flex-direction 0.3s;
+}
 
+
+.game-description > * {
+    display: block;
+    min-width: fit-content;
+}
 .game-description {
     font-size: var(--font-size-sm);
     line-height: 1.6;
-    margin-bottom: var(--space-lg);
     display: -webkit-box;
-    -webkit-line-clamp: 1; /* số dòng */
+    -webkit-line-clamp: 2; /* số dòng muốn ẩn */
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+    transition: all 0.3s;
 }
 
+    .game-description.expanded {
+        display: block !important;
+        -webkit-line-clamp: unset !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+    }
+
 .see-more {
-    color: blue;
+    color: #09f;
+    cursor: pointer;
+    min-width: fit-content;
+    display: none; /* ẩn mặc định */
+    margin-bottom: 10px;
+    text-decoration: underline;
+}
+.see-hidden {
+    color: #09f;
     cursor: pointer;
     display: none; /* ẩn mặc định */
+    margin-bottom: 10px;
+    text-decoration: underline;
 }
 
 
 /* ===== CARD FOOTER ===== */
 .card-footer {
+    margin-top: var(--space-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2285,7 +2327,8 @@ body {
             gap: var(--space-md);
         }
     }
-.ri-close-line {
+#close-icon {
     font-size: 24px;
     cursor: pointer;
+    color: red;
 }

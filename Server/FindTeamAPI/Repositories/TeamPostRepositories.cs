@@ -34,6 +34,7 @@ namespace FindTeamAPI.Repositories
             if (existingPost == null) return null;
             existingPost.Title = teamPost.Title;
             existingPost.Description = teamPost.Description;
+            existingPost.NeededPlayers = teamPost.NeededPlayers;
             existingPost.JoinedPlayers = teamPost.JoinedPlayers;
             existingPost.PricePerPerson = teamPost.PricePerPerson;
             existingPost.UpdatedAt = DateTime.UtcNow;

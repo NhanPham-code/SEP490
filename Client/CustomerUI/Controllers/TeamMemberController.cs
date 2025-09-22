@@ -1,6 +1,7 @@
 ﻿using DTOs.FindTeamDTO;
 using FindTeamAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Service.Interfaces;
 
 namespace CustomerUI.Controllers
@@ -77,11 +78,18 @@ namespace CustomerUI.Controllers
                 return Json(null);
             }
             token = _tokenService.GetAccessTokenFromCookie();
+            int myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
             TeamPostDetailViewModel teamPostDetailViewModel = new TeamPostDetailViewModel();
             var teamPost = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {postId}");
             teamPostDetailViewModel.TeamPost = teamPost.Value.FirstOrDefault();
             // get user profile by userId
             teamPostDetailViewModel.User = await _userService.GetOtherUserByIdAsync(teamPostDetailViewModel.TeamPost.CreatedBy);
+            // tìm xem bạn có phải viên mới không
+            var btn = teamPostDetailViewModel.TeamPost.TeamMembers.FirstOrDefault(n => n.UserId.Equals(myUserId));
+            if (btn == null)
+            {
+                teamPostDetailViewModel.newMember = 1;
+            }
             if (teamPostDetailViewModel != null && teamPost.Value.Any())
             {
                 return Json(teamPostDetailViewModel);
@@ -90,7 +98,7 @@ namespace CustomerUI.Controllers
         }
 
         // chấp nhận từ chối hoặc xóa thành viên khỏi đội
-        public async Task<IActionResult> ChangeStatusMember([FromQuery] int memberId, [FromQuery] int postId, [FromQuery] string status)
+        public async Task<IActionResult> ChangeStatusMember([FromQuery] int memberId, [FromQuery] int postId, [FromQuery] string status, [FromQuery] string role)
         {
             if (memberId <= 0 || postId <= 0)
             {
@@ -109,6 +117,7 @@ namespace CustomerUI.Controllers
                     Id = postId,
                     Title = post.Value.FirstOrDefault().Title,
                     JoinedPlayers = post.Value.FirstOrDefault().JoinedPlayers + 1,
+                    NeededPlayers = post.Value.FirstOrDefault().NeededPlayers,
                     PricePerPerson = post.Value.FirstOrDefault().PricePerPerson,
                     Description = post.Value.FirstOrDefault().Description,
                     UpdatedAt = DateTime.UtcNow
@@ -123,24 +132,43 @@ namespace CustomerUI.Controllers
             }else
             {
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
+                int daletedMemberId = 0;
+                string mesage = string.Empty;
                 if (result)
                 {
-                    var mesage = string.Empty;
+                   
                     if (status == "Cancel")
                     {
                         mesage = "Từ chối thành viên thành công!";
                     }
                     else if (status == "Delete")
                     {
+                        daletedMemberId = 1;
                         mesage = "Đã xóa thành viên thành công!";
                     }else if (status == "Leave"){
+                        if (role == "Member")
+                        {
+                            daletedMemberId = 1;
+
+                        }
                         mesage = "Rời đội thành công!";
                     }
-                        return Json(new { Message = 200, value = mesage });
+                     
                 }
-               
+                var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {postId}");
+                UpdateTeamPostDTO updateTeamPostDTO = new UpdateTeamPostDTO
+                {
+                    Id = postId,
+                    Title = post.Value.FirstOrDefault().Title,
+                    JoinedPlayers = post.Value.FirstOrDefault().JoinedPlayers - daletedMemberId,
+                    NeededPlayers = post.Value.FirstOrDefault().NeededPlayers,
+                    PricePerPerson = post.Value.FirstOrDefault().PricePerPerson,
+                    Description = post.Value.FirstOrDefault().Description,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                var postMember = await _teamPost.UpdateTeamPost(updateTeamPostDTO);
+                return Json(new { Message = 200, value = mesage });
             }
-            return Json(new { Message = 500 });
         }
     }
 }

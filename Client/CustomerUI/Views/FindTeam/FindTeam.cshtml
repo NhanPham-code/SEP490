@@ -121,7 +121,7 @@
                                     Xóa Tất Cả
                                 </button>
                                 <button class="close-filter" id="close-filter" type="button" aria-label="Đóng bộ lọc">
-                                    <i class="ri-close-line" aria-hidden="true"></i>
+                                    <i class="ri-close-line " id="close-icon" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
@@ -741,6 +741,7 @@
                          <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
                      </div>
                      <div class="game-details">
+
                          <div class="detail-item">
                              <i class="ri-basketball-line"></i>
                              <span>${p.sportType}</span>
@@ -761,8 +762,9 @@
                              <a class="view-member" href="/TeamMember/TeamManage?postId=${p.id}"> Xem thành viên   </a>
                          </div>
                      </div>
-                     <div class="game-description" id="gameDesc-${p.id}">${p.description || 'Không có mô tả thêm cho bài đăng này.'}</div>
-                     <span class="see-more" id="seeMore-${p.id}">xem thêm</span>
+                            <div class="game-description" id="gameDesc-${p.id}">${p.description || 'Không có mô tả thêm cho bài đăng này.'}</div>
+                        <span class="see-more" id="seeMore-${p.id}">Xem thêm</span>
+                        <span class="see-hidden" id="seeHidden-${p.id}">Ẩn bớt</span>
                      <div class="card-footer">
                          <div class="price-info">
                              <span id="perPrice-${p.id}" class="price">${formatVND(p.pricePerPerson)}</span>
@@ -788,12 +790,58 @@
 
             // Sửa lỗi: Gọi setupSeeMoreButtons cho MỖI bài đăng sau khi chúng được render
             // Dùng forEach để lặp qua mảng post và gọi hàm cho từng post.id
-            post.forEach(p => {
-                setupSeeMoreButtons(p.id);
-            });
+              requestAnimationFrame(() => {
+            post.forEach(p => setupSeeMoreButtons(p.id));
+        });
         }
 
-        
+        // nut xem them
+           function setupSeeMoreButtons(id) {
+            const gameDesc = document.getElementById(`gameDesc-${id}`);
+            const seeMore = document.getElementById(`seeMore-${id}`);
+            const seeHidden = document.getElementById(`seeHidden-${id}`);
+
+            if (!gameDesc || !seeMore) {
+                console.log(`Không tìm thấy phần tử với id gameDesc-${id} hoặc seeMore-${id}`);
+                return;
+            }
+
+            // Thêm log kiểm tra style đang bị ẩn hay không
+            console.log(
+                `setupSeeMoreButtons ${id}`,
+                'scrollHeight:', gameDesc.scrollHeight,
+                'clientHeight:', gameDesc.clientHeight,
+                'display:', window.getComputedStyle(gameDesc).display,
+                'text:', gameDesc.textContent
+            );
+
+            gameDesc.classList.remove("expanded");
+
+            if (gameDesc.scrollHeight > gameDesc.clientHeight) {
+                seeMore.style.display = "inline";
+            } else {
+                seeMore.style.display = "none";
+            }
+
+            if (!seeMore.dataset.bound) {
+                seeMore.addEventListener("click", () => {
+                    gameDesc.classList.add("expanded");
+                    seeHidden.style.display = "inline";
+                    seeMore.style.display = "none";
+                });
+                seeMore.dataset.bound = "true";
+            }
+
+            // nếu được xem thêm thì mới hiện ẩn bớt
+            if (!seeHidden.dataset.bound) {
+                seeHidden.addEventListener("click", () => {
+                    gameDesc.classList.remove("expanded");
+                    seeMore.style.display = "inline";
+                    seeHidden.style.display = "none";
+                });
+                seeHidden.dataset.bound = "true";
+            }
+        }
 
 
         function joindTeam(postId){

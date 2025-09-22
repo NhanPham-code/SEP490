@@ -136,18 +136,26 @@ namespace CustomerUI.Controllers
             //get booking by user id
             string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and BookingDetails/any(m: m/StartTime ge {formatted})";
             var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url);
-       
+            if (booking == null || !booking.Any())
+            {
+                return Json(new { Message = 404 });
+            }
 
             // get team post by user id and role is leader
-            var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader')");
-            List<int> ints = post.Value.Select(p => p.BookingId).ToList();
+            var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader') ");
+
 
             BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();
+            // lọc những booking đã tạo team post rồi thì không hiện nữa
+            var ints = post.Value.Select(p => p.BookingId).ToHashSet(); 
             bookingAndStadiumViewModel.Bookings = booking.Where(b => !ints.Contains(b.Id)).ToList();
 
-            List<int> stadiumId = booking.Select(s => s.StadiumId).ToList();
-            
+            var stadiumId = booking.Select(s => s.StadiumId).Distinct().ToList();
+
+
+            // get stadium by list id
             var s = await _stadiumService.GetAllStadiumByListId(stadiumId);
+            //thêm stadium vào dictionary theo key là các id của stadium trong booking để dễ truy xuất
             foreach (var item in s.Value)
             {
                 
@@ -161,6 +169,8 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> CreateNewPost()
         {
             CreateTeamPostDTO.CreatedBy = HttpContext.Session.GetInt32("UserId") ?? 0;
+            CreateTeamPostDTO.CreatedAt = DateTime.UtcNow;
+            CreateTeamPostDTO.UpdatedAt = DateTime.UtcNow;
             var result = await _teamPost.CreateTeamPost(CreateTeamPostDTO);
             if (result == null)
             {
@@ -193,6 +203,10 @@ namespace CustomerUI.Controllers
             var result = await _teamPost.GetOdataTeamPostAsync(
                 $"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader')"
             );
+            if (result.Value.Any() == false)
+            {
+                return Json(new { Message = 404 });
+            }
             List<int> userId = result.Value.Select(u => u.CreatedBy).ToList();
 
             // get profile by id 
@@ -203,6 +217,7 @@ namespace CustomerUI.Controllers
             FindTeamViewModel findTeamViewModel = new FindTeamViewModel
             {
                 TeamPosts = result.Value,
+                TotalCount = result.Count
             };
 
             // Chuyển danh sách profile thành Dictionary để tra cứu nhanh hơn.
@@ -216,12 +231,18 @@ namespace CustomerUI.Controllers
                 {
                     findTeamViewModel.UserNames.Add(item.CreatedBy, user);
                 }
-
-                // Sử dụng ContainsKey để kiểm tra key đã tồn tại hay chưa.
-                if (myUserId == item.CreatedBy && !findTeamViewModel.Hidden.ContainsKey(item.CreatedBy))
+               
+           
+                findTeamViewModel.TeamPosts.ForEach(tp =>
                 {
-                    findTeamViewModel.Hidden.Add(item.CreatedBy, 1);
-                }
+                    var playDate = DateTimeOffset.Parse(tp.PlayDate.ToString());
+                    if (playDate < DateTime.UtcNow && !findTeamViewModel.Hidden.ContainsKey(tp.Id))
+                    {
+                        findTeamViewModel.Hidden.Add(tp.Id, 1); // 3 = đã qua, không hiện nút xóa
+                    }
+                });
+
+
             }
 
 
@@ -323,7 +344,14 @@ namespace CustomerUI.Controllers
                 return Json(new { Message = 500, value = "Update team post failed" });
             }
             // get my user id
-
+            var oldPost = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {UpdateTeamPostDTO.Id}");
+            if (oldPost == null || !oldPost.Value.Any())
+            {
+                return Json(new { Message = 404, value = "Team post not found" });
+            }
+            var old = oldPost.Value.FirstOrDefault();
+            UpdateTeamPostDTO.UpdatedAt = DateTime.UtcNow;
+            UpdateTeamPostDTO.JoinedPlayers = old.JoinedPlayers;
             var update = await _teamPost.UpdateTeamPost(UpdateTeamPostDTO);
             return Json(update);
         }

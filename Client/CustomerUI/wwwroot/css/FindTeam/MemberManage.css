@@ -343,6 +343,7 @@ body {
 
 #post-detail {
     display: grid;
+    grid-template-columns: 1fr;
 }
 
 .ri-arrow-left-line {
@@ -360,9 +361,36 @@ body {
     .back-btn:hover {
         color: var(--primary-600);
         text-decoration: none;
+        width: fit-content;
     }
 
 .back {
+    
     top: 0;
     position: sticky;
+    z-index: 10;
+}
+    .back div {
+        background-color: white;
+    }
+
+.join-btn {
+    margin-top: 10px;
+    min-height: 40px;
+    display: flex;
+    justify-items: center;
+}
+.btn-join{
+    padding: 5px;
+    border-radius: 10px;
+    background-color:#cfe8ff;
+    color: #193300;
+}
+    .btn-join::selection {
+        background-color: #96a9b9;
+    }
+.line {
+    margin-top: 30px;
+    height: 1px;
+    background-color: #c5c5c5;
 }

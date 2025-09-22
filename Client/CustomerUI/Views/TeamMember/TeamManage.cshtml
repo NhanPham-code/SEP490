@@ -299,31 +299,34 @@
                   return `
         <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
                 id="btn-confirm"
-                data-member-id="${member.id}">
+                data-member-id="${member.id}"
+                data-member-role="${member.role}">
             <i class="ri-check-line mr-1"></i>
             Chấp Nhận
         </button>
         <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
                 id="btn-cancel"
-                data-member-id="${member.id}">
+                data-member-id="${member.id}"
+                data-member-role="${member.role}">
             <i class="ri-close-line"></i>
             Từ chối
         </button>`;
 
             }
             else if(leader > 0 && member.role === "Member"){
-                return `<button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}">
+                return `<button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}" data-member-role="${member.role}">
                             <i class="ri-edit-line mr-1"></i>
                             Sửa
                         </button>
-                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1" id="btn-removed" data-member-id="${member.id}">
+                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1" id="btn-removed" data-member-id="${member.id}" data-member-role="${member.role}">
                             <i class="ri-delete-bin-line mr-1"></i>
                             Xóa thành viên
                         </button>`;
             } else{
                 return`<button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
                 id="btn-leave"
-                data-member-id="${member.id}">
+                data-member-id="${member.id}"
+                data-member-role="${member.role}">
             <i class="ri-logout-box-line"></i>
             Thoát nhóm
         </button>`;
@@ -331,11 +334,11 @@
         }
 
         // chấp nhận, từ chối hoặc xóa thành viên
-        function changeMemberStatus(memberId, newStatus) {
+        function changeMemberStatus(memberId, newStatus, role) {
             console.log("memberId: ", memberId);
             const postId = @postId; // Lấy postId từ ViewBag hoặc Model
             $.ajax({
-                url: `/TeamMember/ChangeStatusMember?memberId=${memberId}&postId=${postId}&status=${newStatus}`,
+                url: `/TeamMember/ChangeStatusMember?memberId=${memberId}&postId=${postId}&status=${newStatus}&role=${role}`,
                 type: 'GET',
                 success: function(response) {
                     if(response.message === 500){
@@ -348,6 +351,7 @@
                     if(response.message == 200){
                         showNotification(response.value.toString(), 'success');
                         loadMember();
+                        displayPostDetail();
                     }
 
                 },
@@ -402,13 +406,6 @@
             showNotification('Thêm thành viên thành công!', 'success');
         }
 
-        function updateMember(memberId, memberData) {
-            
-        }
-
-        function deleteMember(memberId) {
-           
-        }
 
         // Notification System
         function showNotification(message, type = 'info') {
@@ -476,23 +473,32 @@
 
                $(document).on("click", "#btn-confirm", function(e) {
             const memberId = parseInt(this.dataset.memberId);
-            changeMemberStatus(memberId, "Member");
+                        const role = this.dataset.memberRole;
+
+            changeMemberStatus(memberId, "Member", role);
         });
 
 
             // nut tu choi
                          $(document).on("click", "#btn-cancel", function(e) {
             const memberId = parseInt(this.dataset.memberId);
-            changeMemberStatus(memberId, "Cancel");
+                        const role = this.dataset.memberRole;
+
+            changeMemberStatus(memberId, "Cancel", role);
         });
 
          $(document).on("click", "#btn-leave", function(e) {
             const memberId = parseInt(this.dataset.memberId);
-            changeMemberStatus(memberId, "Leave");
+            const role = this.dataset.memberRole;
+
+
+            changeMemberStatus(memberId, "Leave", role);
         });
         $(document).on("click", "#btn-removed", function(e) {
             const memberId = parseInt(this.dataset.memberId);
-            changeMemberStatus(memberId, "Delete");
+                        const role = this.dataset.memberRole;
+
+            changeMemberStatus(memberId, "Delete", role);
         });
 
 
@@ -614,7 +620,63 @@
                 <!-- Description -->
                 <!-- Chú ý: Nếu description chứa HTML, cần một thư viện để làm sạch (như DOMPurify) thay vì chèn trực tiếp -->
                 <div id="preview" class="text-gray-600 leading-relaxed truncate-html">${response.teamPost.description}</div>
+                <div class="line"></div>
+                <div class="join-btn ">
+                    ${renderJoinButton(response.newMember, response.teamPost)}
+                </div>
             </div>`;
+        }
+        //join team
+         function joindTeam(postId){
+
+
+
+                // Gửi yêu cầu AJAX để tham gia bài đăng
+                $.ajax({
+                    url: '/FindTeam/JoinTeamPost',
+                    type: 'POST',
+                    data: { postId: postId },
+                    success: function(response) {
+                        if (response.message === 200) {
+                            showNotification('Đăng ký tham gia thành công! và đang chờ chủ bài đăng chấp nhận', 'success');
+                            
+                            // Cập nhật lại danh sách bài đăng sau khi tham gia
+                                                     displayPostDetail();
+            loadMember();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: response.message,
+                                confirmButtonColor: '#ef4444'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi tham gia bài đăng. Vui lòng thử lại.',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                });
+        }
+
+        // render nút tham gia
+        function renderJoinButton(newMember, post) {
+
+            if (newMember === 1) {
+                return `
+                <button onClick="joindTeam(${post.id})" class="btn btn-join">
+                    <i class="ri-user-add-line"></i>
+                    Tham Gia
+                </button>
+            `;
+            }else{
+                return ``;
+            }
+
         }
 
         // Cách sử dụng:

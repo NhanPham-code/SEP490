@@ -29,6 +29,47 @@ namespace StadiumAPI.Data
             modelBuilder.Entity<CourtRelations>().ToTable("CourtRelations");
             modelBuilder.Entity<StadiumVideos>().ToTable("StadiumVideos");
 
+            // ===== ADD INDEXES =====
+            // Courts: StadiumId, Name
+            modelBuilder.Entity<Courts>()
+                .HasIndex(c => c.StadiumId)
+                .HasDatabaseName("IX_Courts_StadiumId");
+            modelBuilder.Entity<Courts>()
+                .HasIndex(c => c.Name)
+                .HasDatabaseName("IX_Courts_Name");
+
+            // Stadiums: Name, NameUnsigned, AddressUnsigned, IsApproved
+            modelBuilder.Entity<Stadiums>()
+                .HasIndex(s => s.Name)
+                .HasDatabaseName("IX_Stadiums_Name");
+            modelBuilder.Entity<Stadiums>()
+                .HasIndex(s => s.NameUnsigned)
+                .HasDatabaseName("IX_Stadiums_NameUnsigned");
+            modelBuilder.Entity<Stadiums>()
+                .HasIndex(s => s.AddressUnsigned)
+                .HasDatabaseName("IX_Stadiums_AddressUnsigned");
+            modelBuilder.Entity<Stadiums>()
+                .HasIndex(s => s.IsApproved)
+                .HasDatabaseName("IX_Stadiums_IsApproved");
+
+            // StadiumImages: StadiumId
+            modelBuilder.Entity<StadiumImages>()
+                .HasIndex(si => si.StadiumId)
+                .HasDatabaseName("IX_StadiumImages_StadiumId");
+
+            // StadiumVideos: StadiumId
+            modelBuilder.Entity<StadiumVideos>()
+                .HasIndex(sv => sv.StadiumId)
+                .HasDatabaseName("IX_StadiumVideos_StadiumId");
+
+            // CourtRelations: ParentCourtId, ChildCourtId
+            modelBuilder.Entity<CourtRelations>()
+                .HasIndex(cr => cr.ParentCourtId)
+                .HasDatabaseName("IX_CourtRelations_ParentCourtId");
+            modelBuilder.Entity<CourtRelations>()
+                .HasIndex(cr => cr.ChildCourtId)
+                .HasDatabaseName("IX_CourtRelations_ChildCourtId");
+
             // Courts - Stadium
             modelBuilder.Entity<Courts>()
                 .HasOne(c => c.Stadium)

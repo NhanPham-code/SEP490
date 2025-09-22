@@ -9,6 +9,8 @@ namespace FindTeamAPI.DTOs
         public string Title { get; set; } = string.Empty; // Name of the team
 
         public int JoinedPlayers { get; set; }
+        public int NeededPlayers { get; set; } // Number of players still needed to complete the team
+
         public decimal PricePerPerson { get; set; }
 
         public string Description { get; set; } = string.Empty; // Description of the team
