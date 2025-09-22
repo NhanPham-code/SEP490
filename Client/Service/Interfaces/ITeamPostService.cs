@@ -11,7 +11,7 @@ namespace Service.Interfaces
 {
     public interface ITeamPostService
     {
-        Task<ODataResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url);
+        Task<OdataHaveCountResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url);
         Task<ReadTeamPostDTO> CreateTeamPost(CreateTeamPostDTO createTeamPostDTO);
         Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO);
         Task<bool> DeleteTeamPost(int postId);

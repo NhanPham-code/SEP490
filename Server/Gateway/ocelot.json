@@ -1,4 +1,5 @@
 ﻿{
+
   "Routes": [
     // === USER API ===
     {
@@ -8,6 +9,7 @@
         {
           "Host": "localhost",
           "Port": 7295
+
         }
       ],
       "UpstreamPathTemplate": "/users/google-auth",

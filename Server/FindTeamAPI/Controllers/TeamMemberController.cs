@@ -33,7 +33,7 @@ namespace FindTeamAPI.Controllers
         [HttpPost]
         [Route("AddNewTeamMember")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> AddTeamMember(CreateTeamMemberDTO createTeamMemberDTO)
+        public async Task<IActionResult> AddTeamMember([FromBody] CreateTeamMemberDTO createTeamMemberDTO)
         {
             var member = await _teamMemberService.CreateTeamMemberAsync(createTeamMemberDTO);
             return Ok(member);
@@ -42,7 +42,7 @@ namespace FindTeamAPI.Controllers
         [HttpPut]
         [Route("UpdateTeamMember")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> UpdateTeamMember(UpdateTeamMemberDTO updateTeamMemberDTO)
+        public async Task<IActionResult> UpdateTeamMember([FromBody] UpdateTeamMemberDTO updateTeamMemberDTO)
         {
             var teamMemberUpdate = await _teamMemberService.UpdateTeamMemberAsync(updateTeamMemberDTO);
             return Ok(teamMemberUpdate);

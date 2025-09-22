@@ -4,6 +4,7 @@ using FindTeamAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FindTeamAPI.Migrations
 {
     [DbContext(typeof(FindTeamDbContext))]
-    partial class FindTeamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250916080445_deleteStadiumName")]
+    partial class deleteStadiumName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,11 +50,6 @@ namespace FindTeamAPI.Migrations
 
                     b.HasIndex("TeamPostId");
 
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("TeamPostId", "UserId")
-                        .IsUnique();
-
                     b.ToTable("TeamMembers");
                 });
 
@@ -75,12 +73,12 @@ namespace FindTeamAPI.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("JoinedPlayers")
-                        .HasColumnType("int");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxPlayers")
+                        .HasColumnType("int");
 
                     b.Property<int>("NeededPlayers")
                         .HasColumnType("int");
@@ -109,12 +107,6 @@ namespace FindTeamAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("PlayDate");
-
-                    b.HasIndex("StadiumId", "PlayDate");
 
                     b.ToTable("TeamPosts");
                 });

@@ -24,9 +24,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.css">
     <script src="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
-    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
-    <link href="~/css/FindTeam/tutorial.css" rel="stylesheet" />
+
 
     <!-- SEO and Meta -->
     <meta name="robots" content="index, follow">
@@ -36,79 +34,57 @@
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-link">Chuyển đến nội dung chính</a>
 
-    <!-- Hero Section -->
-    <section class="hero" aria-label="Giới thiệu nền tảng">
-        <div class="hero-background" aria-hidden="true"></div>
-        <div class="hero-overlay" aria-hidden="true"></div>
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">Khám Phá Các Sân Thể Thao Cao Cấp</h1>
-                <p class="hero-subtitle">Kết nối với các vận động viên, đặt sân thể thao đẳng cấp thế giới và nâng tầm trò chơi của bạn với nền tảng thể thao toàn diện.</p>
-                <div class="hero-actions">
-                    <a class="btn btn-primary btn-large" href="#main-list" aria-label="Khám phá danh sách sân thể thao">
-                        Khám Phá Sân
-                    </a>
-                    <button class="btn btn-secondary btn-large" onclick="startGuide()" type="button" aria-label="Xem video hướng dẫn cách hoạt động">
-                        <i class="ri-play-circle-line" aria-hidden="true"></i>
-                        Cách Hoạt Động
-                    </button>
-                </div>
-            </div>
-            <div class="hero-stats" aria-label="Thống kê nền tảng">
-                <div class="stat-item">
-                    <div class="stat-number" aria-label="500 sân cao cấp">500+</div>
-                    <div class="stat-label">Sân Cao Cấp</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" aria-label="10000 người chơi hoạt động">10K+</div>
-                    <div class="stat-label">Người Chơi Hoạt Động</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" aria-label="50 môn thể thao">50+</div>
-                    <div class="stat-label">Môn Thể Thao</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+   
     <!-- Main Content -->
     <main class="main-content" id="main-content">
         <div class="container">
             <!-- Search and Filter Header -->
-            <div class="main-header">
-                <div class="search-header">
-                    <div class="search-info" data-intro="Ở đây sẽ hiển thị số lượng bài đăng được tìm thấy" data-step="4">
-                        <h2 class="page-title">Tìm Kiếm Đồng Đội</h2>
-                        <p class="results-count" id="results-count">Hiển thị <span class="current-count" id="post-count"></span> kết quả</p>
-                    </div>
-                    <button class="btn btn-secondary" id="mobile-filter-btn" type="button" aria-label="Mở bộ lọc" data-intro="Bạn sẽ sử dụng bộ lọc ở đây" data-step="5">
-                        <i class="ri-filter-3-line" aria-hidden="true"></i>
-                        Bộ Lọc
-                    </button>
-
+            <div class="search-header">
+                <div class="search-info">
+                    <h2 class="page-title">Tìm Kiếm Đồng Đội</h2>
+                    <p class="results-count" id="results-count">Hiển thị <span class="current-count" id="post-count"></span> kết quả</p>
                 </div>
 
-                <!-- Mobile Filter Toggle -->
-                @* <div class="mobile-filter-toggle">
-               
-
-                    <!-- Sort Options -->
-                    <div class="sort-options">
-                        <label for="sort-select" class="sort-label">Sắp xếp:</label>
-                        <select id="sort-select" class="sort-select" aria-label="Sắp xếp kết quả">
-                            <option value="newest">Mới nhất</option>
-                            <option value="oldest">Cũ nhất</option>
-                            <option value="most-needed">Cần nhiều người nhất</option>
-                            <option value="least-needed">Cần ít người nhất</option>
-                            <option value="nearest-date">Gần nhất</option>
-                        </select>
+                <!-- Quick Search Bar -->
+                <div class="quick-search">
+                    <div class="search-input-wrapper">
+                        <i class="ri-search-line" aria-hidden="true"></i>
+                        <input type="search"
+                               id="quick-search"
+                               class="search-input"
+                               placeholder="Tìm kiếm theo môn thể thao, địa điểm..."
+                               aria-label="Tìm kiếm nhanh">
+                        <button type="button" class="search-clear" id="clear-search" aria-label="Xóa tìm kiếm">
+                            <i class="ri-close-line" aria-hidden="true"></i>
+                        </button>
                     </div>
-                </div> *@
+                </div>
+            </div>
+
+            <!-- Mobile Filter Toggle -->
+            <div class="mobile-filter-toggle">
+                <button class="btn btn-secondary" id="mobile-filter-btn" type="button" aria-label="Mở bộ lọc">
+                    <i class="ri-filter-3-line" aria-hidden="true"></i>
+                    Bộ Lọc
+                    <span class="filter-count" id="active-filters-count" aria-label="Số bộ lọc đang áp dụng">0</span>
+                </button>
+
+                <!-- Sort Options -->
+                <div class="sort-options">
+                    <label for="sort-select" class="sort-label">Sắp xếp:</label>
+                    <select id="sort-select" class="sort-select" aria-label="Sắp xếp kết quả">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="most-needed">Cần nhiều người nhất</option>
+                        <option value="least-needed">Cần ít người nhất</option>
+                        <option value="nearest-date">Gần nhất</option>
+                    </select>
+                </div>
             </div>
 
             <div class="content-grid">
                 <!-- Filter Sidebar -->
-                <form id="filter-form" data-intro="Bạn sẽ sử dụng bộ lọc ở đây" data-step="5">
+                <form id="filter-form">
                     <aside class="sidebar" id="filter-sidebar" role="complementary" aria-label="Bộ lọc tìm kiếm">
                         <div class="sidebar-header">
                             <h3 class="sidebar-title">
@@ -121,13 +97,13 @@
                                     Xóa Tất Cả
                                 </button>
                                 <button class="close-filter" id="close-filter" type="button" aria-label="Đóng bộ lọc">
-                                    <i class="ri-close-line " id="close-icon" aria-hidden="true"></i>
+                                    <i class="ri-close-line" id="close-icon" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Loại Thể Thao -->
-                        <div class="filter-section" data-intro="Bạn có thể chọn loại thể thao bạn muốn chơi" data-step="6">
+                        <div class="filter-section">
                             <button class="filter-header"
                                     data-target="sport-filter"
                                     type="button"
@@ -142,38 +118,44 @@
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Đá</span>
+                                        <span class="count" aria-label="45 bài viết">(45)</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Rổ">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Rổ</span>
+                                        <span class="count" aria-label="32 bài viết">(32)</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Tennis">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Tennis</span>
+                                        <span class="count" aria-label="28 bài viết">(28)</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu Lông">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Cầu Lông</span>
+                                        <span class="count" aria-label="19 bài viết">(19)</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Chuyền">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
+                                        <span class="count" aria-label="15 bài viết">(15)</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Đa Môn">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Đa Môn</span>
+                                        <span class="count" aria-label="22 bài viết">(22)</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Chọn Ngày -->
-                        <div class="filter-section" data-intro="Bạn có thể chọn ngày bạn muốn chơi" data-step="7">
+                        <div class="filter-section">
                             <button class="filter-header"
                                     data-target="date-filter"
                                     type="button"
@@ -189,7 +171,8 @@
                                            name="play_date"
                                            class="date-input"
                                            id="play-date-filter"
-                                           aria-label="Chọn ngày chơi">
+                                           aria-label="Chọn ngày chơi"
+                                           min="2025-09-11">
                                 </div>
                                 <div class="quick-date-options">
                                     <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
@@ -201,8 +184,7 @@
                         </div>
 
                         <!-- Thời Gian -->
-                        <div class="filter-section" data-intro="Chọn thời gian bạn muốn chơi" data-step="8">
-                          
+                        <div class="filter-section">
                             <button class="filter-header"
                                     data-target="time-filter"
                                     type="button"
@@ -328,16 +310,12 @@
                             <p class="section-subtitle">Kết nối với các vận động viên và tham gia các trận đấu thú vị</p>
                         </div>
                         <div class="section-actions">
-                            <a href="/FindTeam/TeamPostManage" class="btn btn-secondary" data-intro="Nhấn để xem bài viết bạn đã đăng" data-step="3" aria-label="Quản lý bài viết của tôi">
+                            <a href="/FindTeam/TeamPostManage" class="btn btn-secondary" aria-label="Quản lý bài viết của tôi">
                                 <i class="ri-file-list-3-line" aria-hidden="true"></i>
                                 Bài Viết Của Tôi
                             </a>
-                            <a href="/FindTeam/JoinedTeam" class="btn btn-secondary" data-intro="Nhấn để tạo xem những bài đăng bạn đã từng tham gia" data-step="2" aria-label="Quản lý bài viết của tôi">
-                                <i class="ri-file-list-3-line" aria-hidden="true"></i>
-                                Nhóm đã tham gia
-                            </a>
 
-                            <button id="create-post" onclick="openCreate()" class="btn btn-create-post" type="button" data-intro="Nhấn để tạo bài đăng mới" data-step="1" aria-label="Tạo bài viết tìm đồng đội mới">
+                            <button id="create-post" onclick="openCreate()" class="btn btn-create-post" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
                                 <i class="ri-add-line" aria-hidden="true"></i>
                                 Tạo Bài Viết
                             </button>
@@ -359,7 +337,7 @@
 
                     <!-- Load More -->
                     <div id="load-more-render"></div>
-                   
+
 
                     <!-- Empty State -->
                     <div class="empty-state" id="empty-state" style="display: none;">
@@ -377,56 +355,21 @@
             </div>
         </div>
     </main>
-    
+
 
     <script>
         let skip = 0;
         let pageSize = 0;
 
-        //hướng dẫn người chơi
-                 function startGuide() {
-            introJs().setOptions({
-              nextLabel: 'Tiếp ➡️',
-              prevLabel: '⬅️ Quay lại',
-              skipLabel: 'x',
-              doneLabel: 'Hoàn tất',
-              tooltipPosition: 'auto', // Tự động chọn vị trí tốt nhất
-              positionPrecedence: ['bottom', 'top', 'right', 'left'], // Ưu tiên vị trí
-              disableInteraction: false, // Cho phép tương tác với element
-              showStepNumbers: false, // Ẩn số step
-              scrollToElement: true, // Tự động scroll đến element
-              scrollPadding: 30, // Khoảng cách scroll
-              exitOnOverlayClick: false, // Không thoát khi click overlay
-              exitOnEsc: true, // Cho phép thoát bằng ESC
-              overlayOpacity: 0.7,
-              helperElementPadding: 10, // Khoảng cách highlight
-              showButtons: true
-            }).start();
-        }
-
-        //main 
+        //main
         $(document).ready(function() {
 
             sessionStorage.clear();
             showLoading();
-   
+
             loadPost();
 
             setupSearchListener();
-        let today = new Date(); // Lấy ngày hiện tại
-
-        let dd = String(today.getDate()).padStart(2, '0');
-        let mm = String(today.getMonth() + 1).padStart(2, '0');
-        let yyyy = today.getFullYear();
-
-        // Format chuẩn cho input date (yyyy-MM-dd)
-        let formatted = `${yyyy}-${mm}-${dd}`;
-
-        console.log(formatted); // 👉 "2025-09-21"
-
-        // Gán min vào input
-        document.getElementById("play-date-filter").setAttribute("min", formatted);
-
 
         });
                  // SỬA LẠI THEO CÁCH NÀY
@@ -443,7 +386,7 @@
 
         // logic cho loadmore
         function loadMoreLogic(){
-             
+
                             console.log('Button clicked!');
 
                             var count = sessionStorage.getItem('count') || 0;
@@ -459,7 +402,7 @@
                             sessionStorage.setItem('skip', skip);
                             sessionStorage.setItem('currentUrl', `&top = 6 &skip = ${skip}`);
                             console.log('URL:', count);
-                            loadPost();                        
+                            loadPost();
         }
 
         // filter and search
@@ -578,7 +521,7 @@
             }
         }
 
-        // xem thanh cuộn đang ở post nào 
+        // xem thanh cuộn đang ở post nào
         function getCurrentScrollPosition() {
                     const sections = document.querySelectorAll("div[id]");
 
@@ -664,139 +607,16 @@
             $('#loading-state').show();
             $('#players-grid').hide();
             $('#empty-state').hide();
-  
+
         }
         // Hide loading state
         function hideLoading(){
             $('#loading-state').hide();
             $('#players-grid').show();
-       
+
         }
         // Render posts dynamically
-                 // hiện nút xem thêm khi quá dài
-        function setupSeeMoreButtons(id) {
-            // Sửa lỗi: Sử dụng backticks (`) cho template string để nội suy biến `id`
-            const gameDesc = document.getElementById(`gameDesc-${id}`);
-            const seeMore = document.getElementById(`seeMore-${id}`);
-
-            // Kiểm tra xem các element có tồn tại không trước khi thao tác
-            if (!gameDesc || !seeMore) {
-                return;
-            }
-
-            // Check nếu có text bị cắt thì mới hiện "xem thêm"
-            if (gameDesc.scrollHeight > gameDesc.clientHeight) {
-                seeMore.style.display = "inline";
-            }
-
-            seeMore.addEventListener("click", () => {
-                gameDesc.style.display = "block"; // bỏ -webkit-box
-                gameDesc.style.webkitLineClamp = "unset";
-                gameDesc.style.overflow = "visible";
-                seeMore.style.display = "none"; // ẩn "xem thêm" sau khi bấm
-            });
-        }
-
-        function renderPosts(post, profile, hidden) {
-            if (!post || post.length === 0) {
-                $('#players-grid').html('');
-                return;
-            }
-            console.log(profile);
-            console.log(post);
-            console.log(post[0].createdBy);
-            console.log(hidden);
-              // Giả sử các hàm này đã được định nghĩa ở nơi khác trong code của bạn
-            const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('vi-VN');
-                     const formatDateTimeWithDay = (dateTime) => {
-          const d = new Date(dateTime);
-
-          const day = String(d.getDate()).padStart(2, '0');        // 01–31
-          const month = String(d.getMonth() + 1).padStart(2, '0'); // 01–12
-          const year = d.getFullYear();
-
-          const hours = String(d.getHours()).padStart(2, '0');     // 00–23
-          const minutes = String(d.getMinutes()).padStart(2, '0'); // 00–59
-
-          // Map ngày trong tuần
-          const daysOfWeek = [
-            "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư",
-            "Thứ Năm", "Thứ Sáu", "Thứ Bảy"
-          ];
-          const weekday = daysOfWeek[d.getDay()]; // 0=CN, 1=Thứ 2, ...
-
-          return `${day}/${month}/${year} ${hours}:${minutes}-${weekday}`;
-        };
-            const html = post.map(p => `
-                <article class="player-card" id="post-mum-${p.id}">
-                     <div class="player-header">
-                         <div class="player-avatar">
-                             <img src="https://localhost:7136/${profile[p.createdBy].avatarUrl}" alt="${profile[p.createdBy].fullName}">
-                             
-                         </div>
-                         <div class="player-info">
-                             <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
-                                <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
-                         </div>
-                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
-                     </div>
-                     <div class="game-details">
-
-                         <div class="detail-item">
-                             <i class="ri-basketball-line"></i>
-                             <span>${p.sportType}</span>
-                         </div>
-                         <div class="detail-item">
-                             <i class="ri-calendar-line"></i>
-                             <span>${formatDate(p.playDate)} - ${formatTimeForDisplay(p.timePlay)}</span>
-                         </div>
-                         <div class="detail-item">
-                             <i class="ri-map-pin-line"></i>
-                             <span>${p.location}</span>
-                         </div>
-                         <div class="player-item">
-                             <div class="">
-                                <i class="ri-group-line"></i>
-                                <span class="ml-4">Cần <span class="needed-players">${p.joinedPlayers}</span> / <span class="max-players">${p.neededPlayers}</span> người chơi</span>
-                             </div>
-                             <a class="view-member" href="/TeamMember/TeamManage?postId=${p.id}"> Xem thành viên   </a>
-                         </div>
-                     </div>
-                            <div class="game-description" id="gameDesc-${p.id}">${p.description || 'Không có mô tả thêm cho bài đăng này.'}</div>
-                        <span class="see-more" id="seeMore-${p.id}">Xem thêm</span>
-                        <span class="see-hidden" id="seeHidden-${p.id}">Ẩn bớt</span>
-                     <div class="card-footer">
-                         <div class="price-info">
-                             <span id="perPrice-${p.id}" class="price">${formatVND(p.pricePerPerson)}</span>
-                             <span class="price-label">mỗi người</span>
-                         </div>
-                         ${renderJoinButton(p, hidden)}
-                     </div>
-                 </article>
-             `).join('');
-
-            // Lấy giá trị từ sessionStorage và chuyển sang kiểu số.
-            // Nếu không có giá trị, mặc định là 0.
-            const skipPage = parseInt(sessionStorage.getItem('skip') || '0', 10);
-
-            if (skipPage === 0) {
-                console.log('Trang đầu, thay thế nội dung.');
-                $('#players-grid').html(html);
-            } else {
-                // Từ trang thứ 2 trở đi, nối thêm nội dung.
-                console.log('Trang tiếp theo, nối thêm nội dung. skipPage:', skipPage);
-                $('#players-grid').append(html);
-            }
-
-            // Sửa lỗi: Gọi setupSeeMoreButtons cho MỖI bài đăng sau khi chúng được render
-            // Dùng forEach để lặp qua mảng post và gọi hàm cho từng post.id
-              requestAnimationFrame(() => {
-            post.forEach(p => setupSeeMoreButtons(p.id));
-        });
-        }
-
-        // nut xem them
-           function setupSeeMoreButtons(id) {
+                    function setupSeeMoreButtons(id) {
             const gameDesc = document.getElementById(`gameDesc-${id}`);
             const seeMore = document.getElementById(`seeMore-${id}`);
             const seeHidden = document.getElementById(`seeHidden-${id}`);
@@ -843,11 +663,113 @@
             }
         }
 
+        function renderPosts(post, profile, hidden) {
+            if (!post || post.length === 0) {
+                $('#players-grid').html('');
+                return;
+            }
+            console.log(profile);
+            console.log(post);
+            console.log(post[0].createdBy);
+            console.log(hidden);
+              // Giả sử các hàm này đã được định nghĩa ở nơi khác trong code của bạn
+            const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('vi-VN');
+                     const formatDateTimeWithDay = (dateTime) => {
+          const d = new Date(dateTime);
+
+          const day = String(d.getDate()).padStart(2, '0');        // 01–31
+          const month = String(d.getMonth() + 1).padStart(2, '0'); // 01–12
+          const year = d.getFullYear();
+
+          const hours = String(d.getHours()).padStart(2, '0');     // 00–23
+          const minutes = String(d.getMinutes()).padStart(2, '0'); // 00–59
+
+          // Map ngày trong tuần
+          const daysOfWeek = [
+            "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư",
+            "Thứ Năm", "Thứ Sáu", "Thứ Bảy"
+          ];
+          const weekday = daysOfWeek[d.getDay()]; // 0=CN, 1=Thứ 2, ...
+
+          return `${day}/${month}/${year} ${hours}:${minutes}-${weekday}`;
+        };
+            const html = post.map(p => `
+                <article class="player-card" id="post-mum-${p.id}">
+                     <div class="player-header">
+                         <div class="player-avatar">
+                             <img src="https://localhost:7136/${profile[p.createdBy].avatarUrl}" alt="${profile[p.createdBy].fullName}">
+
+                         </div>
+                         <div class="player-info">
+                             <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
+                                <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
+                         </div>
+                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
+                     </div>
+                     <div class="game-details">
+                         <div class="detail-item">
+                             <i class="ri-basketball-line"></i>
+                             <span>${p.sportType}</span>
+                         </div>
+                         <div class="detail-item">
+                             <i class="ri-calendar-line"></i>
+                             <span>${formatDate(p.playDate)} - ${formatTimeForDisplay(p.timePlay)}</span>
+                         </div>
+                         <div class="detail-item">
+                             <i class="ri-map-pin-line"></i>
+                             <span>${p.location}</span>
+                         </div>
+                         <div class="player-item">
+                             <div class="">
+                                <i class="ri-group-line"></i>
+                                <span class="ml-4">Cần <span class="needed-players">${p.joinedPlayers}</span> / <span class="max-players">${p.neededPlayers}</span> người chơi</span>
+                             </div>
+                             <a class="view-member" href="/TeamMember/TeamManage?postId=${p.id}"> Xem thành viên   </a>
+                         </div>
+                     </div>
+                     <div class="description-content" id="description-content-${p.id}">
+                        <div class="game-description" id="gameDesc-${p.id}">${p.description || 'Không có mô tả thêm cho bài đăng này.'}</div>
+                        <span class="see-more" id="seeMore-${p.id}">Xem thêm</span>
+                        <span class="see-hidden" id="seeHidden-${p.id}">Ẩn bớt</span>
+
+                     </div>
+                     <div class="card-footer">
+                         <div class="price-info">
+                             <span id="perPrice-${p.id}" class="price">${formatVND(p.pricePerPerson)}</span>
+                             <span class="price-label">mỗi người</span>
+                         </div>
+                         ${renderJoinButton(p, hidden)}
+                     </div>
+                 </article>
+             `).join('');
+
+            // Lấy giá trị từ sessionStorage và chuyển sang kiểu số.
+            // Nếu không có giá trị, mặc định là 0.
+            const skipPage = parseInt(sessionStorage.getItem('skip') || '0', 10);
+
+            if (skipPage === 0) {
+                console.log('Trang đầu, thay thế nội dung.');
+                $('#players-grid').html(html);
+            } else {
+                // Từ trang thứ 2 trở đi, nối thêm nội dung.
+                console.log('Trang tiếp theo, nối thêm nội dung. skipPage:', skipPage);
+                $('#players-grid').append(html);
+            }
+
+            // Sửa lỗi: Gọi setupSeeMoreButtons cho MỖI bài đăng sau khi chúng được render
+            // Dùng forEach để lặp qua mảng post và gọi hàm cho từng post.id
+        requestAnimationFrame(() => {
+            post.forEach(p => setupSeeMoreButtons(p.id));
+        });
+        }
+
+
+
 
         function joindTeam(postId){
- 
-        
-        
+
+
+
                 // Gửi yêu cầu AJAX để tham gia bài đăng
                 $.ajax({
                     url: '/FindTeam/JoinTeamPost',
@@ -855,25 +777,11 @@
                     data: { postId: postId },
                     success: function(response) {
                         if (response.message === 200) {
-                             Swal.fire({
-            icon: 'success',
-            title: 'Tham gia thành công!',
-            text: 'Đang chờ chủ bài đăng chấp nhận',
-            showCancelButton: true,
-            confirmButtonText: 'Xem chi tiết',
-            cancelButtonText: 'Xác nhận',
-            confirmButtonColor: '#3b82f6',
-            cancelButtonColor: '#aaa'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Nút 1: Đi tới chi tiết
-                window.location.href = `/FindTeam/JoinedTeam?postId=${postId}`; // Đổi URL theo ý bạn
-            } else if (result.isDismissed) {
-                // Nút 2: Chỉ xác nhận (đóng popup hoặc làm gì đó)
-                // Ví dụ: load lại danh sách hoặc gì đó
-                loadPost();
-            }
-        });
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Tham gia thành công!',
+                                confirmButtonColor: '#3b82f6'
+                            });
                             // Cập nhật lại danh sách bài đăng sau khi tham gia
                             loadPost();
                         } else {
@@ -906,10 +814,10 @@
             }
 
             if (post.joinedPlayers >= post.neededPlayers) {
-                return `<button class="btn btn-warning btn-full-member" disabled>Đã đủ người</button>`;
+                return `<button class="btn btn-warning" disabled>Đã đủ người</button>`;
             }
             if (hidden[post.id] === 2) {
-                return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-warning btn-joined">Đã Tham gia</a>`;
+                return `<button class="btn btn-warning btn-joined">Đã Tham gia</button>`;
             }
             if (hidden[post.id] === 0 || post.joinedPlayers < post.neededPlayers) {
                 return `
@@ -919,7 +827,7 @@
                 </button>
             `;
             }
-            
+
         }
 
 
@@ -963,23 +871,28 @@
             }
 
             // Cấu hình thanh công cụ (bạn có thể tùy chỉnh)
-              const toolbarOptions = [
-          ['bold', 'italic', 'underline', 'strike'],
-          ['blockquote', 'code-block'],
-          [{ 'header': 1 }, { 'header': 2 }],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-          [{ 'script': 'sub'}, { 'script': 'super' }],
-          [{ 'indent': '-1'}, { 'indent': '+1' }],
-          [{ 'direction': 'rtl' }],
-          [{ 'size': ['small', false, 'large', 'huge'] }],
-          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-          [{ 'color': [] }, { 'background': [] }],
-          [{ 'font': [] }],
-          [{ 'align': [] }],
-          ['clean'],
-          ['emoji']
-        ];
-         quill = new Quill('#editor-container', {
+            const toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],        // Nút bật/tắt
+                ['blockquote', 'code-block'],
+
+                [{ 'header': 1 }, { 'header': 2 }],               // Nút tiêu đề
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],      // Chữ nhỏ trên/dưới
+                [{ 'indent': '-1'}, { 'indent': '+1' }],          // Tăng/giảm thụt lề
+                [{ 'direction': 'rtl' }],                         // Hướng văn bản
+
+                [{ 'size': ['small', false, 'large', 'huge'] }],  // Dropdown chọn kích thước chữ
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                [{ 'color': [] }, { 'background': [] }],          // Dropdown chọn màu chữ, màu nền
+                [{ 'font': [] }],
+                [{ 'align': [] }],                                // Dropdown căn lề
+
+                ['clean']                                         // Nút xóa định dạng
+            ];
+
+            // Khởi tạo Quill editor
+                    quill = new Quill('#editor-container', {
           modules: {
             toolbar: toolbarOptions,
             'emoji-toolbar': true,
@@ -1012,19 +925,19 @@
                     // Update needed players based on max players
 
 
-                    
+
                 },
                 preConfirm: () => {
                     // Clear any existing validation messages
                     Swal.resetValidationMessage();
 
-                    
+
 
                     try {
                         const title = document.getElementById('newTitle').value.trim();
                         const location = document.getElementById('newLocation').value.trim();
                         const sport = document.getElementById('newSport').value.trim();
-       
+
                         const neededPlayers = parseInt(document.getElementById('newNeededPlayers').value);
                         const pricePerPerson = parseFloat(document.getElementById('newPricePerPerson').value) || 0;
                         const description = quill.root.innerHTML;
@@ -1033,7 +946,7 @@
                         const bookingId = parseInt(document.getElementById('newBookingId').value);
                         const stadiumId = parseInt(document.getElementById('stadiumId').value);
 
-                    
+
 
                         // Validation với error handling
                         const validations = [
@@ -1249,7 +1162,7 @@
                                         <i class="ri-time-line"></i>
                                         Thời gian chơi
                                     </label>
-                                        <select id="newTimePlay" class="form-select"></select>                                     
+                                        <select id="newTimePlay" class="form-select"></select>
                                         <div class="input-helper">Giờ bắt đầu hoạt động</div>
                                 </div>
                             </div>
@@ -1264,6 +1177,16 @@
             `;
         }
 
+        //date format
+                 function formatDateLocal(date = new Date()) {
+          if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+
+          const year  = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day   = String(date.getDate()).padStart(2, '0');
+
+          return `${year}-${month}-${day}`;
+        }
 
 
 
@@ -1424,7 +1347,7 @@
             // Set location (you might need to adjust this based on your stadium data structure)
             document.getElementById('newLocation').value = `${stadium.address}`;
             // set sport type
-        
+
             document.getElementById('newSport').value = getSportType(stadium.courts, booking.stadiumId);
             // Set play time
                    // Lấy list giờ từ bookingDetails

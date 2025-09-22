@@ -1,0 +1,241 @@
+﻿/* Custom CSS cho Intro.js Guide */
+
+/* Overlay background */
+.introjs-overlay {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(2px);
+}
+
+/* Tooltip chính */
+.introjs-tooltip {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    color: white !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    max-width: 350px !important;
+    padding: 0 !important;
+    position: fixed !important;
+    overflow: hidden;
+    z-index: 999999 !important;
+}
+
+/* Header của tooltip */
+.introjs-tooltip-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 20px 24px 16px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.introjs-tooltip-title {
+    color: white !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Nội dung tooltip */
+.introjs-tooltiptext {
+    padding: 20px 24px !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Container các nút */
+.introjs-tooltipbuttons {
+    padding: 16px 24px 24px !important;
+    text-align: right !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Styling chung cho các nút */
+.introjs-button {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 8px !important;
+    color: white !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    margin-left: 8px !important;
+    padding: 10px 16px !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    backdrop-filter: blur(10px);
+}
+
+    .introjs-button:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button:active {
+        transform: translateY(0) !important;
+    }
+
+/* Nút Next - màu xanh nổi bật */
+.introjs-nextbutton {
+    background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+    border: 1px solid #45a049 !important;
+    font-weight: 600 !important;
+}
+
+    .introjs-nextbutton:hover {
+        background: linear-gradient(135deg, #45a049, #3d8b40) !important;
+        box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+    }
+
+/* Nút Done - màu xanh dương */
+.introjs-donebutton {
+    background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+    border: 1px solid #1976D2 !important;
+    font-weight: 600 !important;
+}
+
+    .introjs-donebutton:hover {
+        background: linear-gradient(135deg, #1976D2, #1565C0) !important;
+        box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4) !important;
+    }
+
+/* Nút Skip - màu đỏ nhạt */
+.introjs-skipbutton {
+    background: rgba(244, 67, 54, 0.1) !important;
+    border: 1px solid rgba(244, 67, 54, 0.3) !important;
+    color: #ffcdd2 !important;
+}
+
+    .introjs-skipbutton:hover {
+        background: rgba(244, 67, 54, 0.2) !important;
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        color: white !important;
+    }
+
+/* Arrow của tooltip */
+.introjs-arrow {
+    border: 8px solid transparent !important;
+}
+
+    .introjs-arrow.top {
+        border-bottom-color: #667eea !important;
+    }
+
+    .introjs-arrow.bottom {
+        border-top-color: #667eea !important;
+    }
+
+    .introjs-arrow.left {
+        border-right-color: #667eea !important;
+    }
+
+    .introjs-arrow.right {
+        border-left-color: #667eea !important;
+    }
+
+/* Highlight element */
+.introjs-helperLayer {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 4px solid #667eea !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(102, 126, 234, 0.5) !important;
+    transition: all 0.3s ease !important;
+    z-index: 999998 !important;
+    pointer-events: auto !important;
+}
+
+/* Progress indicator */
+.introjs-bullets {
+    text-align: center !important;
+    margin: 16px 0 8px !important;
+}
+
+    .introjs-bullets ul {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+        .introjs-bullets ul li {
+            background: rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            display: inline-block !important;
+            height: 8px !important;
+            margin: 0 4px !important;
+            width: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+
+            .introjs-bullets ul li.active {
+                background: white !important;
+                transform: scale(1.3) !important;
+            }
+
+/* Animation khi tooltip xuất hiện */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.introjs-tooltip {
+    animation: tooltipFadeIn 0.3s ease-out !important;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .introjs-tooltip {
+        max-width: calc(100vw - 40px) !important;
+        margin: 0 20px !important;
+    }
+
+    .introjs-tooltiptext {
+        font-size: 13px !important;
+    }
+
+    .introjs-button {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+    }
+
+    .introjs-tooltipbuttons {
+        padding: 12px 16px 16px !important;
+    }
+}
+
+/* Hover effects cho highlight element */
+.introjs-helperLayer:hover {
+    border-color: #764ba2 !important;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 30px rgba(118, 75, 162, 0.7) !important;
+}
+
+/* Custom scrollbar cho tooltip content nếu cần */
+.introjs-tooltiptext::-webkit-scrollbar {
+    width: 4px;
+}
+
+.introjs-tooltiptext::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.introjs-tooltiptext::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+    .introjs-tooltiptext::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }

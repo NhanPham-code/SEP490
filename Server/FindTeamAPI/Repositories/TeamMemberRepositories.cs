@@ -14,6 +14,7 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<IEnumerable<TeamMember>> GetAllTeamMembersAsync(int teamId)
         {
+            
             return await _context.TeamMembers.Where(t => t.TeamPostId.Equals(teamId)).ToListAsync();
         }
         public async Task<TeamMember> GetTeamMemberByIdAsync(int memberId, int teamId)
@@ -29,7 +30,10 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<TeamMember> UpdateTeamMemberAsync(TeamMember teamMember)
         {
-            _context.TeamMembers.Update(teamMember);
+            _context.ChangeTracker.Clear();
+            var member = await _context.TeamMembers.FirstOrDefaultAsync(m => m.Id == teamMember.Id);
+            member.role = teamMember.role;
+            _context.TeamMembers.Update(member);
             await _context.SaveChangesAsync();
             return teamMember;
         }

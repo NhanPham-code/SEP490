@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Views\FindTeam\wcfhqyqt.gnk~" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Middlewares\Middlewares.csproj" />
     <ProjectReference Include="..\Service\Service.csproj" />
   </ItemGroup>
