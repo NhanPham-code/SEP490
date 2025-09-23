@@ -234,6 +234,10 @@ namespace CustomerUI.Controllers
             ViewBag.TotalPrice = request.TotalPrice;
             ViewBag.StadiumId = request.StadiumId;
             ViewBag.Courts = request.Courts;
+            ViewBag.AfterPrice = request.AfterPrice;
+            ViewBag.DiscountId = request.DiscountId;
+            ViewBag.Type = request.Type;
+            ViewBag.BookingId = request.BookingId;
 
             return View();
         }
@@ -290,6 +294,9 @@ namespace CustomerUI.Controllers
             ViewBag.SelectedCourtIds = model.SelectedCourtIds;
             ViewBag.TotalPrice = model.TotalPrice;
             ViewBag.StadiumId = model.StadiumId;
+            ViewBag.AfterPrice = model.AfterPrice;
+            ViewBag.DiscountId = model.DiscountId;
+            ViewBag.Type = model.Type;
 
             // Trả về view cho trang checkout hàng tháng
             return View();
