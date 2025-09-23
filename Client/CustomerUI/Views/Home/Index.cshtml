@@ -1196,8 +1196,13 @@
             if (!places) return;
 
             Object.values(places).forEach(place => {
-              // Chỉ hiển thị những sân có isLocked = false (hoặc không có field isLocked)
-              if (place.lat && place.lng && (place.isLocked === false || place.isLocked === undefined)) {
+              
+                if (
+          place.lat &&
+          place.lng &&
+          (place.isLocked === false || place.isLocked === undefined) &&
+          place.isApproved === true
+        )  {
                 let dist = distanceInMeters(userLat, userLng, place.lat, place.lng);
                 if (dist <= radius) {
                   addMarker(place.lat, place.lng, place.name, "📍");

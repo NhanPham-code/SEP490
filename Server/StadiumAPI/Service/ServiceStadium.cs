@@ -52,14 +52,15 @@ namespace StadiumAPI.Service
             var updatedStadium = await _stadiumRepositories.UpdateStadiumAsync(id, stadium);
             var dto = _mapper.Map<ReadStadiumDTO>(updatedStadium);
 
-            // 🔥 Update Firebase
+            // 🔥 Sync Firebase
             if (dto != null)
             {
-                await _firebaseService.AddStadiumAsync(dto);
+                await _firebaseService.UpdateStadiumAsync(dto);
             }
 
             return dto;
         }
+
         public async Task<bool> DeleteStadiumAsync(int id)
         {
             var deleted = await _stadiumRepositories.DeleteStadiumAsync(id);

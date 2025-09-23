@@ -1572,31 +1572,39 @@ function updateDateTime() {
                             cancelButton: 'enhanced-cancel-btn',
                             popup: 'enhanced-popup'
                         },
-                        didOpen: () => {
-                            // Add time preview functionality
-                            const openTimeInput = document.getElementById('editOpenTime');
-                            const closeTimeInput = document.getElementById('editCloseTime');
-                            const timePreview = document.getElementById('editTimePreview');
+                                   didOpen: () => {
+            // Add time preview functionality
+            const openTimeInput = document.getElementById('editOpenTime');
+            const closeTimeInput = document.getElementById('editCloseTime');
+            const timePreview = document.getElementById('editTimePreview');
 
-                            function updateEditTimePreview() {
-                                const openTime = openTimeInput.value || '06:00';
-                                const closeTime = closeTimeInput.value || '22:00';
-                                timePreview.textContent = `${openTime} - ${closeTime}`;
-                            }
+            function updateEditTimePreview() {
+                const openTime = openTimeInput.value || '06:00';
+                const closeTime = closeTimeInput.value || '22:00';
+                timePreview.textContent = `${openTime} - ${closeTime}`;
+            }
 
-                            openTimeInput.addEventListener('change', updateEditTimePreview);
-                            closeTimeInput.addEventListener('change', updateEditTimePreview);
+            openTimeInput.addEventListener('change', updateEditTimePreview);
+            closeTimeInput.addEventListener('change', updateEditTimePreview);
 
-                            // Update approval status display
-                            const statusSelect = document.getElementById('editIsApproved');
-                            statusSelect.addEventListener('change', updateApprovalStatusDisplay);
-         initializeLocationMap();
-                            initializeAddressSearch();
-                        },
-                        willClose: () => {
-                            // ===== THÊM MỚI: CLEANUP MAP =====
-                            onModalClose();
-                        },
+            // Update approval status display
+            const statusSelect = document.getElementById('editIsApproved');
+            statusSelect.addEventListener('change', updateApprovalStatusDisplay);
+
+            // ===== MAP FUNCTIONALITY =====
+            const lat = stadium.Latitude || null;
+            const lng = stadium.Longitude || null;
+
+            initializeLocationMap(lat, lng);
+            initializeAddressSearch();
+
+            // Nếu đã có lat/lng thì load luôn địa chỉ
+            if (lat && lng) {
+                setLocationMarker(lat, lng, true);
+            }
+        },
+
+
                         preConfirm: () => {
                             const name = document.getElementById('editName').value.trim();
                             const address = document.getElementById('editAddress').value.trim();
@@ -1632,8 +1640,9 @@ function updateDateTime() {
                             formData.append('Stadium.CloseTime', closeTime);
                             formData.append('Stadium.IsApproved', document.getElementById('editIsApproved').value);
 
-                            const latitude = document.getElementById('editLatitude').value;
-                            const longitude = document.getElementById('editLongitude').value;
+                                    const latitude = document.getElementById('newLatitude').value;
+        const longitude = document.getElementById('newLongitude').value;
+
                             if (latitude) formData.append('Stadium.Latitude', latitude);
                             if (longitude) formData.append('Stadium.Longitude', longitude);
 
@@ -3529,7 +3538,7 @@ function updateDateTime() {
         let currentMarker = null;
 
         // Initialize map when modal opens
-        function initializeLocationMap() {
+                function initializeLocationMap(lat = null, lng = null) {
             // Wait for the map container to be in DOM
             setTimeout(() => {
                 const mapContainer = document.getElementById('locationMap');
@@ -3540,14 +3549,25 @@ function updateDateTime() {
                     locationMap.remove();
                 }
 
-                // Initialize map centered on Ho Chi Minh City
-                locationMap = L.map('locationMap').setView([10.762622, 106.660172], 13);
+                // Nếu có lat/lng (edit) thì zoom vào đó, không thì mặc định HCM
+                const defaultLat = 10.762622;
+                const defaultLng = 106.660172;
+                const centerLat = lat || defaultLat;
+                const centerLng = lng || defaultLng;
+                const zoomLevel = lat && lng ? 16 : 13;
+
+                locationMap = L.map('locationMap').setView([centerLat, centerLng], zoomLevel);
 
                 // Add OpenStreetMap tiles
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
                     maxZoom: 19
                 }).addTo(locationMap);
+
+                // Nếu edit có sẵn tọa độ thì đặt marker luôn
+                if (lat && lng) {
+                    setLocationMarker(lat, lng);
+                }
 
                 // Add click event to map
                 locationMap.on('click', function(e) {
@@ -3565,8 +3585,9 @@ function updateDateTime() {
             }, 500);
         }
 
+
         // Set marker and update form fields
-        async function setLocationMarker(lat, lng) {
+              async function setLocationMarker(lat, lng) {
             // Remove existing marker
             if (currentMarker) {
                 locationMap.removeLayer(currentMarker);
@@ -3581,15 +3602,20 @@ function updateDateTime() {
                 })
             }).addTo(locationMap);
 
+            // Tìm input theo cả create và edit
+            const latInput = document.getElementById('newLatitude') || document.getElementById('editLatitude');
+            const lngInput = document.getElementById('newLongitude') || document.getElementById('editLongitude');
+            const addressInput = document.getElementById('newAddress') || document.getElementById('editAddress');
+
             // Update form fields
-            document.getElementById('newLatitude').value = lat.toFixed(6);
-            document.getElementById('newLongitude').value = lng.toFixed(6);
+            if (latInput) latInput.value = lat.toFixed(6);
+            if (lngInput) lngInput.value = lng.toFixed(6);
 
             // Get address from coordinates
             try {
                 const address = await reverseGeocode(lat, lng);
-                if (address) {
-                    document.getElementById('newAddress').value = address;
+                if (address && addressInput) {
+                    addressInput.value = address;
                 }
 
                 // Add popup to marker
@@ -3617,6 +3643,7 @@ function updateDateTime() {
                 `).openPopup();
             }
         }
+    
 
         // Reverse geocoding to get address from coordinates
         async function reverseGeocode(lat, lng) {

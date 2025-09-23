@@ -8,6 +8,6 @@
             Task AddStadiumAsync(ReadStadiumDTO stadium);
             Task DeleteStadiumAsync(int stadiumId);
 
-            Task UpdateStadiumLockStatusAsync(int stadiumId, bool isLocked);
+        Task UpdateStadiumAsync(ReadStadiumDTO stadium);
     }
     }

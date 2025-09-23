@@ -2004,49 +2004,7 @@
         // Global functions
         window.scrollToLatestMessage = scrollToLatestMessage;
         window.displayApiUsage = displayApiUsage;
-                // chat-page-init.js
-        function getQueryParams() {
-          const params = new URLSearchParams(window.location.search);
-          return {
-            senderId: params.get('senderId') || '',
-            senderName: params.get('senderName') || '', // optional
-            receiverId: params.get('receiverId') || '',
-            receiverName: params.get('receiverName') || '' // optional
-          };
-        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-          const q = getQueryParams();
-
-          if (!q.receiverId) {
-            // Nothing to auto-open
-            return;
-          }
-
-          // Nếu server đã xác thực, bạn có thể bỏ qua senderId từ query và lấy senderId từ server-rendered hidden input
-          const serverSenderId = document.getElementById('senderId')?.value?.trim();
-          const finalSenderId = serverSenderId || q.senderId;
-
-          // Fill hidden inputs if present
-          const senderIdInput = document.getElementById('senderId');
-          const senderNameInput = document.getElementById('senderName');
-          if (senderIdInput && finalSenderId) senderIdInput.value = finalSenderId;
-          if (senderNameInput && q.senderName) senderNameInput.value = q.senderName;
-
-          // Ensure setUserInfo exists
-          if (typeof window.setUserInfo === 'function') {
-            window.setUserInfo(finalSenderId || '', q.senderName || '');
-          }
-
-          // Ensure openChat exists
-          if (typeof window.openChat === 'function') {
-            const senderNameForOpen = q.senderName || (senderNameInput ? senderNameInput.value : '');
-            const receiverNameForOpen = q.receiverName || q.receiverId; // fallback to id if no name
-            window.openChat(finalSenderId || '', senderNameForOpen, q.receiverId, receiverNameForOpen);
-          } else {
-            console.warn('openChat function not found on this page. Make sure your chat UI exposes openChat(senderId, senderName, receiverId, receiverName).');
-          }
-        });
     </script>
 </body>
 </html>

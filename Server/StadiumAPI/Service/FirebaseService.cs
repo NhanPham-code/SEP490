@@ -18,13 +18,15 @@ namespace StadiumAPI.Services
 
         public async Task AddStadiumAsync(ReadStadiumDTO stadium)
         {
-            var data = new
+            // Khi tạo, isApproved mặc định là false
+            var data = new Dictionary<string, object>
             {
-                id = stadium.Id,
-                lat = stadium.Latitude,
-                lng = stadium.Longitude,
-                name = stadium.Name,
-                isLocked = stadium.IsLocked,
+                ["id"] = stadium.Id,
+                ["lat"] = stadium.Latitude,
+                ["lng"] = stadium.Longitude,
+                ["name"] = stadium.Name,
+                ["isLocked"] = stadium.IsLocked,
+                ["isApproved"] = stadium.IsApproved,
             };
 
             var json = JsonSerializer.Serialize(data);
@@ -35,24 +37,31 @@ namespace StadiumAPI.Services
             var response = await _httpClient.PutAsync(url, content);
             response.EnsureSuccessStatusCode();
         }
-       
-        public async Task UpdateStadiumLockStatusAsync(int stadiumId, bool isLocked)
-{
-    var data = new
-    {
-        isLocked = isLocked
-    };
 
-    var json = JsonSerializer.Serialize(data);
 
-    var url = $"{_firebaseUrl}/customPlaces/{stadiumId}.json";
-    var content = new StringContent(json, Encoding.UTF8, "application/json");
+        public async Task UpdateStadiumAsync(ReadStadiumDTO stadium)
+        {
+            // 🔥 Chỉ update các field khác, không đụng vào Id
+            var data = new
+            {
+                lat = stadium.Latitude,
+                lng = stadium.Longitude,
+                name = stadium.Name,
+                isLocked = stadium.IsLocked,
+                isApproved = stadium.IsApproved,
+            };
 
-    var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
-    var response = await _httpClient.SendAsync(request);
+            var json = JsonSerializer.Serialize(data);
 
-    response.EnsureSuccessStatusCode();
-}
+            var url = $"{_firebaseUrl}/customPlaces/{stadium.Id}.json";
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Dùng PATCH thay vì PUT
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), url) { Content = content };
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
 
         // Thay đổi method DeleteStadiumAsync trong FirebaseService
         public async Task DeleteStadiumAsync(int stadiumId)

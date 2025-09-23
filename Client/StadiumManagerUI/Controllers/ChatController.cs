@@ -42,16 +42,5 @@ namespace CustomerUI.Controllers
 
             return View();
         }
-        public async Task<PartialViewResult> UserHiddenFields()
-        {
-            var accessToken = GetAccessToken();
-            var profile = await _userService.GetMyProfileAsync(accessToken);
-
-            ViewBag.UserId = profile?.UserId;
-            ViewBag.UserName = profile?.FullName ?? "User";
-
-            return PartialView("_UserHiddenFields");
-        }
-
     }
 }

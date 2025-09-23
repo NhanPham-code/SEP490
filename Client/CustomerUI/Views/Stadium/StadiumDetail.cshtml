@@ -1,6 +1,8 @@
 ﻿@model DTOs.StadiumDTO.ReadStadiumDTO
+
 @{
     ViewData["Title"] = Model.Name;
+
     // Tính toán giá sân và giờ hoạt động
     var minPrice = Model.Courts?.Any() == true ? Model.Courts.Min(c => c.PricePerHour) : 0;
     var maxPrice = Model.Courts?.Any() == true ? Model.Courts.Max(c => c.PricePerHour) : 0;
@@ -419,6 +421,458 @@
         }
 
         }
+        /* Responsive Feedback Section Improvements */
+
+        /* Base feedback form styling */
+        .feedback-form-container {
+            padding: 1rem;
+        }
+
+        @@media (min-width: 768px) {
+            .feedback-form-container
+
+        {
+            padding: 2rem;
+        }
+
+        }
+
+        /* Rating stars responsive */
+        #rating-stars {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+
+        @@media (min-width: 640px) {
+            .star
+
+        {
+            font-size: 2rem;
+            min-width: 2.5rem;
+        }
+
+        }
+
+        /* Textarea responsive */
+        #feedback-textarea {
+            font-size: 0.875rem;
+            min-height: 100px;
+        }
+
+        @@media (min-width: 640px) {
+            #feedback-textarea
+
+        {
+            font-size: 1rem;
+            min-height: 120px;
+        }
+
+        }
+
+        /* Image preview responsive */
+        #image-preview img,
+        #current-image-preview {
+            max-width: 100%;
+            height: auto;
+            max-height: 150px;
+        }
+
+        @@media (min-width: 640px) {
+            #image-preview img, #current-image-preview
+
+        {
+            max-height: 200px;
+        }
+
+        }
+
+        /* Form buttons responsive */
+        .form-buttons-container {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        @@media (min-width: 640px) {
+            .form-buttons-container
+
+        {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        }
+
+        .form-buttons-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        @@media (min-width: 640px) {
+            .form-buttons-left
+
+        {
+            flex-direction: row;
+            gap: 0.75rem;
+        }
+
+        }
+
+        /* Button sizing */
+        #submit-btn,
+        #cancel-edit-btn,
+        #delete-feedback-btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        @@media (min-width: 640px) {
+            #submit-btn, #cancel-edit-btn, #delete-feedback-btn
+
+        {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        }
+
+        /* Feedback items responsive */
+        .feedback-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-item
+
+        {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        }
+
+        /* User avatar and info */
+        .feedback-user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-user-avatar
+
+        {
+            width: 3rem;
+            height: 3rem;
+            font-size: 1rem;
+        }
+
+        }
+
+        /* User name and rating layout */
+        .feedback-header {
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: flex-start;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-header
+
+        {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        }
+
+        .feedback-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Rating stars in feedback items */
+        .feedback-rating {
+            margin-top: 0.25rem;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-rating
+
+        {
+            margin-top: 0;
+        }
+
+        }
+
+        /* Feedback image responsive */
+        .feedback-image {
+            max-width: 100%;
+            max-height: 150px;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-image
+
+        {
+            max-height: 200px;
+        }
+
+        }
+
+        @@media (min-width: 768px) {
+            .feedback-image
+
+        {
+            max-width: 300px;
+            max-height: 250px;
+        }
+
+        }
+
+        /* Pagination responsive */
+        .pagination-info {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+
+        @@media (min-width: 640px) {
+            .pagination-info
+
+        {
+            font-size: 0.875rem;
+            text-align: left;
+            margin-bottom: 0;
+        }
+
+        }
+
+        .pagination-buttons {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        @@media (min-width: 640px) {
+            .pagination-buttons
+
+        {
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+        }
+
+        }
+
+        .pagination-btn {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+            min-width: 2rem;
+        }
+
+        @@media (min-width: 640px) {
+            .pagination-btn
+
+        {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            min-width: 2.5rem;
+        }
+
+        }
+
+        /* Edit buttons responsive */
+        .feedback-edit-buttons {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feedback-edit-btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        @@media (min-width: 640sm) {
+            .feedback-edit-btn
+
+        {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        }
+
+        /* Modal responsive */
+        .modal-content {
+            margin: 1rem;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        @@media (min-width: 640px) {
+            .modal-content
+
+        {
+            margin: 2rem;
+            max-height: calc(100vh - 4rem);
+        }
+
+        }
+
+        /* Image upload section responsive */
+        .image-upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        @@media (min-width: 640px) {
+            .image-upload-section
+
+        {
+            gap: 1rem;
+        }
+
+        }
+
+        .image-upload-info {
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        @@media (min-width: 640px) {
+            .image-upload-info
+
+        {
+            font-size: 0.875rem;
+            text-align: left;
+        }
+
+        }
+
+        /* Character counter responsive */
+        #char-counter {
+            font-size: 0.625rem;
+            bottom: 0.5rem;
+            right: 0.5rem;
+        }
+
+        @@media (min-width: 640px) {
+            #char-counter
+
+        {
+            font-size: 0.75rem;
+            bottom: 0.75rem;
+            right: 0.75rem;
+        }
+
+        }
+
+        /* Loading states */
+        .feedback-loading {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        @@media (min-width: 640px) {
+            .feedback-loading
+
+        {
+            padding: 3rem 2rem;
+        }
+
+        }
+
+        /* Empty state */
+        .feedback-empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+            .feedback-empty-state i {
+                font-size: 2rem;
+                margin-bottom: 0.75rem;
+            }
+
+        @@media (min-width: 640px) {
+            .feedback-empty-state
+
+        {
+            padding: 3rem 2rem;
+        }
+
+        .feedback-empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        }
+        /* Toast notification (paste vào <style>) */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 320px;
+            max-width: calc(100% - 40px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            z-index: 99999;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            font-weight: 600;
+        }
+
+            .notification.show {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .notification.success {
+                background: linear-gradient(90deg, #16a34a, #10b981);
+            }
+
+            .notification.error {
+                background: linear-gradient(90deg, #dc2626, #ef4444);
+            }
+
+            .notification.info {
+                background: linear-gradient(90deg, #0ea5e9, #0284c7);
+            }
+
+            .notification .close-btn {
+                background: transparent;
+                border: none;
+                color: rgba(255,255,255,0.95);
+                font-size: 16px;
+                cursor: pointer;
+                margin-left: auto;
+            }
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center">
@@ -498,15 +952,22 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Floating Chat Button -->
     <div class="floating-chat">
-        <button id="floating-chat-btn" class="chat-bubble w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110">
+        <button id="floating-chat-btn"
+                class="chat-bubble w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                data-owner-id="@Model.CreatedBy">
             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
             </svg>
         </button>
     </div>
+
+    <!-- Hidden fields để lấy thông tin user -->
+    <input type="hidden" id="senderId" value="@ViewBag.UserId" />
+    <input type="hidden" id="senderName" value="@ViewBag.UserName" />
+
     <div class="glass-effect rounded-3xl shadow-2xl p-8 md:p-12 max-w-6xl w-full mx-auto">
 
         <div class="mb-10 text-center">
@@ -615,105 +1076,101 @@
 
         <div class="section-divider"></div>
 
-        <div class="mb-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
-            <h2 class="text-2xl font-bold mb-6 text-center gradient-text">💬 Gửi phản hồi của bạn</h2>
+            <!-- Replace your existing feedback form section with this responsive version -->
+            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center gradient-text">💬 Gửi phản hồi của bạn</h2>
 
-            <!-- Trong HTML của bạn, đảm bảo form có đúng stadium id -->
-            <form id="feedback-form" data-stadium-id="@Model.Id" class="space-y-6">
-                <!-- Hidden field for edit mode -->
-                <input type="hidden" id="feedback-id" value="">
-                <input type="hidden" id="edit-mode" value="false">
+                <form id="feedback-form" data-stadium-id="@Model.Id" class="space-y-4 sm:space-y-6">
+                    <!-- Hidden fields for edit mode -->
+                    <input type="hidden" id="feedback-id" value="">
+                    <input type="hidden" id="edit-mode" value="false">
 
-                <!-- Rating -->
-                <div class="text-center">
-                    <label class="block text-lg font-semibold text-gray-700 mb-3">Đánh giá của bạn</label>
-                    <div class="flex justify-center mb-2 space-x-2" id="rating-stars">
-                        <span class="star text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="1">★</span>
-                        <span class="star text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="2">★</span>
-                        <span class="star text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="3">★</span>
-                        <span class="star text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="4">★</span>
-                        <span class="star text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="5">★</span>
-                    </div>
-                    <p class="text-sm text-gray-500">Nhấp vào sao để đánh giá</p>
-                </div>
-
-                <!-- Comment -->
-                <div class="relative">
-                    <label for="feedback-textarea" class="block text-lg font-semibold text-gray-700 mb-3">Chia sẻ trải nghiệm</label>
-                    <textarea id="feedback-textarea" rows="4" maxlength="500"
-                              class="interactive-input w-full p-4 rounded-xl border-2 border-gray-200 bg-white text-gray-800 focus:ring-0 focus:border-blue-500 transition-all duration-300 resize-none"
-                              placeholder="Chia sẻ trải nghiệm của bạn về sân vận động này..."></textarea>
-                    <div class="absolute bottom-3 right-3 text-xs text-gray-400" id="char-counter">0/500</div>
-                </div>
-
-                <!-- Image Upload Section -->
-                <div class="space-y-3">
-                    <label class="block text-lg font-semibold text-gray-700">Thêm hình ảnh (tùy chọn)</label>
-
-                    <!-- Current image display (for edit mode) -->
-                    <div id="current-image" class="hidden">
-                        <p class="text-sm text-gray-600 mb-2">Ảnh hiện tại:</p>
-                        <div class="relative inline-block">
-                            <img id="current-image-preview" src="" alt="Current image" class="max-w-xs max-h-48 rounded-lg shadow-md">
-                            
+                    <!-- Rating Section -->
+                    <div class="text-center">
+                        <label class="block text-base sm:text-lg font-semibold text-gray-700 mb-2 sm:mb-3">Đánh giá của bạn</label>
+                        <div class="flex justify-center mb-2 space-x-1 sm:space-x-2" id="rating-stars">
+                            <span class="star text-2xl sm:text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="1">★</span>
+                            <span class="star text-2xl sm:text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="2">★</span>
+                            <span class="star text-2xl sm:text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="3">★</span>
+                            <span class="star text-2xl sm:text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="4">★</span>
+                            <span class="star text-2xl sm:text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors duration-200" data-value="5">★</span>
                         </div>
+                        <p class="text-xs sm:text-sm text-gray-500">Nhấp vào sao để đánh giá</p>
                     </div>
 
-                    <!-- File input -->
-                    <div class="flex items-center space-x-3">
-                        <label for="feedback-image" class="cursor-pointer inline-flex items-center px-4 py-2 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200 bg-gray-50 hover:bg-blue-50">
-                            <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            <span class="text-sm font-medium text-gray-600" id="image-label">Chọn ảnh mới</span>
-                        </label>
-                        <span class="text-sm text-gray-500">JPG, PNG, GIF (Tối đa 5MB)</span>
+                    <!-- Comment Section -->
+                    <div class="relative">
+                        <label for="feedback-textarea" class="block text-base sm:text-lg font-semibold text-gray-700 mb-2 sm:mb-3">Chia sẻ trải nghiệm</label>
+                        <textarea id="feedback-textarea" rows="4" maxlength="500"
+                                  class="interactive-input w-full p-3 sm:p-4 rounded-xl border-2 border-gray-200 bg-white text-gray-800 focus:ring-0 focus:border-blue-500 transition-all duration-300 resize-none text-sm sm:text-base"
+                                  placeholder="Chia sẻ trải nghiệm của bạn về sân vận động này..."></textarea>
+                        <div class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 text-xs text-gray-400" id="char-counter">0/500</div>
                     </div>
 
-                    <input type="file" id="feedback-image" accept="image/*" class="hidden">
+                    <!-- Image Upload Section -->
+                    <div class="space-y-2 sm:space-y-3">
+                        <label class="block text-base sm:text-lg font-semibold text-gray-700">Thêm hình ảnh (tùy chọn)</label>
 
-                    <!-- New image preview -->
-                    <div id="image-preview" class="hidden mt-3"></div>
-                </div>
+                        <!-- Current image display (for edit mode) -->
+                        <div id="current-image" class="hidden">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Ảnh hiện tại:</p>
+                            <div class="relative inline-block">
+                                <img id="current-image-preview" src="" alt="Current image" class="max-w-full h-auto max-h-32 sm:max-h-48 rounded-lg shadow-md">
+                            </div>
+                        </div>
 
-                <!-- Submit + Cancel + Delete -->
-                <div class="flex justify-between items-center pt-4">
-                    <div class="flex space-x-3">
-                        <button type="submit" id="submit-btn"
-                                class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                            <span id="submit-text">✨ Gửi phản hồi</span>
+                        <!-- File input -->
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                            <label for="feedback-image" class="cursor-pointer inline-flex items-center justify-center sm:justify-start px-3 sm:px-4 py-2 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200 bg-gray-50 hover:bg-blue-50">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <span class="text-xs sm:text-sm font-medium text-gray-600" id="image-label">Chọn ảnh mới</span>
+                            </label>
+                            <span class="text-xs sm:text-sm text-gray-500 text-center sm:text-left">JPG, PNG, GIF (Tối đa 5MB)</span>
+                        </div>
+
+                        <input type="file" id="feedback-image" accept="image/*" class="hidden">
+
+                        <!-- New image preview -->
+                        <div id="image-preview" class="hidden mt-2 sm:mt-3"></div>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="form-buttons-container flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0 pt-4">
+                        <div class="form-buttons-left flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button type="submit" id="submit-btn"
+                                    class="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base">
+                                <span id="submit-text">✨ Gửi phản hồi</span>
+                            </button>
+
+                            <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
+                                    class="hidden w-full sm:w-auto px-4 sm:px-6 py-3 rounded-xl font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base">
+                                ❌ Hủy
+                            </button>
+                        </div>
+
+                        <button type="button" id="delete-feedback-btn" onclick="deleteFeedback()"
+                                class="hidden w-full sm:w-auto px-4 sm:px-6 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base">
+                            🗑️ Xóa phản hồi
                         </button>
-
-                        <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
-                                class="hidden px-6 py-3 rounded-xl font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                            ❌ Hủy
-                        </button>
                     </div>
+                </form>
+            </div>
 
-                    <button type="button" id="delete-feedback-btn" onclick="deleteFeedback()"
-                            class="hidden px-6 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                        🗑️ Xóa phản hồi
-                    </button>
-                </div>
-            </form>
+            <!-- Feedback List Section -->
+            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
 
+                <div id="feedback-count" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
 
-            <div class="mb-12 p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
-                <h2 class="text-2xl font-bold mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
-
-                <div id="feedback-count" class="text-center text-gray-600 mb-4"></div>
-
-            
                 <div id="feedbackList">
-                   
+                    <!-- Feedback items will be loaded here -->
                 </div>
 
-             
                 <div id="pagination-container">
-                  
+                    <!-- Pagination will be loaded here -->
                 </div>
-
-                <div id="pagination-container" class="flex justify-center items-center space-x-2 mt-8"></div>
             </div>
 
 
@@ -918,7 +1375,7 @@
             }
         }
 
-        function handleFeedbackSubmit(e) {
+               function handleFeedbackSubmit(e) {
             e.preventDefault();
             console.log("Form submitted, edit mode:", isEditMode);
 
@@ -977,18 +1434,19 @@
                 success: function(response) {
                     console.log('Success response:', response);
 
-                          if (response.success) {
-            showModal('Thành công!', response.message);
+                    if (response.success) {
+                        showModal('Thành công!', response.message);
 
-          
-            const pageToLoad = isEditMode ? currentPage : 1;
-                    loadFeedbacks(stadiumId, pageToLoad);
-        setTimeout(() => {
-            checkUserFeedback(stadiumId);
-        }, 500);
-        } else {
-            showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
-        }
+                        // Load danh sách feedback (vẫn cần cập nhật list public)
+                        const pageToLoad = isEditMode ? currentPage : 1;
+                        loadFeedbacks(stadiumId, pageToLoad);
+
+                        // Không reset form — gọi lại AJAX kiểm tra feedback của user
+                        // để load lại dữ liệu của form (chuyển sang edit mode, hiển thị ảnh, ...)
+                        checkUserFeedback(stadiumId);
+                    } else {
+                        showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', {status, error, response: xhr.responseText});
@@ -1007,6 +1465,7 @@
                 }
             });
         }
+
 
         function deleteFeedback() {
             if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.')) {
@@ -1028,6 +1487,7 @@
                         // Reset form to create mode
                         setCreateMode();
 loadFeedbacks(stadiumId, currentPage);
+              resetFeedbackForm();
                     } else {
                         showModal('Lỗi', response.message || 'Có lỗi xảy ra khi xóa feedback.');
                     }
@@ -1416,7 +1876,7 @@ loadFeedbacks(stadiumId, currentPage);
 
       
         const firebaseConfig = {
-            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",  
             authDomain: "chatbox-993b2.firebaseapp.com",
             databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com/",
             projectId: "chatbox-993b2",
@@ -1529,7 +1989,7 @@ loadFeedbacks(stadiumId, currentPage);
         document.getElementById('modal-close-btn').onclick = hideModal;
         document.getElementById('booking-modal-close-btn').onclick = hideBookingModal;
         document.getElementById('booking-btn').onclick = showBookingModal;
-        document.getElementById('floating-chat-btn').onclick = chatWithOwner;
+     
 
         // Click outside modal to close
         window.onclick = function(event) {
@@ -1571,7 +2031,202 @@ loadFeedbacks(stadiumId, currentPage);
                         showSlides();
                       
                     };
+
+
+
+                            // Notification + modal helpers (paste near bottom, after jQuery ready or inside ready)
+        (function(){
+          'use strict';
+
+          // Safe grab modal elements after DOM is ready
+          const modalEl = document.getElementById('custom-modal');
+          const bookingModalEl = document.getElementById('booking-modal');
+
+          // showNotification: non-blocking toast
+          function showNotification(message, type = 'info', timeout = 5000) {
+            const notif = document.createElement('div');
+            notif.className = 'notification ' + type;
+            notif.innerHTML = `
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:18px;">
+                  ${type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️'}
+                </span>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-weight:700; font-size:14px;">${message}</div>
+                </div>
+                <button class="close-btn" aria-label="close">&times;</button>
+              </div>
+            `;
+            document.body.appendChild(notif);
+
+            // close button
+            notif.querySelector('.close-btn').addEventListener('click', () => hideNotif(notif));
+
+            // show (allow CSS transition)
+            setTimeout(() => notif.classList.add('show'), 20);
+
+            // auto hide
+            const t = setTimeout(() => hideNotif(notif), timeout);
+
+            function hideNotif(el) {
+              if (!el) return;
+              el.classList.remove('show');
+              clearTimeout(t);
+              setTimeout(() => { if (el && el.parentNode) el.parentNode.removeChild(el); }, 300);
+            }
+
+            return notif;
+          }
+
+          // showModal: lightweight wrapper that prefers toast but also supports Swal if present
+          function showModal(title, message) {
+            const lower = (title || '').toLowerCase();
+            const type = (lower.includes('lỗi') || lower.includes('error')) ? 'error'
+                       : (lower.includes('thành công') || lower.includes('success')) ? 'success'
+                       : 'info';
+
+            // Show non-blocking toast
+            showNotification(message || title, type);
+
+            // If Swal exists, show a nice modal too (optional)
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: title || '',
+                text: message || '',
+                icon: type === 'error' ? 'error' : type === 'success' ? 'success' : 'info',
+                confirmButtonText: 'OK',
+                timer: type === 'success' ? 1800 : null
+              });
+            } else {
+              // fallback: populate custom modal (non-blocking)
+              if (modalEl) {
+                const tEl = modalEl.querySelector('#modal-title');
+                const mEl = modalEl.querySelector('#modal-message');
+                if (tEl) tEl.textContent = title || '';
+                if (mEl) mEl.textContent = message || '';
+                modalEl.style.display = 'flex';
+              } else {
+                // last resort
+                console.log('Modal/Swal not available, message:', title, message);
+              }
+            }
+          }
+
+          function hideModal() { if (modalEl) modalEl.style.display = 'none'; }
+          function showBookingModal() { if (bookingModalEl) bookingModalEl.style.display = 'flex'; }
+          function hideBookingModal() { if (bookingModalEl) bookingModalEl.style.display = 'none'; }
+
+          // wire up built-in buttons if they exist
+          if (document.getElementById('modal-close-btn')) {
+            document.getElementById('modal-close-btn').addEventListener('click', hideModal);
+          }
+          if (document.getElementById('booking-modal-close-btn')) {
+            document.getElementById('booking-modal-close-btn').addEventListener('click', hideBookingModal);
+          }
+
+          // expose to global scope if other scripts call them
+          window.showNotification = showNotification;
+          window.showModal = showModal;
+          window.hideModal = hideModal;
+          window.showBookingModal = showBookingModal;
+          window.hideBookingModal = hideBookingModal;
+        })();
     </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.firebasestorage.app",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Hàm mở chat
+        function toggleChat() {
+            const senderId = document.getElementById("senderId")?.value;      // lấy từ hidden input
+            const senderName = document.getElementById("senderName")?.value;  // lấy từ hidden input
+            const receiverId = document.getElementById("floating-chat-btn")?.getAttribute("data-owner-id");
+
+            if (!senderId || !receiverId) {
+                console.error("❌ Missing user info");
+                alert("⚠️ Không thể mở chat. Vui lòng đăng nhập lại.");
+                return;
+            }
+
+            if (senderId === receiverId) {
+                alert("😅 Bạn không thể chat với chính mình");
+                return;
+            }
+
+            createChatRoomAndRedirect(senderId, senderName, receiverId);
+        }
+
+        // Tạo phòng chat
+        function createChatRoomAndRedirect(senderId, senderName, receiverId) {
+            const timestamp = Date.now();
+
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: "Chủ sân",
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName || "Người dùng",
+                timestamp,
+                lastMessage: ""
+            };
+
+            Promise.all(
+                Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+            ).then(() => {
+                console.log("✅ Chat room created successfully");
+                redirectToChat(senderId, senderName, receiverId, "Chủ sân");
+            }).catch((error) => {
+                console.error("❌ Error creating chat room:", error);
+                redirectToChat(senderId, senderName, receiverId, "Chủ sân");
+            });
+        }
+
+        // Redirect sang trang Chat.cshtml
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName: senderName || "",
+                receiverId,
+                receiverName: receiverName || receiverId
+            });
+
+            // Gọi đến action ChatController.Chat
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+
+        // Gắn sự kiện click cho button
+        document.addEventListener("DOMContentLoaded", () => {
+            const floatingChatBtn = document.getElementById("floating-chat-btn");
+            if (floatingChatBtn) {
+                floatingChatBtn.addEventListener("click", toggleChat);
+            }
+        });
+
+        // Cho phép gọi trực tiếp onclick từ HTML
+        window.toggleChat = toggleChat;
+    </script>
+
+
+
+
 
 </body>
 </html>
