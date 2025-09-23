@@ -139,6 +139,27 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, $"Error creating monthly booking: {ex.Message}");
             }
         }
+
+        [HttpPut("monthly/{id}")]
+        public async Task<ActionResult<MonthlyBookingUpdateDto>> UpdateMonthlyBooking(int id, MonthlyBookingUpdateDto monthlyBookingUpdateDto)
+        {
+            try
+            {
+                var updated = await _bookingService.UpdateMonthlyBookingAsync(id, monthlyBookingUpdateDto);
+
+                if (updated == null)
+                {
+                    return NotFound($"Monthly booking with id {id} not found.");
+                }
+
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating monthly booking: {ex.Message}");
+            }
+        }
+
     }
 }
 
