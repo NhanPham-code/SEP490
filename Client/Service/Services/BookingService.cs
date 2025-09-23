@@ -1,4 +1,5 @@
 ﻿using DTOs.BookingDTO;
+using DTOs.OData;
 using Newtonsoft.Json;
 using Service.BaseService;
 using Service.Interfaces;
@@ -51,6 +52,48 @@ namespace Service.Services
 
             return result?.Value ?? new List<BookingReadDto>();
         }
+
+        public async Task<List<MonthlyBookingReadDto>> GetMonthlyBookingAsync(string accessToken, string queryString)
+        {
+            // Sử dụng HttpRequestMessage để set token thủ công
+            var request = new HttpRequestMessage(HttpMethod.Get, "/monthlyBooking" + queryString);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<MonthlyBookingReadDto>();
+            }
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            // Deserialize theo kiểu DTO bao ngoài chứa 'value'
+            var result = System.Text.Json.JsonSerializer.Deserialize<OdataHaveCountResponse<MonthlyBookingReadDto>>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Value ?? new List<MonthlyBookingReadDto>();
+        }
+
+        public async Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // Gọi đến endpoint Ocelot Gateway
+            var response = await _httpClient.PutAsJsonAsync($"/booking/monthly/{id}", bookingDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Cập nhật booking hàng tháng thất bại. Lỗi từ API: {errorContent}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<MonthlyBookingReadDto>();
+        }
+
 
         // Lấy chi tiết booking theo Id
         public async Task<BookingReadDto?> GetBookingDetailAsync(string accessToken, int bookingId)
@@ -235,5 +278,23 @@ namespace Service.Services
             // Đọc và deserialize kết quả trả về nếu thành công
             return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
+
+        public async Task<BookingReadDto?> UpdateBookingAsync(int id, BookingUpdateDto bookingDto, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // Gọi đến endpoint của Ocelot API Gateway
+            var response = await _httpClient.PutAsJsonAsync($"/booking/{id}", bookingDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Cập nhật booking thất bại. Lỗi từ API: {errorContent}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<BookingReadDto>();
+        }
+
     }
 }
