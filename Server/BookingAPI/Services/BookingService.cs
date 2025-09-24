@@ -5,6 +5,7 @@ using BookingAPI.Repository;
 using BookingAPI.Repository.Interface;
 using BookingAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace BookingAPI.Services
@@ -158,5 +159,25 @@ namespace BookingAPI.Services
             return readDto;
         }
 
+        public IQueryable<MonthlyBooking> GetAllMonthlyBookingsAsQueryable()
+        {
+            return _monthlyBookingRepository.GetAllMonthlyBookingsAsQueryable();
+        }
+
+        public async Task<MonthlyBookingUpdateDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto updateDto)
+        {
+            var existingMonthlyBooking = await _monthlyBookingRepository
+                .GetAllMonthlyBookingsAsQueryable()
+                .FirstOrDefaultAsync(mb => mb.Id == id);
+
+            if (existingMonthlyBooking == null)
+                return null;
+
+            // Map từ DTO sang entity (AutoMapper sẽ update các field có giá trị)
+            _mapper.Map(updateDto, existingMonthlyBooking);
+
+            var updatedMonthlyBooking = await _monthlyBookingRepository.UpdateMonthlyBookingAsync(existingMonthlyBooking);
+            return _mapper.Map<MonthlyBookingUpdateDto>(updatedMonthlyBooking);
+        }
     }
 }

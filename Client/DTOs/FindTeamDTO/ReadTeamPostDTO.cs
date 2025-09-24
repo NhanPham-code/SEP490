@@ -10,7 +10,7 @@
         public string Title { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public string SportType { get; set; } = string.Empty;
-        public int MaxPlayers { get; set; }
+        public int JoinedPlayers { get; set; }
         public int NeededPlayers { get; set; }
         public decimal PricePerPerson { get; set; }
         public string Description { get; set; } = string.Empty;
@@ -24,6 +24,7 @@
         public int CreatedBy { get; set; }
         public int StadiumId { get; set; }
         public int BookingId { get; set; }
+        public List<ReadTeamMemberDTO> TeamMembers { get; set; } = new List<ReadTeamMemberDTO>();
     }
 
 }

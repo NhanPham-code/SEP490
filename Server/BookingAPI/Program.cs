@@ -24,6 +24,8 @@ static Microsoft.OData.Edm.IEdmModel GetEdmModel()
 
     builder.EntitySet<BookingDetail>("BookingDetails")
            .EntityType.HasKey(d => d.Id);
+    builder.EntitySet<MonthlyBooking>("OdataMonthlyBooking")
+           .EntityType.HasKey(d => d.Id);
 
     return builder.GetEdmModel();
 }

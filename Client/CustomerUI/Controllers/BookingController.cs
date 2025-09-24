@@ -1,5 +1,4 @@
-
-﻿using DTOs.BookingDTO;
+using DTOs.BookingDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System;
@@ -688,9 +687,5 @@ namespace CustomerUI.Controllers
     }
 }
 
-﻿
-
-        // --- CreateBooking và các action khác giữ nguyên ---
-        
         
         

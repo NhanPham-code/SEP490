@@ -23,13 +23,22 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<TeamPost> CreateTeamPostAsync(TeamPost teamPost)
         {
+            teamPost.CreatedAt = DateTime.UtcNow;
             _context.TeamPosts.Add(teamPost);
             await _context.SaveChangesAsync();
             return teamPost;
         }
         public async Task<TeamPost> UpdateTeamPostAsync(TeamPost teamPost)
         {
-            _context.TeamPosts.Update(teamPost);
+            var existingPost = await GetTeamPostByIdAsync(teamPost.Id);
+            if (existingPost == null) return null;
+            existingPost.Title = teamPost.Title;
+            existingPost.Description = teamPost.Description;
+            existingPost.NeededPlayers = teamPost.NeededPlayers;
+            existingPost.JoinedPlayers = teamPost.JoinedPlayers;
+            existingPost.PricePerPerson = teamPost.PricePerPerson;
+            existingPost.UpdatedAt = DateTime.UtcNow;
+            _context.TeamPosts.Update(existingPost);
             await _context.SaveChangesAsync();
             return teamPost;
         }
@@ -49,6 +58,11 @@ namespace FindTeamAPI.Repositories
         public IQueryable<TeamPost> GetAllTeamPostsQueryableAsync()
         {
             return _context.TeamPosts.AsQueryable();
+        }
+        public IQueryable<TeamPost> GetAllTeamPostsQueryableByIdAsync(int userId)
+        {
+            return _context.TeamPosts.Include(tp => tp.TeamMembers.Where(p => p.UserId == userId))
+                .AsQueryable();
         }
     }
 }

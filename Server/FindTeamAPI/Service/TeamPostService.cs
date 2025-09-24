@@ -35,6 +35,10 @@ namespace FindTeamAPI.Service
         {
             return await _teamPostRepositories.DeleteTeamPostAsync(postId);
         }
+        public IQueryable<TeamPost> GetAllTeamPostsQueryableByIdAsync(int userId)
+        {
+            return _teamPostRepositories.GetAllTeamPostsQueryableByIdAsync(userId);
+        }
         public IQueryable<TeamPost> GetAllTeamPostsQueryableAsync()
         {
             return _teamPostRepositories.GetAllTeamPostsQueryableAsync();
