@@ -20,7 +20,7 @@ namespace CustomerUI.Controllers
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                return RedirectToAction("Login", "Auth");
+                return RedirectToAction("Login", "Common");
             }
             return View();
         }
