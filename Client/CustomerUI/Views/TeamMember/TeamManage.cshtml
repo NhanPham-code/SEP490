@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Thành Viên Đội - Nền Tảng FindTeam</title>
     <link href="~/css/FindTeam/MemberManage.css" rel="stylesheet" />
+    <link href="~/css/FindTeam/popup-invite.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,9 +61,25 @@
         <div class="floating-circle circle-5"></div>
     </div>
 
+
+    <!-- From Uiverse.io by xopc333 -->
+    
+
     <div class="back max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-8">
+        <!-- From Uiverse.io by cssbuttons-io -->
+        
         <div class="shadow-soft p-8">
-            <a class="back-btn" href="@oldUrl"><i class="ri-arrow-left-line"></i> Quay lại</a>
+            <!-- From Uiverse.io by Rahulcheryala -->
+            <!-- From Uiverse.io by alexmaracinaru -->
+            <button onclick="goBack()" class="cta">
+          
+                <span class="hover-underline-animation">
+                    <svg id="arrow-horizontal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.0003 13.0001L22.0004 11.0002L5.82845 11.0002L9.77817 7.05044L8.36396 5.63623L2 12.0002L8.36396 18.3642L9.77817 16.9499L5.8284 13.0002L22.0003 13.0001Z"></path></svg>
+                    Quay lại
+                </span>
+                
+            </button>
+
         </div>
     </div>
 
@@ -100,88 +117,16 @@
         </div>
     </div>
 
-    <!-- Add/Edit Member Modal -->
-    <div id="member-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="modal-content glass-card rounded-3xl shadow-2xl max-w-md w-full p-8">
-            <div class="flex items-center justify-between mb-6">
-                <h2 id="modal-title" class="text-2xl font-bold text-gray-900">Thêm Thành Viên Mới</h2>
-                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="ri-close-line text-2xl"></i>
-                </button>
-            </div>
+   
 
-            <form id="member-form" class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ID Người Dùng</label>
-                    <input type="number"
-                           id="user-id"
-                           name="userId"
-                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                           placeholder="Nhập ID người dùng"
-                           required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ID Bài Đăng Đội</label>
-                    <input type="number"
-                           id="team-post-id"
-                           name="teamPostId"
-                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                           placeholder="Nhập ID bài đăng đội"
-                           required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Vai Trò</label>
-                    <select id="member-role"
-                            name="role"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                            required>
-                        <option value="">Chọn vai trò</option>
-                        <option value="captain">Đội Trưởng</option>
-                        <option value="member">Thành Viên</option>
-                        <option value="substitute">Dự Bị</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-3 pt-4">
-                    <button type="button"
-                            id="cancel-btn"
-                            class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-colors">
-                        Hủy
-                    </button>
-                    <button type="submit"
-                            class="flex-1 btn-primary text-white px-6 py-3 rounded-2xl font-semibold">
-                        <span id="submit-text">Thêm Thành Viên</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Confirm Delete Modal -->
-    <div id="delete-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="modal-content glass-card rounded-3xl shadow-2xl max-w-md w-full p-8">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ri-delete-bin-line text-2xl text-red-600"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Xóa Thành Viên Đội</h3>
-                <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa thành viên này khỏi đội? Hành động này không thể hoàn tác.</p>
-                <div class="flex gap-3">
-                    <button id="cancel-delete" class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-colors">
-                        Hủy
-                    </button>
-                    <button id="confirm-delete" class="flex-1 btn-danger text-white px-6 py-3 rounded-2xl font-semibold">
-                        Xóa Thành Viên
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- JavaScript -->
     <script>
+        // quay ve url truoc do 
+        function goBack() {
+            window.location.href = '@oldUrl';
+        }
+
         // Sample data based on ReadTeamMemberDTO - Vietnamese names
        
         let editingMemberId = null;
@@ -618,7 +563,7 @@
                 <!-- Chú ý: Nếu description chứa HTML, cần một thư viện để làm sạch (như DOMPurify) thay vì chèn trực tiếp -->
                 <div id="preview" class="text-gray-600 leading-relaxed truncate-html">${response.teamPost.description}</div>
                 <div class="line"></div>
-                <div class="join-btn ">
+                <div class="">
                     ${renderJoinButton(response.newMember, response.isLeader, response.teamPost)}
                 </div>
             </div>`;
@@ -664,18 +609,15 @@
         function renderJoinButton(newMember, isLeader, post) {
             if(isLeader === 1){
                  return `
-                <button onClick="invitePlayer()" class="btn btn-join">
-                    <i class="ri-user-add-line"></i>
-                    Mời bạn bè tham gia
-                </button>
+                <button onClick="invitePlayer()" class="smky-btn3 relative hover:text-[#e6e6e6] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#4b46b6] after:rounded-t-full after:w-full after:bottom-0 after:left-0 text-gray-900">Mời bạn bè tham gia</button>
+
             `;
             }
             if (newMember === 1) {
                 return `
-                <button onClick="joindTeam(${post.id})" class="btn btn-join">
-                    <i class="ri-user-add-line"></i>
-                    Tham Gia
-                </button>
+                <button onClick="joindTeam(${post.id})" 
+                class="smky-btn3 relative hover:text-[#e6e6e6] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#4b46b6] after:rounded-t-full after:w-full after:bottom-0 after:left-0 text-gray-900">Tham Gia</button>
+        
             `;
             }else{
                 return ``;
@@ -683,29 +625,90 @@
 
         }
 
-        // popup mời người chơi khác tham gia đội của mình 
-        function invitePlayer(){
+        // popup mời người chơi khác tham gia đội của mình
+                             function invitePlayer() {
             Swal.fire({
-                title: 'Mời người chơi khác tham gia đội của bạn',
-                input: 'text',
-                inputLabel: 'Nhập ID người chơi',
-                inputPlaceholder: 'VD: 12345',
+                title: '<span style="color: #475569; font-weight: 600;">🎮 Mời người chơi tham gia</span>',
+                html: `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: #64748b; font-size: 14px; margin: 0;">
+                            Nhập số điện thoại để tìm người chơi trong đội
+                        </p>
+                    </div>
+                    <input type="text" id="player-phone-input" class="swal2-input" placeholder="🔍 Nhập số điện thoại..." autocomplete="off" style="margin-bottom:0;">
+                    <div id="suggestions" style="max-height:150px;overflow-y:auto;text-align:left;margin-top:2px;"></div>
+                `,
                 showCancelButton: true,
-                confirmButtonText: 'Gửi lời mời',
-                cancelButtonText: 'Hủy',
-                confirmButtonColor: '#3b82f6',
-                cancelButtonColor: '#ef4444',
-                preConfirm: (userId) => {
-                    if (!userId) {
-                        Swal.showValidationMessage('Vui lòng nhập ID người chơi');
-                    }
-                    return userId;
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const userId = result.value;
-                    // Gọi hàm gửi lời mời với userId
-                    sendInvite(userId);
+                confirmButtonText: '❌ Đóng',
+                showConfirmButton: true,
+                confirmButtonColor: '#94a3b8',
+                background: '#ffffff',
+                color: '#1e293b',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    title: 'swal-custom-title',
+                    confirmButton: 'swal-custom-confirm',
+                    cancelButton: 'swal-custom-cancel'
+                },
+                didOpen: function() {
+                    let debounceTimeout;
+                    let lastPhoneQuery = '';
+                    // Bắt sự kiện Enter trên input
+                    $('#player-phone-input').on('keydown', function(e) {
+                        if(e.key === 'Enter') {
+                            clearTimeout(debounceTimeout);
+                            const phone = $(this).val().trim();
+                            if (phone.length < 6 || !/^\d+$/.test(phone)) {
+                                Swal.showValidationMessage(
+                                    '<span style="color: #f87171; font-size: 13px;">⚠️ Vui lòng nhập số điện thoại hợp lệ</span>'
+                                );
+                                $('#suggestions').html('');
+                                return;
+                            }
+                            lastPhoneQuery = phone;
+                            $('#suggestions').html('<div style="padding:8px;color:#64748b;">Đang tìm kiếm...</div>');
+                            $.ajax({
+                                url: '/TeamMember/FindOtherPlayer?phoneNumber=1',
+                                type: 'GET',
+                                success: function(data) {
+                                    $('#suggestions').html('');
+                                    if (data && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                                        data.suggestions.forEach(function(item) {
+                                            const div = $('<div>')
+                                                .text(item.id + ' - ' + item.name + ' (' + item.phone + ')')
+                                                .css({
+                                                    padding: '6px 10px',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #eee'
+                                                })
+                                                .on('click', function() {
+                                                    // Gửi lời mời khi chọn người chơi
+                                                    Swal.fire({
+                                                        title: '🚀 Đang gửi lời mời...',
+                                                        text: 'Vui lòng đợi trong giây lát',
+                                                        allowOutsideClick: false,
+                                                        allowEscapeKey: false,
+                                                        showConfirmButton: false,
+                                                        background: '#ffffff',
+                                                        color: '#475569',
+                                                        didOpen: () => {
+                                                            Swal.showLoading();
+                                                        }
+                                                    });
+                                                    sendInvite(item.id);
+                                                });
+                                            $('#suggestions').append(div);
+                                        });
+                                    } else {
+                                        $('#suggestions').html('<div style="padding:8px;color:#64748b;">Không tìm thấy người chơi nào!</div>');
+                                    }
+                                },
+                                error: function() {
+                                    $('#suggestions').html('<div style="padding:8px;color:#f87171;">Lỗi khi tìm kiếm!</div>');
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }

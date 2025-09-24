@@ -188,5 +188,24 @@ namespace CustomerUI.Controllers
                 return Json(new { Message = 200, value = mesage });
             }
         }
+
+        // tìm người chơi khác để mời tham gia 
+        public async Task<IActionResult> FindOtherPlayer([FromQuery] string phoneNumber)
+        {
+            if (phoneNumber.Length <= 0)
+            {
+                return Json(null);
+            }
+            token = _tokenService.GetAccessTokenFromCookie();
+            var teamPost = await _userService.GetMyProfileAsync(token);
+            if (teamPost != null)
+            {
+                //var allUser = await _userService.GetAllUsersAsync(token);
+                //// lọc người chơi theo vị trí và loại hình thể thao
+                //var filteredUsers = allUser.Where(u => u.Location.Contains(location, StringComparison.OrdinalIgnoreCase) && u.SportTypes.Contains(sportType, StringComparison.OrdinalIgnoreCase)).ToList();
+                //return Json(filteredUsers);
+            }
+            return Json(teamPost);
+        }
     }
 }
