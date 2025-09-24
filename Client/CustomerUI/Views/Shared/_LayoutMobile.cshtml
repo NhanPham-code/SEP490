@@ -695,13 +695,15 @@
             </a>
 
             <!-- Notifications -->
-            <a href="#"
+            <a asp-controller="Notification" asp-action="Index"
                x-on:click="activeTab = 'notifications'"
                :class="activeTab === 'notifications' ? 'bottom-nav-item active' : 'bottom-nav-item'"
                class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-orange-500 transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
                 <div class="w-6 h-6 flex items-center justify-center relative">
                     <i class="ri-notification-3-line text-lg"></i>
-                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold" style="font-size: 8px;">3</span>
+                    <span id="notification-badge-bottom"
+                          class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold"
+                          style="font-size: 8px; display:none"></span>
                 </div>
                 <span class="text-xs mt-1 font-medium truncate">Alerts</span>
             </a>
@@ -1011,6 +1013,31 @@
                 };
             }
         });
+    </script>
+
+    <script>
+        async function updateMobileNotificationBadges() {
+            try {
+                const resp = await fetch('/Notification/GetUnreadNotificationCount');
+                if (resp.ok) {
+                    const count = await resp.json();
+                    // Bottom nav badge
+                    const badgeBottom = document.getElementById('notification-badge-bottom');
+                    if (badgeBottom) {
+                        if (count > 0) {
+                            badgeBottom.textContent = count;
+                            badgeBottom.style.display = 'flex';
+                        } else {
+                            badgeBottom.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (err) {
+                // Nếu cần xử lý lỗi
+                console.error('Error fetching notification count:', err);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
     </script>
 
 </body>
