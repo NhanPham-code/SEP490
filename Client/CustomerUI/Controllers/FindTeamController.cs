@@ -356,6 +356,29 @@ namespace CustomerUI.Controllers
             return Json(update);
         }
 
+        // delete team post
+        public async Task<IActionResult> DeleteTeamPost(int postId)
+        {
+            if (postId <= 0)
+            {
+                return Json(new { Message = 500, value = "Delete team post failed" });
+            }
+            var result = await _teamPost.DeleteTeamPost(postId);
+            if (result == false)
+            {
+                return Json(new { Message = 500, value = "Delete team post failed" });
+            }
+            var members = await _teamMember.GetAllTeamMemberByPostId(postId);
+            if (members != null && members.Any())
+            {
+                foreach (var member in members)
+                {
+                    await _teamMember.DeleteTeamMember(member.Id, postId);
+                }
+            }
+            return Json(new { Message = 200, value = "Delete team post successfully" });
+        }
+
         // chuyển đổi từ datetime sang timespan
         public TimeSpan ConvertToTimeSpan(DateTime dateTime)
         {

@@ -139,12 +139,22 @@
                             <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
                                 <div class="filter-options">
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 5" >
                                         <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Bóng Đá</span>
+                                        <span class="label-text">Bóng đá sân 5</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Rổ">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 7" >
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 7</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 11" >
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 11</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng rổ">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Rổ</span>
                                     </label>
@@ -154,7 +164,7 @@
                                         <span class="label-text">Tennis</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu Lông">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu lông">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Cầu Lông</span>
                                     </label>
@@ -928,6 +938,22 @@
                 url: '/FindTeam/GetBookByUserId',
                 type: 'GET',
                 success: function(reponse) {
+                    // neu khon cos du lieu thi thong bao
+                    if(reponse.message === 404){
+                         Swal.fire({
+                            icon: 'warning',
+                            title: 'Chưa có lịch đặt sân!',
+                            text: 'Vui lòng đặt sân trước khi tạo bài đăng tìm đội.',
+                            confirmButtonText: 'Đến trang đặt sân',
+                            confirmButtonColor: '#3b82f6',
+                            cancelButtonText: 'Hủy'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/Home/Index'; // Chuyển hướng đến trang đặt sân
+                            }
+                            return;
+                        });
+                    }
                     console.log("booking: ", reponse);
                     let quill;
                     Swal.fire({

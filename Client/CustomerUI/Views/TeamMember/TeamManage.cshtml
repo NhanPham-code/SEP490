@@ -314,10 +314,7 @@
 
             }
             else if(leader > 0 && member.role === "Member"){
-                return `<button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 edit-member" data-member-id="${member.id}" data-member-role="${member.role}">
-                            <i class="ri-edit-line mr-1"></i>
-                            Sửa
-                        </button>
+                return `
                         <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1" id="btn-removed" data-member-id="${member.id}" data-member-role="${member.role}">
                             <i class="ri-delete-bin-line mr-1"></i>
                             Xóa thành viên
@@ -622,7 +619,7 @@
                 <div id="preview" class="text-gray-600 leading-relaxed truncate-html">${response.teamPost.description}</div>
                 <div class="line"></div>
                 <div class="join-btn ">
-                    ${renderJoinButton(response.newMember, response.teamPost)}
+                    ${renderJoinButton(response.newMember, response.isLeader, response.teamPost)}
                 </div>
             </div>`;
         }
@@ -664,8 +661,15 @@
         }
 
         // render nút tham gia
-        function renderJoinButton(newMember, post) {
-
+        function renderJoinButton(newMember, isLeader, post) {
+            if(isLeader === 1){
+                 return `
+                <button onClick="invitePlayer()" class="btn btn-join">
+                    <i class="ri-user-add-line"></i>
+                    Mời bạn bè tham gia
+                </button>
+            `;
+            }
             if (newMember === 1) {
                 return `
                 <button onClick="joindTeam(${post.id})" class="btn btn-join">
@@ -677,6 +681,33 @@
                 return ``;
             }
 
+        }
+
+        // popup mời người chơi khác tham gia đội của mình 
+        function invitePlayer(){
+            Swal.fire({
+                title: 'Mời người chơi khác tham gia đội của bạn',
+                input: 'text',
+                inputLabel: 'Nhập ID người chơi',
+                inputPlaceholder: 'VD: 12345',
+                showCancelButton: true,
+                confirmButtonText: 'Gửi lời mời',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#ef4444',
+                preConfirm: (userId) => {
+                    if (!userId) {
+                        Swal.showValidationMessage('Vui lòng nhập ID người chơi');
+                    }
+                    return userId;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const userId = result.value;
+                    // Gọi hàm gửi lời mời với userId
+                    sendInvite(userId);
+                }
+            });
         }
 
         // Cách sử dụng:

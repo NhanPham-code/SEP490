@@ -159,7 +159,7 @@
                 const postId = $(deleteButton).data('post-id');
 
                 console.log('Xóa bài đăng ID:', postId);
-                // openDeleteModal(postId); // Gọi hàm xóa của bạn
+                openDeleteModal(postId); // Gọi hàm xóa của bạn
             }
         });
         });
@@ -749,6 +749,74 @@
                         icon: 'error',
                         title: 'Lỗi!',
                         text: 'Không thể tải thông tin đặt sân. Vui lòng thử lại sau.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            });
+        }
+
+        //delete pot
+        function openDeleteModal(postId) {
+            Swal.fire({
+                title: 'Xóa Bài Đăng',
+                text: 'Bạn có chắc chắn muốn xóa bài đăng này? Hành động này không thể hoàn tác.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                customClass: {
+                    confirmButton: 'enhanced-confirm-btn',
+                    cancelButton: 'enhanced-cancel-btn',
+                    popup: 'enhanced-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Call your delete function here
+                    deleteTeamPost(postId);
+                }
+            });
+        }
+
+        //delete function
+        function deleteTeamPost(postId) {
+            $.ajax({
+                url: `/FindTeam/DeleteTeamPost?postId=${postId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the post card from the UI with animation
+                        const postCard = document.getElementById(`post-${postId}`);
+                        if (postCard) {
+                            postCard.style.transition = 'all 0.5s ease';
+                            postCard.style.transform = 'scale(0.8) rotate(5deg)';
+                            postCard.style.opacity = '0';
+                            setTimeout(() => {
+                                postCard.remove();
+                                // Optionally, show a success message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa!',
+                                    text: 'Bài đăng đã được xóa thành công.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                            }, 500);
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: response.message || 'Không thể xóa bài đăng. Vui lòng thử lại sau.',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Không thể xóa bài đăng. Vui lòng thử lại sau.',
                         confirmButtonColor: '#ef4444'
                     });
                 }

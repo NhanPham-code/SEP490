@@ -90,6 +90,10 @@ namespace CustomerUI.Controllers
             {
                 teamPostDetailViewModel.newMember = 1;
             }
+            if (teamPostDetailViewModel.TeamPost.CreatedBy == myUserId)
+            {
+                teamPostDetailViewModel.isLeader = 1;
+            }
             if (teamPostDetailViewModel != null && teamPost.Value.Any())
             {
                 return Json(teamPostDetailViewModel);
@@ -122,8 +126,22 @@ namespace CustomerUI.Controllers
                     Description = post.Value.FirstOrDefault().Description,
                     UpdatedAt = DateTime.UtcNow
                 };
-                var postMember = await _teamPost.UpdateTeamPost(updateTeamPostDTO);
+                // cập nhật thành viên 
                 var update = await _teamMember.UpdateTeamMember(updateMember);
+                // cập nhật số thành viên trên bài đăng
+                var postMember = await _teamPost.UpdateTeamPost(updateTeamPostDTO);
+                if (postMember.JoinedPlayers == postMember.NeededPlayers)
+                {
+                    var allMember = await _teamMember.GetAllTeamMemberByPostId(postId);
+                    foreach (var member in allMember)
+                    {
+                        if (member.role == "Waiting")
+                        {
+                          var deleteMember = await _teamMember.DeleteTeamMember(member.Id, postId);
+                        }
+                    }
+                }
+                
                 if (update != null)
                 {
                     return Json(new { Message = 200, value = "Cập nhật thành viên thành công!" });

@@ -14,5 +14,6 @@ namespace DTOs.FindTeamDTO
         public PublicUserProfileDTO? User { get; set; } = new PublicUserProfileDTO();
 
         public int newMember { get; set; }
+        public int isLeader { get; set; }
     }
 }

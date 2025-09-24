@@ -10,17 +10,28 @@
     </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="~/css/Home/home.css" rel="stylesheet" />
+    <link href="~/css/background/background.css" rel="stylesheet" />
+    <link href="~/css/FindTeam/FindTeam.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="js/Home/Home.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.css">
+    <script src="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+    <script src="js/Home/Home.js"></script>
+
     <style>
         .circle{
             border-radius: 50%;
-            max-height: 40px;
+ 
         }
         /* Custom checkbox style */
         input[type="checkbox"] {
@@ -92,13 +103,14 @@
             position: fixed;
             pointer-events: none;
             animation: floatUp 1.5s ease-out forwards;
-            z-index: 9999;
+            z-index: 1000;
             font-size: 16px;
         }
 
         .favorite-btn {
             position: relative;
-            z-index: 20;
+            font-size: 1rem;
+            z-index: 10;
         }
 
             .favorite-btn.favorited {
@@ -110,11 +122,19 @@
 
                 .favorite-btn.favorited .heart-icon {
                     color: rgb(220, 38, 38) !important;
+                    
+                    z-index: 11;
                 }
 
         /* Đảm bảo backdrop blur hoạt động */
         .favorite-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             backdrop-filter: blur(10px);
+            
             -webkit-backdrop-filter: blur(8px);
         }
         /* Custom time slot styles */
@@ -275,8 +295,10 @@
 </head>
 
 
-<body class="bg-gray-50" data-new-gr-c-s-check-loaded="14.1116.0" data-gr-ext-installed="">
-
+<body  data-new-gr-c-s-check-loaded="14.1116.0" data-gr-ext-installed="">
+    <div class="bg"></div>
+    <div class="bg bg2"></div>
+    <div class="bg bg3"></div>
     <section class="relative h-80 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=Modern%20sports%20stadium%20complex%20aerial%20view%20with%20multiple%20fields%2C%20green%20grass%2C%20stadium%20lights%2C%20parking%20areas%2C%20clear%20blue%20sky%20background%2C%20professional%20sports%20facilities%2C%20vibrant%20and%20energetic%20atmosphere%2C%20high-quality%20architectural%20photography%2C%20clean%20and%20inspiring%20sports%20venue%20complex&amp;width=1200&amp;height=320&amp;seq=hero002&amp;orientation=landscape')">
         <div class="absolute inset-0 bg-black bg-opacity-40"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
@@ -294,7 +316,7 @@
             </div>
         </div>
     </section>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 content-bg">
         <div class="weather-card">
             <h1>Thời tiết hiện tại</h1>
             <p id="status" class="location">Đang lấy vị trí...</p>
@@ -304,133 +326,235 @@
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
-
-            <div class="w-full lg:w-80 bg-white rounded-lg shadow-sm p-6 h-fit">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold">Filter Results</h3>
-                    <button class="text-sm text-primary hover:text-blue-600">Clear All</button>
+            <div class="mt-2 search">
+                <!-- From Uiverse.io by mahiatlinux -->
+                <div class="relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
+                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 20 20"
+                             fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="search-text"
+                           class="w-full pl-8 pr-24 py-3 text-base text-gray-700 bg-transparent rounded-lg focus:outline-none"
+                           placeholder="Tìm kiếm bằng tên" />
+                    <button type="submit" id="search-btn" class="absolute right-1 top-1 bottom-1 px-6 bg-[#5044e4] text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5044e4]">
+                        Search
+                    </button>
                 </div>
 
-                <form id="sportFilterForm">
-                    <!-- Sport Type -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Sport Type</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Bóng đá" class="custom-checkbox">
-                                <span class="text-sm">Bóng đá</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Bóng rổ" class="custom-checkbox">
-                                <span class="text-sm">Bóng rổ</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Tennis" class="custom-checkbox">
-                                <span class="text-sm">Tennis</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Bóng chuyền" class="custom-checkbox">
-                                <span class="text-sm">Bóng chuyền</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Cầu lông" class="custom-checkbox">
-                                <span class="text-sm">Cầu lông</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" name="sport_type[]" value="Multi-Sport" class="custom-checkbox">
-                                <span class="text-sm">Multi-Sport</span>
-                            </label>
-                        </div>
-                    </div>
 
-                    <!-- Select Date -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Select Date</h4>
-                        <input type="date" name="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
-                    </div>
-
-                    <!-- Available Time -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Available Time</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="06:00" class="hidden">
-                                06:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="08:00" class="hidden">
-                                08:00
-                            </label>
-                            <label class="time-slot selected p-2 text-sm border border-gray-300 rounded text-center">
-                                <input type="radio" name="time" value="10:00" class="hidden" checked>
-                                10:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="12:00" class="hidden">
-                                12:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="14:00" class="hidden">
-                                14:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="16:00" class="hidden">
-                                16:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="18:00" class="hidden">
-                                18:00
-                            </label>
-                            <label class="time-slot p-2 text-sm border border-gray-300 rounded text-center hover:border-primary">
-                                <input type="radio" name="time" value="20:00" class="hidden">
-                                20:00
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Price Range -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Price Range</h4>
-                        <div class="flex">
-                            <input type="number" id="priceInput" min="0" max="10000000" value="100000" class="w-24 border p-1 rounded-md text-end">
-                            <div class="flex items-center gap-2">
-                                <span class="font-medium">đ/giờ</span>
+                <form id="filter-form" data-intro="Bạn sẽ sử dụng bộ lọc ở đây" data-step="5">
+                    <aside class="sidebar" id="filter-sidebar" role="complementary" aria-label="Bộ lọc tìm kiếm">
+                        <div class="sidebar-header">
+                            <h3 class="sidebar-title">
+                                <i class="ri-filter-3-line" aria-hidden="true"></i>
+                                Bộ Lọc
+                            </h3>
+                            <div class="sidebar-actions">
+                                <button class="clear-filters" type="button" aria-label="Xóa tất cả bộ lọc">
+                                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                                    Xóa Tất Cả
+                                </button>
+                                <button class="close-filter" id="close-filter" type="button" aria-label="Đóng bộ lọc">
+                                    <i class="ri-close-line " id="close-icon" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="px-2">
-                            <input type="range" name="price" min="0" max="10000000" value="100000" class="w-full mb-2">
-                            <div class="flex justify-between items-center text-sm text-gray-600">
-                                <span>0đ</span>
-                                
-                                <span>10.000.000đ</span>
-                            </div>
-                        </div>
-                    </div>
 
-
-
-                    <!-- Location -->
-                    <div class="mb-6">
-                        <h4 class="font-medium mb-3">Location</h4>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <div class="w-4 h-4 flex items-center justify-center">
-                                    <i class="ri-map-pin-line text-gray-400"></i>
+                        <!-- Loại Thể Thao -->
+                        <div class="filter-section" data-intro="Bạn có thể chọn loại thể thao bạn muốn chơi" data-step="6">
+                            <button class="filter-header"
+                                    data-target="sport-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="sport-filter">
+                                <h4 class="filter-title">Loại Thể Thao</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
+                                <div class="filter-options">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng đá sân 5">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 5</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng đá sân 7">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 7</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng đá sân 11">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 11</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng rổ">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng Rổ</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Tennis">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Tennis</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Cầu lông">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Cầu Lông</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng Chuyền">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng Chuyền</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Đa Môn">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Đa Môn</span>
+                                    </label>
                                 </div>
                             </div>
-                            <input type="text" name="location" placeholder="Enter location" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
                         </div>
-                    </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="w-full bg-primary text-white py-3 !rounded-button font-semibold hover:bg-blue-600 transition-colors whitespace-nowrap">
-                        Apply Filters
-                    </button>
+                        <!-- Chọn Ngày -->
+                        <div class="filter-section" data-intro="Bạn có thể chọn ngày bạn muốn chơi" data-step="7">
+                            <button class="filter-header"
+                                    data-target="date-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="date-filter">
+                                <h4 class="filter-title">Chọn Ngày</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="date-filter">
+                                <div class="date-input-wrapper">
+                                    <i class="ri-calendar-line" aria-hidden="true"></i>
+                                    <input type="date"
+                                           name="date"
+                                           class="date-input"
+                                           id="play-date-filter"
+                                           aria-label="Chọn ngày chơi">
+                                </div>
+                                <div class="quick-date-options">
+                                    <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
+                                    <button type="button" class="quick-date-btn" data-days="1">Mai</button>
+                                    <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
+                                    <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thời Gian -->
+                        <div class="filter-section" data-intro="Chọn thời gian bạn muốn chơi" data-step="8">
+                            <button class="filter-header"
+                                    data-target="time-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="time-filter">
+                                <h4 class="filter-title">Thời Gian Chơi</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
+                                <div class="time-grid">
+                                    <label for="startTime" class="range-label">Từ:</label>
+                                    <input type="time" class="time-slot" name="startTime" id="startTime" value="" />
+                                    <label for="endTime" class="range-label">Đến:</label>
+                                    <input type="time" class="time-slot" name="endTime" id="endTime" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khoảng Giá -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="price-filter"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="price-filter">
+                                <h4 class="filter-title">Khoảng Giá</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content active" id="price-filter">
+                                <div class="price-range">
+                                    <input type="range"
+                                           name="price"
+                                           min="0"
+                                           max="500000"
+                                           value="250000"
+                                           step="10000"
+                                           class="range-slider"
+                                           id="price-range-slider"
+                                           aria-label="Khoảng giá từ 0 đến 500.000 VNĐ">
+                                    <div class="price-labels">
+                                        <span>0đ</span>
+                                        <span class="current-price" id="current-price">250.000đ/giờ</span>
+                                        <span>500.000đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Địa Điểm -->
+                        <div class="filter-section">
+                            <button class="filter-header"
+                                    data-target="location-filter"
+                                    type="button"
+                                    aria-expanded="false"
+                                    aria-controls="location-filter">
+                                <h4 class="filter-title">Địa Điểm</h4>
+                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
+                            </button>
+                            <div class="filter-content" id="location-filter">
+                                <div class="location-input-wrapper">
+                                    <i class="ri-map-pin-line" aria-hidden="true"></i>
+                                    <input type="text"
+                                           name="location"
+                                           placeholder="Nhập địa điểm"
+                                           class="location-input"
+                                           id="location-search"
+                                           aria-label="Tìm kiếm địa điểm"
+                                           autocomplete="off">
+                                    <button type="button" class="location-clear" aria-label="Xóa địa điểm">
+                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="popular-locations">
+                                    <h5 class="popular-title">Địa điểm phổ biến:</h5>
+                                    <div class="location-tags">
+                                        <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
+                                        <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
+                                        <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
+                                        <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút hành động của Form -->
+                        <div class="filter-actions">
+                            <button class="btn btn-primary btn-full" type="submit">
+                                <i class="ri-check-line" aria-hidden="true"></i>
+                                Áp Dụng Bộ Lọc
+                            </button>
+                            <button class="btn btn-secondary btn-outline btn-full" type="reset">
+                                <i class="ri-refresh-line" aria-hidden="true"></i>
+                                Đặt Lại
+                            </button>
+                        </div>
+                    </aside>
                 </form>
-
             </div>
+
+           
             <div class="flex-1">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <span class="text-gray-600 whitespace-nowrap" id="count"></span>
                         <div class="flex items-center gap-2">
@@ -485,8 +609,46 @@
                     </div>
 
                 </div>
-                <div id="stadium-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <button class="btn btn-secondary" id="mobile-filter-btn" type="button" aria-label="Mở bộ lọc" data-intro="Bạn sẽ sử dụng bộ lọc ở đây" data-step="5">
+                    <i class="ri-filter-3-line" aria-hidden="true"></i>
+                    Bộ Lọc
+                </button>
+                
+                <div id="stadium-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                    
                     <script>
+                                               function showLoading(){
+                            $('#loading-state').show();
+                            $('#stadium-grid').hide();
+                            // $('#empty-state').hide();
+                            $('#loadMoreBtn').hide();
+
+                        }
+                        // Hide loading state
+                        function hideLoading(){
+                            $('#loading-state').hide();
+                            $('#stadium-grid').show();
+                        }
+                        //loading load more 
+                        function showLoadMore(){
+                            $('#loading-state').show();
+                        }
+
+                        // event search
+                        function performSearch() {
+                             $('#search-btn').on('click', function() {
+                            var url = sessionStorage.getItem('searchTerm') || "";
+                            var searchTerm = $('#search-text').val().trim();
+                            if (url.length <=0 || url === null) {
+                                showLoading();
+                                let searchString = `&$filter=contains(Name,'${removeVietnameseTones(searchTerm)}')`;
+                                displayList(searchString, 10, 0);
+                            }else{
+                                displayList(`contains(Name,'${removeVietnameseTones(searchTerm)}')` + url, 10, 0);
+                            }
+                        });
+                        }
+                        
 
                                                 document.addEventListener('DOMContentLoaded', function () {
                           // Lấy tất cả các nút
@@ -503,80 +665,111 @@
                           });
                         });
 
-                        
+                                                function removeVietnameseTones(str) {
+                          return str
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '')
+                            .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+                        }
                                                 // Get the form element
-                                                                                            $(document).ready(function() {
-                                                                                                sessionStorage.setItem('searchTerm', "")
-                                                                                                let skip = 0;
-                        const top = 9; // Number of items per page
-                                                                                                 $('#stadium-grid').empty().hide(); // Clear previous results
-                                          displayList("", top, skip);
-                            const form = $('#sportFilterForm'); // or $('#myForm') if using an ID
+                                                                      $(document).ready(function() {
+                            //load stadium gird 
+                            showLoading();
+
+                            //search
+                            performSearch();
+
+                                                 $('#mobile-filter-btn').on('click', function() {
+                            $('#filter-sidebar').addClass('active');
+                        });
+
+                        // Đóng sidebar với nút close
+                        $('#close-filter').on('click', function() {
+                            $('#filter-sidebar').removeClass('active');
+                        });
+                            sessionStorage.setItem('searchTerm', "");
+                            let skip = 0;
+                            const top = 10; // Number of items per page
+                            $('#stadium-grid').empty().hide(); // Clear previous results
+                            displayList("", top, skip);
+
+                            const form = $('#filter-form');
                             form.on('submit', function(e) {
                                 e.preventDefault();
 
+                                let filters = [];
 
-                                                let filters = [];
+                                // Location (Stadium.Address)
+                                let location = this.querySelector('input[name="location"]').value.trim();
+                                if (location) {
+                                    filters.push(`contains(AddressUnsigned,'${removeVietnameseTones(location)}')`);
+                                }
 
-                        // Location
-                        let location = this.querySelector('input[name="location"]').value.trim();
-                        if (location) {
-                            filters.push(`contains(Address,'${location}')`);
-                        }
+                                // Sport type (Court.SportType, nhiều => or)
+                                let sportTypes = [...this.querySelectorAll('input[name="sport_type[]"]:checked')]
+                                    .map(cb => `c/SportType eq '${cb.value}'`);
+                                let sportTypeFilter = "";
+                                if (sportTypes.length > 0) {
+                                    sportTypeFilter = `(${sportTypes.join(" or ")})`;
+                                }
 
-                        // Sport type (có thể nhiều cái => or)
-                        let sportTypes = [...this.querySelectorAll('input[name="sport_type[]"]:checked')]
-                            .map(cb => `Courts/any(c: c/SportType eq '${cb.value}')`);
-                        if (sportTypes.length > 0) {
-                            filters.push("(" + sportTypes.join(" or ") + ")");
-                        }
+                                // Price (Court.PricePerHour)
+                                let price = this.querySelector('input[name="price"]').value;
+                                let priceFilter = "";
+                                if (price) {
+                                    priceFilter = `c/PricePerHour le ${price}`;
+                                }
 
-                        // Price
-                        let price = this.querySelector('input[name="price"]').value;
-                        if (price) {
-                            filters.push(`Courts/any(c: c/PricePerHour le ${price})`);
-                        }
+                                // Date (Court.AvailableDates)
+                                let date = this.querySelector('input[name="date"]').value;
+                                let dateFilter = "";
+                                if (date) {
+                                    dateFilter = `c/AvailableDates/any(d: d eq '${date}')`;
+                                }
 
-                        // Time (convert sang duration)
-                        let time = this.querySelector('input[name="time"]:checked')?.value;
-                        if (time) {
-                            let [hh, mm] = time.split(":");
-                                                    let duration;
-                        if (mm && parseInt(mm) > 0) {
-                            duration = `duration'PT${parseInt(hh)}H${parseInt(mm)}M'`;
-                        } else {
-                            duration = `duration'PT${parseInt(hh)}H'`;
-                        }
+                                // Gom tất cả điều kiện Courts vào 1 any (KHÔNG filter OpenTime/CloseTime ở đây!)
+                                let courtsConditions = [sportTypeFilter, priceFilter, dateFilter].filter(Boolean);
+                                if (courtsConditions.length > 0) {
+                                    filters.push(`Courts/any(c: ${courtsConditions.join(" and ")})`);
+                                }
 
-                        }
+                                // Thời gian filter theo Stadium.OpenTime/CloseTime
+                                let startTime = this.querySelector('input[name="startTime"]').value;
+                                let endTime = this.querySelector('input[name="endTime"]').value;
+                                if (startTime && endTime) {
+                                    let [sh, sm] = startTime.split(":").map(Number);
+                                    let [eh, em] = endTime.split(":").map(Number);
+                                    let startDuration = `duration'PT${sh}H${sm || 0}M'`;
+                                    let endDuration = `duration'PT${eh}H${em || 0}M'`;
+                                    filters.push(`OpenTime le ${startDuration} and CloseTime ge ${endDuration}`);
+                                }
 
-                        // Nối filter
-                        let filterString = filters.join(" and ");
-                        let finalUrl = "&$filter=" + encodeURIComponent(filterString);
-                        skip = 0;
-                        console.log(finalUrl);
-                        sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
-                        displayList(finalUrl, top, skip);
-                        });
-                                   $('#loadMoreBtn').on("click", function () {
-                            console.log('Button clicked!');
+                                // Nối filter
+                                let filterString = filters.join(" and ");
+                                let finalUrl = filterString ? "&$filter=" + encodeURIComponent(filterString) : "";
+                                skip = 0;
+                                console.log(finalUrl);
+                                sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
+                                displayList(finalUrl, top, skip);
 
+                            });
 
-                            var count = sessionStorage.getItem('stadiumCount') || 0;
-                            var url = sessionStorage.getItem('searchTerm') || "";
-                            var minTop = 0;
-                            skip += 9;
-                            
-                            if (skip + 9 > count ){
-                                minTop = skip - count; // Giảm skip nếu vượt quá số lượng
-                                $('#loadMoreBtn').hide(); // Ẩn nút nếu không còn dữ liệu
-                            }else if(skip == count){
-                                $('#loadMoreBtn').hide();
-                            }
-                            
-                            console.log('URL:', count);
-                            displayList(url, top - minTop, skip);
-                        });
+                            $('#loadMoreBtn').on("click", function () {
+                                showLoadMore();
+                                var count = sessionStorage.getItem('stadiumCount') || 0;
+                                var url = sessionStorage.getItem('searchTerm') || "";
+                                var minTop = 0;
+                                skip += 10;
+
+                                if (skip + 10 > count ){
+                                    minTop = skip - count; // Giảm top nếu vượt quá số lượng
+                                    $('#loadMoreBtn').hide();
+                                }else if(skip === count){
+                                    $('#loadMoreBtn').hide();
+                                }
+
+                                displayList(url, top - minTop, skip);
+                            });
                         });
 
                             // You can now use formData object to process or send the data
@@ -586,7 +779,14 @@
 
                         // danh sach san pham truoc va sau khi search
                         function displayList(searchTerm, top, skip){
-                            var searchUrl = searchTerm + `&$top=${top}&$skip=${skip}`;
+                            let url;
+                            if(searchTerm <= 0 || searchTerm === null){
+                               url = searchTerm += "&$filter=IsApproved eq true and IsLocked eq false ";
+                            }
+                            else{
+                               url = searchTerm += " and IsApproved eq true and IsLocked eq false ";
+                            }
+                            var searchUrl = url + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);
 
                                                                            $.ajax({
@@ -598,7 +798,10 @@
                                 sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
                                 $("#count").text(`Đã tìm thấy ${count}`);
                                 console.log(skip);
-                                if (skip + 9 >= count){
+                                if(count < 10){
+                                    $('#loadMoreBtn').hide();
+                                }
+                                if (skip + 10 >= count){
                                     $('#loadMoreBtn').hide();
                                 }else{
                                      $('#loadMoreBtn').show();
@@ -633,8 +836,8 @@
                                     <button class="favorite-btn bg-white/90 backdrop-blur-sm hover:bg-white border border-white/20 text-gray-600 hover:text-red-500 p-2.5 circle transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
                                             data-stadium-id="${item.Id}"
                                             data-stadium-name="${item.Name}">
-                                        <i class="heart-icon far fa-heart text-lg"></i>
-                                    </button>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M16.5 3C19.5376 3 22 5.5 22 9C22 16 14.5 20 12 21.5C9.5 20 2 16 2 9C2 5.5 4.5 3 7.5 3C9.35997 3 11 4 12 5C13 4 14.64 3 16.5 3ZM12.9339 18.6038C13.8155 18.0485 14.61 17.4955 15.3549 16.9029C18.3337 14.533 20 11.9435 20 9C20 6.64076 18.463 5 16.5 5C15.4241 5 14.2593 5.56911 13.4142 6.41421L12 7.82843L10.5858 6.41421C9.74068 5.56911 8.5759 5 7.5 5C5.55906 5 4 6.6565 4 9C4 11.9435 5.66627 14.533 8.64514 16.9029C9.39 17.4955 10.1845 18.0485 11.0661 18.6038C11.3646 18.7919 11.6611 18.9729 12 19.1752C12.3389 18.9729 12.6354 18.7919 12.9339 18.6038Z"></path></svg>
+                                                            </button>
                                 </div>
 
                                 <!-- Sport type badge -->
@@ -661,7 +864,7 @@
                                 <div class="mb-4">
                                     <div class="flex items-center text-sm text-gray-600 mb-2">
                                         <i class="ri-time-line mr-1"></i>
-                                        <span>Khung giờ trống hôm nay:</span>
+                                        <span>Khung giờ hoạt động:</span>
                                     </div>
                                     <div class="grid grid-cols-3 gap-1">
                                         <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time">${formatTimeForDisplay(item.OpenTime)}</span>
@@ -683,6 +886,7 @@
                             </div>
                         </div>`;
                         });
+                        hideLoading();
                                             if (skip === 0) {
                             $('#stadium-grid').html(html).show();
                         } else {
@@ -740,7 +944,9 @@
                 </div>
                 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
                 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-
+                <div class="load" id="loading-state" style="display: none;" aria-live="polite">
+                    <div class="loader"></div>
+                </div>
                 <div id="map-container" class="hidden bg-white rounded-lg shadow-sm overflow-hidden relative map-container" style="height: 650px; width: 100%;">
                     <div id="leaflet-map" style="height: 100%; width: 100%;"></div>
                 </div>
