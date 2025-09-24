@@ -391,5 +391,33 @@ namespace Service.Services
 
             return response.IsSuccessStatusCode;
         }
+
+        public async Task<List<PublicUserProfileDTO>> SearchUsersByPhoneAsync(string phoneNumber, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var requestUrl = $"/users/get?$filter=contains(PhoneNumber, '{phoneNumber}')";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                response.EnsureSuccessStatusCode(); // Ném lỗi nếu request thất bại
+
+                string jsonString = await response.Content.ReadAsStringAsync();
+
+                // 5. Deserialize bằng Newtonsoft.Json
+                var odataResponse = JsonConvert.DeserializeObject<ODataResponse<PublicUserProfileDTO>>(jsonString);
+
+                // Trả về danh sách người dùng từ thuộc tính 'Value', hoặc một danh sách rỗng nếu response là null
+                return odataResponse?.Value ?? new List<PublicUserProfileDTO>();
+            }
+            catch (HttpRequestException e)
+            {
+                // (Tùy chọn) Ghi log lỗi ở đây
+                Console.WriteLine($"An error occurred: {e.Message}");
+                // Trả về danh sách rỗng hoặc ném lại lỗi tùy theo yêu cầu của ứng dụng
+                return new List<PublicUserProfileDTO>();
+            }
+        }
     }
 }
