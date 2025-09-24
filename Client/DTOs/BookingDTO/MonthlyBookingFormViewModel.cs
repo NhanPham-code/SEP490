@@ -16,5 +16,8 @@ namespace DTOs.BookingDTO
         public string SelectedCourtIds { get; set; }
         public decimal TotalPrice { get; set; }
         public int StadiumId { get; set; }
+        public decimal AfterPrice { get; set; } // Giá sau khuyến mãi
+        public int? DiscountId { get; set; }   // ID khuyến mãi, có thể là null
+        public string Type { get; set; }
     }
 }

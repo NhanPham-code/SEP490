@@ -1,0 +1,768 @@
+:root {
+  --primary-color: #3a57af;
+  --primary-dark: #2e4583;
+  --secondary-color: #f0f3fa;
+  --accent-color: #ff6b6b;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --text-color: #333;
+  --light-text: #6c757d;
+  --border-color: #e0e0e0;
+  --header-bg: #e9effd;
+  --weekend-bg: #f5f9ff;
+  --hover-color: #f8f9fa;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+/* Filter Controls */
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: 600;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.select-control {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+  color: var(--text-color);
+  font-size: 1rem;
+  min-width: 180px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233a57af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.select-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(58, 87, 175, 0.2);
+}
+
+.select-control:hover {
+  border-color: var(--primary-color);
+}
+
+/* Table Container */
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  overflow: hidden;
+}
+
+/* Table Styling */
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+.booking-table th {
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  background-color: var(--header-bg);
+  position: relative;
+  min-width: 140px;
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
+
+.date-display {
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  color: var(--light-text);
+  font-weight: normal;
+}
+
+/* Weekend styling for headers */
+.booking-table th[data-day="6"],
+.booking-table th[data-day="0"] {
+  background-color: var(--weekend-bg);
+}
+
+/* Day cells */
+.day-cell {
+  padding: 0.5rem;
+  vertical-align: top;
+  border: 1px solid var(--border-color);
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #fafafa;
+  position: relative;
+}
+
+.day-cell[data-day="6"],
+.day-cell[data-day="0"] {
+  background-color: var(--weekend-bg);
+}
+
+.day-cell::-webkit-scrollbar {
+  width: 6px;
+}
+
+.day-cell::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.day-cell::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.day-cell::-webkit-scrollbar-thumb:hover {
+  background: var(--light-text);
+}
+
+/* Booking items - Layout mới với fixed structure */
+.booking-item {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  /* Fixed height structure */
+  height: 180px;
+  justify-content: space-between;
+}
+
+.booking-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.booking-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Booking status colors - border left */
+.booking-item.pending {
+  border-left: 4px solid var(--warning-color);
+}
+
+.booking-item.confirmed {
+  border-left: 4px solid var(--success-color);
+}
+
+.booking-item.cancelled {
+  border-left: 4px solid var(--accent-color);
+  opacity: 0.7;
+}
+
+.booking-item.completed {
+  border-left: 4px solid #2196f3;
+}
+
+/* Content sections với fixed heights */
+.booking-content-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex-grow: 1;
+}
+
+/* Stadium info - hiển thị đầu tiên */
+.stadium-info {
+  display: flex;
+  justify-content: flex-start;
+  height: 32px; /* Fixed height */
+  align-items: center;
+}
+
+.stadium-id {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-block;
+  height: 32px;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+}
+
+/* Booking time styling - hiển thị thứ hai */
+.booking-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  height: 24px; /* Fixed height */
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.booking-time i {
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
+
+/* Courts container - hiển thị thứ ba với fixed height */
+.courts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  height: 60px; /* Fixed height để chứa tối đa 2-3 hàng court chips */
+  overflow: hidden;
+  align-content: flex-start;
+  padding: 0.2rem 0;
+}
+
+/* Court chips */
+.court-chip {
+  background-color: #e3f2fd;
+  color: var(--primary-color);
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+  transition: all 0.2s ease;
+  animation: fadeInUp 0.3s ease-out;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.court-chip:hover {
+  background-color: #bbdefb;
+  border-color: #90caf9;
+  transform: translateY(-1px);
+}
+
+/* Detail container - hiển thị cuối cùng */
+.detail-container {
+  display: flex;
+  justify-content: center;
+  height: 40px; /* Fixed height */
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+/* Detail button */
+.detail-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  width: 100%;
+  justify-content: center;
+  height: 36px;
+}
+
+.detail-btn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(58, 87, 175, 0.3);
+}
+
+.detail-btn:active {
+  transform: translateY(0);
+}
+
+.detail-btn i {
+  font-size: 0.8rem;
+}
+
+/* Hover effects for booking items */
+.booking-item:hover .court-chip {
+  background-color: #bbdefb;
+  border-color: #90caf9;
+}
+
+.booking-item:hover .stadium-id {
+  background-color: var(--primary-dark);
+}
+
+/* No data message */
+.no-data-message {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--light-text);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fafafa;
+}
+
+.no-data-message i {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+/* Loader */
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation for court chips */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Status badges (optional) */
+.status-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.confirmed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.completed {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    padding: 0 0.8rem;
+  }
+
+  .booking-table th {
+    padding: 0.8rem 0.5rem;
+    min-width: 120px;
+  }
+
+  .day-cell {
+    min-height: 180px;
+    padding: 0.4rem;
+  }
+
+  .booking-item {
+    height: 170px;
+  }
+
+  .courts-container {
+    height: 55px;
+  }
+}
+
+@media (max-width: 900px) {
+  .filters {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .select-control {
+    flex-grow: 1;
+    min-width: auto;
+  }
+
+  .booking-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .booking-table th {
+    padding: 0.8rem 0.4rem;
+    min-width: 110px;
+  }
+
+  .booking-item {
+    padding: 0.6rem;
+    height: 160px;
+  }
+
+  .detail-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    height: 32px;
+  }
+
+  .courts-container {
+    height: 50px;
+    gap: 0.3rem;
+  }
+
+  .court-chip {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    height: 22px;
+  }
+
+  .stadium-id {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+    height: 28px;
+  }
+
+  .booking-time {
+    font-size: 0.9rem;
+    height: 22px;
+  }
+
+  .day-cell {
+    min-height: 150px;
+  }
+
+  .detail-container {
+    height: 36px;
+  }
+
+  .stadium-info {
+    height: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 0.5rem;
+    margin: 1rem auto;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filters {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .booking-table th {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.3rem;
+    min-width: 100px;
+  }
+
+  .date-display {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+  }
+
+  .day-cell {
+    min-height: 120px;
+    padding: 0.3rem;
+  }
+
+  .booking-item {
+    padding: 0.5rem;
+    height: 150px;
+    margin-bottom: 0.5rem;
+  }
+
+  .booking-time {
+    font-size: 0.85rem;
+    height: 20px;
+  }
+
+  .detail-btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    height: 30px;
+  }
+
+  .stadium-id {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    height: 26px;
+  }
+
+  .courts-container {
+    height: 45px;
+    gap: 0.25rem;
+  }
+
+  .court-chip {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    height: 20px;
+  }
+
+  .select-control {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    min-width: 150px;
+  }
+
+  .no-data-message {
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .no-data-message i {
+    font-size: 1.5rem;
+  }
+
+  .detail-container {
+    height: 32px;
+  }
+
+  .stadium-info {
+    height: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.3rem;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  .filters {
+    padding: 0.6rem;
+  }
+
+  .booking-table th {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.2rem;
+    min-width: 90px;
+  }
+
+  .day-cell {
+    min-height: 100px;
+    padding: 0.2rem;
+  }
+
+  .booking-item {
+    padding: 0.4rem;
+    height: 140px;
+  }
+
+  .booking-time {
+    font-size: 0.8rem;
+    height: 18px;
+  }
+
+  .detail-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    height: 28px;
+  }
+
+  .court-chip {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    height: 18px;
+  }
+
+  .stadium-id {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    height: 24px;
+  }
+
+  .courts-container {
+    height: 40px;
+  }
+
+  .detail-container {
+    height: 30px;
+  }
+
+  .stadium-info {
+    height: 24px;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background-color: white;
+  }
+
+  .filters,
+  .detail-btn {
+    display: none;
+  }
+
+  .container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .booking-table {
+    border-collapse: collapse;
+  }
+
+  .booking-item {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  .day-cell {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* Accessibility improvements */
+.detail-btn:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.booking-item:focus-within {
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.select-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(58, 87, 175, 0.2);
+}
+
+/* Additional hover effects */
+.booking-item:hover {
+  border-color: #ccc;
+}
+
+.booking-item:hover .booking-time i {
+  color: var(--primary-dark);
+}
+
+/* Focus states for better accessibility */
+.court-chip:focus,
+.stadium-id:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+/* Smooth transitions for all interactive elements */
+.booking-item,
+.court-chip,
+.stadium-id,
+.detail-btn,
+.select-control {
+  transition: all 0.2s ease-in-out;
+}
