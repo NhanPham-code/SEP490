@@ -47,6 +47,11 @@ namespace FindTeamAPI.Migrations
 
                     b.HasIndex("TeamPostId");
 
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TeamPostId", "UserId")
+                        .IsUnique();
+
                     b.ToTable("TeamMembers");
                 });
 
@@ -68,15 +73,14 @@ namespace FindTeamAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JoinedPlayers")
+                        .HasColumnType("int");
 
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaxPlayers")
-                        .HasColumnType("int");
 
                     b.Property<int>("NeededPlayers")
                         .HasColumnType("int");
@@ -94,10 +98,6 @@ namespace FindTeamAPI.Migrations
                     b.Property<int>("StadiumId")
                         .HasColumnType("int");
 
-                    b.Property<string>("StadiumName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeSpan>("TimePlay")
                         .HasColumnType("time");
 
@@ -109,6 +109,12 @@ namespace FindTeamAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("PlayDate");
+
+                    b.HasIndex("StadiumId", "PlayDate");
 
                     b.ToTable("TeamPosts");
                 });

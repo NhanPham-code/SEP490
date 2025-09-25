@@ -220,5 +220,41 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<IEnumerable<FeedbackResponse>>()
                    ?? new List<FeedbackResponse>();
         }
+
+        public async Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetAllWithOdataAsync(
+    int skip = 0,
+    int top = 10,
+    string? filter = null,
+    string? orderBy = "createdAt desc")
+        {
+            var query = new List<string>
+    {
+        $"$skip={skip}",
+        $"$top={top}",
+        "$count=true"
+    };
+
+            if (!string.IsNullOrWhiteSpace(filter))
+                query.Add($"$filter={filter}");
+
+            if (!string.IsNullOrWhiteSpace(orderBy))
+                query.Add($"$orderby={orderBy}");
+
+            var url = "odata/FeedbackOData?" + string.Join("&", query);
+
+            var response = await _httpClient.GetAsync(url);
+            Console.WriteLine($"[FeedbackService] GET {url} => {response.StatusCode}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[FeedbackService] Error content: {errorContent}");
+                return (new List<FeedbackResponse>(), 0);
+            }
+
+            var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<FeedbackResponse>>();
+            return (odataResponse?.Value ?? new List<FeedbackResponse>(), odataResponse?.Count ?? 0);
+        }
+
     }
 }

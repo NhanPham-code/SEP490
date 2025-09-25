@@ -716,16 +716,16 @@
                                         let address = item.Address ?? '';
 
                                                                 // Thay thế đoạn code HTML của bạn bằng đoạn này:
-                        html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                               html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="relative h-48">
                                 <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
-                                <!-- Hot badge - Fixed positioning -->
+                                <!-- Hot badge -->
                                 <div class="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold z-10 pulse-animation shadow-lg">
                                     🔥 Hot
                                 </div>
 
-                                <!-- Favorite Button - Positioned correctly -->
+                                <!-- Favorite Button -->
                                 <div class="absolute top-3 left-3 z-20">
                                     <button class="favorite-btn bg-white/90 backdrop-blur-sm hover:bg-white border border-white/20 text-gray-600 hover:text-red-500 p-2.5 circle transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
                                             data-stadium-id="${item.Id}"
@@ -735,15 +735,17 @@
                                 </div>
 
                                 <!-- Sport type badge -->
-                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800">
+                                <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800 notranslate">
                                     ${item.Courts[0].SportType}
                                 </div>
                             </div>
 
                             <div class="p-4">
-                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
+                                <!-- Tên sân (KHÔNG dịch) -->
+                                <h3 class="font-bold text-lg text-gray-900 mb-1 notranslate">${item.Name}</h3>
 
-                                <div class="flex items-center text-gray-500 text-sm mb-2">
+                                <!-- Địa chỉ (KHÔNG dịch) -->
+                                <div class="flex items-center text-gray-500 text-sm mb-2 notranslate">
                                     <i class="ri-map-pin-line text-gray-400 mr-1"></i>
                                     <span>${address}</span>
                                 </div>
@@ -760,18 +762,18 @@
                                         <i class="ri-time-line mr-1"></i>
                                         <span>Khung giờ trống hôm nay:</span>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-1">
+                                    <div class="grid grid-cols-3 gap-1 notranslate">
                                         <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time">${formatTimeForDisplay(item.OpenTime)}</span>
                                         <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time"><i class="ri-arrow-right-line" style="transform: scaleX(1.3);"></i></span>
                                         <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-md font-medium time">${formatTimeForDisplay(item.CloseTime)}</span>
-                                        
                                     </div>
                                 </div>
 
                                 <div class="items-center justify-end">
-                                    <div class="text-2xl font-bold text-blue-600">
-                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">₫/giờ</span>
-                                    </div>
+                                    <!-- Giá tiền (KHÔNG dịch) -->
+                                                          <div class="text-2xl font-bold text-blue-600 notranslate">
+                          ${formattedPrice}<span class="text-sm font-normal text-gray-500">/giờ</span>
+                        </div>
                                     <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
                                             onclick="redirectToBooking('${item.Id}')">
                                         Đặt ngay
@@ -779,6 +781,7 @@
                                 </div>
                             </div>
                         </div>`;
+
                         });
                                             if (skip === 0) {
                             $('#stadium-grid').html(html).show();

@@ -126,6 +126,66 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/odata/ODataAdminUsers",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/get",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/stats",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/stats",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/ban/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/ban/{userId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/unban/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/adminUsers/unban/{userId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/profile",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -281,9 +341,22 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/odata/OdataMonthlyBooking{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/monthlyBooking{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
       }
     },
     {
@@ -297,12 +370,6 @@
       ],
       "UpstreamPathTemplate": "/bookings/booked",
       "UpstreamHttpMethod": [ "GET" ]
-      // "AuthenticationOptions": {
-      //  "AuthenticationProviderKey": "Bearer",
-      // }
-      // "RouteClaimsRequirement": {
-      //  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-      // }
     },
     {
       "DownstreamPathTemplate": "/odata/bookings/{bookingId}?$expand=BookingDetails",
@@ -318,9 +385,6 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
       }
     },
     {
@@ -367,6 +431,38 @@
       },
       "ChangeDownstreamPathTemplate": {
         "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/monthly/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/monthly/{id}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamPathTemplate": "/booking/{id}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
       }
     },
     // === STADIUM API ===
@@ -1206,6 +1302,7 @@
         "RequireAuthentication": true
       }
     },
+    //==Stadium equipment==
     {
       "DownstreamPathTemplate": "/api/StadiumEquipmentAPI",
       "DownstreamScheme": "https",

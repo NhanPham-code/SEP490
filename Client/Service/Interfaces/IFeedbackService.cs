@@ -13,5 +13,11 @@ namespace Service.Interfaces
         Task<bool> DeleteAsync(string accessToken, int id);
         Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetByStadiumIdPagedAsync(int stadiumId, int page, int pageSize);
         Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId);
+
+        Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetAllWithOdataAsync(
+          int skip = 0,
+          int top = 10,
+          string? filter = null,
+          string? orderBy = "createdAt desc");
     }
 }

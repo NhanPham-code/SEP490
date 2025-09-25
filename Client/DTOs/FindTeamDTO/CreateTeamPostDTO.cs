@@ -7,14 +7,12 @@ namespace FindTeamAPI.DTOs
         [Required(ErrorMessage = "Name is required.")]
         public string Title { get; set; } = string.Empty; // Name of the team
         public string Location { get; set; } = string.Empty; // Location of the team
-        public string Sport { get; set; } = string.Empty; // Sport type of the team
-        [Required(ErrorMessage = "MaxPlayers is required.")]
-        [Range(2, int.MaxValue, ErrorMessage = "MaxPlayers must be at least 1.")]
-        public int MaxPlayers { get; set; } // Maximum number of players allowed in the team
+        public string SportType { get; set; } = string.Empty; // Sport type of the team
+        public int JoinedPlayers { get; set; }
         [Required(ErrorMessage = "NeededPlayers is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "NeededPlayers must be at least 1.")]
         public int NeededPlayers { get; set; } // Number of players still needed to complete the team
-        public decimal PricePerPerson { get; set; }
+        public decimal PricePerPerson { get; set; } 
 
         public string Description { get; set; } = string.Empty; // Description of the team
         public TimeSpan TimePlay { get; set; } // Time when the team plays
@@ -25,5 +23,6 @@ namespace FindTeamAPI.DTOs
         public int CreatedBy { get; set; } // User ID of the creator
         [Required(ErrorMessage = "BookingId is required.")]
         public int BookingId { get; set; } // Foreign key to the Booking entity
+        public int StadiumId { get; set; } // Foreign key to the Stadium entity
     }
 }

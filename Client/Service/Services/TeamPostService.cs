@@ -45,15 +45,16 @@ namespace Service.Services
             return await response.Content.ReadAsStringAsync() == "true";
         }
 
-        public async Task<ODataResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url)
+        public async Task<OdataHaveCountResponse<ReadTeamPostDTO>> GetOdataTeamPostAsync(string url)
         {
             InitializeAsync();
-            var response = await _httpClient.GetAsync("/odata/TeamPost" + url);
+            var response = await _httpClient.GetAsync("/odata/TeamPost?$expand=TeamMembers&$orderby= UpdatedAt desc " + url + "&count=true");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var newResponse = JsonConvert.DeserializeObject<ODataResponse<ReadTeamPostDTO>>(json);
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadTeamPostDTO>>(json);
             return newResponse;
         }
+
 
         public async Task<ReadTeamPostDTO> UpdateTeamPost(UpdateTeamPostDTO updateTeamPostDTO)
         {

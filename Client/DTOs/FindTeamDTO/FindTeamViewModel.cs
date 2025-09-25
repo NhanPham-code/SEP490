@@ -14,5 +14,7 @@ namespace DTOs.FindTeamDTO
         public List<ReadTeamPostDTO> TeamPosts { get; set; } = new List<ReadTeamPostDTO>();
         public Dictionary<int, ReadStadiumDTO> Stadiums { get; set; } = new Dictionary<int, ReadStadiumDTO>();
         public Dictionary<int, PublicUserProfileDTO> UserNames { get; set; } = new Dictionary<int, PublicUserProfileDTO>();
+        public Dictionary<int, int> Hidden { get; set; } = new Dictionary<int, int>();
+        public int? TotalCount { get; set; }
     }
 }

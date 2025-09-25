@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Middlewares
 {
+    // Middleware để ngăn trình duyệt cache các trang web.
+    // Data được lấy mới mỗi khi người dùng truy cập. Tránh việc trình duyệt dùng dữ liệu cũ đã cache.
     public class NoCacheMiddleware
     {
         private readonly RequestDelegate _next;

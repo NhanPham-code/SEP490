@@ -1,4 +1,5 @@
-﻿using DTOs.UserDTO;
+﻿using DTOs.OData;
+using DTOs.UserDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,5 +37,14 @@ namespace Service.Interfaces
         Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest);
 
         Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken);
+
+        Task<OdataHaveCountResponse<AdminUserProfileDTO>> GetUsersForAdmin(string accessToken, UserSearchRequestDTO request);
+
+        Task<AdminUserStatsDTO> GetUserStats(string accessToken); 
+
+        Task<bool> BanUserAsync(int userId, string accessToken);
+
+        Task<bool> UnbanUserAsync(int userId, string accessToken);
+
     }
 }

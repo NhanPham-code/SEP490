@@ -1,13 +1,10 @@
-﻿
-
+﻿```html
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>Chat App - Messenger Style with GIPHY</title>
     <style>
-
-
 
         body {
             margin: 0;
@@ -806,19 +803,42 @@
         /* Responsive */
         @@media (max-width: 768px) {
             .chat-container {
-                height: 500px;
+                height: calc(100vh - 20px);
                 margin: 10px;
                 border-radius: 15px;
+                max-width: 420px;
+                width: calc(100% - 20px);
             }
 
             .chat-sidebar {
-                width: 280px;
+                width: 100%;
+                height: 100%;
+                border-radius: 15px;
             }
 
-                .chat-sidebar h3 {
-                    font-size: 20px;
-                    padding: 15px;
-                }
+            .chat-main {
+                width: 100%;
+                height: 100%;
+                border-radius: 15px;
+            }
+            /* Mobile behavior: show only list OR chat */
+            .chat-main {
+                display: none; /* default show list */
+                flex-direction: column;
+            }
+            /* When .show-chat is set on container, show chat and hide list */
+            .chat-container.show-chat .chat-sidebar {
+                display: none;
+            }
+
+            .chat-container.show-chat .chat-main {
+                display: flex;
+            }
+
+            .chat-sidebar h3 {
+                font-size: 20px;
+                padding: 15px;
+            }
 
             .user-info, .add-chat {
                 padding: 15px;
@@ -836,6 +856,21 @@
 
             .gif-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            /* Show a back button in chat header on mobile */
+            #backBtn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                border: none;
+                background: rgba(255,255,255,0.9);
+                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                cursor: pointer;
+                margin-right: 6px;
+                font-size: 18px;
             }
         }
 
@@ -857,13 +892,45 @@
                 transform: scale(1);
             }
         }
+        @@media (max-width: 768px) {
+            /* Ẩn chat-main mặc định trên mobile và loại bỏ border/box-shadow "ló" ra */
+            .chat-main
+
+        {
+            display: none !important;
+            border-left: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Sidebar full-width, không hiển thị đường viền phải */
+        .chat-sidebar {
+            width: 100% !important;
+            border-right: none !important;
+            border-radius: 15px !important;
+        }
+
+        /* Khi container có class show-chat thì ẩn list (sidebar) và hiện chat */
+        .chat-container.show-chat .chat-sidebar {
+            display: none !important;
+        }
+
+        .chat-container.show-chat .chat-main {
+            display: flex !important;
+        }
+
+        /* Back button styling (ký sẵn) */
+        #backBtn {
+            display: inline-flex !important;
+        }
+
+        }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
         <!-- Sidebar -->
-        <div class="chat-sidebar">
+        <div class="chat-sidebar" id="sidebar">
             <h3>💬 Messenger</h3>
 
             <!-- Hidden user info - set programmatically -->
@@ -882,8 +949,10 @@
         </div>
 
         <!-- Chat Box -->
-        <div class="chat-main">
+        <div class="chat-main" id="chatMain">
             <div class="chat-header">
+                <!-- Back button only visible on mobile (CSS) -->
+                <button id="backBtn" title="Back" aria-label="Back" style="display:none;">←</button>
                 <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 16px;" id="headerAvatar">💬</div>
                 <h4 id="currentChatName">Select a chat to start messaging</h4>
             </div>
@@ -1732,7 +1801,28 @@
             });
         };
 
+        // Helper: detect mobile width (same breakpoint as CSS)
+        function isMobileView() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        function showChatOnMobile() {
+            const container = document.getElementById('chatContainer');
+            if (!container) return;
+            container.classList.add('show-chat');
+            // ensure back button visible (CSS handles display in media query)
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) backBtn.style.display = ''; // let CSS decide
+        }
+
+        function showListOnMobile() {
+            const container = document.getElementById('chatContainer');
+            if (!container) return;
+            container.classList.remove('show-chat');
+        }
+
         function openChat(senderId, senderName, receiverId, receiverName) {
+            // existing behavior first: toggle active item
             document.querySelectorAll('.chat-item').forEach(item => {
                 item.classList.remove('active');
             });
@@ -1828,7 +1918,15 @@
                     msgBox.innerHTML = '<div class="status-message">❌ Error loading messages</div>';
                 }
             });
+
+            // Mobile behavior: if on phone, switch to chat view (hide list)
+            if (isMobileView()) {
+                showChatOnMobile();
+            }
         }
+
+        // Expose openChat globally (used by chat list)
+        window.openChat = openChat;
 
         window.sendMessage = () => {
             const senderId = document.getElementById('senderId')?.value.trim();
@@ -1925,6 +2023,44 @@
                 });
             }
 
+            // Back button on mobile: go back to list
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showListOnMobile();
+                });
+            }
+
+            // Make sure initial mobile/desktop state is correct
+                   function applyResponsiveInitialState() {
+          const container = document.getElementById('chatContainer');
+          if (!container) return;
+          const backBtn = document.getElementById('backBtn');
+
+          if (isMobileView()) {
+            // mặc định show list trên mobile
+            container.classList.remove('show-chat');
+            if (backBtn) backBtn.style.display = ''; // để media query quyết định hiển thị
+          } else {
+            // desktop: đảm bảo cả 2 cột hiển thị (không ép inline styles)
+            container.classList.remove('show-chat');
+            if (backBtn) backBtn.style.display = 'none';
+            // không set chatMain.style.display = 'flex' ở đây nữa
+          }
+        }
+
+            window.addEventListener('resize', () => {
+                // If switching to desktop, ensure the list and chat are both visible and container not locked in show-chat
+                if (!isMobileView()) {
+                    const container = document.getElementById('chatContainer');
+                    if (container) {
+                        container.classList.remove('show-chat');
+                    }
+                }
+                applyResponsiveInitialState();
+            });
+
             // Initialize components
             loadChatList();
             initEmojiPicker();
@@ -1939,6 +2075,9 @@
 
             // Display usage stats every 5 minutes
             setInterval(displayApiUsage, 5 * 60 * 1000);
+
+            // Apply responsive initial state
+            applyResponsiveInitialState();
 
             console.log('🚀 Smart Chat with Optimized GIPHY initialized!');
         });
@@ -2050,3 +2189,4 @@
     </script>
 </body>
 </html>
+```
