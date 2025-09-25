@@ -35,10 +35,12 @@ namespace AdminUI.Controllers
 
                 if (string.IsNullOrEmpty(accessToken))
                 {
+                    // Không có token → trả 401 để client biết cần login/refresh
                     return Unauthorized(new { message = "Access token missing" });
                 }
 
-                var (data, totalCount) = await _feedbackService.GetAllWithOdataAsync(skip, top, filter, orderBy);
+                // Truyền accessToken xuống service để service có thể set Authorization header
+                var (data, totalCount) = await _feedbackService.GetAllWithOdataAsync(accessToken, skip, top, filter, orderBy);
 
                 return Json(new
                 {
@@ -55,6 +57,12 @@ namespace AdminUI.Controllers
                 Console.WriteLine($"[Client.FeedbackController] Exception: {ex.Message}");
                 return Json(new { Data = Array.Empty<object>(), TotalCount = 0 });
             }
+        }
+
+
+        public IActionResult Feedback()
+        {
+            return View();
         }
     }
 

@@ -222,17 +222,24 @@ namespace Service.Services
         }
 
         public async Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetAllWithOdataAsync(
-    int skip = 0,
-    int top = 10,
-    string? filter = null,
-    string? orderBy = "createdAt desc")
+            string accessToken,
+            int skip = 0,
+            int top = 10,
+            string? filter = null,
+            string? orderBy = "createdAt desc")
         {
+            // Set Authorization header trước khi gọi OData (nếu backend OData cần auth)
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                AddBearerAccessToken(accessToken);
+            }
+
             var query = new List<string>
-    {
-        $"$skip={skip}",
-        $"$top={top}",
-        "$count=true"
-    };
+            {
+                $"$skip={skip}",
+                $"$top={top}",
+                "$count=true"
+            };
 
             if (!string.IsNullOrWhiteSpace(filter))
                 query.Add($"$filter={filter}");
@@ -255,6 +262,5 @@ namespace Service.Services
             var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<FeedbackResponse>>();
             return (odataResponse?.Value ?? new List<FeedbackResponse>(), odataResponse?.Count ?? 0);
         }
-
     }
 }

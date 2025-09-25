@@ -15,6 +15,7 @@ namespace Service.Interfaces
         Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId);
 
         Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetAllWithOdataAsync(
+          string accessToken,
           int skip = 0,
           int top = 10,
           string? filter = null,
