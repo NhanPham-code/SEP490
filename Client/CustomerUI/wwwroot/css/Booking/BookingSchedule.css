@@ -205,7 +205,7 @@ label {
   border-left: 4px solid var(--warning-color);
 }
 
-.booking-item.confirmed {
+.booking-item.accepted {
   border-left: 4px solid var(--success-color);
 }
 
@@ -424,7 +424,7 @@ label {
   color: #856404;
 }
 
-.status-badge.confirmed {
+.status-badge.accepted {
   background-color: #d4edda;
   color: #155724;
 }

@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +12,9 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -66,7 +69,7 @@
                         }
                     },
                     animation: {
-              
+
                         'slide-up': 'slideUp 0.5s ease-out forwards',
                         'slide-down': 'slideDown 0.3s ease-out forwards',
                         'bounce-subtle': 'bounceSubtle 2s infinite',
@@ -157,6 +160,7 @@
             font-family: 'Inter', sans-serif;
             box-sizing: border-box;
         }
+
         body {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -166,10 +170,24 @@
             margin: 0;
             padding: 0;
         }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        }
+
         .header-glass {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px) saturate(180%);
@@ -177,6 +195,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .logo-gradient {
             background: linear-gradient(135deg, #3b82f6, #8b5cf6, #22c55e);
             background-size: 300% 300%;
@@ -185,6 +204,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .btn-gradient {
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -192,70 +212,345 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
-        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); }
-        .btn-gradient:active { transform: translateY(0); }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-gradient:active {
+            transform: translateY(0);
+        }
+
         .glass-effect {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
         }
-        .glass-effect:hover { background: rgba(255, 255, 255, 0.9); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);}
+
+        .glass-effect:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
         .search-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             border: 2px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
+
         .search-container:focus-within {
             background: rgba(255, 255, 255, 1);
             border-color: rgba(59, 130, 246, 0.5);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 25px rgba(0, 0, 0, 0.12);
             transform: translateY(-1px);
         }
-        .nav-link { position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 16px; overflow: hidden; }
-        .nav-link:hover { color: #3b82f6; background: rgba(59, 130, 246, 0.08); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);}
-        .nav-link.active { color: #3b82f6; background: rgba(59, 130, 246, 0.12); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);}
-        .nav-link::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 100%; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); transition: width 0.3s ease; z-index: -1;}
-        .nav-link:hover::before { width: 100%; }
-        .action-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: visible; }
-        .action-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);}
-        .action-btn:active { transform: translateY(-1px) scale(0.98);}
-        .notification-badge { animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; z-index: 10; }
-        .notification-dot { animation: shake 0.8s ease-in-out infinite; z-index: 10; }
-        .badge-container { position: relative; display: inline-block; }
-        .badge-container .notification-badge { position: absolute; top: -6px; right: -6px; z-index: 15;}
-        .badge-container .notification-dot { position: absolute; top: -2px; right: -2px; z-index: 15;}
-        .dropdown-solid { background: #ffffff !important; backdrop-filter: none !important; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);}
-        @@media (max-width: 768px) {
-            .header-glass { padding: 0 16px; }
-            .nav-section { display: none; }
-            .mobile-nav-toggle { display: block; }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 16px;
+            overflow: hidden;
         }
-        .tooltip { position: absolute; z-index: 1000; padding: 8px 12px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); color: white; font-size: 0.75rem; font-weight: 500; border-radius: 8px; white-space: nowrap; pointer-events: none; opacity: 0; transform: translateY(4px); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
-        .tooltip.show { opacity: 1; transform: translateY(0);}
-        .notification-panel, .chat-panel, .search-suggestions {
+
+        .nav-link:hover {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+        }
+
+        .nav-link.active {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.12);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .action-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: visible;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .notification-badge {
+            animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            z-index: 10;
+        }
+
+        .notification-dot {
+            animation: shake 0.8s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .badge-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .badge-container .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            z-index: 15;
+        }
+
+        .badge-container .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            z-index: 15;
+        }
+
+        .dropdown-solid {
+            background: #ffffff !important;
+            backdrop-filter: none !important;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        @@media (max-width: 768px) {
+            .header-glass {
+                padding: 0 16px;
+            }
+
+            .nav-section {
+                display: none;
+            }
+
+            .mobile-nav-toggle {
+                display: block;
+            }
+        }
+
+        .tooltip {
+            position: absolute;
+            z-index: 1000;
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-panel,
+        .chat-panel,
+        .search-suggestions {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(226, 232, 240, 0.8);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
         }
-        .logo-container:hover .animate-float { animation-duration: 2s;}
-        .search-suggestions { border: 1px solid rgba(226, 232, 240, 0.5); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);}
+
+        .logo-container:hover .animate-float {
+            animation-duration: 2s;
+        }
+
+        .search-suggestions {
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
         /* Animations */
-        @@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @@keyframes bounceSubtle { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
-        @@keyframes glow { 0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); } 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); } }
-        @@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-        @@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @@keyframes pulse-slow { 0% { box-shadow: 0 0 0 0 #3b82f6; } 70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
-        @@keyframes expand { from { width: 0; opacity: 0; } to { width: 320px; opacity: 1; } }
-        @@keyframes collapse { from { width: 320px; opacity: 1; } to { width: 0; opacity: 0; } }
-        @@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-        @@keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        @@keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes bounceSubtle {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        @@keyframes glow {
+            0% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+            }
+
+            100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            }
+        }
+
+        @@keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @@keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @@keyframes pulse-slow {
+            0% {
+                box-shadow: 0 0 0 0 #3b82f6;
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        @@keyframes expand {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+
+            to {
+                width: 320px;
+                opacity: 1;
+            }
+        }
+
+        @@keyframes collapse {
+            from {
+                width: 320px;
+                opacity: 1;
+            }
+
+            to {
+                width: 0;
+                opacity: 0;
+            }
+        }
+
+        @@keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-3px);
+            }
+
+            75% {
+                transform: translateX(3px);
+            }
+        }
+
+        @@keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
     </style>
 </head>
 
@@ -286,16 +581,16 @@
         }
 
 
-        }"
-        class="header-glass sticky top-0 z-50 transition-all duration-300">
+        }" class="header-glass sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-8xl mx-auto px-4 lg:px-8">
             <div class="flex items-center justify-between h-18">
 
                 <!-- Logo Section - Improved proportions -->
                 <div class="flex items-center flex-shrink-0 min-w-fit logo-container">
                     <a asp-controller="Home" asp-action="Index"
-                       class="flex items-center space-x-3 transition-all duration-300 hover:scale-105 group">
-                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
+                        class="flex items-center space-x-3 transition-all duration-300 hover:scale-105 group">
+                        <div
+                            class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
                             <i class="ri-football-line text-white text-xl animate-float"></i>
                         </div>
                         <h1 class="font-poppins font-bold text-xl logo-gradient hidden sm:block">
@@ -306,19 +601,22 @@
 
                 <!-- Desktop Navigation - Enhanced spacing and visual hierarchy -->
                 <nav class="hidden lg:flex items-center justify-center flex-1 px-8 nav-section">
-                    <div class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
-                        <a asp-controller="Home" asp-action="Index" class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                    <div
+                        class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
+                        <a asp-controller="Home" asp-action="Index"
+                            class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-home-4-line text-base"></i>
                             <span>Home</span>
                         </a>
-   
+
                         <a asp-controller="FindTeam" asp-action="FindTeam"
-                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                            class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-team-line text-base"></i>
                             <span>Teams</span>
                         </a>
- 
-                        <a href="#" class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+
+                        <a href="#"
+                            class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-information-line text-base"></i>
                             <span>About</span>
                         </a>
@@ -343,23 +641,27 @@
                             <!-- Enhanced Notifications with proper spacing -->
                             <div class="relative badge-container">
                                 <a asp-controller="Notification" asp-action="Index"
-                                   class="action-btn p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
-                                   title="Notifications">
-                                    <i class="ri-notification-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
+                                    class="action-btn p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
+                                    title="Notifications">
+                                    <i
+                                        class="ri-notification-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
                                     <!-- Badge số lượng thông báo chưa đọc -->
-                                    <span id="notification-badge" class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10" style="display:none"></span>
+                                    <span id="notification-badge"
+                                        class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10"
+                                        style="display:none"></span>
                                 </a>
                             </div>
 
                             <!-- Enhanced Chat/Messages with proper spacing -->
                             <div class="relative badge-container">
                                 <a href="javascript:void(0);"
-                                   class="action-btn p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
-                                   title="Messages"
-                                   @@click="toggleChat()">
-                                    <i class="ri-message-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
+                                    class="action-btn p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
+                                    title="Messages" @@click="toggleChat()">
+                                    <i
+                                        class="ri-message-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
                                     <!-- Fixed badge positioning -->
-                                    <span class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10">
+                                    <span
+                                        class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10">
                                         0
                                     </span>
                                 </a>
@@ -368,39 +670,41 @@
                             <!-- Enhanced User Menu -->
                             <div class="relative" x-data="{ open: false }">
                                 <button @@click="open = !open"
-                                        class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
+                                    class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
                                     <img src="@avatarUrl" alt="Avatar"
-                                         class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
-                                         data-user-avatar />
+                                        class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
+                                        data-user-avatar />
                                     <div class="hidden xl:block text-left">
-                                        <p class="text-sm font-bold text-slate-800 leading-none" data-user-firstname>@(fullName?.Split(' ').FirstOrDefault() ?? "User")</p>
+                                        <p class="text-sm font-bold text-slate-800 leading-none" data-user-firstname>
+                                            @(fullName?.Split(' ').FirstOrDefault() ?? "User")</p>
                                         <p class="text-xs text-slate-600 font-medium">Premium</p>
                                     </div>
                                     <i class="ri-arrow-down-s-line text-slate-500 group-hover:text-blue-600 transition-all duration-300 text-sm"
-                                       :class="{ 'rotate-180': open }"></i>
+                                        :class="{ 'rotate-180': open }"></i>
                                 </button>
 
                                 <!-- Enhanced User Dropdown -->
-                                <div x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-                                     x-transition:enter-end="opacity-1 scale-100 translate-y-0"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="opacity-1 scale-100 translate-y-0"
-                                     x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                                     @@click.away="open = false"
-                                     class="absolute right-0 mt-3 w-80 dropdown-solid rounded-2xl shadow-2xl z-50">
+                                <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                                    x-transition:enter-end="opacity-1 scale-100 translate-y-0"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-1 scale-100 translate-y-0"
+                                    x-transition:leave-end="opacity-0 scale-95 translate-y-2" @@click.away="open = false"
+                                    class="absolute right-0 mt-3 w-80 dropdown-solid rounded-2xl shadow-2xl z-50">
 
                                     <!-- Enhanced User Header -->
                                     <div class="p-6 border-b border-slate-200">
                                         <div class="flex items-center space-x-4">
                                             <img src="@avatarUrl" alt="Avatar"
-                                                 class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
-                                                 data-user-avatar />
+                                                class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
+                                                data-user-avatar />
                                             <div class="flex-1">
-                                                <p class="font-bold text-slate-800 text-base" data-user-fullname>@fullName</p>
-                                                <p class="text-sm text-slate-600 mt-1" data-user-email>@Context.Session.GetString("Email")</p>
-                                                <span class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold mt-2">
+                                                <p class="font-bold text-slate-800 text-base" data-user-fullname>@fullName
+                                                </p>
+                                                <p class="text-sm text-slate-600 mt-1" data-user-email>
+                                                    @Context.Session.GetString("Email")</p>
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold mt-2">
                                                     <i class="ri-vip-crown-line mr-1"></i>Premium
                                                 </span>
                                             </div>
@@ -410,22 +714,28 @@
                                     <!-- Enhanced Menu Items -->
                                     <div class="p-3">
                                         <a asp-controller="Common" asp-action="Profile"
-                                           class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
-                                            <i class="ri-user-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
+                                            <i
+                                                class="ri-user-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span class="font-semibold">My Profile</span>
                                         </a>
-                                        <a asp-controller="Booking" asp-action="BookingHistory" class="flex items-center px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all duration-200 group">
-                                            <i class="ri-calendar-check-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                        <a asp-controller="Booking" asp-action="BookingSchedule"
+                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all duration-200 group">
+                                            <i
+                                                class="ri-calendar-check-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span class="font-semibold">My Bookings</span>
                                         </a>
-                                        <a href="#" class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
-                                            <i class="ri-settings-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                        <a href="#"
+                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
+                                            <i
+                                                class="ri-settings-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span class="font-semibold">Settings</span>
                                         </a>
                                         <hr class="my-3 border-slate-200">
                                         <a asp-controller="Common" asp-action="Logout"
-                                           class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
-                                            <i class="ri-logout-circle-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                            class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
+                                            <i
+                                                class="ri-logout-circle-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span class="font-semibold">Sign Out</span>
                                         </a>
                                     </div>
@@ -437,7 +747,8 @@
                     {
                         <!-- Enhanced Sign In Button -->
                         <a asp-controller="Common" asp-action="Login">
-                            <button class="btn-gradient text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-bold text-sm flex items-center space-x-2">
+                            <button
+                                class="btn-gradient text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-bold text-sm flex items-center space-x-2">
                                 <i class="ri-login-circle-line text-base"></i>
                                 <span>Sign In</span>
                             </button>
@@ -446,7 +757,7 @@
 
                     <!-- Mobile Menu Toggle -->
                     <button @@click="mobileMenuOpen = !mobileMenuOpen"
-                            class="lg:hidden p-2.5 text-slate-600 hover:text-blue-600 transition-colors mobile-nav-toggle">
+                        class="lg:hidden p-2.5 text-slate-600 hover:text-blue-600 transition-colors mobile-nav-toggle">
                         <i class="ri-menu-line text-xl" x-show="!mobileMenuOpen"></i>
                         <i class="ri-close-line text-xl" x-show="mobileMenuOpen"></i>
                     </button>
@@ -454,24 +765,26 @@
             </div>
 
             <!-- Mobile Navigation Menu -->
-            <div x-show="mobileMenuOpen"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                 x-transition:enter-end="opacity-1 transform translate-y-0"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-1 transform translate-y-0"
-                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                 class="lg:hidden border-t border-white/20 bg-white/95 backdrop-blur-lg">
+            <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-1 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-1 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2"
+                class="lg:hidden border-t border-white/20 bg-white/95 backdrop-blur-lg">
                 <div class="px-4 py-4 space-y-2">
-                    <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                    <a href="#"
+                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-home-4-line mr-3"></i>Home
                     </a>
 
-                    <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                    <a href="#"
+                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-team-line mr-3"></i>Find Teams
                     </a>
 
-                    <a href="#" class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                    <a href="#"
+                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <i class="ri-information-line mr-3"></i>About
                     </a>
 
@@ -479,8 +792,9 @@
                     <div class="pt-4 border-t border-slate-200">
                         <div class="relative">
                             <input type="text" placeholder="Search..."
-                                   class="w-full px-4 py-3 pl-11 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
-                            <i class="ri-search-2-line absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+                                class="w-full px-4 py-3 pl-11 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+                            <i
+                                class="ri-search-2-line absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
                         </div>
                     </div>
                 </div>
@@ -500,20 +814,25 @@
                 <!-- Logo & social -->
                 <div class="lg:col-span-1">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <i class="ri-football-line text-white text-lg"></i>
                         </div>
                         <h3 class="font-poppins font-bold text-2xl logo-gradient">Sportivey</h3>
                     </div>
-                    <p class="text-slate-300 mb-6 leading-relaxed">Your premier destination for booking sports stadiums and connecting with teams.</p>
+                    <p class="text-slate-300 mb-6 leading-relaxed">Your premier destination for booking sports stadiums
+                        and connecting with teams.</p>
                     <div class="flex space-x-3">
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button
+                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-facebook-fill text-lg"></i>
                         </button>
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button
+                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-twitter-fill text-lg"></i>
                         </button>
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button
+                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-instagram-fill text-lg"></i>
                         </button>
                     </div>
@@ -525,8 +844,10 @@
                     <ul class="space-y-2">
 
 
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Pricing</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">About Us</a></li>
+                        <li><a href="#"
+                                class="text-slate-300 hover:text-white transition-colors duration-200">Pricing</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">About
+                                Us</a></li>
                     </ul>
                 </div>
 
@@ -534,10 +855,14 @@
                 <div>
                     <h4 class="text-lg font-semibold mb-4 text-white">Support</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Help Center</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Contact Us</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Terms of Service</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Help
+                                Center</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Contact
+                                Us</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Terms of
+                                Service</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Privacy
+                                Policy</a></li>
                     </ul>
                 </div>
 
@@ -547,7 +872,7 @@
                     <p class="text-slate-300 mb-4">Subscribe for updates and offers.</p>
                     <div class="space-y-3">
                         <input type="email" placeholder="Your email"
-                               class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button class="w-full btn-gradient text-white px-4 py-2 rounded-lg font-semibold">
                             Subscribe
                         </button>
@@ -717,7 +1042,7 @@
 
     @RenderSection("Scripts", required: false)
 
- 
+
 
     <script>
         // Simplified function - sử dụng session data từ server
@@ -782,4 +1107,5 @@
         document.addEventListener('DOMContentLoaded', updateNotificationBadge);
     </script>
 </body>
+
 </html>

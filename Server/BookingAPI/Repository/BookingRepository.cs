@@ -72,9 +72,12 @@ namespace BookingAPI.Repository
         // Trong BookingRepository.cs
         public async Task<IEnumerable<Booking>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime)
         {
+            // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)
-                .Where(b => b.Date.Year == year && b.Date.Month == month);
+                .Where(b => b.Date.Year == year && b.Date.Month == month && validStatuses.Contains(b.Status));
 
             // Lọc theo danh sách ngày
             if (days != null && days.Any())
@@ -92,9 +95,12 @@ namespace BookingAPI.Repository
 
         public async Task<IEnumerable<Booking>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime)
         {
+            // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)
-                .Where(b => b.Date.Year == year && b.Date.Month == month);
+                .Where(b => b.Date.Year == year && b.Date.Month == month && validStatuses.Contains(b.Status));
 
             query = query.Where(b => b.BookingDetails.Any(bd =>
                 courtIds.Contains(bd.CourtId) &&
