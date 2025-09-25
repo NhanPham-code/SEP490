@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="max-w-3xl mx-auto py-8 px-4 sm:px-8">
+    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+        <i class="ri-notification-3-line text-blue-500 mr-2"></i>
+        Notifications
+    </h2>
+
+    <div id="notification-list" class="bg-white rounded-2xl shadow-md divide-y divide-slate-100">
+        <div id="loading" class="text-center text-slate-400 py-10">Loading...</div>
+    </div>
+    <div class="flex justify-center mt-4">
+        <button id="loadMoreBtn"
+                class="px-6 py-2 rounded-xl btn-gradient text-white font-semibold shadow hover:scale-105 transition"
+                style="display:none">
+            Load More
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const pageSize = 6;
+        let skip = 0;
+        let isLoading = false;
+        let isEnd = false;
+        let hasMarkedAllAsRead = false;
+
+        function getIconAndColor(type) {
+            switch (type) {
+                case "Booking.New": return ["ri-calendar-check-line", "bg-blue-100 text-blue-600"];
+                case "Booking.Status": return ["ri-checkbox-circle-line", "bg-green-100 text-green-600"];
+                case "Booking.Reminder": return ["ri-alarm-warning-line", "bg-yellow-100 text-yellow-600"];
+                case "Booking.Problem": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
+                case "Discount.New": return ["ri-price-tag-3-line", "bg-purple-100 text-purple-600"];
+                case "Stadium.FavoriteNews": return ["ri-star-smile-line", "bg-orange-100 text-orange-600"];
+                default: return ["ri-notification-3-line", "bg-gray-100 text-gray-600"];
+            }
+        }
+
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return `${diff} giây trước`;
+            if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString().slice(0, 5);
+        }
+
+        function renderNotifications(notifications, append = true) {
+            const container = document.getElementById('notification-list');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            const loadingElement = document.getElementById('loading');
+            if (!append) {
+                // Giữ lại loading element, chỉ xóa các thông báo đã render
+                if (loadingElement) loadingElement.style.display = 'none';
+                container.innerHTML = "";
+                if (loadingElement) container.appendChild(loadingElement); // Đảm bảo loading element vẫn còn
+            }
+
+            // Xử lý riêng khi rỗng
+            if ((!notifications || notifications.length === 0) && skip === 0) {
+                if (loadingElement) loadingElement.style.display = 'none';
+                container.innerHTML = `<div class="text-center text-slate-400 py-20">
+                                            <i class="ri-inbox-2-line text-4xl mb-3"></i><br />
+                                            No notifications yet.
+                                        </div>`;
+                if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                return;
+            }
+
+            if (loadingElement) loadingElement.style.display = 'none';
+
+            for (const n of notifications) {
+                const [icon, color] = getIconAndColor(n.type);
+                const readClass = n.isRead ? "" : "bg-blue-50";
+                const url = `/Notification/Details/${n.id}`;
+                container.insertAdjacentHTML('beforeend', `
+                                        <a href="${url}" class="block transition hover:bg-slate-50 ${readClass}">
+                                            <div class="flex items-start px-6 py-5">
+                                                <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center ${color} mr-4 mt-1">
+                                                    <i class="${icon} text-2xl"></i>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center">
+                                                        <div class="font-semibold text-slate-900 truncate">${n.title ?? "Notification"}</div>
+                                                        ${!n.isRead ? `<span class="inline-block ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>` : ""}
+                                                    </div>
+                                                    <div class="text-slate-700 mt-1">${n.message ?? ""}</div>
+                                                    <div class="text-xs text-slate-400 mt-2">${timeAgo(n.createdAt)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        `);
+            }
+        }
+
+        async function fetchNotifications() {
+            if (isLoading || isEnd) return;
+            isLoading = true;
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) loadingElement.style.display = 'block';
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
+            try {
+                const resp = await fetch(`/Notification/GetMyNotifications?top=${pageSize}&skip=${skip}`);
+                if (!resp.ok) {
+                    const container = document.getElementById('notification-list');
+                    if (container)
+                        container.innerHTML = `<div class="text-center text-red-400 py-10">Error loading notifications! (HTTP ${resp.status})</div>`;
+                    isLoading = false;
+                    if (loadingElement) loadingElement.style.display = 'none';
+                    return;
+                }
+                const text = await resp.text();
+                let items = [];
+                try {
+                    items = JSON.parse(text);
+                    if (!Array.isArray(items)) {
+                        throw new Error("Response JSON is not an array.");
+                    }
+                } catch (parseErr) {
+                    const container = document.getElementById('notification-list');
+                    if (container)
+                        container.innerHTML = `<div class="text-center text-red-400 py-10">Error: Response is not valid JSON array!</div>`;
+                    isLoading = false;
+                    if (loadingElement) loadingElement.style.display = 'none';
+                    return;
+                }
+
+                renderNotifications(items, skip !== 0);
+
+                if (loadingElement) loadingElement.style.display = 'none';
+
+                if (items.length === pageSize) {
+                    if (loadMoreBtn) loadMoreBtn.style.display = 'inline-block';
+                } else {
+                    isEnd = true;
+                    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                }
+                // Gọi markAllAsRead sau khi load trang đầu tiên (skip == 0)
+                if (skip === 0 && !hasMarkedAllAsRead) {
+                    hasMarkedAllAsRead = true;
+                    markAllNotificationsAsRead();
+                }
+                skip += items.length;
+            } catch (err) {
+                const container = document.getElementById('notification-list');
+                if (container)
+                    container.innerHTML = `<div class="text-center text-red-400 py-10">Error loading notifications!<br/>${err}</div>`;
+                if (loadingElement) loadingElement.style.display = 'none';
+            }
+            isLoading = false;
+        }
+
+        async function markAllNotificationsAsRead() {
+            try {
+                // Gọi API MarkAllAsRead, xử lý không cần body
+                await fetch('/Notification/MarkAllAsRead', { method: 'POST' });
+            } catch (err) {
+                // Có thể log hoặc báo lỗi nhẹ, nhưng không ảnh hưởng trải nghiệm chính
+                console.warn('Failed to mark all notifications as read:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchNotifications();
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) loadMoreBtn.addEventListener('click', fetchNotifications);
+        });
+    </script>
+}

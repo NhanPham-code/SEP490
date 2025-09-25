@@ -38,6 +38,8 @@ namespace Service.Interfaces
 
         Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken);
 
+        Task<List<PublicUserProfileDTO>> SearchUsersByPhoneAsync(string phoneNumber, string accessToken);
+
         Task<OdataHaveCountResponse<AdminUserProfileDTO>> GetUsersForAdmin(string accessToken, UserSearchRequestDTO request);
 
         Task<AdminUserStatsDTO> GetUserStats(string accessToken); 

@@ -54,7 +54,7 @@ builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<ITeamPostService, TeamPostService>();
 builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
 builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
-
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 var app = builder.Build();

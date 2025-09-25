@@ -1,3 +1,4 @@
+﻿using DTOs.BookingDTO;
 using DTOs.BookingDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
@@ -132,7 +133,7 @@ namespace CustomerUI.Controllers
             List<BookingReadDto> bookings;
             try
             {
-                var url = $"?$filter=UserId eq {userId} &$orderby=Date desc";
+                var url = $"?$filter=UserId eq {userId} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting')&$orderby=Date desc";
 
                 bookings = await _bookingService.GetBookingAsync(accessToken, url);
 
@@ -225,14 +226,30 @@ namespace CustomerUI.Controllers
         }
         #endregion
 
-        // ... các action còn lại giữ nguyên ...
-        [HttpPost]
+        public IActionResult BookingSchedule()
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
+                return RedirectToAction("Login", "Common");
+            }
+
+            // Trả về cùng một View "Booking.cshtml".
+            return View();
+        }
+
         public IActionResult Checkout([FromForm] CheckoutRequest request)
         {
             ViewBag.Date = request.Date;
             ViewBag.TotalPrice = request.TotalPrice;
             ViewBag.StadiumId = request.StadiumId;
             ViewBag.Courts = request.Courts;
+            ViewBag.AfterPrice = request.AfterPrice;
+            ViewBag.DiscountId = request.DiscountId;
+            ViewBag.Type = request.Type;
+            ViewBag.BookingId = request.BookingId;
 
             return View();
         }
@@ -275,6 +292,9 @@ namespace CustomerUI.Controllers
             ViewBag.SelectedCourtIds = model.SelectedCourtIds;
             ViewBag.TotalPrice = model.TotalPrice;
             ViewBag.StadiumId = model.StadiumId;
+            ViewBag.DiscountId = model.DiscountId;
+            ViewBag.AfterPrice = model.AfterPrice;
+            ViewBag.Type = model.Type;
 
             // Trả về view cho trang checkout hàng tháng
             return View();
@@ -684,8 +704,40 @@ namespace CustomerUI.Controllers
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
+
+        public async Task<IActionResult> GetBookingsForWeek(DateTime startDate, DateTime endDate)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn." });
+            }
+
+            try
+            {
+                // Định dạng ngày theo chuẩn ISO 8601 UTC (yyyy-MM-ddTHH:mm:ssZ) mà API Ocelot cần
+                // Đặt endDate đến cuối ngày để bao gồm tất cả booking trong ngày đó
+                var startDateIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
+                var endDateIso = endDate.ToString("yyyy-MM-ddT23:59:59Z");
+
+                // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+                // Build query string với điều kiện lọc Status
+                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting')&$expand=BookingDetails&$orderby=Date asc";
+                var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
+
+                if (bookings == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy booking nào." });
+                }
+
+                // Trả về dữ liệu dạng JSON
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetBookingsForWeek] Lỗi: {ex.Message}");
+                return StatusCode(500, new { message = "Lỗi server khi lấy dữ liệu booking." });
+            }
+        }
     }
 }
-
-        
-        
