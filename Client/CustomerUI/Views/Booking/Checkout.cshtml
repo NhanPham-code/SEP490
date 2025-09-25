@@ -213,7 +213,7 @@
             stadiumId: @ViewBag.StadiumId,
             date: "@ViewBag.Date",
             totalPrice: @ViewBag.TotalPrice,
-            afterPrice: @ViewBag.AfterPrice,
+            afterPrice: @((ViewBag.AfterPrice != null && ViewBag.AfterPrice > 0) ? ViewBag.AfterPrice : ViewBag.TotalPrice),
             discountId: @(ViewBag.DiscountId ?? "null"),
             type: "@ViewBag.Type",
             bookingId: @(ViewBag.BookingId ?? "null"),

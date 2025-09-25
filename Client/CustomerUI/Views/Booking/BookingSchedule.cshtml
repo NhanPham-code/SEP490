@@ -27,7 +27,6 @@
             </div>
             <div class="filter-group">
                 <label for="week"><i class="fas fa-calendar-week"></i> Tuần:</label>
-                <!-- *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY *** -->
                 <select id="week" class="select-control" autocomplete="off">
                     <!-- Populated by JavaScript -->
                 </select>
@@ -82,7 +81,6 @@
 
             function populateYears() {
                 const $yearSelect = $('#year');
-                $yearSelect.empty(); // Xóa các năm cũ trước khi thêm
                 for (let year = currentYear - 5; year <= currentYear + 5; year++) {
                     const $option = $('<option>', {
                         value: year,
@@ -138,8 +136,7 @@
                 return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
             }
 
-            // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            function updateWeekDropdownAndFetchData(year) {
+            function populateWeeks(year) {
                 const weeks = getWeeksInYear(year);
                 const $weekSelect = $('#week');
                 $weekSelect.empty();
@@ -154,18 +151,12 @@
                     $weekSelect.append($option);
                 });
 
-                let weekToSelect = 0; // Mặc định chọn tuần đầu tiên
                 if (year === currentYear) {
                     const currentWeekIndex = findCurrentWeekIndex(weeks);
                     if (currentWeekIndex >= 0) {
-                        weekToSelect = currentWeekIndex;
+                        $weekSelect.val(currentWeekIndex);
                     }
                 }
-
-                $weekSelect.val(weekToSelect);
-
-                // Sau khi đã chắc chắn set giá trị, gọi hàm cập nhật bảng
-                updateTableDates();
             }
 
             function findCurrentWeekIndex(weeks) {
@@ -200,7 +191,16 @@
                         }
                     });
 
-                    displayBookingsOnTable(bookings || []);
+                    if (!bookings || bookings.length === 0) {
+                        displayBookingsOnTable([]);
+                        return;
+                    }
+
+                    const uniqueStadiumIds = [...new Set(bookings.map(b => b.stadiumId))];
+                    const stadiumPromises = uniqueStadiumIds.map(id => getStadiumById(id));
+
+                    await Promise.all(stadiumPromises);
+                    displayBookingsOnTable(bookings);
 
                 } catch (error) {
                     console.error("Lỗi khi tải dữ liệu booking:", error);
@@ -226,16 +226,21 @@
                         const stadium = data.value[0];
                         stadiumCache[stadiumId] = stadium;
                         return stadium;
+                    } else {
+                        stadiumCache[stadiumId] = null;
+                        return null;
                     }
                 } catch (error) {
                     console.error(`Lỗi khi tải dữ liệu cho sân vận động ID: ${stadiumId}:`, error);
+                    stadiumCache[stadiumId] = null;
+                    return null;
                 }
-                stadiumCache[stadiumId] = null;
-                return null;
             }
 
             function getCourtName(stadium, courtId) {
-                if (!stadium || !stadium.Courts) return `Court ${courtId}`;
+                if (!stadium || !stadium.Courts) {
+                    return `Court ${courtId}`;
+                }
                 const court = stadium.Courts.find(c => c.Id === courtId);
                 return court ? court.Name : `Court ${courtId}`;
             }
@@ -245,21 +250,31 @@
             }
 
             function equalizeBookingItemHeights() {
-                // ... (giữ nguyên)
+                const bookingItems = document.querySelectorAll('.booking-item');
+                if (bookingItems.length === 0) return;
+
+                bookingItems.forEach(item => item.style.height = 'auto');
+
+                setTimeout(() => {
+                    let maxHeight = 0;
+                    bookingItems.forEach(item => {
+                        if (item.offsetHeight > maxHeight) maxHeight = item.offsetHeight;
+                    });
+                    if (maxHeight > 0) {
+                        bookingItems.forEach(item => item.style.height = `${maxHeight}px`);
+                    }
+                }, 50);
             }
 
-            async function displayBookingsOnTable(bookings) {
+            function displayBookingsOnTable(bookings) {
                 clearTable();
 
-                if (bookings.length === 0) {
+                if (!bookings || bookings.length === 0) {
                     $('#no-data-message').show();
                     return;
                 }
 
                 $('#no-data-message').hide();
-
-                const uniqueStadiumIds = [...new Set(bookings.map(b => b.stadiumId))];
-                await Promise.all(uniqueStadiumIds.map(id => getStadiumById(id)));
 
                 const bookingsByDate = {};
                 bookings.forEach(booking => {
@@ -288,7 +303,6 @@
                     const timeSlots = Object.values(dayBookings).sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
                     timeSlots.forEach(timeSlot => {
-                        // ... (phần code tạo booking item giữ nguyên)
                         const stadium = stadiumCache[timeSlot.bookingData.stadiumId];
                         const stadiumName = stadium ? stadium.Name : `Sân ${timeSlot.bookingData.stadiumId}`;
 
@@ -363,12 +377,7 @@
 
             function updateTableDates() {
                 const selectedOption = $('#week option:selected');
-                if (selectedOption.length === 0) {
-                    console.log("Không có tuần nào được chọn.");
-                    clearTable();
-                    $('#no-data-message').show();
-                    return;
-                };
+                if (selectedOption.length === 0) return;
                 const startDate = new Date(selectedOption.data('start'));
                 const endDate = new Date(selectedOption.data('end'));
                 $('.day-header').each(function () {
@@ -382,11 +391,20 @@
 
             function initializePage() {
                 populateYears();
-                updateWeekDropdownAndFetchData(currentYear);
+                populateWeeks(currentYear);
+                // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+                // Kích hoạt sự kiện change một cách tường minh sau khi đã chắc chắn DOM được cập nhật
+                setTimeout(function () {
+                    $('#week').trigger('change');
+                }, 0);
             }
 
             $('#year').on('change', function () {
-                updateWeekDropdownAndFetchData(parseInt($(this).val()));
+                populateWeeks(parseInt($(this).val()));
+                // Kích hoạt sự kiện change cho dropdown tuần để tải lại dữ liệu
+                setTimeout(function () {
+                    $('#week').trigger('change');
+                }, 0);
             });
 
             $('#week').on('change', updateTableDates);
