@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingAPI.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    [Migration("20250916083825_init")]
+    [Migration("20250921100137_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -173,9 +173,11 @@ namespace BookingAPI.Migrations
 
             modelBuilder.Entity("BookingAPI.Models.Booking", b =>
                 {
-                    b.HasOne("BookingAPI.Models.MonthlyBooking", null)
+                    b.HasOne("BookingAPI.Models.MonthlyBooking", "MonthlyBooking")
                         .WithMany("Bookings")
                         .HasForeignKey("MonthlyBookingId");
+
+                    b.Navigation("MonthlyBooking");
                 });
 
             modelBuilder.Entity("BookingAPI.Models.BookingDetail", b =>

@@ -10,8 +10,420 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/Booking/BookingSchedule.css">
 </head>
 
 <body>
-    <script></script>
+    <div class="container">
+        <h1>Lịch Đặt Sân Của Bạn</h1>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="year"><i class="fas fa-calendar-alt"></i> Năm:</label>
+                <select id="year" class="select-control">
+                    <!-- Populated by JavaScript -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="week"><i class="fas fa-calendar-week"></i> Tuần:</label>
+                <!-- *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY *** -->
+                <select id="week" class="select-control" autocomplete="off">
+                    <!-- Populated by JavaScript -->
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="booking-table" class="booking-table">
+                <thead>
+                    <tr>
+                        <th class="day-header" data-day="1">THỨ 2<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="2">THỨ 3<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="3">THỨ 4<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="4">THỨ 5<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="5">THỨ 6<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="6">THỨ 7<div class="date-display"></div>
+                        </th>
+                        <th class="day-header" data-day="0">CHỦ NHẬT<div class="date-display"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="day-1" class="day-cell" data-day="1"></td>
+                        <td id="day-2" class="day-cell" data-day="2"></td>
+                        <td id="day-3" class="day-cell" data-day="3"></td>
+                        <td id="day-4" class="day-cell" data-day="4"></td>
+                        <td id="day-5" class="day-cell" data-day="5"></td>
+                        <td id="day-6" class="day-cell" data-day="6"></td>
+                        <td id="day-0" class="day-cell" data-day="0"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div id="no-data-message" class="no-data-message">
+                <i class="fas fa-exclamation-circle"></i> Không có sân nào đã đặt trong tuần này
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize variables
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const stadiumCache = {}; // Cache để lưu dữ liệu sân vận động
+
+            function populateYears() {
+                const $yearSelect = $('#year');
+                $yearSelect.empty(); // Xóa các năm cũ trước khi thêm
+                for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                    const $option = $('<option>', {
+                        value: year,
+                        text: year,
+                        selected: year === currentYear
+                    });
+                    $yearSelect.append($option);
+                }
+            }
+
+            function getWeeksInYear(year) {
+                const weeks = [];
+                const firstDayOfYear = new Date(year, 0, 1);
+                let firstMonday = new Date(firstDayOfYear);
+                const dayOfWeek = firstMonday.getDay() || 7;
+
+                if (dayOfWeek !== 1) {
+                    firstMonday.setDate(firstMonday.getDate() + (8 - dayOfWeek) % 7);
+                }
+
+                let currentMonday = new Date(firstMonday);
+                let weekNum = 1;
+
+                while (currentMonday.getFullYear() === year ||
+                    (currentMonday.getFullYear() === year + 1 && currentMonday.getMonth() === 0 && currentMonday.getDate() <= 7)) {
+
+                    const endOfWeek = new Date(currentMonday);
+                    endOfWeek.setDate(currentMonday.getDate() + 6);
+
+                    const startStr = formatDate(currentMonday);
+                    const endStr = formatDate(endOfWeek);
+
+                    weeks.push({
+                        weekNum: weekNum,
+                        startDate: new Date(currentMonday),
+                        endDate: new Date(endOfWeek),
+                        label: `${startStr} đến ${endStr}`
+                    });
+
+                    currentMonday.setDate(currentMonday.getDate() + 7);
+                    weekNum++;
+                }
+
+                return weeks;
+            }
+
+            function formatDate(date) {
+                return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+            }
+
+            function formatTime(timeString) {
+                const date = new Date(timeString);
+                return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+            }
+
+            // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+            function updateWeekDropdownAndFetchData(year) {
+                const weeks = getWeeksInYear(year);
+                const $weekSelect = $('#week');
+                $weekSelect.empty();
+
+                weeks.forEach((week, index) => {
+                    const $option = $('<option>', {
+                        value: index,
+                        text: `Tuần ${week.weekNum}: ${week.label}`,
+                        'data-start': week.startDate.toISOString(),
+                        'data-end': week.endDate.toISOString()
+                    });
+                    $weekSelect.append($option);
+                });
+
+                let weekToSelect = 0; // Mặc định chọn tuần đầu tiên
+                if (year === currentYear) {
+                    const currentWeekIndex = findCurrentWeekIndex(weeks);
+                    if (currentWeekIndex >= 0) {
+                        weekToSelect = currentWeekIndex;
+                    }
+                }
+
+                $weekSelect.val(weekToSelect);
+
+                // Sau khi đã chắc chắn set giá trị, gọi hàm cập nhật bảng
+                updateTableDates();
+            }
+
+            function findCurrentWeekIndex(weeks) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                for (let i = 0; i < weeks.length; i++) {
+                    const weekStart = new Date(weeks[i].startDate);
+                    const weekEnd = new Date(weeks[i].endDate);
+                    weekStart.setHours(0, 0, 0, 0);
+                    weekEnd.setHours(23, 59, 59, 999);
+
+                    if (today >= weekStart && today <= weekEnd) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            async function fetchAndDisplayBookings(startDate, endDate) {
+                console.log(`Đang tải dữ liệu từ ${startDate} đến ${endDate}`);
+                $('#no-data-message').hide();
+                $('.day-cell').html('<div class="loader"></div>');
+
+                try {
+                    const bookings = await $.ajax({
+                        url: '@Url.Action("GetBookingsForWeek", "Booking")',
+                        type: 'GET',
+                        data: {
+                            startDate: startDate.toISOString(),
+                            endDate: endDate.toISOString()
+                        }
+                    });
+
+                    displayBookingsOnTable(bookings || []);
+
+                } catch (error) {
+                    console.error("Lỗi khi tải dữ liệu booking:", error);
+                    clearTable();
+                    $('#no-data-message').show();
+                }
+            }
+
+            async function getStadiumById(stadiumId) {
+                if (stadiumCache[stadiumId]) {
+                    return stadiumCache[stadiumId];
+                }
+
+                const searchTerm = `&$filter=Id eq ${stadiumId}`;
+                try {
+                    const data = await $.ajax({
+                        url: `/Home/Stadiums`,
+                        type: 'GET',
+                        data: { searchTerm: searchTerm }
+                    });
+
+                    if (data.value && data.value.length > 0) {
+                        const stadium = data.value[0];
+                        stadiumCache[stadiumId] = stadium;
+                        return stadium;
+                    }
+                } catch (error) {
+                    console.error(`Lỗi khi tải dữ liệu cho sân vận động ID: ${stadiumId}:`, error);
+                }
+                stadiumCache[stadiumId] = null;
+                return null;
+            }
+
+            function getCourtName(stadium, courtId) {
+                if (!stadium || !stadium.Courts) return `Court ${courtId}`;
+                const court = stadium.Courts.find(c => c.Id === courtId);
+                return court ? court.Name : `Court ${courtId}`;
+            }
+
+            function clearTable() {
+                $('.day-cell').empty();
+            }
+
+            function equalizeBookingItemHeights() {
+                // ... (giữ nguyên)
+            }
+
+            async function displayBookingsOnTable(bookings) {
+                clearTable();
+
+                if (bookings.length === 0) {
+                    $('#no-data-message').show();
+                    return;
+                }
+
+                $('#no-data-message').hide();
+
+                const uniqueStadiumIds = [...new Set(bookings.map(b => b.stadiumId))];
+                await Promise.all(uniqueStadiumIds.map(id => getStadiumById(id)));
+
+                const bookingsByDate = {};
+                bookings.forEach(booking => {
+                    const bookingDate = new Date(booking.date);
+                    const dayOfWeek = bookingDate.getDay();
+                    if (!bookingsByDate[dayOfWeek]) bookingsByDate[dayOfWeek] = {};
+
+                    booking.bookingDetails.forEach(detail => {
+                        const timeKey = `${detail.startTime}-${detail.endTime}`;
+                        if (!bookingsByDate[dayOfWeek][timeKey]) {
+                            bookingsByDate[dayOfWeek][timeKey] = {
+                                bookingData: booking,
+                                startTime: detail.startTime,
+                                endTime: detail.endTime,
+                                courtsForDisplay: []
+                            };
+                        }
+                        bookingsByDate[dayOfWeek][timeKey].courtsForDisplay.push(detail.courtId);
+                    });
+                });
+
+                Object.keys(bookingsByDate).forEach(dayOfWeek => {
+                    const dayBookings = bookingsByDate[dayOfWeek];
+                    const $dayCell = $(`#day-${dayOfWeek}`);
+
+                    const timeSlots = Object.values(dayBookings).sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+                    timeSlots.forEach(timeSlot => {
+                        // ... (phần code tạo booking item giữ nguyên)
+                        const stadium = stadiumCache[timeSlot.bookingData.stadiumId];
+                        const stadiumName = stadium ? stadium.Name : `Sân ${timeSlot.bookingData.stadiumId}`;
+
+                        const courtChips = timeSlot.courtsForDisplay.sort((a, b) => a - b).map(courtId => {
+                            const courtName = getCourtName(stadium, courtId);
+                            return `<span class="court-chip">${courtName}</span>`;
+                        }).join('');
+
+                        const startTimeFormatted = formatTime(timeSlot.startTime);
+                        const endTimeFormatted = formatTime(timeSlot.endTime);
+
+                        const bookingType = timeSlot.bookingData.monthlyBookingId ? 'month' : 'day';
+                        let checkoutData;
+
+                        if (bookingType === 'day') {
+                            const courtsForCheckout = timeSlot.bookingData.bookingDetails.map(detail => ({
+                                courtId: detail.courtId,
+                                times: [`${formatTime(detail.startTime)}-${formatTime(detail.endTime)}`]
+                            }));
+                            checkoutData = {
+                                BookingId: timeSlot.bookingData.id,
+                                Type: bookingType,
+                                StadiumId: timeSlot.bookingData.stadiumId,
+                                Date: new Date(timeSlot.bookingData.date).toISOString().split('T')[0],
+                                TotalPrice: timeSlot.bookingData.originalPrice,
+                                Courts: JSON.stringify(courtsForCheckout),
+                                AfterPrice: timeSlot.bookingData.totalPrice,
+                                DiscountId: timeSlot.bookingData.discountId
+                            };
+                        } else { // bookingType === 'month'
+                            const firstDetail = timeSlot.bookingData.bookingDetails[0];
+                            const date = new Date(timeSlot.bookingData.date);
+                            checkoutData = {
+                                MonthlyBookingId: timeSlot.bookingData.monthlyBookingId,
+                                Type: bookingType,
+                                StadiumId: timeSlot.bookingData.stadiumId,
+                                Year: date.getFullYear(),
+                                Month: date.getMonth() + 1,
+                                SelectedDays: timeSlot.bookingData.bookingDetails.map(d => new Date(d.startTime).getDate()).join(','),
+                                StartTime: new Date(firstDetail.startTime).getHours(),
+                                EndTime: new Date(firstDetail.endTime).getHours(),
+                                SelectedCourtIds: timeSlot.bookingData.bookingDetails.map(d => d.courtId).join(','),
+                                TotalPrice: timeSlot.bookingData.originalPrice,
+                                AfterPrice: timeSlot.bookingData.totalPrice,
+                                DiscountId: timeSlot.bookingData.discountId
+                            };
+                        }
+
+                        const checkoutDataString = JSON.stringify(checkoutData);
+
+                        const $bookingItem = $(`
+                            <div class="booking-item ${timeSlot.bookingData.status}" data-booking-id="${timeSlot.bookingData.id}">
+                                <div class="stadium-name">${stadiumName}</div>
+                                <div class="booking-content-top">
+                                    <div class="booking-time">${startTimeFormatted} - ${endTimeFormatted}</div>
+                                    <div class="courts-container">${courtChips}</div>
+                                </div>
+                                <div class="detail-container">
+                                    <button class="detail-btn checkout-btn" data-checkout='${checkoutDataString}'>
+                                        <i class="fas fa-shopping-cart"></i>
+                                        Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+                        $dayCell.append($bookingItem);
+                    });
+                });
+
+                setTimeout(equalizeBookingItemHeights, 150);
+            }
+
+            function updateTableDates() {
+                const selectedOption = $('#week option:selected');
+                if (selectedOption.length === 0) {
+                    console.log("Không có tuần nào được chọn.");
+                    clearTable();
+                    $('#no-data-message').show();
+                    return;
+                };
+                const startDate = new Date(selectedOption.data('start'));
+                const endDate = new Date(selectedOption.data('end'));
+                $('.day-header').each(function () {
+                    const dayIndex = parseInt($(this).data('day'));
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + (dayIndex === 0 ? 6 : dayIndex - 1));
+                    $(this).find('.date-display').text(formatDate(date));
+                });
+                fetchAndDisplayBookings(startDate, endDate);
+            }
+
+            function initializePage() {
+                populateYears();
+                updateWeekDropdownAndFetchData(currentYear);
+            }
+
+            $('#year').on('change', function () {
+                updateWeekDropdownAndFetchData(parseInt($(this).val()));
+            });
+
+            $('#week').on('change', updateTableDates);
+
+            $(document).on('click', '.checkout-btn', function () {
+                const checkoutData = $(this).data('checkout');
+                goToCheckout(checkoutData);
+            });
+
+            initializePage();
+        });
+
+        function goToCheckout(data) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+
+            if (data.Type === 'month') {
+                form.action = '@Url.Action("MonthlyCheckout", "Booking")';
+            } else {
+                form.action = '@Url.Action("Checkout", "Booking")';
+            }
+
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = key;
+                    hiddenField.value = data[key];
+                    form.appendChild(hiddenField);
+                }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+        $(window).on('resize', () => setTimeout(equalizeBookingItemHeights, 300));
+    </script>
 </body>
+
+</html>
