@@ -1,4 +1,5 @@
-﻿using FeedbackAPI.Models;
+﻿using FeedbackAPI.DTOs;
+using FeedbackAPI.Models;
 
 namespace FeedbackAPI.Repository
 {
@@ -10,6 +11,9 @@ namespace FeedbackAPI.Repository
         Task UpdateAsync(Feedback feedback);
         Task DeleteAsync(Feedback feedback);
         Task SaveChangesAsync();
+
+        Task<IEnumerable<Feedback>> GetByStadiumIdAsync(int stadiumId);
+
 
         IQueryable<Feedback> GetAllAsQueryable();
     }

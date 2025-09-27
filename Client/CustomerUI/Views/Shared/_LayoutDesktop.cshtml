@@ -18,7 +18,127 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        /* Hide Google Translate banner and unwanted elements */
+        .goog-te-banner-frame {
+            display: none !important;
+        }
 
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+            margin: 0 !important;
+            position: static !important;
+        }
+
+        .goog-logo-link {
+            display: none !important;
+        }
+
+        .goog-te-gadget {
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+
+            .goog-te-gadget .goog-te-combo {
+                margin: 0 !important;
+            }
+
+        /* Style the translate dropdown to match navbar */
+       .goog-te-combo {
+    appearance: none !important; /* bỏ style mặc định */
+    background: transparent !important;
+    border: none !important;
+    color: #475569 !important; /* text-slate-600 */
+    font-weight: 600 !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+}
+.goog-te-combo:hover {
+    color: #2563eb !important; /* hover:text-blue-600 */
+}
+
+
+            .goog-te-combo option {
+                background: white !important;
+                color: #475569 !important;
+                font-weight: 600 !important;
+            }
+
+        /* Hide unwanted translate elements */
+        .skiptranslate iframe,
+        iframe[src*="translate.googleapis.com"] {
+            visibility: hidden !important;
+            display: none !important;
+        }
+
+        /* Custom translate container styling */
+        .translate-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translate-icon {
+            color: #475569;
+            font-size: 16px;
+        }
+
+        /* Body styling for demo */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            color: #2563eb !important;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Demo content styling */
+        .demo-content {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px auto;
+            max-width: 800px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight,
+        .goog-te-balloon-frame,
+        #goog-gt-tt {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-banner-frame,
+        .goog-tooltip,
+        .goog-text-highlight {
+            display: none !important;
+        }
+
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -615,14 +735,67 @@
                             <span>Teams</span>
                         </a>
 
+
+                        <a href="#" class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+
                         <a href="#"
                             class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+
                             <i class="ri-information-line text-base"></i>
                             <span>About</span>
                         </a>
+
+                        <!-- Thêm Google Translate vào đây -->
+                        <div id="google_translate_element" class="hidden"></div>
+
+                        <!-- Dropdown Translate -->
+                        <div class="relative ml-4">
+                            <!-- Nút chính -->
+                            <button id="translate-toggle"
+                                    type="button"
+                                    class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                                <i class="ri-translate-2 text-base"></i>
+                                <span>Translate</span>
+                                <i class="ri-arrow-down-s-line text-base"></i>
+                            </button>
+
+                            <!-- Menu xổ xuống -->
+                            <div id="translate-menu"
+                                 class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                                <button data-lang="en"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    English
+                                </button>
+                                <button data-lang="vi"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    Tiếng Việt
+                                </button>
+                                <button data-lang="ja"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    日本語
+                                </button>
+                                <button data-lang="ko"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    한국어
+                                </button>
+                                <button data-lang="zh-CN"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    中文
+                                </button>
+                            </div>
+                        </div>
+                        <button id="reset-translate-btn"
+                                type="button"
+                                class="px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm rounded-xl transition-all duration-200 ml-3"
+                                aria-pressed="false"
+                                title="Đặt về mặc định">
+                            <i class="ri-refresh-line text-base"></i>
+                            <span>Đặt về mặc định</span>
+                        </button>
+
+
                     </div>
                 </nav>
-
                 <!-- Right Section - Enhanced with better spacing and organization -->
                 <div class="flex items-center space-x-3 min-w-fit">
 
@@ -1039,7 +1212,69 @@
         // Initialize tooltips when DOM is ready
         document.addEventListener('DOMContentLoaded', initTooltips);
     </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
+    <script>
+        function initGoogleTranslate() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,vi,ja,ko,zh-CN',
+            autoDisplay: false,
+            multilanguagePage: true
+          }, 'google_translate_element');
 
+          // Ẩn banner Google
+          const handleGoogleUI = () => {
+            document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+            document.body.style.top = '0px';
+          };
+
+          const observer = new MutationObserver(() => handleGoogleUI());
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        // Toggle menu custom
+        const toggleBtn = document.getElementById("translate-toggle");
+        const menu = document.getElementById("translate-menu");
+
+        toggleBtn.addEventListener("click", () => {
+          menu.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add("hidden");
+          }
+        });
+
+    
+        document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const lang = btn.getAttribute("data-lang");
+            const select = document.querySelector("#google_translate_element select");
+            if (select) {
+              select.value = lang;
+              select.dispatchEvent(new Event("change"));
+            }
+            menu.classList.add("hidden");
+
+           
+            setTimeout(() => {
+              document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+                el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+              });
+            }, 500);
+          });
+        });
+
+
+        document.getElementById("reset-translate-btn").addEventListener("click", function() {
+        document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+          if (window.localStorage) {
+            localStorage.removeItem('googtrans');
+          }
+         window.location.reload();
+        });
+    </script>
     @RenderSection("Scripts", required: false)
 
 
@@ -1083,6 +1318,41 @@
     </script>
 
     <script>
+        (function () {
+            function deleteCookie(name) {
+                try {
+                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
+                    if (location.hostname.indexOf('.') !== -1) {
+                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
+                    }
+                } catch (e) { console.warn('Cookie delete failed', e); }
+            }
+
+            function stopTranslateAndReload() {
+                // Xóa cookie Google Translate
+                deleteCookie('googtrans');
+
+                // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
+                // Sau đó reload trang để trạng thái dịch bị loại bỏ
+                location.reload();
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('reset-translate-btn');
+                if (!btn) return;
+                btn.addEventListener('click', function () {
+                    btn.disabled = true;
+                    btn.textContent = 'Đang đặt...';
+                    setTimeout(() => {
+                        stopTranslateAndReload();
+                    }, 150);
+                });
+            });
+        })();
+
+
+    <script>
         async function updateNotificationBadge() {
             try {
                 const resp = await fetch('/Notification/GetUnreadNotificationCount');
@@ -1095,7 +1365,7 @@
                             badge.style.display = 'flex';
                         } else {
                             badge.style.display = 'none';
-                        }
+                        } 
                     }
                 }
             } catch (err) {
@@ -1105,6 +1375,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', updateNotificationBadge);
+
     </script>
 </body>
 

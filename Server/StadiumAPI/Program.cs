@@ -10,6 +10,7 @@ using StadiumAPI.Repositories;
 using StadiumAPI.Repositories.Interface;
 using StadiumAPI.Service;
 using StadiumAPI.Service.Interface;
+using StadiumAPI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -120,6 +121,7 @@ builder.Services.AddScoped<IStadiumImagesRepositories, StadiumImageRepositories>
 builder.Services.AddScoped<ICourtsRepositories, CourtsRepositories>();
 builder.Services.AddScoped<ICourtRelationRepositories, CourtRelationRepositories>();
 builder.Services.AddScoped<IStadiumVideosRepositories, StadiumVideoRepositories>();
+builder.Services.AddHttpClient<IFirebaseService, FirebaseService>();
 
 // Register services
 builder.Services.AddScoped<IServiceStadium, ServiceStadium>();

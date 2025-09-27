@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace FeedbackAPI.DTOs
 {
@@ -14,9 +15,10 @@ namespace FeedbackAPI.DTOs
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int Rating { get; set; }
 
-
-
         [MaxLength(1000)]
         public string? Comment { get; set; }
+
+        // Cho phép upload ảnh khi tạo mới
+        public IFormFile? Image { get; set; }
     }
 }

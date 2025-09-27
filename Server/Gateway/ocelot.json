@@ -900,6 +900,18 @@
         "RequireAuthentication": true
       }
     },
+    {
+      "DownstreamPathTemplate": "/odata/FeedbackOData",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7221
+        }
+      ],
+      "UpstreamPathTemplate": "/odata/FeedbackOData",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
     // === DISCOUNT API ===
     {
       "DownstreamPathTemplate": "/odata/ODataDiscount",
@@ -1290,42 +1302,92 @@
         "RequireAuthentication": true
       }
     },
-    // Notification
+    //==Stadium equipment==
     {
-      "DownstreamPathTemplate": "/odata/ODataNotifications",
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7072
+          "Port": 7262
         }
       ],
-      "UpstreamPathTemplate": "/notifications/myNotification",
+      "UpstreamPathTemplate": "/stadium-equipment",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/unread/count",
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI/{id}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7072
+          "Port": 7262
         }
       ],
-      "UpstreamPathTemplate": "/notifications/unread-count",
+      "UpstreamPathTemplate": "/stadium-equipment/{id}",
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI/stadium/{stadiumId}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7072
+          "Port": 7262
         }
       ],
-      "UpstreamPathTemplate": "/notifications/mark-all-as-read",
+      "UpstreamPathTemplate": "/stadium-equipment/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7262
+        }
+      ],
+      "UpstreamPathTemplate": "/stadium-equipment",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7262
+        }
+      ],
+      "UpstreamPathTemplate": "/stadium-equipment/{id}",
       "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/StadiumEquipmentAPI/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7262
+        }
+      ],
+      "UpstreamPathTemplate": "/stadium-equipment/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
+    },
+
+    // === OData API (StadiumEquipmentODataController) ===
+    {
+      "DownstreamPathTemplate": "/odata/StadiumEquipmentOData",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7262
+        }
+      ],
+      "UpstreamPathTemplate": "/odata/stadium-equipments",
+      "UpstreamHttpMethod": [ "GET" ]
     }
   ],
   "GlobalConfiguration": {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace FeedbackAPI.Models
 {
     public class Feedback
@@ -17,6 +18,10 @@ namespace FeedbackAPI.Models
 
         [MaxLength(1000)]
         public string? Comment { get; set; }
+
+        // Chỉ lưu path ảnh
+        [MaxLength(500)]
+        public string? ImagePath { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

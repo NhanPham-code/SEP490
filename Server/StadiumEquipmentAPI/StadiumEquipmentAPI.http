@@ -1,0 +1,6 @@
+@StadiumEquipmentAPI_HostAddress = http://localhost:5243
+
+GET {{StadiumEquipmentAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

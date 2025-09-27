@@ -20,8 +20,13 @@ namespace CustomerUI.Controllers
         private readonly IStadiumService _stadiumService;
         private readonly IBookingService _bookingService;
         private string token = string.Empty;
-        public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
-            ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
+
+        public FindTeamController(
+            ITeamPostService teamPost,
+            ITeamMemberService teamMember,
+            ITokenService tokenService,
+            IUserService userService,
+            IStadiumService stadiumService,
             IBookingService bookingService)
         {
             _teamPost = teamPost;
@@ -37,45 +42,58 @@ namespace CustomerUI.Controllers
         [BindProperty]
         public UpdateTeamPostDTO UpdateTeamPostDTO { get; set; }
 
-        public IActionResult FindTeam()
+
+        public async Task<IActionResult> FindTeam()
         {
             token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Common");
-            }
-            
-        }
-        public IActionResult JoinedTeam()
-        {
-            token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                return View();
-            }
-            else
+            if (string.IsNullOrEmpty(token))
             {
                 return RedirectToAction("Login", "Common");
             }
 
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
         }
-        public IActionResult TeamPostManage()
+
+        public async Task<IActionResult> JoinedTeam()
         {
             token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                
-                return View();
-            }
-            else
+            if (string.IsNullOrEmpty(token))
             {
                 return RedirectToAction("Login", "Common");
             }
+
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
         }
+
+        public async Task<IActionResult> TeamPostManage()
+        {
+            token = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Common");
+            }
+
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
+        }
+
 
         //get all post and search
         public async Task<IActionResult> GetAllAndSearch(string url)

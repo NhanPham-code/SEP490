@@ -1,0 +1,831 @@
+﻿@{
+    ViewData["Title"] = "Danh Sách Sân Thể Thao";
+}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="~/css/stadium/stadium.css" />
+<link rel="stylesheet" href="~/css/stadium/Background.css" />
+
+@section Scripts {
+    <script>
+        // Constants
+        const CONFIG = {
+            API_ENDPOINTS: {
+                SEARCH: '/StadiumManager/GetAllAndSearch'
+            },
+            PAGINATION: {
+                ITEMS_PER_PAGE: 9,
+                MAX_PAGES: 5
+            }
+        };
+
+        // State Management
+        let state = {
+            currentPage: 1,
+            totalItems: 0,
+            filters: {
+                search: '',
+                status: 'all',
+                sportType: 'all'
+            }
+        };
+
+        // Initialize
+        $(document).ready(function () {
+            initializeApp();
+            updateDateTime();
+            setInterval(updateDateTime, 10000);
+        });
+
+        // Core Functions
+        function initializeApp() {
+            bindEventListeners();
+            loadInitialData();
+        }
+
+        function bindEventListeners() {
+            let debounceTimer;
+            $('#search-input').on('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    state.filters.search = $(this).val();
+                    state.currentPage = 1;
+                    loadData();
+                }, 3000);
+            });
+
+            $('#status-filter, #sport-type-filter').on('change', function () {
+                const filterType = $(this).attr('id').replace('-filter', '').replace('-', '');
+                state.filters[filterType === 'sporttype' ? 'sportType' : filterType] = $(this).val();
+                state.currentPage = 1;
+                loadData();
+            });
+        }
+
+        function loadInitialData() {
+            showLoading();
+            loadData();
+        }
+
+        function loadData() {
+            showLoading();
+            $('#empty-state').hide();
+
+            const filterQuery = buildFilterQuery();
+            const searchTerm = `&$filter=${filterQuery}`;
+
+            $.ajax({
+                url: CONFIG.API_ENDPOINTS.SEARCH,
+                type: 'POST',
+                data: {
+                    url: searchTerm,
+                },
+                success: function (data) {
+                    updateUI(data);
+                    hideLoading();
+
+                    if (!data.value || data.value.length === 0) {
+                        $('#empty-state').show().addClass('animate-fade-in');
+                    } else {
+                        $('#empty-state').hide().removeClass('animate-fade-in');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showEmptyState();
+                }
+            });
+        }
+
+        function updateUI(data) {
+            if (!data) return;
+            console.log('Data received:', data);
+            renderStadiumGrid(data.value);
+            updatePagination(data["@@odata.count"]);
+            hideLoading();
+        }
+
+        // Sửa lại hàm goToDetail để đảm bảo truyền stadiumId chính xác
+        function goToDetail(stadiumId) {
+            console.log('Going to detail for stadium ID:', stadiumId);
+
+            // Clear any existing stadium ID
+            sessionStorage.removeItem("currentStadiumId");
+
+            // Set new stadium ID
+            sessionStorage.setItem("currentStadiumId", stadiumId.toString());
+
+            // Verify the ID was set correctly
+            const savedId = sessionStorage.getItem("currentStadiumId");
+            console.log('Stadium ID saved to sessionStorage:', savedId);
+
+            // Navigate to stadium inventory page
+            window.location.href = "/Management/StadiumInventory";
+        }
+
+        function renderStadiumGrid(stadiums) {
+            if (!stadiums || stadiums.length === 0) {
+                $('#stadium-grid').html('');
+                return;
+            }
+
+            const html = stadiums.map(stadium => `
+                <div class="stadium-card animate-fade-in">
+                    <div class="stadium-image">
+                        <img src="${getUrlImage(stadium.StadiumImages)}"
+                             alt="${stadium.Name}"
+                             loading="lazy">
+                        <div class="image-overlay"></div>
+                        <div class="status-badge status-${stadium.IsApproved}">
+                            <i class="ri-${stadium.IsApproved ? 'checkbox-circle' : 'error-warning'}-line"></i>
+                            ${getStatusText(stadium.IsApproved)}
+                        </div>
+                        <h3 class="stadium-title">${stadium.Name}</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="location-info">
+                            <i class="ri-map-pin-2-line"></i>
+                            ${stadium.Address || 'Chưa cập nhật địa chỉ'}
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-card price-info">
+                                <div class="info-label">Giá/giờ</div>
+                                <div class="info-value">${formatPrice(stadium.Courts)}</div>
+                            </div>
+                            <div class="info-card time-info">
+                                <div class="info-label">Giờ hoạt động</div>
+                                <div class="info-value">${formatTimeForDisplay(stadium.OpenTime)} - ${formatTimeForDisplay(stadium.CloseTime)}</div>
+                            </div>
+                        </div>
+                        <div class="pb-4">
+                            <div class="info-card sport-info">
+                                <div class="info-label">Loại sân</div>
+                                <div class="info-value">${getSportTypes(stadium.Courts)}</div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button onclick="goToDetail(${stadium.Id})" class="details-btn">
+                                <i class="ri-information-line"></i> Chi tiết
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            $('#stadium-grid').html(html);
+        }
+
+        // Time formatting functions (from Stadium Manager)
+        function formatTimeForDisplay(timeString) {
+            if (!timeString) return '--:--';
+
+            if (typeof timeString === 'string' && timeString.includes(':')) {
+                const parts = timeString.split(':');
+                const hours = parts[0].padStart(2, '0');
+                const minutes = parts[1].padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+
+            return timeString;
+        }
+
+        // Enhanced search and filter functions (from Stadium Manager)
+        function performAdvancedSearch() {
+            const searchTerm = state.filters.search.toLowerCase();
+            const statusFilter = state.filters.status;
+            const sportFilter = state.filters.sportType;
+
+            // Reset to first page when searching
+            state.currentPage = 1;
+
+            // Build comprehensive filter query
+            let filters = []; // Base filter
+            let count = 0;
+
+            if (searchTerm.length > 0) {
+                filters.push(`contains(tolower(Name),'${searchTerm}')`);
+                count++;
+            }
+
+            if (statusFilter !== 'all') {
+                const statusValue = statusFilter;
+                filters.push(`IsApproved eq ${statusValue}`);
+                count++;
+            }
+
+            if (sportFilter !== 'all') {
+                filters.push(`Courts/any(c: contains(tolower(c/SportType), '${sportFilter.toLowerCase()}'))`);
+                count++;
+            }
+
+            const filterQuery = filters.length > 1 ? ` and ${filters.slice(1).join(' and ')}` : '';
+            let searchQuery = '';
+            if(count > 0){
+                searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=${filters[0]}${filterQuery} and`;
+            }else{
+                searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=`;
+            }
+
+            console.log('Advanced Search Query:', searchQuery);
+            loadDataWithQuery(searchQuery);
+        }
+
+        function loadDataWithQuery(query) {
+            showLoading();
+            $('#empty-state').hide();
+
+            $.ajax({
+                url: CONFIG.API_ENDPOINTS.SEARCH,
+                type: 'POST',
+                data: { url: query },
+                success: function (data) {
+                    console.log('Data loaded with advanced search:', data.value);
+                    updateUI(data);
+                    hideLoading();
+
+                    if (!data.value || data.value.length === 0) {
+                        showEmptyState();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading data:', error);
+                    hideLoading();
+                    showErrorState(error);
+                }
+            });
+        }
+
+        // Enhanced debounced search
+        const debouncedSearch = debounce(() => {
+            performAdvancedSearch();
+        }, 300);
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Enhanced event listeners with better error handling
+        function bindEventListeners() {
+            // Search input with debouncing
+            $('#search-input').on('input', function () {
+                state.filters.search = $(this).val();
+                console.log('Search input changed to:', state.filters.search);
+                debouncedSearch();
+            });
+
+            // Filter dropdowns
+            $('#status-filter').on('change', function () {
+                state.filters.status = $(this).val();
+                console.log('Status filter changed to:', state.filters.status);
+                state.currentPage = 1;
+                performAdvancedSearch();
+            });
+
+            $('#sport-type-filter').on('change', function () {
+                state.filters.sportType = $(this).val();
+                console.log('Sport type filter changed to:', state.filters.sportType);
+                state.currentPage = 1;
+                performAdvancedSearch();
+            });
+
+            // Keyboard shortcuts
+            $(document).on('keydown', function(e) {
+                // Escape to close modals (if any custom modals are open)
+                if (e.key === 'Escape') {
+                    // Custom logic for closing modals
+                }
+            });
+        }
+
+        // Utility Functions
+        function updateDateTime() {
+            const now = new Date();
+            const formattedDate = now.toLocaleString("en-GB", {
+                timeZone: "Asia/Ho_Chi_Minh",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+            $('#current-time').text(formattedDate);
+        }
+
+        function showLoading() {
+            $('#loading-container').show();
+            $('#stadium-grid').addClass('opacity-50');
+        }
+
+        function hideLoading() {
+            $('#loading-container').hide();
+            $('#stadium-grid').removeClass('opacity-50');
+        }
+
+        function showEmptyState() {
+            $('#empty-state').show().addClass('animate-fade-in');
+        }
+
+        function showErrorState(error) {
+            const errorHtml = `
+                <div class="error-state animate-fade-in">
+                    <div class="error-icon">
+                        <i class="ri-error-warning-line"></i>
+                    </div>
+                    <h3 class="error-title">Có lỗi xảy ra</h3>
+                    <p class="error-description">
+                        Không thể tải dữ liệu sân. Vui lòng kiểm tra kết nối và thử lại.
+                    </p>
+                    <button onclick="loadData()" class="btn btn-primary">
+                        <i class="ri-refresh-line"></i>
+                        Thử lại
+                    </button>
+                </div>
+            `;
+
+            $('#stadium-grid').html(errorHtml);
+        }
+
+        function changePage(newPage) {
+            const maxPages = Math.ceil(state.totalItems / CONFIG.PAGINATION.ITEMS_PER_PAGE);
+            if (newPage < 1 || newPage > maxPages) return;
+
+            state.currentPage = newPage;
+            loadData();
+        }
+
+        function getStatusText(status) {
+            return status ? 'Đã được chấp thuận' : 'Chưa được chấp thuận';
+        }
+
+        function getSportTypes(courts) {
+            if (!courts || courts.length === 0) return 'Chưa có sân';
+            return [...new Set(courts.map(c => c.SportType))].join(', ');
+        }
+
+        function formatPrice(courts) {
+            if (!courts || courts.length === 0) return '0 ₫';
+            const minPrice = Math.min(...courts.map(c => c.PricePerHour));
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(minPrice);
+        }
+
+        function getUrlImage(stadiumImages) {
+            if (!stadiumImages || stadiumImages.length === 0) {
+                return '/api/placeholder/400/220';
+            }
+
+            const firstImage = stadiumImages[0];
+            let imageUrl = firstImage?.ImageUrl;
+
+            if (!imageUrl) return '/api/placeholder/400/220';
+
+            if (imageUrl.startsWith('/') || imageUrl.startsWith('uploads/')) {
+                return `https://localhost:7136/img/img/${imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl}`;
+            }
+
+            if (imageUrl.startsWith('http')) {
+                return imageUrl;
+            }
+
+            return `https://localhost:7136/img/${imageUrl}`;
+        }
+
+        function buildFilterQuery() {
+            let filters = [];
+
+            if (state.filters.search) {
+                filters.push(`(contains(tolower(Name),'${state.filters.search.toLowerCase()}') or contains(tolower(Address),'${state.filters.search.toLowerCase()}'))`);
+            }
+
+            if (state.filters.status !== 'all') {
+                const statusValue = state.filters.status === 'true';
+                filters.push(`IsApproved eq ${statusValue}`);
+            }
+
+            if (state.filters.sportType !== 'all') {
+                filters.push(`Courts/any(c: c/SportType eq '${state.filters.sportType}')`);
+            }
+
+            let query = '';
+            if (filters.length > 0) {
+                query = " and " + filters.join(" and ");
+            }
+
+            console.log('Built filter query:', query);
+            return query;
+        }
+
+        function updatePagination(totalItems) {
+            state.totalItems = totalItems || 0;
+            const totalPages = Math.ceil(state.totalItems / CONFIG.PAGINATION.ITEMS_PER_PAGE);
+
+            const start = (state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE + 1;
+            const end = Math.min(start + CONFIG.PAGINATION.ITEMS_PER_PAGE - 1, state.totalItems);
+
+            $('#showing-range').text(`${start}-${end}`);
+            $('#total-count').text(state.totalItems);
+
+            if (state.totalItems === 0) {
+                $('.pagination-section').hide();
+                return;
+            } else {
+                $('.pagination-section').show();
+            }
+
+            let paginationHtml = '';
+
+            // Previous button
+            paginationHtml += `
+                <button class="pagination-btn ${state.currentPage === 1 ? 'disabled' : ''}"
+                        onclick="changePage(${state.currentPage - 1})"
+                        ${state.currentPage === 1 ? 'disabled' : ''}>
+                    <i class="ri-arrow-left-s-line"></i>
+                </button>
+            `;
+
+            // Calculate page range
+            let startPage = Math.max(1, state.currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+
+            // First page and ellipsis
+            if (startPage > 1) {
+                paginationHtml += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+                }
+            }
+
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+                    <button class="pagination-btn ${i === state.currentPage ? 'active' : ''}"
+                            onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // Last page and ellipsis
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+                }
+                paginationHtml += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Next button
+            paginationHtml += `
+                <button class="pagination-btn ${state.currentPage === totalPages ? 'disabled' : ''}"
+                        onclick="changePage(${state.currentPage + 1})"
+                        ${state.currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="ri-arrow-right-s-line"></i>
+                </button>
+            `;
+
+            $('#pagination-container').html(paginationHtml);
+        }
+
+        // Enhanced data refresh with smart caching
+        let lastRefresh = 0;
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        function smartRefresh() {
+            const now = Date.now();
+            if (now - lastRefresh > REFRESH_INTERVAL) {
+                loadData();
+                lastRefresh = now;
+            }
+        }
+
+        // Auto-refresh when tab becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                smartRefresh();
+            }
+        });
+
+        // Enhanced initialization
+        function initializeEnhancedApp() {
+            // Initialize tooltips
+            $('[title]').each(function() {
+                $(this).attr('data-toggle', 'tooltip');
+            });
+
+            // Initialize advanced features
+            bindEventListeners();
+            loadInitialData();
+
+            // Set up periodic refresh
+            setInterval(smartRefresh, REFRESH_INTERVAL);
+
+            // Initialize progressive web app features if supported
+            if ('serviceWorker' in navigator) {
+                console.log('Service Worker supported');
+            }
+        }
+
+        // Performance monitoring
+        function logPerformanceMetrics() {
+            if (window.performance && window.performance.timing) {
+                const timing = window.performance.timing;
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                console.log(`Page load time: ${loadTime}ms`);
+            }
+        }
+
+        // Initialize performance monitoring
+        window.addEventListener('load', logPerformanceMetrics);
+
+        // Replace the original initialization with enhanced version
+        $(document).ready(function () {
+            initializeEnhancedApp();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+
+        // Custom styles for enhanced functionality
+        const customStyles = `
+        <style>
+            .enhanced-confirm-btn, .enhanced-cancel-btn {
+                border-radius: 12px !important;
+                font-weight: 600 !important;
+                padding: 12px 24px !important;
+                font-size: 14px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                transition: all 0.3s ease !important;
+                border: none !important;
+            }
+
+            .enhanced-confirm-btn:hover, .enhanced-cancel-btn:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            .enhanced-confirm-btn.danger {
+                background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            }
+
+            .enhanced-popup {
+                border-radius: 20px !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            .loading-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .loading-spinner-custom {
+                width: 40px;
+                height: 40px;
+                border: 3px solid rgba(59, 130, 246, 0.1);
+                border-radius: 50%;
+                border-top-color: #3b82f6;
+                animation: spin 1s linear infinite;
+            }
+
+            @@keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+
+            .pagination-ellipsis {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 48px;
+                padding: 0 12px;
+                color: var(--text-muted);
+                font-weight: 600;
+            }
+
+            .error-state {
+                text-align: center;
+                padding: 40px 20px;
+                color: #6b7280;
+            }
+
+            .error-icon {
+                font-size: 3rem;
+                color: #ef4444;
+                margin-bottom: 16px;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #1f2937;
+                margin-bottom: 8px;
+            }
+
+            .error-description {
+                margin-bottom: 24px;
+                line-height: 1.6;
+            }
+        </style>
+        `;
+
+        // Inject custom styles
+        $('head').append(customStyles);
+    </script>
+}
+
+<div class="floating-sports-icons">
+    <!-- Sports icons will be generated dynamically -->
+</div>
+<script src="~/js/Stadium.js"></script>
+
+<div class="admin-container">
+    <!-- Header Section -->
+    <header class="glass-card header-card">
+        <div class="section-header">
+            <div>
+                <h1 class="header-title">
+                    <i class="ri-building-2-line"></i>
+                    Danh Sách Sân Thể Thao
+                </h1>
+                <p class="header-subtitle">
+                    <span id="current-time">2025-08-25 08:06:00</span> - Xin chào, <span style="font-weight: 700;">@User.Identity.Name</span>
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Enhanced Filter Section (from Stadium Manager) -->
+    <section class="glass-card filter-section">
+        <h2 class="filter-title">
+            <i class="ri-filter-3-line"></i> Bộ Lọc Tìm Kiếm Nâng Cao
+        </h2>
+        <div class="filter-grid">
+            <div class="input-group">
+                <i class="ri-search-line input-icon"></i>
+                <input type="text" id="search-input" class="form-control" placeholder="Tìm kiếm theo tên sân, địa chỉ, mô tả...">
+            </div>
+            <div class="input-group">
+                <i class="ri-checkbox-circle-line input-icon"></i>
+                <select id="status-filter" class="form-select">
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="true">Đã duyệt</option>
+                    <option value="false">Chưa duyệt</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <i class="ri-basketball-line input-icon"></i>
+                <select id="sport-type-filter" class="form-select">
+                    <option value="all">Tất cả loại sân</option>
+                    <option value="Bóng đá sân 5">Bóng đá sân 5</option>
+                    <option value="Bóng đá sân 7">Bóng đá sân 7</option>
+                    <option value="Bóng đá sân 11">Bóng đá sân 11</option>
+                    <option value="Bóng rổ">Bóng rổ</option>
+                    <option value="Cầu lông">Cầu lông</option>
+                    <option value="Tennis">Tennis</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Advanced Search Info -->
+        <div class="search-info" style="margin-top: 16px; padding: 12px 16px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; color: #1e40af; font-size: 0.875rem;">
+            <i class="ri-information-line" style="margin-right: 8px;"></i>
+            <span>Tìm kiếm thông minh: Hệ thống sẽ tự động tìm kiếm trong tên sân, địa chỉ và mô tả</span>
+        </div>
+    </section>
+
+    <!-- Stadium Grid -->
+    <section class="glass-card stadium-grid-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="ri-layout-grid-line"></i> Danh Sách Sân
+            </h2>
+            <div class="last-updated">
+                <i class="ri-refresh-line"></i>
+                Cập nhật lần cuối: <span id="last-updated">Vừa xong</span>
+            </div>
+        </div>
+
+        <div id="stadium-grid" class="stadium-grid">
+            <div id="loading-container" class="loading-container">
+                <div>
+                    <div class="loading-spinner"></div>
+                    <p style="color: white; margin-top: 1rem; font-weight: 600;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Empty State -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-icon">
+                <i class="ri-search-line"></i>
+            </div>
+            <h3 class="empty-title">Không tìm thấy sân nào</h3>
+            <p class="empty-description">Không có sân nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh bộ lọc để tìm kiếm lại.</p>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="clearFilters()" style="margin-right: 12px;">
+                    <i class="ri-close-circle-line"></i> Xóa bộ lọc
+                </button>
+                <button class="btn btn-primary" onclick="loadData()">
+                    <i class="ri-refresh-line"></i> Tải lại
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Pagination -->
+    <section class="glass-card pagination-section">
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <i class="ri-information-line"></i>
+                Hiển thị <span id="showing-range">1-10</span> trong tổng số <strong id="total-count">0</strong> sân
+            </div>
+            <div class="pagination-controls" id="pagination-container"></div>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Additional functions for enhanced filter functionality
+    function clearFilters() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('status-filter').value = 'all';
+        document.getElementById('sport-type-filter').value = 'all';
+
+        state.filters = {
+            search: '',
+            status: 'all',
+            sportType: 'all'
+        };
+        state.currentPage = 1;
+
+        loadData();
+    }
+
+    // Show filter results count
+    function updateFilterInfo() {
+        const activeFilters = [];
+
+        if (state.filters.search) activeFilters.push(`Tìm kiếm: "${state.filters.search}"`);
+        if (state.filters.status !== 'all') activeFilters.push(`Trạng thái: ${state.filters.status === 'true' ? 'Đã duyệt' : 'Chưa duyệt'}`);
+        if (state.filters.sportType !== 'all') activeFilters.push(`Loại sân: ${state.filters.sportType}`);
+
+        if (activeFilters.length > 0) {
+            const filterInfo = document.createElement('div');
+            filterInfo.id = 'filter-info';
+            filterInfo.style.cssText = `
+                margin-top: 12px;
+                padding: 8px 12px;
+                background: rgba(16, 185, 129, 0.08);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                border-radius: 8px;
+                font-size: 0.8rem;
+                color: #065f46;
+            `;
+            filterInfo.innerHTML = `
+                <i class="ri-filter-line" style="margin-right: 6px;"></i>
+                Đang lọc: ${activeFilters.join(' • ')}
+                <button onclick="clearFilters()" style="margin-left: 8px; background: none; border: none; color: #dc2626; cursor: pointer;">
+                    <i class="ri-close-line"></i>
+                </button>
+            `;
+
+            // Remove existing filter info
+            const existing = document.getElementById('filter-info');
+            if (existing) existing.remove();
+
+            // Add new filter info
+            document.querySelector('.filter-section').appendChild(filterInfo);
+        } else {
+            const existing = document.getElementById('filter-info');
+            if (existing) existing.remove();
+        }
+    }
+
+    // Update the search function to show filter info
+    const originalPerformAdvancedSearch = performAdvancedSearch;
+    performAdvancedSearch = function() {
+        updateFilterInfo();
+        return originalPerformAdvancedSearch();
+    };
+</script>

@@ -34,16 +34,18 @@ namespace CustomerUI.Controllers
     {
         private readonly IStadiumService _stadiumService;
         private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;   // ✅ thêm UserService
 
-        public StadiumController(IStadiumService stadiumService, ITokenService tokenService)
+        public StadiumController(IStadiumService stadiumService, ITokenService tokenService, IUserService userService)
         {
             _stadiumService = stadiumService;
             _tokenService = tokenService;
+            _userService = userService;
         }
 
-        public IActionResult Index()
+        private string? GetAccessToken()
         {
-            return View();
+            return Request.Cookies["AccessToken"];
         }
 
         public async Task<IActionResult> StadiumDetail(int stadiumId)
@@ -53,6 +55,17 @@ namespace CustomerUI.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // ✅ Lấy user profile từ token
+            var accessToken = GetAccessToken();
+            var profile = string.IsNullOrEmpty(accessToken)
+                ? null
+                : await _userService.GetMyProfileAsync(accessToken);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            // ✅ Load stadium info
             var searchTerm = $"&$filter=Id eq {stadiumId}";
             var odataResponse = await _stadiumService.SearchStadiumAsync(searchTerm);
 
@@ -71,20 +84,18 @@ namespace CustomerUI.Controllers
                     {
                         string stadiumJson = firstStadiumElement.GetRawText();
 
-                        // Thiết lập options và sử dụng converter ISO 8601 mới
                         var serializerOptions = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
-                            Converters = { new Iso8601TimeSpanConverter() } // THAY ĐỔI Ở ĐÂY
+                            Converters = { new Iso8601TimeSpanConverter() }
                         };
 
                         stadium = JsonSerializer.Deserialize<ReadStadiumDTO>(stadiumJson, serializerOptions);
                     }
                 }
             }
-            catch (JsonException ex)
+            catch
             {
-                // Ghi log và trả về trang lỗi
                 return View("Error");
             }
 

@@ -1,33 +1,57 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
+using System.Threading.Tasks;
 
 namespace CustomerUI.Controllers
 {
     public class ChatController : Controller
     {
-        public IActionResult Chat()
+        private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
+
+        
+        public ChatController(ITokenService tokenService, IUserService userService)
         {
-            // Kiểm tra xem cookie có được lưu chưa
-            var hasCookie = Request.Cookies.ContainsKey(".AspNetCore.Session");
-            var sessionId = HttpContext.Session.Id;
-            var userId = HttpContext.Session.GetString("UserId");
-            var fullName = HttpContext.Session.GetString("FullName");
+            _tokenService = tokenService;
+            _userService = userService;
+        }
+        private string? GetAccessToken()
+        {
+            return Request.Cookies["AccessToken"];
+        }
 
-            Console.WriteLine($"Session cookie tồn tại: {hasCookie}");
-            Console.WriteLine($"SessionId: {sessionId}, UserId: {userId}");
+        private string? GetRefreshToken()
+        {
+            return Request.Cookies["RefreshToken"];
+        }
 
-            // Kiểm tra xem user đã login chưa
-            if (string.IsNullOrEmpty(userId))
+        public async Task<IActionResult> Chat()
+        {
+            var accessToken = GetAccessToken();
+
+            if (string.IsNullOrEmpty(accessToken))
             {
-                // Redirect to login if user is not logged in
                 return RedirectToAction("Login", "Common");
             }
 
-            // Pass the actual UserId instead of SessionId
-            ViewBag.UserId = userId;
-            ViewBag.UserName = fullName ?? "User";
-            ViewBag.SessionId = sessionId; // Keep this for debugging if needed
+            var profile = await _userService.GetMyProfileAsync(accessToken);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
 
             return View();
         }
+        public async Task<PartialViewResult> UserHiddenFields()
+        {
+            var accessToken = GetAccessToken();
+            var profile = await _userService.GetMyProfileAsync(accessToken);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+
+            return PartialView("_UserHiddenFields");
+        }
+
     }
 }
