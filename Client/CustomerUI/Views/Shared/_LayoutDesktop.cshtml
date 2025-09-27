@@ -1246,7 +1246,7 @@
           }
         });
 
-        // Đổi ngôn ngữ khi chọn
+    
         document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
           btn.addEventListener("click", () => {
             const lang = btn.getAttribute("data-lang");
@@ -1257,13 +1257,22 @@
             }
             menu.classList.add("hidden");
 
-            // Vá thêm: dịch attribute (placeholder, alt)
+           
             setTimeout(() => {
               document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
                 el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
               });
             }, 500);
           });
+        });
+
+
+        document.getElementById("reset-translate-btn").addEventListener("click", function() {
+        document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+          if (window.localStorage) {
+            localStorage.removeItem('googtrans');
+          }
+         window.location.reload();
         });
     </script>
     @RenderSection("Scripts", required: false)

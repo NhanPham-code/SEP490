@@ -784,6 +784,16 @@ namespace CustomerUI.Controllers
                 return StatusCode(500, new { success = false, message = "Có lỗi xảy ra khi lấy thông tin user." });
             }
         }
-       
+
+        [HttpGet]
+        public async Task<IActionResult> GetSummary(int stadiumId)
+        {
+            var feedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
+            var count = feedbacks.Count();
+            var avg = count > 0 ? feedbacks.Average(f => f.Rating) : 0;
+            return Json(new { count, avgRating = avg });
+        }
+
+
     }
 }

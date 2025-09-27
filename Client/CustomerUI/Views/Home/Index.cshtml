@@ -684,41 +684,42 @@
 
 
                         // danh sach san pham truoc va sau khi search
-                        function displayList(searchTerm, top, skip){
+                                               function displayList(searchTerm, top, skip) {
                             var searchUrl = searchTerm + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);
 
-                                                                           $.ajax({
-                            url: '/Home/Stadiums', // Endpoint for POST request
-                            type: 'POST',
-                            data: {searchTerm: searchUrl},
-                            success: function (data) {
-                                let count = data["@@odata.count"];
-                                sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
-                                $("#count").text(`Đã tìm thấy ${count}`);
-                                console.log(skip);
-                                if (skip + 9 >= count){
-                                    $('#loadMoreBtn').hide();
-                                }else{
-                                     $('#loadMoreBtn').show();
-                                }
-                                let html = '';
-                                if (data.value && data.value.length > 0) {
-                                    data.value.forEach(function (item) {
-                                        let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'default.jpg';
-                                        let price = item.Courts.length > 0 ? item.Courts[0].PricePerHour : 0;
-                                        // Removed console.log(item.val) as 'val' is not defined in the data structure
-                                        console.log(item);
+                            $.ajax({
+                                url: '/Home/Stadiums', // Endpoint for POST request
+                                type: 'POST',
+                                data: { searchTerm: searchUrl },
+                                success: function (data) {
+                                    let count = data["@@odata.count"];
+                                    sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
+                                    $("#count").text(`Đã tìm thấy ${count}`);
+                                    console.log(skip);
 
-                                        // Format tiền Việt Nam
-                                        let formattedPrice = new Intl.NumberFormat('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND'
-                                        }).format(price);
-                                        let address = item.Address ?? '';
+                                    if (skip + 9 >= count) {
+                                        $('#loadMoreBtn').hide();
+                                    } else {
+                                        $('#loadMoreBtn').show();
+                                    }
 
-                                                                // Thay thế đoạn code HTML của bạn bằng đoạn này:
-                                               html += `<div class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                    let html = '';
+                                    if (data.value && data.value.length > 0) {
+                                        data.value.forEach(function (item) {
+                                            let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'default.jpg';
+                                            let price = item.Courts.length > 0 ? item.Courts[0].PricePerHour : 0;
+
+                                            // Format tiền Việt Nam
+                                            let formattedPrice = new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND'
+                                            }).format(price);
+                                            let address = item.Address ?? '';
+
+                                            // HTML card
+                                            html += `
+                        <div id="stadium-${item.Id}" class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="relative h-48">
                                 <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
@@ -744,7 +745,7 @@
 
                             <div class="p-4">
                                 <!-- Tên sân (KHÔNG dịch) -->
-                                <h3 class="font-bold text-lg text-gray-900 mb-1 ">${item.Name}</h3>
+                                <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
 
                                 <!-- Địa chỉ (KHÔNG dịch) -->
                                 <div class="flex items-center text-gray-500 text-sm mb-2 notranslate">
@@ -752,10 +753,11 @@
                                     <span>${address}</span>
                                 </div>
 
+                                <!-- Rating -->
                                 <div class="flex items-center text-sm mb-3">
                                     <i class="ri-star-fill text-yellow-400 mr-1"></i>
-                                    <span class="font-semibold text-gray-800">4.7</span>
-                                    <span class="text-gray-500 ml-1">(124 đánh giá)</span>
+                                    <span class="font-semibold text-gray-800 rating">0.0</span>
+                                    <span class="text-gray-500 ml-1 feedback-count">(0 đánh giá)</span>
                                 </div>
 
                                 <!-- Available time slots -->
@@ -773,9 +775,9 @@
 
                                 <div class="items-center justify-end">
                                     <!-- Giá tiền (KHÔNG dịch) -->
-                                                          <div class="text-2xl font-bold text-blue-600 notranslate">
-                          ${formattedPrice}<span class="text-sm font-normal text-gray-500">/giờ</span>
-                        </div>
+                                    <div class="text-2xl font-bold text-blue-600 notranslate">
+                                        ${formattedPrice}<span class="text-sm font-normal text-gray-500">/giờ</span>
+                                    </div>
                                     <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
                                             onclick="redirectToBooking('${item.Id}')">
                                         Đặt ngay
@@ -784,23 +786,35 @@
                             </div>
                         </div>`;
 
-                        });
-                                            if (skip === 0) {
-                            $('#stadium-grid').html(html).show();
-                        } else {
-                            $('#stadium-grid').append(html);
-                        }
-                                } else {
+                                        });
+
+                                        if (skip === 0) {
+                                            $('#stadium-grid').html(html).show();
+                                        } else {
+                                            $('#stadium-grid').append(html);
+                                        }
+
+                                        // Sau khi render xong thì gọi API feedback cho từng sân
+                                        data.value.forEach(function (item) {
+                                            $.get(`/Feedback/GetSummary?stadiumId=${item.Id}`, function (summary) {
+                                                $(`#stadium-${item.Id} .rating`).text(summary.avgRating.toFixed(1));
+                                                $(`#stadium-${item.Id} .feedback-count`).text(`(${summary.count} đánh giá)`);
+                                            });
+                                        });
+
+                                    } else {
+                                        $('#stadium-grid').empty().hide();
+                                    }
+                                },
+                                error: function () {
                                     $('#stadium-grid').empty().hide();
+                                    console.log('Error fetching suggestions');
                                 }
-                            },
-                            error: function () {
-                                $('#stadium-grid').empty().hide();
-                                console.log('Error fetching suggestions');
-                            }
-                        });
+                            });
                         }
-                                        function formatTimeForDisplay(time) {
+
+                        // Format giờ
+                        function formatTimeForDisplay(time) {
                             if (!time) return '--:--';
 
                             try {

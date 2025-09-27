@@ -1397,7 +1397,6 @@
             loadEmojiCategory(currentCategory);
         }
 
-        // 🎨 OPTIMIZED GIF PICKER
         function initGifPicker() {
             const gifBtn = document.getElementById('gifBtn');
             const gifPicker = document.getElementById('gifPicker');
@@ -1409,6 +1408,11 @@
                 console.error('GIF picker elements not found');
                 return;
             }
+
+            // FIX 1: Ngăn event bubbling từ gifPicker
+            gifPicker.addEventListener('click', (e) => {
+                e.stopPropagation(); // Ngăn event bubble lên document
+            });
 
             gifBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1425,31 +1429,44 @@
                 }
             });
 
+            // FIX 2: Cải thiện click outside logic
             document.addEventListener('click', (e) => {
-                if (!gifPicker.contains(e.target) && !gifBtn.contains(e.target)) {
+                // Chỉ đóng nếu click thực sự ở ngoài và không phải là Load More button
+                if (!gifPicker.contains(e.target) &&
+                    !gifBtn.contains(e.target) &&
+                    !e.target.classList.contains('load-more-btn') &&
+                    !e.target.closest('.load-more-btn')) {
                     gifPicker.classList.remove('show');
                 }
             });
 
-            // Enhanced search with longer debounce
+            // Enhanced search with debounce
             if (gifSearchInput) {
                 let searchTimeout;
                 gifSearchInput.addEventListener('input', (e) => {
                     clearTimeout(searchTimeout);
                     const query = e.target.value.trim();
                     searchTimeout = setTimeout(() => {
-                        if (query && query.length >= 3) { // Minimum 3 characters
+                        if (query && query.length >= 3) {
                             currentGifQuery = query;
                             loadGIFs(query);
                             gifCategoryBtns.forEach(btn => btn.classList.remove('active'));
                         }
-                    }, 1200); // Increased to 1.2 seconds
+                    }, 1200);
+                });
+
+                // FIX 3: Ngăn search input đóng picker
+                gifSearchInput.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             }
 
+            // FIX 4: Ngăn category buttons đóng picker
             gifCategoryBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    e.stopPropagation(); // Quan trọng!
+
                     gifCategoryBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentGifQuery = btn.dataset.query;
@@ -1463,7 +1480,7 @@
             loadGIFs(currentGifQuery);
         }
 
-        // 📱 OPTIMIZED LOAD GIFS WITH PAGINATION
+        // FIX 5: Sửa lại hàm loadGIFs để tránh conflict
         async function loadGIFs(query, append = false) {
             const gifGrid = document.getElementById('gifGrid');
             if (!gifGrid) return;
@@ -1474,18 +1491,34 @@
             } else {
                 const loadMoreBtn = gifGrid.querySelector('.load-more-btn');
                 if (loadMoreBtn) loadMoreBtn.remove();
+
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'gif-loading';
+                loadingDiv.innerHTML = '📥 Loading more GIFs...';
+                gifGrid.appendChild(loadingDiv);
             }
 
             try {
                 const gifs = await searchGIFs(query, GIFS_PER_PAGE, currentOffset);
 
-                if (!append) {
-                    gifGrid.innerHTML = '';
-                }
+                const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                loadingElements.forEach(el => el.remove());
 
-                if (gifs.length === 0 && currentOffset === 0) {
+                if (!append && gifs.length === 0) {
                     gifGrid.innerHTML = '<div class="gif-loading">😅 No GIFs found<br>Try a different search term</div>';
                     return;
+                }
+
+                if (gifs.length === 0 && append) {
+                    const noMoreDiv = document.createElement('div');
+                    noMoreDiv.className = 'gif-loading';
+                    noMoreDiv.innerHTML = '✅ All GIFs loaded';
+                    gifGrid.appendChild(noMoreDiv);
+                    return;
+                }
+
+                if (!append) {
+                    gifGrid.innerHTML = '';
                 }
 
                 // Create GIF grid
@@ -1507,36 +1540,63 @@
                             this.src = gif.images.fixed_width_small.url;
                         };
 
-                        gifItem.appendChild(img);
-                        gifItem.addEventListener('click', () => {
+                        // FIX 6: Ngăn GIF item click đóng picker
+                        gifItem.addEventListener('click', (e) => {
+                            e.stopPropagation();
                             insertGIF(gif.images.fixed_height.url, gif.title || 'GIF');
                         });
 
+                        gifItem.appendChild(img);
                         row.appendChild(gifItem);
                     });
 
                     gifGrid.appendChild(row);
                 }
 
-                // Add Load More button
+                // FIX 7: Load More button với proper event handling
                 if (gifs.length === GIFS_PER_PAGE) {
+                    const loadMoreContainer = document.createElement('div');
+                    loadMoreContainer.style.textAlign = 'center';
+                    loadMoreContainer.style.padding = '15px';
+
                     const loadMoreBtn = document.createElement('button');
-                    loadMoreBtn.className = 'load-more-btn';
+                    loadMoreBtn.className = 'load-more-btn chat-btn';
                     loadMoreBtn.innerHTML = '📥 Load More GIFs';
-                    loadMoreBtn.onclick = () => {
+                    loadMoreBtn.style.width = '80%';
+                    loadMoreBtn.style.margin = '0 auto';
+
+                    // QUAN TRỌNG: Ngăn event bubbling
+                    loadMoreBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation(); // Ngăn đóng picker!
+
                         currentOffset += GIFS_PER_PAGE;
                         loadGIFs(query, true);
-                    };
-                    gifGrid.appendChild(loadMoreBtn);
+                    });
+
+                    loadMoreContainer.appendChild(loadMoreBtn);
+                    gifGrid.appendChild(loadMoreContainer);
                 }
 
             } catch (error) {
                 console.error('Error loading GIFs:', error);
+
+                const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                loadingElements.forEach(el => el.remove());
+
                 if (!append) {
                     gifGrid.innerHTML = '<div class="gif-loading">❌ Error loading GIFs<br>Try again later</div>';
+                } else {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'gif-loading';
+                    errorDiv.innerHTML = '❌ Error loading more GIFs<br>Try again';
+                    gifGrid.appendChild(errorDiv);
                 }
             }
         }
+
+
+
 
         function loadEmojiCategory(category) {
             const emojiGrid = document.getElementById('emojiGrid');

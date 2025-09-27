@@ -1321,14 +1321,22 @@
             const now = Date.now();
 
             // Check cache first
-            if (gifCache.has(cacheKey)) {
-                const cached = gifCache.get(cacheKey);
-                if (now - cached.timestamp < CACHE_DURATION) {
-                    console.log(`📦 Using cached data for: ${query}`);
+                    // Check cache first
+        if (gifCache.has(cacheKey)) {
+            const cached = gifCache.get(cacheKey);
+            if (now - cached.timestamp < CACHE_DURATION) {
+                // Nếu cached.data.length < GIFS_PER_PAGE, nghĩa là đã hết GIF, không hiển thị "Load More"
+                if (cached.data.length < limit) {
+                    // Xóa cacheKey này để lần sau gọi lại API cho chắc chắn!
+                    gifCache.delete(cacheKey);
+                } else {
+                    console.log(`📦 Using cached data for: ${query}, offset: ${offset}`);
                     return cached.data;
                 }
+            } else {
                 gifCache.delete(cacheKey);
             }
+        }
 
             try {
                 let url;
@@ -1466,148 +1474,208 @@
             loadEmojiCategory(currentCategory);
         }
 
-        // 🎨 OPTIMIZED GIF PICKER
         function initGifPicker() {
-            const gifBtn = document.getElementById('gifBtn');
-            const gifPicker = document.getElementById('gifPicker');
-            const gifGrid = document.getElementById('gifGrid');
-            const gifSearchInput = document.getElementById('gifSearchInput');
-            const gifCategoryBtns = document.querySelectorAll('.gif-category-btn');
+             const gifBtn = document.getElementById('gifBtn');
+             const gifPicker = document.getElementById('gifPicker');
+             const gifGrid = document.getElementById('gifGrid');
+             const gifSearchInput = document.getElementById('gifSearchInput');
+             const gifCategoryBtns = document.querySelectorAll('.gif-category-btn');
 
-            if (!gifBtn || !gifPicker || !gifGrid) {
-                console.error('GIF picker elements not found');
-                return;
-            }
+             if (!gifBtn || !gifPicker || !gifGrid) {
+                 console.error('GIF picker elements not found');
+                 return;
+             }
 
-            gifBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+             // FIX 1: Ngăn event bubbling từ gifPicker
+             gifPicker.addEventListener('click', (e) => {
+                 e.stopPropagation(); // Ngăn event bubble lên document
+             });
 
-                const emojiPicker = document.getElementById('emojiPicker');
-                if (emojiPicker) {
-                    emojiPicker.classList.remove('show');
-                }
+             gifBtn.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 e.stopPropagation();
 
-                gifPicker.classList.toggle('show');
-                if (gifPicker.classList.contains('show')) {
-                    loadGIFs(currentGifQuery);
-                }
-            });
+                 const emojiPicker = document.getElementById('emojiPicker');
+                 if (emojiPicker) {
+                     emojiPicker.classList.remove('show');
+                 }
 
-            document.addEventListener('click', (e) => {
-                if (!gifPicker.contains(e.target) && !gifBtn.contains(e.target)) {
-                    gifPicker.classList.remove('show');
-                }
-            });
+                 gifPicker.classList.toggle('show');
+                 if (gifPicker.classList.contains('show')) {
+                     loadGIFs(currentGifQuery);
+                 }
+             });
 
-            // Enhanced search with longer debounce
-            if (gifSearchInput) {
-                let searchTimeout;
-                gifSearchInput.addEventListener('input', (e) => {
-                    clearTimeout(searchTimeout);
-                    const query = e.target.value.trim();
-                    searchTimeout = setTimeout(() => {
-                        if (query && query.length >= 3) { // Minimum 3 characters
-                            currentGifQuery = query;
-                            loadGIFs(query);
-                            gifCategoryBtns.forEach(btn => btn.classList.remove('active'));
-                        }
-                    }, 1200); // Increased to 1.2 seconds
-                });
-            }
+             // FIX 2: Cải thiện click outside logic
+             document.addEventListener('click', (e) => {
+                 // Chỉ đóng nếu click thực sự ở ngoài và không phải là Load More button
+                 if (!gifPicker.contains(e.target) &&
+                     !gifBtn.contains(e.target) &&
+                     !e.target.classList.contains('load-more-btn') &&
+                     !e.target.closest('.load-more-btn')) {
+                     gifPicker.classList.remove('show');
+                 }
+             });
 
-            gifCategoryBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    gifCategoryBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentGifQuery = btn.dataset.query;
-                    if (gifSearchInput) {
-                        gifSearchInput.value = '';
-                    }
-                    loadGIFs(currentGifQuery);
-                });
-            });
+             // Enhanced search with debounce
+             if (gifSearchInput) {
+                 let searchTimeout;
+                 gifSearchInput.addEventListener('input', (e) => {
+                     clearTimeout(searchTimeout);
+                     const query = e.target.value.trim();
+                     searchTimeout = setTimeout(() => {
+                         if (query && query.length >= 3) {
+                             currentGifQuery = query;
+                             loadGIFs(query);
+                             gifCategoryBtns.forEach(btn => btn.classList.remove('active'));
+                         }
+                     }, 1200);
+                 });
 
-            loadGIFs(currentGifQuery);
-        }
+                 // FIX 3: Ngăn search input đóng picker
+                 gifSearchInput.addEventListener('click', (e) => {
+                     e.stopPropagation();
+                 });
+             }
 
-        // 📱 OPTIMIZED LOAD GIFS WITH PAGINATION
-        async function loadGIFs(query, append = false) {
-            const gifGrid = document.getElementById('gifGrid');
-            if (!gifGrid) return;
+             // FIX 4: Ngăn category buttons đóng picker
+             gifCategoryBtns.forEach(btn => {
+                 btn.addEventListener('click', (e) => {
+                     e.preventDefault();
+                     e.stopPropagation(); // Quan trọng!
 
-            if (!append) {
-                gifGrid.innerHTML = '<div class="gif-loading">🔍 Searching GIFs...</div>';
-                currentOffset = 0;
-            } else {
-                const loadMoreBtn = gifGrid.querySelector('.load-more-btn');
-                if (loadMoreBtn) loadMoreBtn.remove();
-            }
+                     gifCategoryBtns.forEach(b => b.classList.remove('active'));
+                     btn.classList.add('active');
+                     currentGifQuery = btn.dataset.query;
+                     if (gifSearchInput) {
+                         gifSearchInput.value = '';
+                     }
+                     loadGIFs(currentGifQuery);
+                 });
+             });
 
-            try {
-                const gifs = await searchGIFs(query, GIFS_PER_PAGE, currentOffset);
+             loadGIFs(currentGifQuery);
+         }
 
-                if (!append) {
-                    gifGrid.innerHTML = '';
-                }
+         // FIX 5: Sửa lại hàm loadGIFs để tránh conflict
+         async function loadGIFs(query, append = false) {
+             const gifGrid = document.getElementById('gifGrid');
+             if (!gifGrid) return;
 
-                if (gifs.length === 0 && currentOffset === 0) {
-                    gifGrid.innerHTML = '<div class="gif-loading">😅 No GIFs found<br>Try a different search term</div>';
-                    return;
-                }
+             if (!append) {
+                 gifGrid.innerHTML = '<div class="gif-loading">🔍 Searching GIFs...</div>';
+                 currentOffset = 0;
+             } else {
+                 const loadMoreBtn = gifGrid.querySelector('.load-more-btn');
+                 if (loadMoreBtn) loadMoreBtn.remove();
 
-                // Create GIF grid
-                for (let i = 0; i < gifs.length; i += 3) {
-                    const row = document.createElement('div');
-                    row.className = 'gif-row';
+                 const loadingDiv = document.createElement('div');
+                 loadingDiv.className = 'gif-loading';
+                 loadingDiv.innerHTML = '📥 Loading more GIFs...';
+                 gifGrid.appendChild(loadingDiv);
+             }
 
-                    const rowGifs = gifs.slice(i, i + 3);
-                    rowGifs.forEach(gif => {
-                        const gifItem = document.createElement('div');
-                        gifItem.className = 'gif-item';
+             try {
+                 const gifs = await searchGIFs(query, GIFS_PER_PAGE, currentOffset);
 
-                        const img = document.createElement('img');
-                        img.src = gif.images.fixed_height_small.url;
-                        img.alt = gif.title || 'GIF';
-                        img.loading = 'lazy';
+                 const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                 loadingElements.forEach(el => el.remove());
 
-                        img.onerror = function() {
-                            this.src = gif.images.fixed_width_small.url;
-                        };
+                 if (!append && gifs.length === 0) {
+                     gifGrid.innerHTML = '<div class="gif-loading">😅 No GIFs found<br>Try a different search term</div>';
+                     return;
+                 }
 
-                        gifItem.appendChild(img);
-                        gifItem.addEventListener('click', () => {
-                            insertGIF(gif.images.fixed_height.url, gif.title || 'GIF');
-                        });
+                 if (gifs.length === 0 && append) {
+                     const noMoreDiv = document.createElement('div');
+                     noMoreDiv.className = 'gif-loading';
+                     noMoreDiv.innerHTML = '✅ All GIFs loaded';
+                     gifGrid.appendChild(noMoreDiv);
+                     return;
+                 }
 
-                        row.appendChild(gifItem);
-                    });
+                 if (!append) {
+                     gifGrid.innerHTML = '';
+                 }
 
-                    gifGrid.appendChild(row);
-                }
+                 // Create GIF grid
+                 for (let i = 0; i < gifs.length; i += 3) {
+                     const row = document.createElement('div');
+                     row.className = 'gif-row';
 
-                // Add Load More button
-                if (gifs.length === GIFS_PER_PAGE) {
-                    const loadMoreBtn = document.createElement('button');
-                    loadMoreBtn.className = 'load-more-btn';
-                    loadMoreBtn.innerHTML = '📥 Load More GIFs';
-                    loadMoreBtn.onclick = () => {
-                        currentOffset += GIFS_PER_PAGE;
-                        loadGIFs(query, true);
-                    };
-                    gifGrid.appendChild(loadMoreBtn);
-                }
+                     const rowGifs = gifs.slice(i, i + 3);
+                     rowGifs.forEach(gif => {
+                         const gifItem = document.createElement('div');
+                         gifItem.className = 'gif-item';
 
-            } catch (error) {
-                console.error('Error loading GIFs:', error);
-                if (!append) {
-                    gifGrid.innerHTML = '<div class="gif-loading">❌ Error loading GIFs<br>Try again later</div>';
-                }
-            }
-        }
+                         const img = document.createElement('img');
+                         img.src = gif.images.fixed_height_small.url;
+                         img.alt = gif.title || 'GIF';
+                         img.loading = 'lazy';
 
-        function loadEmojiCategory(category) {
+                         img.onerror = function() {
+                             this.src = gif.images.fixed_width_small.url;
+                         };
+
+                         // FIX 6: Ngăn GIF item click đóng picker
+                         gifItem.addEventListener('click', (e) => {
+                             e.stopPropagation();
+                             insertGIF(gif.images.fixed_height.url, gif.title || 'GIF');
+                         });
+
+                         gifItem.appendChild(img);
+                         row.appendChild(gifItem);
+                     });
+
+                     gifGrid.appendChild(row);
+                 }
+
+                 // FIX 7: Load More button với proper event handling
+                 if (gifs.length === GIFS_PER_PAGE) {
+                     const loadMoreContainer = document.createElement('div');
+                     loadMoreContainer.style.textAlign = 'center';
+                     loadMoreContainer.style.padding = '15px';
+
+                     const loadMoreBtn = document.createElement('button');
+                     loadMoreBtn.className = 'load-more-btn chat-btn';
+                     loadMoreBtn.innerHTML = '📥 Load More GIFs';
+                     loadMoreBtn.style.width = '80%';
+                     loadMoreBtn.style.margin = '0 auto';
+
+                     // QUAN TRỌNG: Ngăn event bubbling
+                     loadMoreBtn.addEventListener('click', (e) => {
+                         e.preventDefault();
+                         e.stopPropagation(); // Ngăn đóng picker!
+
+                         currentOffset += GIFS_PER_PAGE;
+                         loadGIFs(query, true);
+                     });
+
+                     loadMoreContainer.appendChild(loadMoreBtn);
+                     gifGrid.appendChild(loadMoreContainer);
+                 }
+
+             } catch (error) {
+                 console.error('Error loading GIFs:', error);
+
+                 const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                 loadingElements.forEach(el => el.remove());
+
+                 if (!append) {
+                     gifGrid.innerHTML = '<div class="gif-loading">❌ Error loading GIFs<br>Try again later</div>';
+                 } else {
+                     const errorDiv = document.createElement('div');
+                     errorDiv.className = 'gif-loading';
+                     errorDiv.innerHTML = '❌ Error loading more GIFs<br>Try again';
+                     gifGrid.appendChild(errorDiv);
+                 }
+             }
+         }
+
+
+
+
+         function loadEmojiCategory(category) {
             const emojiGrid = document.getElementById('emojiGrid');
             if (!emojiGrid) return;
 
@@ -2186,6 +2254,8 @@
             console.warn('openChat function not found on this page. Make sure your chat UI exposes openChat(senderId, senderName, receiverId, receiverName).');
           }
         });
+
+
     </script>
 </body>
 </html>
