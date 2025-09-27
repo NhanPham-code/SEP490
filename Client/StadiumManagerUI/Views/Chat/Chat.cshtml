@@ -1606,13 +1606,13 @@
             }
         }
 
-        function sendGIFMessage(gifUrl, title) {
+               function sendGIFMessage(gifUrl, title) {
             const senderId = document.getElementById('senderId')?.value.trim();
-            const senderName = document.getElementById('senderName')?.value.trim();
+            // const senderName = document.getElementById('senderName')?.value.trim(); // Không cần thiết nữa
             const timestamp = Date.now();
 
-            if (!senderId || !senderName) {
-                alert('⚠️ Please enter your ID and name first');
+            if (!senderId) {
+                alert('⚠️ Please enter your ID first');
                 return;
             }
 
@@ -1627,25 +1627,19 @@
 
             push(ref(db, `chats/${currentChatId}`), {
                 senderId,
-                senderName,
+                // senderName, // Không cần thiết nữa
                 message,
                 timestamp,
                 type: 'gif'
             }).then(() => {
                 const updates = {};
-                updates[`userChats/${senderId}/${currentReceiverId}`] = {
-                    lastMessage: '[GIF]',
-                    timestamp,
-                    name: currentReceiverName
-                };
-                updates[`userChats/${currentReceiverId}/${senderId}`] = {
-                    lastMessage: '[GIF]',
-                    timestamp,
-                    name: senderName
-                };
+                updates[`userChats/${senderId}/${currentReceiverId}/lastMessage`] = '[GIF]';
+                updates[`userChats/${senderId}/${currentReceiverId}/timestamp`] = timestamp;
+                updates[`userChats/${currentReceiverId}/${senderId}/lastMessage`] = '[GIF]';
+                updates[`userChats/${currentReceiverId}/${senderId}/timestamp`] = timestamp;
 
-                Promise.all(Object.keys(updates).map(path =>
-                    set(ref(db, path), updates[path])
+                Promise.all(Object.entries(updates).map(([path, value]) =>
+                    set(ref(db, path), value)
                 )).then(() => {
                     hideTypingIndicator();
                     scrollToLatestMessage();
@@ -1830,15 +1824,15 @@
             });
         }
 
-        window.sendMessage = () => {
+               window.sendMessage = () => {
             const senderId = document.getElementById('senderId')?.value.trim();
-            const senderName = document.getElementById('senderName')?.value.trim();
+            // const senderName = document.getElementById('senderName')?.value.trim(); // Không cần
             const messageInput = document.getElementById('messageInput');
             const message = messageInput?.value.trim();
             const timestamp = Date.now();
 
-            if (!senderId || !senderName) {
-                alert('⚠️ Please enter your ID and name first');
+            if (!senderId) {
+                alert('⚠️ Please enter your ID first');
                 return;
             }
 
@@ -1851,24 +1845,18 @@
 
             push(ref(db, `chats/${currentChatId}`), {
                 senderId,
-                senderName,
+                // senderName, // Không cần
                 message,
                 timestamp
             }).then(() => {
                 const updates = {};
-                updates[`userChats/${senderId}/${currentReceiverId}`] = {
-                    lastMessage: message,
-                    timestamp,
-                    name: currentReceiverName
-                };
-                updates[`userChats/${currentReceiverId}/${senderId}`] = {
-                    lastMessage: message,
-                    timestamp,
-                    name: senderName
-                };
+                updates[`userChats/${senderId}/${currentReceiverId}/lastMessage`] = message;
+                updates[`userChats/${senderId}/${currentReceiverId}/timestamp`] = timestamp;
+                updates[`userChats/${currentReceiverId}/${senderId}/lastMessage`] = message;
+                updates[`userChats/${currentReceiverId}/${senderId}/timestamp`] = timestamp;
 
-                Promise.all(Object.keys(updates).map(path =>
-                    set(ref(db, path), updates[path])
+                Promise.all(Object.entries(updates).map(([path, value]) =>
+                    set(ref(db, path), value)
                 )).then(() => {
                     if (messageInput) {
                         messageInput.value = '';

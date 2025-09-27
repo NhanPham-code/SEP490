@@ -2178,7 +2178,7 @@ loadFeedbacks(stadiumId, currentPage);
 
             const updates = {};
             updates[`userChats/${senderId}/${receiverId}`] = {
-                name: "Chủ sân",
+                name: "@Html.Raw(Model.Name)",
                 timestamp,
                 lastMessage: ""
             };
