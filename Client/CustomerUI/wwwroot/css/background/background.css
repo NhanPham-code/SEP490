@@ -24,7 +24,7 @@
 .content-bg {
     margin-top: 3%;
     background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 2%;
+    border-radius:  50px;
     overflow: visible;
 }
 

@@ -1,9 +1,12 @@
 ﻿using DTOs.FindTeamDTO;
+using DTOs.NotificationDTO;
 using DTOs.StadiumDTO;
 using FindTeamAPI.DTOs;
 using MailKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Service.Interfaces;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -19,10 +22,12 @@ namespace CustomerUI.Controllers
         private readonly IUserService _userService;
         private readonly IStadiumService _stadiumService;
         private readonly IBookingService _bookingService;
+        private readonly INotificationService _notificationService;
+
         private string token = string.Empty;
         public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
             ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
-            IBookingService bookingService)
+            IBookingService bookingService, INotificationService notificationService)
         {
             _teamPost = teamPost;
             _teamMember = teamMember;
@@ -30,12 +35,55 @@ namespace CustomerUI.Controllers
             _userService = userService;
             _stadiumService = stadiumService;
             _bookingService = bookingService;
+            _notificationService = notificationService;
         }
 
         [BindProperty]
         public CreateTeamPostDTO CreateTeamPostDTO { get; set; }
         [BindProperty]
         public UpdateTeamPostDTO UpdateTeamPostDTO { get; set; }
+
+        //kết nối với signalR
+        private async Task<HubConnection> ConnectToSignalRAsync()
+        {
+            var connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7072/notificationHub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(_tokenService.GetAccessTokenFromCookie());
+                })
+                .WithAutomaticReconnect()
+                .Build();
+
+            await connection.StartAsync();
+            return connection;
+        }
+
+        private async Task SendNotificationToUserAsync(NotificationDTO notification)
+        {
+            HubConnection connection = await ConnectToSignalRAsync();
+            await connection.InvokeAsync("SendNotificationToUser", notification);
+        }
+
+        private async Task SendNotificationToGroupUserAsync( string groupName, List<NotificationDTO> notificationDTOs)
+        {
+            HubConnection connection = await ConnectToSignalRAsync();
+            await connection.InvokeAsync("SendNotificationToGroup", groupName, notificationDTOs);
+        }
+
+        private async Task<bool> RegisterGroupAsync(string groupName)
+        {
+            HubConnection connection = await ConnectToSignalRAsync();
+            try
+            {
+                await connection.InvokeAsync("RegisterGroups", groupName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error registering group: {ex.Message}");
+                return false;
+            }
+        }
 
         public IActionResult FindTeam()
         {
@@ -136,25 +184,25 @@ namespace CustomerUI.Controllers
             //get booking by user id
             string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and BookingDetails/any(m: m/StartTime ge {formatted})";
             var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url);
+     
             if (booking == null || !booking.Any())
             {
                 return Json(new { Message = 404 });
             }
-
+            var stadiumId = booking.Select(s => s.StadiumId).Distinct().ToList();
             // get team post by user id and role is leader
+
             var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=CreatedBy eq {myUserId} and TeamMembers/any(m: m/Role eq 'Leader') ");
 
+            // get stadium by list id
+            var s = await _stadiumService.GetAllStadiumByListId(stadiumId);
 
             BookingAndStadiumViewModel bookingAndStadiumViewModel = new BookingAndStadiumViewModel();
             // lọc những booking đã tạo team post rồi thì không hiện nữa
             var ints = post.Value.Select(p => p.BookingId).ToHashSet(); 
             bookingAndStadiumViewModel.Bookings = booking.Where(b => !ints.Contains(b.Id)).ToList();
 
-            var stadiumId = booking.Select(s => s.StadiumId).Distinct().ToList();
-
-
-            // get stadium by list id
-            var s = await _stadiumService.GetAllStadiumByListId(stadiumId);
+            
             //thêm stadium vào dictionary theo key là các id của stadium trong booking để dễ truy xuất
             foreach (var item in s.Value)
             {
@@ -191,6 +239,15 @@ namespace CustomerUI.Controllers
                 await _teamPost.DeleteTeamPost(result.Id);
                 return Json(new { Message = 500, value = "Create team member failed" });
             }
+            // signalR đăng ký group theo id bài đăng để gửi notification cho những người trong nhóm
+            _ = await _notificationService.SendNotificationToAll(new NotificationDTO
+            {
+                Title = "Vừa có một nhóm được tạo",
+                Message = "A new team post has been created. Check it out!",
+                Type = "Recruitment.NewPost",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false
+            });
 
             return Json(new { Message = 200, value = result });
         }
@@ -296,6 +353,7 @@ namespace CustomerUI.Controllers
                 }
             }
 
+          
 
             return Json(findTeamViewModel);
         }
@@ -317,6 +375,17 @@ namespace CustomerUI.Controllers
             {
                 return Json(new { Message = 500, value = "Join team post failed" });
             }
+            var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {postId}");
+            // gửi notification cho người tạo bài đăng biết có người tham gia
+            SendNotificationToUserAsync( new NotificationDTO
+            {
+                UserId = post.Value.Select(p => p.CreatedBy).FirstOrDefault(),
+                Type = "Recruitment.JoinRequest",
+                Title = "<h3 class=\"text-green-500\">Yêu cầu tham gia nhóm</h3>",
+                Message = "<div><span>Đã có một thành viên tham gia vào nhóm của bạn: </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId=" + postId + "\">Xem chi tiết</a></div>",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            }).GetAwaiter().GetResult();
             return Json(new { Message = 200, value = res });
         }
 
@@ -359,16 +428,38 @@ namespace CustomerUI.Controllers
         // delete team post
         public async Task<IActionResult> DeleteTeamPost(int postId)
         {
+            var members = await _teamMember.GetAllTeamMemberByPostId(postId);
+            List<NotificationDTO> notificationDTOs = new List<NotificationDTO>();
+            // gửi notification cho tất cả thành viên trong bài đăng biết bài đăng đã bị xóa
+            foreach (var member in members)
+            {
+                if (member.UserId != null && member.UserId != 0)
+                {
+
+                    notificationDTOs.Add(new NotificationDTO
+                    {
+                        UserId = (Int32)member.UserId,
+                        Type = "Recruitment.Accepted",
+                        Title = "<h3 class=\"text-red-600\">Bài đăng đã bị xóa</h3>",
+                        Message = "<div><span>Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm bài đăng khác</a></div>",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+            await SendNotificationToGroupUserAsync(postId.ToString(), notificationDTOs);
             if (postId <= 0)
             {
                 return Json(new { Message = 500, value = "Delete team post failed" });
             }
+
+            // xóa bài đăng
             var result = await _teamPost.DeleteTeamPost(postId);
             if (result == false)
             {
-                return Json(new { Message = 500, value = "Delete team post failed" });
+                return Json(new { Message = false, value = "Delete team post failed" });
             }
-            var members = await _teamMember.GetAllTeamMemberByPostId(postId);
+            // xóa thành viên
             if (members != null && members.Any())
             {
                 foreach (var member in members)
@@ -376,7 +467,7 @@ namespace CustomerUI.Controllers
                     await _teamMember.DeleteTeamMember(member.Id, postId);
                 }
             }
-            return Json(new { Message = 200, value = "Delete team post successfully" });
+            return Json(new { Message = true, value = "Delete team post successfully" });
         }
 
         // chuyển đổi từ datetime sang timespan

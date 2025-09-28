@@ -35,7 +35,8 @@ namespace FindTeamAPI.Repositories
             member.role = teamMember.role;
             _context.TeamMembers.Update(member);
             await _context.SaveChangesAsync();
-            return teamMember;
+            member.role = teamMember.role;
+            return member;
         }
         public async Task<bool> DeleteTeamMemberAsync(int memberId, int teamId)
         {

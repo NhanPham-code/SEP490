@@ -265,9 +265,9 @@
 
             /* Active state (khi nhấn hoặc được chọn) */
             button[id$="-view"].active-btn {
-                border-color: #164e63; /* Màu xanh đậm hơn */
+                border-color: #b2b0ffe1; /* Màu xanh đậm hơn */
                 color: #ffffff; /* Chữ trắng để tương phản */
-                background-color: #164e63; /* Nền xanh đậm */
+                background-color: #b2b0ffe1; /* Nền xanh đậm */
                 box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2); /* Hiệu ứng lún */
             }
 
@@ -328,7 +328,7 @@
         <div class="flex flex-col lg:flex-row gap-8">
             <div class="mt-2 search">
                 <!-- From Uiverse.io by mahiatlinux -->
-                <div class="relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
+                <div class="mt-3 relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-gray-400"
                              xmlns="http://www.w3.org/2000/svg"
@@ -568,44 +568,58 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-4 mb-6">
+                        <!-- From Uiverse.io by 0x3ther -->
+                        <div class="flex items-center gap-2 mt-5">
+                            
+                            <button id="grid-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
+                                <svg class="lucide lucide-newspaper text-blue-400 dark:text-blue-600"
+                                     stroke-linejoin="round"
+                                     stroke-linecap="round"
+                                     stroke-width="2"
+                                     stroke="#60A5FA"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     height="22"
+                                     width="22"  
+                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM11 13H4V19H11V13ZM20 13H13V19H20V13ZM11 5H4V11H11V5ZM20 5H13V11H20V5Z"></path>
+                                </svg>
+                                DANH SÁCH
+                            </button>
+                            <button id="map-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FACC14] h-9 rounded-md px-3">
+                                <svg stroke-linejoin="round"
+                                     stroke-linecap="round"
+                                     stroke-width="2"
+                                     stroke="#7aae00"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     height="22"
+                                     width="22" 
+                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M4 6.14286V18.9669L9.06476 16.7963L15.0648 19.7963L20 17.6812V4.85714L21.303 4.2987C21.5569 4.18992 21.8508 4.30749 21.9596 4.56131C21.9862 4.62355 22 4.69056 22 4.75827V19L15 22L9 19L2.69696 21.7013C2.44314 21.8101 2.14921 21.6925 2.04043 21.4387C2.01375 21.3765 2 21.3094 2 21.2417V7L4 6.14286ZM16.2426 11.2426L12 15.4853L7.75736 11.2426C5.41421 8.89949 5.41421 5.10051 7.75736 2.75736C10.1005 0.414214 13.8995 0.414214 16.2426 2.75736C18.5858 5.10051 18.5858 8.89949 16.2426 11.2426ZM12 12.6569L14.8284 9.82843C16.3905 8.26633 16.3905 5.73367 14.8284 4.17157C13.2663 2.60948 10.7337 2.60948 9.17157 4.17157C7.60948 5.73367 7.60948 8.26633 9.17157 9.82843L12 12.6569Z"></path>
+                                </svg>
+                                BẢN ĐỒ
+                            </button>
+                            
+                            <button id="compare-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FB923C] h-9 rounded-md px-3">
+                                <svg class="lucide lucide-heart text-orange-400 dark:text-orange-600"
+                                     stroke-linejoin="round"
+                                     stroke-linecap="round"
+                                     stroke-width="2"
+                                     stroke="#f20"
+                                     fill="#f20"
+                                     viewBox="0 0 24 24"
+                                     height="22"
+                                     width="22"  
+                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853ZM18.827 6.1701C17.3279 4.66794 14.9076 4.60701 13.337 6.01687L12.0019 7.21524L10.6661 6.01781C9.09098 4.60597 6.67506 4.66808 5.17157 6.17157C3.68183 7.66131 3.60704 10.0473 4.97993 11.6232L11.9999 18.6543L19.0201 11.6232C20.3935 10.0467 20.319 7.66525 18.827 6.1701Z"></path>
+                                </svg>
+                                YÊU THÍCH
+                            </button>
+                        </div>
+
                         <!-- Grid View Card -->
-                        <div class="group perspective-1000">
-                            <button type="button" id="grid-view"
-                                    class="relative w-32 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 active-btn">
-                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
-                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                                    <i class="ri-grid-line text-3xl mb-1"></i>
-                                    <span class="text-xs font-bold">DANH SÁCH</span>
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
-                            </button>
-                        </div>
-
-                        <!-- Map View Card -->
-                        <div class="group perspective-1000">
-                            <button type="button" id="map-view"
-                                    class="relative w-32 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 opacity-70 hover:opacity-100">
-                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
-                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                                    <i class="ri-map-line text-3xl mb-1"></i>
-                                    <span class="text-xs font-bold">BẢN ĐỒ</span>
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
-                            </button>
-                        </div>
-
-                        <!-- Favorites Card -->
-                        <div class="group perspective-1000">
-                            <button type="button" id="compare-view"
-                                    class="relative w-32 h-24 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:rotate-y-12 opacity-70 hover:opacity-100">
-                                <div class="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm"></div>
-                                <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                                    <i class="ri-heart-line text-3xl mb-1"></i>
-                                    <span class="text-xs font-bold">YÊU THÍCH</span>
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
-                            </button>
-                        </div>
+                       
                     </div>
 
                 </div>

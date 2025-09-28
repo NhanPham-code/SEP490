@@ -287,12 +287,16 @@
                 <div class=" bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 mb-6">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="sport-icon">
-                            <i class="ri-basketball-line text-lg"></i>
+                            <i class="ri-home-6-line"></i>
                         </div>
-                        <span class="font-semibold text-gray-900">${post.sportType}</span>
+                        <span class="font-semibold text-gray-900">${post.stadiumName}</span>
                     </div>
 
                     <div class="card-content space-y-3 card-info">
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="ri-basketball-line mr-3 text-primary"></i>
+                            <span class="font-medium text-green-600">${post.sportType}</span>
+                        </div>
                         <div class="flex items-center text-sm text-gray-700">
                             <i class="ri-calendar-2-line mr-3 text-primary"></i>
                             <span class="font-medium">${formatDate(post.playDate)}<span> Vào lúc </span>${formatTimeForDisplay(post.timePlay)}</span>
@@ -690,6 +694,7 @@
                         const playDate = document.getElementById('newPlayDate').value;
                         const bookingId = parseInt(document.getElementById('newBookingId').value);
                         const stadiumId = parseInt(document.getElementById('stadiumId').value);
+                        const stadiumName = document.getElementById('stadiumName').value;
 
 
 
@@ -702,7 +707,8 @@
                             { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
-                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' }
+                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
+                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' }
                         ];
                         console.log("validations: ", validations);
 
@@ -724,6 +730,7 @@
                         formData.append('description', description);
                         formData.append('timePlay', timePlay);
                         formData.append('playDate', playDate);
+                        formData.append('stadiumName', stadiumName); // Mặc định là 1 (Đang tìm đội)
                         formData.append('bookingId', bookingId);
                         formData.append('stadiumId', stadiumId)
 
@@ -1024,6 +1031,7 @@
                                 </div>
                                 <div class="input-helper">Chọn một booking đã đặt để tạo bài đăng tìm đội</div>
                                 <input type="hidden" id="selectedBookingId" value="">
+                                <input type="hidden" id="stadiumName" value="">
                             </div>
 
                             <!-- Selected Booking Info Display -->
@@ -1385,12 +1393,12 @@
 
                         <div class="booking-card-body">
                         <div class="booking-detail">
-                                <i class="ri-calendar-line"></i>
+                                <i class="ri-id-card-line"></i>
                                 <span>${name}</span>
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
-                                <span>${formattedDate}</span>
+                                <span>Ngày chơi: ${formattedDate}</span>
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
@@ -1472,6 +1480,7 @@
             console.log("Selected stadium data:", stadium);
             // Update hidden input with selected booking ID
             document.getElementById('selectedBookingId').value = bookingData.id;
+            document.getElementById('stadiumName').value = stadium.name || 'Sân không xác định';
 
             // Auto-fill form fields based on selected booking
             fillFormFromBooking(bookingData, stadium);
@@ -1493,22 +1502,31 @@
         // Function to auto-fill form from selected booking
         function fillFormFromBooking(booking, stadium) {
             // Set date
-                       const dateForInput = booking.date.substring(0, 10);
+                        const dateForInput = booking.date.substring(0, 10);
 
         document.getElementById("newPlayDate").value = dateForInput;
+
+
 
             // Set location (you might need to adjust this based on your stadium data structure)
             document.getElementById('newLocation').value = `${stadium.address}`;
             // set sport type
-            const player = document.getElementById('newMaxPlayers').value || 10;
 
             document.getElementById('newSport').value = getSportType(stadium.courts, booking.stadiumId);
             // Set play time
-            document.getElementById('newTimePlay').value = formatTimeForInput(booking.bookingDetails.startTime);
+                   // Lấy list giờ từ bookingDetails
+        const timeList = booking.bookingDetails.map(detail => {
+          // Nếu startTime là ISO thì cắt phần giờ phút
+          return new Date(detail.startTime).toISOString().substring(11, 16);
+        });
+
+        // Render tất cả giờ vào select
+        renderTimeOptions(timeList);
+
 
             // Calculate price per person suggestion (total price divided by estimated team size)
             if (booking.totalPrice) {
-                const suggestedPricePerPerson = Math.ceil(booking.totalPrice / player); // Assuming average team of 10
+                const suggestedPricePerPerson = Math.ceil(booking.totalPrice / 10); // Assuming average team of 10
                 document.getElementById('newPricePerPerson').value = suggestedPricePerPerson;
             }
 
@@ -1529,7 +1547,22 @@
                         const formattedDate = new Date(playDate).toLocaleDateString('vi-VN');
                         schedulePreview.textContent = `${formattedDate} lúc ${timePlay}`;
                     }
+                    function renderTimeOptions(list, selected = null) {
+          const select = document.getElementById("newTimePlay");
+          select.innerHTML = "";
 
+          list.forEach(time => {
+            const option = document.createElement("option");
+            option.value = time;
+            option.textContent = time;
+
+            if (selected && selected === time) {
+              option.selected = true;
+            }
+
+            select.appendChild(option);
+          });
+        }
                     
 
 

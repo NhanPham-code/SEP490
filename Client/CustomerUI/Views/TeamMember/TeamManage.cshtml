@@ -668,14 +668,15 @@
                             lastPhoneQuery = phone;
                             $('#suggestions').html('<div style="padding:8px;color:#64748b;">Đang tìm kiếm...</div>');
                             $.ajax({
-                                url: '/TeamMember/FindOtherPlayer?phoneNumber=1',
+                                url: '/TeamMember/FindOtherPlayer?phoneNumber=asfas',
                                 type: 'GET',
                                 success: function(data) {
+                                    console.log(data);
                                     $('#suggestions').html('');
-                                    if (data && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                                    if (data && data.length > 0) {
                                         data.suggestions.forEach(function(item) {
                                             const div = $('<div>')
-                                                .text(item.id + ' - ' + item.name + ' (' + item.phone + ')')
+                                                .text(item.id + ' - ' + item.fullName + ' (' + item.phone + ')')
                                                 .css({
                                                     padding: '6px 10px',
                                                     cursor: 'pointer',

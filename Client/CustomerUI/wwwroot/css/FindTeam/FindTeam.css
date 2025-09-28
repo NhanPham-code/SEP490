@@ -2333,3 +2333,7 @@ body {
     color: red;
 }
 
+.stadium-name {
+    font-weight: 700;
+    font-size: large;
+}
