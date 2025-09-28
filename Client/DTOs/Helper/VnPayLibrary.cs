@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace UserUI.Helpers
+namespace DTOs.Helpers
 {
     public class VnPayLibrary
     {

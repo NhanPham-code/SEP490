@@ -4,6 +4,7 @@ using BookingAPI.Models;
 using BookingAPI.Repository;
 using BookingAPI.Repository.Interface;
 using BookingAPI.Services.Interface;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -53,6 +54,10 @@ namespace BookingAPI.Services
             }*/
 
             var createdBooking = await _bookingRepository.CreateBookingAsync(booking);
+
+            var jobId = BackgroundJob.Schedule(() => AutoAcceptBookingByIdAsync(createdBooking.Id),TimeSpan.FromMinutes(5));
+
+            Console.WriteLine($"Đã thêm job {jobId} để tự động check booking {createdBooking.Id} trong 5 phút");
             return _mapper.Map<BookingReadDto>(createdBooking);
         }
 
@@ -178,6 +183,97 @@ namespace BookingAPI.Services
 
             var updatedMonthlyBooking = await _monthlyBookingRepository.UpdateMonthlyBookingAsync(existingMonthlyBooking);
             return _mapper.Map<MonthlyBookingUpdateDto>(updatedMonthlyBooking);
+        }
+
+        public async Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots)
+        {
+            // Đơn giản là gọi phương thức từ repository đã được tạo trước đó
+            return await _bookingDetailRepository.AreSlotsConflictingAsync(requestedSlots);
+        }
+
+        public async Task AutoAcceptBookingByIdAsync(int bookingId)
+        {
+            Console.WriteLine($"Bắt đầu check Booking: {bookingId}");
+
+            var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
+
+            if (booking != null && "pending".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
+            {
+
+                booking.Status = "accepted";
+                booking.Note = (booking.Note ?? "") + "Đã được tự động duyệt bởi hệ thống";
+
+                try
+                {
+
+                    await _bookingRepository.UpdateBookingAsync(booking);
+                    Console.WriteLine($"Duyệt thành công booking {bookingId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi duyệt Booking {bookingId}: {ex.Message}");
+                    throw;
+                }
+            }
+            else if ("waiting".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    await _bookingRepository.DeleteBookingAsync(booking.Id);
+                    Console.WriteLine($"Đã loại bỏ Booking treo thanh toán: {bookingId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi xóa Booking treo thanh toán {bookingId}: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                var currentStatus = booking?.Status ?? "Không tìm thấy trạng thái";
+                Console.WriteLine($"Bỏ qua Booking có trạng thái hợp lệ");
+            }
+        }
+        public async Task AutoCompleteBookingsAsync()
+        {
+            Console.WriteLine("Bắt đầu chuyển cập nhật trạng thái completed");
+
+            var now = DateTime.UtcNow;
+
+
+            var bookingsToComplete = await _bookingRepository.GetAllBookingsAsQueryable()
+                .Where(b => b.Status == "accepted" && b.BookingDetails.Any(bd => bd.EndTime < now))
+                .ToListAsync();
+
+            if (bookingsToComplete == null || !bookingsToComplete.Any())
+            {
+                Console.WriteLine("Không có booking phù hợp");
+                return;
+            }
+
+            Console.WriteLine($"Đã tìm thấy {bookingsToComplete.Count} booking để chuyển về completed");
+
+            int completedCount = 0;
+            foreach (var booking in bookingsToComplete)
+            {
+                booking.Status = "completed";
+                booking.Note = (booking.Note ?? "") + " Tự động cập nhật completed bởi hệ thống";
+
+                try
+                {
+                    await _bookingRepository.UpdateBookingAsync(booking);
+                    completedCount++;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($" Lỗi khi complete booking ID {booking.Id}: {ex.Message}");
+                }
+            }
+
+            if (completedCount > 0)
+            {
+                Console.WriteLine($" Cập nhật thành công {completedCount} booking");
+            }
         }
     }
 }

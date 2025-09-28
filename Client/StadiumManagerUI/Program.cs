@@ -31,12 +31,13 @@ builder.Services.AddAuthentication("CookieAuth")
     {
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Login"; // Redirect khi chưa login
         options.AccessDeniedPath = "/AccessDenied";
     });
 
 // Session
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(24);
