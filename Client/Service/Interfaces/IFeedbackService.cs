@@ -1,15 +1,24 @@
-﻿using FeedbackAPI.DTOs;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using FeedbackAPI.DTOs;
 
-namespace FeedbackAPI.Service
+namespace Service.Interfaces
 {
     public interface IFeedbackService
     {
-        Task<IEnumerable<FeedbackResponse>> GetAllAsync();
-        Task<FeedbackResponse?> GetByIdAsync(int id);
-        Task<FeedbackResponse> CreateAsync(CreateFeedback dto);
-        Task<bool> UpdateAsync(int id, UpdateFeedback dto);
-        Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<FeedbackResponse>> GetAllAsync(string accessToken);
+        Task<FeedbackResponse?> GetByIdAsync(string accessToken, int id);
+        Task<FeedbackResponse?> CreateAsync(CreateFeedback dto, string accessToken);
+        Task<bool> UpdateAsync(string accessToken, int id, UpdateFeedback dto);
+        Task<bool> DeleteAsync(string accessToken, int id);
+        Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetByStadiumIdPagedAsync(int stadiumId, int page, int pageSize);
+        Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId);
 
-       
+        Task<(IEnumerable<FeedbackResponse> data, int totalCount)> GetAllWithOdataAsync(
+          string accessToken,
+          int skip = 0,
+          int top = 10,
+          string? filter = null,
+          string? orderBy = "createdAt desc");
     }
 }

@@ -73,7 +73,7 @@ namespace BookingAPI.Repository
         public async Task<IEnumerable<Booking>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime)
         {
             // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+            var validStatuses = new List<string> { "pending", "accepted", "waiting", "completed" };
 
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)
@@ -96,7 +96,7 @@ namespace BookingAPI.Repository
         public async Task<IEnumerable<Booking>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime)
         {
             // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+            var validStatuses = new List<string> { "pending", "accepted", "waiting", "completed" };
 
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)

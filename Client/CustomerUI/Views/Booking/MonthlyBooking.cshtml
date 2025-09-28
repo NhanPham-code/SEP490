@@ -672,11 +672,17 @@
         }
 
         // Render time button
-        function renderTimeButtons() {
+               function renderTimeButtons() {
             $timeButtonsContainer.empty();
             allHours.forEach(hour => {
-                const $button = $(`<button class="time-button text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"></button>`);
-                $button.text(`${hour}:00`);
+                const $button = $(`
+                    <button
+                        class="time-button text-center py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"
+                    ></button>
+                `);
+
+                // bọc text trong span notranslate
+                $button.html(`<span class="notranslate" translate="no">${hour}:00</span>`);
 
                 $button.on('click', function () {
                     handleTimeSelect(hour);
@@ -696,6 +702,7 @@
                 $timeButtonsContainer.append($button);
             });
         }
+
 
         // Xử lý khi chọn thời gian
         function handleTimeSelect(hour) {

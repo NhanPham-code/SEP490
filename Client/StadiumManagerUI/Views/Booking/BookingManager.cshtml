@@ -1,432 +1,78 @@
 ﻿@model DTOs.BookingDTO.ViewModel.BookingManagementViewModel
-@using DTOs.BookingDTO
-@using DTOs.StadiumDTO
 @using System.Text.Json;
+@using DTOs.StadiumDTO
 
 @{
     ViewData["Title"] = "Quản Lý Lịch Đặt Sân";
     var stadiums = ViewBag.Stadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
 
-    // Tính toán các chỉ số
-    var pendingBookings = Model.DailyBookings.Count(b => b.Status.Equals("pending", StringComparison.OrdinalIgnoreCase)) +
-                          Model.MonthlyBookings.Count(b => b.Status.Equals("pending", StringComparison.OrdinalIgnoreCase));
+    var sortedDailyBookings = Model.DailyBookings
+        .OrderBy(b => b.Booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+        .ThenByDescending(b => b.Booking.CreatedAt)
+        .ToList();
 
-    var acceptedBookings = Model.DailyBookings.Count(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase)) +
-                            Model.MonthlyBookings.Count(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase));
+    var sortedMonthlyBookings = Model.MonthlyBookings
+        .OrderBy(b => b.MonthlyBooking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+        .ThenByDescending(b => b.MonthlyBooking.CreatedAt)
+        .ToList();
 
-    var totalRevenue = Model.DailyBookings
-        .Where(b => b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
-        .Sum(b => b.TotalPrice ?? 0) +
-        Model.MonthlyBookings
-        .Where(b => b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
-        .Sum(b => b.TotalPrice ?? 0);
+    var pendingBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase));
+    var acceptedBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
+    + sortedDailyBookings.Count(b => b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase));
+    var totalRevenue = sortedDailyBookings.Where(b => b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)).Sum(b => b.Booking.TotalPrice ?? 0)
+                     + sortedMonthlyBookings.Where(mb => mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase)).Sum(mb => mb.MonthlyBooking.TotalPrice ?? 0);
 
-    // Hàm để lấy class CSS cho từng trạng thái
-    string GetStatusClass(string status)
+    string GetStatusClass(string status) => status.ToLower() switch
     {
-        return status.ToLower() switch
-        {
-            "pending" => "status-pending",
-            "accepted" => "status-accepted",
-            "completed" => "status-completed",
-            "cancelled" or "denied" => "status-cancelled",
-            _ => "status-default"
-        };
-    }
+        "pending" => "bm-status-pending",
+        "accepted" => "bm-status-accepted",
+        "completed" => "bm-status-completed",
+        "denied" or "cancelled" or "payfail" => "bm-status-cancelled",
+        "waiting" => "bm-status-waiting",
+        _ => "bm-status-default"
+    };
 
-    // Hàm để dịch trạng thái
-    string TranslateStatus(string status)
+    string TranslateStatus(string status) => status.ToLower() switch
     {
-        return status.ToLower() switch
-        {
-            "pending" => "Chờ xử lý",
-            "accepted" => "Đã nhận",
-            "completed" => "Đã hoàn thành",
-            "cancelled" => "Đã hủy",
-            "denied" => "Đã từ chối",
-            _ => status
-        };
-    }
+        "pending" => "Chờ xử lý",
+        "accepted" => "Đã nhận",
+        "completed" => "Đã hoàn thành",
+        "cancelled" => "Đã hủy",
+        "denied" => "Đã từ chối",
+        "waiting" => "Chờ thanh toán",
+        "payfail" => "Lỗi thanh toán",
+        _ => status
+    };
+
+    string GetInitials(string fullName) { if (string.IsNullOrWhiteSpace(fullName)) return "U"; var parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); return parts.Length > 1 ? $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper() : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U"); }
 }
 
-@* Nhúng CSS và thêm style cho Modal *@
-<style>
-    @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-    :root {
-        --bg-color: #f4f7fe;
-        --container-bg: #ffffff;
-        --text-main: #1f2937;
-        --text-sub: #6b7280;
-        --border-color: #e5e7eb;
-        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --radius-lg: 0.75rem;
-    }
-
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        padding: 2rem;
-    }
-
-    .container {
-        max-width: 1600px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .filter-section {
-        background-color: var(--container-bg);
-        padding: 1.5rem 2rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1.5rem;
-    }
-
-        .filter-section .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+@section Style {
+    <link rel="stylesheet" href="~/css/Booking/BookingManager.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .bm-status-waiting {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
         }
+    </style>
+}
 
-        .filter-section label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+<div class="bm-container">
+    <h1 style="font-weight: 800; font-size: 2.5rem; margin-bottom: 2rem;">Quản Lý Lịch Đặt Sân</h1>
 
-        .filter-section select {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            min-width: 200px;
-            font-size: 0.9rem;
-            background-color: #fff;
-        }
-
-    .booking-section {
-        background-color: var(--container-bg);
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .stat-card {
-        background-color: var(--container-bg);
-        padding: 1.5rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        border-top: 5px solid transparent;
-    }
-
-        .stat-card.yellow {
-            border-top-color: #fbbf24;
-        }
-
-        .stat-card.blue {
-            border-top-color: #60a5fa;
-        }
-
-        .stat-card.green {
-            border-top-color: #34d399;
-        }
-
-        .stat-card.teal {
-            border-top-color: #2dd4bf;
-        }
-
-    .stat-header {
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: var(--text-sub);
-    }
-
-    .stat-value {
-        font-size: 2.25rem;
-        font-weight: 700;
-    }
-
-    .booking-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 1rem;
-        min-width: 900px;
-    }
-
-        .booking-table th, .booking-table td {
-            text-align: left;
-            padding: 1rem 1.25rem;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .booking-table th {
-            color: var(--text-sub);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-
-        .booking-table tbody tr {
-            background-color: #fff;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            transition: all 0.2s ease;
-        }
-
-            .booking-table tbody tr:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            }
-
-    .customer-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .customer-avatar {
-        width: 3rem;
-        height: 3rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        background-color: #7c3aed;
-    }
-
-    .customer-details {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .customer-name {
-        font-weight: 600;
-        font-size: 1rem;
-    }
-
-    .stadium-name {
-        font-size: 0.8rem;
-        color: var(--text-sub);
-        margin-top: 0.25rem;
-    }
-
-    .price {
-        font-weight: 600;
-        color: #3b82f6;
-        font-size: 1rem;
-    }
-
-    .status-badge {
-        padding: 0.375rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        display: inline-block;
-        text-align: center;
-    }
-
-    .status-pending {
-        background-color: #fef3c7;
-        color: #92400e;
-    }
-
-    .status-accepted {
-        background-color: #dbeafe;
-        color: #1e40af;
-    }
-
-    .status-completed {
-        background-color: #d1fae5;
-        color: #065f46;
-    }
-
-    .status-cancelled, .status-denied {
-        background-color: #fee2e2;
-        color: #b91c1c;
-    }
-
-    .status-default {
-        background-color: #e5e7eb;
-        color: #4b5563;
-    }
-
-    .actions {
-        display: flex;
-        gap: 0.75rem;
-        justify-content: flex-end;
-    }
-
-    .action-btn {
-        background-color: #f8fafc;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        width: 2.5rem;
-        height: 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-sub);
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-        .action-btn:hover {
-            border-color: #cbd5e1;
-            transform: scale(1.05);
-        }
-
-        .action-btn.details:hover {
-            background-color: #e0e7ff;
-            color: #4338ca;
-        }
-
-        .action-btn.accept:hover {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .action-btn.deny:hover, .action-btn.cancel:hover {
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-
-    .no-data {
-        text-align: center;
-        padding: 3rem;
-        color: var(--text-sub);
-        background-color: #f9fafb;
-        border-radius: var(--radius-lg);
-    }
-
-    /* Modal Styles */
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1040;
-        display: none;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-content {
-        background-color: #fff;
-        border-radius: var(--radius-lg);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        width: 90%;
-        max-width: 600px;
-        max-height: 90vh;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modal-header {
-        padding: 1.25rem 1.75rem;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-    .modal-close-btn {
-        background: none;
-        border: none;
-        font-size: 1.75rem;
-        color: var(--text-sub);
-        cursor: pointer;
-    }
-
-    .modal-body {
-        padding: 1.75rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-    }
-
-    .detail-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-        .detail-item .label {
-            font-weight: 500;
-            color: var(--text-sub);
-        }
-
-        .detail-item .value {
-            font-weight: 600;
-            text-align: right;
-        }
-
-    .detail-courts-list {
-        background-color: #f9fafb;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-top: 0.5rem;
-        border: 1px solid var(--border-color);
-    }
-
-        .detail-courts-list .court-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-        }
-
-            .detail-courts-list .court-item:not(:last-child) {
-                border-bottom: 1px dashed #e5e7eb;
-            }
-</style>
-
-<div class="container">
-    <h1 style="font-weight: 800; font-size: 2.5rem;">Quản Lý Lịch Đặt Sân</h1>
-
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card yellow"><div class="stat-header">Lịch chờ xử lý</div><div class="stat-value">@pendingBookings</div></div>
-        <div class="stat-card blue"><div class="stat-header">Lịch đã nhận</div><div class="stat-value">@acceptedBookings</div></div>
-        <div class="stat-card green"><div class="stat-header">Tổng doanh thu</div><div class="stat-value">@totalRevenue.ToString("N0")₫</div></div>
-        <div class="stat-card teal"><div class="stat-header">Sân vận động</div><div class="stat-value">@stadiums.Count</div></div>
+    <div class="bm-stats-grid" style="margin-bottom: 2rem;">
+        <div class="bm-stat-card bm-yellow"><div class="bm-stat-header">Lịch chờ xử lý</div><div class="bm-stat-value">@pendingBookings</div></div>
+        <div class="bm-stat-card bm-blue"><div class="bm-stat-header">Lịch đã nhận</div><div class="bm-stat-value">@acceptedBookings</div></div>
+        <div class="bm-stat-card bm-green"><div class="bm-stat-header">Tổng doanh thu</div><div class="bm-stat-value">@totalRevenue.ToString("N0")₫</div></div>
+        <div class="bm-stat-card bm-teal"><div class="bm-stat-header">Sân vận động</div><div class="bm-stat-value">@stadiums.Count</div></div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="filter-section">
-        <div class="filter-group">
-            <label for="stadiumFilter">Lọc theo sân:</label>
-            <select id="stadiumFilter" name="stadiumFilter">
+    <div class="bm-filter-section">
+        <div class="bm-filter-group">
+            <label for="bm-stadiumFilter">Lọc theo sân:</label>
+            <select id="bm-stadiumFilter">
                 <option value="all">Tất cả các sân</option>
                 @foreach (var stadium in stadiums)
                 {
@@ -434,356 +80,205 @@
                 }
             </select>
         </div>
-        <div class="filter-group">
-            <label for="bookingTypeFilter">Loại lịch đặt:</label>
-            <select id="bookingTypeFilter" name="bookingTypeFilter">
+        <div class="bm-filter-group">
+            <label for="bm-bookingTypeFilter">Loại lịch đặt:</label>
+            <select id="bm-bookingTypeFilter">
                 <option value="all">Tất cả các loại</option>
                 <option value="daily">Lịch Hằng Ngày</option>
                 <option value="monthly">Lịch Hằng Tháng</option>
             </select>
         </div>
+        <div class="bm-filter-group">
+            <label for="bm-statusFilter">Trạng thái:</label>
+            <select id="bm-statusFilter">
+                <option value="all">Tất cả các trạng thái</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="accepted">Đã nhận</option>
+                <option value="completed">Đã hoàn thành</option>
+                <option value="waiting">Chờ thanh toán</option>
+                <option value="cancelled-group">Đã hủy / Lỗi</option>
+            </select>
+        </div>
     </div>
 
-    <!-- Daily Bookings Section -->
-    <div class="booking-section" id="daily-booking-section">
-        <h2 class="section-title">Lịch Đặt Hằng Ngày</h2>
-        @if (Model.DailyBookings.Any())
-        {
-            <div style="overflow-x: auto;">
-                <table class="booking-table">
-                    <thead>
-                        <tr>
-                            <th>Khách hàng / Sân</th>
-                            <th>Ngày chơi</th>
-                            <th>Ngày tạo</th>
-                            <th>Giá tiền</th>
-                            <th>Trạng thái</th>
-                            <th style="text-align: right;">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var booking in Model.DailyBookings)
+    <div class="bm-booking-section" id="bm-daily-booking-section">
+        <div class="bm-section-header">
+            <h2 class="bm-section-title">Lịch Đặt Hằng Ngày</h2>
+            <div class="bm-filter-group bm-date-filter-container">
+                <label for="bm-dateFilter"><i class="fas fa-calendar-alt"></i> Ngày chơi:</label>
+                <input type="date" id="bm-dateFilter" placeholder=" " />
+                <button class="bm-clear-date-btn" title="Xóa ngày">&times;</button>
+            </div>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="bm-booking-table">
+                <thead><tr><th class="bm-align-left">Khách hàng / Sân</th><th>Ngày chơi</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                <tbody>
+                    @if (sortedDailyBookings.Any())
+                    {
+                        @foreach (var dailyVm in sortedDailyBookings)
                         {
+                            var booking = dailyVm.Booking;
+                            var user = dailyVm.User;
                             var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                            <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily">
-                                <td>
-                                    <div class="customer-info">
-                                        <div class="customer-avatar"><span>U@booking.UserId.ToString("D2")</span></div>
-                                        <div class="customer-details">
-                                            <span class="customer-name">Khách hàng ID: @booking.UserId</span>
-                                            <span class="stadium-name">@stadium?.Name</span>
+                            <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily" data-play-date="@booking.Date.ToString("yyyy-MM-dd")" data-status="@booking.Status.ToLower()">
+                                <td class="bm-align-left">
+                                    <div class="bm-customer-info">
+                                        <div class="bm-customer-avatar">
+                                            @if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                            {
+                                                <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
+                                            }
+                                            else
+                                            {
+                                                <span>@GetInitials(user.FullName)</span>
+                                            }
+                                        </div>
+                                        <div class="bm-customer-details">
+                                            <span class="bm-customer-name">@user.FullName</span>
+                                            <span class="bm-stadium-name">@stadium?.Name</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>@booking.Date.ToString("dd/MM/yyyy")</td>
                                 <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
-                                <td><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
-                                <td class="actions">
-                                    <button class="action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-eye"></i></button>
+                                <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                                <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
+                                <td class="bm-actions">
+                                    <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-eye"></i></button>
                                     @if (booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        <button class="action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-check"></i></button>
-                                        <button class="action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-times"></i></button>
+                                        <button class="bm-action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-check"></i></button> <button class="bm-action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-times"></i></button>
                                     }
                                     @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        <button class="action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-ban"></i></button>
+                                        <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-ban"></i></button>
                                     }
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="no-data"><p>Không có lịch đặt hằng ngày nào.</p></div>
-        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6"><div class="no-data"><p>Không có lịch đặt hằng ngày nào.</p></div></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Monthly Bookings Section -->
-    <div class="booking-section" id="monthly-booking-section">
-        <h2 class="section-title">Lịch Đặt Hằng Tháng</h2>
-        @if (Model.MonthlyBookings.Any())
-        {
-            <div style="overflow-x: auto;">
-                <table class="booking-table">
-                    <thead>
-                        <tr>
-                            <th>Khách hàng / Sân</th>
-                            <th>Khung giờ / Thời gian</th>
-                            <th>Ngày tạo</th>
-                            <th>Giá tiền</th>
-                            <th>Trạng thái</th>
-                            <th style="text-align: right;">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var booking in Model.MonthlyBookings)
+    <div class="bm-booking-section" id="bm-monthly-booking-section">
+        <div class="bm-section-header">
+            <h2 class="bm-section-title">Lịch Đặt Hằng Tháng</h2>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="bm-booking-table">
+                <thead><tr><th style="width: 50px;"></th><th class="bm-align-left">Khách hàng / Sân</th><th>Khung giờ / Thời gian</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                <tbody>
+                    @if (sortedMonthlyBookings.Any())
+                    {
+                        @foreach (var monthlyVm in sortedMonthlyBookings)
                         {
+                            var booking = monthlyVm.MonthlyBooking;
+                            var user = monthlyVm.User;
                             var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                            <tr data-stadium-id="@booking.StadiumId" data-booking-type="monthly">
-                                <td>
-                                    <div class="customer-info">
-                                        <div class="customer-avatar"><span>U@booking.UserId.ToString("D2")</span></div>
-                                        <div class="customer-details">
-                                            <span class="customer-name">Khách hàng ID: @booking.UserId</span>
-                                            <span class="stadium-name">@stadium?.Name</span>
+                            <tr class="bm-monthly-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
+                                <td><i class="fas fa-chevron-down bm-expand-toggle"></i></td>
+                                <td class="bm-align-left">
+                                    <div class="bm-customer-info">
+                                        <div class="bm-customer-avatar">
+                                            @if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                            {
+                                                <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
+                                            }
+                                            else
+                                            {
+                                                <span>@GetInitials(user.FullName)</span>
+                                            }
+                                        </div>
+                                        <div class="bm-customer-details">
+                                            <span class="bm-customer-name">@user.FullName</span>
+                                            <span class="bm-stadium-name">@stadium?.Name</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span>
-                                        <span style="font-size: 0.8rem; color: var(--text-sub); margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span>
-                                    </div>
-                                </td>
+                                <td><div style="display: flex; flex-direction: column; align-items: center;"><span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span><span style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span></div></td>
                                 <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
-                                <td><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
-                                <td class="actions">
-                                    <button class="action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-eye"></i></button>
+                                <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                                <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
+                                <td class="bm-actions">
+                                    <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-eye"></i></button>
                                     @if (booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        <button class="action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-check"></i></button>
-                                        <button class="action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-times"></i></button>
+                                        <button class="bm-action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-check"></i></button> <button class="bm-action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-times"></i></button>
                                     }
                                     @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        <button class="action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-ban"></i></button>
+                                        <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-ban"></i></button>
                                     }
                                 </td>
                             </tr>
+                            <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id">
+                                <td colspan="7">
+                                    <div class="bm-child-table-container">
+                                        <h4>Các Lịch Đặt Chi Tiết</h4>
+                                        @if (monthlyVm.Bookings.Any())
+                                        {
+                                            <table class="bm-child-table">
+                                                <thead><tr><th>Ngày Chơi</th><th>Sân Con</th><th>Thời Gian</th><th>Trạng Thái</th></tr></thead>
+                                                <tbody>
+                                                    @foreach (var childBooking in monthlyVm.Bookings)
+                                                    {
+                                                        <tr>
+                                                            <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
+                                                            <td>@string.Join(", ", childBooking.BookingDetails.Select(d => $"ID {d.CourtId}"))</td>
+                                                            <td>@if (childBooking.BookingDetails.Any())
+                                                                {
+                                                                    <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
+                                                                }</td>
+                                                            <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        }
+                                        else
+                                        {
+                                            <p style="text-align:center; padding: 1rem;">Không có lịch đặt chi tiết nào cho tháng này.</p>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="no-data"><p>Không có lịch đặt hằng tháng nào.</p></div>
-        }
-    </div>
-</div>
-
-<!-- Modal Structure -->
-<div id="bookingDetailModal" class="modal-backdrop">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modalTitle">Chi Tiết Lịch Đặt</h3>
-            <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
-        </div>
-        <div class="modal-body" id="modalBodyContent">
-            <!-- Content will be injected by JavaScript -->
+                    }
+                    else
+                    {
+                        <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng tháng nào.</p></div></td></tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
+<div class="bm-modal-backdrop" id="bm-bookingDetailModal">
+    <div class="bm-modal-content">
+        <div class="bm-modal-header" id="bm-modalHeader"></div>
+        <div class="bm-modal-body" id="bm-modalBodyContent"></div>
+    </div>
+</div>
 
 @section Scripts {
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="~/js/BookingManager.js" asp-append-version="true"></script>
     <script>
-        // Serialize model data to be accessible in JavaScript
-        const viewModel = @Html.Raw(JsonSerializer.Serialize(Model));
-        const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums));
-
         document.addEventListener('DOMContentLoaded', function () {
-            const stadiumFilter = document.getElementById('stadiumFilter');
-            const bookingTypeFilter = document.getElementById('bookingTypeFilter');
-            const dailySection = document.getElementById('daily-booking-section');
-            const monthlySection = document.getElementById('monthly-booking-section');
-            const modal = document.getElementById('bookingDetailModal');
-            const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-            // --- FILTERING LOGIC ---
-            function applyFilters() {
-                const selectedStadiumId = stadiumFilter.value;
-                const selectedBookingType = bookingTypeFilter.value;
-
-                // Filter sections (daily/monthly)
-                dailySection.style.display = (selectedBookingType === 'all' || selectedBookingType === 'daily') ? '' : 'none';
-                monthlySection.style.display = (selectedBookingType === 'all' || selectedBookingType === 'monthly') ? '' : 'none';
-
-                // Filter rows within tables
-                document.querySelectorAll('.booking-table tbody tr').forEach(row => {
-                    const rowStadiumId = row.getAttribute('data-stadium-id');
-                    const rowBookingType = row.getAttribute('data-booking-type');
-
-                    const stadiumMatch = selectedStadiumId === 'all' || rowStadiumId === selectedStadiumId;
-                    const typeMatch = selectedBookingType === 'all' || rowBookingType === selectedBookingType;
-
-                    row.style.display = (stadiumMatch && typeMatch) ? '' : 'none';
-                });
-            }
-
-            stadiumFilter.addEventListener('change', applyFilters);
-            bookingTypeFilter.addEventListener('change', applyFilters);
-
-
-            // --- MODAL LOGIC ---
-            function openModal() { modal.style.display = 'flex'; }
-            function closeModal() { modal.style.display = 'none'; }
-            modalCloseBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-            function populateModal(booking, type) {
-                const modalBody = document.getElementById('modalBodyContent');
-                const stadium = stadiums.find(s => s.Id === booking.StadiumId);
-                const originalPrice = (booking.OriginalPrice ?? 0).toLocaleString('vi-VN') + '₫';
-                const totalPrice = (booking.TotalPrice ?? 0).toLocaleString('vi-VN') + '₫';
-
-                let detailsHtml = `
-                    <div class="detail-item"><span class="label">Mã Lịch Đặt:</span> <span class="value">#${booking.Id}</span></div>
-                    <div class="detail-item"><span class="label">Khách hàng ID:</span> <span class="value">${booking.UserId}</span></div>
-                    <div class="detail-item"><span class="label">Sân vận động:</span> <span class="value">${stadium?.Name ?? 'N/A'}</span></div>
-                    <div class="detail-item"><span class="label">Ngày tạo:</span> <span class="value">${new Date(booking.CreatedAt).toLocaleString('vi-VN')}</span></div>
-                    <div class="detail-item"><span class="label">Trạng thái:</span> <span class="value">${translateStatus(booking.Status)}</span></div>
-                     <div class="detail-item"><span class="label">Ghi chú:</span> <span class="value">${booking.Note || 'Không có'}</span></div>
-                `;
-
-                if (type === 'daily') {
-                    document.getElementById('modalTitle').innerText = 'Chi Tiết Lịch Đặt Hằng Ngày';
-                    detailsHtml += `
-                        <div class="detail-item"><span class="label">Ngày chơi:</span> <span class="value">${new Date(booking.Date).toLocaleDateString('vi-VN')}</span></div>
-                        <div class="detail-item"><span class="label">Chi tiết sân con:</span></div>
-                        <div class="detail-courts-list">
-                            ${booking.BookingDetails.map(d => `
-                                <div class="court-item">
-                                    <span>Sân con ID: ${d.CourtId}</span>
-                                    <span>${new Date(d.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - ${new Date(d.EndTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                } else { // monthly
-                    document.getElementById('modalTitle').innerText = 'Chi Tiết Lịch Đặt Hằng Tháng';
-                    detailsHtml += `
-                        <div class="detail-item"><span class="label">Thời gian:</span> <span class="value">Tháng ${booking.Month}/${booking.Year}</span></div>
-                        <div class="detail-item"><span class="label">Khung giờ:</span> <span class="value">${formatTimeSpan(booking.StartTime)} - ${formatTimeSpan(booking.EndTime)}</span></div>
-                        <div class="detail-item"><span class="label">Tổng số giờ:</span> <span class="value">${booking.TotalHour} giờ</span></div>
-                    `;
-                }
-
-                detailsHtml += `
-                    <hr>
-                    <div class="detail-item"><span class="label">Giá gốc:</span> <span class="value" style="text-decoration: line-through;">${originalPrice}</span></div>
-                    <div class="detail-item"><span class="label">Giảm giá:</span> <span class="value">- ${((booking.OriginalPrice ?? 0) - (booking.TotalPrice ?? 0)).toLocaleString('vi-VN')}₫</span></div>
-                    <div class="detail-item" style="font-size: 1.1rem;"><span class="label">Thành tiền:</span> <span class="value" style="color: #3b82f6;">${totalPrice}</span></div>
-                `;
-
-                modalBody.innerHTML = detailsHtml;
-                openModal();
-            }
-
-            // --- ACTION HANDLING (EVENT DELEGATION) ---
-            document.querySelector('.container').addEventListener('click', function (e) {
-                const button = e.target.closest('.action-btn');
-                if (!button) return;
-
-                const bookingId = button.dataset.bookingId;
-                const bookingType = button.dataset.bookingType;
-
-                if (button.classList.contains('details')) {
-                    const collection = bookingType === 'daily' ? viewModel.DailyBookings : viewModel.MonthlyBookings;
-                    const bookingData = collection.find(b => b.Id == bookingId);
-                    if (bookingData) {
-                        populateModal(bookingData, bookingType);
-                    }
-                }
-                else if (button.classList.contains('accept')) {
-                    updateBookingStatus(bookingId, bookingType, 'accepted', 'Chấp nhận lịch đặt?');
-                }
-                else if (button.classList.contains('deny')) {
-                    updateBookingStatus(bookingId, bookingType, 'denied', 'Từ chối lịch đặt này?');
-                }
-                else if (button.classList.contains('cancel')) {
-                    updateBookingStatus(bookingId, bookingType, 'cancelled', 'Bạn có chắc muốn hủy lịch đặt này?');
-                }
-            });
-
-                    function updateBookingStatus(id, type, newStatus, confirmText) {
-            Swal.fire({
-                title: confirmText,
-                text: "Hành động này không thể hoàn tác!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Đồng ý',
-                cancelButtonText: 'Hủy bỏ'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Tìm dữ liệu booking trong viewModel
-                    const collection = type === 'daily' ? viewModel.DailyBookings : viewModel.MonthlyBookings;
-                    const bookingData = collection.find(b => b.Id == id);
-
-                    if (!bookingData) {
-                        Swal.fire('Lỗi!', 'Không tìm thấy booking để cập nhật!', 'error');
-                        return;
-                    }
-
-                    // Tạo object update (gửi full data hoặc các trường cần thiết)
-                    let dto = { ...bookingData, status: newStatus }; // gửi tất cả field và cập nhật status
-                    // Nếu muốn chỉ gửi 1 số trường, hãy liệt kê explicit:
-                    // let dto = { status: newStatus, note: bookingData.Note, ... };
-
-                    const url = type === 'daily'
-                        ? `/Booking/UpdateBooking/${id}`
-                        : `/Booking/UpdateMonthlyBooking/${id}`;
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(dto)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => { throw new Error(err.message || 'Cập nhật thất bại') });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Thành công!', 'Trạng thái lịch đặt đã được cập nhật.', 'success')
-                                .then(() => location.reload());
-                        } else {
-                            throw new Error(data.message || 'Cập nhật thất bại từ server');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire('Lỗi!', error.message, 'error');
-                    });
-                }
-            });
-        }
-
-            // --- HELPER FUNCTIONS ---
-            function translateStatus(status) {
-                switch (status.toLowerCase()) {
-                    case "pending": return "Chờ xử lý";
-                    case "accepted": return "Đã nhận";
-                    case "completed": return "Đã hoàn thành";
-                    case "cancelled": return "Đã hủy";
-                    case "denied": return "Đã từ chối";
-                    default: return status;
-                }
-            }
-
-            function formatTimeSpan(timespanString) {
-                // Input format is "hh:mm:ss"
-                if (!timespanString || typeof timespanString !== 'string') return '';
-                const parts = timespanString.split(':');
-                return `${parts[0]}:${parts[1]}`; // Returns "hh:mm"
-            }
+            const viewModel = {
+                dailyBookings: @Html.Raw(JsonSerializer.Serialize(sortedDailyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })),
+                monthlyBookings: @Html.Raw(JsonSerializer.Serialize(sortedMonthlyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
+            };
+            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums));
+            initializeBookingManager(viewModel, stadiums);
         });
     </script>
 }

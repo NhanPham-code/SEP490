@@ -10,6 +10,9 @@ namespace FeedbackAPI.Service
         Task<bool> UpdateAsync(int id, UpdateFeedback dto);
         Task<bool> DeleteAsync(int id);
 
+        Task<IEnumerable<FeedbackResponse>> GetByStadiumIdAsync(int stadiumId);
+
+
         IQueryable<FeedbackResponse> GetAllAsQueryable();
     }
 }
