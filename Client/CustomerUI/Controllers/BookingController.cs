@@ -164,7 +164,7 @@ namespace CustomerUI.Controllers
             List<BookingReadDto> bookings;
             try
             {
-                var url = $"?$filter=UserId eq {userId} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting')&$orderby=Date desc";
+                var url = $"?$filter=UserId eq {userId} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$orderby=Date desc";
 
                 bookings = await _bookingService.GetBookingAsync(accessToken, url);
 
@@ -706,14 +706,10 @@ namespace CustomerUI.Controllers
                 return Redirect(Request.Headers["Referer"].ToString() ?? "/");
             }
 
-            // =================================================================
-            // === BẮT ĐẦU LOGIC KIỂM TRA XUNG ĐỘT CHO ĐẶT SÂN HÀNG THÁNG ===
-            // =================================================================
-
             var slotsToCheck = new List<BookingSlotRequest>();
             var allCourtIdsInvolved = new HashSet<int>();
 
-            // 1. Lấy tất cả các sân gốc và các sân liên quan
+
             foreach (var courtId in bookingDto.CourtIds)
             {
                 allCourtIdsInvolved.Add(courtId);
@@ -724,14 +720,13 @@ namespace CustomerUI.Controllers
                 foreach (var relation in relatedAsChild) allCourtIdsInvolved.Add(relation.ParentCourtId);
             }
 
-            // 2. Chuyển đổi StartTime/EndTime từ string "HH:mm" sang TimeSpan
             if (!TimeSpan.TryParse(bookingDto.StartTime, out var startTime) || !TimeSpan.TryParse(bookingDto.EndTime, out var endTime))
             {
                 TempData["ErrorMessage"] = "Định dạng thời gian không hợp lệ. Vui lòng dùng HH:mm.";
                 return Redirect(Request.Headers["Referer"].ToString() ?? "/");
             }
 
-            // 3. Tạo danh sách kiểm tra cuối cùng
+
             foreach (var day in bookingDto.Dates)
             {
                 var bookingDate = new DateTime(bookingDto.Year, bookingDto.Month, day);
@@ -746,7 +741,7 @@ namespace CustomerUI.Controllers
                 }
             }
 
-            // 4. Gọi service để kiểm tra (đã bao gồm các sân liên quan)
+
             if (slotsToCheck.Any())
             {
                 bool isAvailable = await _bookingService.CheckSlotsAvailabilityAsync(slotsToCheck, accessToken);
@@ -756,10 +751,6 @@ namespace CustomerUI.Controllers
                     return Redirect(Request.Headers["Referer"].ToString() ?? "/");
                 }
             }
-            // =================================================================
-            // === KẾT THÚC LOGIC KIỂM TRA ===
-            // =================================================================
-
             try
             {
                 // Nếu không có xung đột, tiếp tục tạo MonthlyBooking
@@ -823,7 +814,7 @@ namespace CustomerUI.Controllers
 
                 // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
                 // Build query string với điều kiện lọc Status
-                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting')&$expand=BookingDetails&$orderby=Date asc";
+                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$expand=BookingDetails&$orderby=Date asc";
                 var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
 
                 if (bookings == null)

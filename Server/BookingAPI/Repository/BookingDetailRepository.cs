@@ -76,7 +76,7 @@ namespace BookingAPI.Repository
                 return false; // Không có gì để check, không có xung đột
             }
 
-            var validBookingStatuses = new List<string> { "pending", "accepted", "waiting" };
+            var validBookingStatuses = new List<string> { "pending", "accepted", "waiting", "completed" };
             var courtIds = requestedSlots.Select(r => r.CourtId).Distinct().ToList();
 
             // Lấy tất cả các lượt đặt có khả năng bị trùng về server
