@@ -1,15 +1,11 @@
 ﻿using DTOs.FindTeamDTO;
 using DTOs.NotificationDTO;
-using DTOs.StadiumDTO;
 using FindTeamAPI.DTOs;
-using MailKit;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
+
 using Service.Interfaces;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CustomerUI.Controllers
 {
@@ -25,6 +21,7 @@ namespace CustomerUI.Controllers
         private readonly INotificationService _notificationService;
 
         private string token = string.Empty;
+
         public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
             ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
             IBookingService bookingService, INotificationService notificationService)
@@ -42,6 +39,7 @@ namespace CustomerUI.Controllers
         public CreateTeamPostDTO CreateTeamPostDTO { get; set; }
         [BindProperty]
         public UpdateTeamPostDTO UpdateTeamPostDTO { get; set; }
+
 
         //kết nối với signalR
         private async Task<HubConnection> ConnectToSignalRAsync()
@@ -85,45 +83,58 @@ namespace CustomerUI.Controllers
             }
         }
 
-        public IActionResult FindTeam()
+        public async Task<IActionResult> FindTeam()
+
         {
             token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Common");
-            }
-            
-        }
-        public IActionResult JoinedTeam()
-        {
-            token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                return View();
-            }
-            else
+            if (string.IsNullOrEmpty(token))
             {
                 return RedirectToAction("Login", "Common");
             }
 
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
         }
-        public IActionResult TeamPostManage()
+
+        public async Task<IActionResult> JoinedTeam()
         {
             token = _tokenService.GetAccessTokenFromCookie();
-            if (token != null)
-            {
-                
-                return View();
-            }
-            else
+            if (string.IsNullOrEmpty(token))
             {
                 return RedirectToAction("Login", "Common");
             }
+
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
         }
+
+        public async Task<IActionResult> TeamPostManage()
+        {
+            token = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Common");
+            }
+
+            var profile = await _userService.GetMyProfileAsync(token);
+
+            ViewBag.UserId = profile?.UserId;
+            ViewBag.UserName = profile?.FullName ?? "User";
+            ViewBag.Profile = profile;
+
+            return View();
+        }
+
 
         //get all post and search
         public async Task<IActionResult> GetAllAndSearch(string url)

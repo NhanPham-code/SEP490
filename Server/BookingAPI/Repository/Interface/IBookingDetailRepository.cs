@@ -1,4 +1,5 @@
-﻿using BookingAPI.Models;
+﻿using BookingAPI.DTOs;
+using BookingAPI.Models;
 
 namespace BookingAPI.Repository.Interface
 {
@@ -11,5 +12,6 @@ namespace BookingAPI.Repository.Interface
         Task<bool> DeleteBookingDetailAsync(int id);
         Task<bool> BookingDetailExistsAsync(int id);
         Task<bool> SaveChangesAsync();
+        Task<bool> AreSlotsConflictingAsync(List<BookingSlotRequest> requestedSlots);
     }
 }

@@ -9,11 +9,265 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="~/css/stadium/stadium.css"/>
 <link rel="stylesheet" href="~/css/stadium/Background.css" />
+<!-- Add these to your HTML head -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+        <style>
+    /* Map Styles */
+    .map-container {
+        width: 100%;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s ease;
+    }
 
+        .map-container:hover {
+            border-color: #0066cc;
+        }
 
+    .location-map {
+        width: 100%;
+        height: 400px;
+        position: relative;
+        background: #f8f9fa;
+    }
+
+    .map-controls {
+        display: flex;
+        gap: 12px;
+        padding: 16px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-top: 1px solid #e1e5e9;
+    }
+
+    .btn-detect-location,
+    .btn-search-location {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border: 2px solid #0066cc;
+        border-radius: 8px;
+        background: white;
+        color: #0066cc;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+        .btn-detect-location:hover,
+        .btn-search-location:hover {
+            background: #0066cc;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-detect-location:active,
+        .btn-search-location:active {
+            transform: translateY(0);
+        }
+
+        .btn-detect-location i,
+        .btn-search-location i {
+            font-size: 16px;
+        }
+
+    /* Custom Leaflet Popup Styles */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border: none;
+    }
+
+    .leaflet-popup-content {
+        margin: 16px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .custom-popup {
+        max-width: 250px;
+    }
+
+    .popup-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+    .popup-address {
+        color: #4a5568;
+        font-size: 14px;
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    .popup-coordinates {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+        color: #718096;
+        background: #f7fafc;
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+        .popup-coordinates span {
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+    /* Loading spinner for map */
+    .map-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .map-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #e1e5e9;
+        border-top: 3px solid #0066cc;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    .map-loading-text {
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .location-map
+
+    {
+        height: 300px;
+    }
+
+    .map-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-detect-location,
+    .btn-search-location {
+        justify-content: center;
+        width: 100%;
+    }
+
+    }
+
+    /* Custom marker styles */
+    .custom-marker {
+        background: #0066cc;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+        animation: markerPulse 2s infinite;
+    }
+
+    @@keyframes markerPulse {
+        0%
+
+    {
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 4px 20px rgba(0, 102, 204, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    }
+
+    /* Search overlay */
+    .location-search-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+    }
+
+    .location-search-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .search-results {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .search-result-item {
+        padding: 12px 16px;
+        border-top: 1px solid #e1e5e9;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item:first-child {
+            border-top: none;
+        }
+        </style>
 @section Scripts {
-    
-    
+
+    <!-- Thêm vào <head> của trang -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="mapStyles.css">
+
+    <!-- Thêm trước thẻ đóng </body> -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="mapFunctions.js"></script>
 
     <script>
                 // Complete Enhanced Stadium Management JavaScript with Improved Modals
@@ -240,7 +494,7 @@
         }
 
         // Enhanced Create Modal
-        function openCreate() {
+               function openCreate() {
             Swal.fire({
                 title: `
                     <div class="modal-header">
@@ -263,7 +517,7 @@
                     popup: 'enhanced-popup'
                 },
                 didOpen: () => {
-                    // Add time preview functionality
+                    // Existing time preview functionality
                     const openTimeInput = document.getElementById('newOpenTime');
                     const closeTimeInput = document.getElementById('newCloseTime');
                     const timePreview = document.getElementById('timePreview');
@@ -277,76 +531,84 @@
                     openTimeInput.addEventListener('change', updateTimePreview);
                     closeTimeInput.addEventListener('change', updateTimePreview);
                     updateTimePreview();
+
+                    // ===== THÊM MỚI: MAP FUNCTIONALITY =====
+                    initializeLocationMap();
+                    initializeAddressSearch();
                 },
-                        preConfirm: () => {
-            // Clear any existing validation messages
-            Swal.resetValidationMessage();
+                willClose: () => {
+                    // ===== THÊM MỚI: CLEANUP MAP =====
+                    onModalClose();
+                },
+                preConfirm: () => {
+                    // Clear any existing validation messages
+                    Swal.resetValidationMessage();
 
-            try {
-                const name = document.getElementById('newName').value.trim();
-                const address = document.getElementById('newAddress').value.trim();
-                const openTime = document.getElementById('newOpenTime').value;
-                const closeTime = document.getElementById('newCloseTime').value;
-                const images = document.getElementById("newImageUpload").files;
-                const videos = document.getElementById("newVideoUpload").files;
+                    try {
+                        const name = document.getElementById('newName').value.trim();
+                        const address = document.getElementById('newAddress').value.trim();
+                        const openTime = document.getElementById('newOpenTime').value;
+                        const closeTime = document.getElementById('newCloseTime').value;
+                        const images = document.getElementById("newImageUpload").files;
+                        const videos = document.getElementById("newVideoUpload").files;
 
-                // Validation với error handling
-                const validations = [
-                    { condition: !name, message: 'Vui lòng nhập tên sân' },
-                    { condition: !address, message: 'Vui lòng nhập địa chỉ' },
-                    { condition: !openTime || !closeTime, message: 'Vui lòng chọn giờ hoạt động' },
-                    { condition: !validateTimeRange(openTime, closeTime), message: 'Giờ đóng cửa phải sau giờ mở cửa' },
-                    { condition: images.length === 0, message: 'Hãy tải lên hình ảnh về sân của bạn' },
-                    { condition: videos.length === 0, message: 'Hãy tải lên video về sân của bạn' }
-                ];
+                        // Validation với error handling
+                        const validations = [
+                            { condition: !name, message: 'Vui lòng nhập tên sân' },
+                            { condition: !address, message: 'Vui lòng nhập địa chỉ' },
+                            { condition: !openTime || !closeTime, message: 'Vui lòng chọn giờ hoạt động' },
+                            { condition: !validateTimeRange(openTime, closeTime), message: 'Giờ đóng cửa phải sau giờ mở cửa' },
+                            { condition: images.length === 0, message: 'Hãy tải lên hình ảnh về sân của bạn' },
+                            { condition: videos.length === 0, message: 'Hãy tải lên video về sân của bạn' }
+                        ];
 
-                for (const validation of validations) {
-                    if (validation.condition) {
-                        Swal.showValidationMessage(`<i class="ri-error-warning-line mr-1"></i>${validation.message}`);
+                        for (const validation of validations) {
+                            if (validation.condition) {
+                                Swal.showValidationMessage(`<i class="ri-error-warning-line mr-1"></i>${validation.message}`);
+                                return false;
+                            }
+                        }
+
+                        // Build FormData...
+                        const formData = new FormData();
+                        formData.append('Stadium.Name', name);
+                        formData.append('Stadium.NameUnsigned', address);
+                        formData.append('Stadium.Address', address);
+                        formData.append('Stadium.AddressUnsigned', address);
+                        formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
+                        formData.append('Stadium.OpenTime', openTime);
+                        formData.append('Stadium.CloseTime', closeTime);
+
+                        // ===== THÊM MỚI: GPS COORDINATES =====
+                        const latitude = document.getElementById('newLatitude').value;
+                        const longitude = document.getElementById('newLongitude').value;
+                        if (latitude) formData.append('Stadium.Latitude', latitude);
+                        if (longitude) formData.append('Stadium.Longitude', longitude);
+
+                        // Add images
+                        for (let i = 0; i < images.length; i++) {
+                            formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
+                        }
+
+                        // Add videos
+                        for (let i = 0; i < videos.length; i++) {
+                            formData.append(`StadiumVideo[${i}].VideoUrl`, videos[i]);
+                        }
+
+                        return formData;
+
+                    } catch (error) {
+                        console.error('Validation error:', error);
+                        Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Có lỗi xảy ra, vui lòng thử lại');
                         return false;
                     }
                 }
-
-                // Build FormData...
-                const formData = new FormData();
-                formData.append('Stadium.Name', name);
-                formData.append('Stadium.NameUnsigned', address);
-                formData.append('Stadium.Address', address);
-                formData.append('Stadium.AddressUnsigned', address);
-                formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
-                formData.append('Stadium.OpenTime', openTime);
-                formData.append('Stadium.CloseTime', closeTime);
-
-                const latitude = document.getElementById('newLatitude').value;
-                const longitude = document.getElementById('newLongitude').value;
-                if (latitude) formData.append('Stadium.Latitude', latitude);
-                if (longitude) formData.append('Stadium.Longitude', longitude);
-
-                // Add images
-                for (let i = 0; i < images.length; i++) {
-                    formData.append(`StadiumImage[${i}].ImageUrl`, images[i]);
-                }
-
-                // Add videos
-                for (let i = 0; i < videos.length; i++) {
-                    formData.append(`StadiumVideo[${i}].VideoUrl`, videos[i]);
-                }
-
-                return formData;
-
-            } catch (error) {
-                console.error('Validation error:', error);
-                Swal.showValidationMessage('<i class="ri-error-warning-line mr-1"></i>Có lỗi xảy ra, vui lòng thử lại');
-                return false;
-            }
-        }
             }).then((result) => {
                 if (result.isConfirmed) {
                     createNewStadium(result.value);
                 }
             });
         }
-
        
 
         // Helper function to render current images for edit modal
@@ -1310,25 +1572,39 @@ function updateDateTime() {
                             cancelButton: 'enhanced-cancel-btn',
                             popup: 'enhanced-popup'
                         },
-                        didOpen: () => {
-                            // Add time preview functionality
-                            const openTimeInput = document.getElementById('editOpenTime');
-                            const closeTimeInput = document.getElementById('editCloseTime');
-                            const timePreview = document.getElementById('editTimePreview');
+                                   didOpen: () => {
+            // Add time preview functionality
+            const openTimeInput = document.getElementById('editOpenTime');
+            const closeTimeInput = document.getElementById('editCloseTime');
+            const timePreview = document.getElementById('editTimePreview');
 
-                            function updateEditTimePreview() {
-                                const openTime = openTimeInput.value || '06:00';
-                                const closeTime = closeTimeInput.value || '22:00';
-                                timePreview.textContent = `${openTime} - ${closeTime}`;
-                            }
+            function updateEditTimePreview() {
+                const openTime = openTimeInput.value || '06:00';
+                const closeTime = closeTimeInput.value || '22:00';
+                timePreview.textContent = `${openTime} - ${closeTime}`;
+            }
 
-                            openTimeInput.addEventListener('change', updateEditTimePreview);
-                            closeTimeInput.addEventListener('change', updateEditTimePreview);
+            openTimeInput.addEventListener('change', updateEditTimePreview);
+            closeTimeInput.addEventListener('change', updateEditTimePreview);
 
-                            // Update approval status display
-                            const statusSelect = document.getElementById('editIsApproved');
-                            statusSelect.addEventListener('change', updateApprovalStatusDisplay);
-                        },
+            // Update approval status display
+            const statusSelect = document.getElementById('editIsApproved');
+            statusSelect.addEventListener('change', updateApprovalStatusDisplay);
+
+            // ===== MAP FUNCTIONALITY =====
+            const lat = stadium.Latitude || null;
+            const lng = stadium.Longitude || null;
+
+            initializeLocationMap(lat, lng);
+            initializeAddressSearch();
+
+            // Nếu đã có lat/lng thì load luôn địa chỉ
+            if (lat && lng) {
+                setLocationMarker(lat, lng, true);
+            }
+        },
+
+
                         preConfirm: () => {
                             const name = document.getElementById('editName').value.trim();
                             const address = document.getElementById('editAddress').value.trim();
@@ -1364,8 +1640,9 @@ function updateDateTime() {
                             formData.append('Stadium.CloseTime', closeTime);
                             formData.append('Stadium.IsApproved', document.getElementById('editIsApproved').value);
 
-                            const latitude = document.getElementById('editLatitude').value;
-                            const longitude = document.getElementById('editLongitude').value;
+                                    const latitude = document.getElementById('newLatitude').value;
+        const longitude = document.getElementById('newLongitude').value;
+
                             if (latitude) formData.append('Stadium.Latitude', latitude);
                             if (longitude) formData.append('Stadium.Longitude', longitude);
 
@@ -1544,41 +1821,56 @@ function updateDateTime() {
                         </div>
 
                         <!-- Location Section -->
-                        <div class="form-section">
-                            <div class="section-header">
-                                <i class="ri-map-line"></i>
-                                <h3>Vị Trí GPS (Tùy chọn)</h3>
-                            </div>
+                              
+                <div class="form-section">
+                                    <div class="section-header">
+                                        <i class="ri-map-line"></i>
+                                        <h3>Vị Trí Sân</h3>
+                                    </div>
 
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        <i class="ri-compass-line"></i>
-                                        Vĩ độ (Latitude)
-                                    </label>
-                                    <input type="number" step="any" id="editLatitude"
-                                           value="${stadium.Latitude || ''}" class="form-input"
-                                           placeholder="10.762622">
-                                    <div class="input-helper">Tọa độ vĩ độ GPS</div>
+                                    <!-- Map Container -->
+                                    <div class="map-container">
+                                        <div id="locationMap" class="location-map"></div>
+                                        <div class="map-controls">
+                                            <button type="button" id="detectLocationBtn" class="btn-detect-location">
+                                                <i class="ri-crosshair-line"></i>
+                                                Xác định vị trí hiện tại
+                                            </button>
+                                            <button type="button" id="searchLocationBtn" class="btn-search-location">
+                                                <i class="ri-search-line"></i>
+                                                Tìm kiếm địa điểm
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Coordinates Display -->
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="ri-compass-line"></i>
+                                                Vĩ độ (Latitude)
+                                            </label>
+                                            <input type="number" step="any" id="newLatitude" class="form-input" readonly
+                                                   placeholder="Sẽ tự động điền khi chọn trên bản đồ">
+                                            <div class="input-helper">Tọa độ vĩ độ GPS</div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="ri-navigation-line"></i>
+                                                Kinh độ (Longitude)
+                                            </label>
+                                            <input type="number" step="any" id="newLongitude" class="form-input" readonly
+                                                   placeholder="Sẽ tự động điền khi chọn trên bản đồ">
+                                            <div class="input-helper">Tọa độ kinh độ GPS</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="location-helper">
+                                        <i class="ri-information-line"></i>
+                                        <span>Nhấp vào bản đồ để chọn vị trí chính xác của sân</span>
+                                    </div>
                                 </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        <i class="ri-navigation-line"></i>
-                                        Kinh độ (Longitude)
-                                    </label>
-                                    <input type="number" step="any" id="editLongitude"
-                                           value="${stadium.Longitude || ''}" class="form-input"
-                                           placeholder="106.660172">
-                                    <div class="input-helper">Tọa độ kinh độ GPS</div>
-                                </div>
-                            </div>
-
-                            <div class="location-helper">
-                                <i class="ri-information-line"></i>
-                                <span>Tọa độ GPS giúp khách hàng định vị chính xác sân của bạn</span>
-                            </div>
-                        </div>
 
                         <!-- Images Section -->
                         <div class="form-section">
@@ -1689,10 +1981,10 @@ function updateDateTime() {
 
 
         // Complete Create Modal HTML Generator (fixing the incomplete code)
-        function generateCreateModalHTML() {
+                function generateCreateModalHTML() {
             return `
                 <div class="enhanced-modal-content">
-                            <form id="newStadiumForm" class="stadium-form" enctype="multipart/form-data">
+                    <form id="newStadiumForm" class="stadium-form" enctype="multipart/form-data">
                         <!-- Basic Information Section -->
                         <div class="form-section">
                             <div class="section-header">
@@ -1717,7 +2009,7 @@ function updateDateTime() {
                                         Địa chỉ
                                     </label>
                                     <input type="text" id="newAddress" class="form-input"
-                                           placeholder="Nhập địa chỉ chi tiết">
+                                           placeholder="Nhập địa chỉ chi tiết hoặc chọn trên bản đồ">
                                     <div class="input-helper">Địa chỉ đầy đủ giúp khách hàng dễ tìm</div>
                                 </div>
                             </div>
@@ -1772,21 +2064,37 @@ function updateDateTime() {
                             </div>
                         </div>
 
-                        <!-- Location Section -->
+                        <!-- Location Section with Map -->
                         <div class="form-section">
                             <div class="section-header">
                                 <i class="ri-map-line"></i>
-                                <h3>Vị Trí GPS (Tùy chọn)</h3>
+                                <h3>Vị Trí Sân</h3>
                             </div>
 
+                            <!-- Map Container -->
+                            <div class="map-container">
+                                <div id="locationMap" class="location-map"></div>
+                                <div class="map-controls">
+                                    <button type="button" id="detectLocationBtn" class="btn-detect-location">
+                                        <i class="ri-crosshair-line"></i>
+                                        Xác định vị trí hiện tại
+                                    </button>
+                                    <button type="button" id="searchLocationBtn" class="btn-search-location">
+                                        <i class="ri-search-line"></i>
+                                        Tìm kiếm địa điểm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Coordinates Display -->
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label class="form-label">
                                         <i class="ri-compass-line"></i>
                                         Vĩ độ (Latitude)
                                     </label>
-                                    <input type="number" step="any" id="newLatitude" class="form-input"
-                                           placeholder="10.762622">
+                                    <input type="number" step="any" id="newLatitude" class="form-input" readonly
+                                           placeholder="Sẽ tự động điền khi chọn trên bản đồ">
                                     <div class="input-helper">Tọa độ vĩ độ GPS</div>
                                 </div>
 
@@ -1795,15 +2103,15 @@ function updateDateTime() {
                                         <i class="ri-navigation-line"></i>
                                         Kinh độ (Longitude)
                                     </label>
-                                    <input type="number" step="any" id="newLongitude" class="form-input"
-                                           placeholder="106.660172">
+                                    <input type="number" step="any" id="newLongitude" class="form-input" readonly
+                                           placeholder="Sẽ tự động điền khi chọn trên bản đồ">
                                     <div class="input-helper">Tọa độ kinh độ GPS</div>
                                 </div>
                             </div>
 
                             <div class="location-helper">
                                 <i class="ri-information-line"></i>
-                                <span>Tọa độ GPS giúp khách hàng định vị chính xác sân của bạn</span>
+                                <span>Nhấp vào bản đồ để chọn vị trí chính xác của sân</span>
                             </div>
                         </div>
 
@@ -1837,42 +2145,43 @@ function updateDateTime() {
                                 <span>Hình ảnh đầu tiên sẽ được làm ảnh đại diện chính</span>
                             </div>
                         </div>
-                                <!-- Videos Section -->
-        <div class="form-section">
-            <div class="section-header">
-                <i class="ri-video-line"></i>
-                <h3>Video Giới Thiệu Sân</h3>
-            </div>
 
-            <div class="video-upload-area">
-                <div class="upload-zone" onclick="document.getElementById('newVideoUpload').click()">
-                    <div class="upload-content">
-                        <div class="upload-icon">
-                            <i class="ri-video-upload-line"></i>
+                        <!-- Videos Section -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <i class="ri-video-line"></i>
+                                <h3>Video Giới Thiệu Sân</h3>
+                            </div>
+
+                            <div class="video-upload-area">
+                                <div class="upload-zone" onclick="document.getElementById('newVideoUpload').click()">
+                                    <div class="upload-content">
+                                        <div class="upload-icon">
+                                            <i class="ri-video-upload-line"></i>
+                                        </div>
+                                        <div class="upload-text">
+                                            <strong>Chọn hoặc kéo thả video</strong>
+                                            <p>MP4, AVI, MOV tối đa 30MB mỗi file</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="newVideoUpload" class="hidden"
+                                           multiple accept="video/*" onchange="handleNewVideoUpload(event)">
+                                </div>
+
+                                <div id="newVideoPreview" class="video-preview-grid hidden"></div>
+                            </div>
+
+                            <div class="video-helper">
+                                <i class="ri-lightbulb-line"></i>
+                                <span>Video giúp khách hàng hiểu rõ hơn về sân của bạn</span>
+                            </div>
                         </div>
-                        <div class="upload-text">
-                            <strong>Chọn hoặc kéo thả video</strong>
-                            <p>MP4, AVI, MOV tối đa 30MB mỗi file</p>
-                        </div>
-                    </div>
-                    <input type="file" id="newVideoUpload" class="hidden"
-                           multiple accept="video/*" onchange="handleNewVideoUpload(event)">
-                </div>
-
-                <div id="newVideoPreview" class="video-preview-grid hidden"></div>
-            </div>
-
-            <div class="video-helper">
-                <i class="ri-lightbulb-line"></i>
-                <span>Video giúp khách hàng hiểu rõ hơn về sân của bạn</span>
-            </div>
-        </div>
                     </form>
                 </div>
-
-                ${getModalStyles()}
             `;
         }
+
+
 
         // Complete Modal Styles Function
         function getModalStyles() {
@@ -3056,7 +3365,455 @@ function updateDateTime() {
             setInterval(updateDateTime, 1000);
         });
 
-       
+               // Add these functions to your JavaScript file
+
+        let mapPickerInstance = null;
+        let selectedMarker = null;
+
+        function openMapPicker() {
+            const mapModalHTML = `
+                <div class="map-container" id="mapContainer"></div>
+                <div class="map-controls">
+                    <div class="selected-info">
+                        <h4>Vị trí đã chọn:</h4>
+                        <p id="selectedCoords">Nhấn vào bản đồ để chọn vị trí</p>
+                        <p id="selectedAddress">Địa chỉ sẽ hiển thị ở đây</p>
+                    </div>
+                    <button type="button" class="use-current-location-btn" onclick="useCurrentLocation()">
+                        <i class="ri-gps-line"></i> Vị trí hiện tại
+                    </button>
+                </div>
+            `;
+
+            Swal.fire({
+                title: '<i class="ri-map-pin-line"></i> Chọn Vị Trí Sân',
+                html: mapModalHTML,
+                showCancelButton: true,
+                confirmButtonText: '<i class="ri-check-line"></i> Xác Nhận Vị Trí',
+                cancelButtonText: '<i class="ri-close-line"></i> Hủy',
+                customClass: {
+                    popup: 'map-modal'
+                },
+                didOpen: () => {
+                    initializeMap();
+                },
+                preConfirm: () => {
+                    if (!selectedMarker) {
+                        Swal.showValidationMessage('Vui lòng chọn một vị trí trên bản đồ');
+                        return false;
+                    }
+
+                    const latlng = selectedMarker.getLatLng();
+                    return {
+                        lat: latlng.lat,
+                        lng: latlng.lng,
+                        address: document.getElementById('selectedAddress').textContent
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { lat, lng, address } = result.value;
+
+                    // Fill the form fields
+                    document.getElementById('newLatitude').value = lat.toFixed(6);
+                    document.getElementById('newLongitude').value = lng.toFixed(6);
+
+                    // Update address if it's valid and different from placeholder
+                    if (address && address !== 'Địa chỉ sẽ hiển thị ở đây' && address !== 'Đang tìm địa chỉ...') {
+                        document.getElementById('newAddress').value = address;
+                    }
+
+                    // Show selected location
+                    const locationDisplay = document.getElementById('currentLocationDisplay');
+                    const locationText = document.getElementById('selectedLocationText');
+                    locationText.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                    locationDisplay.style.display = 'flex';
+                }
+
+                // Cleanup map
+                if (mapPickerInstance) {
+                    mapPickerInstance.remove();
+                    mapPickerInstance = null;
+                }
+            });
+        }
+
+        function initializeMap() {
+            // Default to Ho Chi Minh City center
+            const defaultLat = 10.762622;
+            const defaultLng = 106.660172;
+
+            // Get current values if they exist
+            const currentLat = document.getElementById('newLatitude').value || defaultLat;
+            const currentLng = document.getElementById('newLongitude').value || defaultLng;
+
+            mapPickerInstance = L.map('mapContainer').setView([currentLat, currentLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(mapPickerInstance);
+
+            // Add click event to map
+            mapPickerInstance.on('click', function(e) {
+                const { lat, lng } = e.latlng;
+
+                // Remove existing marker
+                if (selectedMarker) {
+                    mapPickerInstance.removeLayer(selectedMarker);
+                }
+
+                // Add new marker
+                selectedMarker = L.marker([lat, lng]).addTo(mapPickerInstance);
+
+                // Update coordinates display
+                document.getElementById('selectedCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                // Get address from coordinates
+                getAddressFromCoordinates(lat, lng);
+            });
+
+            // If there are existing coordinates, add marker
+            if (currentLat && currentLng && currentLat != defaultLat && currentLng != defaultLng) {
+                selectedMarker = L.marker([currentLat, currentLng]).addTo(mapPickerInstance);
+                document.getElementById('selectedCoords').textContent = `${currentLat}, ${currentLng}`;
+                getAddressFromCoordinates(currentLat, currentLng);
+            }
+        }
+
+        function useCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        // Update map view
+                        mapPickerInstance.setView([lat, lng], 15);
+
+                        // Remove existing marker
+                        if (selectedMarker) {
+                            mapPickerInstance.removeLayer(selectedMarker);
+                        }
+
+                        // Add new marker
+                        selectedMarker = L.marker([lat, lng]).addTo(mapPickerInstance);
+
+                        // Update display
+                        document.getElementById('selectedCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                        getAddressFromCoordinates(lat, lng);
+                    },
+                    function(error) {
+                        Swal.showValidationMessage('Không thể lấy vị trí hiện tại: ' + error.message);
+                    }
+                );
+            } else {
+                Swal.showValidationMessage('Trình duyệt không hỗ trợ định vị GPS');
+            }
+        }
+
+        async function getAddressFromCoordinates(lat, lng) {
+            try {
+                document.getElementById('selectedAddress').textContent = 'Đang tìm địa chỉ...';
+
+                // Using Nominatim reverse geocoding service
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&language=vi`
+                );
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const address = data.display_name || 'Không tìm thấy địa chỉ';
+                    document.getElementById('selectedAddress').textContent = address;
+                } else {
+                    document.getElementById('selectedAddress').textContent = 'Không thể lấy địa chỉ';
+                }
+            } catch (error) {
+                console.error('Error getting address:', error);
+                document.getElementById('selectedAddress').textContent = 'Lỗi khi lấy địa chỉ';
+            }
+        }
+
+                // Global map variable
+        let locationMap = null;
+        let currentMarker = null;
+
+        // Initialize map when modal opens
+                function initializeLocationMap(lat = null, lng = null) {
+            // Wait for the map container to be in DOM
+            setTimeout(() => {
+                const mapContainer = document.getElementById('locationMap');
+                if (!mapContainer) return;
+
+                // Remove existing map if any
+                if (locationMap) {
+                    locationMap.remove();
+                }
+
+                // Nếu có lat/lng (edit) thì zoom vào đó, không thì mặc định HCM
+                const defaultLat = 10.762622;
+                const defaultLng = 106.660172;
+                const centerLat = lat || defaultLat;
+                const centerLng = lng || defaultLng;
+                const zoomLevel = lat && lng ? 16 : 13;
+
+                locationMap = L.map('locationMap').setView([centerLat, centerLng], zoomLevel);
+
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(locationMap);
+
+                // Nếu edit có sẵn tọa độ thì đặt marker luôn
+                if (lat && lng) {
+                    setLocationMarker(lat, lng);
+                }
+
+                // Add click event to map
+                locationMap.on('click', function(e) {
+                    setLocationMarker(e.latlng.lat, e.latlng.lng);
+                });
+
+                // Initialize control buttons
+                initializeMapControls();
+
+                // Force map to resize after a short delay
+                setTimeout(() => {
+                    locationMap.invalidateSize();
+                }, 100);
+
+            }, 500);
+        }
+
+
+        // Set marker and update form fields
+              async function setLocationMarker(lat, lng) {
+            // Remove existing marker
+            if (currentMarker) {
+                locationMap.removeLayer(currentMarker);
+            }
+
+            // Add new marker
+            currentMarker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(locationMap);
+
+            // Tìm input theo cả create và edit
+            const latInput = document.getElementById('newLatitude') || document.getElementById('editLatitude');
+            const lngInput = document.getElementById('newLongitude') || document.getElementById('editLongitude');
+            const addressInput = document.getElementById('newAddress') || document.getElementById('editAddress');
+
+            // Update form fields
+            if (latInput) latInput.value = lat.toFixed(6);
+            if (lngInput) lngInput.value = lng.toFixed(6);
+
+            // Get address from coordinates
+            try {
+                const address = await reverseGeocode(lat, lng);
+                if (address && addressInput) {
+                    addressInput.value = address;
+                }
+
+                // Add popup to marker
+                currentMarker.bindPopup(`
+                    <div class="custom-popup">
+                        <div class="popup-title">Vị trí đã chọn</div>
+                        <div class="popup-address">${address || 'Không tìm thấy địa chỉ'}</div>
+                        <div class="popup-coordinates">
+                            <span>Lat: ${lat.toFixed(6)}</span>
+                            <span>Lng: ${lng.toFixed(6)}</span>
+                        </div>
+                    </div>
+                `).openPopup();
+
+            } catch (error) {
+                console.error('Error getting address:', error);
+                currentMarker.bindPopup(`
+                    <div class="custom-popup">
+                        <div class="popup-title">Vị trí đã chọn</div>
+                        <div class="popup-coordinates">
+                            <span>Lat: ${lat.toFixed(6)}</span>
+                            <span>Lng: ${lng.toFixed(6)}</span>
+                        </div>
+                    </div>
+                `).openPopup();
+            }
+        }
+    
+
+        // Reverse geocoding to get address from coordinates
+        async function reverseGeocode(lat, lng) {
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`
+                );
+                const data = await response.json();
+                return data.display_name || null;
+            } catch (error) {
+                console.error('Reverse geocoding error:', error);
+                return null;
+            }
+        }
+
+        // Forward geocoding to get coordinates from address
+        async function geocodeAddress(address) {
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5&accept-language=vi`
+                );
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                return [];
+            }
+        }
+
+        // Initialize map control buttons
+        function initializeMapControls() {
+            const detectBtn = document.getElementById('detectLocationBtn');
+            const searchBtn = document.getElementById('searchLocationBtn');
+
+            if (detectBtn) {
+                detectBtn.addEventListener('click', detectCurrentLocation);
+            }
+
+            if (searchBtn) {
+                searchBtn.addEventListener('click', showLocationSearch);
+            }
+        }
+
+        // Detect current location
+        function detectCurrentLocation() {
+            const detectBtn = document.getElementById('detectLocationBtn');
+            const originalText = detectBtn.innerHTML;
+
+            detectBtn.innerHTML = `
+                <div class="map-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                Đang xác định...
+            `;
+            detectBtn.disabled = true;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        locationMap.setView([lat, lng], 16);
+                        setLocationMarker(lat, lng);
+
+                        detectBtn.innerHTML = originalText;
+                        detectBtn.disabled = false;
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        alert('Không thể xác định vị trí hiện tại. Vui lòng kiểm tra quyền truy cập vị trí.');
+                        detectBtn.innerHTML = originalText;
+                        detectBtn.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                alert('Trình duyệt không hỗ trợ định vị GPS.');
+                detectBtn.innerHTML = originalText;
+                detectBtn.disabled = false;
+            }
+        }
+
+        // Show location search
+        function showLocationSearch() {
+            const searchQuery = prompt('Nhập địa chỉ cần tìm kiếm:');
+            if (!searchQuery) return;
+
+            const searchBtn = document.getElementById('searchLocationBtn');
+            const originalText = searchBtn.innerHTML;
+
+            searchBtn.innerHTML = `
+                <div class="map-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                Đang tìm...
+            `;
+            searchBtn.disabled = true;
+
+            geocodeAddress(searchQuery)
+                .then(results => {
+                    if (results.length > 0) {
+                        const firstResult = results[0];
+                        const lat = parseFloat(firstResult.lat);
+                        const lng = parseFloat(firstResult.lon);
+
+                        locationMap.setView([lat, lng], 16);
+                        setLocationMarker(lat, lng);
+                    } else {
+                        alert('Không tìm thấy địa điểm. Vui lòng thử lại với từ khóa khác.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    alert('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.');
+                })
+                .finally(() => {
+                    searchBtn.innerHTML = originalText;
+                    searchBtn.disabled = false;
+                });
+        }
+
+        // Update address field when user types
+        function initializeAddressSearch() {
+            const addressInput = document.getElementById('newAddress');
+            let searchTimeout = null;
+
+            if (addressInput) {
+                addressInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    const address = e.target.value.trim();
+
+                    if (address.length > 3) {
+                        searchTimeout = setTimeout(() => {
+                            geocodeAddress(address)
+                                .then(results => {
+                                    if (results.length > 0) {
+                                        const firstResult = results[0];
+                                        const lat = parseFloat(firstResult.lat);
+                                        const lng = parseFloat(firstResult.lon);
+
+                                        if (locationMap) {
+                                            locationMap.setView([lat, lng], 15);
+                                            setLocationMarker(lat, lng);
+                                        }
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Auto-search error:', error);
+                                });
+                        }, 1000);
+                    }
+                });
+            }
+        }
+
+        // Call this function when the modal is opened
+        function onModalOpen() {
+            initializeLocationMap();
+            initializeAddressSearch();
+        }
+
+        // Clean up map when modal is closed
+        function onModalClose() {
+            if (locationMap) {
+                locationMap.remove();
+                locationMap = null;
+                currentMarker = null;
+            }
+        }
     </script>
 }
 

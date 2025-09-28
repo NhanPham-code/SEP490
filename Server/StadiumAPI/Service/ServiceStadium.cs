@@ -4,6 +4,7 @@ using StadiumAPI.DTOs;
 using StadiumAPI.Models;
 using StadiumAPI.Repositories.Interface;
 using StadiumAPI.Service.Interface;
+using StadiumAPI.Services;
 using System.Threading.Tasks;
 
 namespace StadiumAPI.Service
@@ -12,10 +13,12 @@ namespace StadiumAPI.Service
     {
         private readonly IStadiumRepositories _stadiumRepositories;
         private readonly IMapper _mapper;
-        public ServiceStadium(IStadiumRepositories stadiumRepositories, IMapper mapper)
+        private readonly IFirebaseService _firebaseService;
+        public ServiceStadium(IStadiumRepositories stadiumRepositories, IMapper mapper, IFirebaseService firebaseService)
         {
             _stadiumRepositories = stadiumRepositories ?? throw new ArgumentNullException(nameof(stadiumRepositories));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _firebaseService = firebaseService ?? throw new ArgumentNullException(nameof(firebaseService));
         }
 
         public async Task<IEnumerable<ReadStadiumDTO>> GetAllStadiumsAsync()
@@ -32,17 +35,43 @@ namespace StadiumAPI.Service
         {
             var stadium = _mapper.Map<Stadiums>(createStadiumDTO);
             var createdStadium = await _stadiumRepositories.CreateStadiumAsync(stadium);
-            return _mapper.Map<ReadStadiumDTO>(createdStadium);
+            var dto = _mapper.Map<ReadStadiumDTO>(createdStadium);
+
+            // 🔥 Sync Firebase
+            if (dto != null)
+            {
+                await _firebaseService.AddStadiumAsync(dto);
+            }
+
+            return dto;
         }
+
         public async Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO updateStadiumDTO)
         {
             var stadium = _mapper.Map<Stadiums>(updateStadiumDTO);
             var updatedStadium = await _stadiumRepositories.UpdateStadiumAsync(id, stadium);
-            return _mapper.Map<ReadStadiumDTO>(updatedStadium);
+            var dto = _mapper.Map<ReadStadiumDTO>(updatedStadium);
+
+            // 🔥 Sync Firebase
+            if (dto != null)
+            {
+                await _firebaseService.UpdateStadiumAsync(dto);
+            }
+
+            return dto;
         }
+
         public async Task<bool> DeleteStadiumAsync(int id)
         {
-            return await _stadiumRepositories.DeleteStadiumAsync(id);
+            var deleted = await _stadiumRepositories.DeleteStadiumAsync(id);
+
+            if (deleted)
+            {
+                // 🔥 Remove Firebase node
+                await _firebaseService.DeleteStadiumAsync(id);
+            }
+
+            return deleted;
         }
         public IQueryable<Stadiums> GetAllOdataStadiums()
         {

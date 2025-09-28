@@ -160,6 +160,34 @@ namespace BookingAPI.Controllers
             }
         }
 
+        [HttpPost("checkAvailability")]
+        public async Task<IActionResult> CheckAvailability([FromBody] List<BookingSlotRequest> requestedSlots)
+        {
+            if (requestedSlots == null || !requestedSlots.Any())
+            {
+                return BadRequest(new { message = "Danh sách cần kiểm tra không được để trống." });
+            }
+
+            try
+            {
+                bool hasConflict = await _bookingService.CheckSlotsAvailabilityAsync(requestedSlots);
+
+                if (hasConflict)
+                {
+                    // Nếu có trùng, trả về lỗi 409 Conflict
+                    return Conflict(new { message = "Một hoặc nhiều khung giờ bạn chọn đã có người khác đặt." });
+                }
+
+                // Nếu không trùng, trả về 200 OK
+                return Ok(new { message = "Tất cả các khung giờ đều hợp lệ." });
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi không mong muốn từ tầng service/repository
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
 

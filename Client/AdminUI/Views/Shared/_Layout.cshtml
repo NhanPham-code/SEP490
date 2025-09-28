@@ -138,7 +138,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Admin/Feedback" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")" data-section="feedback">
+                        <a asp-controller="Feedback"
+                           asp-action="Feedback"
+                           class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")"
+                           data-section="feedback">
                             <i class="ri-feedback-line"></i>
                             <span>Quản Lý Feedback</span>
                             @if (ViewContext.RouteData.Values["action"]?.ToString() == "Feedback")
@@ -146,9 +149,12 @@
                                 <div class="nav-indicator"></div>
                             }
                         </a>
+
                     </li>
                     <li>
-                        <a href="/Admin/Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")" data-section="chat">
+                        <a asp-controller="Chat" asp-action="Chat"
+                           class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"
+                           data-section="chat">
                             <i class="ri-chat-3-line"></i>
                             <span>Quản Lý Chat</span>
                             @if (ViewContext.RouteData.Values["action"]?.ToString() == "Chat")
@@ -157,6 +163,8 @@
                             }
                         </a>
                     </li>
+
+
                     <li>
                         <a href="/Admin/Notifications" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")" data-section="notifications">
                             <i class="ri-notification-line"></i>

@@ -109,6 +109,8 @@
                     </div>
                 </div> *@
             </div>
+            <input type="hidden" id="senderId" value="@ViewBag.UserId" />
+            <input type="hidden" id="senderName" value="@ViewBag.UserName" />
 
             <div class="content-grid">
                 <!-- Filter Sidebar -->
@@ -793,7 +795,14 @@
                              <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
                                 <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
                          </div>
-                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
+                         <a href="javascript:void(0)"
+                   title="Chat với người đăng"
+                   class="chat-icon"
+                   data-receiver-id="${p.createdBy}"
+                   data-receiver-name="${profile[p.createdBy].fullName}"
+                   onclick="toggleChat(this)">
+                   <i class="ri-message-2-line"></i>
+                </a>
                      </div>
                      <div class="game-details">
                         <div class="detail-item">
@@ -1744,6 +1753,98 @@
           return `${hours}:${minutes}`;
         }
 
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.firebasestorage.app",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Hàm mở chat
+                       // Hàm mở chat
+        function toggleChat(el) {
+            const senderId = document.getElementById("senderId")?.value;
+            const senderName = document.getElementById("senderName")?.value;
+
+            const receiverId = el.getAttribute("data-receiver-id");
+            const receiverName = el.getAttribute("data-receiver-name");
+
+            if (!senderId || !receiverId) {
+                alert("⚠️ Thiếu thông tin user");
+                return;
+            }
+            if (senderId === receiverId) {
+                alert("😅 Bạn không thể chat với chính mình");
+                return;
+            }
+
+            // truyền luôn receiverName vào
+            createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+        }
+
+        // Tạo phòng chat
+        function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName || "Người dùng",  // 👈 hiển thị đúng tên người nhận
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName || "Người dùng",   // 👈 hiển thị tên người gửi
+                timestamp,
+                lastMessage: ""
+            };
+
+            Promise.all(
+                Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+            ).then(() => {
+                console.log("✅ Chat room created successfully");
+                redirectToChat(senderId, senderName, receiverId, receiverName);
+            }).catch((error) => {
+                console.error("❌ Error creating chat room:", error);
+                redirectToChat(senderId, senderName, receiverId, receiverName);
+            });
+        }
+
+        // Redirect sang trang Chat.cshtml
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName: senderName || "",
+                receiverId,
+                receiverName: receiverName || receiverId
+            });
+
+            // Gọi đến action ChatController.Chat
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+
+        // Gắn sự kiện click cho button
+        document.addEventListener("DOMContentLoaded", () => {
+            const floatingChatBtn = document.getElementById("floating-chat-btn");
+            if (floatingChatBtn) {
+                floatingChatBtn.addEventListener("click", toggleChat);
+            }
+        });
+
+        // Cho phép gọi trực tiếp onclick từ HTML
+        window.toggleChat = toggleChat;
     </script>
 
     <!-- Filter Overlay for Mobile -->

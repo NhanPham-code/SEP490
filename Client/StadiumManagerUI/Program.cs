@@ -31,12 +31,13 @@ builder.Services.AddAuthentication("CookieAuth")
     {
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Login"; // Redirect khi chưa login
         options.AccessDeniedPath = "/AccessDenied";
     });
 
 // Session
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(24);
@@ -64,7 +65,8 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICourtService, CourtService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
-
+builder.Services.AddScoped<IStadiumEquipmentService, StadiumEquipmentService>();
+builder.Services.AddScoped<IFileService, FileService>();
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 

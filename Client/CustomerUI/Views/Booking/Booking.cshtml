@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="~/css/Booking/Booking.css" />
 </head>
+
 <body class="min-h-screen bg-gray-50">
 
     <!-- Enhanced Modal -->
@@ -22,7 +24,8 @@
                 </div>
                 <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-2"></h3>
                 <p id="modal-message" class="text-gray-600 mb-4 leading-relaxed"></p>
-                <button id="modal-close-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                <button id="modal-close-btn"
+                        class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
                     Đóng
                 </button>
             </div>
@@ -46,7 +49,8 @@
                         📅 <span class="ml-2">Chọn ngày</span>
                     </label>
                     <div class="relative">
-                    <input type="date" id="date-picker" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
+                        <input type="date" id="date-picker"
+                               class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -54,7 +58,8 @@
                         🏟️ <span class="ml-2">Chọn loại sân</span>
                     </label>
                     <div class="relative">
-                        <select id="court-type-select" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 pr-10 rounded-xl shadow-sm text-gray-700 font-medium appearance-none">
+                        <select id="court-type-select"
+                                class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 pr-10 rounded-xl shadow-sm text-gray-700 font-medium appearance-none">
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -112,11 +117,21 @@
                 <div class="hidden md:flex items-center space-x-4 text-sm">
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giờ mở cửa: <span id="footer-hours" class="font-semibold">06:00 - 22:00</span></span>
+                        <span class="text-gray-600">
+                            Giờ mở cửa: <span id="footer-hours" class="font-semibold">
+                                06:00 -
+                                22:00
+                            </span>
+                        </span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-gray-600">Giá thuê: <span id="footer-price" class="font-semibold">200.000 - 300.000 VNĐ/giờ</span></span>
+                        <span class="text-gray-600">
+                            Giá thuê: <span id="footer-price" class="font-semibold">
+                                200.000 -
+                                300.000 VNĐ/giờ
+                            </span>
+                        </span>
                     </div>
                 </div>
 
@@ -328,7 +343,7 @@
                 `;
 
             } else {
-                bookingSummaryEl.innerHTML = '<p>Chưa có thông tin</p>';  
+                bookingSummaryEl.innerHTML = '<p>Chưa có thông tin</p>';
             }
         }
 
@@ -767,7 +782,7 @@
                 url: `/Home/Stadiums`,
                 type: 'GET',
                 data: { searchTerm: searchTerm },
-                success: function(data) {
+                success: function (data) {
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0];
                         openTime = parseHour(stadiumData.OpenTime);
@@ -784,14 +799,14 @@
                         console.error('Không tìm thấy dữ liệu sân vận động.');
                     }
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
+                error: function (jqXHR, textStatus, errorThrown) {
                     console.error('Lỗi khi tải dữ liệu sân vận động:', textStatus, errorThrown);
                 }
             });
         }
 
         // Khởi tạo ứng dụng
-        window.onload = function() {
+        window.onload = function () {
             fetchStadiumData(stadiumId);
             continueButtonEl.onclick = showCheckoutPage;
             document.getElementById('modal-close-btn').onclick = hideModal;
@@ -800,7 +815,7 @@
                 datePickerEl.addEventListener("change", function () {
                     selectedDate = this.value;
                     isToday = selectedDate && now.toDateString()
-                            === new Date(selectedDate).toDateString();
+                        === new Date(selectedDate).toDateString();
                     renderTimeButtons();
                     updateUI();
 
@@ -811,7 +826,7 @@
                 });
             }
 
-            timeButtonsContainerEl.addEventListener('click', function(e) {
+            timeButtonsContainerEl.addEventListener('click', function (e) {
                 if (e.target.classList.contains('time-button')) {
                     maybeFetchBookedCourts();
                 }
@@ -819,4 +834,5 @@
         };
     </script>
 </body>
+
 </html>

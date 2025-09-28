@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FavoriteAPI", "FavoriteAPI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationAPI", "NotificationAPI\NotificationAPI.csproj", "{088735A7-0BE7-4292-B36A-75FAAE8F67F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StadiumEquipmentAPI", "StadiumEquipmentAPI\StadiumEquipmentAPI.csproj", "{C8C95347-EBCC-44B4-B659-F86E432BCCC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,10 +61,17 @@ Global
 		{D6E8BF78-8798-4B24-8F10-E7CC876821A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6E8BF78-8798-4B24-8F10-E7CC876821A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6E8BF78-8798-4B24-8F10-E7CC876821A2}.Release|Any CPU.Build.0 = Release|Any CPU
+<<<<<<< HEAD
+		{C8C95347-EBCC-44B4-B659-F86E432BCCC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8C95347-EBCC-44B4-B659-F86E432BCCC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8C95347-EBCC-44B4-B659-F86E432BCCC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8C95347-EBCC-44B4-B659-F86E432BCCC3}.Release|Any CPU.Build.0 = Release|Any CPU
+=======
 		{088735A7-0BE7-4292-B36A-75FAAE8F67F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{088735A7-0BE7-4292-B36A-75FAAE8F67F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{088735A7-0BE7-4292-B36A-75FAAE8F67F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{088735A7-0BE7-4292-B36A-75FAAE8F67F9}.Release|Any CPU.Build.0 = Release|Any CPU
+>>>>>>> ba472a8bac1eb78415b382aa34b4cc8b7497d3b7
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

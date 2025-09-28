@@ -296,5 +296,27 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
 
+        public async Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots, string accessToken)
+        {
+
+
+            AddBearerAccessToken(accessToken);
+            var response = await _httpClient.PostAsJsonAsync("/bookings/checkAvailability", requestedSlots);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(error);
+                return false;
+            }
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Kiểm tra tình trạng sân thất bại. Lỗi từ API: {response.StatusCode} - {errorContent}");
+        }
     }
 }

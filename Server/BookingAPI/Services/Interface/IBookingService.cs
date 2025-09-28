@@ -17,5 +17,8 @@ namespace BookingAPI.Services.Interface
         Task<MonthlyBookingReadDto> CreateMonthlyBookingAsync(int userId, MonthlyBookingCreateDto monthlyBookingCreateDto);
         IQueryable<MonthlyBooking> GetAllMonthlyBookingsAsQueryable();
         Task<MonthlyBookingUpdateDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto updateDto);
+        Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots);
+        Task AutoAcceptBookingByIdAsync(int bookingId);
+        Task AutoCompleteBookingsAsync();
     }
 }

@@ -398,7 +398,8 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Support", "Customer")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Customer" && ViewContext.RouteData.Values["action"].ToString() == "Support" ? "active" : "")">
+                <a href="@Url.Action("Chat", "Chat")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Chat" && ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")">
                     <i class="nav-icon fas fa-headset"></i>
                     Chat & Hỗ trợ
                 </a>

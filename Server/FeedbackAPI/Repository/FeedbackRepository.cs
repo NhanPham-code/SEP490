@@ -1,6 +1,7 @@
 ﻿using FeedbackAPI.Data;
 using FeedbackAPI.Models;
 using Microsoft.EntityFrameworkCore;
+
 namespace FeedbackAPI.Repository
 {
     public class FeedbackRepository : IFeedbackRepository
@@ -22,6 +23,8 @@ namespace FeedbackAPI.Repository
             return await _context.Feedbacks.FirstOrDefaultAsync(f => f.Id == id);
         }
 
+        
+
         public async Task AddAsync(Feedback feedback)
         {
             await _context.Feedbacks.AddAsync(feedback);
@@ -41,9 +44,16 @@ namespace FeedbackAPI.Repository
         {
             await _context.SaveChangesAsync();
         }
+
         public IQueryable<Feedback> GetAllAsQueryable()
         {
             return _context.Feedbacks.AsQueryable();
+        }
+        public async Task<IEnumerable<Feedback>> GetByStadiumIdAsync(int stadiumId)
+        {
+            return await _context.Feedbacks
+                .Where(f => f.StadiumId == stadiumId)
+                .ToListAsync();
         }
 
     }
