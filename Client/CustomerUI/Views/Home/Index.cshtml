@@ -31,15 +31,12 @@
     <style>
 
         
-        body, html {
+        body {
             margin: 0;
             padding: 0;
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f8;
-            color: #333;
-            display: flex;
-            flex-direction: column;
+
         }
 
    
@@ -126,14 +123,12 @@
             position: fixed;
             pointer-events: none;
             animation: floatUp 1.5s ease-out forwards;
-            z-index: 1000;
             font-size: 16px;
         }
 
         .favorite-btn {
             position: relative;
             font-size: 1rem;
-            z-index: 10;
         }
 
             .favorite-btn.favorited {
@@ -146,7 +141,6 @@
                 .favorite-btn.favorited .heart-icon {
                     color: rgb(220, 38, 38) !important;
                     
-                    z-index: 11;
                 }
 
         /* Đảm bảo backdrop blur hoạt động */
@@ -311,14 +305,6 @@
                 background-color: #21618c;
             }
 
-        .btn-secondary {
-            background-color: #27ae60;
-            color: white;
-        }
-
-            .btn-secondary:hover {
-                background-color: #1e8449;
-            }
 
        
         #grid-view, #map-view, #compare-view {
@@ -362,7 +348,7 @@
             /* Active state (khi nhấn hoặc được chọn) */
             button[id$="-view"].active-btn {
                 border-color: #b2b0ffe1; /* Màu xanh đậm hơn */
-                color: #ffffff; /* Chữ trắng để tương phản */
+                color: #000; /* Chữ trắng để tương phản */
                 background-color: #b2b0ffe1; /* Nền xanh đậm */
                 box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2); /* Hiệu ứng lún */
             }
@@ -392,7 +378,7 @@
 </head>
 
 
-<body  data-new-gr-c-s-check-loaded="14.1116.0" data-gr-ext-installed="">
+<body id="body" data-new-gr-c-s-check-loaded="14.1116.0" data-gr-ext-installed="">
     <div class="bg"></div>
     <div class="bg bg2"></div>
     <div class="bg bg3"></div>
@@ -401,15 +387,7 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
             <div class="w-full text-center text-white">
                 <h1 class="text-4xl font-bold mb-4">Discover Premium Stadiums</h1>
-                <p class="text-lg mb-6 max-w-2xl mx-auto">Browse our extensive collection of world-class sports facilities. Find the perfect venue for your next game, training session, or event.</p>
-                <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                    <button class="bg-primary text-white px-6 py-3 !rounded-button font-semibold hover:bg-blue-600 transition-colors whitespace-nowrap">
-                        Explore Stadiums
-                    </button>
-                    <button class="bg-white text-gray-900 px-6 py-3 !rounded-button font-semibold hover:bg-gray-100 transition-colors whitespace-nowrap">
-                        How It Works
-                    </button>
-                </div>
+                <p class="text-lg mb-6 max-w-2xl mx-auto">Browse our extensive collection of world-class sports facilities. Find the perfect venue for your next game, training session, or event.</p>  
             </div>
         </div>
     </section>
@@ -750,12 +728,17 @@
                              $('#search-btn').on('click', function() {
                             var url = sessionStorage.getItem('searchTerm') || "";
                             var searchTerm = $('#search-text').val().trim();
-                            if (url.length <=0 || url === null) {
+                                                sessionStorage.setItem('searchName', removeVietnameseTones(searchTerm)); // Lưu search term vào sessionStorage
+                            if(searchTerm.length <= 0){
+                                                    sessionStorage.setItem('searchTerm', ""); // Xóa search term nếu ô tìm kiếm trống
+                                                    displayList("", 10, 0);
+                            }
+                            if (url.length <=0) {
                                 showLoading();
                                 let searchString = `&$filter=contains(Name,'${removeVietnameseTones(searchTerm)}')`;
                                 displayList(searchString, 10, 0);
                             }else{
-                                displayList(`contains(Name,'${removeVietnameseTones(searchTerm)}')` + url, 10, 0);
+                                displayList(`${url} and contains(Name,'${removeVietnameseTones(searchTerm)}')` , 10, 0);
                             }
                         });
                         }
@@ -792,11 +775,19 @@
 
                                                  $('#mobile-filter-btn').on('click', function() {
                             $('#filter-sidebar').addClass('active');
+                            $('#footer').addClass('hidden');
+                            $('#header-mobile').addClass('hidden');
+                                                $('#main-body').addClass('aria-hidden', 'false');
+                            $('#nav-mobile').addClass('hidden');
                         });
 
                         // Đóng sidebar với nút close
                         $('#close-filter').on('click', function() {
                             $('#filter-sidebar').removeClass('active');
+                            $('#footer').removeClass('hidden');
+                            $('#header-mobile').removeClass('hidden');
+                                                $('#main-body').removeClass('aria-hidden', 'false');
+                            $('#nav-mobile').removeClass('hidden');
                         });
                             sessionStorage.setItem('searchTerm', "");
                             let skip = 0;
@@ -860,7 +851,14 @@
                                 let finalUrl = filterString ? "&$filter=" + encodeURIComponent(filterString) : "";
                                 skip = 0;
                                 console.log(finalUrl);
-                                sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
+                                                    let searchName = sessionStorage.getItem('searchName') || "";
+                                if(searchName.length > 0){
+                                                        sessionStorage.setItem('searchTerm', finalUrl += ` and contains(Name,'${searchName}')`); // Lưu search term vào sessionStorage
+                                }else{
+                                  sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
+
+                                }
+                                                    showLoading();
                                 displayList(finalUrl, top, skip);
 
                             });
@@ -906,6 +904,16 @@
                             data: {searchTerm: searchUrl},
                             success: function (data) {
                                 let count = data["@@odata.count"];
+                                if(count <= 0){
+                                    hideLoading();
+                                     $('#stadium-grid').html(`
+        <div class="no-stadium-found">
+            <img src="https://cdn-icons-png.flaticon.com/512/2748/2748558.png" alt="Not found" style="width:64px;height:64px;opacity:0.7;">
+            <div>Không tìm thấy sân nào phù hợp.</div>
+        </div>
+    `).show();
+                                }
+                                
                                 sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
                                 $("#count").text(`Đã tìm thấy ${count}`);
                                 console.log(skip);
@@ -939,13 +947,8 @@
                             <div class="relative h-48">
                                 <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
-                                <!-- Hot badge -->
-                                <div class="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold z-10 pulse-animation shadow-lg">
-                                    🔥 Hot
-                                </div>
-
                                 <!-- Favorite Button -->
-                                <div class="absolute top-3 left-3 z-20">
+                                <div class="absolute top-3 left-3 ">
                                     <button class="favorite-btn bg-white/90 backdrop-blur-sm hover:bg-white border border-white/20 text-gray-600 hover:text-red-500 p-2.5 circle transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
                                             data-stadium-id="${item.Id}"
                                             data-stadium-name="${item.Name}">
@@ -1010,7 +1013,7 @@
                                         } else {
                                             $('#stadium-grid').append(html);
                                         }
-
+                                        hideLoading();
                                         // Sau khi render xong thì gọi API feedback cho từng sân
                                         data.value.forEach(function (item) {
                                             $.get(`/Feedback/GetSummary?stadiumId=${item.Id}`, function (summary) {

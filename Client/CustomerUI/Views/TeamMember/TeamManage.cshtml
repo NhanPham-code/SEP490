@@ -23,6 +23,8 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
     <script>
         tailwind.config = {
           theme: {
@@ -122,10 +124,38 @@
 
     <!-- JavaScript -->
     <script>
+
+        function connectToSignalR() {
+                    const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7072/notificationHub")
+            .build();
+
+        // Lắng nghe sự kiện "ReceiveNotification"
+               connection.on("ReceiveNotification", function (notification) {
+            // Xử lý notification nhận được ở đây
+            console.log("Nhận thông báo mới:", notification);
+            if(notification.parameters.length > 0){
+                loadPost();
+        // Parse chuỗi thành object/array
+        const data = JSON.parse(notification.parameters);
+        console.log("Dữ liệu đã phân tích:", data);
+            }else{
+                setTimeout(function() {
+                loadPost(); // Tải lại bài đăng sau 3 giây
+            }, 3000);
+            }
+
+            // Ví dụ: Hiển thị thông báo toast
+            // showToast(notification.title, notification.message);
+        });
+        }
+
         // quay ve url truoc do 
         function goBack() {
             window.location.href = '@oldUrl';
         }
+
+        
 
         // Sample data based on ReadTeamMemberDTO - Vietnamese names
        
@@ -407,7 +437,7 @@
             displayPostDetail();
             loadMember();
 
-
+            connectToSignalR();
 
           
 

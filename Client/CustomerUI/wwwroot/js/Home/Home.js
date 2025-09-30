@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function openMobileFilter() {
         // Show overlay first
-        filterOverlay.classList.add('active');
+        filterOverlay.addClass('active');
 
         // Small delay for better animation
         setTimeout(() => {

@@ -393,15 +393,12 @@
             </div>
         </div>
     </main>
-    @{
-        var token = Context.Request.Cookies["AccessToken"];
-    }
+
 
     <script>
 
         //kết nối với signalR
-           var token = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(token));
-        console.log("Token truyền từ server:", token);
+
 
         function connectToSignalR() {
                     const connection = new signalR.HubConnectionBuilder()
@@ -413,7 +410,7 @@
             // Xử lý notification nhận được ở đây
             console.log("Nhận thông báo mới:", notification);
             if(notification.parameters.length > 0){
-
+                loadPost();
         // Parse chuỗi thành object/array
         const data = JSON.parse(notification.parameters);
         console.log("Dữ liệu đã phân tích:", data);
@@ -990,8 +987,20 @@
             
         }
 
+        // loading khi nhan tao bai dang
+        function createLoading(){
+            Swal.fire({
+                title: 'Đang tạo bài đăng...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
 
                              function openCreate() {
+                                 createLoading();
             $.ajax({
                 url: '/FindTeam/GetBookByUserId',
                 type: 'GET',

@@ -397,6 +397,14 @@ namespace CustomerUI.Controllers
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             }).GetAwaiter().GetResult();
+            _ = await _notificationService.SendNotificationToAll(new NotificationDTO
+            {
+                Title = "Một người vừa tham gia vào nhóm",
+                Message = "Someone just joined a team. Check it out!",
+                Type = "Recruitment.NewMember",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false
+            });
             return Json(new { Message = 200, value = res });
         }
 
