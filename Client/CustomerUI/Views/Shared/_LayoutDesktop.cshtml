@@ -18,6 +18,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <style>
         /* Hide Google Translate banner and unwanted elements */
         .goog-te-banner-frame {
@@ -289,6 +291,10 @@
             overflow-x: hidden;
             margin: 0;
             padding: 0;
+        }
+
+        #nav{
+            display: flex;
         }
 
         ::-webkit-scrollbar {
@@ -701,8 +707,8 @@
         }
 
 
-        }" class="header-glass sticky top-0 z-50 transition-all duration-300">
-        <div class="max-w-8xl mx-auto px-4 lg:px-8">
+        }" class="header-glass sticky top-0 z-50 transition-all duration-300" id="header-pc">
+        <div class="max-w-8xl mx-auto px-4 lg:px-8" id="header-mobile">
             <div class="flex items-center justify-between h-18">
 
                 <!-- Logo Section - Improved proportions -->
@@ -720,8 +726,8 @@
                 </div>
 
                 <!-- Desktop Navigation - Enhanced spacing and visual hierarchy -->
-                <nav class="hidden lg:flex items-center justify-center flex-1 px-8 nav-section">
-                    <div
+                <nav class="hidden lg:flex items-center justify-center flex-1 px-8 nav-section" >
+                    <div id="nav"
                         class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
                         <a asp-controller="Home" asp-action="Index"
                             class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
@@ -735,8 +741,6 @@
                             <span>Teams</span>
                         </a>
 
-
-                        <a href="#" class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
 
                         <a href="#"
                             class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
@@ -1351,31 +1355,62 @@
             });
         })();
 
-
+    </script>
     <script>
+        function connectToSignalR() {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://localhost:7072/notificationHub")
+                .build();
+
+            // Lắng nghe sự kiện "ReceiveNotification"
+            connection.on("ReceiveNotification", function (notification) {
+                console.log("Nhận thông báo mới:", notification);
+
+                // Nếu không có parameters, delay 3 giây rồi cập nhật badge
+                setTimeout(function () {
+                    updateNotificationBadge();
+                }, 3000);
+
+                // Hiển thị thông báo toast nếu muốn
+                // showToast(notification.title, notification.message);
+            });
+
+            // Kết nối tới hub
+            connection.start()
+                .then(function () {
+                    console.log("Đã kết nối tới notification hub!");
+                })
+                .catch(function (err) {
+                    console.error("Kết nối SignalR thất bại:", err);
+                });
+        }
+
         async function updateNotificationBadge() {
             try {
                 const resp = await fetch('/Notification/GetUnreadNotificationCount');
                 if (resp.ok) {
                     const count = await resp.json();
                     const badge = document.getElementById('notification-badge');
+                    console.log('Unread notifications:', count);
                     if (badge) {
                         if (count > 0) {
                             badge.textContent = count;
                             badge.style.display = 'flex';
                         } else {
                             badge.style.display = 'none';
-                        } 
+                        }
                     }
                 }
             } catch (err) {
-                // Xử lý lỗi nếu cần
                 console.error('Error fetching notification count:', err);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', updateNotificationBadge);
-
+        // Gọi khi DOM đã sẵn sàng
+        $(document).ready(function () {
+            connectToSignalR();
+            updateNotificationBadge();
+        });
     </script>
 </body>
 

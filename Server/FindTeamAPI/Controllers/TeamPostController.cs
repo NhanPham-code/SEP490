@@ -44,7 +44,7 @@ namespace FindTeamAPI.Controllers
             var result = await _teamPostService.DeleteTeamPostAsync(postId);
             if (result)
             {
-                return NoContent();
+                return Ok(true);
             }
             return NotFound("Team post not found or you are not authorized to delete this post.");
         }

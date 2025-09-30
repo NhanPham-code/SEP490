@@ -6,6 +6,7 @@ namespace NotificationAPI.Repository.Interface
     {
         // Thêm notification mới
         Task<Notification> AddAsync(Notification notification);
+        Task<List<Notification>> AddRangeAsync(List<Notification> notifications);
 
         // Lấy notification theo Id
         Task<Notification?> GetByIdAsync(int id);

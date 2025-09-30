@@ -20,6 +20,7 @@ namespace FindTeamAPI.DTOs
         public DateTime UpdatedAt { get; set; } // Timestamp when the post was last updated
         [Required(ErrorMessage = "CreatedBy is required.")]
         public int CreatedBy { get; set; } // User ID of the creator
+        public string StadiumName { get; set; } = string.Empty;
         [Required(ErrorMessage = "BookingId is required.")]
         public int BookingId { get; set; } // Foreign key to the Booking entity
         public int StadiumId { get; set; }

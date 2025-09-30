@@ -21,6 +21,17 @@ namespace NotificationAPI.Repository
             return result.Entity;
         }
 
+        public async Task<List<Notification>> AddRangeAsync(List<Notification> notifications)
+        {
+            if (notifications.Any())
+            {
+                await _context.Notifications.AddRangeAsync(notifications);
+                await _context.SaveChangesAsync();
+            }
+             
+            
+            return notifications;
+        }
         public async Task<int> CountUnreadAsync(int userId)
         {
             var count = await _context.Notifications.CountAsync(n => n.UserId == userId && !n.IsRead);

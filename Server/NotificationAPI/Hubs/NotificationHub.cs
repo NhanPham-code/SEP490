@@ -26,21 +26,30 @@ namespace NotificationAPI.Hubs
         // method gửi tới tất cả client đã kết nối
         public async Task SendNotificationToAll(Notification notification)
         {
-            // Lưu vào database
-            await _notificationService.AddNotificationAsync(notification);
 
             // Gửi realtime tới tất cả client
             await Clients.All.SendAsync("ReceiveNotification", notification);
         }
+        // method tham gia nhóm (group) theo tên nhóm 
+        public async Task<bool> RegisterGroups(List<string> groupName)
+        {
+            foreach (var group in groupName)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+
+            }
+
+            return true; // hoặc kiểm tra điều kiện rồi trả về true/false
+        }
 
         // method gửi đến 1 nhóm client
-        public async Task SendNotificationToGroup(string groupName, Notification notification)
+        public async Task SendNotificationToGroup(string groupName, List<Notification> notification)
         {
             // Lưu vào database
-            await _notificationService.AddNotificationAsync(notification);
+            await _notificationService.AddRangeNotificationsAsync(notification);
 
             // Gửi realtime tới nhóm client
-            await Clients.Group(groupName).SendAsync("ReceiveNotification", notification);
+            await Clients.Group(groupName).SendAsync("ReceiveNotification", notification.FirstOrDefault());
         }
 
         // Đánh dấu tất cả đã đọc
