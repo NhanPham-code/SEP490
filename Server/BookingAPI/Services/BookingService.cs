@@ -55,7 +55,7 @@ namespace BookingAPI.Services
 
             var createdBooking = await _bookingRepository.CreateBookingAsync(booking);
 
-            var jobId = BackgroundJob.Schedule(() => AutoAcceptBookingByIdAsync(createdBooking.Id),TimeSpan.FromMinutes(5));
+            var jobId = BackgroundJob.Schedule(() => AutoAcceptBookingByIdAsync(createdBooking.Id), TimeSpan.FromMinutes(5));
 
             Console.WriteLine($"Đã thêm job {jobId} để tự động check booking {createdBooking.Id} trong 5 phút");
             return _mapper.Map<BookingReadDto>(createdBooking);
@@ -274,6 +274,78 @@ namespace BookingAPI.Services
             {
                 Console.WriteLine($" Cập nhật thành công {completedCount} booking");
             }
+        }
+
+        public async Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day)
+        {
+            var nowYear = DateTime.UtcNow.Year;
+
+            // Xác định các năm cần lấy dữ liệu
+            List<int> yearsToFetch;
+            if (year == nowYear)
+            {
+                // Nếu là năm hiện tại: chỉ lấy 2 năm trước và năm hiện tại
+                yearsToFetch = new List<int> { year - 2, year - 1, year };
+            }
+            else
+            {
+                // Nếu là năm khác: lấy 2 năm trước, năm hiện tại, 1 năm sau
+                yearsToFetch = new List<int> { year - 2, year - 1, year, year + 1 };
+            }
+
+            // Lấy booking của các năm này (bạn cần sửa repository cho phép truyền IEnumerable<int>)
+            var bookingsForChart = await _bookingRepository.GetBookingsForStatisticsAsync(yearsToFetch);
+
+            // Lọc booking cho phần thống kê (chỉ năm đang xem)
+            var bookingsForStats = bookingsForChart.Where(b => b.Date.Year == year).ToList();
+            if (month.HasValue)
+            {
+                bookingsForStats = bookingsForStats.Where(b => b.Date.Month == month.Value).ToList();
+            }
+            if (day.HasValue)
+            {
+                bookingsForStats = bookingsForStats.Where(b => b.Date.Day == day.Value).ToList();
+            }
+
+            var totalBookingsCount = bookingsForStats.Count;
+            var completedBookings = bookingsForStats.Where(b => b.Status == "completed").ToList();
+            var pendingBookingsCount = bookingsForStats.Count(b => b.Status == "pending");
+            var acceptedBookingsCount = bookingsForStats.Count(b => b.Status == "accepted");
+            var cancelledBookingsCount = bookingsForStats.Count(b => b.Status == "cancelled");
+
+            var totalRevenue = completedBookings.Sum(b => b.TotalPrice ?? 0);
+            var totalCompletedBookings = completedBookings.Count;
+
+            // Dữ liệu cho biểu đồ: mỗi năm là 1 dictionary 12 tháng
+            var monthlyRevenueChartData = new Dictionary<int, Dictionary<int, decimal>>();
+            foreach (var y in yearsToFetch)
+            {
+                var revenueByMonth = bookingsForChart
+                    .Where(b => b.Date.Year == y && b.Status == "completed")
+                    .GroupBy(b => b.Date.Month)
+                    .ToDictionary(g => g.Key, g => g.Sum(b => b.TotalPrice ?? 0));
+                var fullYearRevenue = new Dictionary<int, decimal>();
+                for (int i = 1; i <= 12; i++)
+                {
+                    fullYearRevenue[i] = revenueByMonth.ContainsKey(i) ? revenueByMonth[i] : 0;
+                }
+                monthlyRevenueChartData[y] = fullYearRevenue;
+            }
+
+            var statisticsDto = new RevenueStatisticDto
+            {
+                TotalRevenue = totalRevenue,
+                TotalCompletedBookings = totalCompletedBookings,
+                CompletedBookingsPercentage = totalBookingsCount > 0 ? (double)totalCompletedBookings / totalBookingsCount * 100 : 0,
+                PendingBookingsCount = pendingBookingsCount,
+                AcceptedBookingsCount = acceptedBookingsCount,
+                WaitingBookingsPercentage = totalBookingsCount > 0 ? (double)(pendingBookingsCount + acceptedBookingsCount) / totalBookingsCount * 100 : 0,
+                CancelledBookingsCount = cancelledBookingsCount,
+                CancelledBookingsPercentage = totalBookingsCount > 0 ? (double)cancelledBookingsCount / totalBookingsCount * 100 : 0,
+                MonthlyRevenueChartData = monthlyRevenueChartData
+            };
+
+            return statisticsDto;
         }
     }
 }
