@@ -13,24 +13,20 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Đặt một tên cho policy CORS
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 // Configure OData EDM Model
 static Microsoft.OData.Edm.IEdmModel GetEdmModel()
 {
     var builder = new ODataConventionModelBuilder();
-
-    // Khai b�o EntitySet v� key
-    builder.EntitySet<Booking>("Bookings")
-           .EntityType.HasKey(b => b.Id);
-
-    builder.EntitySet<BookingDetail>("BookingDetails")
-           .EntityType.HasKey(d => d.Id);
-    builder.EntitySet<MonthlyBooking>("OdataMonthlyBooking")
-           .EntityType.HasKey(d => d.Id);
-
+    builder.EntitySet<Booking>("Bookings").EntityType.HasKey(b => b.Id);
+    builder.EntitySet<BookingDetail>("BookingDetails").EntityType.HasKey(d => d.Id);
+    builder.EntitySet<MonthlyBooking>("OdataMonthlyBooking").EntityType.HasKey(d => d.Id);
     return builder.GetEdmModel();
 }
 
-// Add services to the container.
+// === SỬA LỖI: GIỮ LẠI CÁCH VIẾT NỐI CHUỖI ĐÚNG CÚ PHÁP ===
 builder.Services.AddControllers()
     .AddOData(options => options
         .Select()
@@ -39,7 +35,7 @@ builder.Services.AddControllers()
         .Expand()
         .Count()
         .SetMaxTop(100)
-        .AddRouteComponents("odata", GetEdmModel()));
+        .AddRouteComponents("odata", GetEdmModel())); // Prefix "odata" sẽ giúp OData không xung đột với API thường
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -52,47 +48,43 @@ builder.Services.AddAuthentication("Bearer")
         {
             ValidateIssuer = true,
             ValidIssuer = jwtSettings["Issuer"],
-
             ValidateAudience = true,
             ValidAudience = jwtSettings["Audience"],
-
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
     });
 
-// Authorization policies (cho ph�p Customer) ?? d�ng trong Controller
+// Authorization policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Customer", policy =>
-    {
-        policy.RequireRole("Customer");
-    });
+    options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("StadiumManager", policy => policy.RequireRole("StadiumManager"));
+});
 
-    options.AddPolicy("Admin", policy =>
-    {
-        policy.RequireRole("Admin");
-    });
-
-    options.AddPolicy("StadiumManager", policy =>
-    {
-        policy.RequireRole("StadiumManager");
-    });
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5020")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
 });
 
 // Entity Framework
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repositories
+// Repositories & Services
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
 builder.Services.AddScoped<IMonthlyBookingRepository, MonthlyBookingRepository>();
-
-// Services
 builder.Services.AddScoped<IBookingService, BookingService>();
 
 // AutoMapper
@@ -111,6 +103,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Thứ tự Middleware
+app.UseRouting();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -21,5 +21,6 @@ namespace Service.Interfaces
         Task<List<MonthlyBookingReadDto>> GetMonthlyBookingAsync(string accessToken, string queryString);
         Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken);
         Task<BookingReadDto?> UpdateBookingAsync(int id, BookingUpdateDto bookingDto, string accessToken);
+        Task<RevenueStatisticViewModel> GetRevenueStatisticsAsync(string accessToken, int year, int? month, int? day);
     }
 }

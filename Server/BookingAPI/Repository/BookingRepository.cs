@@ -109,5 +109,30 @@ namespace BookingAPI.Repository
 
             return await query.ToListAsync();
         }
+
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day)
+        {
+            var query = _context.Bookings.AsNoTracking().Where(b => b.Date.Year == year);
+
+            if (month.HasValue)
+            {
+                query = query.Where(b => b.Date.Month == month.Value);
+            }
+
+            if (day.HasValue)
+            {
+                query = query.Where(b => b.Date.Day == day.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .Where(b => years.Contains(b.Date.Year))
+                .ToListAsync();
+        }
     }
 }
