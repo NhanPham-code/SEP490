@@ -188,6 +188,42 @@ namespace BookingAPI.Controllers
             }
         }
 
+        [HttpGet("statistics")]
+        public async Task<ActionResult<RevenueStatisticDto>> GetRevenueStatistics([FromQuery] int? year, [FromQuery] int? month, [FromQuery] int? day)
+        {
+            try
+            {
+                // Nếu không có năm được cung cấp, mặc định lấy năm hiện tại
+                int targetYear = year ?? DateTime.UtcNow.Year;
+
+                var statistics = await _bookingService.GetRevenueStatisticsAsync(targetYear, month, day);
+                return Ok(statistics);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("by-stadiums-and-date")]
+        public async Task<ActionResult<IEnumerable<BookingReadDto>>> GetBookingsByStadiumsAndDate(
+                    [FromQuery] List<int> stadiumIds,
+                    [FromQuery] DateTime date)
+        {
+            if (stadiumIds == null || !stadiumIds.Any())
+            {
+                return BadRequest("Stadium IDs must be provided.");
+            }
+
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
-
