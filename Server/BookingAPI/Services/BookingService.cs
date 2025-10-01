@@ -347,5 +347,11 @@ namespace BookingAPI.Services
 
             return statisticsDto;
         }
+
+        public async Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        {
+            var bookings = await _bookingRepository.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+            return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
+        }
     }
 }

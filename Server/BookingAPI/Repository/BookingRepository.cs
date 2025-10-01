@@ -134,5 +134,15 @@ namespace BookingAPI.Repository
                 .Where(b => years.Contains(b.Date.Year))
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        {
+            return await _context.Bookings
+                .Include(b => b.BookingDetails) // Include chi tiết booking
+                .Include(b => b.MonthlyBooking) // Include booking tháng nếu có
+                .Where(b => stadiumIds.Contains(b.StadiumId) && b.Date.Date == date.Date)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

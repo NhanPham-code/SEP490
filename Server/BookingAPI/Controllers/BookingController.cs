@@ -204,5 +204,26 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("by-stadiums-and-date")]
+        public async Task<ActionResult<IEnumerable<BookingReadDto>>> GetBookingsByStadiumsAndDate(
+                    [FromQuery] List<int> stadiumIds,
+                    [FromQuery] DateTime date)
+        {
+            if (stadiumIds == null || !stadiumIds.Any())
+            {
+                return BadRequest("Stadium IDs must be provided.");
+            }
+
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
