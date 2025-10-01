@@ -1431,23 +1431,20 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(response) {
-                    console.log('Success response:', response);
+                        success: function(response) {
+            if (response.success) {
+                showModal('Thành công!', response.message);
 
-                    if (response.success) {
-                        showModal('Thành công!', response.message);
+                // Cập nhật lại danh sách feedback
+                loadFeedbacks(stadiumId, currentPage);
 
-                        // Load danh sách feedback (vẫn cần cập nhật list public)
-                        const pageToLoad = isEditMode ? currentPage : 1;
-                        loadFeedbacks(stadiumId, pageToLoad);
-
-                        // Không reset form — gọi lại AJAX kiểm tra feedback của user
-                        // để load lại dữ liệu của form (chuyển sang edit mode, hiển thị ảnh, ...)
-                        checkUserFeedback(stadiumId);
-                    } else {
-                        showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
-                    }
-                },
+                // Clear preview ảnh mới và load lại feedback của user
+                clearImagePreview();
+                checkUserFeedback(stadiumId); // Form hiển thị lại đúng trạng thái (chỉ ảnh hiện tại)
+            } else {
+                showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
+            }
+        },
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', {status, error, response: xhr.responseText});
 

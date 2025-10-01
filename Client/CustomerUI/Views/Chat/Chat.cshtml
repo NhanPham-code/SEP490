@@ -496,7 +496,21 @@
             .emoji-picker.show {
                 display: flex;
             }
+        /* Giới hạn chiều cao emoji picker, luôn nằm trên input bar */
+        .emoji-picker {
+            max-height: 60vh; /* hoặc dùng: calc(100vh - 120px) */
+            overflow: hidden; /* Ẩn phần tràn */
+            bottom: 60px !important; /* Đẩy lên trên input, nếu cần */
+            box-sizing: border-box;
+        }
 
+        /* Scroll bên trong grid emoji */
+        .emoji-grid {
+            max-height: 42vh; /* hoặc tuỳ chỉnh thấp hơn nếu còn tràn */
+            overflow-y: auto !important;
+            min-height: 120px;
+            box-sizing: border-box;
+        }
         @@keyframes emojiPickerSlideIn {
             from {
                 opacity: 0;
@@ -924,6 +938,75 @@
         }
 
         }
+
+
+
+        /* Responsive images in chat messages */
+        .msg-image img, .msg-gif img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        /* Gọn lại input bar trên mobile */
+        @@media (max-width: 768px) {
+            .chat-input-section
+
+        {
+            padding: 4px 2px 4px 2px !important;
+            gap: 3px;
+            min-height: unset;
+        }
+
+        .chat-input-wrapper {
+            border-radius: 14px;
+            padding: 0 2px;
+        }
+
+        .chat-input {
+            padding: 6px 7px;
+            font-size: 12px;
+            min-height: 16px;
+            max-height: 36px;
+            line-height: 16px;
+        }
+
+        .input-actions button {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 16px !important;
+            padding: 3px !important;
+        }
+
+        .chat-send-btn {
+            padding: 7px 8px !important;
+            min-width: 34px !important;
+            font-size: 14px !important;
+            border-radius: 15px !important;
+        }
+
+        }
+
+        .emoji-categories {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 5px;
+            justify-content: flex-start;
+            padding: 10px;
+            -webkit-overflow-scrolling: touch; /* cho mượt trên iOS */
+            scrollbar-width: thin; /* cho Firefox */
+        }
+
+            .emoji-categories::-webkit-scrollbar {
+                height: 4px;
+                background: transparent;
+            }
+
+       
     </style>
 </head>
 <body>
@@ -1003,12 +1086,18 @@
                     <div class="input-actions">
                         <button class="emoji-btn" id="emojiBtn" title="Add emoji">😊</button>
                         <button class="gif-btn" id="gifBtn" title="Add GIF">🎬</button>
+                        <button class="emoji-btn" id="imageBtn" title="Upload image">📷</button>
                     </div>
                 </div>
                 <button class="chat-btn chat-send-btn" onclick="sendMessage()" disabled id="sendBtn">
                     <span id="sendIcon">🚀</span>
                 </button>
+                <input type="file" id="imageInput" accept="image/*" style="display:none" />
             </div>
+        </div>
+        <div id="imageModal" style="display:none; position:fixed; z-index:2000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+            <span id="closeImageModal" style="position:absolute; top:30px; right:40px; font-size:40px; color:white; cursor:pointer; font-weight:bold;">&times;</span>
+            <img id="modalImg" src="" alt="Zoom Image" style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow:0 6px 30px #000b; display:block; margin:auto;" />
         </div>
     </div>
 
@@ -1780,7 +1869,7 @@
                     timestamp,
                     name: senderName
                 };
-
+                 tangSoTinChuaDoc333(currentReceiverId);
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -1890,17 +1979,19 @@
         }
 
         function openChat(senderId, senderName, receiverId, receiverName) {
-            // existing behavior first: toggle active item
+            // Bỏ active khỏi tất cả chat-item
             document.querySelectorAll('.chat-item').forEach(item => {
                 item.classList.remove('active');
             });
 
+            // Đánh dấu chat hiện tại là active
             const currentChatItem = document.getElementById(`chat-${receiverId}`);
             if (currentChatItem) {
                 currentChatItem.classList.add('active');
             }
 
-            if (currentMessagesRef) {
+            // Gỡ listener cũ nếu có
+            if (typeof currentMessagesRef !== 'undefined' && currentMessagesRef) {
                 off(currentMessagesRef);
             }
 
@@ -1908,22 +1999,28 @@
             currentReceiverName = receiverName;
             currentChatId = generateChatId(senderId, receiverId);
 
+            // Cập nhật UI tên chat và avatar
             document.getElementById('currentChatName').textContent = receiverName;
             const headerAvatar = document.getElementById('headerAvatar');
             if (headerAvatar) {
                 headerAvatar.textContent = receiverName.charAt(0).toUpperCase();
             }
 
+            // Bật ô nhập và nút gửi
             const messageInput = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendBtn');
             if (messageInput) messageInput.disabled = false;
             if (sendBtn) sendBtn.disabled = false;
 
+            // Loading message
             const msgBox = document.getElementById('messages');
             if (msgBox) {
                 msgBox.innerHTML = '<div class="status-message">📖 Loading messages...</div>';
             }
-
+             if (isMobileView()) {
+                showChatOnMobile();
+            }
+            // Lắng nghe dữ liệu message mới
             currentMessagesRef = ref(db, `chats/${currentChatId}`);
             onValue(currentMessagesRef, (snapshot) => {
                 const data = snapshot.val();
@@ -1957,6 +2054,7 @@
                                 minute: '2-digit'
                             });
 
+                            // Hiển thị GIF
                             if (msg.message && msg.message.startsWith('[GIF]')) {
                                 const gifData = msg.message.substring(5);
                                 const [gifUrl, title] = gifData.split('|');
@@ -1966,7 +2064,21 @@
                                     </div>
                                     <small>${time}</small>
                                 `;
-                            } else {
+                            }
+                            // Hiển thị ảnh upload
+                                                   else if (msg.message && msg.message.startsWith('[IMAGE]')) {
+            const imgData = msg.message.substring(7);
+            const [imgUrl, name] = imgData.split('|');
+            div.innerHTML = `
+                <div class="msg-image">
+                    <img src="${imgUrl}" alt="${name || 'Image'}" style="cursor:pointer;"
+                         onclick="window.openImageModal && window.openImageModal('${imgUrl.replace(/'/g, "\\'")}')" />
+                </div>
+                <small>${time}</small>
+            `;
+        }
+                            // Hiển thị text thường
+                            else {
                                 div.innerHTML = `
                                     <div>${msg.message || ''}</div>
                                     <small>${time}</small>
@@ -1986,11 +2098,6 @@
                     msgBox.innerHTML = '<div class="status-message">❌ Error loading messages</div>';
                 }
             });
-
-            // Mobile behavior: if on phone, switch to chat view (hide list)
-            if (isMobileView()) {
-                showChatOnMobile();
-            }
         }
 
         // Expose openChat globally (used by chat list)
@@ -2032,7 +2139,7 @@
                     timestamp,
                     name: senderName
                 };
-
+                 tangSoTinChuaDoc333(currentReceiverId);
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -2173,6 +2280,60 @@
                 subtree: true
             });
         };
+                document.getElementById('imageBtn').addEventListener('click', () => {
+            document.getElementById('imageInput').click();
+        });
+                const IMGBB_API_KEY = '2f25b1206387ee1533a68c5bb1d1f54d'; // Thay YOUR_IMGBB_API_KEY bằng key của bạn
+
+        document.getElementById('imageInput').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                // Đọc file thành base64
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    const base64 = reader.result.split(',')[1];
+                    // Gửi tới ImgBB
+                    const formData = new FormData();
+                    formData.append('key', IMGBB_API_KEY);
+                    formData.append('image', base64);
+
+                    const res = await fetch('https://api.imgbb.com/1/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        sendImageMessage(data.data.url, file.name);
+                    } else {
+                        alert('❌ Không gửi được ảnh, thử lại sau!');
+                    }
+                };
+                reader.readAsDataURL(file);
+            } catch (err) {
+                alert('❌ Không gửi được ảnh, thử lại sau!');
+            }
+        });
+        function sendImageMessage(imageUrl, name) {
+            const senderId = document.getElementById('senderId')?.value.trim();
+            const senderName = document.getElementById('senderName')?.value.trim();
+            const timestamp = Date.now();
+            if (!senderId || !senderName || !currentReceiverId || !currentChatId) {
+                alert('⚠️ Vui lòng nhập đủ thông tin và chọn chat');
+                return;
+            }
+            showTypingIndicator();
+            push(ref(db, `chats/${currentChatId}`), {
+                senderId,
+                senderName,
+                message: `[IMAGE]${imageUrl}|${name}`,
+                timestamp,
+                type: 'image'
+            }).then(() => {
+                hideTypingIndicator();
+                scrollToLatestMessage();
+            });
+        }
 
         // Utility functions
         window.setUserInfo = (userId, userName) => {
@@ -2255,7 +2416,27 @@
           }
         });
 
+         function tangSoTinChuaDoc333(receiverId) {
+            // Tăng số tin chưa đọc cho user nhận (chỉ 1 cấp)
+            const unreadRef = ref(db, `unreadMessages/${receiverId}`);
+            import("https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js").then(({ runTransaction }) => {
+                runTransaction(unreadRef, (current) => (current || 0) + 1);
+            });
+        }
+          window.openImageModal = function(imgUrl) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            modalImg.src = imgUrl;
+            modal.style.display = 'flex';
+        };
 
+        // Đóng modal khi bấm dấu X hoặc nền tối
+        document.getElementById('closeImageModal').onclick = function() {
+            document.getElementById('imageModal').style.display = 'none';
+        };
+        document.getElementById('imageModal').onclick = function(e) {
+            if (e.target === this) this.style.display = 'none';
+        };
     </script>
 </body>
 </html>

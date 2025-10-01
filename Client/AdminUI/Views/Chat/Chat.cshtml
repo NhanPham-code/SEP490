@@ -1704,7 +1704,11 @@
                     timestamp,
                     name: senderName
                 };
-
+                    const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -1927,7 +1931,11 @@
                     timestamp,
                     name: senderName
                 };
-
+                    const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
