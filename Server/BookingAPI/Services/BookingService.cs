@@ -197,34 +197,20 @@ namespace BookingAPI.Services
 
             var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
 
-            if (booking != null && "pending".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
+            if (booking != null && "waiting".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
             {
 
-                booking.Status = "accepted";
-                booking.Note = (booking.Note ?? "") + "Đã được tự động duyệt bởi hệ thống";
+                booking.Status = "payfail";
 
                 try
                 {
 
                     await _bookingRepository.UpdateBookingAsync(booking);
-                    Console.WriteLine($"Duyệt thành công booking {bookingId}");
+                    Console.WriteLine($"Booking {bookingId} thanh toán thất bại");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Lỗi khi duyệt Booking {bookingId}: {ex.Message}");
-                    throw;
-                }
-            }
-            else if ("waiting".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    await _bookingRepository.DeleteBookingAsync(booking.Id);
-                    Console.WriteLine($"Đã loại bỏ Booking treo thanh toán: {bookingId}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi khi xóa Booking treo thanh toán {bookingId}: {ex.Message}");
                     throw;
                 }
             }

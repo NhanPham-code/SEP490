@@ -40,7 +40,6 @@ namespace StadiumManagerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> BookingManager()
         {
-
             var accessToken = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(accessToken))
                 return RedirectToAction("Login", "Account");
@@ -77,11 +76,32 @@ namespace StadiumManagerUI.Controllers
 
             if (stadiums.Any())
             {
+                // 1. Tạo một dictionary để tra cứu CourtName từ CourtId
+                var courtNameLookup = stadiums
+                    .SelectMany(s => s.Courts)
+                    .ToDictionary(c => c.Id, c => c.Name);
+
                 var stadiumIds = stadiums.Select(s => s.Id);
                 string bookingFilter = string.Join(" or ", stadiumIds.Select(id => $"StadiumId eq {id}"));
 
                 var allBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=({bookingFilter})&$expand=BookingDetails") ?? new List<BookingReadDto>();
                 var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter={bookingFilter}") ?? new List<MonthlyBookingReadDto>();
+
+                // 2. Điền CourtName cho tất cả các booking details
+                foreach (var booking in allBookings)
+                {
+                    foreach (var detail in booking.BookingDetails)
+                    {
+                        if (courtNameLookup.TryGetValue(detail.CourtId, out var courtName))
+                        {
+                            detail.CourtName = courtName;
+                        }
+                        else
+                        {
+                            detail.CourtName = $"Sân {detail.CourtId}"; // Giá trị mặc định nếu không tìm thấy
+                        }
+                    }
+                }
 
                 var dailyUserIds = allBookings.Where(b => b.MonthlyBookingId == null).Select(b => b.UserId);
                 var monthlyUserIds = monthlyBookings.Select(b => b.UserId);
@@ -172,60 +192,54 @@ namespace StadiumManagerUI.Controllers
             if (string.IsNullOrEmpty(accessToken))
                 return Unauthorized(new { message = "Token not found" });
 
-            if ("cancelled".Equals(dto.Status, StringComparison.OrdinalIgnoreCase) || "denied".Equals(dto.Status, StringComparison.OrdinalIgnoreCase))
+            if (!"cancelled".Equals(dto.Status, StringComparison.OrdinalIgnoreCase) || dto.ChildBookingIdsToCancel == null || !dto.ChildBookingIdsToCancel.Any())
             {
-                var cancellationFee = (long)(dto.TotalPrice.GetValueOrDefault());
-                if (cancellationFee > 0)
-                {
-                    HttpContext.Session.SetString("FinalStatus", dto.Status);
-                    HttpContext.Session.SetInt32("BookingIdToUpdate", id);
-                    HttpContext.Session.SetString("BookingType", "Monthly");
-                    HttpContext.Session.SetString("AccessToken", accessToken); // Lưu token cho callback
-
-                    var vnpay = new VnPayLibrary();
-                    vnpay.AddRequestData("vnp_Version", _configuration["VNPAY:Version"]);
-                    vnpay.AddRequestData("vnp_Command", _configuration["VNPAY:Command"]);
-                    vnpay.AddRequestData("vnp_TmnCode", _configuration["VNPAY:TmnCode"]);
-                    vnpay.AddRequestData("vnp_Amount", (cancellationFee * 100).ToString());
-                    vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-                    vnpay.AddRequestData("vnp_CurrCode", _configuration["VNPAY:CurrCode"]);
-                    vnpay.AddRequestData("vnp_IpAddr", "127.0.0.1");
-                    vnpay.AddRequestData("vnp_Locale", _configuration["VNPAY:Locale"]);
-                    vnpay.AddRequestData("vnp_OrderInfo", $"Pay cancellation fee for MonthlyBookingId:{id}");
-                    vnpay.AddRequestData("vnp_OrderType", "other");
-                    vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VNPAY:ReturnUrl"]);
-                    vnpay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
-
-                    string paymentUrl = vnpay.CreateRequestUrl(_configuration["VNPAY:Url"], _configuration["VNPAY:HashSecret"]);
-                    return Json(new { paymentRequired = true, paymentUrl = paymentUrl });
-                }
+                return BadRequest(new { message = "Yêu cầu không hợp lệ cho quy trình hủy." });
             }
 
-            // Nếu không có phí, cập nhật như bình thường
-            var updatedMonthlyBooking = await _bookingService.UpdateMonthlyBookingAsync(id, dto, accessToken);
-            if (updatedMonthlyBooking == null)
-                return BadRequest(new { message = "Cập nhật lịch đặt tháng thất bại." });
+            var filter = string.Join(" or ", dto.ChildBookingIdsToCancel.Select(childId => $"Id eq {childId}"));
+            var bookingsToCancel = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {id} and ({filter})");
 
-            try
+            if (bookingsToCancel == null || !bookingsToCancel.Any())
+                return Json(new { success = false, message = "Không tìm thấy lịch đặt hợp lệ để hủy." });
+
+            var totalCancellationValue = bookingsToCancel.Sum(b => b.TotalPrice.GetValueOrDefault());
+            var cancellationFee = (long)(totalCancellationValue);
+
+            // Trường hợp không có phí (ví dụ: hủy các lịch 0đ)
+            if (cancellationFee <= 0)
             {
-                string childBookingFilter = $"?$filter=MonthlyBookingId eq {id}";
-                var childBookings = await _bookingService.GetBookingAsync(accessToken, childBookingFilter);
-                if (childBookings != null && childBookings.Any())
-                {
-                    foreach (var childBooking in childBookings)
-                    {
-                        var childUpdateDto = new BookingUpdateDto { Status = dto.Status, UserId = childBooking.UserId, Date = childBooking.Date, TotalPrice = childBooking.TotalPrice, OriginalPrice = childBooking.OriginalPrice, Note = childBooking.Note, DiscountId = childBooking.DiscountId, StadiumId = childBooking.StadiumId, };
-                        await _bookingService.UpdateBookingAsync(childBooking.Id, childUpdateDto, accessToken);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Lỗi khi cập nhật các lịch đặt con cho MonthlyBookingId {id}: {ex.Message}");
-                return BadRequest(new { message = $"Cập nhật lịch cha thành công, nhưng thất bại khi đồng bộ các lịch con: {ex.Message}" });
+                // Vẫn gọi qua PaymentController để xử lý tập trung, nhưng không qua VNPay
+                // Bằng cách lưu vào TempData và redirect
+                TempData["AccessToken"] = accessToken;
+                TempData["MonthlyBookingId"] = id;
+                TempData["ChildIdsToCancel"] = JsonSerializer.Serialize(bookingsToCancel.Select(b => b.Id));
+                return RedirectToAction("HandleFreeCancellation", "Payment");
             }
 
-            return Json(new { success = true, booking = updatedMonthlyBooking });
+            // CÓ PHÍ: Lưu thông tin vào Session để callback từ VNPay
+            HttpContext.Session.SetString("AccessToken", accessToken);
+            HttpContext.Session.SetInt32("MonthlyBookingIdToUpdate", id);
+            HttpContext.Session.SetString("ChildBookingIdsToCancel", JsonSerializer.Serialize(bookingsToCancel.Select(b => b.Id)));
+
+            var vnpay = new VnPayLibrary();
+            vnpay.AddRequestData("vnp_Version", _configuration["VNPAY:Version"]);
+            vnpay.AddRequestData("vnp_Command", _configuration["VNPAY:Command"]);
+            vnpay.AddRequestData("vnp_TmnCode", _configuration["VNPAY:TmnCode"]);
+            vnpay.AddRequestData("vnp_Amount", (cancellationFee * 100).ToString());
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", _configuration["VNPAY:CurrCode"]);
+            vnpay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1");
+            vnpay.AddRequestData("vnp_Locale", _configuration["VNPAY:Locale"]);
+            vnpay.AddRequestData("vnp_OrderInfo", $"Thanh toan phi huy cho lich dat thang #{id}");
+            vnpay.AddRequestData("vnp_OrderType", "other");
+            vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VNPAY:ReturnUrl"]);
+            vnpay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+
+            string paymentUrl = vnpay.CreateRequestUrl(_configuration["VNPAY:Url"], _configuration["VNPAY:HashSecret"]);
+
+            // Trả về URL để client tự chuyển hướng
+            return Json(new { paymentRequired = true, paymentUrl });
         }
     }
 }

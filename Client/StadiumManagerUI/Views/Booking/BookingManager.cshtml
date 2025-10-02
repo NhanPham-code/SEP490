@@ -56,6 +56,48 @@
             color: #4b5563;
             border: 1px solid #d1d5db;
         }
+        /* ===== BỔ SUNG CSS CHO CHỨC NĂNG HỦY TÍCH HỢP ===== */
+        .bm-child-table th:first-child, .bm-child-table td:first-child {
+            width: 40px;
+            text-align: center;
+        }
+
+        .bm-child-booking-checkbox, .bm-select-all-children {
+            transform: scale(1.2);
+        }
+
+        .bm-child-cancellation-actions {
+            padding: 1rem 1.5rem;
+            text-align: right;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+
+        .bm-confirm-child-cancel-btn {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+            .bm-confirm-child-cancel-btn:hover {
+                background-color: #b91c1c;
+            }
+
+            .bm-confirm-child-cancel-btn:disabled {
+                background-color: #fca5a5;
+                cursor: not-allowed;
+            }
+
+        .cancellation-summary-text {
+            font-size: 0.9em;
+            color: #4b5563;
+            margin-right: 1rem;
+        }
     </style>
 }
 
@@ -168,9 +210,7 @@
     </div>
 
     <div class="bm-booking-section" id="bm-monthly-booking-section">
-        <div class="bm-section-header">
-            <h2 class="bm-section-title">Lịch Đặt Hằng Tháng</h2>
-        </div>
+        <div class="bm-section-header"> <h2 class="bm-section-title">Lịch Đặt Hằng Tháng</h2> </div>
         <div style="overflow-x: auto;">
             <table class="bm-booking-table">
                 <thead><tr><th style="width: 50px;"></th><th class="bm-align-left">Khách hàng / Sân</th><th>Khung giờ / Thời gian</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
@@ -212,35 +252,47 @@
                                     {
                                         <button class="bm-action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-check"></i></button> <button class="bm-action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-times"></i></button>
                                     }
-                                    @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-ban"></i></button>
-                                    }
                                 </td>
                             </tr>
-                            <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id">
+                            <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id" style="display:none;">
                                 <td colspan="7">
                                     <div class="bm-child-table-container">
                                         <h4>Các Lịch Đặt Chi Tiết</h4>
                                         @if (monthlyVm.Bookings.Any())
                                         {
                                             <table class="bm-child-table">
-                                                <thead><tr><th>Ngày Chơi</th><th>Sân Con</th><th>Thời Gian</th><th>Trạng Thái</th></tr></thead>
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th>
+                                                        <th>Ngày Chơi</th>
+                                                        <th>Sân Con</th>
+                                                        <th>Thời Gian</th>
+                                                        <th>Giá tiền</th>
+                                                        <th>Trạng Thái</th>
+                                                    </tr>
+                                                </thead>
                                                 <tbody>
-                                                    @foreach (var childBooking in monthlyVm.Bookings)
+                                                    @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
                                                     {
-                                                        <tr>
+                                                        var isCancellable = !childBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) && !childBooking.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase);
+                                                        <tr style="@(isCancellable ? "" : "color: #9ca3af;")">
+                                                            <td><input type="checkbox" class="bm-child-booking-checkbox" value="@childBooking.Id" data-price="@childBooking.TotalPrice" @(isCancellable ? "" : "disabled")></td>
                                                             <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
-                                                            <td>@string.Join(", ", childBooking.BookingDetails.Select(d => $"ID {d.CourtId}"))</td>
+                                                            <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
                                                             <td>@if (childBooking.BookingDetails.Any())
                                                                 {
                                                                     <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
                                                                 }</td>
+                                                            <td class="bm-price">@((childBooking.TotalPrice ?? 0).ToString("N0"))₫</td>
                                                             <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
                                                         </tr>
                                                     }
                                                 </tbody>
                                             </table>
+                                            <div class="bm-child-cancellation-actions">
+                                                <span class="cancellation-summary-text">Đã chọn: <b class="selected-count">0</b> | Phí hủy: <b class="cancellation-fee">0₫</b></span>
+                                                <button class="bm-confirm-child-cancel-btn" disabled>Hủy <span class="selected-count">0</span> mục đã chọn</button>
+                                            </div>
                                         }
                                         else
                                         {

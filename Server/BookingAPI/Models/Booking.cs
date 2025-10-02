@@ -11,6 +11,7 @@ namespace BookingAPI.Models
         [Required]
         [ForeignKey("User")]
         public int UserId { get; set; }
+        public int CreatedById { get; set; }
 
         [StringLength(20)]
         public string Status { get; set; } = "pending";
