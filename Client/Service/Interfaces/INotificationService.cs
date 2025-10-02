@@ -1,5 +1,6 @@
 ﻿using DTOs.NotificationDTO;
 using DTOs.OData;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,9 @@ namespace Service.Interfaces
         Task<IEnumerable<NotificationDTO>> GetNotificationsByUserIdAsync(int userId, int top, int skip);
         Task<int> GetUnreadNotificationCountAsync(string accessToken);
         Task MarkAllAsReadAsync(string accessToken);
+        Task<HubConnection> ConnectToSignalRAsync();
+        Task<bool> SendNotificationToUserAsync(NotificationDTO notificationDTO);
+        Task<bool> SendNotificationToGroupUserAsync(string groupName, List<NotificationDTO> notificationDTOs);
+        Task<bool> SendNotificationToAll(NotificationDTO notificationDTO);
     }
 }

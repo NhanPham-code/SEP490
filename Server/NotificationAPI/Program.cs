@@ -91,7 +91,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("StadiumManager");
     });
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(_ => true) // hoặc .WithOrigins("http://localhost:3000") với frontend cụ thể
+            .AllowCredentials();
+    });
+});
 // Inject DB
 builder.Services.AddDbContext<NotificationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -115,6 +125,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(); // Phải đặt trước UseAuthorization và MapHub
 
 app.UseAuthorization();
 

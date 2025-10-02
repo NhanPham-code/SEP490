@@ -46,7 +46,7 @@ namespace Service.Services
             {
                 HttpOnly = true, // Quan trọng: Ngăn JavaScript truy cập -> chống XSS
                 Secure = true,   // Chỉ gửi qua HTTPS
-                SameSite = SameSiteMode.Strict // Chống CSRF
+                SameSite = SameSiteMode.Lax // Chống CSRF
             };
 
             // 2. Thiết lập cho cookie chứa thông tin công khai (thời gian hết hạn)
@@ -54,7 +54,7 @@ namespace Service.Services
             {
                 HttpOnly = false, // Cho phép JavaScript đọc nếu cần (ví dụ: để hiển thị thông báo sắp hết hạn)
                 Secure = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Lax
             };
 
             // 3. Xử lý thời gian sống của cookie

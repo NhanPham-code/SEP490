@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Gateway\\Gateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "StadiumAPI\\StadiumAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "UserAPI\\UserAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookingAPI\\BookingAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "NotificationAPI\\NotificationAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -415,7 +415,7 @@ body {
 }
 #filter-form {
     padding-top: 17%;
-
+    z-index: 20;
     position: sticky;
     top: 0;
 }
@@ -1740,7 +1740,7 @@ body {
         left: -100%;
         width: 350px;
         height: 100vh;
-        z-index: var(--z-modal);
+
         transition: left var(--transition-base);
         max-height: none;
         border-radius: 0;
@@ -1748,6 +1748,7 @@ body {
 
         .sidebar.active {
             left: 0;
+    
         }
 
     #mobile-filter-btn {
@@ -2331,4 +2332,9 @@ body {
     font-size: 24px;
     cursor: pointer;
     color: red;
+}
+
+.stadium-name {
+    font-weight: 700;
+    font-size: large;
 }

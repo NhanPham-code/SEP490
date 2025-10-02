@@ -296,5 +296,47 @@ namespace Service.Services
             return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
 
+        public async Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots, string accessToken)
+        {
+
+
+            AddBearerAccessToken(accessToken);
+            var response = await _httpClient.PostAsJsonAsync("/bookings/checkAvailability", requestedSlots);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(error);
+                return false;
+            }
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Kiểm tra tình trạng sân thất bại. Lỗi từ API: {response.StatusCode} - {errorContent}");
+        }
+        public async Task<RevenueStatisticViewModel> GetRevenueStatisticsAsync(string accessToken, int year, int? month, int? day)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var queryParams = new List<string> { $"year={year}" };
+            if (month.HasValue) queryParams.Add($"month={month.Value}");
+            if (day.HasValue) queryParams.Add($"day={day.Value}");
+            var queryString = string.Join("&", queryParams);
+
+            var response = await _httpClient.GetAsync($"/booking/statistics?{queryString}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Xử lý lỗi tùy ý (throw hoặc trả về model rỗng)
+                return new RevenueStatisticViewModel();
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<RevenueStatisticViewModel>();
+            return result ?? new RevenueStatisticViewModel();
+        }
     }
 }

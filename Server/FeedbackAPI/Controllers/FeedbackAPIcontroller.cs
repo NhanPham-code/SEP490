@@ -1,5 +1,6 @@
 ﻿using FeedbackAPI.DTOs;
 using FeedbackAPI.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -39,10 +40,11 @@ namespace FeedbackAPI.Controllers
         }
 
         /// <summary>
-        /// Tạo feedback mới
+        /// Tạo feedback mới (cho phép upload ảnh)
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateFeedback dto)
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> Create([FromForm] CreateFeedback dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -52,10 +54,10 @@ namespace FeedbackAPI.Controllers
         }
 
         /// <summary>
-        /// Cập nhật feedback
+        /// Cập nhật feedback (có thể cập nhật ảnh hoặc giữ nguyên)
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateFeedback dto)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateFeedback dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -71,6 +73,7 @@ namespace FeedbackAPI.Controllers
         /// Xóa feedback
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteAsync(id);
@@ -80,5 +83,14 @@ namespace FeedbackAPI.Controllers
             return Ok(new { message = "Deleted successfully" });
         }
 
+        /// <summary>
+        /// Lấy feedback theo StadiumId
+        /// </summary>
+        [HttpGet("stadium/{stadiumId}")]
+        public async Task<IActionResult> GetByStadiumId(int stadiumId)
+        {
+            var feedbacks = await _service.GetByStadiumIdAsync(stadiumId);
+            return Ok(feedbacks);
+        }
     }
 }

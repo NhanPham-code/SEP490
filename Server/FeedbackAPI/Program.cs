@@ -2,14 +2,77 @@
 using FeedbackAPI.Mapper;
 using FeedbackAPI.Repository;
 using FeedbackAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// ===== JWT Authentication =====
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// ===== CORS ===== (Cập nhật)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:7128", "http://localhost:7128") // Thêm cả http
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Thêm dòng này
+    });
+
+    // Hoặc dùng policy rộng hơn để test
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+// ===== Authorization Policies =====
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Customer", policy =>
+    {
+        policy.RequireRole("Customer");
+    });
+
+    options.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+
+    options.AddPolicy("StadiumManager", policy =>
+    {
+        policy.RequireRole("StadiumManager");
+    });
+});
+
+// ===== OData + Controllers =====
 builder.Services.AddControllers()
     .AddOData(options =>
     {
@@ -19,26 +82,27 @@ builder.Services.AddControllers()
                .Expand()
                .Count()
                .SetMaxTop(100)
-               .AddRouteComponents("api", GetEdmModel()); // Thêm route OData + EDM model
+               .AddRouteComponents("odata", GetEdmModel());
+        // route là "/odata"
     });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Đăng ký DbContext
+// ===== DbContext =====
 builder.Services.AddDbContext<FeedbackDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Đăng ký Repository & Service
+// ===== Repository & Service =====
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
-// Đăng ký AutoMapper
+// ===== AutoMapper =====
 builder.Services.AddAutoMapper(typeof(FeedbackProfile));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// ===== Middleware Pipeline =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -46,14 +110,23 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+// ⚡ Thêm CORS ở đây (phải trước Authentication/Authorization)
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
 
-// Tạo EDM model cho OData
+// ===== EDM Model for OData =====
 IEdmModel GetEdmModel()
 {
     var modelBuilder = new ODataConventionModelBuilder();
-    modelBuilder.EntitySet<FeedbackAPI.Models.Feedback>("Feedback");
+    // EntitySet phải trùng với Controller: FeedbackODataController
+    modelBuilder.EntitySet<FeedbackAPI.Models.Feedback>("FeedbackOData");
     return modelBuilder.GetEdmModel();
 }

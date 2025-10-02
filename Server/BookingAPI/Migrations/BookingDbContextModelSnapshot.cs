@@ -170,9 +170,11 @@ namespace BookingAPI.Migrations
 
             modelBuilder.Entity("BookingAPI.Models.Booking", b =>
                 {
-                    b.HasOne("BookingAPI.Models.MonthlyBooking", null)
+                    b.HasOne("BookingAPI.Models.MonthlyBooking", "MonthlyBooking")
                         .WithMany("Bookings")
                         .HasForeignKey("MonthlyBookingId");
+
+                    b.Navigation("MonthlyBooking");
                 });
 
             modelBuilder.Entity("BookingAPI.Models.BookingDetail", b =>

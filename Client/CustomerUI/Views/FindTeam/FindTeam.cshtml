@@ -11,21 +11,25 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" as="style">
 
     <!-- Stylesheets -->
+    <!-- CSS trước, JS sau -->
     <link rel="stylesheet" href="~/css/FindTeam/FindTeam.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chỉ giữ 1 remixicon -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.css">
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.css">
     <script src="https://cdn.jsdelivr.net/npm/quill-emoji/dist/quill-emoji.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
     <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
     <link href="~/css/FindTeam/tutorial.css" rel="stylesheet" />
 
     <!-- SEO and Meta -->
@@ -105,6 +109,8 @@
                     </div>
                 </div> *@
             </div>
+            <input type="hidden" id="senderId" value="@ViewBag.UserId" />
+            <input type="hidden" id="senderName" value="@ViewBag.UserName" />
 
             <div class="content-grid">
                 <!-- Filter Sidebar -->
@@ -139,12 +145,22 @@
                             <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
                                 <div class="filter-options">
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 5" >
                                         <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Bóng Đá</span>
+                                        <span class="label-text">Bóng đá sân 5</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Rổ">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 7" >
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 7</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 11" >
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 11</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng rổ">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Rổ</span>
                                     </label>
@@ -154,7 +170,7 @@
                                         <span class="label-text">Tennis</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu Lông">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu lông">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Cầu Lông</span>
                                     </label>
@@ -377,9 +393,47 @@
             </div>
         </div>
     </main>
-    
+
 
     <script>
+
+        //kết nối với signalR
+
+
+        function connectToSignalR() {
+                    const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7072/notificationHub")
+            .build();
+
+        // Lắng nghe sự kiện "ReceiveNotification"
+               connection.on("ReceiveNotification", function (notification) {
+            // Xử lý notification nhận được ở đây
+            console.log("Nhận thông báo mới:", notification);
+            if(notification.parameters.length > 0){
+                loadPost();
+        // Parse chuỗi thành object/array
+        const data = JSON.parse(notification.parameters);
+        console.log("Dữ liệu đã phân tích:", data);
+            }else{
+                setTimeout(function() {
+                loadPost(); // Tải lại bài đăng sau 3 giây
+            }, 3000);
+            }
+            
+            // Ví dụ: Hiển thị thông báo toast
+            // showToast(notification.title, notification.message);
+        });
+
+        // Kết nối tới hub
+        connection.start()
+            .then(function () {
+                console.log("Đã kết nối tới notification hub!");
+            })
+            .catch(function (err) {
+                return console.error(err.toString());
+            });
+        }
+
         let skip = 0;
         let pageSize = 0;
 
@@ -406,7 +460,7 @@
 
         //main 
         $(document).ready(function() {
-
+            connectToSignalR();
             sessionStorage.clear();
             showLoading();
    
@@ -738,10 +792,20 @@
                              <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
                                 <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
                          </div>
-                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
+                         <a href="javascript:void(0)"
+                   title="Chat với người đăng"
+                   class="chat-icon"
+                   data-receiver-id="${p.createdBy}"
+                   data-receiver-name="${profile[p.createdBy].fullName}"
+                   onclick="toggleChat(this)">
+                   <i class="ri-message-2-line"></i>
+                </a>
                      </div>
                      <div class="game-details">
-
+                        <div class="detail-item">
+                             <i class="ri-home-6-line"></i>
+                             <h3 class="stadium-name">${p.stadiumName}</h3>
+                         </div>
                          <div class="detail-item">
                              <i class="ri-basketball-line"></i>
                              <span>${p.sportType}</span>
@@ -846,8 +910,9 @@
 
         function joindTeam(postId){
  
-        
-        
+        // $('#join-btn').classList.add('loading'); 
+        //         $('#join-btn').classList.add('disable'); 
+
                 // Gửi yêu cầu AJAX để tham gia bài đăng
                 $.ajax({
                     url: '/FindTeam/JoinTeamPost',
@@ -913,7 +978,7 @@
             }
             if (hidden[post.id] === 0 || post.joinedPlayers < post.neededPlayers) {
                 return `
-                <button onClick="joindTeam(${post.id})" class="btn btn-primary btn-join">
+                <button onClick="joindTeam(${post.id})" id="join-btn" class="btn btn-primary btn-join">
                     <i class="ri-user-add-line"></i>
                     Tham Gia
                 </button>
@@ -922,12 +987,40 @@
             
         }
 
+        // loading khi nhan tao bai dang
+        function createLoading(){
+            Swal.fire({
+                title: 'Đang tạo bài đăng...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
 
                              function openCreate() {
+                                 createLoading();
             $.ajax({
                 url: '/FindTeam/GetBookByUserId',
                 type: 'GET',
                 success: function(reponse) {
+                    // neu khon cos du lieu thi thong bao
+                    if(reponse.message === 404){
+                         Swal.fire({
+                            icon: 'warning',
+                            title: 'Chưa có lịch đặt sân!',
+                            text: 'Vui lòng đặt sân trước khi tạo bài đăng tìm đội.',
+                            confirmButtonText: 'Đến trang đặt sân',
+                            confirmButtonColor: '#3b82f6',
+                            cancelButtonText: 'Hủy'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/Home/Index'; // Chuyển hướng đến trang đặt sân
+                            }
+                            return;
+                        });
+                    }
                     console.log("booking: ", reponse);
                     let quill;
                     Swal.fire({
@@ -1032,6 +1125,7 @@
                         const playDate = document.getElementById('newPlayDate').value;
                         const bookingId = parseInt(document.getElementById('newBookingId').value);
                         const stadiumId = parseInt(document.getElementById('stadiumId').value);
+                        const stadiumName = document.getElementById('stadiumName').value;
 
                     
 
@@ -1044,7 +1138,8 @@
                             { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
-                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' }
+                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
+                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' }
                         ];
                         console.log("validations: ", validations);
 
@@ -1066,6 +1161,7 @@
                         formData.append('description', description);
                         formData.append('timePlay', timePlay);
                         formData.append('playDate', playDate);
+                        formData.append('stadiumName', stadiumName); // Mặc định là 1 (Đang tìm đội)
                         formData.append('bookingId', bookingId);
                         formData.append('stadiumId', stadiumId)
 
@@ -1119,6 +1215,7 @@
                                 </div>
                                 <div class="input-helper">Chọn một booking đã đặt để tạo bài đăng tìm đội</div>
                                 <input type="hidden" id="selectedBookingId" value="">
+                                <input type="hidden" id="stadiumName" value="">
                             </div>
 
                             <!-- Selected Booking Info Display -->
@@ -1394,6 +1491,7 @@
             console.log("Selected stadium data:", stadium);
             // Update hidden input with selected booking ID
             document.getElementById('selectedBookingId').value = bookingData.id;
+            document.getElementById('stadiumName').value = stadium.name || 'Sân không xác định';
 
             // Auto-fill form fields based on selected booking
             fillFormFromBooking(bookingData, stadium);
@@ -1664,6 +1762,98 @@
           return `${hours}:${minutes}`;
         }
 
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.firebasestorage.app",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Hàm mở chat
+                       // Hàm mở chat
+        function toggleChat(el) {
+            const senderId = document.getElementById("senderId")?.value;
+            const senderName = document.getElementById("senderName")?.value;
+
+            const receiverId = el.getAttribute("data-receiver-id");
+            const receiverName = el.getAttribute("data-receiver-name");
+
+            if (!senderId || !receiverId) {
+                alert("⚠️ Thiếu thông tin user");
+                return;
+            }
+            if (senderId === receiverId) {
+                alert("😅 Bạn không thể chat với chính mình");
+                return;
+            }
+
+            // truyền luôn receiverName vào
+            createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+        }
+
+        // Tạo phòng chat
+        function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName || "Người dùng",  // 👈 hiển thị đúng tên người nhận
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName || "Người dùng",   // 👈 hiển thị tên người gửi
+                timestamp,
+                lastMessage: ""
+            };
+
+            Promise.all(
+                Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+            ).then(() => {
+                console.log("✅ Chat room created successfully");
+                redirectToChat(senderId, senderName, receiverId, receiverName);
+            }).catch((error) => {
+                console.error("❌ Error creating chat room:", error);
+                redirectToChat(senderId, senderName, receiverId, receiverName);
+            });
+        }
+
+        // Redirect sang trang Chat.cshtml
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName: senderName || "",
+                receiverId,
+                receiverName: receiverName || receiverId
+            });
+
+            // Gọi đến action ChatController.Chat
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+
+        // Gắn sự kiện click cho button
+        document.addEventListener("DOMContentLoaded", () => {
+            const floatingChatBtn = document.getElementById("floating-chat-btn");
+            if (floatingChatBtn) {
+                floatingChatBtn.addEventListener("click", toggleChat);
+            }
+        });
+
+        // Cho phép gọi trực tiếp onclick từ HTML
+        window.toggleChat = toggleChat;
     </script>
 
     <!-- Filter Overlay for Mobile -->

@@ -473,10 +473,13 @@
                 min-height: 52px;
             }
         }
+        #header-mobile{
+            position: relative;
+        }
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
+<body id="body-mobile" class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
 
     @{
         var accessToken = Context.Request.Cookies["AccessToken"];
@@ -492,7 +495,8 @@
         searchOpen: false,
         notificationCount: 3
     }"
-            class="mobile-nav glass-effect sticky top-0 z-50 shadow-soft">
+    id="header-mobile"
+            class="mobile-nav glass-effect  top-0 z-50 shadow-soft">
         <div class="flex justify-between items-center h-16 px-4">
 
             <!-- Left: Menu Button -->
@@ -638,10 +642,10 @@
     </button>
 
     <!-- Enhanced Bottom Navigation with Profile - Responsive -->
-    <nav x-data="{
+    <nav id="nav-mobile" x-data="{
         activeTab: 'home',
         userMenuOpen: false
-    }" class="mobile-nav fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-200 z-40 shadow-soft bottom-nav-safe">
+    }" class="mobile-nav fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-200 z-40 shadow-soft bottom-nav-safe" >
         <div class="bottom-nav-container">
             <!-- Home -->
             <a asp-controller="Home" asp-action="Index"
@@ -794,12 +798,12 @@
     </nav>
 
     <!-- Main Content -->
-    <div role="main" class="pb-24 max-w-7xl mx-auto px-4 animate-fade-in">
+    <div id="main-body" role="main" class="pb-24 max-w-7xl mx-auto px-4 animate-fade-in">
         @RenderBody()
     </div>
 
     <!-- Enhanced Footer -->
-    <footer class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16 mt-12 relative overflow-hidden">
+    <footer id="footer" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16 mt-12 relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Logo & social -->
