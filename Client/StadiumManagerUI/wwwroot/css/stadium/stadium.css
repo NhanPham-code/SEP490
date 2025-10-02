@@ -385,7 +385,8 @@
 
 .location-info {
     display: flex;
-    align-items: center;
+    align-items: start;
+    text-align: start;
     gap: 0.5rem;
     color: var(--text-secondary);
     margin-bottom: 1.5rem;

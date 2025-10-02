@@ -434,7 +434,6 @@ body {
     .sidebar {
 
         max-height: calc(90vh - 2rem) !important;
-
         
     }
 
@@ -1729,7 +1728,7 @@ body {
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1000px) {
     .content-grid {
         grid-template-columns: 1fr;
     }
@@ -1750,6 +1749,7 @@ body {
             left: 0;
     
         }
+
 
     #mobile-filter-btn {
         display: flex;

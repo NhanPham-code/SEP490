@@ -44,6 +44,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IStadiumService, StadiumService>();
+builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
