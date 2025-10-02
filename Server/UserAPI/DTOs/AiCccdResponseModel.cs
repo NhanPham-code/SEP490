@@ -2,7 +2,7 @@
 
 namespace UserAPI.DTOs
 {
-    public class AiResponseModel
+    public class AiCccdResponseModel
     {
         [JsonPropertyName("name")]
         public List<string> Name { get; set; } = new List<string>();

@@ -66,12 +66,18 @@ namespace Service.Services
                 form.Add(avatarContent, nameof(dto.Avatar), dto.Avatar.FileName);
             }
 
-            if (dto.FaceVideo != null)
+            if (dto.FaceImages != null && dto.FaceImages.Any())
             {
-                var faceContent = new StreamContent(dto.FaceVideo.OpenReadStream());
-                faceContent.Headers.ContentType =
-                    new MediaTypeHeaderValue(dto.FaceVideo.ContentType);
-                form.Add(faceContent, nameof(dto.FaceVideo), dto.FaceVideo.FileName);
+                foreach (var faceImage in dto.FaceImages)
+                {
+                    if (faceImage != null && faceImage.Length > 0)
+                    {
+                        var faceContent = new StreamContent(faceImage.OpenReadStream());
+                        faceContent.Headers.ContentType = new MediaTypeHeaderValue(faceImage.ContentType);
+                        // Tên field là FaceImages (trùng tên property trong DTO)
+                        form.Add(faceContent, "FaceImages", faceImage.FileName);
+                    }
+                }
             }
 
             var response = await _httpClient.PostAsync("/users/CustomerRegister", form);
@@ -418,6 +424,20 @@ namespace Service.Services
                 // Trả về danh sách rỗng hoặc ném lại lỗi tùy theo yêu cầu của ứng dụng
                 return new List<PublicUserProfileDTO>();
             }
+        }
+
+        public async Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO)
+        {
+            using var form = new MultipartFormDataContent();
+            if (aiFaceLoginRequestDTO.FaceImage != null)
+            {
+                var faceContent = new StreamContent(aiFaceLoginRequestDTO.FaceImage.OpenReadStream());
+                faceContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(aiFaceLoginRequestDTO.FaceImage.ContentType);
+                form.Add(faceContent, "FaceImage", aiFaceLoginRequestDTO.FaceImage.FileName);
+            }
+
+            var response = await _httpClient.PostAsync("/users/face-login", form);
+            return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace UserAPI.Model
 
         public string? AvatarUrl { get; set; }
 
-        public string? FaceVideoUrl { get; set; }
+        public string? FaceEmbeddingsJson { get; set; } // Lưu trữ embeddings dưới dạng JSON string
 
         public string? IdentityNumber { get; set; }
 

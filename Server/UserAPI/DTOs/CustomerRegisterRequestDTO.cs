@@ -14,8 +14,6 @@ namespace UserAPI.DTOs
         [Required]
         public string Password { get; set; } = null!;
 
-        public string Role { get; set; } = "None";
-
         public string? Address { get; set; }
 
         [Required, MaxLength(12), MinLength(9)]
@@ -25,11 +23,12 @@ namespace UserAPI.DTOs
         [GenderValidator]
         public string? Gender { get; set; }
 
-        [DateOfBirth(18)] // bắt buộc >= 18 tuổi
+        [DateOfBirth(15)] // bắt buộc >= 15 tuổi đối với khách hàng
         public string? DateOfBirth { get; set; }
 
         public IFormFile? Avatar { get; set; }
 
-        public IFormFile? FaceVideo { get; set; }
+        // thêm 5 ảnh khuông mặt
+        public List<IFormFile>? FaceImages { get; set; }
     }
 }

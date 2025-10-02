@@ -73,7 +73,6 @@ namespace UserAPI.Repository
 
         public async Task<AdminUserStatsDTO> GetAdminUserStatsAsync()
         {
-            // Query DB với Entity Framework hoặc Dapper...
             var now = DateTime.UtcNow;
             var monthStart = new DateTime(now.Year, now.Month, 1);
 
@@ -89,6 +88,25 @@ namespace UserAPI.Repository
                 BannedUsers = bannedUsers,
                 NewUsersThisMonth = newUsersThisMonth
             };
+        }
+
+        public async Task<List<UserEmbeddingDTO>> GetAllUserEmbeddingsAsync()
+        {
+            // Lấy tất cả người dùng có face embeddings
+            var usersWithEmbeddings = await _context.Users
+                .Where(u => u.FaceEmbeddingsJson != null && u.FaceEmbeddingsJson != "")
+                .Select(u => new { u.UserId, u.Email, u.FaceEmbeddingsJson })
+                .ToListAsync();
+
+            // Chuyển đổi sang DTO
+            var usersWithEmbeddingsDTO = usersWithEmbeddings.Select(u => new UserEmbeddingDTO
+            {
+                UserId = u.UserId,
+                Email = u.Email,
+                FaceEmbeddingsJson = u.FaceEmbeddingsJson
+            }).ToList();
+
+            return usersWithEmbeddingsDTO;
         }
     }
 }
