@@ -14,5 +14,6 @@ namespace DTOs.BookingDTO
 
         [StringLength(20)]
         public string? Status { get; set; }
+        public List<int>? ChildBookingIdsToCancel { get; set; }
     }
 }

@@ -11,6 +11,9 @@ using StadiumAPI.DTOs;
 using System.Text.Json;
 using DTOs.Helpers;
 using System.Net;
+using DTOs.BookingDTO.ViewModel;
+using DTOs.StadiumDTO;
+using DTOs.UserDTO;
 
 namespace CustomerUI.Controllers
 {
@@ -147,77 +150,110 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetInt32("BookingId", createdBooking.Id);
             return Redirect(paymentUrl);
         }
+        [HttpGet]
         public async Task<IActionResult> BookingHistory()
         {
-            // **SỬA ĐỔI Ở ĐÂY**
-            // GetAccessToken giờ sẽ ưu tiên đọc từ Session trước
-            var accessToken = GetAccessToken();
-
+            var accessToken = GetAccessToken(); // Giả sử phương thức này tồn tại để lấy token
             if (string.IsNullOrEmpty(accessToken))
             {
                 TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
-                return RedirectToAction("Login", "Common");
+                return RedirectToAction("Login", "Account"); // Chuyển hướng đến trang đăng nhập
             }
 
             var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["ErrorMessage"] = "Không thể xác định người dùng.";
+                return RedirectToAction("Login", "Account");
+            }
 
-            List<BookingReadDto> bookings;
+            // TÁI SỬ DỤNG ViewModel từ trang quản lý
+            var viewModel = new BookingManagementViewModel();
+
+            // Lấy thông tin người dùng hiện tại một lần
+            var currentUser = await _userService.GetUsersByIdsAsync(new List<int> { userId.Value }, accessToken);
+            var userProfile = currentUser?.FirstOrDefault() ?? new PublicUserProfileDTO { FullName = "Người dùng" };
+
             try
             {
-                var url = $"?$filter=UserId eq {userId} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$orderby=Date desc";
+                // 1. Lấy tất cả booking (cả lẻ và con của tháng) của user
+                string bookingFilter = $"?$filter=UserId eq {userId}&$expand=BookingDetails&$orderby=Date desc";
+                var allUserBookings = await _bookingService.GetBookingAsync(accessToken, bookingFilter) ?? new List<BookingReadDto>();
 
-                bookings = await _bookingService.GetBookingAsync(accessToken, url);
+                // 2. Lấy tất cả các gói đặt tháng của user
+                string monthlyBookingFilter = $"?$filter=UserId eq {userId}&$orderby=CreatedAt desc";
+                var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyBookingFilter) ?? new List<MonthlyBookingReadDto>();
 
-                // ... logic xử lý booking của bạn ...
-                if (bookings != null && bookings.Count > 0)
+                // 3. Lấy thông tin các sân vận động liên quan
+                var allStadiumIds = allUserBookings.Select(b => b.StadiumId)
+                                      .Concat(monthlyBookings.Select(b => b.StadiumId))
+                                      .Distinct().ToList();
+
+                var stadiumLookup = new Dictionary<int, ReadStadiumDTO>();
+                if (allStadiumIds.Any())
                 {
-                    var stadiumIds = bookings.Select(b => b.StadiumId).Distinct().ToList();
-                    var stadiumNames = new Dictionary<int, string>();
-                    foreach (var id in stadiumIds)
+                    var stadiumTasks = allStadiumIds.Select(id => _stadiumService.GetStadiumByIdAsync(id));
+                    var stadiums = await Task.WhenAll(stadiumTasks);
+                    foreach (var stadium in stadiums.Where(s => s != null))
                     {
-                        var stadium = await _stadiumService.GetStadiumByIdAsync(id);
-                        if (stadium != null)
-                        {
-                            stadiumNames[id] = stadium.Name;
-                        }
+                        stadiumLookup[stadium.Id] = stadium;
                     }
-                    ViewBag.StadiumNames = stadiumNames;
+                }
+                ViewBag.AllStadiums = stadiumLookup.Values.ToList(); // Gửi danh sách sân cho View
 
-                    var discountInfo = new Dictionary<int, string>();
-                    foreach (var booking in bookings)
+                // 4. Hoàn thiện CourtName cho các BookingDetails
+                var courtNameLookup = stadiumLookup.Values
+                    .SelectMany(s => s.Courts)
+                    .ToDictionary(c => c.Id, c => c.Name);
+
+                foreach (var booking in allUserBookings)
+                {
+                    foreach (var detail in booking.BookingDetails)
                     {
-                        if (booking.DiscountId.HasValue)
-                        {
-                            var discount = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
-                            if (discount != null)
-                            {
-                                discountInfo[booking.Id] = $"Giảm {discount.PercentValue}%";
-                            }
-                            else
-                            {
-                                discountInfo[booking.Id] = "Mã không hợp lệ";
-                            }
-                        }
-                        else
-                        {
-                            discountInfo[booking.Id] = "Không áp dụng";
-                        }
+                        detail.CourtName = courtNameLookup.GetValueOrDefault(detail.CourtId, $"Sân {detail.CourtId}");
                     }
-                    ViewBag.DiscountInfo = discountInfo;
+                }
+
+                // 5. Phân loại và đưa vào ViewModel
+                // Lịch đặt ngày (không thuộc gói tháng)
+                var dailyBookingsList = allUserBookings.Where(b => b.MonthlyBookingId == null);
+                foreach (var booking in dailyBookingsList)
+                {
+                    viewModel.DailyBookings.Add(new DailyBookingWithUserViewModel
+                    {
+                        Booking = booking,
+                        User = userProfile // User ở đây là chính họ
+                    });
+                }
+
+                // Lịch đặt tháng và các lịch con của nó
+                var bookingsInMonthlyPlan = allUserBookings
+                    .Where(b => b.MonthlyBookingId != null)
+                    .GroupBy(b => b.MonthlyBookingId.Value) // Chắc chắn có giá trị
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var mb in monthlyBookings)
+                {
+                    viewModel.MonthlyBookings.Add(new MonthlyBookingWithDetailsViewModel
+                    {
+                        MonthlyBooking = mb,
+                        User = userProfile, // User ở đây là chính họ
+                        Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>())
+                    });
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Lỗi khi lấy lịch sử booking.";
-                bookings = new List<BookingReadDto>();
+                // Ghi lại log lỗi (quan trọng)
+                // logger.LogError(ex, "Error fetching booking history for user {UserId}", userId);
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi tải lịch sử đặt sân của bạn.";
             }
             finally
             {
-                // Sau khi đã dùng xong, xóa token khỏi session để các lần sau dùng cookie như bình thường
                 HttpContext.Session.Remove("AccessToken");
             }
 
-            return View(bookings);
+            return View(viewModel);
         }
 
         #region Private Helper Methods
@@ -776,7 +812,7 @@ namespace CustomerUI.Controllers
                     vnpay.AddRequestData("vnp_Locale", _configuration["VNPAY:Locale"]);
                     vnpay.AddRequestData("vnp_OrderInfo", $"MonthlyId:{createdMonthlyBooking.Id}");
                     vnpay.AddRequestData("vnp_OrderType", "other");
-                    vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VNPAY:ReturnUrl"]);
+                    vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VNPAY:ReturnUrlMonthly"]);
                     vnpay.AddRequestData("vnp_TxnRef", tick);
                     vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(5).ToString("yyyyMMddHHmmss"));
 
