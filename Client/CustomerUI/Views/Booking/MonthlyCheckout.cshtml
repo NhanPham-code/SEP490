@@ -108,7 +108,7 @@
             </div>
 
             <!-- Discount Section -->
-            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+            <div id="discount-section" class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Mã giảm giá</h2>
                 <div class="flex gap-2 items-center">
                     <span id="selected-discount-code" class="flex-grow p-3 rounded-lg bg-white border border-gray-300 text-gray-600">Chưa có mã giảm giá nào được chọn</span>
@@ -117,7 +117,7 @@
             </div>
 
             <!-- Payment Method Section -->
-            <div class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
+            <div id="payment-section" class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Chọn phương thức thanh toán</h2>
                 <div class="space-y-4">
                     <label class="flex items-center p-4 bg-white rounded-lg shadow-sm cursor-pointer border border-gray-200">
@@ -128,7 +128,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-between items-center gap-4 mt-8">
+            <div id="action-buttons-container" class="flex justify-between items-center gap-4 mt-8">
                 <button type="button" id="back-button" class="min-w-[150px] px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">Quay lại</button>
                 <button type="submit" id="complete-booking-button" class="w-full px-12 py-3 rounded-xl font-bold text-white bg-indigo-600">Hoàn tất đặt sân</button>
             </div>
@@ -145,15 +145,23 @@
             selectedCourtIds: "@ViewBag.SelectedCourtIds".split(',').map(Number),
             startTime: parseInt("@ViewBag.StartTime"),
             endTime: parseInt("@ViewBag.EndTime"),
-            totalPrice: parseFloat("@ViewBag.TotalPrice")
+            totalPrice: parseFloat("@ViewBag.TotalPrice"),
+            afterPrice: parseFloat("@(ViewBag.AfterPrice ?? ViewBag.TotalPrice)"),
+            discountId: @(ViewBag.DiscountId ?? "null"),
+            type: "@ViewBag.Type",
+            monthlyBookingId: @(ViewBag.MonthlyBookingId ?? "null")
         };
 
         // State variables
         let stadiumData = null;
+        if (bookingData.afterPrice === 0 && bookingData.discountId === null) {
+            bookingData.afterPrice = bookingData.totalPrice;
+        }
+
         let originalPrice = bookingData.totalPrice;
-        let discountAmount = 0;
-        let finalPrice = originalPrice;
-        let selectedDiscountId = null;
+        let discountAmount = originalPrice - bookingData.afterPrice;
+        let finalPrice = bookingData.afterPrice;
+        let selectedDiscountId = bookingData.discountId;
 
         // Utility Functions
         const showModal = (title, message) => { $('#modal-title').text(title); $('#modal-message').text(message); $('#custom-modal').removeClass('opacity-0').addClass('open').fadeIn(); };
@@ -203,6 +211,21 @@
                 error: (xhr) => {
                     const msg = xhr.responseJSON?.message || 'Lỗi khi lấy danh sách mã giảm giá.';
                     $('#discount-list').html(`<p class="text-red-500 italic">${msg}</p>`);
+                }
+            });
+        }
+
+        function fetchAndDisplayAppliedDiscount(discountId) {
+            $.ajax({
+                url: `/Booking/GetDiscountById?id=${discountId}`,
+                type: 'GET',
+                success: function (discount) {
+                    if (discount) {
+                        $('#selected-discount-code').text(`Mã: ${discount.code} (-${formatCurrency(discountAmount)})`);
+                    }
+                },
+                error: function () {
+                    $('#selected-discount-code').text(`Đã áp dụng mã giảm giá (-${formatCurrency(discountAmount)})`);
                 }
             });
         }
@@ -272,14 +295,14 @@
             const datesContainer = $('#dates-container');
             datesContainer.empty();
             bookingData.selectedDays.forEach((day, index) => {
-                datesContainer.append(`<input type="hidden" name="Dates[${index}]" value="${day}" />`);
+                datesContainer.append(`<input type="hidden" name="SelectedDates[${index}]" value="${day}" />`);
             });
 
             // Generate hidden inputs for CourtIds list
             const courtIdsContainer = $('#courtids-container');
             courtIdsContainer.empty();
             bookingData.selectedCourtIds.forEach((id, index) => {
-                courtIdsContainer.append(`<input type="hidden" name="CourtIds[${index}]" value="${id}" />`);
+                courtIdsContainer.append(`<input type="hidden" name="SelectedCourtIds[${index}]" value="${id}" />`);
             });
         }
 
@@ -289,6 +312,27 @@
             fetchStadiumData(bookingData.stadiumId);
             loadUserProfile();
             updateHiddenFields(); // Call on load to set initial values
+            
+            // Check if we have a pre-selected discount
+            if (selectedDiscountId) {
+                fetchAndDisplayAppliedDiscount(selectedDiscountId);
+            }
+            
+            // Handle different view modes
+            if (bookingData.type === 'month') {
+                console.log("Hiding discount and payment sections for monthly booking view.");
+                // Hide sections not needed for monthly view
+                $('#discount-section').hide();
+                $('#payment-section').hide();
+                
+                // Modify action buttons
+                const actionContainer = $('#action-buttons-container');
+                actionContainer.empty();
+                actionContainer.append(`<button type="button" id="back-button" class="w-full px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">Quay lại</button>`);
+                
+                // Re-attach event handler for back button
+                $('#back-button').click(() => window.history.back());
+            }
 
             // Modal and navigation buttons
             $('#modal-close-btn').click(hideModal);
@@ -321,6 +365,11 @@
 
             // Form submission
             $('#booking-form').submit(function(e) {
+                if (bookingData.type === 'month') {
+                    e.preventDefault();
+                    return false; // Prevent form submission in "month" mode
+                }
+                
                 e.preventDefault();
                 updateHiddenFields(); // Ensure data is up-to-date before submitting
                 console.log('Dữ liệu form được gửi đi:');
