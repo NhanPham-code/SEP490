@@ -268,7 +268,6 @@
                     API_ENDPOINTS: {
                         SEARCH: '/Stadium/GetAllAndSearch',
                         DELETE: '/Stadium/LockStadium',
-
                         EDIT: '/StadiumManager/UpdateStadium'
 
                     },
@@ -298,12 +297,13 @@
                     sessionStorage.clear();
                     initializeApp();
                     updateDateTime();
+                    loadNewStadiumsToday();
                     // setInterval(updateDateTime, 10000);
                 });
 
                 // Core Functions
                 function initializeApp() {
-                    // bindEventListeners();
+                    bindEventListeners();
                     loadInitialData();
                 }
 
@@ -372,6 +372,7 @@
                     console.log('Data received:', data);
                     renderStadiumGrid(data.value);
                     updatePagination(data["@@odata.count"]);
+                    $("#count").text(data["@@odata.count"]);
                     hideLoading();
                 }
 
@@ -453,6 +454,7 @@
 
                 //set icon cho btn 
                 function setIcon(court){
+                    console.log(court);
                           switch (court[0].SportType) {
         case "Bóng chuyền":
           return `<svg xmlns="http://www.w3.org/2000/svg" style=" width:20px;" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @@fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M576 322.9C552.6 330.9 528.2 336 503.4 338C509.3 239.4 472.7 146.9 408.5 79.7C506.3 115.7 576 209.7 576 320C576 321 576 321.9 576 322.9zM570.1 374.9C564.9 398.6 556.5 421.1 545.2 441.8C450.5 494 331.2 491.8 236.8 428.2C258.5 396.9 286.6 369.3 320.6 347.7C400.1 389.3 489.1 396.8 570.1 374.8zM343.7 305.6C340 215.9 302 135.1 242.4 75.9C264.7 68.8 288.4 64.7 312.9 64C405.4 119.9 463.2 224.3 455.3 337.8C417.3 334.6 379.4 324.1 343.7 305.5zM194.5 96.8C213.1 113.1 229.8 131.7 243.9 152.2C155.5 196.3 93.7 274.3 67.7 363.5C65.3 349.3 64 334.8 64 320C64 224.2 116.6 140.7 194.5 96.8zM267.9 193.8C284.2 228.3 294 266.4 295.8 306.6C220 354.6 169 427.9 147.5 509.1C129.9 493 114.5 474.5 102 454.1C104.1 346 165.7 243.7 267.9 193.8zM320 576C272.3 576 227.7 563 189.5 540.3C194.3 516 202.1 492.3 212.7 469.9C295.1 524.3 393.5 538.8 483.7 516.9C439.3 553.9 382.2 576.1 320 576.1z"/></svg>`;
@@ -474,7 +476,7 @@
           return `<i class="ri-basketball-line"></i>`;
           break;
 
-        default: ""
+        default: return ``;
                           }
                 }
 
@@ -760,37 +762,38 @@
                     }
 
                     // Handle full URLs
-                    if (imageUrl.startsWith('http')) {
+                    if (imageUrl.startsWith('https')) {
                         return imageUrl;
                     }
 
                     return `https://localhost:7136/img/${imageUrl}`;
                 }
 
-                function buildFilterQuery() {
-                    let filters = [];
+               function buildFilterQuery() {
+            let filters = [];
 
-                    if (state.filters.search) {
-                        filters.push(`(contains(tolower(Name),'${state.filters.search.toLowerCase()}') or contains(tolower(Address),'${state.filters.search.toLowerCase()}'))`);
-                    }
+            if (state.filters.search) {
+                filters.push(`(contains(tolower(Name),'${state.filters.search.toLowerCase()}') or contains(tolower(Address),'${state.filters.search.toLowerCase()}'))`);
+            }
 
-                    if (state.filters.status !== 'all') {
-                        const statusValue = state.filters.status === 'true';
-                        filters.push(`IsApproved eq ${statusValue}`);
-                    }
+            if (state.filters.status !== 'all') {
+                const statusValue = state.filters.status === 'true';
+                filters.push(`IsApproved eq ${statusValue}`);
+            }
 
-                    if (state.filters.sportType !== 'all') {
-                        filters.push(`Courts/any(c: c/SportType eq '${state.filters.sportType}')`);
-                    }
+            if (state.filters.sportType !== 'all') {
+                filters.push(`Courts/any(c: c/SportType eq '${state.filters.sportType}')`);
+            }
 
-                    let query = '';
-                    if (filters.length > 0) {
-                        query = " and " + filters.join(" and ");
-                    }
+            let query = "";
+            if (filters.length > 0) {
+                query = filters.filter(f => f && f.trim() !== "").join(" and ");
+            }
 
-                    console.log('Built filter query:', query);
-                    return query;
-                }
+            console.log('Built filter query:', query);
+            return query;
+        }
+
 
                 function updatePagination(totalItems) {
                     state.totalItems = totalItems || 0;
@@ -2665,9 +2668,12 @@
                 function smartRefresh() {
                     const now = Date.now();
                     if (now - lastRefresh > REFRESH_INTERVAL) {
-                        loadData();
+                        
                         lastRefresh = now;
                     }
+
+                    $('#refresh-button').text(((new Date() - lastRefresh) / 1000).toFixed(1) + "s");
+
                 }
 
                 // Auto-refresh when tab becomes visible
@@ -3215,6 +3221,54 @@
                         currentMarker = null;
                     }
                 }
+
+                //lấy các nhà thi đấu vừa mới đăng ký ngày hôm nay
+                        function loadNewStadiumsToday() {
+            const today = new Date();
+            const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 00:00 hôm nay
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1); // 00:00 ngày mai
+
+            // formatter ISO 8601 có timezone (ex: +07:00)
+            function formatWithOffset(date) {
+                const pad = (n) => String(n).padStart(2, '0');
+
+                const year = date.getFullYear();
+                const month = pad(date.getMonth() + 1);
+                const day = pad(date.getDate());
+                const hours = pad(date.getHours());
+                const minutes = pad(date.getMinutes());
+                const seconds = pad(date.getSeconds());
+
+                const offsetMinutes = -date.getTimezoneOffset();
+                const sign = offsetMinutes >= 0 ? "+" : "-";
+                const offsetH = pad(Math.floor(Math.abs(offsetMinutes) / 60));
+                const offsetM = pad(Math.abs(offsetMinutes) % 60);
+
+                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetH}:${offsetM}`;
+            }
+
+            const filter = `&$filter=CreatedAt ge ${formatWithOffset(start)} and CreatedAt lt ${formatWithOffset(end)}`;
+            const url = `${CONFIG.API_ENDPOINTS.SEARCH}?${filter}&$top=0`;
+            console.log('New stadiums today URL:', url);
+            console.log('Fetching new stadiums from', formatWithOffset(start), 'to', formatWithOffset(end));
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(data) {
+                    console.log('New stadiums today data:', data);
+                    const count = data["@@odata.count"] || (data.value ? data.value.length : 0);
+                    $('#stadium-now').text(count);
+                },
+                error: function(err) {
+                    console.error('Error fetching new stadiums today:', err);
+                }
+            });
+        }
+
+
+
     </script>
 }
 
@@ -3237,6 +3291,33 @@
                 </p>
             </div>
 
+        </div>
+        @* hiển thị số lượng nhà thi đấu vừa đăng ký hôm này  *@
+        <div class="header-stats">
+            <div class="stat-card-waiting">
+                <div class="stat-icon bg-blue">
+                    <i class="ri-building-2-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Nhà Thi Đấu Mới Hôm Nay</p>
+                    <h2 class="stat-value" id="stadium-now">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    <i class="ri-building-2-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Nhà Thi Đấu Đã Đăng Kí</p>
+                    <h2 class="stat-value" id="count">
+                        0
+                    </h2>
+                </div>
+            </div>
         </div>
     </header>
 

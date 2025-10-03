@@ -46,6 +46,8 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
+builder.Services.AddScoped<ICourtService, CourtService>();
+builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 var app = builder.Build();

@@ -2060,3 +2060,45 @@
         grid-template-columns: 1fr;
     }
 }
+.header-stats {
+    display: flex;
+
+    justify-content: center;
+    gap: 5%;
+}
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #0b59c6;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+.stat-label {
+    font-size: large;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.stat-card-waiting {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #c6780b;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+.stat-icon {
+    font-size: 40px;
+}
+.stat-value{
+        font-size: 32px;
+    font-weight: 700;
+    margin-top: 8px;
+}

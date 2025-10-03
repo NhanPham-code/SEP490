@@ -85,7 +85,7 @@ namespace StadiumAPI.Controllers
 
         // DELETE: api/ReadStadiumDTOes/5
         [HttpDelete]
-        [Authorize(Roles = ("StadiumManager"))]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> DeleteReadStadiumDTO([FromQuery] int id)
         {
             return Ok(await _serviceStadium.DeleteStadiumAsync(id));
