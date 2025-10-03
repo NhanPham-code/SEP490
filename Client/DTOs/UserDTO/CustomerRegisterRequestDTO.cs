@@ -31,6 +31,7 @@ namespace DTOs.UserDTO
 
         public IFormFile? Avatar { get; set; }
 
-        public IFormFile? FaceVideo { get; set; }
+        // thêm 5 ảnh khuông mặt
+        public List<IFormFile>? FaceImages { get; set; }
     }
 }

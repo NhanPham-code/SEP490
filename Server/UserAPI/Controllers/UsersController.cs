@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.UriParser;
 using System.Security.Claims;
 using UserAPI.DTOs;
@@ -16,12 +17,38 @@ namespace UserAPI.Controllers
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IEmailService _emailService;
+        private readonly IMemoryCache _memoryCache;
 
-        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService)
+        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService, IEmailService emailService, IMemoryCache memoryCache)
         {
             _userService = userService;
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _googleAuthService = googleAuthService;
+            _emailService = emailService;
+            _memoryCache = memoryCache;
+        }
+
+        /// <summary>
+        /// Đăng nhập bằng khuôn mặt cho Cusotmer
+        /// api/Users/face-login
+        /// </summary>
+        [HttpPost("face-login")]
+        public async Task<IActionResult> FaceLogin([FromForm] AiFaceLoginRequestDTO request)
+        {
+            if (request.FaceImage == null || request.FaceImage.Length == 0)
+            {
+                return BadRequest(new { message = "Face image is required." });
+            }
+
+            var result = await _userService.LoginWithFaceAsync(request);
+
+            if (!result.IsValid)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -129,6 +156,47 @@ namespace UserAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendOtp([FromBody] SendOtpRequestDTO request)
+        {
+            // 1. Tạo mã OTP
+            var otp = new Random().Next(100000, 999999).ToString();
+            var cacheKey = $"otp_{request.Email}";
+
+            // 2. Lưu vào Cache với thời gian hết hạn là 5 phút
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(5)); // Hoặc SetAbsoluteExpiration
+
+            _memoryCache.Set(cacheKey, otp, cacheEntryOptions);
+
+            // 3. Gửi email
+            await _emailService.SendEmailAsync(request.Email, "Mã xác thực của bạn", $"Mã OTP của bạn là: {otp}");
+
+            return Ok(new { message = "OTP has been sent to your email." });
+        }
+
+        [HttpPost("verify-otp")]
+        public IActionResult VerifyOtp([FromBody] VerifyOtpRequestDTO request)
+        {
+            var cacheKey = $"otp_{request.Email}";
+
+            // 4. Lấy mã từ cache
+            if (_memoryCache.TryGetValue(cacheKey, out string? cachedOtp))
+            {
+                // 5. So sánh
+                if (cachedOtp == request.Code)
+                {
+                    // Xác thực thành công, xóa key khỏi cache
+                    _memoryCache.Remove(cacheKey);
+                    return Ok(new { verified = true });
+                }
+            }
+
+            // Nếu không tìm thấy key hoặc mã không khớp
+            return BadRequest(new { verified = false, message = "Invalid or expired OTP." });
         }
 
         /// <summary>

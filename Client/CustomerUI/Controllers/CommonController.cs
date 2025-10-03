@@ -67,6 +67,40 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
 
+        // Xử lý đăng nhập bằng AI Face
+        [HttpPost]
+        public async Task<IActionResult> AiFaceAuth([FromForm] AiFaceLoginRequestDTO request)
+        {
+            if (request == null || request.FaceImage == null)
+            {
+                return Json(new { success = false, message = "Ảnh khuôn mặt không hợp lệ." });
+            }
+
+            try
+            {
+                var response = await _userService.LoginWithFaceAsync(request);
+
+                if (response.IsValid == false)
+                {
+                    return Json(new { success = false, message = response.Message });
+                }
+
+                _tokenService.SaveTokensToCookies(response, false);
+                UpdateUserSession(response);
+
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return Json(new { success = false, message = "Lỗi khi gọi dịch vụ nhận diện khuôn mặt: " + httpEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Đã có lỗi xảy ra phía máy chủ. " + ex.Message });
+            }
+        }
+
+        // Xử lý đăng nhập bằng Google
         [HttpPost]
         public async Task<IActionResult> GoogleAuth([FromBody] GoogleApiLoginRequestDTO request)
         {
@@ -362,7 +396,13 @@ namespace CustomerUI.Controllers
 
         // Action xử lý việc tải lên ảnh đại diện và ảnh khuôn mặt
         [HttpPost]
-        public async Task<IActionResult> CompleteRegistration(IFormFile avatar, IFormFile faceVideo)
+        public async Task<IActionResult> CompleteRegistration(
+            IFormFile avatar,
+            IFormFile faceImage1,
+            IFormFile faceImage2,
+            IFormFile faceImage3,
+            IFormFile faceImage4,
+            IFormFile faceImage5)
         {
 
             // Lấy dữ liệu tạm từ session
@@ -372,6 +412,8 @@ namespace CustomerUI.Controllers
             {
                 return BadRequest(new { success = false, message = "Phiên đăng ký đã hết hạn. Vui lòng thử lại từ đầu." });
             }
+
+            var faceImages = new List<IFormFile> { faceImage1, faceImage2, faceImage3, faceImage4, faceImage5 };
 
             // Tạo một DTO từ dữ liệu tạm
             var registerRequestDTO = new CustomerRegisterRequestDTO
@@ -385,7 +427,7 @@ namespace CustomerUI.Controllers
                 Gender = tempRegisterData.RegisterData.Gender,
                 DateOfBirth = tempRegisterData.RegisterData.DateOfBirth,
                 Avatar = avatar,
-                FaceVideo = faceVideo // nhận dạng IFormFile chuẩn
+                FaceImages = faceImages // nhận list ảnh khuôn mặt
             };
 
             // Gọi service để đăng ký người dùng (API sẽ xử lý lưu file video từ base64)

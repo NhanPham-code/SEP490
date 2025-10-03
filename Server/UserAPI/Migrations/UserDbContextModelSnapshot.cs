@@ -79,7 +79,7 @@ namespace UserAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("FaceVideoUrl")
+                    b.Property<string>("FaceEmbeddingsJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FrontCCCDUrl")
@@ -140,7 +140,6 @@ namespace UserAPI.Migrations
                             AvatarUrl = "https://example.com/avatar/admin.png",
                             CreatedDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@example.com",
-                            FaceVideoUrl = "https://example.com/videos/admin.png",
                             FrontCCCDUrl = "https://example.com/cccd/admin.png",
                             FullName = "Admin User",
                             IsActive = true,

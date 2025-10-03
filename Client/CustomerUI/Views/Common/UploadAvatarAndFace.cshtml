@@ -1,6 +1,6 @@
 ﻿@using CustomerUI.Models
 @{
-    ViewData["Title"] = "Tải Lên Ảnh & Video Khuôn Mặt";
+    ViewData["Title"] = "Tải Lên Ảnh & 5 Góc Khuôn Mặt";
     Layout = null;
 }
 
@@ -12,15 +12,11 @@
     <title>@ViewData["Title"] - Sportivey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    
     <link href="~/css/common/upload.css" rel="stylesheet" />
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-4">
-    
-    <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
-    
     @if (ViewBag.ErrorMessage != null)
     {
         <div class="toast error" id="server-error">
@@ -35,7 +31,6 @@
     </a>
 
     <div class="main-container rounded-3xl shadow-2xl w-full max-w-2xl p-8 relative overflow-hidden">
-        
         <div class="text-center mb-8 relative z-10">
             <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4">
                 <i class="ri-camera-fill text-3xl text-white"></i>
@@ -49,7 +44,6 @@
         </div>
 
         <form id="completeRegForm" enctype="multipart/form-data" class="space-y-6 relative z-10">
-            
             <!-- Avatar Section -->
             <div class="bg-gray-50 rounded-xl p-6">
                 <label class="block text-lg font-semibold text-gray-800 mb-4">
@@ -59,7 +53,7 @@
                 <div class="flex items-center gap-6">
                     <div>
                         <img id="avatarPreview" class="w-20 h-20 rounded-full object-cover border-3 border-teal-500"
-                             src="https://ui-avatars.com/api/?name=Avatar&background=0891b2&color=ffffff&size=128" 
+                             src="https://ui-avatars.com/api/?name=Avatar&background=0891b2&color=ffffff&size=128"
                              alt="Avatar Preview">
                     </div>
                     <div class="flex flex-col gap-3">
@@ -84,9 +78,9 @@
                         <div class="text-yellow-800">
                             <h4 class="font-semibold mb-2">Lưu ý quan trọng:</h4>
                             <ul class="text-sm space-y-1">
-                                <li>• Giữ khuôn mặt trong khung hình suốt quá trình quay</li>
-                                <li>• Thực hiện đúng hướng theo từng bước hướng dẫn</li>
-                                <li>• Nếu vi phạm quá 3 lần, hệ thống sẽ yêu cầu quay lại từ đầu</li>
+                                <li>• Giữ khuôn mặt trong khung hình suốt quá trình thực hiện</li>
+                                <li>• Quay mặt theo đúng hướng từng bước hướng dẫn</li>
+                                <li>• Nếu vi phạm quá 3 lần, hệ thống sẽ yêu cầu chụp lại từ đầu</li>
                             </ul>
                         </div>
                     </div>
@@ -122,27 +116,22 @@
                     </ol>
                 </div>
 
-                <!-- Video Preview -->
+                <!-- Live Camera + Face Detection UI -->
                 <div class="video-container">
                     <video id="preview" class="w-full h-auto block" autoplay muted playsinline></video>
-                    
                     <canvas id="faceCanvas" class="face-detection-canvas"></canvas>
-                    
                     <div id="directionGuide" class="direction-guide" style="display: none;">
                         <div id="directionText">Nhìn thẳng vào camera</div>
                     </div>
-                    
                     <div id="faceStatus" class="face-status loading">
                         <i class="ri-loader-line"></i>
                         <span>Đang khởi động...</span>
                         <div class="loading-spinner"></div>
                     </div>
-                    
                     <div id="violationCounter" class="violation-counter" style="display: none;">
                         <i class="ri-error-warning-line mr-1"></i>
                         Vi phạm: <span id="violationCount">0</span>/3
                     </div>
-                    
                     <div id="overlay" class="video-overlay opacity-0">
                         <div id="overlayText" class="text-xl font-semibold mb-4 text-center">Chuẩn bị...</div>
                         <div id="countdown" class="countdown-text">3</div>
@@ -172,11 +161,11 @@
                 <div class="flex flex-wrap gap-3 justify-center">
                     <button type="button" id="startBtn" class="sport-btn sport-btn-primary" disabled>
                         <i class="ri-play-circle-line"></i>
-                        Bắt đầu quay
+                        Bắt đầu chụp
                     </button>
                     <button type="button" id="resetBtn" class="sport-btn sport-btn-warning" disabled>
                         <i class="ri-refresh-line"></i>
-                        Quay lại từ đầu
+                        Chụp lại từ đầu
                     </button>
                     <button type="button" id="stopBtn" class="sport-btn sport-btn-danger" disabled>
                         <i class="ri-stop-circle-line"></i>
@@ -184,16 +173,8 @@
                     </button>
                 </div>
 
-                <!-- Final Video -->
-                <div id="finalWrap" class="hidden">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="ri-video-line mr-2"></i>
-                        Xem lại video của bạn
-                    </h4>
-                    <div class="video-container">
-                        <video id="finalVideo" class="w-full h-auto block" controls></video>
-                    </div>
-                </div>
+                <!-- Preview 5 Face Images Section -->
+                <div id="faceImagePreviewZone" class="flex gap-2 mt-4 justify-center"></div>
             </div>
 
             <button type="button" id="submitBtn" class="w-full sport-btn sport-btn-primary text-lg py-4" disabled>
@@ -203,50 +184,38 @@
         </form>
     </div>
 
-    <!-- TensorFlow.js phiên bản tương thích -->
+    <!-- TensorFlow.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/@@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
-
-    <!-- Face-api.js từ file cục bộ -->
+    <!-- Face-api.js -->
     <script defer src="~/js/ai/face-api.min.js"></script>
-
-    <!-- Script logic của bạn -->
+    <!-- Main logic JS -->
     <script defer src="~/js/ai/face.js"></script>
 
     <script>
-        // Toast notification system
+        // Toast notification system (giữ nguyên như cũ)
         function showToast(message, type = 'success', autoHide = true) {
             const container = document.getElementById('toast-container');
             const toastId = 'toast-' + Date.now();
-            
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.id = toastId;
-            
             const iconMap = {
                 'success': 'ri-check-circle-line',
                 'error': 'ri-error-warning-line',
                 'warning': 'ri-alert-line'
             };
-            
-            toast.innerHTML = `
-                <i class="${iconMap[type] || 'ri-information-line'}"></i>
-                <div>${message}</div>
-            `;
-            
+            toast.innerHTML = `<i class="${iconMap[type] || 'ri-information-line'}"></i>
+                        <div>${message}</div>`;
             container.appendChild(toast);
-            
             if (autoHide) {
                 setTimeout(() => {
                     toast.style.animation = 'slideOutAlert 0.3s ease-out forwards';
                     setTimeout(() => toast.remove(), 300);
                 }, 5000);
             }
-            
             return toastId;
         }
-
-        // Auto-hide server error message
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const serverError = document.getElementById('server-error');
             if (serverError) {
                 setTimeout(() => {
@@ -255,14 +224,10 @@
                 }, 5000);
             }
         });
-
-        // Handle orientation change
-        window.addEventListener('orientationchange', function() {
+        window.addEventListener('orientationchange', function () {
             setTimeout(() => {
-                // Trigger video resize if needed
                 const video = document.getElementById('preview');
                 if (video && video.srcObject) {
-                    // Force video refresh
                     const stream = video.srcObject;
                     video.srcObject = null;
                     setTimeout(() => {

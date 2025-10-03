@@ -18,5 +18,7 @@ namespace UserAPI.Repository.Interface
         IQueryable<User> GetAllUsers();
 
         Task<AdminUserStatsDTO> GetAdminUserStatsAsync();
+
+        Task<List<UserEmbeddingDTO>> GetAllUserEmbeddingsAsync();
     }
 }
