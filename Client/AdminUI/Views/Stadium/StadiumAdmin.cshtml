@@ -422,7 +422,9 @@
                                         <div class="info-value">${getSportTypes(stadium.Courts)}</div>
                                     </div>
                                 </div>
-                                <div class="card-actions">
+                                
+                            </div>
+                            <div class="card-actions card-content">
                                                            <div class="card-detail">
                                                                    <button onclick="openViewModal(${stadium.Id})" class="details-btn loading" title="Xem chi tiết">
                         <i class="ri-information-line"></i> Chi tiết
@@ -430,11 +432,11 @@
                                                              <button onclick="goToDetail(${stadium.Id})" class="details-btn loading">
                     ${setIcon(stadium.Courts)} Xem sân
                 </button>
-        
+
                                                            </div>
 
                                             <div class="action-buttons">
-                    
+
                     ${stadium.IsLocked ?
                         `<button onclick="confirmUnlock(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
                             <i class="ri-lock-unlock-line"></i>
@@ -443,9 +445,16 @@
                             <i class="ri-lock-line"></i>
                         </button>`
                     }
+                    ${stadium.isApproved ?
+                        `<button onclick="confirmApprove(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
+                            <i class="ri-lock-unlock-line"></i>
+                        </button>` :
+                        `<button onclick="confirmLock(${stadium.Id})" class="action-btn lock-btn" title="Khóa">
+                            <i class="ri-lock-line"></i>
+                        </button>`
+                    }
                 </div>
                                 </div>
-                            </div>
                         </div>
                     `).join('');
 
@@ -479,6 +488,13 @@
         default: return ``;
                           }
                 }
+
+                //chấp nhận sân 
+                function confirmApprove(stadiumId) {
+                    
+                }
+
+  
 
                 // Enhanced Time Formatting Functions
                 function formatTimeForDisplay(timeString) {
@@ -784,10 +800,12 @@
             if (state.filters.sportType !== 'all') {
                 filters.push(`Courts/any(c: c/SportType eq '${state.filters.sportType}')`);
             }
-
+            console.log('Current filters:', filters);
+            
             let query = "";
             if (filters.length > 0) {
-                query = filters.filter(f => f && f.trim() !== "").join(" and ");
+                query = filters.filter(f => f && f.trim()).join(" and ");
+
             }
 
             console.log('Built filter query:', query);
@@ -2305,46 +2323,53 @@
                 }
 
                 // Enhanced search and filter functions
-                function performAdvancedSearch() {
-                    const searchTerm = state.filters.search.toLowerCase();
-                    const statusFilter = state.filters.status;
-                    const sportFilter = state.filters.sportType;
+                      
+        function performAdvancedSearch() {
+            const searchTerm = state.filters.search?.toLowerCase() || "";
+            const statusFilter = state.filters.status;
+            const sportFilter = state.filters.sportType;
 
-                    // Reset to first page when searching
-                    state.currentPage = 1;
+            // Reset về trang đầu
+            state.currentPage = 1;
 
-                    // Build comprehensive filter query
-                            let filters = []; // Base filter
-                            let count = 0;
+            // Danh sách filters
+            let filters = [];
 
-                    if (searchTerm.length > 0) {
-                        filters.push(`(contains(tolower(Name),'${searchTerm}') or contains(tolower(Address),'${searchTerm}') or contains(tolower(Description),'${searchTerm}'))`);
-                                count++;
-                    }
+            if (searchTerm.length > 0) {
+                filters.push(
+                    `(contains(tolower(Name),'${searchTerm}') or ` +
+                    `contains(tolower(Address),'${searchTerm}') or ` +
+                    `contains(tolower(Description),'${searchTerm}'))`
+                );
+            }
 
-                    if (statusFilter !== 'all') {
-                        const statusValue = statusFilter;
-                                filters.push(`IsApproved eq ${statusValue}`);
-                                        count++;
-                    }
+            if (statusFilter !== "all") {
+                filters.push(`IsApproved eq ${statusFilter}`);
+            }
 
-                    if (sportFilter !== 'all') {
-                        filters.push(`Courts/any(c: contains(tolower(c/SportType), '${sportFilter.toLowerCase()}'))`);
-                                count++;
-                    }
+            if (sportFilter !== "all") {
+                filters.push(
+                    `Courts/any(c: contains(tolower(c/SportType), '${sportFilter.toLowerCase()}'))`
+                );
+            }
 
-                    const filterQuery = filters.length > 1 ? ` and ${filters.slice(1).join(' and ')}` : '';
-                            let searchQuery = '';
-                    if(count > 0){
-                                             searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=${filters[0]}${filterQuery} and`;
+            // Ghép filters thành query
+            const filterQuery = filters.join(" and ");
 
-                    }else{
-                                                     searchQuery = `&$skip=${(state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE}&$top=${CONFIG.PAGINATION.ITEMS_PER_PAGE}&$filter=`;
-                            }
+            // Build query string
+            const skip = (state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE;
+            const top = CONFIG.PAGINATION.ITEMS_PER_PAGE;
 
-                    console.log('Advanced Search Query:', searchQuery);
-                    loadDataWithQuery(searchQuery);
-                }
+            let searchQuery = `&$skip=${skip}&$top=${top}`;
+            if (filterQuery) {
+                searchQuery += `&$filter=${filterQuery}`;
+            }
+
+            console.log("Advanced Search Query:", searchQuery);
+            loadDataWithQuery(searchQuery);
+        }
+      
+
 
                 function loadDataWithQuery(query) {
                     showLoading();
@@ -2755,12 +2780,15 @@
 
                 // Performance monitoring
                 function logPerformanceMetrics() {
-                    if (window.performance && window.performance.timing) {
-                        const timing = window.performance.timing;
-                        const loadTime = timing.loadEventEnd - timing.navigationStart;
-                        console.log(`Page load time: ${loadTime}ms`);
-                    }
+            if (performance.getEntriesByType) {
+                const [nav] = performance.getEntriesByType("navigation");
+                if (nav) {
+                    console.log(`Page load time: ${nav.duration}ms`);
                 }
+            }
+        }
+
+
 
                 // Initialize performance monitoring
                 window.addEventListener('load', logPerformanceMetrics);
@@ -3223,49 +3251,63 @@
                 }
 
                 //lấy các nhà thi đấu vừa mới đăng ký ngày hôm nay
-                        function loadNewStadiumsToday() {
-            const today = new Date();
-            const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 00:00 hôm nay
-            const end = new Date(start);
-            end.setDate(end.getDate() + 1); // 00:00 ngày mai
+            function loadNewStadiumsToday() {
+    const today = new Date();
+    // Lấy 00:00:00 của ngày hôm nay theo giờ địa phương của trình duyệt
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); 
+    // Lấy 00:00:00 của ngày mai, là điểm kết thúc
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
 
-            // formatter ISO 8601 có timezone (ex: +07:00)
-            function formatWithOffset(date) {
-                const pad = (n) => String(n).padStart(2, '0');
+    // Hàm này của bạn đã viết đúng để tạo chuỗi ngày giờ có múi giờ.
+    // Ví dụ: 2025-10-04T00:00:00+07:00
+    function formatWithOffset(date) {
+        const pad = (n) => String(n).padStart(2, '0');
 
-                const year = date.getFullYear();
-                const month = pad(date.getMonth() + 1);
-                const day = pad(date.getDate());
-                const hours = pad(date.getHours());
-                const minutes = pad(date.getMinutes());
-                const seconds = pad(date.getSeconds());
+        const year = date.getFullYear();
+        const month = pad(date.getMonth() + 1);
+        const day = pad(date.getDate());
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const seconds = pad(date.getSeconds());
 
-                const offsetMinutes = -date.getTimezoneOffset();
-                const sign = offsetMinutes >= 0 ? "+" : "-";
-                const offsetH = pad(Math.floor(Math.abs(offsetMinutes) / 60));
-                const offsetM = pad(Math.abs(offsetMinutes) % 60);
+        const offsetMinutes = -date.getTimezoneOffset();
+        const sign = offsetMinutes >= 0 ? "+" : "-";
+        const offsetH = pad(Math.floor(Math.abs(offsetMinutes) / 60));
+        const offsetM = pad(Math.abs(offsetMinutes) % 60);
 
-                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetH}:${offsetM}`;
-            }
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetH}:${offsetM}`;
+    }
 
-            const filter = `&$filter=CreatedAt ge ${formatWithOffset(start)} and CreatedAt lt ${formatWithOffset(end)}`;
-            const url = `${CONFIG.API_ENDPOINTS.SEARCH}?${filter}&$top=0`;
-            console.log('New stadiums today URL:', url);
-            console.log('Fetching new stadiums from', formatWithOffset(start), 'to', formatWithOffset(end));
+    // 1. Xây dựng chuỗi $filter với ngày giờ đã được định dạng đúng
+    const filter = `CreatedAt ge ${formatWithOffset(start)} and CreatedAt lt ${formatWithOffset(end)}`;
+    
+    // 2. Thêm `$count=true` để yêu cầu OData trả về tổng số lượng record
+    //    Đây là điều kiện cần để `data["@@odata.count"]` hoạt động.
+    const queryParams = `$filter=${filter}&$top=0&$count=true`;
+    
+    // 3. Nối các tham số truy vấn vào URL gốc.
+    //    Lưu ý: Phải có dấu '?' ngăn cách giữa URL và các tham số.
+    const url = `${CONFIG.API_ENDPOINTS.SEARCH}?${queryParams}`;
+    
+    console.log('Final Request URL:', url);
+    console.log('Fetching new stadiums from', formatWithOffset(start), 'to', formatWithOffset(end));
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(data) {
-                    console.log('New stadiums today data:', data);
-                    const count = data["@@odata.count"] || (data.value ? data.value.length : 0);
-                    $('#stadium-now').text(count);
-                },
-                error: function(err) {
-                    console.error('Error fetching new stadiums today:', err);
-                }
-            });
+    $.ajax({
+        url: url, // Sử dụng URL đã được xây dựng hoàn chỉnh
+        method: 'GET',
+        // Không dùng thuộc tính 'data' ở đây cho request GET với OData
+        success: function(data) {
+            console.log('New stadiums today data:', data);
+            
+            const count = data["@@odata.count"] || (data.value ? data.value.length : 0);
+            $('#stadium-now').text(count);
+        },
+        error: function(err) {
+            console.error('Error fetching new stadiums today:', err);
         }
+    });
+}
 
 
 
@@ -3383,9 +3425,6 @@
             </div>
             <h3 class="empty-title">Không tìm thấy sân nào</h3>
             <p class="empty-description">Không có sân nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh bộ lọc để tìm kiếm lại.</p>
-            <button class="btn btn-primary" onclick="openCreate()">
-                <i class="ri-add-line"></i> Thêm Sân Mới
-            </button>
         </div>
     </section>
 

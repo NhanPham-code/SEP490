@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTOs.StadiumDTO;
+using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
 namespace AdminUI.Controllers
@@ -45,6 +46,35 @@ namespace AdminUI.Controllers
             }
             else
                 return Json(new { success = 400, value = locked });
+        }
+
+        // chap nhan san dau
+        public async Task<IActionResult> AcceptStadium(int id)
+        {
+            var stadium = await _service.GetStadiumByIdAsync(id);
+            UpdateStadiumDTO updateStadiumDTO = new UpdateStadiumDTO
+            {
+                Name = stadium.Name,
+                Address = stadium.Address,
+                Description = stadium.Description,
+                NameUnsigned = stadium.NameUnsigned,
+                AddressUnsigned = stadium.AddressUnsigned,
+                CreatedBy = stadium.CreatedBy,
+                CloseTime = stadium.CloseTime,
+                OpenTime = stadium.OpenTime,
+                IsApproved = true,
+                Id = stadium.Id,
+                IsLocked = stadium.IsLocked,
+                Latitude = stadium.Latitude,
+                Longitude = stadium.Longitude
+            };
+            var updatedStadium = await _service.UpdateStadiumAsync(id, updateStadiumDTO);
+            if (updatedStadium != null)
+            {
+                return Json(new { success = 200, value = updatedStadium });
+            }
+            else
+                return Json(new { success = 400, value = updatedStadium });
         }
     }
 }

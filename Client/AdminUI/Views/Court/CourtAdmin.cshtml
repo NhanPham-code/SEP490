@@ -56,9 +56,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Danh Sách Sân</h2>
-                <button class="btn btn-primary" onclick="addCourt()">
-                    <i class="ri-add-line me-2"></i>Thêm Sân Mới
-                </button>
+        
             </div>
 
             <div class="table-responsive">
@@ -130,18 +128,7 @@
                         let statusBadge = court.isAvailable
                             ? '<span class="badge badge-available">Có Sẵn</span>'
                             : '<span class="badge badge-unavailable">Không Có Sẵn</span>';
-                        let actionButtons = `
-                            <button class="btn btn-sm btn-outline-primary me-2" onclick="editCourt(${court.id})" title="Chỉnh sửa">
-                                <i class="ri-edit-line"></i>
-                            </button>
-                                    ${court.isAvailable ?
-            `<button onclick="lockCourt(${court.id})" class="btn-lock btn btn-sm btn-outline-warning me-2" title="Khóa sân">
-                <i class="ri-lock-line"></i>
-            </button>` :
-            `<button onclick="unlockCourt(${court.id})" class="btn-lock btn btn-sm btn-outline-success me-2" title="Mở khóa">
-                <i class="ri-lock-unlock-line"></i>
-            </button>`
-        }`;
+                        let actionButtons = ``;
                         if (court.sportType === 'Bóng đá sân 7' || court.sportType === "Bóng đá sân 11") {
                             actionButtons += `
                                 <button class="btn btn-sm btn-outline-info" onclick="editCourtRelation(${court.id})" title="Liên kết các sân">

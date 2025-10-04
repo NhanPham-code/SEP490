@@ -41,5 +41,7 @@ namespace AdminUI.Controllers
             var courtRelations = await _courtRelationService.GetAllCourtRelationBychildId(childId);
             return Json(courtRelations);
         }
+
+
     }
 }
