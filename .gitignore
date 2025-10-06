@@ -432,6 +432,4 @@ ValidateSolutionConfiguration:
 [Bb]in/
 [Oo]bj/
 
-**/launchSettings.json
-
 .run/
