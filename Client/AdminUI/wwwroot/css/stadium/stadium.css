@@ -154,7 +154,19 @@
     .btn:hover::before {
         left: 100%;
     }
-
+.isApproved-btn {
+    background: linear-gradient(123deg, #00ed1d, #8fff57);
+    color: white;
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+}
+.isApproved-btn svg {
+    width: 30px;
+    height: 30px;
+    color: white;
+}
+    .isApproved-btn svg:hover {
+        animation: lock 0.5s ease-in-out infinite;
+    }
 .btn-primary {
     background: var(--primary-gradient);
     color: white;
@@ -165,7 +177,23 @@
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
     }
-
+.excel-btn {
+    background: conic-gradient(from 0deg at 0% 25%, blue, green, yellow 180deg);
+    color: white;
+}
+.court-btn {
+    background-color: lightgray;
+    color: #3da2ff;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.875rem;
+}
 .btn-success {
     background: var(--success-gradient);
     color: white;
@@ -381,15 +409,24 @@
 
 .card-content {
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.bottom-content {
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
 }
 
 .location-info {
     display: grid;
     grid-template-columns: auto 1fr;
+    height: 33px;
     align-items: start;
     text-align: start;
     justify-content: start;
-    gap: 0.5rem;    
+    gap: 0.5rem;
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
     font-weight: 500;
@@ -447,10 +484,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
+    .info-label svg {
+        margin-right: 0.5rem;
+    }
 
-.sport-info .info-label {
-    color: #6366f1;
-}
+    .sport-info .info-label {
+        color: #6366f1;
+    }
 
 .price-info .info-label {
     color: #10b981;
@@ -474,10 +514,12 @@
 .card-detail{
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
     gap: 0.5rem;
 }
-
+.link{
+    color: cornflowerblue;
+    text-decoration-line: underline;
+}
 .details-btn {
     color: #6366f1;
     font-weight: 600;
@@ -493,7 +535,7 @@
 
     .details-btn:hover {
         background: rgba(99, 102, 241, 0.1);
-        color: #4f46e5;
+        color: #f5f4ff;
         transform: translateX(4px);
     }
 
@@ -2103,3 +2145,4 @@
     font-weight: 700;
     margin-top: 8px;
 }
+

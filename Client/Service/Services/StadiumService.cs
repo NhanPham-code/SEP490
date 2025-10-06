@@ -70,11 +70,44 @@ namespace Service.Services
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }
+
+        public async Task<string> ExportExcel()
+        {
+            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable)");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            return await response.Content.ReadAsStringAsync();
+        }
+        public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetSportType(string searchTerm)
+        {
+            var response = await _httpClient.GetAsync($"/odata/Stadium?$expand=StadiumVideos,Courts($select=SportType)&$filter=Courts/any(c: contains(tolower(c/SportType), '{searchTerm}'))&$top=0&$count=true");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            var stadium = await response.Content.ReadAsStringAsync();
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);
+            return newResponse;
+        }
         public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetAllStadiumByListId(List<int> stadiumId)
         {
             var ids = string.Join(",", stadiumId);
 
             var response = await _httpClient.GetAsync($"/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable),StadiumImages($select=Id,StadiumId,ImageUrl)&$count=true&$filter=Id in ({ids})");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            var stadium = await response.Content.ReadAsStringAsync();
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);
+            return newResponse;
+        }
+        // Lấy những sân chưa được duyệt
+        public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetUnapprovedStadiums()
+        {
+            var response = await _httpClient.GetAsync($"/odata/Stadium?$filter=IsApproved eq false&$count=true");
+            response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
+            var stadium = await response.Content.ReadAsStringAsync();
+            var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);
+            return newResponse;
+        }
+        // Lấy tổng số sân
+        public async Task<OdataHaveCountResponse<ReadStadiumDTO>> GetTotalStadiums()
+        {
+            var response = await _httpClient.GetAsync($"/odata/Stadium?$count=true&$top=0");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             var stadium = await response.Content.ReadAsStringAsync();
             var newResponse = JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadStadiumDTO>>(stadium);

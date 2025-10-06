@@ -24,25 +24,51 @@ namespace AdminUI.Controllers
         }
         public IActionResult StadiumAdmin()
         {
-            return View();
+            var token = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(token) == false)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
         }
 
         public async Task<IActionResult> GetAllAndSearch(string url)
         {
             var token = _tokenService.GetAccessTokenFromCookie();
-            var userId = await _userService.GetMyProfileAsync(token);
-            var stadium = await _service.SearchStadiumAsync(url);
-            return Content(stadium, "application/json");
+            if (string.IsNullOrEmpty(token) == false)
+            {
+                var stadium = await _service.SearchStadiumAsync(url+= "&$orderby=CreatedAt desc");
+                return Content(stadium, "application/json");
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
         }
 
         public async Task<IActionResult> LockStadium(int id)
         {
 
             var locked = await _service.DeleteStadiumAsync(id);
-
+            List<int> ids = new List<int>();
+            ids.Add(id);
+            var stadium = await _service.GetAllStadiumByListId(ids);
             if (locked)
             {
-                return Json(new { success = 200, value = locked });
+                var islock = stadium.Value.FirstOrDefault();
+                if ( islock.IsLocked == true)
+                {
+                    return Json(new { success = 200, value = "Sân được khóa thành công!" });
+                }
+                else
+                {
+                    return Json(new { success = 200, value = "Sân được mở khóa thành công!" });
+                }
             }
             else
                 return Json(new { success = 400, value = locked });
@@ -69,12 +95,106 @@ namespace AdminUI.Controllers
                 Longitude = stadium.Longitude
             };
             var updatedStadium = await _service.UpdateStadiumAsync(id, updateStadiumDTO);
+            
+            
             if (updatedStadium != null)
             {
-                return Json(new { success = 200, value = updatedStadium });
+                if (updatedStadium.IsLocked == true)
+                {
+                    return Json(new { success = 200, value = "Sân được khóa thành công!" });
+                }
+                else
+                {
+                    return Json(new { success = 200, value = "Sân được mở khóa thành công!" });
+                }
+
             }
             else
                 return Json(new { success = 400, value = updatedStadium });
         }
+
+        // lấy những sân vừa đăng kí hôm nay
+        public async Task<IActionResult> GetNewStadiums()
+        {
+            var token = _tokenService.GetAccessTokenFromCookie();
+
+            // hôm nay (UTC)
+            var today = DateTime.UtcNow.Date;
+
+            // hôm qua 00:00 (UTC)
+            var yesterday = today.AddDays(-1);
+            
+
+            // ngày mai 00:00 (UTC)
+            var tomorrow = today.AddDays(1);
+
+            // Lấy CreatedAt >= hôm qua và < ngày mai
+            var filter = $"&$filter=CreatedAt ge {yesterday:o} and CreatedAt lt {tomorrow:o}";
+
+            var stadiums = await _service.SearchStadiumAsync(filter);
+
+
+            return Content(stadiums, "application/json");
+        }
+
+        //Lấy dữ liệu để xuất file excel
+        public async Task<IActionResult> GetStadiumsForExcel()
+        {
+   
+            var stadiums = await _service.ExportExcel();
+            return Content(stadiums, "application/json");
+        }
+
+        //lấy count của tất cả các loại thể thao
+        public async Task<IActionResult> GetCourtTypes()
+        {
+            SportCountViewModel model = new SportCountViewModel();
+            
+            var badminton = await _service.GetSportType("Cầu lông");
+            var tennis = await _service.GetSportType("Tennis");
+            var basketball = await _service.GetSportType("Bóng rổ");
+            var volleyball = await _service.GetSportType("Bóng chuyền");
+            var football = await _service.GetSportType("Bóng đá");
+            model.volleyballCount = (int)volleyball.Count;
+            model.basketballCount = (int)basketball.Count;
+            model.tennisCount = (int)tennis.Count;
+            model.badmintonCount = (int)badminton.Count;
+            model.footballCount = (int)football.Count;
+            return Json(model);
+        }
+
+        // Lấy nhà thi đấu chưa duyệt
+        public async Task<IActionResult> GetUnapprovedStadiums()
+        { 
+            var stadiums = await _service.GetUnapprovedStadiums();
+            return Json(stadiums);
+        }
+
+        // Lấy tổng số nhà thi đấu
+        public async Task<IActionResult> GetTotalStadiums()
+        {
+            var stadiums = await _service.GetTotalStadiums();
+            return Json(stadiums);
+        }
+
+        // lấy nhà thi đấu theo các năm đăng ký
+        public async Task<IActionResult> GetStadiumsByYear(int year)
+        {
+            // Lọc các sân được tạo trong năm cụ thể
+            var filter = $"&$filter=year(CreatedAt) eq {year}";
+            var stadiums = await _service.SearchStadiumAsync(filter);
+            return Content(stadiums, "application/json");
+        }
+        // lấy nhà thi đấu theo các tháng đăng ký trong năm hiện tại
+        public async Task<IActionResult> GetStadiumsByMonth(int month)
+        {
+            var currentYear = DateTime.UtcNow.Year;
+            // Lọc các sân được tạo trong tháng cụ thể của năm hiện tại
+            var filter = $"&$filter=year(CreatedAt) eq {currentYear} and month(CreatedAt) eq {month}";
+            var stadiums = await _service.SearchStadiumAsync(filter);
+            return Content(stadiums, "application/json");
+        }
+
+
     }
 }

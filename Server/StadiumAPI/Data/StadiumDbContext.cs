@@ -91,7 +91,7 @@ namespace StadiumAPI.Data
                 .HasForeignKey(sv => sv.StadiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            var fixedDate = new DateTime(2025, 8, 14, 10, 0, 0);
+            var fixedDate = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
             modelBuilder.Entity<CourtRelations>()
            .HasOne(cr => cr.ChildCourt)
@@ -125,7 +125,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0528m,
                     Longitude = 105.7725m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -143,7 +143,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0401m,
                     Longitude = 105.7684m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -161,7 +161,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0381m,
                     Longitude = 105.7788m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -179,7 +179,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0163m,
                     Longitude = 105.7539m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -197,7 +197,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0249m,
                     Longitude = 105.7687m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -215,7 +215,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0396m,
                     Longitude = 105.7725m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 8,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -233,7 +233,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0094m,
                     Longitude = 105.7877m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 8,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -251,7 +251,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0331m,
                     Longitude = 105.7770m,
                     IsApproved = true,
-                    CreatedBy = 2,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false

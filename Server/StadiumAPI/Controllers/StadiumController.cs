@@ -53,7 +53,7 @@ namespace StadiumAPI.Controllers
         // PUT: api/ReadStadiumDTOes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize(Roles = ("StadiumManager"))]
+        [Authorize(Roles = "StadiumManager,Admin")]
         public async Task<IActionResult> PutReadStadiumDTO([FromQuery] int id, [FromBody] UpdateStadiumDTO updateStadiumDTO)
         {
             if (id != updateStadiumDTO.Id)
@@ -72,7 +72,7 @@ namespace StadiumAPI.Controllers
         // POST: api/ReadStadiumDTOes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = ("StadiumManager"))]
+        [Authorize(Roles = "StadiumManager,Admin")]
         public async Task<ActionResult<ReadStadiumDTO>> PostReadStadiumDTO([FromBody] CreateStadiumDTO createStadiumDTO)
         {
             createStadiumDTO.NameUnsigned = RemoveDiacritics(createStadiumDTO.Name).ToLower();

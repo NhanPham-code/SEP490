@@ -5,8 +5,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript" crossorigin="anonymous" src="https://e.fontawesome.com/static/surveys.js?v=1.268.6"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <link rel="stylesheet" href="~/css/stadium/stadium.css" />
 <link rel="stylesheet" href="~/css/stadium/Background.css" />
 <!-- Add these to your HTML head -->
@@ -298,6 +301,9 @@
                     initializeApp();
                     updateDateTime();
                     loadNewStadiumsToday();
+                    loadCourtTypes();
+                    loadTotalStadiums();
+                    GetUnapprovedStadiums();
                     // setInterval(updateDateTime, 10000);
                 });
 
@@ -372,7 +378,6 @@
                     console.log('Data received:', data);
                     renderStadiumGrid(data.value);
                     updatePagination(data["@@odata.count"]);
-                    $("#count").text(data["@@odata.count"]);
                     hideLoading();
                 }
 
@@ -405,31 +410,22 @@
                                     <i class="ri-map-pin-2-line"></i>
                                     ${stadium.Address || 'Chưa cập nhật địa chỉ'}
                                 </div>
-                                <div class="info-grid">
-
-                                    <div class="info-card price-info">
-                                        <div class="info-label">Giá/giờ</div>
-                                        <div class="info-value">${formatPrice(stadium.Courts)}</div>
-                                    </div>
-                                    <div class="info-card time-info">
-                                        <div class="info-label">Giờ hoạt động</div>
-                                        <div class="info-value">${formatTimeForDisplay(stadium.OpenTime)} - ${formatTimeForDisplay(stadium.CloseTime)}</div>
-                                    </div>
-                                </div>
+                                
                                 <div class="pb-4">
                                     <div class="info-card sport-info">
-                                        <div class="info-label">Loại sân</div>
+                                        <div class="info-label">Đánh giá </div> 
                                         <div class="info-value">${getSportTypes(stadium.Courts)}</div>
                                     </div>
                                 </div>
-                                
+                                <a href="#" class="link">Xem chi tiết đánh giá</a>
                             </div>
-                            <div class="card-actions card-content">
+                            
+                            <div class="card-actions bottom-content">
                                                            <div class="card-detail">
                                                                    <button onclick="openViewModal(${stadium.Id})" class="details-btn loading" title="Xem chi tiết">
                         <i class="ri-information-line"></i> Chi tiết
                     </button>
-                                                             <button onclick="goToDetail(${stadium.Id})" class="details-btn loading">
+                                                             <button onclick="goToDetail(${stadium.Id})" class="court-btn loading">
                     ${setIcon(stadium.Courts)} Xem sân
                 </button>
 
@@ -437,21 +433,26 @@
 
                                             <div class="action-buttons">
 
-                    ${stadium.IsLocked ?
-                        `<button onclick="confirmUnlock(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
-                            <i class="ri-lock-unlock-line"></i>
-                        </button>` :
-                        `<button onclick="confirmLock(${stadium.Id})" class="action-btn lock-btn" title="Khóa">
-                            <i class="ri-lock-line"></i>
-                        </button>`
-                    }
-                    ${stadium.isApproved ?
-                        `<button onclick="confirmApprove(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
-                            <i class="ri-lock-unlock-line"></i>
-                        </button>` :
-                        `<button onclick="confirmLock(${stadium.Id})" class="action-btn lock-btn" title="Khóa">
-                            <i class="ri-lock-line"></i>
-                        </button>`
+                    
+                    ${stadium.IsApproved == false?
+                        `
+                          <button onclick="confirmApprove(${stadium.Id})" class="action-btn isApproved-btn" title="Chấp nhận sân">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.0072 2.10365C8.60556 1.64993 7.08193 2.28104 6.41168 3.59294L5.6059 5.17011C5.51016 5.35751 5.35775 5.50992 5.17036 5.60566L3.59318 6.41144C2.28128 7.08169 1.65018 8.60532 2.10389 10.0069L2.64935 11.6919C2.71416 11.8921 2.71416 12.1077 2.64935 12.3079L2.10389 13.9929C1.65018 15.3945 2.28129 16.9181 3.59318 17.5883L5.17036 18.3941C5.35775 18.4899 5.51016 18.6423 5.6059 18.8297L6.41169 20.4068C7.08194 21.7187 8.60556 22.3498 10.0072 21.8961L11.6922 21.3507C11.8924 21.2859 12.1079 21.2859 12.3081 21.3507L13.9931 21.8961C15.3947 22.3498 16.9183 21.7187 17.5886 20.4068L18.3944 18.8297C18.4901 18.6423 18.6425 18.4899 18.8299 18.3941L20.4071 17.5883C21.719 16.9181 22.3501 15.3945 21.8964 13.9929L21.3509 12.3079C21.2861 12.1077 21.2861 11.8921 21.3509 11.6919L21.8964 10.0069C22.3501 8.60531 21.719 7.08169 20.4071 6.41144L18.8299 5.60566C18.6425 5.50992 18.4901 5.3575 18.3944 5.17011L17.5886 3.59294C16.9183 2.28104 15.3947 1.64993 13.9931 2.10365L12.3081 2.6491C12.1079 2.71391 11.8924 2.71391 11.6922 2.6491L10.0072 2.10365ZM8.19271 4.50286C8.41612 4.06556 8.924 3.8552 9.39119 4.00643L11.0762 4.55189C11.6768 4.74632 12.3235 4.74632 12.9241 4.55189L14.6091 4.00643C15.0763 3.8552 15.5841 4.06556 15.8076 4.50286L16.6133 6.08004C16.9006 6.64222 17.3578 7.09946 17.92 7.38668L19.4972 8.19246C19.9345 8.41588 20.1448 8.92375 19.9936 9.39095L19.4481 11.076C19.2537 11.6766 19.2537 12.3232 19.4481 12.9238L19.9936 14.6088C20.1448 15.076 19.9345 15.5839 19.4972 15.8073L17.92 16.6131C17.3578 16.9003 16.9006 17.3576 16.6133 17.9197L15.8076 19.4969C15.5841 19.9342 15.0763 20.1446 14.6091 19.9933L12.9241 19.4479C12.3235 19.2535 11.6768 19.2535 11.0762 19.4479L9.3912 19.9933C8.924 20.1446 8.41612 19.9342 8.19271 19.4969L7.38692 17.9197C7.09971 17.3576 6.64246 16.9003 6.08028 16.6131L4.50311 15.8073C4.06581 15.5839 3.85544 15.076 4.00668 14.6088L4.55213 12.9238C4.74656 12.3232 4.74656 11.6766 4.55213 11.076L4.00668 9.39095C3.85544 8.92375 4.06581 8.41588 4.50311 8.19246L6.08028 7.38668C6.64246 7.09946 7.09971 6.64222 7.38692 6.08004L8.19271 4.50286ZM6.75972 11.7573L11.0023 15.9999L18.0734 8.92885L16.6592 7.51464L11.0023 13.1715L8.17394 10.343L6.75972 11.7573Z"></path></svg>
+                        </button>
+                       ` :
+                        `
+                      
+
+                         
+                                ${stadium.IsLocked ?
+                                `<button onclick="confirmUnlock(${stadium.Id})" class="action-btn unlock-btn" title="Mở khóa">
+                                    <i class="ri-lock-unlock-line"></i>
+                                </button>` :
+                                `<button onclick="confirmLock(${stadium.Id})" class="action-btn lock-btn" title="Khóa">
+                                    <i class="ri-lock-line"></i>
+                                </button>`
+                            }
+                        `
                     }
                 </div>
                                 </div>
@@ -464,35 +465,86 @@
                 //set icon cho btn 
                 function setIcon(court){
                     console.log(court);
-                          switch (court[0].SportType) {
+                          if(court[0].SportType.length > 0){
+                              switch (court[0].SportType) {
         case "Bóng chuyền":
-          return `<svg xmlns="http://www.w3.org/2000/svg" style=" width:20px;" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @@fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M576 322.9C552.6 330.9 528.2 336 503.4 338C509.3 239.4 472.7 146.9 408.5 79.7C506.3 115.7 576 209.7 576 320C576 321 576 321.9 576 322.9zM570.1 374.9C564.9 398.6 556.5 421.1 545.2 441.8C450.5 494 331.2 491.8 236.8 428.2C258.5 396.9 286.6 369.3 320.6 347.7C400.1 389.3 489.1 396.8 570.1 374.8zM343.7 305.6C340 215.9 302 135.1 242.4 75.9C264.7 68.8 288.4 64.7 312.9 64C405.4 119.9 463.2 224.3 455.3 337.8C417.3 334.6 379.4 324.1 343.7 305.5zM194.5 96.8C213.1 113.1 229.8 131.7 243.9 152.2C155.5 196.3 93.7 274.3 67.7 363.5C65.3 349.3 64 334.8 64 320C64 224.2 116.6 140.7 194.5 96.8zM267.9 193.8C284.2 228.3 294 266.4 295.8 306.6C220 354.6 169 427.9 147.5 509.1C129.9 493 114.5 474.5 102 454.1C104.1 346 165.7 243.7 267.9 193.8zM320 576C272.3 576 227.7 563 189.5 540.3C194.3 516 202.1 492.3 212.7 469.9C295.1 524.3 393.5 538.8 483.7 516.9C439.3 553.9 382.2 576.1 320 576.1z"/></svg>`;
+          return `🏐`;
           break;
 
-        case "Bóng rổ":
-          return `<i class="ri-basketball-line"></i>`;
-          break;
-
-        case "Bóng đá sân 5" || "Bóng đá sân 7" || "Bóng đá sân 11":
-          return `<i class="ri-football-line"></i>`;
-          break;
-
-        case "Cầu long":
+        case "Tennis":
           return `🎾`;
           break;
 
+        case "Bóng đá sân 5":
+          return `⚽`;
+          break;
+
+        case "Bóng đá sân 7" :
+          return `⚽`;
+          break;
+
+           case "Bóng đá sân 11":
+          return `⚽`;
+          break;
+
+        case "Cầu lông":
+          return `🏸`;
+          break;
+
         case "Bóng rổ":
-          return `<i class="ri-basketball-line"></i>`;
+          return `🏀`;
           break;
 
         default: return ``;
+                          }
                           }
                 }
 
                 //chấp nhận sân 
                 function confirmApprove(stadiumId) {
-                    
+                    $.ajax({
+                        url: `/Stadium/AcceptStadium/${stadiumId}`,
+                        type: 'POST',
+                        success: function(response) {
+                            showNotification('Duyệt nhà thi đấu thành công!', 'success');
+        loadData();
+        GetUnapprovedStadiums();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error approving stadium:', error);
+                            let errorMessage = 'Không thể chấp nhận sân. Vui lòng thử lại!';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            showNotification('Duyệt sân thất bại!', 'error');
+                        }
+                    });
                 }
+
+                //thông báo
+                function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-2xl shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="ri-check-line text-xl"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
 
   
 
@@ -550,7 +602,7 @@
                                 <div class="modal-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
                                     <i class="ri-lock-unlock-line"></i>
                                 </div>
-                                <div class="modal-title-text">Xác nhận Mở khóa sân</div>
+                                <div class="modal-title-text">Xác Nhận Mở Khóa Sân</div>
                             </div>
                         `,
                         html: `
@@ -595,7 +647,7 @@
                                 <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
                                     <i class="ri-lock-line"></i>
                                 </div>
-                                <div class="modal-title-text">Xác nhận Khóa sân</div>
+                                <div class="modal-title-text">Xác Nhận Khóa Sân</div>
                             </div>
                         `,
                         html: `
@@ -608,10 +660,7 @@
                                 <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
                                     Bạn có chắc chắn muốn khóa sân này không?
                                 </h3>
-                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem; line-height: 1.6;">
-                                    Tất cả dữ liệu liên quan<br>
-                                    đến sân này sẽ bị khóa đến khi nào mở lại.
-                                </p>
+                      
                             </div>
                         `,
                         showCancelButton: true,
@@ -1110,7 +1159,19 @@
                                 </div>
                                 <div class="info-value">${stadium.Address || 'Chưa có địa chỉ'}</div>
                             </div>
+                             <div class="info-item">
+                                <div class="info-label">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.0049 6.99979H21.0049C21.5572 6.99979 22.0049 7.4475 22.0049 7.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H18.0049V6.99979ZM4.00488 8.99979V18.9998H20.0049V8.99979H4.00488ZM4.00488 4.99979V6.99979H16.0049V4.99979H4.00488ZM15.0049 12.9998H18.0049V14.9998H15.0049V12.9998Z"></path></svg>                                    Giá sân
+                                </div>
+                                <div class="info-value">${stadium.Courts[0].PricePerHour || 'Chưa có giá'}/Giờ</div>
+                            </div>
 
+                            <div class="info-item">
+                                <div class="info-label">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM13.6695 15.9999H10.3295L8.95053 17.8969L9.5044 19.6031C10.2897 19.8607 11.1286 20 12 20C12.8714 20 13.7103 19.8607 14.4956 19.6031L15.0485 17.8969L13.6695 15.9999ZM5.29354 10.8719L4.00222 11.8095L4 12C4 13.7297 4.54894 15.3312 5.4821 16.6397L7.39254 16.6399L8.71453 14.8199L7.68654 11.6499L5.29354 10.8719ZM18.7055 10.8719L16.3125 11.6499L15.2845 14.8199L16.6065 16.6399L18.5179 16.6397C19.4511 15.3312 20 13.7297 20 12L19.997 11.81L18.7055 10.8719ZM12 9.536L9.656 11.238L10.552 14H13.447L14.343 11.238L12 9.536ZM14.2914 4.33299L12.9995 5.27293V7.78993L15.6935 9.74693L17.9325 9.01993L18.4867 7.3168C17.467 5.90685 15.9988 4.84254 14.2914 4.33299ZM9.70757 4.33329C8.00021 4.84307 6.53216 5.90762 5.51261 7.31778L6.06653 9.01993L8.30554 9.74693L10.9995 7.78993V5.27293L9.70757 4.33329Z"></path></svg>                                    Loại sân
+                                </div>
+                                <div class="info-value">${getSportTypes(stadium.Courts) || 'Chưa có sân'}</div>
+                            </div>
                             <div class="info-item full-width">
                                 <div class="info-label">
                                     <i class="ri-file-text-line"></i>
@@ -1971,41 +2032,15 @@
 
                 // Complete delete stadium function with proper success message
                 function deleteStadium(stadiumId) {
-                    Swal.fire({
-                        title: 'Đang xóa sân...',
-                        html: `
-                            <div class="loading-content">
-                                <div class="loading-spinner-custom" style="border-top-color: #ef4444;"></div>
-                                <p style="margin-top: 16px; color: #6b7280;">Đang xóa sân khỏi hệ thống...</p>
-                            </div>
-                        `,
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
+                    
 
                     $.ajax({
                         url: `${CONFIG.API_ENDPOINTS.DELETE}/${stadiumId}`,
                         type: 'DELETE',
                         success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Khóa thành công!',
-                                html: `
-                                    <div style="text-align: center; padding: 20px 0;">
-                                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669);
-                                                    border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="ri-check-line" style="font-size: 40px; color: white;"></i>
-                                        </div>
-                                        <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                                            Sân đã được xóa khóa
-                                        </h3>
-                                    </div>
-                                `,
-                                confirmButtonText: 'Đã hiểu',
-                                confirmButtonColor: '#10b981'
-                            }).then(() => {
-                                loadData();
-                            });
+                            console.log("khoa san: ", response);
+                                                        showNotification(response.value.toString(), 'success');
+                                                        loadData();
                         },
                         error: function(xhr, status, error) {
                             console.error('Error deleting stadium:', error);
@@ -3251,65 +3286,106 @@
                 }
 
                 //lấy các nhà thi đấu vừa mới đăng ký ngày hôm nay
-            function loadNewStadiumsToday() {
-    const today = new Date();
-    // Lấy 00:00:00 của ngày hôm nay theo giờ địa phương của trình duyệt
-    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()); 
-    // Lấy 00:00:00 của ngày mai, là điểm kết thúc
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
-
-    // Hàm này của bạn đã viết đúng để tạo chuỗi ngày giờ có múi giờ.
-    // Ví dụ: 2025-10-04T00:00:00+07:00
-    function formatWithOffset(date) {
-        const pad = (n) => String(n).padStart(2, '0');
-
-        const year = date.getFullYear();
-        const month = pad(date.getMonth() + 1);
-        const day = pad(date.getDate());
-        const hours = pad(date.getHours());
-        const minutes = pad(date.getMinutes());
-        const seconds = pad(date.getSeconds());
-
-        const offsetMinutes = -date.getTimezoneOffset();
-        const sign = offsetMinutes >= 0 ? "+" : "-";
-        const offsetH = pad(Math.floor(Math.abs(offsetMinutes) / 60));
-        const offsetM = pad(Math.abs(offsetMinutes) % 60);
-
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetH}:${offsetM}`;
-    }
-
-    // 1. Xây dựng chuỗi $filter với ngày giờ đã được định dạng đúng
-    const filter = `CreatedAt ge ${formatWithOffset(start)} and CreatedAt lt ${formatWithOffset(end)}`;
-    
-    // 2. Thêm `$count=true` để yêu cầu OData trả về tổng số lượng record
-    //    Đây là điều kiện cần để `data["@@odata.count"]` hoạt động.
-    const queryParams = `$filter=${filter}&$top=0&$count=true`;
-    
-    // 3. Nối các tham số truy vấn vào URL gốc.
-    //    Lưu ý: Phải có dấu '?' ngăn cách giữa URL và các tham số.
-    const url = `${CONFIG.API_ENDPOINTS.SEARCH}?${queryParams}`;
-    
-    console.log('Final Request URL:', url);
-    console.log('Fetching new stadiums from', formatWithOffset(start), 'to', formatWithOffset(end));
-
-    $.ajax({
-        url: url, // Sử dụng URL đã được xây dựng hoàn chỉnh
-        method: 'GET',
-        // Không dùng thuộc tính 'data' ở đây cho request GET với OData
-        success: function(data) {
-            console.log('New stadiums today data:', data);
+                          function loadNewStadiumsToday() {
             
-            const count = data["@@odata.count"] || (data.value ? data.value.length : 0);
-            $('#stadium-now').text(count);
-        },
-        error: function(err) {
-            console.error('Error fetching new stadiums today:', err);
+            $.ajax({
+                url: "/Stadium/GetNewStadiums",
+                method: 'GET',
+                success: function(data) {
+                    console.log('New stadiums today data:', data);
+
+                    const count = data["@@odata.count"] || (data.value ? data.value.length : 0);
+                    // Lưu ý: Tên thuộc tính có thể là "@@odata.count" (không có @@)
+                    $('#stadium-now').text(count);
+                },
+                error: function(err) {
+                    console.error('Error fetching new stadiums today:', err);
+                }
+            });
         }
-    });
-}
 
+        // xuất file excel
+                function exportFromJSON() {
 
+           $.ajax({
+                url: "/Stadium/GetStadiumsForExcel",
+                method: 'GET',
+                success: function(data) {
+                            // 1. Chuyển JSON thành sheet
+                            console.log('Data for export:', data.value);
+        const ws = XLSX.utils.json_to_sheet(data.value);
+
+        // 2. Tạo workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Danh-sach-nha-thi-dau");
+
+        // 3. Xuất file
+        XLSX.writeFile(wb, "Export.xlsx");
+                },
+                error: function(err) {
+                    console.error('Error exporting to Excel:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Có lỗi xảy ra khi xuất file Excel. Vui lòng thử lại sau.',
+                        confirmButtonColor: '#10b981'
+                    });
+                }
+            });
+        }
+
+        //lấy court của các loại sân 
+        function loadCourtTypes() {
+            $.ajax({
+                url: "/Stadium/GetCourtTypes",
+                method: 'GET',
+                success: function(data) {
+                    console.log('Court types data:', data);
+                    console.log('Football count:', data.footballCount);
+                    $('#football-count').text(data.footballCount || 0);
+                    $('#basketball-count').text(data.basketballCount || 0);
+                    $('#volleyball-count').text(data.volleyballCount || 0);
+                    $('#badminton-count').text(data.badmintonCount || 0);
+                    $('#tennis-count').text(data.tennisCount || 0);
+                },
+                error: function(err) {
+                    console.error('Error fetching court types:', err);
+                }
+            });
+        }
+
+        //lấy số nhà thi đấu chưa được duyệt
+        function GetUnapprovedStadiums() {
+            $.ajax({
+                url: "/Stadium/GetUnapprovedStadiums",
+                method: 'GET',
+                success: function(data) {
+                    console.log('Pending stadiums count:', data);
+                    const count = data.count || 0;
+                    $('#pending-count').text(count);
+                },
+                error: function(err) {
+                    console.error('Error fetching pending stadiums count:', err);
+                }
+            });
+        }
+        //lấy tổng số nhà thi đấu đã đăng ký
+        function loadTotalStadiums() {
+            $.ajax({
+                url: "/Stadium/GetTotalStadiums",
+                method: 'GET',
+                success: function(data) {
+                    console.log('Total stadiums count:', data);
+                    const count = data.count || 0;
+                    $('#count').text(count);
+                },
+                error: function(err) {
+                    console.error('Error fetching total stadiums count:', err);
+                }
+            });
+        }
+
+        // biểu đồ các sân đăng ký trong các năm
 
     </script>
 }
@@ -3331,8 +3407,9 @@
                 <p class="header-subtitle">
                     <span id="current-time">2025-08-25 08:06:00</span> - Xin chào, <span style="font-weight: 700;">@User.Identity.Name</span>
                 </p>
+                
             </div>
-
+            <button class="btn excel-btn" onclick="exportFromJSON()">📑 Xuất Excel</button>
         </div>
         @* hiển thị số lượng nhà thi đấu vừa đăng ký hôm này  *@
         <div class="header-stats">
@@ -3354,8 +3431,83 @@
                 </div>
                 <div class="stat-info">
                     <p class="stat-label
+                        ">Nhà Thi Đấu Chưa Duyệt</p>
+                    <h2 class="stat-value" id="pending-count">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    <i class="ri-building-2-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
                         ">Nhà Thi Đấu Đã Đăng Kí</p>
                     <h2 class="stat-value" id="count">
+                        0
+                    </h2>
+                </div>
+            </div>
+        </div>
+        @* loại sân  *@
+        <div class="header-stats mt-4">
+            <div class="stat-card-waiting">
+                <div class="stat-icon bg-blue">
+                    ⚽
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Bóng đá</p>
+                    <h2 class="stat-value" id="football-count">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    🏀
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Bóng rổ</p>
+                    <h2 class="stat-value" id="basketball-count">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    🏐
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Bóng chuyền</p>
+                    <h2 class="stat-value" id="volleyball-count">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    🏸
+                </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Cầu long</p>
+                    <h2 class="stat-value" id="badminton-count">
+                        0
+                    </h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    🎾
+                    </div>
+                <div class="stat-info">
+                    <p class="stat-label
+                        ">Tennis</p>
+                    <h2 class="stat-value" id="tennis-count">
                         0
                     </h2>
                 </div>
@@ -3389,6 +3541,7 @@
                     <option value="Bóng đá sân 7">Bóng đá sân 7</option>
                     <option value="Bóng đá sân 11">Bóng đá sân 11</option>
                     <option value="Bóng rổ">Bóng rổ</option>
+                    <option value="Bóng chuyền">Bóng chuyền</option>
                     <option value="Cầu lông">Cầu lông</option>
                     <option value="Tennis">Tennis</option>
                 </select>
@@ -3396,7 +3549,7 @@
         </div>
 
     </section>
-
+    
     <!-- Stadium Grid -->
     <section class="glass-card stadium-grid-section">
         <div class="section-header">
