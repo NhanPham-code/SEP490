@@ -180,7 +180,12 @@ namespace AdminUI.Controllers
                 return Json(new { success = false, message = "Có lỗi xảy ra khi xóa feedback" });
             }
         }
-
+        [HttpGet]
+        public IActionResult ByStadium(int stadiumId)
+        {
+            ViewData["stadiumId"] = stadiumId;
+            return View("FeedbackByStadium");
+        }
         // Logic kiểm tra hợp lệ (ví dụ: comment phải khác rỗng)
         private bool IsValidFeedback(FeedbackResponse feedback)
         {
@@ -189,7 +194,14 @@ namespace AdminUI.Controllers
             // Có thể thêm check khác theo nhu cầu
             return true;
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetSummary(int stadiumId)
+        {
+            var feedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
+            var count = feedbacks.Count();
+            var avg = count > 0 ? feedbacks.Average(f => f.Rating) : 0;
+            return Json(new { count, avgRating = avg });
+        }
         public IActionResult Feedback()
         {
             return View();
