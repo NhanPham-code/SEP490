@@ -207,8 +207,10 @@ namespace BookingAPI.Controllers
 
         [HttpGet("by-stadiums-and-date")]
         public async Task<ActionResult<IEnumerable<BookingReadDto>>> GetBookingsByStadiumsAndDate(
-                    [FromQuery] List<int> stadiumIds,
-                    [FromQuery] DateTime date)
+            [FromQuery] List<int> stadiumIds, 
+            [FromQuery] int? year,
+            [FromQuery] int? month,
+            [FromQuery] int? day)
         {
             if (stadiumIds == null || !stadiumIds.Any())
             {
@@ -217,7 +219,7 @@ namespace BookingAPI.Controllers
 
             try
             {
-                var bookings = await _bookingService.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+                var bookings = await _bookingService.GetBookingsByStadiumsAndDateAsync(stadiumIds, year, month, day);
                 return Ok(bookings);
             }
             catch (Exception ex)

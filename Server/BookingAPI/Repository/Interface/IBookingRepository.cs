@@ -16,6 +16,6 @@ namespace BookingAPI.Repository.Interface
         Task<IEnumerable<Booking>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime);
         Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day);
         Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years);
-        Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date);
+        Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync( IEnumerable<int> stadiumIds, int? year, int? month, int? day);
     }
 }

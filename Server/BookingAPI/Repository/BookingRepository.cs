@@ -135,14 +135,27 @@ namespace BookingAPI.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        public async Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, int? year, int? month, int? day)
         {
-            return await _context.Bookings
-                .Include(b => b.BookingDetails) // Include chi tiết booking
-                .Include(b => b.MonthlyBooking) // Include booking tháng nếu có
-                .Where(b => stadiumIds.Contains(b.StadiumId) && b.Date.Date == date.Date)
-                .AsNoTracking()
-                .ToListAsync();
+            var query = _context.Bookings
+                .Include(b => b.BookingDetails)
+                .Include(b => b.MonthlyBooking)
+                .Where(b => stadiumIds.Contains(b.StadiumId));
+
+            if (year.HasValue)
+            {
+                query = query.Where(b => b.Date.Year == year.Value);
+            }
+            if (month.HasValue)
+            {
+                query = query.Where(b => b.Date.Month == month.Value);
+            }
+            if (day.HasValue)
+            {
+                query = query.Where(b => b.Date.Day == day.Value);
+            }
+
+            return await query.AsNoTracking().ToListAsync();
         }
     }
 }

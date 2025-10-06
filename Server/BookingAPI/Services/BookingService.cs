@@ -334,9 +334,9 @@ namespace BookingAPI.Services
             return statisticsDto;
         }
 
-        public async Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        public async Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, int? year, int? month, int? day)
         {
-            var bookings = await _bookingRepository.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+            var bookings = await _bookingRepository.GetBookingsByStadiumsAndDateAsync(stadiumIds, year, month, day);
             return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
         }
     }

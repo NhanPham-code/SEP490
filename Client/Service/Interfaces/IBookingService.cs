@@ -23,5 +23,6 @@ namespace Service.Interfaces
                 Task<BookingReadDto?> UpdateBookingAsync(int id, BookingUpdateDto bookingDto, string accessToken);
                 Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots, string accessToken);
                 Task<RevenueStatisticViewModel> GetRevenueStatisticsAsync(string accessToken, int year, int? month, int? day);
+                Task<List<StadiumBookingOverviewDto>> GetStadiumRevenueAsync(string accessToken, int page, int pageSize, int? year, int? month, int? day);
         }
 }
