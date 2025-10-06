@@ -64,5 +64,32 @@ namespace AdminUI.Controllers
                 return Json(new { success = false, message = "Có lỗi xảy ra khi lấy dữ liệu." });
             }
         }
+        
+        [HttpGet]
+        public IActionResult StadiumRevenue()
+        {
+            // Chỉ cần trả về View, dữ liệu sẽ được load bằng AJAX
+            return View();
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetStadiumRevenueData(int page, int pageSize, int? year, int? month, int? day)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn." });
+            }
+            try
+            {
+                var data = await _bookingService.GetStadiumRevenueAsync(accessToken, page, pageSize, year, month, day);
+                return Json(new { success = true, data = data });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting stadium revenue data.");
+                return Json(new { success = false, message = "Có lỗi xảy ra khi lấy dữ liệu." });
+            }
+        }
     }
 }

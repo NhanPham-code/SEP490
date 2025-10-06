@@ -21,6 +21,6 @@ namespace BookingAPI.Services.Interface
                 Task AutoAcceptBookingByIdAsync(int bookingId);
                 Task AutoCompleteBookingsAsync();
                 Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day);
-                Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date);
+                Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync( IEnumerable<int> stadiumIds, int? year, int? month, int? day);
         }
 }
