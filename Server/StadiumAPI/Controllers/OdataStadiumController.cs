@@ -28,8 +28,5 @@ namespace StadiumAPI.Controllers
             var stadiums = _serviceStadium.GetAllOdataStadiums(); // IQueryable<Stadiums>
             return stadiums;
         }
-
-
-
     }
 }

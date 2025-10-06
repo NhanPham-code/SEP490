@@ -48,5 +48,7 @@ namespace Service.Interfaces
 
         Task<bool> UnbanUserAsync(int userId, string accessToken);
 
+        Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
+
     }
 }

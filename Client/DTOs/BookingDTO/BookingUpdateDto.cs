@@ -3,6 +3,7 @@
     public class BookingUpdateDto
     {
         public int UserId { get; set; }
+        public int CreatedById { get; set; }
         public string Status { get; set; } = "pending";
         public DateTime Date { get; set; }
         public decimal? TotalPrice { get; set; }

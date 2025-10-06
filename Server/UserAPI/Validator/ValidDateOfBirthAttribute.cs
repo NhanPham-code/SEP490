@@ -7,7 +7,7 @@ namespace UserAPI.Validator
     {
         public int MinimumAge { get; }
 
-        public DateOfBirthAttribute(int minimumAge = 18)
+        public DateOfBirthAttribute(int minimumAge = 15)
         {
             MinimumAge = minimumAge;
             ErrorMessage = $"Date of birth must indicate an age of at least {minimumAge}.";

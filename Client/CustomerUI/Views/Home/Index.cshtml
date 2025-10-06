@@ -401,9 +401,9 @@
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
-            <div class="mt-2 search">
+            <div class="mt-2">
                 <!-- From Uiverse.io by mahiatlinux -->
-                <div class="mt-3 relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
+                <div class="search mt-3 relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-gray-400"
                              xmlns="http://www.w3.org/2000/svg"
@@ -632,19 +632,11 @@
 
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <span class="text-gray-600 whitespace-nowrap" id="count"></span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-600">Sort by:</span>
-                            <button class="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:border-primary transition-colors">
-                                <span>Popularity</span>
-                                <div class="w-4 h-4 flex items-center justify-center">
-                                    <i class="ri-arrow-down-s-line"></i>
-                                </div>
-                            </button>
-                        </div>
+                    
                     </div>
                     <div class="flex items-center gap-4 mb-6">
                         <!-- From Uiverse.io by 0x3ther -->
-                        <div class="flex items-center gap-2 mt-5">
+                        <div class="flex items-center gap-2 mt-5 model-btn">
                             
                             <button id="grid-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
                                 <svg class="lucide lucide-newspaper text-blue-400 dark:text-blue-600"
@@ -962,8 +954,8 @@
                                 </div>
                             </div>
 
-                            <div class="p-4">
-                             
+                            <div class="p-4 card-info">
+                                <!-- Tên sân (KHÔNG dịch) -->
                                 <h3 class="font-bold text-lg text-gray-900 mb-1">${item.Name}</h3>
 
                                 <!-- Địa chỉ (KHÔNG dịch) -->

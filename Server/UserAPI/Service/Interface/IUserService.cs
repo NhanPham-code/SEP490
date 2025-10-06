@@ -39,5 +39,7 @@ namespace UserAPI.Service.Interface
         Task BanUserAsync(int userId);
 
         Task UnbanUserAsync(int userId);
+
+        Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
     }
 }

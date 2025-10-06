@@ -46,6 +46,8 @@ namespace UserAPI.Service
             user.Email = updateUserProfileDTO.Email;
             user.Address = updateUserProfileDTO.Address;
             user.PhoneNumber = updateUserProfileDTO.PhoneNumber;
+            user.Gender = updateUserProfileDTO.Gender;
+            user.DateOfBirth = string.IsNullOrEmpty(updateUserProfileDTO.DateOfBirth) ? null : DateHelper.Parse(updateUserProfileDTO.DateOfBirth);
 
             // Cập nhật thông tin vào DB
             var updatedUser = await _userRepository.UpdateUserAsync(user);
@@ -310,29 +312,47 @@ namespace UserAPI.Service
 
         public async Task<PrivateUserProfileDTO> CustomerRegisterAsync(CustomerRegisterRequestDTO registerDto)
         {
-            // 1. Check email tồn tại
+            // 1.Check email tồn tại
             if (await IsEmailExistsAsync(registerDto.Email))
             {
                 throw new InvalidOperationException("Email already exists.");
             }
 
-            // 2. Hash password
+            // 2. Gọi AI Service để đăng ký khuôn mặt và lấy 5 embeddings từ 5 ảnh
+            AiFaceRegisterResponseModel? aiResponse = null;
+            if (registerDto.FaceImages != null)
+            {
+                try
+                {
+                    aiResponse = await _aiService.RegisterFaceAsync(registerDto.FaceImages, registerDto.Email);
+                    if (aiResponse == null || !aiResponse.Success || aiResponse.Embeddings == null || aiResponse.Embeddings.Count != 5)
+                    {
+                        throw new Exception("Không lấy được embeddings từ AI server.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "AIService đã ném ra một lỗi hệ thống trong quá trình đăng ký của email {Email}.", registerDto.Email);
+                    throw new Exception("Hệ thống xác thực khuôn mặt đang gặp sự cố. Vui lòng thử lại sau.");
+                }
+            }
+
+            // 3. Hash password
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            // 3. Chuẩn bị thư mục lưu file (theo email)
+            // 4. Chuẩn bị thư mục lưu file (theo email)
             string safeEmail = registerDto.Email.Replace("@", "_at_").Replace(".", "_dot_");
 
             string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             string avatarFolder = Path.Combine(uploadFolder, "avatars", safeEmail);
-            string videoFolder = Path.Combine(uploadFolder, "videos", safeEmail);
+            string faceFolder = Path.Combine(uploadFolder, "faces", safeEmail);
 
             Directory.CreateDirectory(avatarFolder);
-            Directory.CreateDirectory(videoFolder);
+            Directory.CreateDirectory(faceFolder);
 
             string? avatarUrl = null;
-            string? faceVideoUrl = null;
 
-            // 3.1 Lưu Avatar
+            // 4.1 Lưu Avatar
             if (registerDto.Avatar != null && registerDto.Avatar.Length > 0)
             {
                 string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.Avatar.FileName)}";
@@ -349,24 +369,33 @@ namespace UserAPI.Service
                 avatarUrl = "/uploads/avatars/default-avatar.png";
             }
 
-            // 3.2 Lưu Face Video
-            if (registerDto.FaceVideo != null && registerDto.FaceVideo.Length > 0)
+            // 4.2 Lưu 5 ảnh khuôn mặt
+            if (registerDto.FaceImages != null)
             {
-                string faceFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.FaceVideo.FileName)}";
-                string facePath = Path.Combine(videoFolder, faceFileName);
-
-                using (var stream = new FileStream(facePath, FileMode.Create))
+                int idx = 1;
+                foreach (var file in registerDto.FaceImages)
                 {
-                    await registerDto.FaceVideo.CopyToAsync(stream);
+                    if (file != null && file.Length > 0)
+                    {
+                        string faceFileName = $"face_{idx}.jpg";
+                        string facePath = Path.Combine(faceFolder, faceFileName);
+                        using (var stream = new FileStream(facePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                        idx++;
+                    }
                 }
-                faceVideoUrl = $"/uploads/videos/{safeEmail}/{faceFileName}";
-            }
-            else
-            {
-                faceVideoUrl = null;
             }
 
-            // 4. Tạo entity User
+            // 4.3 Chuyển embeddings sang JSON string để lưu vào DB
+            string? embeddingsJson = null;
+            if (aiResponse?.Embeddings != null)
+            {
+                embeddingsJson = System.Text.Json.JsonSerializer.Serialize(aiResponse.Embeddings);
+            }
+
+            // 5. Tạo entity User
             var user = new User
             {
                 FullName = registerDto.FullName,
@@ -379,16 +408,16 @@ namespace UserAPI.Service
                 Gender = registerDto.Gender,
                 DateOfBirth = string.IsNullOrEmpty(registerDto.DateOfBirth) ? null : DateHelper.Parse(registerDto.DateOfBirth),
                 AvatarUrl = avatarUrl,
-                FaceVideoUrl = faceVideoUrl,
+                FaceEmbeddingsJson = embeddingsJson,
                 IsActive = true,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow
             };
 
-            // 5. Lưu vào DB
+            // 6. Lưu vào DB
             await _userRepository.CreateUserAsync(user);
 
-            // 6. Map sang ReadUserDTO
+            // 7. Map sang ReadUserDTO
             return _mapper.Map<PrivateUserProfileDTO>(user);
         }
 
@@ -407,7 +436,7 @@ namespace UserAPI.Service
             }
 
             // 2. Gọi AI cho ảnh MẶT TRƯỚC
-            AiResponseModel? aiData;
+            AiCccdResponseModel? aiData;
             try
             {
                 _logger.LogInformation("Đang gửi ảnh CCCD của email {Email} đến AI Service để xác thực.", registerDto.Email);
@@ -697,6 +726,104 @@ namespace UserAPI.Service
 
             user.IsActive = true;
             await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO)
+        {
+            // 1. Validate input
+            if (aiFaceLoginRequestDTO.FaceImage == null || aiFaceLoginRequestDTO.FaceImage.Length == 0)
+            {
+                throw new ArgumentException("Ảnh khuôn mặt không hợp lệ.", nameof(aiFaceLoginRequestDTO.FaceImage));
+            }
+
+            // 2. Lấy tất cả user có embeddings
+            var usersWithEmbeddings = await _userRepository.GetAllUserEmbeddingsAsync();
+
+            if (usersWithEmbeddings == null || usersWithEmbeddings.Count == 0)
+            {
+                return new LoginResponseDTO
+                {
+                    IsValid = false,
+                    Message = "Hệ thống chưa có người dùng nào được đăng ký khuôn mặt. Vui lòng đăng ký trước khi đăng nhập bằng khuôn mặt."
+                };
+            }
+
+            // 3. Gọi AI Service để xác thực khuôn mặt
+            AiFaceLoginResponseModel? aiResponse;
+            try
+            {
+                aiResponse = await _aiService.LoginWithFaceAsync(aiFaceLoginRequestDTO.FaceImage, usersWithEmbeddings);
+
+                if (aiResponse == null || !aiResponse.Success || aiResponse.Email == null)
+                {
+                    return new LoginResponseDTO
+                    {
+                        IsValid = false,
+                        Message = aiResponse.Message ?? "Xác thực khuôn mặt thất bại hoặc không khớp dữ liệu."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AIService đã ném ra một lỗi hệ thống trong quá trình đăng nhập khuôn mặt.");
+                throw new Exception("Hệ thống xác thực khuôn mặt đang gặp sự cố. Vui lòng thử lại sau.");
+            }
+           
+            // 4. Tìm user theo email trả về từ AI
+            var user = await _userRepository.GetUserByEmailAsync(aiResponse.Email);
+            if (user == null)
+            {
+                return new LoginResponseDTO
+                {
+                    IsValid = false,
+                    Message = "Không tìm thấy người dùng với email được xác thực từ khuôn mặt."
+                };
+            }
+
+            // 5. Kiểm tra vai trò (chỉ Customer được phép đăng nhập bằng khuôn mặt)
+            if (user.Role != "Customer")
+            {
+                return new LoginResponseDTO
+                {
+                    IsValid = false,
+                    Message = "Tài khoản với vai trò quản trị không được phép đăng nhập bằng khuôn mặt."
+                };
+            }
+
+            // 6. Kiểm tra trạng thái tài khoản
+            if (!user.IsActive)
+            {
+                return new LoginResponseDTO
+                {
+                    IsValid = false,
+                    Message = "Tài khoản của bạn đã bị khóa."
+                };
+            }
+
+            // 7. Tạo Access Token và Refresh Token
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenEntity = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.UserId,
+                ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpiresDays"]!)),
+                CreatedDate = DateTime.UtcNow
+            };
+            await _refreshTokenRepository.CreateRefreshTokenAsync(refreshTokenEntity);
+
+            // 8. Trả về kết quả
+            return new LoginResponseDTO
+            {
+                IsValid = true,
+                Message = "Đăng nhập bằng khuôn mặt thành công!",
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
+                UserId = user.UserId,
+                FullName = user.FullName,
+                AvatarUrl = user.AvatarUrl
+            };
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.UriParser;
 using System.Security.Claims;
 using UserAPI.DTOs;
@@ -16,12 +17,120 @@ namespace UserAPI.Controllers
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IEmailService _emailService;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IBiometricCredentialService _biometricCredentialService;
 
-        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService)
+        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService, 
+            IEmailService emailService, IMemoryCache memoryCache, IBiometricCredentialService biometricCredentialService)
         {
             _userService = userService;
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _googleAuthService = googleAuthService;
+            _emailService = emailService;
+            _memoryCache = memoryCache;
+            _biometricCredentialService = biometricCredentialService;
+        }
+
+        /// <summary>
+        /// Đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-login
+        /// </summary>
+        [HttpPost("biometric-login")]
+        public async Task<IActionResult> BiometricLogin([FromBody] string biometricToken)
+        {
+            if (string.IsNullOrEmpty(biometricToken))
+            {
+                return BadRequest(new { message = "Biometric token is required." });
+            }
+
+            var result = await _biometricCredentialService.LoginWithBiometricAsync(biometricToken);
+            if (!result.IsValid)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Xóa token đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-delete
+        /// </summary>
+        [HttpDelete("biometric-delete")]
+        public async Task<IActionResult> DeleteBiometricCredential()
+        {
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // Lấy deviceId từ header
+            var deviceId = Request.Headers["Device-Id"].FirstOrDefault();
+            if (string.IsNullOrEmpty(deviceId))
+                return BadRequest(new { message = "Device-Id header is required." });
+
+            try
+            {
+                await _biometricCredentialService.DeleteBiometricCredentialAsync(userIdFromToken, deviceId);
+                return Ok(new { message = "Biometric credential deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting biometric credential.", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Tạo mã đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-token
+        /// </summary>
+        [HttpGet("biometric-token")]
+        public async Task<IActionResult> GenerateBiometricToken() 
+        {
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // Lấy deviceId và deviceName từ header
+            var deviceId = Request.Headers["Device-Id"].FirstOrDefault();
+            var deviceName = Request.Headers["Device-Name"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(deviceId))
+                return BadRequest(new { message = "Device-Id header is required." });
+
+            try
+            {
+                var biometricToken = await _biometricCredentialService.GenerateBiometricCredentialAsync(userIdFromToken, deviceId, deviceName);
+                return Ok(new { biometricToken });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while generating biometric token.", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Đăng nhập bằng khuôn mặt cho Cusotmer
+        /// api/Users/face-login
+        /// </summary>
+        [HttpPost("face-login")]
+        public async Task<IActionResult> FaceLogin([FromForm] AiFaceLoginRequestDTO request)
+        {
+            if (request.FaceImage == null || request.FaceImage.Length == 0)
+            {
+                return BadRequest(new { message = "Face image is required." });
+            }
+
+            var result = await _userService.LoginWithFaceAsync(request);
+
+            if (!result.IsValid)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -129,6 +238,47 @@ namespace UserAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendOtp([FromBody] SendOtpRequestDTO request)
+        {
+            // 1. Tạo mã OTP
+            var otp = new Random().Next(100000, 999999).ToString();
+            var cacheKey = $"otp_{request.Email}";
+
+            // 2. Lưu vào Cache với thời gian hết hạn là 5 phút
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(5)); // Hoặc SetAbsoluteExpiration
+
+            _memoryCache.Set(cacheKey, otp, cacheEntryOptions);
+
+            // 3. Gửi email
+            await _emailService.SendEmailAsync(request.Email, "Mã xác thực của bạn", $"Mã OTP của bạn là: {otp}");
+
+            return Ok(new { message = "OTP has been sent to your email." });
+        }
+
+        [HttpPost("verify-otp")]
+        public IActionResult VerifyOtp([FromBody] VerifyOtpRequestDTO request)
+        {
+            var cacheKey = $"otp_{request.Email}";
+
+            // 4. Lấy mã từ cache
+            if (_memoryCache.TryGetValue(cacheKey, out string? cachedOtp))
+            {
+                // 5. So sánh
+                if (cachedOtp == request.Code)
+                {
+                    // Xác thực thành công, xóa key khỏi cache
+                    _memoryCache.Remove(cacheKey);
+                    return Ok(new { verified = true });
+                }
+            }
+
+            // Nếu không tìm thấy key hoặc mã không khớp
+            return BadRequest(new { verified = false, message = "Invalid or expired OTP." });
         }
 
         /// <summary>

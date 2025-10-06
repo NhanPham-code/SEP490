@@ -108,16 +108,18 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 // Inject Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IBiometricCredentialRepository, BiometricCredentialRepository>();
 
 // Inject Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHttpClient<IAiService, AIService>();
+builder.Services.AddScoped<IBiometricCredentialService, BiometricCredentialService>();
 
-builder.Services.AddHttpClient<IAiService, AIService>(client =>
-{
-    client.BaseAddress = new Uri("http://127.0.0.1:9999");
-});
+// Thêm dịch vụ Memory Cache
+builder.Services.AddMemoryCache();
 
 // Inject AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

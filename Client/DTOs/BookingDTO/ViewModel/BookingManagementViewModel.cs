@@ -28,4 +28,15 @@ namespace DTOs.BookingDTO.ViewModel
         public List<DailyBookingWithUserViewModel> DailyBookings { get; set; } = new List<DailyBookingWithUserViewModel>();
         public List<MonthlyBookingWithDetailsViewModel> MonthlyBookings { get; set; } = new List<MonthlyBookingWithDetailsViewModel>();
     }
+    public class BookingDetailViewModel
+    {
+        public int Id { get; set; }
+        public int BookingId { get; set; }
+        public int CourtId { get; set; }
+        public string CourtName { get; set; } // <-- DỮ LIỆU MỚI QUAN TRỌNG
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
+
+
 }

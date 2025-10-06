@@ -2,6 +2,78 @@
   "Routes": [
     // === USER API ===
     {
+      "DownstreamPathTemplate": "/api/Users/biometric-login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/biometric-login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/biometric-delete",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/biometric-delete",
+      "UpstreamHttpMethod": [ "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/biometric-token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/biometric-token",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/face-login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/face-login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/send-otp",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/send-otp",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/verify-otp",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7295
+        }
+      ],
+      "UpstreamPathTemplate": "/users/verify-otp",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/Users/google-auth",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -1457,6 +1529,19 @@
       ],
       "UpstreamPathTemplate": "/notifications/mark-all-as-read",
       "UpstreamHttpMethod": ["PUT"]
+    },
+    // AggregatorPatternAPI
+    {
+      "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7175
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+      "UpstreamHttpMethod": [ "GET" ]
     }
   ],
   "GlobalConfiguration": {

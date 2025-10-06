@@ -38,7 +38,7 @@ namespace UserAPI.Model
 
         public string? AvatarUrl { get; set; }
 
-        public string? FaceVideoUrl { get; set; }
+        public string? FaceEmbeddingsJson { get; set; } // Lưu trữ embeddings dưới dạng JSON string
 
         public string? IdentityNumber { get; set; }
 
@@ -57,5 +57,7 @@ namespace UserAPI.Model
         public string? GoogleId { get; set; } // Lưu ID duy nhất từ Google
 
         public string? Provider { get; set; } // Lưu nguồn đăng ký: "local", "google"
+
+        public ICollection<BiometricCredential>? BiometricCredentials { get; set; }
     }
 }
