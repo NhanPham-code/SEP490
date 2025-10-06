@@ -46,6 +46,8 @@ namespace UserAPI.Service
             user.Email = updateUserProfileDTO.Email;
             user.Address = updateUserProfileDTO.Address;
             user.PhoneNumber = updateUserProfileDTO.PhoneNumber;
+            user.Gender = updateUserProfileDTO.Gender;
+            user.DateOfBirth = string.IsNullOrEmpty(updateUserProfileDTO.DateOfBirth) ? null : DateHelper.Parse(updateUserProfileDTO.DateOfBirth);
 
             // Cập nhật thông tin vào DB
             var updatedUser = await _userRepository.UpdateUserAsync(user);

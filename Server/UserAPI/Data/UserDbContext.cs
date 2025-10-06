@@ -11,6 +11,7 @@ namespace UserAPI.Data
 
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<BiometricCredential> BiometricCredentials { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

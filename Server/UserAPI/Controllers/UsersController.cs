@@ -19,14 +19,96 @@ namespace UserAPI.Controllers
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _memoryCache;
+        private readonly IBiometricCredentialService _biometricCredentialService;
 
-        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService, IEmailService emailService, IMemoryCache memoryCache)
+        public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService, 
+            IEmailService emailService, IMemoryCache memoryCache, IBiometricCredentialService biometricCredentialService)
         {
             _userService = userService;
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _googleAuthService = googleAuthService;
             _emailService = emailService;
             _memoryCache = memoryCache;
+            _biometricCredentialService = biometricCredentialService;
+        }
+
+        /// <summary>
+        /// Đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-login
+        /// </summary>
+        [HttpPost("biometric-login")]
+        public async Task<IActionResult> BiometricLogin([FromBody] string biometricToken)
+        {
+            if (string.IsNullOrEmpty(biometricToken))
+            {
+                return BadRequest(new { message = "Biometric token is required." });
+            }
+
+            var result = await _biometricCredentialService.LoginWithBiometricAsync(biometricToken);
+            if (!result.IsValid)
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Xóa token đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-delete
+        /// </summary>
+        [HttpDelete("biometric-delete")]
+        public async Task<IActionResult> DeleteBiometricCredential()
+        {
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // Lấy deviceId từ header
+            var deviceId = Request.Headers["Device-Id"].FirstOrDefault();
+            if (string.IsNullOrEmpty(deviceId))
+                return BadRequest(new { message = "Device-Id header is required." });
+
+            try
+            {
+                await _biometricCredentialService.DeleteBiometricCredentialAsync(userIdFromToken, deviceId);
+                return Ok(new { message = "Biometric credential deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting biometric credential.", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Tạo mã đăng nhập bằng sinh trắc học (biometric) cho Customer
+        /// api/Users/biometric-token
+        /// </summary>
+        [HttpGet("biometric-token")]
+        public async Task<IActionResult> GenerateBiometricToken() 
+        {
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Invalid access token" });
+
+            // Lấy deviceId và deviceName từ header
+            var deviceId = Request.Headers["Device-Id"].FirstOrDefault();
+            var deviceName = Request.Headers["Device-Name"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(deviceId))
+                return BadRequest(new { message = "Device-Id header is required." });
+
+            try
+            {
+                var biometricToken = await _biometricCredentialService.GenerateBiometricCredentialAsync(userIdFromToken, deviceId, deviceName);
+                return Ok(new { biometricToken });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while generating biometric token.", error = ex.Message });
+            }
         }
 
         /// <summary>

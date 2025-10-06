@@ -57,5 +57,7 @@ namespace UserAPI.Model
         public string? GoogleId { get; set; } // Lưu ID duy nhất từ Google
 
         public string? Provider { get; set; } // Lưu nguồn đăng ký: "local", "google"
+
+        public ICollection<BiometricCredential>? BiometricCredentials { get; set; }
     }
 }
