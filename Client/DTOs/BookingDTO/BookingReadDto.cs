@@ -1,9 +1,12 @@
-﻿namespace DTOs.BookingDTO
+﻿using DTOs.BookingDTO.ViewModel;
+
+namespace DTOs.BookingDTO
 {
     public class BookingReadDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public int CreatedById { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
         public decimal? TotalPrice { get; set; }
@@ -15,6 +18,6 @@
         public int? DiscountId { get; set; }
         public int StadiumId { get; set; }
         public int? MonthlyBookingId { get; set; }
-        public List<BookingDetailReadDto> BookingDetails { get; set; } = new List<BookingDetailReadDto>();
+        public List<BookingDetailViewModel> BookingDetails { get; set; } = new List<BookingDetailViewModel>();
     }
 }

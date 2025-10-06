@@ -19,11 +19,11 @@
         "Action": "Start"
       },
       {
-        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
+        "Path": "NotificationAPI\\NotificationAPI.csproj",
         "Action": "Start"
       },
       {
-        "Path": "NotificationAPI\\NotificationAPI.csproj",
+        "Path": "AggregatorPatternAPI\\AggregatorPatternAPI.csproj",
         "Action": "Start"
       }
     ]

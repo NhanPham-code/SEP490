@@ -420,3 +420,18 @@ FodyWeavers.xsd
 **/*.tmpValidateSolutionConfiguration:
 ValidateSolutionConfiguration:
 **/.vscode/
+
+# Cấu hình IDE (Rider/JetBrains)
+.idea/
+*.iml
+*.iws
+*.ipr
+*.slnLaunch
+
+# Thư mục build (Binaries and object files)
+[Bb]in/
+[Oo]bj/
+
+**/launchSettings.json
+
+.run/

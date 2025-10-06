@@ -1529,6 +1529,19 @@
       ],
       "UpstreamPathTemplate": "/notifications/mark-all-as-read",
       "UpstreamHttpMethod": ["PUT"]
+    },
+    // AggregatorPatternAPI
+    {
+      "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7175
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+      "UpstreamHttpMethod": [ "GET" ]
     }
   ],
   "GlobalConfiguration": {

@@ -1,247 +1,950 @@
-﻿@model List<DTOs.BookingDTO.BookingReadDto>
+﻿@model DTOs.BookingDTO.ViewModel.BookingManagementViewModel
+@using System.Text.Json
+@using DTOs.StadiumDTO
+
 @{
-    ViewData["Title"] = "Lịch sử Booking";
+    ViewData["Title"] = "Lịch Sử Đặt Sân";
+    var stadiums = ViewBag.AllStadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+    var userFullName = Model.DailyBookings.FirstOrDefault()?.User.FullName ?? Model.MonthlyBookings.FirstOrDefault()?.User.FullName ?? "của bạn";
+
+    var sortedDailyBookings = Model.DailyBookings
+        .OrderByDescending(b => b.Booking.Date)
+        .ToList();
+
+    var sortedMonthlyBookings = Model.MonthlyBookings
+        .OrderByDescending(b => b.MonthlyBooking.CreatedAt)
+        .ToList();
+
+    string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "pending" => "status--pending",
+        "accepted" => "status--accepted",
+        "completed" => "status--completed",
+        "denied" or "cancelled" or "payfail" => "status--cancelled",
+        "waiting" => "status--waiting",
+        _ => "status--default"
+    };
+
+    string TranslateStatus(string status) => status.ToLower() switch
+    {
+        "pending" => "Chờ xử lý",
+        "accepted" => "Đã nhận",
+        "completed" => "Đã hoàn thành",
+        "cancelled" => "Đã hủy",
+        "denied" => "Bị từ chối",
+        "waiting" => "Chờ thanh toán",
+        "payfail" => "Lỗi thanh toán",
+        _ => status
+    };
 }
-@if (TempData["BookingSuccess"] != null && (bool)TempData["BookingSuccess"])
-{
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        /* =================================================================== */
+        /*                      CUSTOM CSS FOR THIS PAGE                       */
+        /* =================================================================== */
+        :root {
+            --bh-primary-50: #eff6ff;
+            --bh-primary-100: #dbeafe;
+            --bh-primary-500: #3b82f6;
+            --bh-primary-600: #2563eb;
+            --bh-primary-700: #1d4ed8;
+            --bh-text-dark: #111827;
+            --bh-text-med: #374151;
+            --bh-text-light: #6b7280;
+            --bh-bg-main: #f9fafb;
+            --bh-bg-card: #ffffff;
+            --bh-border-color: #e5e7eb;
+            --bh-success: #10b981;
+            --bh-warning: #f59e0b;
+            --bh-danger: #ef4444;
+            --bh-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --bh-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .bh-body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bh-bg-main);
+            color: var(--bh-text-med);
+        }
+
+        .bh-container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .bh-header {
+            text-align: center;
+        }
+
+            .bh-header h1 {
+                font-size: 2.25rem;
+                font-weight: 700;
+                color: var(--bh-text-dark);
+                margin-bottom: 0.25rem;
+            }
+
+            .bh-header p {
+                font-size: 1.125rem;
+                color: var(--bh-text-light);
+            }
+
+        .bh-empty-state {
+            background: var(--bh-bg-card);
+            border-radius: 0.75rem;
+            box-shadow: var(--bh-shadow);
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+            .bh-empty-state .icon {
+                font-size: 3rem;
+                color: var(--bh-primary-500);
+                margin-bottom: 1.5rem;
+            }
+
+            .bh-empty-state h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--bh-text-dark);
+            }
+
+            .bh-empty-state .bh-btn {
+                margin-top: 1.5rem;
+            }
+
+        .bh-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .bh-btn.bh-btn-primary {
+                background-color: var(--bh-primary-600);
+                color: white;
+                border-color: var(--bh-primary-600);
+            }
+
+                .bh-btn.bh-btn-primary:hover {
+                    background-color: var(--bh-primary-700);
+                }
+
+        .bh-filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bh-bg-card);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--bh-shadow);
+        }
+
+            .bh-filters .bh-filter-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .bh-filters label {
+                font-weight: 500;
+                font-size: 0.875rem;
+                color: var(--bh-text-light);
+            }
+
+            .bh-filters select {
+                background-color: var(--bh-bg-card);
+                border: 1px solid var(--bh-border-color);
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+                min-width: 180px;
+            }
+
+        .bh-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bh-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bh-text-dark);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--bh-border-color);
+        }
+
+        .bh-table-wrapper {
+            background: var(--bh-bg-card);
+            border-radius: 0.75rem;
+            box-shadow: var(--bh-shadow);
+            overflow: hidden;
+        }
+
+        .bh-table-scroll {
+            overflow-x: auto;
+        }
+
+        .bh-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+            .bh-table thead {
+                background-color: #f9fafb;
+            }
+
+            .bh-table th {
+                padding: 0.75rem 1.5rem;
+                text-align: left;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--bh-text-light);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .bh-table td {
+                padding: 1rem 1.5rem;
+                vertical-align: middle;
+                border-top: 1px solid var(--bh-border-color);
+            }
+
+            .bh-table tbody tr:first-child td {
+                border-top: none;
+            }
+
+        .bh-table-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+            .bh-table-info .icon {
+                font-size: 1.25rem;
+                color: var(--bh-primary-500);
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--bh-primary-50);
+                border-radius: 8px;
+            }
+
+            .bh-table-info .details {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .bh-table-info .name {
+                font-weight: 600;
+                color: var(--bh-text-dark);
+            }
+
+            .bh-table-info .sub {
+                font-size: 0.875rem;
+                color: var(--bh-text-light);
+            }
+
+        .bh-table .price {
+            font-weight: 600;
+            color: var(--bh-primary-700);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status--pending {
+            background-color: #fffbeb;
+            color: #b45309;
+        }
+
+        .status--accepted {
+            background-color: var(--bh-primary-50);
+            color: var(--bh-primary-700);
+        }
+
+        .status--completed {
+            background-color: #ecfdf5;
+            color: #065f46;
+        }
+
+        .status--cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status--waiting {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .bh-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .bh-actions .bh-btn-icon {
+                width: 2.25rem;
+                height: 2.25rem;
+                padding: 0;
+                background: transparent;
+                color: var(--bh-text-light);
+                border: 1px solid transparent;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+            }
+
+                .bh-actions .bh-btn-icon:hover {
+                    background-color: var(--bh-primary-50);
+                    color: var(--bh-primary-600);
+                }
+
+                .bh-actions .bh-btn-icon.pay {
+                    color: var(--bh-success);
+                }
+
+                    .bh-actions .bh-btn-icon.pay:hover {
+                        background-color: #ecfdf5;
+                    }
+
+                .bh-actions .bh-btn-icon.cancel {
+                    color: var(--bh-danger);
+                }
+
+                    .bh-actions .bh-btn-icon.cancel:hover {
+                        background-color: #fee2e2;
+                    }
+
+        .bh-table .expand-toggle {
+            cursor: pointer;
+            color: var(--bh-text-light);
+            transition: transform 0.3s;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            border-radius: 50%;
+        }
+
+        .bh-parent-row.expanded .expand-toggle {
+            transform: rotate(180deg);
+            background-color: var(--bh-primary-50);
+        }
+
+        .bh-child-row {
+            display: none;
+        }
+
+            .bh-child-row > td {
+                padding: 0;
+                background-color: #f9fafb;
+            }
+
+        .bh-child-container {
+            padding: 1.5rem;
+        }
+
+            .bh-child-container h4 {
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: var(--bh-text-dark);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+                .bh-child-container h4 i {
+                    color: var(--bh-primary-500);
+                }
+
+        .bh-child-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+            .bh-child-table thead {
+                background-color: #f3f4f6;
+            }
+
+            .bh-child-table th, .bh-child-table td {
+                padding: 0.75rem 1rem;
+                text-align: left;
+                font-size: 0.875rem;
+                border-bottom: 1px solid var(--bh-border-color);
+            }
+
+            .bh-child-table th {
+                font-weight: 600;
+                color: var(--bh-text-med);
+            }
+
+            .bh-child-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        /* Modal Styles */
+        .bh-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background-color: rgb(17 24 39 / 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .bh-modal {
+            background: var(--bh-bg-card);
+            border-radius: 0.75rem;
+            box-shadow: var(--bh-shadow-md);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bh-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--bh-border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .bh-modal-header h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--bh-text-dark);
+                margin: 0;
+            }
+
+        .bh-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--bh-text-light);
+            cursor: pointer;
+        }
+
+        .bh-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .bh-modal-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bh-text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .bh-modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .bh-modal-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+            .bh-modal-item .label {
+                font-size: 0.875rem;
+                color: var(--bh-text-light);
+            }
+
+            .bh-modal-item .value {
+                font-weight: 600;
+            }
+
+        .bh-modal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bh-modal-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bh-bg-main);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+
+        .bh-modal-pricing {
+            border-top: 1px solid var(--bh-border-color);
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+            .bh-modal-pricing .total {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+            }
+
+                .bh-modal-pricing .total .label {
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                }
+
+                .bh-modal-pricing .total .value {
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    color: var(--bh-primary-600);
+                }
+
+        @@media (max-width: 768px) {
+            .bh-header h1
+
+        {
+            font-size: 1.75rem;
+        }
+
+        .bh-header p {
+            font-size: 1rem;
+        }
+
+        .bh-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .bh-table-wrapper {
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .bh-table {
+            min-width: 0;
+        }
+
+            .bh-table thead {
+                display: none;
+            }
+
+            .bh-table tbody, .bh-table tr, .bh-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .bh-table tr {
+                border: 1px solid var(--bh-border-color);
+                border-radius: 0.75rem;
+                margin-bottom: 1rem;
+                box-shadow: var(--bh-shadow);
+            }
+
+            .bh-table td {
+                padding: 0.75rem 1rem;
+                border: none;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+                .bh-table td:not(:last-child) {
+                    border-bottom: 1px dashed var(--bh-border-color);
+                }
+
+                .bh-table td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: var(--bh-text-dark);
+                }
+
+            .bh-table .bh-table-info .icon {
+                display: none;
+            }
+        /* Hide icon on mobile */
+        }
+    </style>
+
+
+<body class="bh-body">
+    <div class="bh-container">
+        <div class="bh-header">
+            <h1>Lịch sử đặt sân</h1>
+            <p>Xem lại tất cả các lịch đặt sân @userFullName.</p>
+        </div>
+
+        @if (!sortedDailyBookings.Any() && !sortedMonthlyBookings.Any())
+        {
+            <div class="bh-empty-state">
+                <div class="icon"><i class="fa-regular fa-calendar-xmark"></i></div>
+                <h3>Bạn chưa có lịch đặt nào</h3>
+                <p>Hãy bắt đầu trải nghiệm bằng cách đặt sân ngay hôm nay!</p>
+                <a href="@Url.Action("Index", "Home")" class="bh-btn bh-btn-primary">
+                    <i class="fa-solid fa-plus"></i> Đặt sân ngay
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="bh-filters">
+                <div class="bh-filter-group">
+                    <label for="bh-stadiumFilter"><i class="fa-solid fa-futbol"></i></label>
+                    <select id="bh-stadiumFilter">
+                        <option value="all">Tất cả sân vận động</option>
+                        @foreach (var stadium in stadiums)
+                        {
+                            <option value="@stadium.Id">@stadium.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="bh-filter-group">
+                    <label for="bh-bookingTypeFilter"><i class="fa-solid fa-layer-group"></i></label>
+                    <select id="bh-bookingTypeFilter">
+                        <option value="all">Tất cả loại lịch</option>
+                        <option value="daily">Lịch hằng ngày</option>
+                        <option value="monthly">Lịch hằng tháng</option>
+                    </select>
+                </div>
+                <div class="bh-filter-group">
+                    <label for="bh-statusFilter"><i class="fa-solid fa-flag"></i></label>
+                    <select id="bh-statusFilter">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="waiting">Chờ thanh toán</option>
+                        <option value="accepted">Đã nhận / Sắp tới</option>
+                        <option value="completed">Đã hoàn thành</option>
+                        <option value="cancelled-group">Đã hủy / Lỗi</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bh-section" id="bh-daily-booking-section">
+                <h2 class="bh-section-title">Lịch Đặt Trong Ngày</h2>
+                <div class="bh-table-wrapper">
+                    <div class="bh-table-scroll">
+                        <table class="bh-table">
+                            <thead><tr><th>Sân Vận Động</th><th>Ngày chơi</th><th>Giá tiền</th><th>Trạng thái</th><th style="text-align: right;">Hành động</th></tr></thead>
+                            <tbody>
+                                @foreach (var dailyVm in sortedDailyBookings)
+                                {
+                                    var booking = dailyVm.Booking;
+                                    var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+                                    <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily" data-status="@booking.Status.ToLower()">
+                                        <td data-label="Sân">
+                                            <div class="bh-table-info">
+                                                <div class="icon"><i class="fa-solid fa-futbol"></i></div>
+                                                <div class="details"><span class="name">@stadium?.Name</span><span class="sub">ID: #@booking.Id</span></div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Ngày chơi">@booking.Date.ToString("dd/MM/yyyy")</td>
+                                        <td data-label="Giá tiền"><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                                        <td data-label="Trạng thái"><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
+                                        <td data-label="Hành động">
+                                            <div class="bh-actions" style="justify-content: flex-end;">
+                                                <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-eye"></i></button>
+                                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow)
+                                                {
+                                                    <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-ban"></i></button>
+                                                }
+                                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <a href="/Payment/CreatePayment?bookingId=@booking.Id" class="bh-btn-icon pay" title="Thanh toán ngay"><i class="fa-solid fa-credit-card"></i></a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bh-section" id="bh-monthly-booking-section">
+                <h2 class="bh-section-title">Lịch Đặt Theo Tháng</h2>
+                <div class="bh-table-wrapper">
+                    <div class="bh-table-scroll">
+                        <table class="bh-table">
+                            <thead><tr><th style="width: 50px;"></th><th>Sân / Gói</th><th>Khung giờ</th><th>Giá tiền</th><th>Trạng thái</th><th style="text-align: right;">Hành động</th></tr></thead>
+                            <tbody>
+                                @foreach (var monthlyVm in sortedMonthlyBookings)
+                                {
+                                    var booking = monthlyVm.MonthlyBooking;
+                                    var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+                                    <tr class="bh-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
+                                        <td style="text-align: center;"><i class="fa-solid fa-chevron-down expand-toggle"></i></td>
+                                        <td data-label="Sân / Gói">
+                                            <div class="bh-table-info">
+                                                <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+                                                <div class="details"><span class="name">@stadium?.Name</span><span class="sub">Gói tháng @booking.Month/@booking.Year</span></div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Khung giờ">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</td>
+                                        <td data-label="Giá tiền"><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                                        <td data-label="Trạng thái"><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
+                                        <td data-label="Hành động">
+                                            <div class="bh-actions" style="justify-content: flex-end;">
+                                                <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fa-solid fa-eye"></i></button>
+                                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <a href="/Payment/CreatePaymentForMonthlyBooking?monthlyBookingId=@booking.Id" class="bh-btn-icon pay" title="Thanh toán ngay"><i class="fa-solid fa-credit-card"></i></a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="bh-child-row" data-parent-monthly-id="@booking.Id">
+                                        <td colspan="6">
+                                            <div class="bh-child-container">
+                                                <h4><i class="fa-solid fa-list-check"></i> Các Lịch Đặt Chi Tiết</h4>
+                                                @if (monthlyVm.Bookings.Any())
+                                                {
+                                                    <table class="bh-child-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Ngày chơi</th>
+                                                                <th>Sân con</th>
+                                                                <th>Trạng thái</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
+                                                            {
+                                                                <tr>
+                                                                    <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
+                                                                    <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
+                                                                    <td><span class="status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <p>Không có lịch đặt chi tiết nào cho gói này.</p>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="bh-modal-backdrop" id="bh-modal">
+        <div class="bh-modal">
+            <div class="bh-modal-header">
+                <h3 id="bh-modal-title">Chi tiết lịch đặt</h3>
+                <button class="bh-modal-close" title="Đóng">&times;</button>
+            </div>
+            <div class="bh-modal-body" id="bh-modal-body">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+    </div>
+</body>
+
+@section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))',
-            showConfirmButton: false,
-            timer: 2500
+        document.addEventListener('DOMContentLoaded', function () {
+            // ===================================================================
+            //                      JAVASCRIPT FOR THIS PAGE
+            // ===================================================================
+            const viewModel = @Html.Raw(JsonSerializer.Serialize(Model, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+
+            const container = document.querySelector('.bh-container');
+            if (!container) return;
+
+            const modalEl = document.getElementById('bh-modal');
+            const stadiumFilter = document.getElementById('bh-stadiumFilter');
+            const typeFilter = document.getElementById('bh-bookingTypeFilter');
+            const statusFilter = document.getElementById('bh-statusFilter');
+
+            // --- Helpers ---
+            const getStatusBadge = (status) => {
+                const s = status.toLowerCase();
+                let className = 'status--default', text = s;
+                if (s === 'pending') { className = 'status--pending'; text = 'Chờ xử lý'; }
+                else if (s === 'accepted') { className = 'status--accepted'; text = 'Đã nhận'; }
+                else if (s === 'completed') { className = 'status--completed'; text = 'Hoàn thành'; }
+                else if (['cancelled', 'denied', 'payfail'].includes(s)) { className = 'status--cancelled'; text = s === 'denied' ? 'Bị từ chối' : 'Đã hủy'; }
+                else if (s === 'waiting') { className = 'status--waiting'; text = 'Chờ thanh toán'; }
+                return `<span class="status-badge ${className}">${text}</span>`;
+            };
+            const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+            const formatTime = (ts) => ts ? ts.substring(0, 5) : '';
+
+            // --- Filters ---
+            function applyFilters() {
+                const stadiumId = stadiumFilter.value;
+                const type = typeFilter.value;
+                const status = statusFilter.value;
+                const cancelled = ['cancelled', 'denied', 'payfail'];
+
+                document.getElementById('bh-daily-booking-section').style.display = (type === 'all' || type === 'daily') ? 'block' : 'none';
+                document.getElementById('bh-monthly-booking-section').style.display = (type === 'all' || type === 'monthly') ? 'block' : 'none';
+
+                container.querySelectorAll('tbody > tr[data-booking-type]').forEach(row => {
+                    const rowStadium = row.dataset.stadiumId;
+                    const rowStatus = row.dataset.status;
+                    const stadiumMatch = stadiumId === 'all' || rowStadium === stadiumId;
+                    const statusMatch = status === 'all' || (status === 'cancelled-group' && cancelled.includes(rowStatus)) || rowStatus === status;
+                    row.style.display = (stadiumMatch && statusMatch) ? '' : 'none';
+                    if(row.classList.contains('bh-parent-row')) {
+                        row.classList.remove('expanded');
+                        const child = container.querySelector(`.bh-child-row[data-parent-monthly-id="${row.dataset.monthlyId}"]`);
+                        if(child) child.style.display = 'none';
+                    }
+                });
+            }
+            [stadiumFilter, typeFilter, statusFilter].forEach(f => f.addEventListener('change', applyFilters));
+
+            // --- Modal ---
+            const openModal = () => modalEl.style.display = 'flex';
+            const closeModal = () => modalEl.style.display = 'none';
+            modalEl.addEventListener('click', (e) => { if (e.target === modalEl || e.target.closest('.bh-modal-close')) closeModal(); });
+
+            function populateModal(bookingVm, type) {
+                const isMonthly = type === 'monthly';
+                const booking = isMonthly ? bookingVm.monthlyBooking : bookingVm.booking;
+                const stadium = stadiums.find(s => s.id === booking.stadiumId);
+                const modalBody = document.getElementById('bh-modal-body');
+
+                document.getElementById('bh-modal-title').textContent = `Chi tiết lịch đặt #${booking.id}`;
+
+                let detailsHtml = `
+                    <div class="bh-modal-section">
+                        <h4>Thông tin chung</h4>
+                        <div class="bh-modal-grid">
+                            <div class="bh-modal-item"><span class="label">Sân vận động</span><span class="value">${stadium?.name ?? 'N/A'}</span></div>
+                            <div class="bh-modal-item"><span class="label">Ngày tạo</span><span class="value">${new Date(booking.createdAt).toLocaleString('vi-VN')}</span></div>
+                            <div class="bh-modal-item"><span class="label">Trạng thái</span><span class="value">${getStatusBadge(booking.status)}</span></div>
+                            <div class="bh-modal-item"><span class="label">Thanh toán</span><span class="value">${booking.paymentMethod || 'Chưa có'}</span></div>
+                        </div>
+                    </div>`;
+
+                if (isMonthly) {
+                    detailsHtml += `
+                        <div class="bh-modal-section">
+                            <h4>Chi tiết Gói Tháng ${booking.month}/${booking.year}</h4>
+                            <div class="bh-modal-grid">
+                                <div class="bh-modal-item"><span class="label">Khung giờ</span><span class="value">${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}</span></div>
+                            </div>
+                            <h4 style="margin-top: 1.5rem;">Danh sách ngày đặt</h4>
+                            <div class="bh-modal-list">
+                                ${bookingVm.bookings.map(b => `<div class="bh-modal-list-item"><span>${new Date(b.date).toLocaleDateString('vi-VN')}</span>${getStatusBadge(b.status)}</div>`).join('') || '<p>Không có.</p>'}
+                            </div>
+                        </div>`;
+                } else {
+                    detailsHtml += `
+                        <div class="bh-modal-section">
+                             <h4>Chi tiết Lịch Ngày</h4>
+                             <div class="bh-modal-grid">
+                                <div class="bh-modal-item"><span class="label">Ngày chơi</span><span class="value">${new Date(booking.date).toLocaleDateString('vi-VN')}</span></div>
+                             </div>
+                             <h4 style="margin-top: 1.5rem;">Các sân con đã đặt</h4>
+                             <div class="bh-modal-list">
+                                ${booking.bookingDetails.map(d => `<div class="bh-modal-list-item"><span>${d.courtName}</span><span>${new Date(d.startTime).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})} - ${new Date(d.endTime).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}
+                             </div>
+                        </div>`;
+                }
+
+                detailsHtml += `
+                    <div class="bh-modal-pricing">
+                        <div class="total">
+                            <span class="label">Tổng cộng</span>
+                            <span class="value">${formatCurrency(booking.totalPrice ?? 0)}</span>
+                        </div>
+                    </div>`;
+
+                modalBody.innerHTML = detailsHtml;
+                openModal();
+            }
+
+            // --- Actions ---
+            container.addEventListener('click', e => {
+                const target = e.target;
+                // Expand/Collapse child rows
+                if(target.classList.contains('expand-toggle') || target.closest('.expand-toggle')) {
+                    const parentRow = target.closest('.bh-parent-row');
+                    parentRow.classList.toggle('expanded');
+                    const childRow = container.querySelector(`.bh-child-row[data-parent-monthly-id="${parentRow.dataset.monthlyId}"]`);
+                    childRow.style.display = parentRow.classList.contains('expanded') ? 'table-row' : 'none';
+                    return;
+                }
+                // Button clicks
+                const button = target.closest('.bh-btn-icon, .bh-btn');
+                if(!button) return;
+
+                if(button.classList.contains('details')) {
+                    const id = button.dataset.bookingId;
+                    const type = button.dataset.bookingType;
+                    const collection = type === 'daily' ? viewModel.dailyBookings : viewModel.monthlyBookings;
+                    const findKey = type === 'daily' ? 'booking' : 'monthlyBooking';
+                    const bookingVm = collection.find(vm => vm[findKey].id == id);
+                    if(bookingVm) populateModal(bookingVm, type);
+                }
+                else if(button.classList.contains('cancel')) {
+                    Swal.fire({
+                        title: 'Xác nhận hủy lịch?', text: "Hành động này không thể hoàn tác!", icon: 'warning',
+                        showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'Không', confirmButtonText: 'Đồng ý hủy',
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                             fetch(`/Booking/CancelBooking/${button.dataset.bookingId}`, { method: 'POST' })
+                            .then(res => res.json()).then(data => {
+                                if (data.success) {
+                                    Swal.fire('Đã hủy!', 'Lịch đặt đã được hủy.', 'success').then(() => location.reload());
+                                } else { throw new Error(data.message); }
+                            }).catch(err => Swal.fire('Lỗi!', err.message, 'error'));
+                        }
+                    });
+                }
+            });
         });
     </script>
 }
-
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col items-center justify-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-800">Danh sách booking</h2>
-        <p class="mt-2 text-gray-500">Xem lại các lịch đặt của bạn</p>
-    </div>
-
-    @if (Model == null || !Model.Any())
-    {
-        <div class="bg-white rounded-xl shadow-md p-8 text-center">
-            <div class="mb-4">
-                <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-            </div>
-            <p class="text-xl font-medium text-gray-900">Bạn chưa có booking nào</p>
-            <p class="mt-2 text-gray-500">Hãy đặt lịch ngay để trải nghiệm dịch vụ của chúng tôi!</p>
-            <div class="mt-6">
-                <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    Đặt lịch ngay
-                </a>
-            </div>
-        </div>
-    }
-    else
-    {
-        
-
-        <!-- Mobile View (Hidden on desktop) -->
-        <div class="block lg:hidden space-y-4">
-            @{
-                var stadiumNames = ViewBag.StadiumNames as Dictionary<int, string>;
-                var discountInfo = ViewBag.DiscountInfo as Dictionary<int, string>;
-            }
-            @foreach (var booking in Model)
-            {
-                <div class="bg-white rounded-xl shadow-md p-4 border-l-4 @(booking.Status == "Confirmed" ? "border-green-500" : booking.Status == "Pending" ? "border-yellow-500" : "border-red-500")">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 class="font-semibold text-gray-900 text-sm">
-                                @(stadiumNames != null && stadiumNames.ContainsKey(booking.StadiumId) ? stadiumNames[booking.StadiumId] : "Đang cập nhật...")
-                            </h3>
-                            <p class="text-xs text-gray-500">ID: #@booking.Id</p>
-                        </div>
-                        @{
-                            var statusClass = "";
-                            var statusText = "";
-                            switch (booking.Status)
-                            {
-                                case "Confirmed":
-                                    statusClass = "bg-green-100 text-green-700";
-                                    statusText = "Xác nhận";
-                                    break;
-                                case "pending":
-                                    statusClass = "bg-yellow-100 text-yellow-700";
-                                    statusText = "Chờ duyệt";
-                                    break;
-                                case "Cancelled":
-                                    statusClass = "bg-red-100 text-red-700";
-                                    statusText = "Đã hủy";
-                                    break;
-                                default:
-                                    statusClass = "bg-gray-100 text-gray-700";
-                                    statusText = $"{booking.Status}";
-                                    break;
-                            }
-                        }
-                        <span class="px-2 py-1 text-xs font-medium rounded-full @statusClass">
-                            @statusText
-                        </span>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-2 text-sm mb-3">
-                        <div>
-                            <span class="text-gray-500">Ngày:</span>
-                            <span class="font-medium">@booking.Date.ToString("dd/MM/yyyy")</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-500">Giảm giá:</span>
-                            <span class="font-medium text-green-600">@(discountInfo != null && discountInfo.ContainsKey(booking.Id) ? discountInfo[booking.Id] : "Không có")</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="text-lg font-bold text-blue-600">@booking.TotalPrice?.ToString("N0") VNĐ</span>
-                        </div>
-                        <a asp-action="BookingDetail" asp-route-id="@booking.Id" 
-                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100">
-                            Chi tiết
-                        </a>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Desktop View (Hidden on mobile) -->
-        <div class="hidden lg:block">
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                                    Sân thể thao
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                    Trạng thái
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                    Ngày đặt
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                    Giảm giá
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                                    Tổng tiền
-                                </th>
-                                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
-                                    Hành động
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach (var booking in Model)
-                            {
-                                <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                    <td class="px-4 py-4">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div class="ml-3">
-                                                <div class="text-sm font-medium text-gray-900 truncate max-w-xs">
-                                                    @(stadiumNames != null && stadiumNames.ContainsKey(booking.StadiumId) ? stadiumNames[booking.StadiumId] : "Đang cập nhật...")
-                                                </div>
-                                                <div class="text-xs text-gray-500">ID: #@booking.Id</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        @{
-                                            var statusClass = "";
-                                            var statusText = "";
-                                            switch (booking.Status)
-                                            {
-                                                case "Confirmed":
-                                                    statusClass = "bg-green-100 text-green-700";
-                                                    statusText = "Xác nhận";
-                                                    break;
-                                                case "pending":
-                                                    statusClass = "bg-yellow-100 text-yellow-700";
-                                                    statusText = "Chờ duyệt";
-                                                    break;
-                                                case "Cancelled":
-                                                    statusClass = "bg-red-100 text-red-700";
-                                                    statusText = "Đã hủy";
-                                                    break;
-                                                default:
-                                                    statusClass = "bg-gray-100 text-gray-700";
-                                                    statusText = $"{booking.Status}";
-                                                    break;
-                                            }
-                                        }
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full @statusClass">
-                                            @statusText
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700">
-                                        <div class="font-medium">@booking.Date.ToString("dd/MM/yyyy")</div>
-                                        <div class="text-xs text-gray-500">@booking.Date.DayOfWeek.ToString()</div>
-                                    </td>
-                                    <td class="px-4 py-4 text-sm">
-                                        <span class="text-green-600 font-medium">
-                                            @(discountInfo != null && discountInfo.ContainsKey(booking.Id) ? discountInfo[booking.Id] : "Không có")
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-sm font-bold">
-                                        <span class="text-blue-600 text-lg">@booking.TotalPrice?.ToString("N0")</span>
-                                        <span class="text-gray-500 text-xs">VNĐ</span>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <a asp-action="BookingDetail" asp-route-id="@booking.Id" 
-                                           class="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200"
-                                           title="Xem chi tiết">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination (if needed) -->
-        @if (Model.Count > 10)
-        {
-            <div class="flex justify-center mt-6">
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <a href="#" class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        Trước
-                    </a>
-                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
-                        1
-                    </a>
-                    <a href="#" class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        Sau
-                    </a>
-                </nav>
-            </div>
-        }
-    }
-</div>
-
-<style>
-    .truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-</style>

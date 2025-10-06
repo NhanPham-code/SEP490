@@ -338,5 +338,31 @@ namespace Service.Services
             var result = await response.Content.ReadFromJsonAsync<RevenueStatisticViewModel>();
             return result ?? new RevenueStatisticViewModel();
         }
+        
+        public async Task<List<StadiumBookingOverviewDto>> GetStadiumRevenueAsync(string accessToken, int page, int pageSize, int? year, int? month, int? day)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var queryParams = new List<string> { $"page={page}", $"pageSize={pageSize}" };
+            if (year.HasValue) queryParams.Add($"year={year.Value}");
+            if (month.HasValue) queryParams.Add($"month={month.Value}");
+            if (day.HasValue) queryParams.Add($"day={day.Value}");
+    
+            var queryString = string.Join("&", queryParams);
+
+            // Gọi đến Upstream Path của Ocelot
+            var response = await _httpClient.GetAsync($"/aggregator/stadiums-bookings?{queryString}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error fetching stadium revenue: {error}");
+                // Trả về danh sách rỗng để không làm crash UI
+                return new List<StadiumBookingOverviewDto>();
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<List<StadiumBookingOverviewDto>>();
+            return result ?? new List<StadiumBookingOverviewDto>();
+        }
     }
 }

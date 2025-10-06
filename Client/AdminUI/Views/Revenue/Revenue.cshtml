@@ -44,6 +44,10 @@
         <div class="header">
             <h1 class="page-title">Quản Lý Doanh Thu</h1>
             <div class="header-actions">
+                <a href="@Url.Action("StadiumRevenue", "Revenue")" class="btn btn-info">
+                    <i class="fas fa-chart-bar"></i>
+                    Xem doanh thu các sân
+                </a>
                 <button class="btn btn-secondary" onclick="alert('Chức năng đang phát triển!')">
                     <i class="fas fa-download"></i>
                     Xuất Excel
@@ -181,7 +185,7 @@
 
     <script>
         @{
-                var typedModel = Model as DTOs.BookingDTO.RevenueStatisticViewModel ?? new DTOs.BookingDTO.RevenueStatisticViewModel();
+                DTOs.BookingDTO.RevenueStatisticViewModel? typedModel = Model as DTOs.BookingDTO.RevenueStatisticViewModel ?? new DTOs.BookingDTO.RevenueStatisticViewModel();
             }
 
             let statusPieChart, trendChart;

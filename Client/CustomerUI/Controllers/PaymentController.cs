@@ -57,41 +57,35 @@ namespace CustomerUI.Controllers
 
             if (isPaymentSuccess)
             {
-                // Mặc định là "pending" nếu thanh toán thành công
-                finalStatus = "pending";
+                finalStatus = "accepted";
 
-                try
-                {
-                    // 1. Tạo query string để lấy lịch sử đặt sân của user tại sân vận động này
-                    string historyQueryString = $"?$filter=UserId eq '{booking.UserId}' and StadiumId eq {booking.StadiumId}";
+                //try
+                //{
+                //    string historyQueryString = $"?$filter=UserId eq '{booking.UserId}' and StadiumId eq {booking.StadiumId}";
 
-                    // 2. Gọi service để lấy lịch sử
-                    List<BookingReadDto> historyBookings = await _bookingService.GetBookingAsync(accessToken, historyQueryString);
+                //    List<BookingReadDto> historyBookings = await _bookingService.GetBookingAsync(accessToken, historyQueryString);
 
-                    if (historyBookings != null)
-                    {
-                        // 3. Đếm tổng số booking và số booking đã hoàn thành
-                        int totalBookings = historyBookings.Count;
-                        int completedBookings = historyBookings.Count(b => "completed".Equals(b.Status, StringComparison.OrdinalIgnoreCase));
+                //    if (historyBookings != null)
+                //    {
+                //        int totalBookings = historyBookings.Count;
+                //        int completedBookings = historyBookings.Count(b => "completed".Equals(b.Status, StringComparison.OrdinalIgnoreCase));
 
-                        // 4. Tính toán tỷ lệ hoàn thành
 
-                        double completionRate = (totalBookings > 0) ? (double)completedBookings / totalBookings : 0;
+                //        double completionRate = (totalBookings > 0) ? (double)completedBookings / totalBookings : 0;
 
-                        // 5. Kiểm tra điều kiện để nâng cấp trạng thái
-                        if (totalBookings > 3 && completionRate >= 0.8)
-                        {
-                            finalStatus = "accepted"; // Nâng cấp trạng thái!
-                            TempData["AutoAcceptedMessage"] = "Cảm ơn bạn là khách hàng thân thiết! Đơn đặt sân của bạn đã được tự động chấp nhận.";
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Nếu có lỗi khi kiểm tra lịch sử, hệ thống vẫn hoạt động bình thường
-                    // và giữ trạng thái là "pending". Ghi log lại lỗi để kiểm tra sau.
-                    // _logger.LogError(ex, "Error checking booking history for auto-approval.");
-                }
+                //        if (totalBookings > 3 && completionRate >= 0.8)
+                //        {
+                //            finalStatus = "accepted"; // Nâng cấp trạng thái!
+                //            TempData["AutoAcceptedMessage"] = "Cảm ơn bạn là khách hàng thân thiết! Đơn đặt sân của bạn đã được tự động chấp nhận.";
+                //        }
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    // Nếu có lỗi khi kiểm tra lịch sử, hệ thống vẫn hoạt động bình thường
+                //    // và giữ trạng thái là "pending". Ghi log lại lỗi để kiểm tra sau.
+                //    // _logger.LogError(ex, "Error checking booking history for auto-approval.");
+                //}
             }
             else
             {
@@ -115,7 +109,7 @@ namespace CustomerUI.Controllers
             {
                 await _bookingService.UpdateBookingAsync(bookingId.Value, updateDto, accessToken);
 
-                if (finalStatus == "pending" || finalStatus == "accepted")
+                if (finalStatus == "accepted")
                 {
                     TempData["BookingSuccess"] = true;
                     TempData["SuccessMessage"] = "Đặt sân và thanh toán thành công!";
@@ -171,16 +165,40 @@ namespace CustomerUI.Controllers
             }
 
             // Tạo DTO để cập nhật trạng thái
+
             var updateDto = new MonthlyBookingUpdateDto
             {
-                Status = (checkSignature && vnp_ResponseCode == "00") ? "pending" : "canceled"
+                Status = (checkSignature && vnp_ResponseCode == "00") ? "accepted" : "canceled",
+                TotalPrice = monthlyBooking.TotalPrice,
+                PaymentMethod = monthlyBooking.PaymentMethod,
+                OriginalPrice = monthlyBooking.OriginalPrice,
+                Note = monthlyBooking.Note,
             };
+
 
             try
             {
                 await _bookingService.UpdateMonthlyBookingAsync(monthlyBookingId.Value, updateDto, accessToken);
 
-                if (updateDto.Status == "pending")
+                // Đồng bộ các booking con
+                var childBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
+                foreach (var child in childBookings)
+                {
+                    var childUpdateDto = new BookingUpdateDto
+                    {
+                        Status = updateDto.Status,
+                        // Thêm các trường còn thiếu từ logic gốc:
+                        UserId = child.UserId,
+                        StadiumId = child.StadiumId,
+                        Date = child.Date,
+                        TotalPrice = child.TotalPrice,
+                        OriginalPrice = child.OriginalPrice,
+                        Note = child.Note,
+                        DiscountId = child.DiscountId
+                    };
+                    await _bookingService.UpdateBookingAsync(child.Id, childUpdateDto, accessToken);
+                }
+                if (updateDto.Status == "accepted")
                 {
                     TempData["SuccessMessage"] = "Đặt sân hàng tháng và thanh toán thành công!";
                 }
