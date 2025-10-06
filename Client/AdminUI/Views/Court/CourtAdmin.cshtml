@@ -1,0 +1,959 @@
+﻿@{
+    ViewData["Title"] = "Quản Lý Sân";
+    string name = ViewBag.Name;
+    var currentUser = Context.Session.GetString("FullName"); // You can get this from your auth system
+    DateTime time = DateTime.UtcNow;
+    TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+    DateTime currentUtc = TimeZoneInfo.ConvertTimeFromUtc(time, vnTimeZone);
+
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link href="~/css/stadium/court.css" rel="stylesheet" />
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Your existing styles remain the same -->
+    <style>
+        /* Your existing CSS styles here */
+    </style>
+</head>
+<body>
+    
+    <div class="container py-5">
+        <div class="card p-4">
+            <!-- Add user info and datetime -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="user-info">
+                        <span class="text-muted">
+                            <i class="ri-user-line me-1"></i>@currentUser
+                        </span>
+                        <span class="mx-2">|</span>
+                        <span class="text-muted">
+                            <i class="ri-time-line me-1"></i>@currentUtc.ToString("yyyy-MM-dd HH:mm:ss UTC")
+                        </span>
+                    </div>
+                    <div class="stadium-info">
+                        <span class="badge bg-primary">
+                            <i class="ri-building-line me-1"></i>Sân vận động #@name
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Danh Sách Sân</h2>
+        
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="courtsTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Tên Sân</th>
+                            <th scope="col">Loại Thể Thao</th>
+                            <th scope="col">Giá/Giờ</th>
+                            <th scope="col">Trạng Thái</th>
+                            <th scope="col">Ngày Tạo</th>
+                            <th scope="col">Ngày Cập Nhật</th>
+                            <th scope="col">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const stadiumId = sessionStorage.getItem('currentStadiumId');
+        const currentUser = '@currentUser';
+        const currentDateTime = '@currentUtc.ToString("yyyy-MM-dd HH:mm:ss")';
+        let selectedSportType = '';
+        let selectedStatus = true;
+
+        $(document).ready(function () {
+            // Initial load
+            loadCourts(stadiumId);
+
+            // Load Courts Function
+                    function loadCourts(stadiumId) {
+            $.ajax({
+                url: '/Court/GetAllCourts',
+                type: 'GET',
+                dataType: 'json',
+                data: { stadiumId: stadiumId },
+                success: function (data) {
+                    // Kiểm tra nếu không có data hoặc data rỗng
+                    if (!data || data.length === 0) {
+                        $('#courtsTable tbody').html(`
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">
+                                    <div class="py-5">
+                                        <i class="ri-basketball-line" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <div class="mt-3">
+                                            <h5 class="text-muted">Không có sân nào</h5>
+                                            <p class="mb-0">Chưa có sân nào được tạo cho sân vận động này.</p>
+                                            <button class="btn btn-primary mt-3" onclick="addCourt()">
+                                                <i class="ri-add-line me-1"></i>
+                                                Thêm sân mới
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>`);
+                        return;
+                    }
+
+                    // Xử lý khi có data
+                    let rows = '';
+                    data.forEach(court => {
+                        let formattedPrice = Number(court.pricePerHour).toLocaleString('vi-VN') + ' VND';
+                        let statusBadge = court.isAvailable
+                            ? '<span class="badge badge-available">Có Sẵn</span>'
+                            : '<span class="badge badge-unavailable">Không Có Sẵn</span>';
+                        let actionButtons = ``;
+                        if (court.sportType === 'Bóng đá sân 7' || court.sportType === "Bóng đá sân 11") {
+                            actionButtons += `
+                                <button class="btn btn-sm btn-outline-info" onclick="editCourtRelation(${court.id})" title="Liên kết các sân">
+                                    <i class="ri-links-line"></i>
+                                </button>`;
+                        }
+                        rows += `
+                            <tr>
+                                <td>${court.id}</td>
+                                <td>${court.name}</td>
+                                <td>${court.sportType}</td>
+                                <td>${formattedPrice}</td>
+                                <td>${statusBadge}</td>
+                                <td>${new Date(court.createdAt).toLocaleString('vi-VN')}</td>
+                                <td>${new Date(court.updatedAt).toLocaleString('vi-VN')}</td>
+                                <td>${actionButtons}</td>
+                            </tr>`;
+                    });
+                    $('#courtsTable tbody').html(rows);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi khi tải danh sách sân:', error);
+                    $('#courtsTable tbody').html(`
+                        <tr>
+                            <td colspan="8" class="text-center text-danger">
+                                <div class="py-4">
+                                    <i class="ri-error-warning-line me-2" style="font-size: 2rem;"></i>
+                                    <div class="mt-2">
+                                        <h6 class="text-danger mb-1">Lỗi khi tải danh sách sân</h6>
+                                        <p class="mb-2 text-muted">Vui lòng thử lại sau.</p>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="loadCourts(${stadiumId})">
+                                            <i class="ri-refresh-line me-1"></i>
+                                            Thử lại
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>`);
+                }
+            });
+        }
+
+            // Add Court Function
+            window.addCourt = function() {
+                selectedSportType = '';
+
+                Swal.fire({
+                    title: '<i class="ri-add-circle-line"></i> Thêm Sân Mới',
+                    html: getCourtFormHtml(),
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="ri-check-line me-1"></i>Thêm Sân',
+                    cancelButtonText: '<i class="ri-close-line me-1"></i>Hủy',
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    focusConfirm: false,
+                    width: '500px',
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    showCloseButton: true,
+                    didOpen: () => {
+                        initializeSportTypeGrid();
+
+                    },
+                    preConfirm: validateCourtForm
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const courtData = result.value;
+                        courtData.createdAt = currentDateTime;
+                        courtData.updatedAt = currentDateTime;
+                        courtData.createdBy = currentUser;
+                        const formData = new FormData();
+                        // add value to form data
+                        formData.append("StadiumId", courtData.stadiumId);
+                        formData.append("Name", courtData.name);
+                        formData.append("SportType", courtData.sportType);
+                        formData.append("PricePerHour", courtData.pricePerHour);
+                        formData.append("IsAvailable", true);
+                        formData.append("CreatedAt", courtData.createdAt);
+                        formData.append("UpdatedAt", courtData.updatedAt);
+                        formData.append("CreatedBy", courtData.createdBy);
+
+
+                        $.ajax({
+                            url: '/CourtsManager/CreateCourt',
+                            type: 'POST',
+                            processData: false,
+                            contentType: false,
+                            data: formData,
+                            success: function(response) {
+                                showSuccessMessage('Thêm Sân Thành Công', 'Sân đã được thêm thành công');
+                                loadCourts(stadiumId);
+                            },
+                            error: function(xhr, status, error) {
+                                showErrorMessage('Không thể thêm sân. Vui lòng thử lại.');
+                            }
+                        });
+                    }
+                });
+            };
+
+            // Edit Court Function
+            window.editCourt = function(courtId) {
+                $.ajax({
+                    url: '/CourtsManager/GetCourtById',
+                    type: 'GET',
+                    data: { id: courtId },
+                    success: function(court) {
+                        selectedSportType = court.sportType;
+
+
+                        Swal.fire({
+                            title: '<i class="ri-edit-2-line"></i> Chỉnh Sửa Sân',
+                            html: getCourtFormHtml(court),
+                            showCancelButton: true,
+                            confirmButtonText: '<i class="ri-save-line me-1"></i>Lưu Thay Đổi',
+                            cancelButtonText: '<i class="ri-close-line me-1"></i>Hủy',
+                            confirmButtonColor: '#3b82f6',
+                            cancelButtonColor: '#6b7280',
+                            focusConfirm: false,
+                            width: '1000px',
+                            allowOutsideClick: true,
+                            allowEscapeKey: true,
+                            showCloseButton: true,
+                            didOpen: () => {
+                                initializeSportTypeGrid();
+
+                                updatePriceDisplay(court.pricePerHour);
+                            },
+                            preConfirm: () => validateCourtForm(courtId)
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const courtData = result.value;
+                                courtData.updatedAt = currentDateTime;
+                                courtData.updatedBy = currentUser;
+                                const formData = new FormData();
+                        // add value to form data
+                        formData.append("Id", courtData.id);
+                        formData.append("StadiumId", courtData.stadiumId);
+                        formData.append("Name", courtData.name);
+                        formData.append("SportType", courtData.sportType.trim());
+                        formData.append("PricePerHour", courtData.pricePerHour);
+                        formData.append("IsAvailable", true);
+                        formData.append("CreatedAt", courtData.createdAt);
+                        formData.append("UpdatedAt", courtData.updatedAt);
+                        formData.append("CreatedBy", courtData.createdBy);
+
+                                $.ajax({
+                                    url: '/CourtsManager/UpdateCourt',
+                                    type: 'PUT',
+                                    processData: false,
+                                    contentType: false,
+                                    data: formData,
+                                    success: function(response) {
+                                        showSuccessMessage('Cập Nhật Thành Công', 'Sân đã được cập nhật thành công');
+                                        loadCourts(stadiumId);
+                                    },
+                                    error: function(xhr, status, error) {
+                                        showErrorMessage('Không thể cập nhật sân. Vui lòng thử lại.');
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        showErrorMessage('Không thể lấy thông tin sân. Vui lòng thử lại.');
+                    }
+                });
+            };
+
+                    // Lock Court Function
+        window.lockCourt = function(courtId) {
+            Swal.fire({
+                title: '<i class="ri-lock-line"></i> Bạn có chắc chắn?',
+                html: `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 4rem; color: #f59e0b; margin-bottom: 16px;">
+                            <i class="ri-lock-line"></i>
+                        </div>
+                        <p style="font-size: 1.1rem; color: #374151; margin-bottom: 8px;">
+                            Sân sẽ bị khóa tạm thời!
+                        </p>
+                        <p style="color: #6b7280;">
+                            Sân sẽ không thể sử dụng cho đến khi được mở khóa.
+                        </p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="ri-lock-line me-1"></i>Có, khóa sân!',
+                cancelButtonText: '<i class="ri-close-line me-1"></i>Hủy',
+                width: '400px',
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/CourtsManager/DeleteCourt?id=${courtId}`,
+                        type: 'POST',
+                        data: {
+                            id: courtId
+                        },
+                        success: function(response) {
+                            showSuccessMessage('Đã Khóa!', 'Sân đã được khóa thành công');
+                            loadCourts(stadiumId);
+                        },
+                        error: function(xhr, status, error) {
+                            showErrorMessage('Không thể khóa sân. Vui lòng thử lại.');
+                        }
+                    });
+                }
+            });
+        };
+
+        // Unlock Court Function
+        window.unlockCourt = function(courtId) {
+            Swal.fire({
+                title: '<i class="ri-lock-unlock-line"></i> Bạn có chắc chắn?',
+                html: `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 4rem; color: #10b981; margin-bottom: 16px;">
+                            <i class="ri-lock-unlock-line"></i>
+                        </div>
+                        <p style="font-size: 1.1rem; color: #374151; margin-bottom: 8px;">
+                            Sân sẽ được mở khóa!
+                        </p>
+                        <p style="color: #6b7280;">
+                            Sân sẽ có thể sử dụng bình thường trở lại.
+                        </p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="ri-lock-unlock-line me-1"></i>Có, mở khóa!',
+                cancelButtonText: '<i class="ri-close-line me-1"></i>Hủy',
+                width: '400px',
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/CourtsManager/DeleteCourt?id=${courtId}`,
+                        type: 'GET',
+
+                        success: function(response) {
+                            showSuccessMessage('Đã Mở Khóa!', 'Sân đã được mở khóa thành công');
+                            loadCourts(stadiumId);
+                        },
+                        error: function(xhr, status, error) {
+                            showErrorMessage('Không thể mở khóa sân. Vui lòng thử lại.');
+                        }
+                    });
+                }
+            });
+        };
+                    // Edit Court Relation Function
+                      function validateCourtRelationForm(parentCourtId) {
+            const parentId = document.getElementById('parentCourtId').value;
+            const parentCourtType = document.getElementById('parentCourtType').value;
+
+            // Lấy tất cả checkbox con đã được checked
+            const childCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="childCourt_"]:checked:not([disabled])');
+            const childCourtIds = Array.from(childCheckboxes).map(cb => parseInt(cb.value));
+
+            // Khởi tạo mảng quan hệ sân 7
+            let court7Relations = [];
+
+            // Nếu sân cha là sân 11, kiểm tra các sân 7 đã chọn và sân 5 tương ứng
+            if (parentCourtType === "Bóng đá sân 11") {
+                childCourtIds.forEach(courtId => {
+                    // Lấy tất cả checkbox sân 5 đã chọn cho sân 7 này
+                    const selectedCourt5s = document.querySelectorAll(`input[name="court5_${courtId}"]:checked`);
+
+                    if (selectedCourt5s.length > 0) {
+                        // Tạo mảng childCourtIds cho sân 7 này
+                        const court5Ids = Array.from(selectedCourt5s).map(cb => parseInt(cb.value));
+
+                        court7Relations.push({
+                            parentCourtId: courtId, // Sân 7 làm parent
+                            childCourtIds: court5Ids // Mảng sân 5 làm child
+                        });
+                    }
+                });
+            }
+
+            console.log('Parent Court ID:', parentId);
+            console.log('Child Court IDs:', childCourtIds);
+            console.log('Court 7 Relations:', court7Relations);
+
+            return {
+                parentCourtId: parseInt(parentId),
+                childCourtIds: childCourtIds,
+                court7Relations: court7Relations
+            };
+        }
+
+        // Cập nhật phần gửi AJAX request
+                                           window.editCourtRelation = function(courtId) {
+            $.ajax({
+                url: '/Court/GetAllCourtRelationsByParentId',
+                type: 'GET',
+                data: { parentId: courtId },
+                success: function(courtRelation) {
+                    let relations = (courtRelation && courtRelation.length > 0) ? courtRelation : [];
+
+                    // Lấy tất cả sân để fill vào
+                    $.ajax({
+                        url: '/Court/GetAllCourts',
+                        type: 'GET',
+                        data: { stadiumId: stadiumId },
+                        success: function(courts) {
+                            Swal.fire({
+                                title: '<i class="ri-eye-line"></i> Xem Quan Hệ Sân', // MODIFIED: Changed title
+                                html: getCourtRelationFormHtml(courtId, relations, courts),
+                                showCancelButton: true,
+                                showConfirmButton: false, // MODIFIED: Hide confirm button
+                                cancelButtonText: '<i class="ri-close-line me-1"></i>Đóng', // MODIFIED: Changed cancel button text
+                                cancelButtonColor: '#6b7280',
+                                width: '1000px',
+                                heightAuto: false,
+                                customClass: {
+                                    popup: 'extra-wide-court-popup',
+                                    container: 'extra-wide-container'
+                                },
+                                padding: '2rem'
+                                // MODIFIED: Removed preConfirm and .then() block as no action is needed
+                            });
+                        },
+                        error: function() {
+                            showErrorMessage('Không thể tải danh sách sân. Vui lòng thử lại.');
+                        }
+                    });
+                },
+                error: function() {
+                    showErrorMessage('Không thể lấy thông tin quan hệ sân. Vui lòng thử lại.');
+                }
+            });
+        };
+
+        function getCourtRelationFormHtml(parentCourtId, relations, courts) {
+            // Lấy danh sách id con hiện tại (nếu có)
+            const selectedChildIds = relations.map(r => r.childCourtId);
+
+            // Tìm thông tin sân cha
+            const parentCourt = courts.find(c => c.id === parentCourtId);
+
+            // Lọc các sân bóng đá (loại bỏ sân cha và logic theo yêu cầu)
+            const availableCourts = courts
+                .filter(c => c.id !== parentCourtId) // loại bỏ chính sân cha
+                .filter(c => {
+                    // Chỉ lấy sân bóng đá
+                    if (c.sportType !== "Bóng đá sân 5" && c.sportType !== "Bóng đá sân 7" && c.sportType !== "Bóng đá sân 11") {
+                        return false;
+                    }
+
+                    // Logic cho sân 11
+                    if (parentCourt && parentCourt.sportType === "Bóng đá sân 11") {
+                        // Sân 11 có thể liên kết với sân 7 và sân 5
+                        return c.sportType === "Bóng đá sân 7" ;
+                    }
+
+                    // Nếu sân cha là sân 7, thì không hiển thị sân 7
+                    if (parentCourt && parentCourt.sportType === "Bóng đá sân 7" && c.sportType === "Bóng đá sân 7" || c.sportType === "Bóng đá sân 11") {
+                        return false;
+                    }
+
+                    return true;
+                });
+
+            // Lấy danh sách sân 5 cho dropdown
+            const court5Options = courts.filter(c =>
+                c.sportType === "Bóng đá sân 5" && c.id !== parentCourtId
+            );
+
+            // Build loading state first
+            let childCheckboxes = '';
+
+            if (availableCourts.length === 0) {
+                let message = "Không có sân bóng đá nào có thể liên kết";
+                let subMessage = "Hiện tại chưa có sân bóng đá khác trong hệ thống.";
+
+                childCheckboxes = `
+                    <div class="text-center py-4">
+                        <div style="font-size: 2.5rem; color: #9ca3af; margin-bottom: 12px;">
+                            <i class="ri-football-line"></i>
+                        </div>
+                        <p class="text-muted mb-0">${message}</p>
+                        <small class="text-muted">${subMessage}</small>
+                    </div>
+                `;
+            } else {
+                // Show loading state initially
+                childCheckboxes = `
+                    <div id="courtsContainer">
+                        <div class="text-center py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang kiểm tra...</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0">Đang kiểm tra trạng thái sân...</p>
+                        </div>
+                    </div>
+                `;
+
+                // Load courts after render
+                setTimeout(() => {
+                    loadCourtsAsync(availableCourts, selectedChildIds, parentCourtId, court5Options, parentCourt);
+                }, 100);
+            }
+
+            return `
+                <div class="text-left">
+                    <div class="mb-3">
+                        <label class="form-label">Sân Cha</label>
+                        <input type="text" class="form-control" value="${parentCourt ? parentCourt.name : ''}" disabled />
+                        <input type="hidden" id="parentCourtId" value="${parentCourtId}" />
+                        <input type="hidden" id="parentCourtType" value="${parentCourt ? parentCourt.sportType : ''}" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sân Con Liên Kết</label> <!-- MODIFIED: Changed label -->
+                        <div class="border rounded p-3 courts-container">
+                            ${childCheckboxes}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ✅ UPDATED: Modified async function for "view only" mode
+        async function loadCourtsAsync(availableCourts, selectedChildIds, parentCourtId, court5Options, parentCourt, courts) {
+            const container = document.getElementById('courtsContainer');
+
+            if (!container) return;
+
+            console.log('🔍 Loading courts async in view-only mode...');
+
+            try {
+                const courtPromises = availableCourts.map(async (court) => {
+                    try {
+                        const response = await $.ajax({
+                            url: '/Court/GetAllCourtRelationsByChildId',
+                            type: 'GET',
+                            data: { childId: court.id }
+                        });
+
+                        const allRelations = response || [];
+
+                        const isLinkedToCurrentParent = allRelations.some(relation =>
+                            relation.parentCourtId === parentCourtId
+                        );
+
+                        let isLinkedToOtherCourt = false;
+                        let linkedCourtName = '';
+
+                        const otherRelation = allRelations.find(relation => relation.parentCourtId !== parentCourtId);
+                        if (otherRelation && otherRelation.parentCourt) {
+                            isLinkedToOtherCourt = true;
+                            linkedCourtName = otherRelation.parentCourt.name;
+                        }
+
+                        return {
+                            court: court,
+                            isLinkedToCurrentParent: isLinkedToCurrentParent,
+                            isLinkedToOtherCourt: isLinkedToOtherCourt,
+                            linkedCourtName: linkedCourtName,
+                            existingRelations: allRelations,
+                        };
+                    } catch (error) {
+                        console.error(`❌ Error checking court ${court.id}:`, error);
+                        return { court: court, isLinkedToCurrentParent: false, isLinkedToOtherCourt: false, linkedCourtName: '', existingRelations: [] };
+                    }
+                });
+
+                const courtResults = await Promise.all(courtPromises);
+
+                const allCourt5Relations = await Promise.all(
+                    court5Options.map(async (c5) => {
+                        try {
+                            const response = await $.ajax({
+                                url: '/Court/GetAllCourtRelationsByChildId',
+                                type: 'GET',
+                                data: { childId: c5.id }
+                            });
+                            return { court5Id: c5.id, relations: response || [] };
+                        } catch (error) {
+                            console.error(`❌ Error getting court 5 relations for ${c5.id}:`, error);
+                            return { court5Id: c5.id, relations: [] };
+                        }
+                    })
+                );
+
+                // MODIFIED: Render courts in view-only mode
+                const courtsHtml = courtResults.map(result => {
+                    const court = result.court;
+                    const isLinkedToCurrentParent = result.isLinkedToCurrentParent;
+                    const checked = isLinkedToCurrentParent ? 'checked' : '';
+
+                    let statusIcon = '';
+                    let statusText = '';
+
+                    if (isLinkedToCurrentParent) {
+                        statusIcon = '<i class="ri-check-circle-fill text-success me-2"></i>';
+                        statusText = `<small class="text-success d-block">Đã liên kết với sân này</small>`;
+                    } else if (result.isLinkedToOtherCourt) {
+                        statusIcon = '<i class="ri-forbid-line text-danger me-2"></i>';
+                        statusText = `<small class="text-danger d-block">Đã liên kết với ${result.linkedCourtName}</small>`;
+                    } else {
+                        statusIcon = '<i class="ri-checkbox-blank-circle-line text-muted me-2"></i>';
+                        statusText = '<small class="text-muted d-block">Không có liên kết</small>';
+                    }
+
+                    let court7Dropdown = '';
+                    if (court.sportType === "Bóng đá sân 7") {
+                        if (!court5Options || court5Options.length === 0) {
+                            court7Dropdown = `<div class="court7-dropdown mt-2 readonly-dropdown" id="dropdown_${court.id}"><div class="text-muted small">-- Không có sân 5 khả dụng --</div></div>`;
+                        } else {
+                            const dropdownOptions = court5Options.map(c5 => {
+                                const c5RelationData = allCourt5Relations.find(cr => cr.court5Id === c5.id);
+                                const c5Relations = c5RelationData ? c5RelationData.relations : [];
+
+                                const isLinkedToThisCourt7 = c5Relations.some(r => r.parentCourtId === court.id);
+
+                                let court5StatusText = '';
+                                let court5Icon = '';
+
+                                if (isLinkedToThisCourt7) {
+                                    court5Icon = '<i class="ri-check-circle-fill text-success me-2"></i>';
+                                    court5StatusText = '<small class="text-success d-block">Đã liên kết</small>';
+                                } else {
+                                    court5Icon = '<i class="ri-checkbox-blank-circle-line text-muted me-2"></i>';
+                                    court5StatusText = '<small class="text-muted d-block">Không có liên kết</small>';
+                                }
+
+                                return `
+                                    <div class="form-check form-check-sm disabled-option">
+                                        <input class="form-check-input court5-checkbox" type="checkbox" value="${c5.id}" disabled ${isLinkedToThisCourt7 ? 'checked' : ''}>
+                                        <label class="form-check-label text-muted">
+                                            <div class="d-flex align-items-center">
+                                                ${court5Icon}
+                                                <div class="flex-grow-1">
+                                                    ${c5.name}
+                                                    ${court5StatusText}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                `;
+                            }).join('');
+
+                            const selectedCount = court5Options.filter(c5 => {
+                                const c5RelationData = allCourt5Relations.find(cr => cr.court5Id === c5.id);
+                                return c5RelationData && c5RelationData.relations.some(r => r.parentCourtId === court.id);
+                            }).length;
+
+                            court7Dropdown = `
+                                <div class="court7-dropdown mt-2 readonly-dropdown" id="dropdown_${court.id}">
+                                    <label class="form-label text-muted small mb-2 d-block">
+                                        <i class="ri-arrow-down-s-line"></i>
+                                        Xem sân 5 liên kết với ${court.name}:
+                                        <span class="badge bg-secondary ms-2">${selectedCount}/${court5Options.length}</span>
+                                    </label>
+                                    <div class="court5-options readonly-options">
+                                        ${dropdownOptions}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Only render courts that have a relationship with the current parent
+                    if (!isLinkedToCurrentParent) {
+                        return '';
+                    }
+
+                    return `
+                        <div class="form-check form-check-readonly" data-court-id="${court.id}">
+                            <input hidden class="form-check-input" type="checkbox" value="${court.id}" ${checked} disabled>
+                            <label class="form-check-label text-muted readonly-label">
+                                <div class="d-flex align-items-center">
+                                    ${statusIcon}
+                                    <div class="flex-grow-0">
+                                        ${court.name}
+                                        <small class="text-muted d-block">${court.sportType}</small>
+                                        ${statusText}
+                                    </div>
+                                </div>
+                            </label>
+                            ${court7Dropdown}
+                        </div>
+                    `;
+                }).join('');
+
+                // If no courts are linked, show a message
+                if (courtsHtml.trim() === '') {
+                     container.innerHTML = `
+                        <div class="text-center py-4">
+                            <div style="font-size: 2.5rem; color: #9ca3af; margin-bottom: 12px;">
+                                <i class="ri-link-unlink"></i>
+                            </div>
+                            <p class="text-muted mb-0">Sân này chưa có liên kết nào.</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = courtsHtml;
+                }
+
+                // MODIFIED: No need to set up events in view-only mode
+                // setupCourtEvents();
+
+                console.log('✅ Rendered courts in view-only mode');
+
+            } catch (error) {
+                console.error('❌ Error loading courts:', error);
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="text-danger mb-2">
+                            <i class="ri-error-warning-line" style="font-size: 2rem;"></i>
+                        </div>
+                        <p class="text-danger">Lỗi khi tải danh sách sân</p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // MODIFIED: This function is no longer needed as events are disabled
+        function setupCourtEvents() {
+            // All events are disabled in view-only mode.
+            console.log('✅ Court events are disabled in view-only mode.');
+        }
+
+            // Helper Functions (your existing helper functions remain the same)
+            function getCourtFormHtml(court = null) {
+                return `
+                    <div class="custom-form-container">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="ri-text me-1"></i>Tên Sân
+                            </label>
+                            <div class="input-group">
+                                <i class="ri-football-line input-icon"></i>
+                                <input id="courtName" class="form-control-custom with-icon"
+                                       placeholder="Nhập tên sân" maxlength="255"
+                                       value="${court ? court.name : ''}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="ri-basketball-line me-1"></i>Loại Thể Thao
+                            </label>
+                            <div class="sport-type-grid" id="sportTypeGrid">
+                                <div class="sport-option ${court && court.sportType === 'Bóng đá sân 11' ? 'selected' : ''}"
+                                     data-value="Bóng đá sân 11">
+                                    <i class="ri-football-line"></i>
+                                    <div>Bóng đá sân 11</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Bóng đá sân 7' ? 'selected' : ''}"
+                                     data-value="Bóng đá sân 7">
+                                    <i class="ri-football-line"></i>
+                                    <div>Bóng đá sân 7</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Bóng đá sân 5' ? 'selected' : ''}"
+                                     data-value="Bóng đá sân 5">
+                                    <i class="ri-football-line"></i>
+                                    <div>Bóng đá sân 5</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Pickleball' ? 'selected' : ''}"
+                                     data-value="Pickleball">
+                                    <i class="ri-pickleball-line" style="font-size:24px; color:orange;"></i>
+                                    <div>Pickleball</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Bóng rổ' ? 'selected' : ''}"
+                                     data-value="Bóng rổ">
+                                    <i class="ri-basketball-line"></i>
+                                    <div>Bóng rổ</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Tennis' ? 'selected' : ''}"
+                                     data-value="Tennis">
+                                    <i class="ri-ping-pong-line"></i>
+                                    <div>Tennis</div>
+                                </div>
+                                <div class="sport-option ${court && court.sportType === 'Cầu lông' ? 'selected' : ''}"
+                                     data-value="Cầu lông">
+                                    <i class="ri-trophy-line"></i>
+                                    <div>Cầu lông</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="ri-money-dollar-circle-line me-1"></i>Giá mỗi Giờ (VND)
+                            </label>
+                            <div class="input-group">
+                                <i class="ri-money-dollar-circle-line input-icon"></i>
+                                <input id="pricePerHour" class="form-control-custom with-icon"
+                                       type="number" step="1000" placeholder="Nhập giá mỗi giờ"
+                                       value="${court ? court.pricePerHour : ''}"
+                                       oninput="updatePriceDisplay(this.value)">
+                            </div>
+                            <div class="price-display" id="priceDisplay"></div>
+                        </div>
+
+                        <!-- Add metadata display if editing -->
+                        ${court ? `
+                        <div class="metadata mt-4 pt-3 border-top">
+                            <div class="text-muted small">
+                                <div><i class="ri-user-line me-1"></i>Tạo bởi: ${court.createdBy || currentUser}</div>
+                                <div><i class="ri-time-line me-1"></i>Ngày tạo: ${new Date(court.createdAt || currentDateTime).toLocaleString('vi-VN')}</div>
+                                ${court.updatedBy ? `
+                                <div><i class="ri-user-line me-1"></i>Cập nhật bởi: ${court.updatedBy}</div>
+                                <div><i class="ri-time-line me-1"></i>Ngày cập nhật: ${new Date(court.updatedAt).toLocaleString('vi-VN')}</div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            // Your other helper functions remain the same
+            function validateCourtForm(courtId = null) {
+                const courtName = document.getElementById('courtName').value;
+                const pricePerHour = document.getElementById('pricePerHour').value;
+
+                if (!courtName || courtName.length > 255) {
+                    Swal.showValidationMessage('Tên sân bắt buộc và tối đa 255 ký tự.');
+                    return false;
+                }
+                if (!selectedSportType) {
+                    Swal.showValidationMessage('Vui lòng chọn loại thể thao.');
+                    return false;
+                }
+                if (!pricePerHour || pricePerHour <= 0) {
+                    Swal.showValidationMessage('Giá mỗi giờ phải là số dương.');
+                    return false;
+                }
+
+                const data = {
+                    stadiumId: stadiumId,
+                    name: courtName,
+                    sportType: selectedSportType,
+                    pricePerHour: parseFloat(pricePerHour),
+                };
+
+                if (courtId) {
+                    data.id = courtId;
+                }
+
+                return data;
+            }
+
+            function initializeSportTypeGrid() {
+                document.querySelectorAll('.sport-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        document.querySelectorAll('.sport-option').forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedSportType = this.dataset.value;
+                    });
+                });
+            }
+
+            // function initializeStatusToggle() {
+            //     document.querySelectorAll('.status-option').forEach(option => {
+            //         option.addEventListener('click', function() {
+            //             document.querySelectorAll('.status-option').forEach(opt => {
+            //                 opt.classList.remove('active', 'inactive');
+            //             });
+
+            //             const isAvailable = this.dataset.value === 'true';
+            //             if (isAvailable) {
+            //                 this.classList.add('active');
+            //             } else {
+            //                 this.classList.add('inactive');
+            //             }
+            //             selectedStatus = isAvailable;
+            //         });
+            //     });
+            // }
+
+                window.updatePriceDisplay = function(value) {
+            const priceDisplay = document.getElementById('priceDisplay');
+            if (priceDisplay && value && !isNaN(value)) {
+                const formattedPrice = Number(value).toLocaleString('vi-VN');
+                priceDisplay.textContent = `${formattedPrice} VND`;
+                priceDisplay.style.color = '#10b981';
+            } else if (priceDisplay) {
+                priceDisplay.textContent = '';
+            }
+        };
+
+
+            function showSuccessMessage(title, text) {
+                Swal.fire({
+                    icon: 'success',
+                    title: `<i class="ri-check-circle-line"></i> ${title}`,
+                    text: text,
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'Hoàn Tất',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    showCloseButton: true
+                });
+            }
+
+            function showErrorMessage(text) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '<i class="ri-error-warning-line"></i> Lỗi',
+                    text: text,
+                    confirmButtonColor: '#ef4444',
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    showCloseButton: true
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

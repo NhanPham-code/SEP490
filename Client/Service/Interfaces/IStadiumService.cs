@@ -17,5 +17,9 @@ namespace Service.Interfaces
         Task<ReadStadiumDTO> UpdateStadiumAsync(int id, UpdateStadiumDTO stadiumDto);
         Task<bool> DeleteStadiumAsync(int id);
         Task<string> SearchStadiumAsync(string searchTerm); 
+        Task<string> ExportExcel();
+        Task<OdataHaveCountResponse<ReadStadiumDTO>> GetSportType(string searchTerm);
+        Task<OdataHaveCountResponse<ReadStadiumDTO>> GetUnapprovedStadiums();
+        Task<OdataHaveCountResponse<ReadStadiumDTO>> GetTotalStadiums();
     }
 }
