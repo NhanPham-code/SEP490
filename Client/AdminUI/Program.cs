@@ -47,6 +47,7 @@ builder.Services.AddScoped<IStadiumService, StadiumService>();
 builder.Services.AddScoped<IStadiumImageService, StadiumImageService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

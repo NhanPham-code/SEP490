@@ -4,6 +4,7 @@ using BookingAPI.Models;
 using BookingAPI.Repository;
 using BookingAPI.Repository.Interface;
 using BookingAPI.Services.Interface;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -53,6 +54,10 @@ namespace BookingAPI.Services
             }*/
 
             var createdBooking = await _bookingRepository.CreateBookingAsync(booking);
+
+            var jobId = BackgroundJob.Schedule(() => AutoAcceptBookingByIdAsync(createdBooking.Id), TimeSpan.FromMinutes(5));
+
+            Console.WriteLine($"Đã thêm job {jobId} để tự động check booking {createdBooking.Id} trong 5 phút");
             return _mapper.Map<BookingReadDto>(createdBooking);
         }
 
@@ -178,6 +183,175 @@ namespace BookingAPI.Services
 
             var updatedMonthlyBooking = await _monthlyBookingRepository.UpdateMonthlyBookingAsync(existingMonthlyBooking);
             return _mapper.Map<MonthlyBookingUpdateDto>(updatedMonthlyBooking);
+        }
+
+        public async Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots)
+        {
+            // Đơn giản là gọi phương thức từ repository đã được tạo trước đó
+            return await _bookingDetailRepository.AreSlotsConflictingAsync(requestedSlots);
+        }
+
+        public async Task AutoAcceptBookingByIdAsync(int bookingId)
+        {
+            Console.WriteLine($"Bắt đầu check Booking: {bookingId}");
+
+            var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
+
+            if (booking != null && "pending".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
+            {
+
+                booking.Status = "accepted";
+                booking.Note = (booking.Note ?? "") + "Đã được tự động duyệt bởi hệ thống";
+
+                try
+                {
+
+                    await _bookingRepository.UpdateBookingAsync(booking);
+                    Console.WriteLine($"Duyệt thành công booking {bookingId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi duyệt Booking {bookingId}: {ex.Message}");
+                    throw;
+                }
+            }
+            else if ("waiting".Equals(booking.Status, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    await _bookingRepository.DeleteBookingAsync(booking.Id);
+                    Console.WriteLine($"Đã loại bỏ Booking treo thanh toán: {bookingId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi xóa Booking treo thanh toán {bookingId}: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+                var currentStatus = booking?.Status ?? "Không tìm thấy trạng thái";
+                Console.WriteLine($"Bỏ qua Booking có trạng thái hợp lệ");
+            }
+        }
+        public async Task AutoCompleteBookingsAsync()
+        {
+            Console.WriteLine("Bắt đầu chuyển cập nhật trạng thái completed");
+
+            var now = DateTime.UtcNow;
+
+
+            var bookingsToComplete = await _bookingRepository.GetAllBookingsAsQueryable()
+                .Where(b => b.Status == "accepted" && b.BookingDetails.Any(bd => bd.EndTime < now))
+                .ToListAsync();
+
+            if (bookingsToComplete == null || !bookingsToComplete.Any())
+            {
+                Console.WriteLine("Không có booking phù hợp");
+                return;
+            }
+
+            Console.WriteLine($"Đã tìm thấy {bookingsToComplete.Count} booking để chuyển về completed");
+
+            int completedCount = 0;
+            foreach (var booking in bookingsToComplete)
+            {
+                booking.Status = "completed";
+                booking.Note = (booking.Note ?? "") + " Tự động cập nhật completed bởi hệ thống";
+
+                try
+                {
+                    await _bookingRepository.UpdateBookingAsync(booking);
+                    completedCount++;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($" Lỗi khi complete booking ID {booking.Id}: {ex.Message}");
+                }
+            }
+
+            if (completedCount > 0)
+            {
+                Console.WriteLine($" Cập nhật thành công {completedCount} booking");
+            }
+        }
+
+        public async Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day)
+        {
+            var nowYear = DateTime.UtcNow.Year;
+
+            // Xác định các năm cần lấy dữ liệu
+            List<int> yearsToFetch;
+            if (year == nowYear)
+            {
+                // Nếu là năm hiện tại: chỉ lấy 2 năm trước và năm hiện tại
+                yearsToFetch = new List<int> { year - 2, year - 1, year };
+            }
+            else
+            {
+                // Nếu là năm khác: lấy 2 năm trước, năm hiện tại, 1 năm sau
+                yearsToFetch = new List<int> { year - 2, year - 1, year, year + 1 };
+            }
+
+            // Lấy booking của các năm này (bạn cần sửa repository cho phép truyền IEnumerable<int>)
+            var bookingsForChart = await _bookingRepository.GetBookingsForStatisticsAsync(yearsToFetch);
+
+            // Lọc booking cho phần thống kê (chỉ năm đang xem)
+            var bookingsForStats = bookingsForChart.Where(b => b.Date.Year == year).ToList();
+            if (month.HasValue)
+            {
+                bookingsForStats = bookingsForStats.Where(b => b.Date.Month == month.Value).ToList();
+            }
+            if (day.HasValue)
+            {
+                bookingsForStats = bookingsForStats.Where(b => b.Date.Day == day.Value).ToList();
+            }
+
+            var totalBookingsCount = bookingsForStats.Count;
+            var completedBookings = bookingsForStats.Where(b => b.Status == "completed").ToList();
+            var pendingBookingsCount = bookingsForStats.Count(b => b.Status == "pending");
+            var acceptedBookingsCount = bookingsForStats.Count(b => b.Status == "accepted");
+            var cancelledBookingsCount = bookingsForStats.Count(b => b.Status == "cancelled");
+
+            var totalRevenue = completedBookings.Sum(b => b.TotalPrice ?? 0);
+            var totalCompletedBookings = completedBookings.Count;
+
+            // Dữ liệu cho biểu đồ: mỗi năm là 1 dictionary 12 tháng
+            var monthlyRevenueChartData = new Dictionary<int, Dictionary<int, decimal>>();
+            foreach (var y in yearsToFetch)
+            {
+                var revenueByMonth = bookingsForChart
+                    .Where(b => b.Date.Year == y && b.Status == "completed")
+                    .GroupBy(b => b.Date.Month)
+                    .ToDictionary(g => g.Key, g => g.Sum(b => b.TotalPrice ?? 0));
+                var fullYearRevenue = new Dictionary<int, decimal>();
+                for (int i = 1; i <= 12; i++)
+                {
+                    fullYearRevenue[i] = revenueByMonth.ContainsKey(i) ? revenueByMonth[i] : 0;
+                }
+                monthlyRevenueChartData[y] = fullYearRevenue;
+            }
+
+            var statisticsDto = new RevenueStatisticDto
+            {
+                TotalRevenue = totalRevenue,
+                TotalCompletedBookings = totalCompletedBookings,
+                CompletedBookingsPercentage = totalBookingsCount > 0 ? (double)totalCompletedBookings / totalBookingsCount * 100 : 0,
+                PendingBookingsCount = pendingBookingsCount,
+                AcceptedBookingsCount = acceptedBookingsCount,
+                WaitingBookingsPercentage = totalBookingsCount > 0 ? (double)(pendingBookingsCount + acceptedBookingsCount) / totalBookingsCount * 100 : 0,
+                CancelledBookingsCount = cancelledBookingsCount,
+                CancelledBookingsPercentage = totalBookingsCount > 0 ? (double)cancelledBookingsCount / totalBookingsCount * 100 : 0,
+                MonthlyRevenueChartData = monthlyRevenueChartData
+            };
+
+            return statisticsDto;
+        }
+
+        public async Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        {
+            var bookings = await _bookingRepository.GetBookingsByStadiumsAndDateAsync(stadiumIds, date);
+            return _mapper.Map<IEnumerable<BookingReadDto>>(bookings);
         }
     }
 }

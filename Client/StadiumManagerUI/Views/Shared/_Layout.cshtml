@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context.Session.GetInt32("UserId");
+}
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     @await RenderSectionAsync("Styles", required: false)
@@ -7,6 +10,8 @@
     <title>@ViewData["Title"] - Sportivey</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     @await RenderSectionAsync("style", required: false)
     <style>
         :root {
@@ -397,13 +402,24 @@
                     Mã giảm giá
                 </a>
             </div>
-            <div class="nav-item">
+            <!-- ✅ Giao diện Chat & Hỗ trợ có badge -->
+            <div class="nav-item" x-data="chatBadge()" x-init="init()">
                 <a href="@Url.Action("Chat", "Chat")"
-                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Chat" && ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")">
+                   class="nav-link relative @(ViewContext.RouteData.Values["controller"].ToString() == "Chat" && ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")"
+                   @@click ="window.resetUnreadMessages && window.resetUnreadMessages()">
+
                     <i class="nav-icon fas fa-headset"></i>
                     Chat & Hỗ trợ
+
+                    <!-- 🔴 Badge tin chưa đọc -->
+                    <template x-if="unreadCount > 0">
+                        <span x-text="unreadCount"
+                              class="absolute top-0 right-0 -translate-y-2 translate-x-2 bg-red-600 text-white text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg z-20">
+                        </span>
+                    </template>
                 </a>
             </div>
+
             <div class="nav-item">
                 <a href="@Url.Action("Settings", "Account")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Settings" ? "active" : "")">
                     <i class="nav-icon fas fa-cog"></i>
@@ -412,7 +428,11 @@
             </div>
         </div>
     </nav>
-
+   
+    <script>
+        window.currentUserId = @userId;
+        console.log("🔑 UserId từ Session:", @userId);
+    </script>
     @{
         var accessToken = Context.Request.Cookies["AccessToken"];
         var fullName = Context.Session.GetString("FullName");
@@ -480,6 +500,117 @@
             @RenderBody()
         </main>
     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        // 🔹 Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 🔸 Xin quyền hiển thị thông báo
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // 🔹 Lấy danh sách phòng có chứa userId
+        async function getUserRooms(userId) {
+            const snapshot = await get(ref(db, "chats"));
+            const rooms = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(roomSnap => {
+                    const roomId = roomSnap.key;
+                    if (roomId.split("_").includes(String(userId))) {
+                        rooms.push(roomId);
+                    }
+                });
+            }
+            return rooms;
+        }
+
+        // 🔹 Hiển thị thông báo desktop
+        function showNotification(msg) {
+            if (Notification.permission === "granted") {
+                new Notification(`${msg.senderName}`, { body: msg.message });
+            }
+        }
+
+        // 🔹 Tăng số tin chưa đọc cho user
+        async function incrementUnread(userId) {
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        // 🔹 Lắng nghe tin mới và cập nhật badge
+        async function listenForUserMessages(userId, badgeHandler) {
+            const rooms = await getUserRooms(userId);
+            const startTime = Date.now();
+
+            // Cập nhật badge theo số tin chưa đọc
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                badgeHandler(count);
+            });
+
+            // Hiển thị thông báo khi có tin mới
+            rooms.forEach(roomId => {
+                const roomRef = ref(db, `chats/${roomId}`);
+                onChildAdded(roomRef, (snapshot) => {
+                    const msg = snapshot.val();
+                    if (msg.timestamp > startTime && msg.senderId != userId) {
+                        showNotification(msg);
+                    }
+                });
+            });
+        }
+
+        // 🔹 Khởi tạo lắng nghe cho user hiện tại
+        const currentUserId = window.currentUserId;
+
+        if (currentUserId && currentUserId > 0) {
+            window.listenForUserMessages = (badgeHandler) => {
+                return listenForUserMessages(currentUserId, badgeHandler);
+            };
+
+            window.resetUnreadMessages = async () => {
+                const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+                await set(unreadRef, 0);
+            };
+        } else {
+            console.warn("⚠️ Không tìm thấy currentUserId, badge sẽ không hoạt động.");
+        }
+    </script>
+    <script>
+        function chatBadge() {
+            return {
+                unreadCount: 0,
+                setBadge(count) {
+                    this.unreadCount = count;
+                },
+                init() {
+                    setTimeout(() => {
+                        if (typeof window.listenForUserMessages === "function") {
+                            window.listenForUserMessages((count) => {
+                                this.setBadge(count);
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

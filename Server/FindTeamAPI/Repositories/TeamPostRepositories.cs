@@ -24,7 +24,7 @@ namespace FindTeamAPI.Repositories
         public async Task<TeamPost> CreateTeamPostAsync(TeamPost teamPost)
         {
             teamPost.CreatedAt = DateTime.UtcNow;
-            _context.TeamPosts.Add(teamPost);
+            var tempost = await _context.TeamPosts.AddAsync(teamPost);
             await _context.SaveChangesAsync();
             return teamPost;
         }

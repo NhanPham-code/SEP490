@@ -73,7 +73,7 @@ namespace BookingAPI.Repository
         public async Task<IEnumerable<Booking>> GetBookingsByDateRangeAndHourAsync(int year, int month, IEnumerable<int> days, TimeSpan startTime, TimeSpan endTime)
         {
             // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+            var validStatuses = new List<string> { "pending", "accepted", "waiting", "completed" };
 
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)
@@ -96,7 +96,7 @@ namespace BookingAPI.Repository
         public async Task<IEnumerable<Booking>> GetBookingsByCourtIdsAndHourAsync(IEnumerable<int> courtIds, int year, int month, TimeSpan startTime, TimeSpan endTime)
         {
             // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            var validStatuses = new List<string> { "pending", "accepted", "waiting" };
+            var validStatuses = new List<string> { "pending", "accepted", "waiting", "completed" };
 
             var query = _context.Bookings
                 .Include(b => b.BookingDetails)
@@ -108,6 +108,41 @@ namespace BookingAPI.Repository
                 endTime > bd.StartTime.TimeOfDay));
 
             return await query.ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day)
+        {
+            var query = _context.Bookings.AsNoTracking().Where(b => b.Date.Year == year);
+
+            if (month.HasValue)
+            {
+                query = query.Where(b => b.Date.Month == month.Value);
+            }
+
+            if (day.HasValue)
+            {
+                query = query.Where(b => b.Date.Day == day.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years)
+        {
+            return await _context.Bookings
+                .AsNoTracking()
+                .Where(b => years.Contains(b.Date.Year))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, DateTime date)
+        {
+            return await _context.Bookings
+                .Include(b => b.BookingDetails) // Include chi tiết booking
+                .Include(b => b.MonthlyBooking) // Include booking tháng nếu có
+                .Where(b => stadiumIds.Contains(b.StadiumId) && b.Date.Date == date.Date)
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

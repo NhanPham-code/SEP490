@@ -18,6 +18,11 @@ namespace NotificationAPI.Service
             var result = await _notificationRepository.AddAsync(notification);
             return result;
         }
+        public async Task<List<Notification>> AddRangeNotificationsAsync(List<Notification> notifications)
+        {
+            var result = await _notificationRepository.AddRangeAsync(notifications);
+            return result;
+        }
 
         public async Task<int> CountUnreadNotificationsAsync(int userId)
         {

@@ -22,6 +22,7 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public int CreatedBy { get; set; }
+        public string StadiumName { get; set; } = string.Empty;
         public int StadiumId { get; set; }
         public int BookingId { get; set; }
         public List<ReadTeamMemberDTO> TeamMembers { get; set; } = new List<ReadTeamMemberDTO>();

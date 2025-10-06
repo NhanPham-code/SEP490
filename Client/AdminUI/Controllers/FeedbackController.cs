@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using DTOs.NotificationDTO; // Để dùng NotificationDTO
+using FeedbackAPI.DTOs;    // Để dùng FeedbackResponse
 
 namespace AdminUI.Controllers
 {
@@ -7,11 +9,17 @@ namespace AdminUI.Controllers
     {
         private readonly IFeedbackService _feedbackService;
         private readonly IUserService _userService;
+        private readonly INotificationService _notificationService; // Inject notification service
 
-        public FeedbackController(IFeedbackService feedbackService, IUserService userService)
+        public FeedbackController(
+            IFeedbackService feedbackService,
+            IUserService userService,
+            INotificationService notificationService // Inject ở đây
+        )
         {
             _feedbackService = feedbackService;
             _userService = userService;
+            _notificationService = notificationService;
         }
 
         private string? GetAccessToken()
@@ -125,6 +133,7 @@ namespace AdminUI.Controllers
                 return Json(new { Data = Array.Empty<object>(), TotalCount = 0 });
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -137,8 +146,25 @@ namespace AdminUI.Controllers
                     return Unauthorized(new { message = "Access token missing" });
                 }
 
+                // Lấy feedback để lấy UserId
+                var feedback = await _feedbackService.GetByIdAsync(accessToken, id);
+                if (feedback == null)
+                    return Json(new { success = false, message = "Feedback không tồn tại" });
+
                 var result = await _feedbackService.DeleteAsync(accessToken, id);
 
+
+
+                // Gửi notification cho user, KHÔNG cần type/title
+                var notification = new NotificationDTO
+                {
+                    UserId = feedback.UserId,
+                    Type = "Feedback.Deleted",
+                    Message = "Feedback của bạn đã bị xóa do vi phạm tiêu chuẩn cộng đồng.",
+                    CreatedAt = DateTime.Now
+                };
+                await _notificationService.SendNotificationToUserAsync(notification);
+                await _notificationService.SendNotificationToAll(notification);
                 if (result)
                 {
                     return Json(new { success = true, message = "Xóa feedback thành công" });
@@ -153,6 +179,15 @@ namespace AdminUI.Controllers
                 Console.WriteLine($"[FeedbackController] Delete exception: {ex.Message}");
                 return Json(new { success = false, message = "Có lỗi xảy ra khi xóa feedback" });
             }
+        }
+
+        // Logic kiểm tra hợp lệ (ví dụ: comment phải khác rỗng)
+        private bool IsValidFeedback(FeedbackResponse feedback)
+        {
+            if (feedback == null) return false;
+            if (string.IsNullOrWhiteSpace(feedback.Comment)) return false;
+            // Có thể thêm check khác theo nhu cầu
+            return true;
         }
 
         public IActionResult Feedback()
