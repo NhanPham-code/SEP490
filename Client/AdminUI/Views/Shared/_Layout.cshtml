@@ -107,7 +107,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Admin/Revenue" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Revenue" ? "active" : "")" data-section="revenue">
+                        <a href="/Revenue/Revenue" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Revenue" ? "active" : "")" data-section="revenue">
                             <i class="ri-money-dollar-circle-line"></i>
                             <span>Quản Lý Doanh Thu</span>
                             @if (ViewContext.RouteData.Values["action"]?.ToString() == "Revenue")
@@ -117,7 +117,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Stadium/StadiumAdmin" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Venues" ? "active" : "")" data-section="venues">
+                        <a href="/Stadium/StadiumAdmin" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "StadiumAdmin" ? "active" : "")" data-section="venues">
                             <i class="ri-building-line"></i>
                             <span>Quản Lý Nhà Thi Đấu</span>
                             @if (ViewContext.RouteData.Values["action"]?.ToString() == "Venues")

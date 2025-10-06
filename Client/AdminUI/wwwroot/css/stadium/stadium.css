@@ -178,8 +178,10 @@
         box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
     }
 .excel-btn {
-    background: conic-gradient(from 0deg at 0% 25%, blue, green, yellow 180deg);
-    color: white;
+
+    background-color:#9fd59f;
+    color: #000;
+    backdrop-filter: blur(10px);
 }
 .court-btn {
     background-color: lightgray;
@@ -2146,3 +2148,9 @@
     margin-top: 8px;
 }
 
+grammarly-desktop-integration,
+grammarly-extension,
+grammarly-extension-root {
+    display: none !important;
+    visibility: hidden !important;
+}

@@ -21,6 +21,10 @@
       {
         "Path": "NotificationAPI\\NotificationAPI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "AggregatorPatternAPI\\AggregatorPatternAPI.csproj",
+        "Action": "Start"
       }
     ]
   }

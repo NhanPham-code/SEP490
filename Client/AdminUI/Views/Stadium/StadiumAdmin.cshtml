@@ -412,9 +412,10 @@
                                 </div>
                                 
                                 <div class="pb-4">
-                                    <div class="info-card sport-info">
-                                        <div class="info-label">Đánh giá </div> 
-                                        <div class="info-value">${getSportTypes(stadium.Courts)}</div>
+                                    <div class="flex items-center text-sm mb-3">
+                                        <i class="ri-star-fill text-yellow-400 mr-1"></i>
+                                        <span class="font-semibold text-gray-800 rating">0.0</span>
+                                        <span class="text-gray-500 ml-1 feedback-count">(0 đánh giá)</span>
                                     </div>
                                 </div>
                                 <a href="#" class="link">Xem chi tiết đánh giá</a>
@@ -461,6 +462,8 @@
 
                     $('#stadium-grid').html(html);
                 }
+
+                // render nhà thi dấu chưa được duyệt
 
                 //set icon cho btn 
                 function setIcon(court){
