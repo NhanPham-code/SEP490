@@ -53,6 +53,23 @@ namespace BookingAPI.Controllers
             }
         }
 
+        [HttpPost("by-owner")]
+        [Authorize(Roles = "StadiumManager")] // Bảo vệ cho chủ sân hoặc admin
+        public async Task<ActionResult<BookingReadDto>> CreateBookingByOwner([FromBody] BookingCreateDto bookingCreateDto)
+        {
+            try
+            {
+                var createdBooking = await _bookingService.CreateBookingAsync(bookingCreateDto);
+
+                // Trả về kết quả thành công
+                return Ok(createdBooking);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error creating booking by owner: {ex.Message}");
+            }
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<BookingUpdateDto>> UpdateBooking(int id, BookingUpdateDto bookingUpdateDto)
         {

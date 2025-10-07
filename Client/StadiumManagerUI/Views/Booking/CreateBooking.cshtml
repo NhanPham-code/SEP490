@@ -1,0 +1,385 @@
+﻿@using DTOs.StadiumDTO
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Tạo Lịch Đặt Sân";
+    var ownedStadiums = ViewBag.OwnedStadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+}
+
+@section Style {
+    <link rel="stylesheet" href="~/css/Booking/VisuallyBooking.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .owner-booking-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+            .page-header h1 {
+                font-size: 1.875rem;
+                font-weight: 700;
+                color: #111827;
+                margin: 0;
+            }
+
+        .back-link {
+            color: #4b5563;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .back-link:hover {
+                color: #1d4ed8;
+            }
+
+        .setup-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .form-group select, .form-group input {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 1px solid #d1d5db;
+                border-radius: 0.375rem;
+                font-size: 1rem;
+            }
+
+        #booking-visual-section {
+            display: none;
+            padding-top: 2rem;
+            border-top: 1px dashed #d1d5db;
+        }
+
+        .customer-info-group {
+            position: relative;
+        }
+
+        #user-search-results {
+            position: absolute;
+            background: white;
+            border: 1px solid #d1d5db;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+
+        .user-search-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+            .user-search-item:last-child {
+                border-bottom: none;
+            }
+
+            .user-search-item:hover {
+                background-color: #f3f4f6;
+            }
+
+        .user-info-text {
+            display: block;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+            .modal-overlay.open {
+                display: flex;
+                opacity: 1;
+            }
+
+        .modal-content {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+            .modal-header h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin: 0;
+            }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .modal-body {
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 1rem;
+        }
+
+        .summary-label {
+            color: #6b7280;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .modal-footer {
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+            .modal-footer button {
+                padding: 0.6rem 1.2rem;
+                border-radius: 0.375rem;
+                border: none;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+        .modal-cancel-btn {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+            .modal-cancel-btn:hover {
+                background-color: #d1d5db;
+            }
+
+        .modal-confirm-btn {
+            background-color: #1d4ed8;
+            color: white;
+        }
+
+            .modal-confirm-btn:hover {
+                background-color: #1e40af;
+            }
+
+        .alert-container {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+    </style>
+}
+
+<div class="owner-booking-container">
+    <div class="page-header">
+        <a asp-action="BookingManager" asp-controller="Booking" class="back-link" title="Quay lại"><i class="fas fa-arrow-left"></i></a>
+        <h1>Tạo Lịch Đặt Sân Thủ Công</h1>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-container alert-danger" role="alert">
+            <strong>Lỗi!</strong> @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-container alert-success" role="alert">
+            <strong>Thành công!</strong> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ownedStadiums.Any())
+    {
+        <div class="setup-section">
+            <div class="form-group">
+                <label for="stadium-select">1. Chọn sân vận động để đặt lịch</label>
+                <select id="stadium-select" name="stadiumId" required>
+                    <option value="" disabled selected>-- Vui lòng chọn một sân --</option>
+                    @foreach (var stadium in ownedStadiums)
+                    {
+                        <option value="@stadium.Id">@stadium.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="customer-search">2. Thông tin khách hàng (để trống cho khách vãng lai)</label>
+                <div class="customer-info-group">
+                    <input type="text" id="customer-search" placeholder="Tìm kiếm theo SĐT hoặc Email..." autocomplete="off">
+                    <div id="user-search-results" style="display: none;"></div>
+                </div>
+                <input type="text" id="customer-name-display" placeholder="Khách vãng lai" class="mt-2" disabled style="font-weight: bold; background: #e9ecef;">
+            </div>
+        </div>
+
+        <div id="booking-visual-section">
+            <div class="stadium-info" id="stadiumInfo" style="display: none;">
+                <h3 id="stadiumName">Tên sân</h3>
+                <p><strong>Địa chỉ:</strong> <span id="stadiumAddress">Địa chỉ</span></p>
+                <p><strong>Giờ hoạt động:</strong> <span id="stadiumHours">6:00 - 22:00</span></p>
+            </div>
+            <div class="mb-10 text-center"><h2 class="text-3xl md:text-4xl font-bold gradient-text mb-4 mt-4">3. Chọn lịch đặt trực quan</h2></div>
+            <div class="dashboard-layout">
+                <div class="calendar-section">
+                    <label for="date-picker" class="block text-sm font-semibold text-gray-700 mb-2">📅 Chọn ngày</label>
+                    <input type="date" id="date-picker" class="interactive-input w-full bg-white border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 px-4 py-3 rounded-xl shadow-sm text-gray-700 font-medium" />
+                </div>
+                <div class="stats-wrapper">
+                    <div class="stat-item"><div class="stat-icon">⏱️</div><div class="stat-info"><h3>Tổng số giờ</h3><p>0</p></div></div>
+                    <div class="stat-item"><div class="stat-icon">💰</div><div class="stat-info"><h3>Giá tiền</h3><p>0 VNĐ</p></div></div>
+                </div>
+            </div>
+            <div class="schedule-container mt-3">
+                <div class="sport-type-column" id="sportTypeColumn"><div class="fixed-header">Loại</div></div>
+                <div class="fixed-column" id="fixedColumn"><div class="fixed-header">Sân</div></div>
+                <div class="scrollable-area">
+                    <div class="time-header-wrapper"><div class="time-header notranslate" id="timeHeader" translate="no"></div></div>
+                    <div class="schedule-body-wrapper"><div class="schedule-grid" id="scheduleGrid"></div></div>
+                </div>
+            </div>
+            <div class="legend-container">
+                <div class="legend-item"><div class="legend-color booked" style="background: red"></div><span class="legend-text">Đã đặt</span></div>
+                <div class="legend-item"><div class="legend-color related"></div><span class="legend-text">Liên quan</span></div>
+                <div class="legend-item"><div class="legend-color blocked"></div><span class="legend-text">Khóa</span></div>
+                <div class="legend-item"><div class="legend-color event"></div><span class="legend-text">Đã chọn</span></div>
+            </div>
+
+            <form id="ownerBookingForm" method="post" asp-action="CreateBookingByOwner" asp-controller="Booking">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="StadiumId" id="form-stadium-id" />
+                <input type="hidden" name="Date" id="form-date" />
+                <input type="hidden" name="TotalPrice" id="form-total-price" />
+                <input type="hidden" name="OriginalPrice" id="form-original-price" />
+                <input type="hidden" name="UserId" id="form-user-id" />
+                <input type="hidden" name="Status" value="accepted" />
+                <input type="hidden" name="Note" id="form-note" />
+                <div id="booking-details-container"></div>
+                <div class="text-center mb-12 mt-8">
+                    <button type="button" id="continue-button" disabled class="continue-btn w-full md:w-auto px-16 py-4 rounded-2xl font-bold text-white text-lg transition-all duration-300 shadow-xl cursor-not-allowed relative overflow-hidden">
+                        <span class="relative z-10">✅ Hoàn Tất Tạo Lịch Đặt</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="no-stadiums-message">
+            <p>Bạn chưa có sân vận động nào được quản lý.</p>
+            <p>Vui lòng <a asp-controller="Stadium" asp-action="CreateStadium">tạo sân vận động</a> trước khi tạo lịch đặt.</p>
+        </div>
+    }
+</div>
+
+<div id="confirmation-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Xác Nhận Lịch Đặt</h3>
+            <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="summary-line"><span class="summary-label">Khách hàng:</span><span class="summary-value" id="modal-customer-name"></span></div>
+            <div class="summary-line"><span class="summary-label">Sân vận động:</span><span class="summary-value" id="modal-stadium-name"></span></div>
+            <hr style="margin: 0.5rem 0;" />
+            <div class="summary-line"><span class="summary-label">Ngày đặt:</span><span class="summary-value" id="modal-date"></span></div>
+            <div class="summary-line"><span class="summary-label">Các sân đã chọn:</span><span class="summary-value" id="modal-courts"></span></div>
+            <div class="summary-line"><span class="summary-label">Tổng số giờ:</span><span class="summary-value" id="modal-hours"></span></div>
+            <hr style="margin: 0.5rem 0;" />
+            <div class="summary-line" style="font-size: 1.25rem;"><strong class="summary-label">Tổng cộng:</strong><strong class="summary-value" id="modal-total-price" style="color: #1d4ed8;"></strong></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-cancel-btn">Hủy</button>
+            <button type="button" id="confirm-booking-btn" class="modal-confirm-btn">Xác Nhận & Tạo</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/CreateBooking.js" asp-append-version="true"></script>
+}

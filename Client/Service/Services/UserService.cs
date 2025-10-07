@@ -426,6 +426,31 @@ namespace Service.Services
             }
         }
 
+        // Thêm hàm này vào IUserService và class implement nó
+        public async Task<List<PublicUserProfileDTO>> SearchUsersByEmailAsync(string email, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var requestUrl = $"/users/get?$filter=contains(Email, '{email}')";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                response.EnsureSuccessStatusCode();
+
+                string jsonString = await response.Content.ReadAsStringAsync();
+
+                var odataResponse = JsonConvert.DeserializeObject<ODataResponse<PublicUserProfileDTO>>(jsonString);
+
+                return odataResponse?.Value ?? new List<PublicUserProfileDTO>();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"An error occurred while searching by email: {e.Message}");
+                return new List<PublicUserProfileDTO>();
+            }
+        }
+
         public async Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO)
         {
             using var form = new MultipartFormDataContent();

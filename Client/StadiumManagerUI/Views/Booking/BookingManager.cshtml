@@ -17,10 +17,17 @@
         .ToList();
 
     var pendingBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase));
-    var acceptedBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
-    + sortedDailyBookings.Count(b => b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase));
-    var totalRevenue = sortedDailyBookings.Where(b => b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)).Sum(b => b.Booking.TotalPrice ?? 0)
-                     + sortedMonthlyBookings.Where(mb => mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase)).Sum(mb => mb.MonthlyBooking.TotalPrice ?? 0);
+
+    // *** SỬA LỖI TÍNH TỔNG DOANH THU ***
+    var acceptedBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
+                         + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase));
+
+    var totalRevenue = sortedDailyBookings
+                         .Where(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
+                         .Sum(b => b.Booking.TotalPrice ?? 0)
+                     + sortedMonthlyBookings
+                         .Where(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
+                         .Sum(mb => mb.MonthlyBooking.TotalPrice ?? 0);
 
     string GetStatusClass(string status) => status.ToLower() switch
     {
@@ -45,6 +52,15 @@
     };
 
     string GetInitials(string fullName) { if (string.IsNullOrWhiteSpace(fullName)) return "U"; var parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); return parts.Length > 1 ? $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper() : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U"); }
+
+    (string Text, string Class) GetCreatorInfo(int creatorId)
+    {
+        if (creatorId == 0)
+        {
+            return ("Khách tự đặt", "creator-customer");
+        }
+        return ("Chủ sân tạo", "creator-owner");
+    }
 }
 
 @section Style {
@@ -56,7 +72,7 @@
             color: #4b5563;
             border: 1px solid #d1d5db;
         }
-        /* ===== BỔ SUNG CSS CHO CHỨC NĂNG HỦY TÍCH HỢP ===== */
+
         .bm-child-table th:first-child, .bm-child-table td:first-child {
             width: 40px;
             text-align: center;
@@ -99,11 +115,10 @@
             margin-right: 1rem;
         }
 
-        /* ===== CSS CHO GIAO DIỆN THANH TOÁN MỚI ===== */
         .bm-pricing-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem; /* Khoảng cách giữa các dòng */
+            gap: 0.75rem;
             font-size: 1rem;
         }
 
@@ -114,36 +129,91 @@
         }
 
             .bm-pricing-line .label {
-                color: #4b5563; /* Gray-600 */
+                color: #4b5563;
             }
 
             .bm-pricing-line .value {
                 font-weight: 600;
-                color: #1f2937; /* Gray-800 */
+                color: #1f2937;
             }
 
         .bm-pricing-divider {
             border: none;
-            border-top: 1px solid #e5e7eb; /* Gray-200 */
+            border-top: 1px solid #e5e7eb;
             margin: 0.5rem 0;
         }
 
         .bm-pricing-line.bm-total .label {
-            font-size: 1.125rem; /* text-lg */
+            font-size: 1.125rem;
             font-weight: 700;
-            color: #111827; /* Gray-900 */
+            color: #111827;
         }
 
         .bm-pricing-line.bm-total .value {
-            font-size: 1.25rem; /* text-xl */
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #1d4ed8; /* Blue-700 */
+            color: #1d4ed8;
+        }
+
+        .bm-header-with-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .bm-create-booking-btn {
+            background-color: #1d4ed8;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+            .bm-create-booking-btn:hover {
+                background-color: #1e40af;
+            }
+
+            .bm-create-booking-btn i {
+                font-size: 1rem;
+            }
+
+        .bm-creator-badge {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .creator-customer {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .creator-owner {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .bm-modal-detail-item.bm-full-width {
+            grid-column: 1 / -1;
         }
     </style>
 }
 
 <div class="bm-container">
-    <h1 style="font-weight: 800; font-size: 2.5rem; margin-bottom: 2rem;">Quản Lý Lịch Đặt Sân</h1>
+    <div class="bm-header-with-action">
+        <h1 style="font-weight: 800; font-size: 2.5rem; margin: 0;">Quản Lý Lịch Đặt Sân</h1>
+        <a asp-controller="Booking" asp-action="CreateBooking" class="bm-create-booking-btn">
+            <i class="fas fa-plus"></i> Tạo Lịch Đặt Mới
+        </a>
+    </div>
 
     <div class="bm-stats-grid" style="margin-bottom: 2rem;">
         <div class="bm-stat-card bm-yellow"><div class="bm-stat-header">Lịch chờ xử lý</div><div class="bm-stat-value">@pendingBookings</div></div>
@@ -195,7 +265,7 @@
         </div>
         <div style="overflow-x: auto;">
             <table class="bm-booking-table">
-                <thead><tr><th class="bm-align-left">Khách hàng / Sân</th><th>Ngày chơi</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                <thead><tr><th class="bm-align-left">Khách hàng / Sân</th><th>Ngày chơi</th><th>Ngày tạo</th><th>Người tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
                 <tbody>
                     @if (sortedDailyBookings.Any())
                     {
@@ -204,6 +274,7 @@
                             var booking = dailyVm.Booking;
                             var user = dailyVm.User;
                             var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+                            var creatorInfo = GetCreatorInfo(booking.CreatedById);
                             <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily" data-play-date="@booking.Date.ToString("yyyy-MM-dd")" data-status="@booking.Status.ToLower()">
                                 <td class="bm-align-left">
                                     <div class="bm-customer-info">
@@ -225,6 +296,7 @@
                                 </td>
                                 <td>@booking.Date.ToString("dd/MM/yyyy")</td>
                                 <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td><span class="bm-creator-badge @creatorInfo.Class">@creatorInfo.Text</span></td>
                                 <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
                                 <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                                 <td class="bm-actions">
@@ -243,7 +315,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="6"><div class="no-data"><p>Không có lịch đặt hằng ngày nào.</p></div></td></tr>
+                        <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng ngày nào.</p></div></td></tr>
                     }
                 </tbody>
             </table>
@@ -285,6 +357,7 @@
                                 </td>
                                 <td><div style="display: flex; flex-direction: column; align-items: center;"><span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span><span style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span></div></td>
                                 <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                               
                                 <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
                                 <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                                 <td class="bm-actions">
@@ -296,22 +369,13 @@
                                 </td>
                             </tr>
                             <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id" style="display:none;">
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="bm-child-table-container">
                                         <h4>Các Lịch Đặt Chi Tiết</h4>
                                         @if (monthlyVm.Bookings.Any())
                                         {
                                             <table class="bm-child-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th>
-                                                        <th>Ngày Chơi</th>
-                                                        <th>Sân Con</th>
-                                                        <th>Thời Gian</th>
-                                                        <th>Giá tiền</th>
-                                                        <th>Trạng Thái</th>
-                                                    </tr>
-                                                </thead>
+                                                <thead><tr><th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th><th>Ngày Chơi</th><th>Sân Con</th><th>Thời Gian</th><th>Giá tiền</th><th>Trạng Thái</th></tr></thead>
                                                 <tbody>
                                                     @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
                                                     {
@@ -320,10 +384,10 @@
                                                             <td><input type="checkbox" class="bm-child-booking-checkbox" value="@childBooking.Id" data-price="@childBooking.TotalPrice" @(isCancellable ? "" : "disabled")></td>
                                                             <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
                                                             <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
-                                                            <td>@if (childBooking.BookingDetails.Any())
+                                                            <td> @if (childBooking.BookingDetails.Any())
                                                                 {
                                                                     <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
-                                                                }</td>
+                                                                } </td>
                                                             <td class="bm-price">@((childBooking.TotalPrice ?? 0).ToString("N0"))₫</td>
                                                             <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
                                                         </tr>
@@ -346,7 +410,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng tháng nào.</p></div></td></tr>
+                        <tr><td colspan="8"><div class="no-data"><p>Không có lịch đặt hằng tháng nào.</p></div></td></tr>
                     }
                 </tbody>
             </table>
@@ -370,7 +434,7 @@
                 dailyBookings: @Html.Raw(JsonSerializer.Serialize(sortedDailyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })),
                 monthlyBookings: @Html.Raw(JsonSerializer.Serialize(sortedMonthlyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
             };
-            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums));
+            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
             initializeBookingManager(viewModel, stadiums);
         });
     </script>
