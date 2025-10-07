@@ -1,4 +1,5 @@
 ﻿using Google;
+using Microsoft.EntityFrameworkCore;
 using UserAPI.Data;
 using UserAPI.Model;
 using UserAPI.Repository.Interface;
@@ -36,9 +37,9 @@ namespace UserAPI.Repository
 
         public async Task<BiometricCredential?> GetByTokenAsync(string token)
         {
-            var result = await _context.BiometricCredentials
-                .FindAsync(token);
-            return result;
+            return await _context.BiometricCredentials
+                        .Include(bc => bc.User) // Quan trọng: Lấy cả thông tin User đi kèm
+                        .FirstOrDefaultAsync(bc => bc.Token == token && bc.IsActive);
         }
 
         public async Task<IEnumerable<BiometricCredential>> GetByUserIdAsync(int userId)
