@@ -13,18 +13,6 @@
       {
         "Path": "UserAPI\\UserAPI.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "BookingAPI\\BookingAPI.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "NotificationAPI\\NotificationAPI.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "AggregatorPatternAPI\\AggregatorPatternAPI.csproj",
-        "Action": "Start"
       }
     ]
   }
