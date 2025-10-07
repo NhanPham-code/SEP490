@@ -35,6 +35,9 @@ namespace BookingAPI.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -78,7 +81,7 @@ namespace BookingAPI.Migrations
 
                     b.HasIndex("MonthlyBookingId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("BookingAPI.Models.BookingDetail", b =>
@@ -105,7 +108,7 @@ namespace BookingAPI.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("BookingDetails", (string)null);
+                    b.ToTable("BookingDetails");
                 });
 
             modelBuilder.Entity("BookingAPI.Models.MonthlyBooking", b =>
@@ -165,7 +168,7 @@ namespace BookingAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MonthlyBookings", (string)null);
+                    b.ToTable("MonthlyBookings");
                 });
 
             modelBuilder.Entity("BookingAPI.Models.Booking", b =>
