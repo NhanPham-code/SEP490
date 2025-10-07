@@ -378,26 +378,45 @@
     },
     // === BOOKING API ===
     {
-      "DownstreamPathTemplate": "/api/Booking/{userId}",
-      "UpstreamPathTemplate": "/Bookings/add",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7015
+        "DownstreamPathTemplate": "/api/Booking/{userId}",
+        "UpstreamPathTemplate": "/Bookings/add",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7015
+            }
+        ],
+        "UpstreamHttpMethod": [ "POST" ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "RequireAuthentication": true
+        },
+        "RouteClaimsRequirement": {
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
+        },
+        "ChangeDownstreamPathTemplate": {
+            "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
         }
-      ],
-      "UpstreamHttpMethod": ["POST"],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      },
-      "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Customer"
-      },
-      "ChangeDownstreamPathTemplate": {
-        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
-      }
+    },
+    {
+        "DownstreamPathTemplate": "/api/Booking/by-owner",
+        "UpstreamPathTemplate": "/Bookings/create-by-owner",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7015
+            }
+        ],
+        "UpstreamHttpMethod": [ "POST" ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "RequireAuthentication": true
+        },
+        "RouteClaimsRequirement": {
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "StadiumManager"
+        }
     },
     {
       "DownstreamPathTemplate": "/odata/bookings/{everything}",
@@ -1536,7 +1555,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+            "Host": "localhost",
           "Port": 7175
         }
       ],
