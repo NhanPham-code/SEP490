@@ -6,6 +6,7 @@ namespace BookingAPI.DTOs
     {
         // Các chỉ số thống kê tổng quan (có thể lọc theo ngày, tháng, năm)
         public decimal TotalRevenue { get; set; }
+        public decimal TotalOriginalRevenue { get; set; }
         public int TotalCompletedBookings { get; set; }
         public double CompletedBookingsPercentage { get; set; }
         public int PendingBookingsCount { get; set; }

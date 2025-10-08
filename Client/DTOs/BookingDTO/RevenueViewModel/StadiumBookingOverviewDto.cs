@@ -1,6 +1,6 @@
 using DTOs.StadiumDTO;
 
-namespace DTOs.BookingDTO;
+namespace DTOs.BookingDTO.RevenueViewModel;
 
 public class StadiumBookingOverviewDto
 {
@@ -9,5 +9,6 @@ public class StadiumBookingOverviewDto
     public List<ReadCourtDTO> Courts { get; set; }
     public int CompletedBookingsCount { get; set; }
     public decimal TotalRevenue { get; set; }
-    public List<BookingReadDto> Bookings { get; set; } = new List<BookingReadDto>();
+    public List<EnrichedBookingDto> Bookings { get; set; } = new List<EnrichedBookingDto>();
+    public decimal TotalOriginRevenue { get; set; }
 }
