@@ -110,7 +110,7 @@ namespace BookingAPI.Repository
             return await query.ToListAsync();
         }
 
-        public async Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day)
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day, IEnumerable<int>? stadiumIds = null)
         {
             var query = _context.Bookings.AsNoTracking().Where(b => b.Date.Year == year);
 
@@ -123,16 +123,30 @@ namespace BookingAPI.Repository
             {
                 query = query.Where(b => b.Date.Day == day.Value);
             }
+            
+            if (stadiumIds != null && stadiumIds.Any())
+            {
+                // Giả định Booking có trường StadiumId kiểu int (đã xác nhận từ Booking.cs)
+                query = query.Where(b => stadiumIds.Contains(b.StadiumId));
+            }
 
             return await query.ToListAsync();
         }
 
-        public async Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years)
+        public async Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years, IEnumerable<int>? stadiumIds = null)
         {
-            return await _context.Bookings
+            var query = _context.Bookings
                 .AsNoTracking()
-                .Where(b => years.Contains(b.Date.Year))
-                .ToListAsync();
+                .Where(b => years.Contains(b.Date.Year)); // Giữ nguyên việc lọc theo nhiều năm
+
+            // Áp dụng bộ lọc theo danh sách sân
+            if (stadiumIds != null && stadiumIds.Any())
+            {
+                // Giả định Booking có trường StadiumId kiểu int (đã xác nhận từ Booking.cs)
+                query = query.Where(b => stadiumIds.Contains(b.StadiumId));
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync(IEnumerable<int> stadiumIds, int? year, int? month, int? day)

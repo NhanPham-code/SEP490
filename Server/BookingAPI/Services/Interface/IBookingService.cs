@@ -20,7 +20,7 @@ namespace BookingAPI.Services.Interface
                 Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots);
                 Task AutoAcceptBookingByIdAsync(int bookingId);
                 Task AutoCompleteBookingsAsync();
-                Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day);
+                Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day, IEnumerable<int> stadiumIds);
                 Task<IEnumerable<BookingReadDto>> GetBookingsByStadiumsAndDateAsync( IEnumerable<int> stadiumIds, int? year, int? month, int? day);
         }
 }
