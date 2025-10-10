@@ -5,17 +5,24 @@ using System.Text.Json;
 using DTOs.Helpers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
+using DTOs.DiscountDTO; // Thêm using cho Discount DTOs
+using System.Linq; // Thêm using cho LINQ
 
 namespace CustomerUI.Controllers
 {
     public class PaymentController : Controller
     {
         private readonly IBookingService _bookingService;
+        private readonly IDiscountService _discountService; // *** THÊM IDiscountService
         private readonly IConfiguration _configuration;
 
-        public PaymentController(IBookingService bookingService, IConfiguration configuration)
+        public PaymentController(
+            IBookingService bookingService,
+            IDiscountService discountService, // *** INJECT IDiscountService
+            IConfiguration configuration)
         {
             _bookingService = bookingService;
+            _discountService = discountService; // *** GÁN SERVICE
             _configuration = configuration;
         }
 
@@ -42,7 +49,6 @@ namespace CustomerUI.Controllers
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
-            // Lấy lại booking từ API
             string queryString = $"?$filter=Id eq {bookingId}";
             var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
             var booking = bookings.FirstOrDefault();
@@ -59,37 +65,43 @@ namespace CustomerUI.Controllers
             {
                 finalStatus = "accepted";
 
-                //try
-                //{
-                //    string historyQueryString = $"?$filter=UserId eq '{booking.UserId}' and StadiumId eq {booking.StadiumId}";
-
-                //    List<BookingReadDto> historyBookings = await _bookingService.GetBookingAsync(accessToken, historyQueryString);
-
-                //    if (historyBookings != null)
-                //    {
-                //        int totalBookings = historyBookings.Count;
-                //        int completedBookings = historyBookings.Count(b => "completed".Equals(b.Status, StringComparison.OrdinalIgnoreCase));
-
-
-                //        double completionRate = (totalBookings > 0) ? (double)completedBookings / totalBookings : 0;
-
-                //        if (totalBookings > 3 && completionRate >= 0.8)
-                //        {
-                //            finalStatus = "accepted"; // Nâng cấp trạng thái!
-                //            TempData["AutoAcceptedMessage"] = "Cảm ơn bạn là khách hàng thân thiết! Đơn đặt sân của bạn đã được tự động chấp nhận.";
-                //        }
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    // Nếu có lỗi khi kiểm tra lịch sử, hệ thống vẫn hoạt động bình thường
-                //    // và giữ trạng thái là "pending". Ghi log lại lỗi để kiểm tra sau.
-                //    // _logger.LogError(ex, "Error checking booking history for auto-approval.");
-                //}
+                // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" START ***
+                if (booking.DiscountId.HasValue && booking.DiscountId > 0)
+                {
+                    try
+                    {
+                        var discountDetails = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
+                        if (discountDetails != null && "Unique".Equals(discountDetails.CodeType, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Tạo DTO để cập nhật
+                            var discountUpdateDto = new UpdateDiscountDTO
+                            {
+                                Id = discountDetails.Id,
+                                Code = discountDetails.Code,
+                                Description = discountDetails.Description,
+                                PercentValue = discountDetails.PercentValue,
+                                MaxDiscountAmount = discountDetails.MaxDiscountAmount,
+                                MinOrderAmount = discountDetails.MinOrderAmount,
+                                StartDate = discountDetails.StartDate,
+                                EndDate = discountDetails.EndDate,
+                                CodeType = discountDetails.CodeType,
+                                IsActive = false, // Vô hiệu hóa mã
+                                TargetUserId = discountDetails.TargetUserId,
+                                StadiumIds = discountDetails.StadiumIds
+                            };
+                            await _discountService.UpdateDiscountAsync(accessToken, discountUpdateDto);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Ghi log lỗi nhưng không làm gián đoạn luồng chính
+                        Console.WriteLine($"[PaymentCallback] Lỗi khi vô hiệu hóa mã Unique Discount ID {booking.DiscountId}: {ex.Message}");
+                    }
+                }
+                // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" END ***
             }
             else
             {
-                // Nếu thanh toán thất bại
                 finalStatus = "payfail";
             }
 
@@ -97,7 +109,7 @@ namespace CustomerUI.Controllers
             {
                 UserId = booking.UserId,
                 StadiumId = booking.StadiumId,
-                Status = finalStatus, // Sử dụng trạng thái đã được tính toán
+                Status = finalStatus,
                 Date = booking.Date,
                 TotalPrice = booking.TotalPrice,
                 OriginalPrice = booking.OriginalPrice,
@@ -126,11 +138,12 @@ namespace CustomerUI.Controllers
             finally
             {
                 HttpContext.Session.Remove("BookingId");
-                HttpContext.Session.Remove("AccessToken"); // Cũng nên xóa token sau khi dùng
+                HttpContext.Session.Remove("AccessToken");
             }
 
             return RedirectToAction("BookingHistory", "Booking");
         }
+
         public async Task<IActionResult> MonthlyPaymentCallback()
         {
             var vnpay = new VnPayLibrary();
@@ -142,7 +155,7 @@ namespace CustomerUI.Controllers
 
             string vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             string hashSecret = _configuration["VNPAY:HashSecret"];
-            bool checkSignature = vnpay.ValidateSignature(hashSecret);
+            bool isPaymentSuccess = vnpay.ValidateSignature(hashSecret) && vnp_ResponseCode == "00";
 
             int? monthlyBookingId = HttpContext.Session.GetInt32("MonthlyBookingId");
             var accessToken = HttpContext.Session.GetString("AccessToken");
@@ -153,7 +166,6 @@ namespace CustomerUI.Controllers
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
-            // Lấy lại monthly booking từ API
             string queryString = $"?$filter=Id eq {monthlyBookingId}";
             var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, queryString);
             var monthlyBooking = monthlyBookings.FirstOrDefault();
@@ -164,42 +176,69 @@ namespace CustomerUI.Controllers
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
-            // Tạo DTO để cập nhật trạng thái
-
             var updateDto = new MonthlyBookingUpdateDto
             {
-                Status = (checkSignature && vnp_ResponseCode == "00") ? "accepted" : "canceled",
+                Status = isPaymentSuccess ? "accepted" : "canceled",
                 TotalPrice = monthlyBooking.TotalPrice,
                 PaymentMethod = monthlyBooking.PaymentMethod,
                 OriginalPrice = monthlyBooking.OriginalPrice,
                 Note = monthlyBooking.Note,
             };
 
-
             try
             {
                 await _bookingService.UpdateMonthlyBookingAsync(monthlyBookingId.Value, updateDto, accessToken);
 
-                // Đồng bộ các booking con
-                var childBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
-                foreach (var child in childBookings)
+                if (isPaymentSuccess)
                 {
-                    var childUpdateDto = new BookingUpdateDto
+                    // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" START ***
+                    if (monthlyBooking.DiscountId.HasValue && monthlyBooking.DiscountId > 0)
                     {
-                        Status = updateDto.Status,
-                        // Thêm các trường còn thiếu từ logic gốc:
-                        UserId = child.UserId,
-                        StadiumId = child.StadiumId,
-                        Date = child.Date,
-                        TotalPrice = child.TotalPrice,
-                        OriginalPrice = child.OriginalPrice,
-                        Note = child.Note,
-                        DiscountId = child.DiscountId
-                    };
-                    await _bookingService.UpdateBookingAsync(child.Id, childUpdateDto, accessToken);
-                }
-                if (updateDto.Status == "accepted")
-                {
+                        try
+                        {
+                            var discountDetails = await _discountService.GetDiscountByIdAsync(monthlyBooking.DiscountId.Value);
+                            if (discountDetails != null && "Unique".Equals(discountDetails.CodeType, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var discountUpdateDto = new UpdateDiscountDTO
+                                {
+                                    Id = discountDetails.Id,
+                                    Code = discountDetails.Code,
+                                    Description = discountDetails.Description,
+                                    PercentValue = discountDetails.PercentValue,
+                                    MaxDiscountAmount = discountDetails.MaxDiscountAmount,
+                                    MinOrderAmount = discountDetails.MinOrderAmount,
+                                    StartDate = discountDetails.StartDate,
+                                    EndDate = discountDetails.EndDate,
+                                    CodeType = discountDetails.CodeType,
+                                    IsActive = false, // Vô hiệu hóa mã
+                                    TargetUserId = discountDetails.TargetUserId,
+                                    StadiumIds = discountDetails.StadiumIds
+                                };
+                                await _discountService.UpdateDiscountAsync(accessToken, discountUpdateDto);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[MonthlyPaymentCallback] Lỗi khi vô hiệu hóa mã Unique Discount ID {monthlyBooking.DiscountId}: {ex.Message}");
+                        }
+                    }
+
+                    var childBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
+                    foreach (var child in childBookings)
+                    {
+                        var childUpdateDto = new BookingUpdateDto
+                        {
+                            Status = "accepted", // Đã thanh toán thành công
+                            UserId = child.UserId,
+                            StadiumId = child.StadiumId,
+                            Date = child.Date,
+                            TotalPrice = child.TotalPrice,
+                            OriginalPrice = child.OriginalPrice,
+                            Note = child.Note,
+                            DiscountId = child.DiscountId
+                        };
+                        await _bookingService.UpdateBookingAsync(child.Id, childUpdateDto, accessToken);
+                    }
                     TempData["SuccessMessage"] = "Đặt sân hàng tháng và thanh toán thành công!";
                 }
                 else
@@ -214,6 +253,7 @@ namespace CustomerUI.Controllers
             finally
             {
                 HttpContext.Session.Remove("MonthlyBookingId");
+                // Không xóa AccessToken ở đây để các lệnh gọi API sau đó vẫn hoạt động
             }
 
             return RedirectToAction("BookingHistory", "Booking");

@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using DTOs.DiscountDTO;
 using DTOs.StadiumDTO;
 using StadiumManagerUI.Helpers;
-
+using DTOs.UserDTO;
+using System.Linq;
 
 namespace StadiumManagerUI.Controllers
 {
@@ -16,16 +17,18 @@ namespace StadiumManagerUI.Controllers
         private readonly IDiscountService _discountService;
         private readonly IStadiumService _stadiumService;
         private readonly ITokenService _tokenService;
+        private readonly IUserService _userService; // Add IUserService
 
         public DiscountController(
             IDiscountService discountService,
             IStadiumService stadiumService,
             ITokenService tokenService,
-            IUserService userService)
+            IUserService userService) // Inject IUserService
         {
             _discountService = discountService;
             _stadiumService = stadiumService;
             _tokenService = tokenService;
+            _userService = userService; // Assign injected service
         }
 
         // Action này CHỈ trả về View rỗng
@@ -45,15 +48,15 @@ namespace StadiumManagerUI.Controllers
             }
 
             var userId = HttpContext.Session.GetInt32("UserId");
-            Console.WriteLine($"------------------------------------------------{userId}");
             if (userId == null)
             {
                 return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
             }
 
+            // --- LOGIC UPDATE START ---
 
-            // Gọi service để lấy discount (OData)
-            var discountsResponseTask = _discountService.GetDiscountsByUserAsync(
+            // 1. Lấy danh sách discount trước
+            var discountsResponse = await _discountService.GetDiscountsByUserAsync(
                 accessToken,
                 userId,
                 page,
@@ -63,19 +66,28 @@ namespace StadiumManagerUI.Controllers
                 isActive
             );
 
-            // Lấy danh sách stadium của user
-            string filter = $"&$filter=CreatedBy eq {userId}";
-            var stadiumsJsonTask = _stadiumService.SearchStadiumAsync(filter);
-
-            await Task.WhenAll(discountsResponseTask, stadiumsJsonTask);
-
-            // Xử lý discount
-            var discountsResponse = discountsResponseTask.Result;
             var discounts = discountsResponse?.Value ?? new List<ReadDiscountDTO>();
             var totalCount = discountsResponse?.Count ?? 0;
 
+            // 2. Thu thập TargetUserIds từ danh sách discount
+            var targetUserIds = discounts
+                .Where(d => !string.IsNullOrEmpty(d.TargetUserId) && int.TryParse(d.TargetUserId, out _))
+                .Select(d => int.Parse(d.TargetUserId!))
+                .Distinct()
+                .ToList();
+
+            var targetUsers = new List<PublicUserProfileDTO>();
+            // 3. Gọi service để lấy thông tin user nếu có ID
+            if (targetUserIds.Any())
+            {
+                targetUsers = await _userService.GetUsersByIdsAsync(targetUserIds, accessToken);
+            }
+
+            // 4. Lấy danh sách stadium (có thể chạy song song với việc lấy user)
+            string filter = $"&$filter=CreatedBy eq {userId}";
+            var stadiumsJson = await _stadiumService.SearchStadiumAsync(filter);
+
             // Xử lý stadium
-            var stadiumsJson = stadiumsJsonTask.Result;
             var stadiums = new List<ReadStadiumDTO>();
             if (!string.IsNullOrEmpty(stadiumsJson))
             {
@@ -97,9 +109,39 @@ namespace StadiumManagerUI.Controllers
                 }
             }
 
-            // Trả về cho client: discounts, stadiums, count
-            return Json(new { discounts, stadiums, count = totalCount });
+            // 5. Trả về cho client: discounts, stadiums, targetUsers, và count
+            return Json(new { discounts, stadiums, targetUsers, count = totalCount });
+
+            // --- LOGIC UPDATE END ---
         }
+
+        // NEW ACTION to search for users
+        [HttpGet]
+        public async Task<IActionResult> SearchUsers(string searchTerm)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest(new { success = false, message = "Yêu cầu không hợp lệ." });
+            }
+
+            var phoneTask = _userService.SearchUsersByPhoneAsync(searchTerm, accessToken);
+            var emailTask = _userService.SearchUsersByEmailAsync(searchTerm, accessToken);
+
+            await Task.WhenAll(phoneTask, emailTask);
+
+            var usersByPhone = phoneTask.Result;
+            var usersByEmail = emailTask.Result;
+
+            // Combine and remove duplicates
+            var allUsers = usersByPhone.Concat(usersByEmail)
+                                       .GroupBy(u => u.UserId)
+                                       .Select(g => g.First())
+                                       .ToList();
+
+            return Json(new { success = true, users = allUsers });
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateDiscount([FromBody] CreateDiscountDTO dto)
