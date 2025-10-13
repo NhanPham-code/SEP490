@@ -30,8 +30,6 @@ namespace Service.Interfaces
 
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
 
-        Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
-
         Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
 
         Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest);
@@ -49,6 +47,8 @@ namespace Service.Interfaces
         Task<bool> UnbanUserAsync(int userId, string accessToken);
 
         Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
+
+        Task<bool> AddorUpdateFaceEmbeddings(FaceImagesDTO faceImagesDTO, string accessToken);
 
     }
 }

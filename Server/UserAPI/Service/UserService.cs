@@ -33,6 +33,47 @@ namespace UserAPI.Service
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public async Task<bool> AddorUpdateFaceEmbeddings(int userId, FaceImagesDTO faceImagesDTO)
+        {
+            // 1. Lấy user từ DB
+            var user = await  _userRepository.GetUserByIdAsync(userId);
+            if(user == null)
+            {
+                throw new InvalidOperationException("Không tìm thấy người dùng.");
+            }
+
+            // 2. Gọi AI Service để lấy embeddings
+            AiFaceRegisterResponseModel? aiResponse = null;
+            if (faceImagesDTO.FaceImages != null)
+            {
+                try
+                {
+                    aiResponse = await _aiService.RegisterFaceAsync(faceImagesDTO.FaceImages, user.Email);
+                    if (aiResponse == null || !aiResponse.Success || aiResponse.Embeddings == null || aiResponse.Embeddings.Count != 5)
+                    {
+                        throw new Exception("Không lấy được embeddings từ AI server.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "AIService đã ném ra một lỗi hệ thống trong quá trình thêm/cập nhật embeddings của userId {UserId}.", userId);
+                    throw new Exception("Hệ thống xác thực khuôn mặt đang gặp sự cố. Vui lòng thử lại sau.");
+                }
+            }
+
+            // 3. Chuyển embeddings sang JSON string để lưu vào DB
+            string? embeddingsJson = null;
+            if (aiResponse?.Embeddings != null)
+            {
+                embeddingsJson = System.Text.Json.JsonSerializer.Serialize(aiResponse.Embeddings);
+            }
+            user.FaceEmbeddingsJson = embeddingsJson;
+
+            // 4. Cập nhật vào DB
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            return updatedUser != null;
+        }
+
         public async Task<PrivateUserProfileDTO> UpdateUserProfileAsync(UpdateUserProfileDTO updateUserProfileDTO)
         {
             var user = await _userRepository.GetUserByIdAsync(updateUserProfileDTO.UserId);
@@ -345,10 +386,8 @@ namespace UserAPI.Service
 
             string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             string avatarFolder = Path.Combine(uploadFolder, "avatars", safeEmail);
-            string faceFolder = Path.Combine(uploadFolder, "faces", safeEmail);
 
             Directory.CreateDirectory(avatarFolder);
-            Directory.CreateDirectory(faceFolder);
 
             string? avatarUrl = null;
 
@@ -369,26 +408,7 @@ namespace UserAPI.Service
                 avatarUrl = "/uploads/avatars/default-avatar.png";
             }
 
-            // 4.2 Lưu 5 ảnh khuôn mặt
-            if (registerDto.FaceImages != null)
-            {
-                int idx = 1;
-                foreach (var file in registerDto.FaceImages)
-                {
-                    if (file != null && file.Length > 0)
-                    {
-                        string faceFileName = $"face_{idx}.jpg";
-                        string facePath = Path.Combine(faceFolder, faceFileName);
-                        using (var stream = new FileStream(facePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
-                        idx++;
-                    }
-                }
-            }
-
-            // 4.3 Chuyển embeddings sang JSON string để lưu vào DB
+            // 4.2 Chuyển embeddings sang JSON string để lưu vào DB
             string? embeddingsJson = null;
             if (aiResponse?.Embeddings != null)
             {
@@ -766,7 +786,11 @@ namespace UserAPI.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AIService đã ném ra một lỗi hệ thống trong quá trình đăng nhập khuôn mặt.");
-                throw new Exception("Hệ thống xác thực khuôn mặt đang gặp sự cố. Vui lòng thử lại sau.");
+                return new LoginResponseDTO
+                {
+                    IsValid = false,
+                    Message = "Hệ thống xác thực khuôn mặt đang gặp sự cố. Vui lòng thử lại sau."
+                };
             }
            
             // 4. Tìm user theo email trả về từ AI

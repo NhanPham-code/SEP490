@@ -205,32 +205,6 @@ namespace Service.Services
             }
         }
 
-        public async Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken)
-        {
-            AddBearerAccessToken(accessToken);
-
-            using var formData = new MultipartFormDataContent();
-            formData.Add(new StringContent(updateFaceImageDTO.UserId.ToString()), "UserId");
-
-            if (updateFaceImageDTO.FaceImage != null)
-            {
-                var stream = updateFaceImageDTO.FaceImage.OpenReadStream();
-                var fileContent = new StreamContent(stream);
-                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(updateFaceImageDTO.FaceImage.ContentType ?? "image/jpeg");
-                formData.Add(fileContent, "FaceImage", updateFaceImageDTO.FaceImage.FileName);
-            }
-
-            var response = await _httpClient.PutAsync("/users/update-face-image", formData);
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<PrivateUserProfileDTO>();
-            }
-            else
-            {
-                throw new HttpRequestException($"Error updating face image: {response.ReasonPhrase}");
-            }
-        }
-
         public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
             if(string.IsNullOrEmpty(resetPasswordDTO.Email) || string.IsNullOrEmpty(resetPasswordDTO.NewPassword) || resetPasswordDTO.NewPassword.Length < 6)
@@ -463,6 +437,30 @@ namespace Service.Services
 
             var response = await _httpClient.PostAsync("/users/face-login", form);
             return await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+        }
+
+        public async Task<bool> AddorUpdateFaceEmbeddings(FaceImagesDTO faceImagesDTO, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            using var form = new MultipartFormDataContent();
+
+            if (faceImagesDTO.FaceImages != null && faceImagesDTO.FaceImages.Any())
+            {
+                foreach (var faceImage in faceImagesDTO.FaceImages)
+                {
+                    if (faceImage != null && faceImage.Length > 0)
+                    {
+                        var faceContent = new StreamContent(faceImage.OpenReadStream());
+                        faceContent.Headers.ContentType = new MediaTypeHeaderValue(faceImage.ContentType);
+                        // Tên field là FaceImages (trùng tên property trong DTO)
+                        form.Add(faceContent, "FaceImages", faceImage.FileName);
+                    }
+                }
+            }
+
+            var response = await _httpClient.PutAsync("/users/face-embeddings", form);
+            return response.IsSuccessStatusCode;
         }
     }
 }
