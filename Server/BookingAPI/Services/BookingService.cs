@@ -262,7 +262,7 @@ namespace BookingAPI.Services
             }
         }
 
-        public async Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day)
+        public async Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day, IEnumerable<int>? stadiumIds = null)
         {
             var nowYear = DateTime.UtcNow.Year;
 
@@ -280,7 +280,7 @@ namespace BookingAPI.Services
             }
 
             // Lấy booking của các năm này (bạn cần sửa repository cho phép truyền IEnumerable<int>)
-            var bookingsForChart = await _bookingRepository.GetBookingsForStatisticsAsync(yearsToFetch);
+            var bookingsForChart = await _bookingRepository.GetBookingsForStatisticsAsync(yearsToFetch, stadiumIds);
 
             // Lọc booking cho phần thống kê (chỉ năm đang xem)
             var bookingsForStats = bookingsForChart.Where(b => b.Date.Year == year).ToList();
@@ -295,11 +295,12 @@ namespace BookingAPI.Services
 
             var totalBookingsCount = bookingsForStats.Count;
             var completedBookings = bookingsForStats.Where(b => b.Status == "completed").ToList();
-            var pendingBookingsCount = bookingsForStats.Count(b => b.Status == "pending");
+            var pendingBookingsCount = bookingsForStats.Count(b => b.Status == "waiting");
             var acceptedBookingsCount = bookingsForStats.Count(b => b.Status == "accepted");
             var cancelledBookingsCount = bookingsForStats.Count(b => b.Status == "cancelled");
 
             var totalRevenue = completedBookings.Sum(b => b.TotalPrice ?? 0);
+            var totalOriginalRevenue = completedBookings.Sum(b => b.OriginalPrice ?? 0); 
             var totalCompletedBookings = completedBookings.Count;
 
             // Dữ liệu cho biểu đồ: mỗi năm là 1 dictionary 12 tháng
@@ -321,6 +322,7 @@ namespace BookingAPI.Services
             var statisticsDto = new RevenueStatisticDto
             {
                 TotalRevenue = totalRevenue,
+                TotalOriginalRevenue = totalOriginalRevenue, 
                 TotalCompletedBookings = totalCompletedBookings,
                 CompletedBookingsPercentage = totalBookingsCount > 0 ? (double)totalCompletedBookings / totalBookingsCount * 100 : 0,
                 PendingBookingsCount = pendingBookingsCount,
