@@ -5,25 +5,32 @@ using System.Text.Json;
 using DTOs.Helpers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
-using DTOs.DiscountDTO; // Thêm using cho Discount DTOs
-using System.Linq; // Thêm using cho LINQ
+using DTOs.DiscountDTO;
+using System.Linq;
+using DTOs.NotificationDTO; // Thêm using cho Notification DTO
 
 namespace CustomerUI.Controllers
 {
     public class PaymentController : Controller
     {
         private readonly IBookingService _bookingService;
-        private readonly IDiscountService _discountService; // *** THÊM IDiscountService
+        private readonly IDiscountService _discountService;
         private readonly IConfiguration _configuration;
+        private readonly IStadiumService _stadiumService;
+        private readonly INotificationService _notificationService;
 
         public PaymentController(
             IBookingService bookingService,
-            IDiscountService discountService, // *** INJECT IDiscountService
-            IConfiguration configuration)
+            IDiscountService discountService,
+            IConfiguration configuration,
+            IStadiumService stadiumService,
+            INotificationService notificationService)
         {
             _bookingService = bookingService;
-            _discountService = discountService; // *** GÁN SERVICE
+            _discountService = discountService;
             _configuration = configuration;
+            _stadiumService = stadiumService;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -65,7 +72,7 @@ namespace CustomerUI.Controllers
             {
                 finalStatus = "accepted";
 
-                // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" START ***
+                // Logic vô hiệu hóa discount... (giữ nguyên)
                 if (booking.DiscountId.HasValue && booking.DiscountId > 0)
                 {
                     try
@@ -73,7 +80,6 @@ namespace CustomerUI.Controllers
                         var discountDetails = await _discountService.GetDiscountByIdAsync(booking.DiscountId.Value);
                         if (discountDetails != null && "Unique".Equals(discountDetails.CodeType, StringComparison.OrdinalIgnoreCase))
                         {
-                            // Tạo DTO để cập nhật
                             var discountUpdateDto = new UpdateDiscountDTO
                             {
                                 Id = discountDetails.Id,
@@ -85,7 +91,7 @@ namespace CustomerUI.Controllers
                                 StartDate = discountDetails.StartDate,
                                 EndDate = discountDetails.EndDate,
                                 CodeType = discountDetails.CodeType,
-                                IsActive = false, // Vô hiệu hóa mã
+                                IsActive = false,
                                 TargetUserId = discountDetails.TargetUserId,
                                 StadiumIds = discountDetails.StadiumIds
                             };
@@ -94,11 +100,9 @@ namespace CustomerUI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        // Ghi log lỗi nhưng không làm gián đoạn luồng chính
                         Console.WriteLine($"[PaymentCallback] Lỗi khi vô hiệu hóa mã Unique Discount ID {booking.DiscountId}: {ex.Message}");
                     }
                 }
-                // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" END ***
             }
             else
             {
@@ -125,6 +129,9 @@ namespace CustomerUI.Controllers
                 {
                     TempData["BookingSuccess"] = true;
                     TempData["SuccessMessage"] = "Đặt sân và thanh toán thành công!";
+
+                    // Gửi thông báo cho chủ sân (BOOKING NGÀY)
+                    await SendNewBookingNotificationAsync("daily", bookingId.Value, booking.StadiumId);
                 }
                 else
                 {
@@ -191,7 +198,7 @@ namespace CustomerUI.Controllers
 
                 if (isPaymentSuccess)
                 {
-                    // *** LOGIC VÔ HIỆU HÓA DISCOUNT "UNIQUE" START ***
+                    // Logic vô hiệu hóa discount... (giữ nguyên)
                     if (monthlyBooking.DiscountId.HasValue && monthlyBooking.DiscountId > 0)
                     {
                         try
@@ -210,7 +217,7 @@ namespace CustomerUI.Controllers
                                     StartDate = discountDetails.StartDate,
                                     EndDate = discountDetails.EndDate,
                                     CodeType = discountDetails.CodeType,
-                                    IsActive = false, // Vô hiệu hóa mã
+                                    IsActive = false,
                                     TargetUserId = discountDetails.TargetUserId,
                                     StadiumIds = discountDetails.StadiumIds
                                 };
@@ -223,12 +230,13 @@ namespace CustomerUI.Controllers
                         }
                     }
 
+                    // Cập nhật trạng thái cho tất cả booking con
                     var childBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
                     foreach (var child in childBookings)
                     {
                         var childUpdateDto = new BookingUpdateDto
                         {
-                            Status = "accepted", // Đã thanh toán thành công
+                            Status = "accepted",
                             UserId = child.UserId,
                             StadiumId = child.StadiumId,
                             Date = child.Date,
@@ -240,6 +248,10 @@ namespace CustomerUI.Controllers
                         await _bookingService.UpdateBookingAsync(child.Id, childUpdateDto, accessToken);
                     }
                     TempData["SuccessMessage"] = "Đặt sân hàng tháng và thanh toán thành công!";
+
+                    // *** THAY ĐỔI: GỬI MỘT THÔNG BÁO DUY NHẤT CHO GÓI THÁNG ***
+                    // Lời gọi hàm được đưa ra ngoài vòng lặp và sử dụng ID của gói tháng.
+                    await SendNewBookingNotificationAsync("monthly", monthlyBookingId.Value, monthlyBooking.StadiumId);
                 }
                 else
                 {
@@ -253,10 +265,65 @@ namespace CustomerUI.Controllers
             finally
             {
                 HttpContext.Session.Remove("MonthlyBookingId");
-                // Không xóa AccessToken ở đây để các lệnh gọi API sau đó vẫn hoạt động
             }
 
             return RedirectToAction("BookingHistory", "Booking");
+        }
+
+        /// <summary>
+        /// Tạo và gửi thông báo có lịch đặt sân mới cho chủ sân.
+        /// </summary>
+        /// <param name="bookingType">Loại booking: "daily" hoặc "monthly".</param>
+        /// <param name="bookingId">ID của booking (booking con nếu là daily, booking cha nếu là monthly).</param>
+        /// <param name="stadiumId">ID của sân vận động được đặt.</param>
+        private async Task SendNewBookingNotificationAsync(string bookingType, int bookingId, int stadiumId)
+        {
+            try
+            {
+                var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+
+                if (stadium != null && stadium.CreatedBy > 0)
+                {
+                    int ownerId = stadium.CreatedBy;
+
+                    // *** THAY ĐỔI: Tùy chỉnh nội dung và loại thông báo dựa trên bookingType ***
+                    string notifType;
+                    string notifTitle;
+                    string notifMessage;
+                    object notifParams;
+
+                    if (bookingType == "monthly")
+                    {
+                        notifType = "MonthlyBooking.New";
+                        notifTitle = "Gói đặt sân tháng mới";
+                        notifMessage = $"Sân '{stadium.Name}' của bạn vừa có một gói đặt sân theo tháng được thanh toán thành công.";
+                        notifParams = new { bookingType, monthlyBookingId = bookingId }; // Tham số trỏ đến ID của gói tháng
+                    }
+                    else // Mặc định là "daily"
+                    {
+                        notifType = "Booking.New";
+                        notifTitle = "Lịch đặt sân mới";
+                        notifMessage = $"Sân '{stadium.Name}' của bạn vừa có một lịch đặt mới đã thanh toán thành công.";
+                        notifParams = new { bookingType, bookingId };
+                    }
+
+                    var notificationDto = new NotificationDTO
+                    {
+                        UserId = ownerId,
+                        Type = notifType,
+                        Title = notifTitle,
+                        Message = notifMessage,
+                        Parameters = JsonSerializer.Serialize(notifParams),
+                        CreatedAt = DateTime.UtcNow,
+                    };
+
+                    await _notificationService.SendNotificationToUserAsync(notificationDto);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NotificationError] Lỗi khi gửi thông báo cho {bookingType} booking ID {bookingId}: {ex.Message}");
+            }
         }
     }
 }

@@ -1,0 +1,197 @@
+﻿/* Reset và thiết lập font chữ cơ bản */
+.notification-page * {
+    box-sizing: border-box;
+}
+
+/* Container chính của trang */
+.notification-container {
+    max-width: 800px; /* Giới hạn chiều rộng */
+    margin: 0 auto; /* Căn giữa */
+    padding: 32px 16px;
+}
+
+/* Tiêu đề trang "Thông Báo" */
+.notification-title {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #1e293b; /* slate-800 */
+    display: flex;
+    align-items: center;
+}
+
+    .notification-title i {
+        color: #3b82f6; /* blue-500 */
+        margin-right: 8px;
+    }
+
+/* Khung chứa danh sách thông báo */
+#notification-list {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border: 1px solid #f1f5f9; /* slate-100 */
+}
+
+    /* CSS cho từng mục thông báo (thẻ <a>) */
+    #notification-list a {
+        display: block;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out;
+        border-bottom: 1px solid #f1f5f9; /* slate-100 */
+    }
+
+        #notification-list a:last-child {
+            border-bottom: none;
+        }
+
+        #notification-list a:hover {
+            background-color: #f8fafc; /* slate-50 */
+        }
+
+        #notification-list a.unread {
+            background-color: #eff6ff; /* blue-50 */
+        }
+
+/* Layout bên trong mỗi thông báo */
+.notification-item-content {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 24px;
+}
+
+/* Vòng tròn chứa icon */
+.notification-icon-wrapper {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px; /* rounded-full */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    margin-top: 4px;
+}
+
+    .notification-icon-wrapper i {
+        font-size: 24px;
+    }
+
+/* Phần nội dung text (tiêu đề, tin nhắn, thời gian) */
+.notification-text-content {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.notification-text-header {
+    display: flex;
+    align-items: center;
+}
+
+.notification-text-title {
+    font-weight: 600;
+    color: #0f172a; /* slate-900 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-unread-dot {
+    display: inline-block;
+    margin-left: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6; /* blue-500 */
+    border-radius: 9999px;
+}
+
+.notification-text-message {
+    color: #334155; /* slate-700 */
+    margin-top: 4px;
+}
+
+.notification-text-time {
+    font-size: 0.75rem; /* 12px */
+    color: #94a3b8; /* slate-400 */
+    margin-top: 8px;
+}
+
+/* Nút "Load More" */
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+#loadMoreBtn {
+    padding: 8px 24px;
+    border-radius: 12px;
+    background-image: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    transition: transform 0.2s;
+}
+
+    #loadMoreBtn:hover {
+        transform: scale(1.05);
+    }
+
+/* Các lớp màu nền và màu chữ cho icon */
+.bg-teal-100 {
+    background-color: #ccfbf1;
+}
+
+.text-teal-600 {
+    color: #0d9488;
+}
+
+.bg-orange-100 {
+    background-color: #ffedd5;
+}
+
+.text-orange-600 {
+    color: #ea580c;
+}
+
+.bg-blue-100 {
+    background-color: #dbeafe;
+}
+
+.text-blue-600 {
+    color: #2563eb;
+}
+
+.bg-red-100 {
+    background-color: #fee2e2;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.bg-yellow-100 {
+    background-color: #fef9c3;
+}
+
+.text-yellow-600 {
+    color: #ca8a04;
+}
+
+.bg-purple-100 {
+    background-color: #f3e8ff;
+}
+
+.text-purple-600 {
+    color: #9333ea;
+}
+
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}

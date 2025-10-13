@@ -666,5 +666,31 @@ namespace CustomerUI.Controllers
 
             return Json(new { success = true, message = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập với mật khẩu mới." });
         }
+
+        //public IActionResult GetSignalRToken()
+        //{
+        //    // Kiểm tra xem người dùng đã đăng nhập vào ứng dụng MVC này hay chưa
+        //    // bằng cách kiểm tra một giá trị nào đó trong Session.
+        //    // Nếu chưa đăng nhập, session sẽ không có UserId.
+        //    if (HttpContext.Session.GetInt32("UserId") == null)
+        //    {
+        //        // Trả về lỗi 401 Unauthorized để JavaScript biết và dừng lại
+        //        return Unauthorized();
+        //    }
+
+        //    // Sử dụng ITokenService đã có sẵn để đọc giá trị từ cookie.
+        //    // Đây là cách làm nhất quán và đúng đắn.
+        //    var token = _tokenService.GetAccessTokenFromCookie();
+
+        //    // Nếu vì lý do nào đó không có token (dù đã đăng nhập)
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        return NotFound(new { message = "Access Token cookie not found." });
+        //    }
+
+        //    // Trả về token dưới dạng JSON
+        //    return Ok(new { token = token });
+        //}
     }
+
 }
