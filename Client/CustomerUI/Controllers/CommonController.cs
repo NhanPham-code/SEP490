@@ -67,6 +67,41 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
 
+        // thêm hoặc cập nhật khuôn mặt
+        [HttpPost]
+        public async Task<IActionResult> AddOrUpdateFaceEmbeddings([FromForm] FaceImagesDTO faceImagesDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            // 3. Call the service to add or update face embeddings
+            try
+            {
+                var result = await _userService.AddorUpdateFaceEmbeddings(faceImagesDTO, accessToken);
+
+                if (!result)
+                {
+                    return BadRequest(new { message = "Thêm và cập nhật khuôn mặt thất bại. " });
+                }
+
+                return Ok(new { message = "Thêm và cập nhật khuôn mặt thành công." });
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Thêm và cập nhật khuôn mặt thất bại: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
         // Xử lý đăng nhập bằng AI Face
         [HttpPost]
         public async Task<IActionResult> AiFaceAuth([FromForm] AiFaceLoginRequestDTO request)
