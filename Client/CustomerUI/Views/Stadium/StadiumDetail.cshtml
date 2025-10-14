@@ -805,15 +805,6 @@
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center">
-    <!-- Hiển thị lỗi từ TempData -->
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                showNotification('@Html.Raw(TempData["ErrorMessage"])', 'error');
-            });
-        </script>
-    }
 
     <!-- Feedback Modal -->
     <div id="custom-modal" class="modal fixed inset-0 z-50 flex items-center justify-center">

@@ -120,5 +120,16 @@ namespace FavoriteAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("stadium/{stadiumId}")]
+        public async Task<IActionResult> GetFavoritesByStadiumId(int stadiumId)
+        {
+            var favorites = await _favoriteService.GetFavoritesByStadiumIdAsync(stadiumId);
+            if (favorites == null || !favorites.Any())
+            {
+                return NotFound(new { message = "No favorites found for this stadium." });
+            }
+            return Ok(favorites);
+        }
     }
 }

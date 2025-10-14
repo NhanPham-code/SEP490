@@ -2,28 +2,27 @@
 
 #nullable disable
 
-namespace BookingAPI.Migrations
+namespace DiscountAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreatedByIdToBooking : Migration
+    public partial class AddTargetUserId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "CreatedById",
-                table: "Bookings",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+            migrationBuilder.AddColumn<string>(
+                name: "TargetUserId",
+                table: "Discounts",
+                type: "nvarchar(max)",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "CreatedById",
-                table: "Bookings");
+                name: "TargetUserId",
+                table: "Discounts");
         }
     }
 }

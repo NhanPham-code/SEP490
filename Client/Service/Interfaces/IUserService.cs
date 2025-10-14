@@ -30,8 +30,6 @@ namespace Service.Interfaces
 
         Task<PrivateUserProfileDTO> UpdateAvatarAsync(UpdateAvatarDTO updateAvatarDTO, string accessToken);
 
-        Task<PrivateUserProfileDTO> UpdateFaceImageAsync(UpdateFaceImageDTO updateFaceImageDTO, string accessToken);
-
         Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
 
         Task<LoginResponseDTO> LoginWithGoogleAsync(GoogleApiLoginRequestDTO googleRequest);
@@ -39,7 +37,7 @@ namespace Service.Interfaces
         Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken);
 
         Task<List<PublicUserProfileDTO>> SearchUsersByPhoneAsync(string phoneNumber, string accessToken);
-
+        Task<List<PublicUserProfileDTO>> SearchUsersByEmailAsync(string email, string accessToken);
         Task<OdataHaveCountResponse<AdminUserProfileDTO>> GetUsersForAdmin(string accessToken, UserSearchRequestDTO request);
 
         Task<AdminUserStatsDTO> GetUserStats(string accessToken); 
@@ -49,6 +47,8 @@ namespace Service.Interfaces
         Task<bool> UnbanUserAsync(int userId, string accessToken);
 
         Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
+
+        Task<bool> AddorUpdateFaceEmbeddings(FaceImagesDTO faceImagesDTO, string accessToken);
 
     }
 }

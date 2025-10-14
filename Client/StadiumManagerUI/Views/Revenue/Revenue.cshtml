@@ -1,0 +1,482 @@
+@using System.Text.Json;
+@using DTOs.StadiumDTO
+
+@{
+    ViewData["Title"] = "Quản Lý Doanh Thu";
+    var stadiums = ViewBag.Stadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="~/css/Revenue/Revenue.css">
+    <style>
+        .filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .filter-grid .form-group {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .stat-card-revenue {
+            height: auto;
+            padding-bottom: 20px;
+        }
+
+        .stat-sub-value {
+            font-size: 1.1em;
+            color: #64748b;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card stat-card-revenue">
+                <div class="stat-value" id="totalRevenue">@Model.TotalRevenue.ToString("N0")</div>
+                <div class="stat-label">Tổng doanh thu (VNĐ)</div>
+
+                @{
+                    decimal systemRevenue = Math.Round(Model.TotalOriginalRevenue * 0.02M); 
+                }
+                
+                <div class="stat-sub-value" id="systemRevenue">
+                    Phí hệ thống: @systemRevenue.ToString("N0") VNĐ
+                </div>
+                <div id="systemRevenueNote" class="stat-sub-value">2% doanh thu ban đầu</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCompletedBookings">@Model.TotalCompletedBookings</div>
+                <div class="stat-label">Booking hoàn thành</div>
+                <div class="stat-change positive" id="completedPercentage">
+                    @Model.CompletedBookingsPercentage.ToString("F1")%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="waitingCount">@(Model.PendingBookingsCount + Model.AcceptedBookingsCount)
+                </div>
+                <div class="stat-label">Booking đang chờ</div>
+                <div class="stat-change" id="waitingPercentage">@Model.WaitingBookingsPercentage.ToString("F1")%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="cancelledCount">@Model.CancelledBookingsCount</div>
+                <div class="stat-label">Booking đã hủy</div>
+                <div class="stat-change negative" id="cancelledPercentage">
+                    @Model.CancelledBookingsPercentage.ToString("F1")%</div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="stadiumFilter">Sân vận động:</label>
+                    <select id="stadiumFilter" class="form-control">
+                        <option value="">Tất cả sân</option>
+                        @if (stadiums != null)
+                        {
+                            foreach (var stadium in stadiums)
+                            {
+                                <option value="@stadium.Id">@stadium.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lọc theo</label>
+                    <select class="form-control" id="filterType" onchange="toggleFilterInputs()">
+                        <option value="day" selected>Ngày</option>
+                        <option value="month">Tháng</option>
+                        <option value="year">Năm</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="dayFilter">
+                    <label>Chọn ngày</label>
+                    <input type="date" class="form-control" id="dateInput">
+                </div>
+
+                <div class="form-group" id="monthFilter" style="display: none;">
+                    <label>Chọn tháng</label>
+                    <select class="form-control" id="monthInput">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i">Tháng @i</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group" id="commonYearFilter" style="display: none;">
+                    <label>Năm</label>
+                    <input type="number" class="form-control" id="yearForMonthInput" placeholder="VD: 2025">
+                </div>
+
+                <div class="form-group" id="yearFilter" style="display: none;">
+                    <label>Chọn năm</label>
+                    <input type="number" class="form-control" id="yearInput" placeholder="VD: 2025">
+                </div>
+
+                <div class="form-group filter-button-group">
+                    <button class="btn btn-primary" onclick="filterData(false)">
+                        <i class="fas fa-filter"></i>
+                        Xác nhận
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card status-card">
+                <h3 class="chart-title">Trạng thái booking</h3>
+                <div class="status-list">
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-dot pending"></div><span class="status-name">Đang chờ</span>
+                        </div>
+                        <div class="status-stats">
+                            <div class="status-count" id="pendingCount">@Model.PendingBookingsCount</div>
+                        </div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-dot accepted"></div><span class="status-name">Đã chấp nhận</span>
+                        </div>
+                        <div class="status-stats">
+                            <div class="status-count" id="acceptedCount">@Model.AcceptedBookingsCount</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-dot completed"></div><span class="status-name">Hoàn thành</span>
+                        </div>
+                        <div class="status-stats">
+                            <div class="status-count" id="completedCount">@Model.TotalCompletedBookings</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-dot denied"></div><span class="status-name">Đã hủy</span>
+                        </div>
+                        <div class="status-stats">
+                            <div class="status-count" id="cancelledStatusCount">@Model.CancelledBookingsCount</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 200px; margin-top: 30px;">
+                    <canvas id="statusPieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card trend-card">
+                <h3 class="chart-title" id="trendChartTitle">Xu hướng doanh thu 12 tháng</h3>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        @{
+            DTOs.BookingDTO.RevenueStatisticViewModel? typedModel = Model as DTOs.BookingDTO.RevenueStatisticViewModel ?? new DTOs.BookingDTO.RevenueStatisticViewModel();
+        }
+
+        let statusPieChart, trendChart;
+
+        const formatCurrency = (value) => new Intl.NumberFormat('vi-VN').format(value);
+
+        function updateDashboard(data, year, filterType) {
+            document.getElementById('totalRevenue').textContent = formatCurrency(data.totalRevenue);
+            const systemRevenue = Math.round(data.totalOriginalRevenue * 0.02);
+            document.getElementById('systemRevenue').innerHTML = 'Phí trả: ' + formatCurrency(systemRevenue) + ' VNĐ';
+            document.getElementById('systemRevenueNote').textContent = '2% doanh thu ban đầu';
+            document.getElementById('totalCompletedBookings').textContent = data.totalCompletedBookings;
+            document.getElementById('completedPercentage').textContent = data.completedBookingsPercentage.toFixed(1) + '%';
+            document.getElementById('waitingCount').textContent = data.pendingBookingsCount + data.acceptedBookingsCount;
+            document.getElementById('waitingPercentage').textContent = data.waitingBookingsPercentage.toFixed(1) + '%';
+            document.getElementById('cancelledCount').textContent = data.cancelledBookingsCount;
+            document.getElementById('cancelledPercentage').textContent = data.cancelledBookingsPercentage.toFixed(1) + '%';
+            document.getElementById('pendingCount').textContent = data.pendingBookingsCount;
+            document.getElementById('acceptedCount').textContent = data.acceptedBookingsCount;
+            document.getElementById('completedCount').textContent = data.totalCompletedBookings;
+            document.getElementById('cancelledStatusCount').textContent = data.cancelledBookingsCount;
+
+            const statusData = [
+                data.pendingBookingsCount,
+                data.acceptedBookingsCount,
+                data.totalCompletedBookings,
+                data.cancelledBookingsCount
+            ];
+            updateChartData(statusPieChart, null, statusData);
+
+            let trendLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
+            let datasets = [];
+            if (filterType === 'year' && data.monthlyRevenueChartData) {
+                const years = Object.keys(data.monthlyRevenueChartData).sort((a, b) => b - a);
+                const colors = ['#4f46e5', '#a78bfa', '#059669', '#eab308'];
+
+                years.forEach((yearKey, idx) => {
+                    const yearData = [];
+                    for (let i = 1; i <= 12; i++)
+                        yearData.push(data.monthlyRevenueChartData[yearKey][i] || 0);
+
+                    datasets.push({
+                        label: yearKey,
+                        data: yearData,
+                        borderColor: colors[idx % colors.length],
+                        backgroundColor: colors[idx % colors.length] + "33",
+                        borderWidth: (yearKey == year) ? 3 : 2,
+                        borderDash: (yearKey == year) ? [] : [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    });
+                });
+                document.getElementById("trendChartTitle").textContent = `So sánh doanh thu`;
+            } else {
+                let chartYear = year;
+                let arr = [];
+                if (data.monthlyRevenueChartData && data.monthlyRevenueChartData[chartYear]) {
+                    for (let i = 1; i <= 12; i++)
+                        arr.push(data.monthlyRevenueChartData[chartYear][i] || 0);
+                } else {
+                    arr = Array(12).fill(0);
+                }
+                datasets.push({
+                    label: chartYear,
+                    data: arr,
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                });
+                document.getElementById("trendChartTitle").textContent = `So sánh doanh thu`;
+            }
+            updateTrendChart(trendLabels, datasets);
+        }
+
+        function filterData(isRefresh) {
+            const filterType = document.getElementById('filterType').value;
+            let year, month, day;
+            const today = new Date();
+
+            const stadiumSelect = document.getElementById('stadiumFilter');
+            let selectedStadiumIds = [];
+
+            if (stadiumSelect.options[0].selected) {
+                // Nếu chọn "Tất cả các sân" thì lấy toàn bộ IDs các sân (trừ "all")
+                selectedStadiumIds = Array.from(stadiumSelect.options)
+                    .filter(opt => opt.value !== "all")
+                    .map(opt => opt.value);
+            } else {
+                selectedStadiumIds = Array.from(stadiumSelect.selectedOptions)
+                    .map(opt => opt.value);
+            }
+            let stadiumIdsParams = selectedStadiumIds.map(id => `stadiumIds=${id}`).join('&');
+
+            if (isRefresh) {
+                year = today.getFullYear();
+                month = today.getMonth() + 1;
+                day = today.getDate();
+                document.getElementById('filterType').value = 'day';
+                document.getElementById('dateInput').value = today.toISOString().split('T')[0];
+                toggleFilterInputs();
+            } else {
+                if (filterType === 'day') {
+                    const dateVal = document.getElementById('dateInput').value;
+                    if (!dateVal) { alert('Vui lòng chọn ngày.'); return; }
+                    const date = new Date(dateVal);
+                    year = date.getFullYear();
+                    month = date.getMonth() + 1;
+                    day = date.getDate();
+                } else if (filterType === 'month') {
+                    year = document.getElementById('yearForMonthInput').value;
+                    month = document.getElementById('monthInput').value;
+                    if (!year) { alert('Vui lòng nhập năm.'); return; }
+                } else {
+                    year = document.getElementById('yearInput').value;
+                    if (!year) { alert('Vui lòng nhập năm.'); return; }
+                }
+            }
+
+            let url = `/Revenue/GetStatistics?year=${year}${month ? '&month=' + month : ''}${day ? '&day=' + day : ''}`;
+            if (stadiumIdsParams) {
+                url += `&${stadiumIdsParams}`;
+            }
+
+            const confirmBtn = document.querySelector('.filter-button-group .btn-primary');
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
+            confirmBtn.disabled = true;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success === false) {
+                        alert(data.message || 'Có lỗi xảy ra.');
+                    } else {
+                        updateDashboard(data, year, filterType);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching statistics:', error);
+                    alert('Không thể kết nối đến máy chủ.');
+                })
+                .finally(() => {
+                    confirmBtn.innerHTML = '<i class="fas fa-filter"></i> Xác nhận';
+                    confirmBtn.disabled = false;
+                });
+        }
+
+        function toggleFilterInputs() {
+            const filterType = document.getElementById('filterType').value;
+            document.getElementById('dayFilter').style.display = filterType === 'day' ? 'flex' : 'none';
+            document.getElementById('monthFilter').style.display = filterType === 'month' ? 'flex' : 'none';
+            document.getElementById('commonYearFilter').style.display = filterType === 'month' ? 'flex' : 'none';
+            document.getElementById('yearFilter').style.display = filterType === 'year' ? 'flex' : 'none';
+        }
+
+        function updateChartData(chart, labels, data) {
+            if (labels) chart.data.labels = labels;
+            if (chart.data.datasets.length > 0) chart.data.datasets[0].data = data;
+            chart.update();
+        }
+
+        function updateTrendChart(labels, datasets) {
+            trendChart.data.labels = labels;
+            trendChart.data.datasets = datasets;
+            trendChart.update();
+        }
+
+        // Hiển thị placeholder "Tất cả các sân" nếu tất cả được chọn
+        function updateStadiumFilterTitle() {
+            const select = document.getElementById('stadiumFilter');
+            if (select.options[0].selected) {
+                select.title = "Tất cả các sân";
+            } else {
+                const selected = Array.from(select.selectedOptions)
+                    .map(opt => opt.text);
+                if (selected.length === 0) {
+                    select.title = "Chọn sân vận động";
+                } else {
+                    select.title = selected.join(', ');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const today = new Date();
+            document.getElementById('dateInput').value = today.toISOString().split('T')[0];
+            document.getElementById('yearInput').value = today.getFullYear();
+            document.getElementById('yearForMonthInput').value = today.getFullYear();
+            document.getElementById('monthInput').value = today.getMonth() + 1;
+
+            // Mặc định chỉ chọn "Tất cả các sân"
+            const stadiumSelect = document.getElementById('stadiumFilter');
+            for (let i = 0; i < stadiumSelect.options.length; ++i) {
+                stadiumSelect.options[i].selected = (i === 0);
+            }
+            updateStadiumFilterTitle();
+
+            // Xử lý chọn mutually exclusive
+            stadiumSelect.addEventListener('change', function () {
+                if (stadiumSelect.options[0].selected) {
+                    // Nếu chọn "Tất cả các sân", bỏ chọn các sân còn lại
+                    for (let i = 1; i < stadiumSelect.options.length; ++i) {
+                        stadiumSelect.options[i].selected = false;
+                    }
+                } else {
+                    // Nếu chọn sân cụ thể, bỏ chọn "Tất cả các sân"
+                    stadiumSelect.options[0].selected = false;
+                }
+                updateStadiumFilterTitle();
+            });
+
+            const initialStatusData = [
+                @typedModel.PendingBookingsCount,
+                @typedModel.AcceptedBookingsCount,
+                @typedModel.TotalCompletedBookings,
+                @typedModel.CancelledBookingsCount
+            ];
+            statusPieChart = createStatusPieChart(initialStatusData);
+
+            const initialChartData = @Html.Raw(Json.Serialize(typedModel.MonthlyRevenueChartData));
+            const initialYear = new Date().getFullYear();
+            let trendLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
+            let datasets = [];
+            if (initialChartData && Object.keys(initialChartData).length > 0) {
+                const years = Object.keys(initialChartData).sort((a, b) => b - a);
+                const colors = ['#4f46e5', '#a78bfa', '#059669', '#eab308'];
+                years.forEach((yearKey, idx) => {
+                    const yearData = [];
+                    for (let i = 1; i <= 12; i++)
+                        yearData.push(initialChartData[yearKey][i] || 0);
+
+                    datasets.push({
+                        label: yearKey,
+                        data: yearData,
+                        borderColor: colors[idx % colors.length],
+                        backgroundColor: colors[idx % colors.length] + "33",
+                        borderWidth: (yearKey == initialYear) ? 3 : 2,
+                        borderDash: (yearKey == initialYear) ? [] : [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    });
+                });
+            }
+            trendChart = createTrendChart(trendLabels, datasets);
+            document.getElementById("trendChartTitle").textContent = `So sánh doanh thu`;
+        });
+
+        function createStatusPieChart(initialData) {
+            const ctx = document.getElementById('statusPieChart').getContext('2d');
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Đang chờ', 'Đã chấp nhận', 'Hoàn thành', 'Đã hủy'],
+                    datasets: [{ data: initialData, backgroundColor: ['#f59e0b', '#34d399', '#059669', '#ef4444'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: false } } }
+            });
+        }
+
+        function createTrendChart(labels, datasets) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels || [],
+                    datasets: datasets || []
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { 
+                            position: 'top' 
+                        } 
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

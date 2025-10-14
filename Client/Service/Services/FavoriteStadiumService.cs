@@ -132,5 +132,16 @@ namespace Service.Services
                 throw; // Ném lại exception để controller xử lý
             }
         }
+        public async Task<IEnumerable<ReadFavoriteDTO>> GetFavoritesByStadiumIdAsync(int stadiumId, string accessToken)
+        {
+            AddBearerAccessToken(accessToken);
+
+            var response = await _httpClient.GetAsync($"/favorite/stadium/{stadiumId}");
+
+            response.EnsureSuccessStatusCode();
+
+            var favorites = await response.Content.ReadFromJsonAsync<IEnumerable<ReadFavoriteDTO>>();
+            return favorites ?? new List<ReadFavoriteDTO>();
+        }
     }
 }

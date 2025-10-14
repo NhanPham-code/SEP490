@@ -14,6 +14,7 @@ using System.Net;
 using DTOs.BookingDTO.ViewModel;
 using DTOs.StadiumDTO;
 using DTOs.UserDTO;
+using DTOs.DiscountDTO;
 
 namespace CustomerUI.Controllers
 {
@@ -450,25 +451,59 @@ namespace CustomerUI.Controllers
             var accessToken = GetAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = "Vui lòng đăng nhập để xem mã giảm giá." });
+            }
+
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId == null)
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập không hợp lệ." });
             }
 
             try
             {
-                var discounts = await _discountService.GetDiscountsByStadiumIdAsync(stadiumId);
-                if (discounts == null)
+                // 1. Lấy tất cả các mã giảm giá cho sân vận động (chưa lọc)
+                var allDiscountsForStadium = await _discountService.GetDiscountsByStadiumIdAsync(stadiumId);
+
+                if (allDiscountsForStadium == null || !allDiscountsForStadium.Any())
                 {
-                    return NotFound(new { message = "Không tìm thấy mã giảm giá nào cho sân vận động này." });
+                    return Ok(new List<ReadDiscountDTO>());
                 }
-                return Ok(discounts);
+                var now = DateTime.UtcNow;
+
+                var filteredDiscounts = allDiscountsForStadium.Where(discount =>
+                {
+
+                    bool isGenerallyValid = discount.IsActive && discount.StartDate <= now && discount.EndDate >= now;
+
+                    if (!isGenerallyValid)
+                    {
+                        return false;
+                    }
+
+                    // Điều kiện 2: Xử lý logic cho mã 'Unique'
+                    if (discount.CodeType == "Unique")
+                    {
+
+                        if (int.TryParse(discount.TargetUserId, out int targetId))
+                        {
+                            return targetId == currentUserId.Value; 
+                        }
+                        return false; 
+                    }
+
+                    return true;
+                }).ToList();
+
+                return Ok(filteredDiscounts);
             }
             catch (Exception ex)
             {
-                // Log lỗi
-                Console.WriteLine($"[GetDiscounts] Lỗi khi lấy danh sách giảm giá: {ex.Message}");
+                Console.WriteLine($"[GetDiscounts] Lỗi khi lấy danh sách giảm giá cho sân {stadiumId}: {ex.Message}");
                 return StatusCode(500, new { message = "Lỗi server khi lấy danh sách giảm giá." });
             }
         }
+
 
         /*public IActionResult Booking()
         {

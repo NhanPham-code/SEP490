@@ -55,5 +55,9 @@ namespace FavoriteAPI.Service
            // check if favorite exists by userId and stadiumId
            return await _favoriteRepository.IsFavoriteExistsAsync(userId, stadiumId);
         }
+        public async Task<IEnumerable<Favorite>> GetFavoritesByStadiumIdAsync(int stadiumId)
+        {
+            return await _favoriteRepository.GetFavoritesByStadiumIdAsync(stadiumId);
+        }
     }
 }

@@ -21,6 +21,9 @@ namespace UserAPI.Controllers
         private readonly IMemoryCache _memoryCache;
         private readonly IBiometricCredentialService _biometricCredentialService;
 
+        // Record để lưu trữ trong cache
+        public record OtpCacheEntry(string Code, DateTime ExpirationUtc);
+
         public UsersController(IUserService userService, ITokenService tokenService, IGoogleAuthService googleAuthService, 
             IEmailService emailService, IMemoryCache memoryCache, IBiometricCredentialService biometricCredentialService)
         {
@@ -30,6 +33,42 @@ namespace UserAPI.Controllers
             _emailService = emailService;
             _memoryCache = memoryCache;
             _biometricCredentialService = biometricCredentialService;
+        }
+
+        /// <sumary>
+        /// Thêm hoặc cập nhật khuôn mặt cho Customer
+        /// api/Users/face-embeddings
+        /// </sumary>
+        [HttpPut("face-embeddings")]
+        public async Task<IActionResult> AddOrUpdateFaceEmbeddings([FromForm] FaceImagesDTO request)
+        {
+            if (request.FaceImages == null || request.FaceImages.Count == 0)
+            {
+                return BadRequest(new { message = "Cần bổ sung ảnh khuôn mặt." });
+            }
+
+            // Lấy userId từ token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                return Unauthorized(new { message = "Không thể xác thực. " });
+
+            try
+            {
+                var result = await _userService.AddorUpdateFaceEmbeddings(userIdFromToken, request);
+                if (!result)
+                {
+                    return BadRequest(new { message = "Không thể thêm hoặc cập nhật khuôn mặt." });
+                }
+                return Ok(new { message = "Khuôn mặt được thêm hoặc cập nhật thành công." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -245,40 +284,62 @@ namespace UserAPI.Controllers
         public async Task<IActionResult> SendOtp([FromBody] SendOtpRequestDTO request)
         {
             // 1. Tạo mã OTP
-            var otp = new Random().Next(100000, 999999).ToString();
+            var otpCode = new Random().Next(100000, 999999).ToString();
             var cacheKey = $"otp_{request.Email}";
+            var expirationTime = TimeSpan.FromMinutes(1); // 60 giây
+            var expirationUtc = DateTime.UtcNow.Add(expirationTime);
 
-            // 2. Lưu vào Cache với thời gian hết hạn là 5 phút
+            // 2. Tạo đối tượng để lưu vào cache
+            var cacheEntry = new OtpCacheEntry(otpCode, expirationUtc);
+
+            // 3. Sử dụng SetAbsoluteExpiration để đảm bảo hết hạn đúng 1 phút
             var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(5)); // Hoặc SetAbsoluteExpiration
+                .SetAbsoluteExpiration(expirationTime);
 
-            _memoryCache.Set(cacheKey, otp, cacheEntryOptions);
+            _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
 
-            // 3. Gửi email
-            await _emailService.SendEmailAsync(request.Email, "Mã xác thực của bạn", $"Mã OTP của bạn là: {otp}");
+            // 4. Gửi email
+            await _emailService.SendEmailAsync(request.Email, "Mã xác thực của bạn", $"Mã OTP của bạn là: {otpCode}. Mã này sẽ hết hạn sau 1 phút.");
 
-            return Ok(new { message = "OTP has been sent to your email." });
+            return Ok(new { message = "Mã OTP đã được gửi đến email của bạn." });
         }
 
         [HttpPost("verify-otp")]
         public IActionResult VerifyOtp([FromBody] VerifyOtpRequestDTO request)
         {
+            if (request.Code.Length != 6 || !int.TryParse(request.Code, out _))
+                return BadRequest(new { verified = false, message = "Mã OTP không hợp lệ." });
+
             var cacheKey = $"otp_{request.Email}";
 
-            // 4. Lấy mã từ cache
-            if (_memoryCache.TryGetValue(cacheKey, out string? cachedOtp))
+            // 1. Lấy đối tượng từ cache
+            if (!_memoryCache.TryGetValue(cacheKey, out OtpCacheEntry? cachedEntry))
             {
-                // 5. So sánh
-                if (cachedOtp == request.Code)
-                {
-                    // Xác thực thành công, xóa key khỏi cache
-                    _memoryCache.Remove(cacheKey);
-                    return Ok(new { verified = true });
-                }
+                // Nếu không tìm thấy key trong cache, có nghĩa là mã đã hết hạn hoặc chưa bao giờ tồn tại.
+                // Trong cả hai trường hợp, chúng ta đều có thể coi là "hết hạn".
+                return Ok(new { verified = false, message = "Mã đã hết hạn." });
             }
 
-            // Nếu không tìm thấy key hoặc mã không khớp
-            return BadRequest(new { verified = false, message = "Invalid or expired OTP." });
+            // 2. Kiểm tra xem mã đã hết hạn hay chưa (kiểm tra thủ công)
+            if (DateTime.UtcNow > cachedEntry.ExpirationUtc)
+            {
+                // Mã vẫn còn trong cache nhưng đã quá thời gian, xóa nó đi
+                _memoryCache.Remove(cacheKey);
+                return Ok(new { verified = false, message = "Mã đã hết hạn." });
+            }
+
+            // 3. So sánh mã OTP
+            if (cachedEntry.Code == request.Code)
+            {
+                // Xác thực thành công, xóa key khỏi cache để không thể sử dụng lại
+                _memoryCache.Remove(cacheKey);
+                return Ok(new { verified = true, message = "Xác thực mã thành công." });
+            }
+            else
+            {
+                // Mã không chính xác
+                return Ok(new { verified = false, message = "Mã không chính xác." });
+            }
         }
 
         /// <summary>

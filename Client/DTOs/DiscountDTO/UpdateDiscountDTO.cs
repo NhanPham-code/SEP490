@@ -30,6 +30,8 @@ namespace DTOs.DiscountDTO
 
         public bool IsActive { get; set; }
 
+        public string? TargetUserId { get; set; }
+
         // Cập nhật danh sách stadium
         public List<int>? StadiumIds { get; set; } = new();
     }
