@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context.Session.GetInt32("UserId");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -518,14 +521,20 @@
                 @if (isLoggedIn)
                 {
                     <!-- Messages Button -->
-                    <a asp-controller="Chat" asp-action="Chat"
-                       class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
-                       title="Messages">
-                        <i class="ri-message-3-line text-lg text-white"></i>
-                        <span x-show="notificationCount > 0"
-                              class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
-                              x-text="notificationCount"></span>
-                    </a>
+                   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<a asp-controller="Chat" asp-action="Chat"
+   x-data="chatBadge()"
+   x-init="init()"
+   class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
+   title="Messages"
+   @@click.prevent="openChat">
+    <i class="ri-message-3-line text-lg text-white"></i>
+    <span x-show="unreadCount > 0"
+          class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
+          x-text="unreadCount"></span>
+</a>
+
                 }
                 else
                 {
@@ -1014,6 +1023,126 @@
         }
         document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
     </script>
+    <script>
+        window.currentUserId = @userId;
+        console.log("🔑 UserId từ Session:", @userId);
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        async function getUserRooms(userId) {
+            const snapshot = await get(ref(db, "chats"));
+            const rooms = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(roomSnap => {
+                    const roomId = roomSnap.key;
+                    if (roomId.split("_").includes(String(userId))) {
+                        rooms.push(roomId);
+                    }
+                });
+            }
+
+            return rooms;
+        }
+
+        function showNotification(msg) {
+            if (Notification.permission === "granted") {
+                new Notification(`${msg.senderName}`, { body: msg.message });
+            }
+        }
+
+        // ✅ Tăng số tin chưa đọc trong Firebase
+               import { runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        async function incrementUnread(userId) {
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        async function listenForUserMessages(userId, badgeHandler) {
+            const rooms = await getUserRooms(userId);
+
+            // ✅ Lắng nghe thay đổi số tin chưa đọc từ Firebase
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                badgeHandler(count);
+            });
+
+            // ✅ Lắng nghe tin mới
+            const startTime = Date.now();
+
+            rooms.forEach(roomId => {
+                const roomRef = ref(db, `chats/${roomId}`);
+
+                onChildAdded(roomRef, (snapshot) => {
+                    const msg = snapshot.val();
+
+                    if (msg.timestamp > startTime && msg.senderId != userId) {
+
+                        showNotification(msg);
+                    }
+                });
+            });
+        }
+
+        const currentUserId = window.currentUserId;
+
+        if (currentUserId) {
+            window.listenForUserMessages = (badgeHandler) => {
+                return listenForUserMessages(currentUserId, badgeHandler);
+            };
+
+            // ✅ Reset số tin chưa đọc về 0 khi mở chat
+            window.resetUnreadMessages = async () => {
+                const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+                await set(unreadRef, 0);
+            };
+        }
+    </script>
+    <script>
+        function chatBadge() {
+            return {
+                unreadCount: 0,
+                async openChat() {
+                    if (typeof window.resetUnreadMessages === "function") {
+                        await window.resetUnreadMessages();
+                    }
+                    this.unreadCount = 0;
+                    window.location.href = '@Url.Action("Chat", "Chat")';
+                },
+                setBadge(count) {
+                    this.unreadCount = count;
+                },
+                init() {
+                    setTimeout(() => {
+                        if (typeof window.listenForUserMessages === "function") {
+                            window.listenForUserMessages((count) => {
+                                this.setBadge(count);
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        }
+    </script>
 </body>
 </html>

@@ -12,7 +12,7 @@ using UserAPI.Data;
 namespace UserAPI.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20251006095804_init")]
+    [Migration("20250911062133_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,44 +24,6 @@ namespace UserAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("UserAPI.Model.BiometricCredential", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceId")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("DeviceName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BiometricCredentials");
-                });
 
             modelBuilder.Entity("UserAPI.Model.RefreshToken", b =>
                 {
@@ -120,7 +82,7 @@ namespace UserAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("FaceEmbeddingsJson")
+                    b.Property<string>("FaceVideoUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FrontCCCDUrl")
@@ -181,6 +143,7 @@ namespace UserAPI.Migrations
                             AvatarUrl = "https://example.com/avatar/admin.png",
                             CreatedDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@example.com",
+                            FaceVideoUrl = "https://example.com/videos/admin.png",
                             FrontCCCDUrl = "https://example.com/cccd/admin.png",
                             FullName = "Admin User",
                             IsActive = true,
@@ -191,17 +154,6 @@ namespace UserAPI.Migrations
                             Role = "Admin",
                             UpdatedDate = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
-                });
-
-            modelBuilder.Entity("UserAPI.Model.BiometricCredential", b =>
-                {
-                    b.HasOne("UserAPI.Model.User", "User")
-                        .WithMany("BiometricCredentials")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("UserAPI.Model.RefreshToken", b =>
@@ -217,8 +169,6 @@ namespace UserAPI.Migrations
 
             modelBuilder.Entity("UserAPI.Model.User", b =>
                 {
-                    b.Navigation("BiometricCredentials");
-
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
