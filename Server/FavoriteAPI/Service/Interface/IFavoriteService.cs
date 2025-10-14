@@ -11,5 +11,6 @@ namespace FavoriteAPI.Service.Interface
         Task<Model.Favorite> AddFavoriteAsync(CreateFavoriteDTO createFavoriteDTO);
         Task<bool> DeleteFavoriteAsync(int userId, int stadiumId);
         Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId);
+        Task<IEnumerable<Favorite>> GetFavoritesByStadiumIdAsync(int stadiumId);
     }
 }

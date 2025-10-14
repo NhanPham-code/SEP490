@@ -28,6 +28,8 @@ namespace DTOs.DiscountDTO
         [Required]
         public string UserId { get; set; } = null!;
 
+        public string? TargetUserId { get; set; }
+
         // Danh sách Stadium áp dụng (nếu có)
         public List<int>? StadiumIds { get; set; } = new();
     }

@@ -10,5 +10,6 @@ namespace FavoriteAPI.Repository.Interface
         Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId);
         Task<Favorite?> GetFavoriteByIdAsync(int userId, int stadiumId);
         Task<IEnumerable<Favorite>> GetFavoritesByUserIdAsync(int userId);
+        Task<IEnumerable<Favorite>> GetFavoritesByStadiumIdAsync(int stadiumId);
     }
 }

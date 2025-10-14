@@ -30,7 +30,7 @@ namespace Models
         public DateTime EndDate { get; set; }
 
         [Required]
-        public string CodeType { get; set; } // "System" hoặc "Stadium"
+        public string CodeType { get; set; } 
 
         public bool IsActive { get; set; } = true;
 
@@ -38,6 +38,8 @@ namespace Models
 
         [Required]
         public string UserId { get; set; }
+
+        public string? TargetUserId { get; set; }
 
         // Quan hệ 1-nhiều tới bảng trung gian
         public ICollection<DiscountStadium> DiscountStadiums { get; set; } = new List<DiscountStadium>();

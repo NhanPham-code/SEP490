@@ -67,6 +67,8 @@ builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<IStadiumVideoSetvice, StadiumVideoService>();
 builder.Services.AddScoped<IStadiumEquipmentService, StadiumEquipmentService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 

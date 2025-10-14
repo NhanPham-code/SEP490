@@ -1,0 +1,727 @@
+﻿@{
+    ViewData["Title"] = "Danh sách Mã giảm giá";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Giả sử layout của AdminUI
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .admin-discount-list-container {
+            --primary-blue: #4A90E2;
+            --primary-indigo: #6366F1;
+            --primary-purple: #8B5CF6;
+            --primary-teal: #14B8A6;
+            --accent-sky: #0EA5E9;
+            --accent-violet: #A855F7;
+            --bg-light-blue: #eff6ff;
+            --bg-light-indigo: #eef2ff;
+            --bg-light-purple: #faf5ff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+        }
+
+            .admin-discount-list-container .page-container {
+                max-width: 1600px; /* Tăng độ rộng để chứa nhiều cột hơn */
+                margin: 0 auto;
+                padding: 2rem 1rem;
+            }
+
+            .admin-discount-list-container .page-header {
+                background: linear-gradient(135deg, white 0%, var(--bg-light-indigo) 100%);
+                border-radius: 16px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border: 1px solid var(--border-light);
+                box-shadow: var(--shadow-soft);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .admin-discount-list-container .page-title {
+                font-size: 2rem;
+                font-weight: 800;
+                margin: 0;
+                background: linear-gradient(135deg, var(--primary-indigo), var(--primary-blue));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .admin-discount-list-container .filters-card {
+                background: white;
+                border-radius: 16px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border: 1px solid var(--border-light);
+                box-shadow: var(--shadow-soft);
+            }
+
+            .admin-discount-list-container .filter-row {
+                display: grid;
+                grid-template-columns: 2fr 1.5fr 1fr auto;
+                gap: 1.5rem;
+                align-items: end;
+            }
+
+            .admin-discount-list-container .form-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .admin-discount-list-container .form-label {
+                font-weight: 700;
+                margin-bottom: 0.75rem;
+            }
+
+            .admin-discount-list-container .form-control {
+                border: 2px solid var(--border-light);
+                border-radius: 12px;
+                padding: 0.875rem 1rem;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+
+                .admin-discount-list-container .form-control:focus {
+                    outline: none;
+                    border-color: var(--primary-indigo);
+                    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+                }
+
+            .admin-discount-list-container .filter-buttons {
+                display: flex;
+                gap: 0.75rem;
+            }
+
+            .admin-discount-list-container .filter-btn, .admin-discount-list-container .reset-btn {
+                color: white;
+                border: none;
+                border-radius: 12px;
+                padding: 0.875rem 1.5rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: var(--shadow-soft);
+            }
+
+            .admin-discount-list-container .filter-btn {
+                background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+            }
+
+            .admin-discount-list-container .reset-btn {
+                background: linear-gradient(135deg, var(--text-secondary), var(--text-muted));
+            }
+
+                .admin-discount-list-container .filter-btn:hover, .admin-discount-list-container .reset-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-hover);
+                }
+
+            .admin-discount-list-container .discounts-container {
+                background: white;
+                border-radius: 16px;
+                border: 1px solid var(--border-light);
+                box-shadow: var(--shadow-soft);
+                overflow-x: auto;
+            }
+
+            .admin-discount-list-container .table-header {
+                background: linear-gradient(135deg, var(--bg-light-blue), var(--bg-light-indigo));
+                padding: 1.5rem 2rem;
+                border-bottom: 1px solid var(--border-light);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .admin-discount-list-container .table-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+
+            .admin-discount-list-container .results-count {
+                color: var(--text-secondary);
+                background: white;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                box-shadow: var(--shadow-soft);
+                font-weight: 600;
+            }
+
+            .admin-discount-list-container .discount-table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: auto; /* Để trình duyệt tự điều chỉnh cột */
+            }
+
+                .admin-discount-list-container .discount-table th {
+                    background: var(--bg-light-blue);
+                    padding: 1rem 1.25rem;
+                    text-align: center;
+                    font-weight: 700;
+                    border-bottom: 1px solid var(--border-light);
+                    font-size: 0.9rem;
+                    white-space: nowrap;
+                }
+
+                .admin-discount-list-container .discount-table td {
+                    padding: 1rem 1.25rem;
+                    border-bottom: 1px solid var(--border-light);
+                    vertical-align: middle;
+                    text-align: center;
+                }
+
+                .admin-discount-list-container .discount-table tr:hover {
+                    background: var(--bg-light-blue);
+                }
+
+            .admin-discount-list-container .discount-code {
+                font-weight: 800;
+                font-family: 'Courier New', monospace;
+                background: rgba(99, 102, 241, 0.1);
+                padding: 0.5rem 0.75rem;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                color: var(--primary-indigo);
+            }
+
+            .admin-discount-list-container .discount-value {
+                font-weight: 800;
+                font-size: 1.25rem;
+                color: var(--primary-teal);
+            }
+
+            .admin-discount-list-container .discount-dates {
+                font-size: 0.9rem;
+                color: var(--text-secondary);
+            }
+
+            .admin-discount-list-container .status-badge {
+                padding: 0.5rem 1.25rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: white;
+            }
+
+            .admin-discount-list-container .status-active {
+                background: var(--success-green);
+            }
+
+            .admin-discount-list-container .status-inactive {
+                background: var(--danger-red);
+            }
+
+            .admin-discount-list-container .code-type-badge {
+                padding: 0.4rem 0.8rem;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: white;
+                white-space: nowrap;
+            }
+
+            .admin-discount-list-container .type-stadium {
+                background: linear-gradient(135deg, var(--accent-violet), var(--primary-purple));
+            }
+
+            .admin-discount-list-container .type-unique {
+                background: linear-gradient(135deg, var(--primary-purple), var(--primary-indigo));
+            }
+
+            .admin-discount-list-container .stadium-tag,
+            .admin-discount-list-container .user-tag,
+            .admin-discount-list-container .creator-tag {
+                display: inline-block;
+                padding: 0.3rem 0.8rem;
+                border-radius: 12px;
+                margin: 0.15rem;
+                font-size: 0.8rem;
+                font-weight: 600;
+                color: white;
+                white-space: nowrap;
+            }
+
+            .admin-discount-list-container .stadium-tag {
+                background: linear-gradient(135deg, var(--primary-teal), var(--accent-sky));
+            }
+
+            .admin-discount-list-container .user-tag {
+                background: linear-gradient(135deg, var(--primary-purple), var(--primary-indigo));
+            }
+
+            .admin-discount-list-container .creator-tag {
+                background: #6c757d;
+            }
+
+            .admin-discount-list-container .action-btn {
+                padding: 0.6rem;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                color: white;
+                font-size: 1rem;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: var(--shadow-soft);
+            }
+
+            .admin-discount-list-container .view-btn {
+                background: linear-gradient(135deg, var(--primary-blue), var(--primary-indigo));
+            }
+
+                .admin-discount-list-container .view-btn:hover {
+                    transform: scale(1.1) translateY(-2px);
+                    box-shadow: var(--shadow-hover);
+                }
+
+            .admin-discount-list-container .pagination-container {
+                padding: 1.5rem 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-top: 1px solid var(--border-light);
+            }
+
+            .admin-discount-list-container .pagination-info {
+                margin: 0 1rem;
+                font-weight: 600;
+            }
+
+            .admin-discount-list-container .pagination-btn {
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--border-light);
+                background: white;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+                .admin-discount-list-container .pagination-btn:hover:not(:disabled) {
+                    background: var(--primary-indigo);
+                    color: white;
+                }
+
+                .admin-discount-list-container .pagination-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+            /* Modal Styles */
+            .admin-discount-list-container .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 9999;
+                backdrop-filter: blur(4px);
+                visibility: hidden;
+                opacity: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: all 0.3s ease;
+            }
+
+                .admin-discount-list-container .modal-overlay.active {
+                    visibility: visible;
+                    opacity: 1;
+                }
+
+            .admin-discount-list-container .modal {
+                background: white;
+                border-radius: 20px;
+                padding: 2rem;
+                width: 90%;
+                max-width: 800px;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: var(--shadow-hover);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .admin-discount-list-container .modal-overlay.active .modal {
+                transform: scale(1);
+            }
+
+            .admin-discount-list-container .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .admin-discount-list-container .modal-title {
+                font-size: 1.75rem;
+                font-weight: 800;
+                margin: 0;
+            }
+
+            .admin-discount-list-container .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+                .admin-discount-list-container .modal-close:hover {
+                    color: var(--danger-red);
+                    transform: rotate(90deg);
+                }
+
+            .admin-discount-list-container .details-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem 2rem;
+            }
+
+            .admin-discount-list-container .detail-item {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+                .admin-discount-list-container .detail-item strong {
+                    display: block;
+                    color: var(--text-muted);
+                    font-size: 0.9rem;
+                    margin-bottom: 0.25rem;
+                }
+
+                .admin-discount-list-container .detail-item span {
+                    font-size: 1rem;
+                    font-weight: 500;
+                }
+
+            .admin-discount-list-container .detail-item-full {
+                grid-column: 1 / -1;
+            }
+
+            .admin-discount-list-container #detailStadiums {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+        @@media (max-width: 1024px) {
+            .admin-discount-list-container .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-discount-list-container .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-discount-list-container">
+        <div class="page-container">
+            <div class="page-header">
+                <h1 class="page-title">Quản lý Mã giảm giá (Admin)</h1>
+            </div>
+
+            <div class="filters-card">
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label class="form-label">Tìm kiếm mã giảm giá</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mã...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sân vận động</label>
+                        <select class="form-control" id="stadiumFilter">
+                            <option value="">Tất cả sân</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-control" id="statusFilter">
+                            <option value="">Tất cả</option>
+                            <option value="true">Đang hoạt động</option>
+                            <option value="false">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" onclick="applyFilters()">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="reset-btn" onclick="resetFilters()">
+                            <i class="fas fa-undo-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="discounts-container">
+                <div class="table-header">
+                    <h3 class="table-title">Danh sách mã giảm giá</h3>
+                    <span class="results-count" id="resultsCount">Đang tải...</span>
+                </div>
+                <table class="discount-table">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Giá trị</th>
+                            <th>Thời gian áp dụng</th>
+                            <th>Loại</th>
+                            <th>Sân áp dụng</th>
+                            <th>Người dùng ĐN</th>
+                            <th>Người tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="discountTableBody"></tbody>
+                </table>
+                <div class="pagination-container" id="paginationControls"></div>
+            </div>
+        </div>
+
+        <!-- Details Modal HTML -->
+        <div class="modal-overlay" id="detailsModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">Chi tiết Mã giảm giá</h2>
+                    <button class="modal-close" onclick="closeDetailsModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="details-grid">
+                    <div class="detail-item"><strong>Mã Code</strong><span id="detailCode"></span></div>
+                    <div class="detail-item"><strong>Loại</strong><span id="detailCodeType"></span></div>
+                    <div class="detail-item"><strong>Giá trị giảm</strong><span id="detailPercentValue"></span></div>
+                    <div class="detail-item"><strong>Giảm tối đa</strong><span id="detailMaxAmount"></span></div>
+                    <div class="detail-item"><strong>Đơn hàng tối thiểu</strong><span id="detailMinOrder"></span></div>
+                    <div class="detail-item"><strong>Trạng thái</strong><span id="detailStatus"></span></div>
+                    <div class="detail-item"><strong>Ngày bắt đầu</strong><span id="detailStartDate"></span></div>
+                    <div class="detail-item"><strong>Ngày kết thúc</strong><span id="detailEndDate"></span></div>
+                    <div class="detail-item"><strong>Người tạo</strong><span id="detailCreator"></span></div>
+                    <div class="detail-item"><strong>Người dùng được nhận</strong><span id="detailTargetUser"></span></div>
+                    <div class="detail-item detail-item-full"><strong>Mô tả</strong><span id="detailDescription"></span></div>
+                    <div class="detail-item detail-item-full"><strong>Sân vận động áp dụng</strong><div id="detailStadiums"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            let allUsers = [];
+            let allStadiums = [];
+            let currentDiscounts = [];
+            let currentPage = 1;
+            let pageSize = 10;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchAndRenderDiscounts();
+            });
+
+            function fetchAndRenderDiscounts(page = 1) {
+                currentPage = page;
+                const searchCode = document.getElementById('searchInput').value;
+                const stadiumId = document.getElementById('stadiumFilter').value;
+                const status = document.getElementById('statusFilter').value;
+                let query = `?page=${currentPage}&pageSize=${pageSize}`;
+                if (searchCode) query += `&searchByCode=${encodeURIComponent(searchCode)}`;
+                if (stadiumId) query += `&stadiumId=${stadiumId}`;
+                if (status !== "") query += `&isActive=${status}`;
+
+                setLoadingState(true);
+                fetch(`/Discount/GetDiscountPageData${query}`)
+                    .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
+                    .then(data => {
+                        currentDiscounts = data.discounts || [];
+                        if (data.users) cacheUserData(data.users);
+                        if (data.stadiums) {
+                            allStadiums = data.stadiums;
+                            renderFilterOptions(allStadiums);
+                        }
+                        renderTable(currentDiscounts);
+                        renderPagination(currentDiscounts.length);
+                    })
+                    .catch(error => {
+                        console.error('Lỗi tải dữ liệu:', error);
+                        document.getElementById('discountTableBody').innerHTML = `<tr><td colspan="9" class="text-center">Lỗi tải dữ liệu.</td></tr>`;
+                    })
+                    .finally(() => setLoadingState(false));
+            }
+
+            function setLoadingState(isLoading) {
+                const tableBody = document.getElementById('discountTableBody');
+                const resultsCount = document.getElementById('resultsCount');
+                if (isLoading) {
+                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>`;
+                    resultsCount.textContent = 'Đang tải...';
+                }
+            }
+
+            function renderTable(discounts) {
+                const tableBody = document.getElementById('discountTableBody');
+                const resultsCount = document.getElementById('resultsCount');
+                tableBody.innerHTML = '';
+                if (!discounts || discounts.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px;">Không có mã giảm giá nào.</td></tr>`;
+                    resultsCount.textContent = '0 kết quả';
+                } else {
+                    discounts.forEach(d => tableBody.appendChild(createTableRow(d)));
+                    resultsCount.textContent = `Hiển thị ${discounts.length} kết quả`;
+                }
+            }
+
+            function createTableRow(d) {
+                const tr = document.createElement('tr');
+                const isExpired = new Date() > new Date(d.endDate);
+                const isActive = d.isActive && !isExpired;
+                const statusClass = isActive ? 'status-active' : 'status-inactive';
+                const statusText = isActive ? 'ON' : 'OFF';
+
+                const codeTypeLabels = { 'Stadium': 'Mã theo sân', 'Unique': 'Mã cá nhân' };
+                const codeTypeDisplay = codeTypeLabels[d.codeType] || d.codeType;
+
+                const stadiumTag = (d.stadiumIds && d.stadiumIds.length > 0)
+                    ? `<span class="stadium-tag">${d.stadiumIds.length} sân</span>`
+                    : '<span>-</span>';
+
+                let targetUserTag = '<span class="user-tag">Tất cả</span>';
+                       if (d.codeType === 'Unique' && d.targetUserId) {
+                           const targetUser = allUsers.find(u => u.userId == d.targetUserId);
+                           targetUserTag = targetUser ? `<span class="user-tag" title="${targetUser.email || ''}">${targetUser.fullName}</span>` : `<span class="user-tag">User #${d.targetUserId}</span>`;
+                       }
+
+                const creator = allUsers.find(u => u.userId == d.userId);
+                const creatorTag = creator ? `<span class="creator-tag" title="Người tạo: ${creator.email || ''}">${creator.fullName}</span>` : `<span class="creator-tag">User #${d.userId}</span>`;
+
+                tr.innerHTML = `
+                    <td><span class="discount-code">${d.code}</span></td>
+                    <td><span class="discount-value">${d.percentValue}%</span></td>
+                    <td><div class="discount-dates"><strong>${new Date(d.startDate).toLocaleDateString('vi-VN')} - ${new Date(d.endDate).toLocaleDateString('vi-VN')}</strong></div></td>
+                    <td><span class="code-type-badge type-${d.codeType.toLowerCase()}">${codeTypeDisplay}</span></td>
+                    <td>${stadiumTag}</td>
+                    <td>${targetUserTag}</td>
+                    <td>${creatorTag}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td><button class="action-btn view-btn" title="Xem chi tiết" onclick="openDetailsModal(${d.id})"><i class="fas fa-eye"></i></button></td>
+                `;
+                return tr;
+            }
+
+            function openDetailsModal(discountId) {
+                const d = currentDiscounts.find(disc => disc.id === discountId);
+                if (!d) return;
+
+                document.getElementById('detailCode').textContent = d.code;
+                document.getElementById('detailCodeType').textContent = (d.codeType === 'Unique' ? 'Mã cá nhân' : 'Mã theo sân');
+                document.getElementById('detailPercentValue').textContent = `${d.percentValue}%`;
+                document.getElementById('detailMaxAmount').textContent = d.maxDiscountAmount.toLocaleString('vi-VN') + ' VNĐ';
+                document.getElementById('detailMinOrder').textContent = d.minOrderAmount.toLocaleString('vi-VN') + ' VNĐ';
+
+                const isExpired = new Date() > new Date(d.endDate);
+                const isActive = d.isActive && !isExpired;
+                document.getElementById('detailStatus').innerHTML = `</br><span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">${isActive ? 'Đang hoạt động' : 'Không hoạt động'}</span>`;
+
+                document.getElementById('detailStartDate').textContent = new Date(d.startDate).toLocaleString('vi-VN');
+                document.getElementById('detailEndDate').textContent = new Date(d.endDate).toLocaleString('vi-VN');
+
+                const creator = allUsers.find(u => u.userId == d.userId);
+                document.getElementById('detailCreator').textContent = creator ? `${creator.fullName} (${creator.email})` : `User ID: ${d.userId}`;
+
+                let targetUserText = 'Tất cả người dùng';
+                if (d.codeType === 'Unique') {
+                    const targetUser = allUsers.find(u => u.userId == d.targetUserId);
+                    targetUserText = targetUser ? `${targetUser.fullName} (${targetUser.email})` : `User ID: ${d.targetUserId}`;
+                }
+                document.getElementById('detailTargetUser').textContent = targetUserText;
+
+                document.getElementById('detailDescription').textContent = d.description || '(Không có mô tả)';
+
+                const stadiumContainer = document.getElementById('detailStadiums');
+                stadiumContainer.innerHTML = '';
+                if (d.stadiumIds && d.stadiumIds.length > 0) {
+                    d.stadiumIds.forEach(stadiumId => {
+                        const stadium = allStadiums.find(s => s.id === stadiumId);
+                        if (stadium) {
+                            const tag = document.createElement('span');
+                            tag.className = 'stadium-tag';
+                            tag.textContent = stadium.name;
+                            stadiumContainer.appendChild(tag);
+                        }
+                    });
+                } else {
+                    stadiumContainer.textContent = '(Không áp dụng cho sân cụ thể)';
+                }
+
+                document.getElementById('detailsModal').classList.add('active');
+            }
+
+            function closeDetailsModal() {
+                document.getElementById('detailsModal').classList.remove('active');
+            }
+
+            function renderPagination(currentItemCount) {
+                const container = document.getElementById('paginationControls');
+                container.innerHTML = '';
+                const hasPrevious = currentPage > 1;
+                const hasNext = currentItemCount === pageSize;
+                if (!hasPrevious && !hasNext) return;
+                container.innerHTML = `
+                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage - 1})" ${!hasPrevious ? 'disabled' : ''}>Trước</button>
+                    <span class="pagination-info">Trang ${currentPage}</span>
+                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage + 1})" ${!hasNext ? 'disabled' : ''}>Sau</button>
+                `;
+            }
+
+            function renderFilterOptions(stadiums) {
+                const stadiumFilter = document.getElementById('stadiumFilter');
+                stadiumFilter.innerHTML = '<option value="">Tất cả sân</option>';
+                stadiums.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = s.name;
+                    stadiumFilter.appendChild(option);
+                });
+            }
+
+            function applyFilters() { fetchAndRenderDiscounts(1); }
+            function resetFilters() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stadiumFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                fetchAndRenderDiscounts(1);
+            }
+
+            function cacheUserData(users) {
+                users.forEach(user => {
+                    if (!allUsers.some(u => u.userId === user.userId)) {
+                        allUsers.push(user);
+                    }
+                });
+            }
+        </script>
+    }
+</body>
+</html>

@@ -279,7 +279,7 @@
         }
 
         // Form and Data Handling
-        function updateHiddenFields() {
+            function updateHiddenFields() {
             // Update simple fields
             $('#StadiumId').val(bookingData.stadiumId);
             $('#DiscountId').val(selectedDiscountId || '');
@@ -295,14 +295,16 @@
             const datesContainer = $('#dates-container');
             datesContainer.empty();
             bookingData.selectedDays.forEach((day, index) => {
-                datesContainer.append(`<input type="hidden" name="SelectedDates[${index}]" value="${day}" />`);
+
+                datesContainer.append(`<input type="hidden" name="Dates[${index}]" value="${day}" />`);
             });
 
             // Generate hidden inputs for CourtIds list
             const courtIdsContainer = $('#courtids-container');
             courtIdsContainer.empty();
             bookingData.selectedCourtIds.forEach((id, index) => {
-                courtIdsContainer.append(`<input type="hidden" name="SelectedCourtIds[${index}]" value="${id}" />`);
+
+                courtIdsContainer.append(`<input type="hidden" name="CourtIds[${index}]" value="${id}" />`);
             });
         }
 
@@ -364,18 +366,23 @@
             $('input[name="payment-method"]').change(updateHiddenFields);
 
             // Form submission
-            $('#booking-form').submit(function(e) {
-                if (bookingData.type === 'month') {
-                    e.preventDefault();
-                    return false; // Prevent form submission in "month" mode
-                }
-                
-                e.preventDefault();
-                updateHiddenFields(); // Ensure data is up-to-date before submitting
-                console.log('Dữ liệu form được gửi đi:');
-                new FormData(this).forEach((value, key) => console.log(`${key}: ${value}`));
-                this.submit();
-            });
+                    $('#booking-form').submit(function(e) {
+            // Nếu là chế độ xem (type === 'month'), không làm gì cả
+            if (bookingData.type === 'month') {
+                e.preventDefault(); // Ngăn chặn việc gửi form
+                return;
+            }
+
+            // Cập nhật các trường ẩn với dữ liệu mới nhất trước khi gửi
+            updateHiddenFields();
+
+            // Log dữ liệu để kiểm tra (tùy chọn)
+            console.log('Dữ liệu form chuẩn bị được gửi đi:');
+            new FormData(this).forEach((value, key) => console.log(`${key}: ${value}`));
+
+            // Không cần e.preventDefault() hay this.submit() nữa.
+            // Form sẽ được gửi đi một cách tự nhiên với dữ liệu đã được cập nhật.
+        });
         });
     </script>
 </body>

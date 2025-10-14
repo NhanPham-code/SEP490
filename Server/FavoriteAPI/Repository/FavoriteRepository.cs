@@ -58,5 +58,11 @@ namespace FavoriteAPI.Repository
             // check if favorite exists by userId and stadiumId
             return await _context.Favorites.AnyAsync(f => f.UserId == userId && f.StadiumId == stadiumId);
         }
+        public async Task<IEnumerable<Favorite>> GetFavoritesByStadiumIdAsync(int stadiumId)
+        {
+            return await _context.Favorites
+                .Where(f => f.StadiumId == stadiumId)
+                .ToListAsync();
+        }
     }
 }

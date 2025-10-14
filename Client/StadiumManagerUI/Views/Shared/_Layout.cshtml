@@ -222,40 +222,45 @@
             text-transform: uppercase;
         }
 
-        .notification-badge {
+        /* Cập nhật cho Notification Badge */
+        .notification-container {
             position: relative;
             margin-right: 1rem;
             cursor: pointer;
+            /* Thêm để loại bỏ gạch chân của link */
+            text-decoration: none;
+        }
+
+        .notification-icon {
             padding: 8px;
             border-radius: 50%;
             transition: background-color 0.3s ease;
         }
 
-            .notification-badge:hover {
-                background-color: #f8f9fa;
-            }
+        .notification-container:hover .notification-icon {
+            background-color: #f8f9fa;
+        }
 
-            .notification-badge i {
-                font-size: 18px;
-                color: var(--text-muted);
-                transition: color 0.3s ease;
-            }
+        .notification-icon i {
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
 
-            .notification-badge:hover i {
-                color: var(--primary-blue);
-            }
+        .notification-container:hover .notification-icon i {
+            color: var(--primary-blue);
+        }
 
-            .notification-badge::after {
-                content: '';
-                position: absolute;
-                top: 2px;
-                right: 2px;
-                width: 10px;
-                height: 10px;
-                background: var(--danger-red);
-                border-radius: 50%;
-                border: 2px solid white;
-            }
+        #notification-badge-count {
+            position: absolute;
+            top: 2px;
+            right: 0px;
+            transform: translate(50%, -50%);
+            font-size: 10px;
+            padding: .25em .5em;
+            display: none; /* Sẽ được hiển thị bằng JS */
+        }
+
 
         /* User name styling */
         .user-info .fw-medium {
@@ -343,7 +348,7 @@
                 height: 35px;
             }
 
-            .notification-badge {
+            .notification-container {
                 margin-right: 0.5rem;
             }
         }
@@ -356,7 +361,7 @@
             <div class="sidebar-logo">S</div>
             <div>
                 <h5 class="sidebar-title">Sportivey</h5>
-                <small class="sidebar-subtitle">Stadium Owner</small>
+                <small class="sidebar-subtitle">Chủ sân vận động</small>
             </div>
         </div>
 
@@ -418,7 +423,6 @@
         var fullName = Context.Session.GetString("FullName");
         var avatarUrl = Context.Session.GetString("AvatarUrl");
 
-        // Nếu không có accessToken hoặc fullName => Người dùng chưa đăng nhập
         if (string.IsNullOrEmpty(accessToken))
         {
             Context.Response.Redirect(Url.Action("Login", "Common"));
@@ -433,9 +437,13 @@
             </div>
 
             <div class="user-info dropdown">
-                <div class="notification-badge" title="Thông báo">
-                    <i class="fas fa-bell"></i>
-                </div>
+                <a href="@Url.Action("Index", "Notification")" class="notification-container" title="Thông báo">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <span id="notification-badge-count" class="badge rounded-pill bg-danger"></span>
+                </a>
+
                 <span class="fw-medium" title="@fullName">@fullName</span>
                 <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Menu tài khoản">
                     @if (!string.IsNullOrEmpty(avatarUrl))
@@ -481,7 +489,71 @@
         </main>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        $(document).ready(function () {
+
+
+            function updateNotificationBadge() {
+                $.ajax({
+                    url: '/Notification/GetUnreadNotificationCount',
+                    type: 'GET',
+                    success: function (count) {
+                        const badge = $('#notification-badge-count'); 
+
+                        if (badge.length) { 
+                            if (count > 0) {
+                                badge.text(count);
+                                badge.show(); 
+                            } else {
+                                badge.hide(); 
+                            }
+                        }
+                    },
+                    error: function () {
+                        
+                    }
+                });
+            }
+
+
+            function connectToSignalR() {
+                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
+
+                if (!userId || userId === 0) {
+                    console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
+                    return;
+                }
+
+                const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
+
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl(hubUrl)
+                    .withAutomaticReconnect()
+                    .build();
+
+                connection.on("ReceiveNotification", function (notification) {
+                    console.log("Nhận được tín hiệu có thông báo mới:", notification);
+                    updateNotificationBadge();
+                });
+
+                connection.start()
+                    .then(() => {
+                        console.log(`Đã kết nối tới hub thông báo với UserId = ${userId}`);
+                    })
+                    .catch(err => {
+                        console.error("Lỗi khi kết nối SignalR:", err);
+                    });
+            }
+
+            connectToSignalR();
+            updateNotificationBadge();
+
+        });
+    </script>
 </body>
 </html>

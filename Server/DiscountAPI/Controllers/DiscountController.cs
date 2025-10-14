@@ -68,7 +68,6 @@ namespace DiscountAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "StadiumManager,Admin")]
         public async Task<IActionResult> Update([FromBody] UpdateDiscountDTO dto)
         {
             try

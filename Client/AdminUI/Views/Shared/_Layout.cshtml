@@ -127,14 +127,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Admin/Coupons" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Coupons" ? "active" : "")" data-section="coupons">
+                        <a href="@Url.Action("DiscountList", "Discount")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Discount" && ViewContext.RouteData.Values["action"].ToString() == "DiscountList" ? "active" : "")">
                             <i class="ri-coupon-line"></i>
                             <span>Quản Lý Mã Giảm Giá</span>
-                            <span class="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Mới</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Coupons")
-                            {
-                                <div class="nav-indicator"></div>
-                            }
                         </a>
                     </li>
                     <li>

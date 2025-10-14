@@ -1422,20 +1422,36 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/api/Favorite/{userId}/{stadiumId}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7139
+        "DownstreamPathTemplate": "/api/Favorite/{userId}/{stadiumId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7139
+            }
+        ],
+        "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
+        "UpstreamHttpMethod": [ "DELETE" ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "RequireAuthentication": true
         }
-      ],
-      "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "RequireAuthentication": true
-      }
+    },
+    {
+        "DownstreamPathTemplate": "/api/Favorite/stadium/{stadiumId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7139
+            }
+        ],
+        "UpstreamPathTemplate": "/favorite/stadium/{stadiumId}",
+        "UpstreamHttpMethod": [ "GET" ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "RequireAuthentication": true
+        }
     },
     //==Stadium equipment==
     {
