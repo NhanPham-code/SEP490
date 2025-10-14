@@ -9,6 +9,8 @@ using DTOs.StadiumDTO;
 using StadiumManagerUI.Helpers;
 using DTOs.UserDTO;
 using System.Linq;
+using DTOs.NotificationDTO;
+using System;
 
 namespace StadiumManagerUI.Controllers
 {
@@ -17,18 +19,24 @@ namespace StadiumManagerUI.Controllers
         private readonly IDiscountService _discountService;
         private readonly IStadiumService _stadiumService;
         private readonly ITokenService _tokenService;
-        private readonly IUserService _userService; // Add IUserService
+        private readonly IUserService _userService;
+        private readonly IFavoriteStadiumService _favoriteStadiumService;
+        private readonly INotificationService _notificationService;
 
         public DiscountController(
             IDiscountService discountService,
             IStadiumService stadiumService,
             ITokenService tokenService,
-            IUserService userService) // Inject IUserService
+            IUserService userService,
+            IFavoriteStadiumService favoriteStadiumService,
+            INotificationService notificationService)
         {
             _discountService = discountService;
             _stadiumService = stadiumService;
             _tokenService = tokenService;
-            _userService = userService; // Assign injected service
+            _userService = userService;
+            _favoriteStadiumService = favoriteStadiumService;
+            _notificationService = notificationService;
         }
 
         // Action này CHỈ trả về View rỗng
@@ -163,6 +171,17 @@ namespace StadiumManagerUI.Controllers
                 return StatusCode(500, new { success = false, message = "Tạo discount thất bại. Mã có thể đã tồn tại." });
             }
 
+            try
+            {
+                // Gọi hàm helper để xử lý logic gửi thông báo phức tạp
+                await SendNotificationForNewDiscount(createdDiscount, accessToken);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nhưng không làm ảnh hưởng đến luồng chính
+                Console.WriteLine($"[NotificationError] Failed to send notification for new discount {createdDiscount.Code}: {ex.Message}");
+            }
+
             return Json(new { success = true, data = createdDiscount });
         }
 
@@ -210,6 +229,74 @@ namespace StadiumManagerUI.Controllers
 
             var updatedDiscount = await _discountService.GetDiscountByIdAsync(dto.Id);
             return Json(new { success = true, data = updatedDiscount });
+        }
+
+        // --- HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT VỚI LOGIC IF/ELSE ---
+        private async Task SendNotificationForNewDiscount(ReadDiscountDTO discount, string accessToken)
+        {
+            // Lấy tên các sân áp dụng (dùng chung cho cả hai loại)
+            var stadiumNames = new List<string>();
+            if (discount.StadiumIds.Any())
+            {
+                foreach (var stadiumId in discount.StadiumIds)
+                {
+                    var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+                    if (stadium != null) stadiumNames.Add(stadium.Name);
+                }
+            }
+            string appliedStadiums = stadiumNames.Any() ? string.Join(", ", stadiumNames) : "các sân được chọn";
+
+            // Trường hợp 1: Gửi cho người dùng cụ thể (UNIQUE)
+            if ("Unique".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && int.TryParse(discount.TargetUserId, out int targetUserId))
+            {
+                var notification = new NotificationDTO
+                {
+                    UserId = targetUserId,
+                    Type = "Discount.New",
+                    Title = "Bạn có mã giảm giá cá nhân!",
+                    Message = $"Bạn nhận được mã giảm giá cá nhân: {discount.Code}, áp dụng cho sân: '{appliedStadiums}'. Mã này chỉ dành riêng cho bạn!",
+                    Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
+                    CreatedAt = DateTime.UtcNow,
+                };
+                Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
+
+                await _notificationService.SendNotificationToUserAsync(notification); // Giả sử hàm này gọi API
+
+                Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+            }
+            // Trường hợp 2: Gửi cho người yêu thích sân (STADIUM)
+            else if ("Stadium".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && discount.StadiumIds.Any())
+            {
+                var userIdsToNotify = new HashSet<int>();
+                foreach (var stadiumId in discount.StadiumIds)
+                {
+                    var favorites = await _favoriteStadiumService.GetFavoritesByStadiumIdAsync(stadiumId, accessToken);
+                    foreach (var fav in favorites)
+                    {
+                        userIdsToNotify.Add(fav.UserId);
+                    }
+                }
+
+                if (!userIdsToNotify.Any()) return;
+
+                foreach (var userId in userIdsToNotify)
+                {
+                    var notification = new NotificationDTO
+                    {
+                        UserId = userId,
+                        Type = "Discount.New",
+                        Title = "Sân bạn yêu thích có mã giảm giá mới!",
+                        Message = $"Sân '{appliedStadiums}' bạn yêu thích vừa có mã giảm giá mới: {discount.Code}. Hãy sử dụng ngay!",
+                        Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
+                        CreatedAt = DateTime.Now,
+                    };
+                    Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
+
+                    await _notificationService.SendNotificationToAll(notification); // Giả sử hàm này gọi API
+
+                    Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+                }
+            }
         }
     }
 }

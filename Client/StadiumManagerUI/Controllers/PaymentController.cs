@@ -157,7 +157,7 @@ namespace StadiumManagerUI.Controllers
                 Title = "Lịch đặt sân đã bị hủy",
                 Message = $"Lịch đặt của bạn tại sân '{stadiumName}' vào ngày {booking.Date:dd/MM/yyyy} đã được chủ sân hủy.",
                 Parameters = JsonSerializer.Serialize(new { bookingType = "daily", bookingId }),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
             };
             await _notificationService.SendNotificationToUserAsync(notificationDto);
         }
@@ -203,7 +203,7 @@ namespace StadiumManagerUI.Controllers
                     var cancelledDates = string.Join(", ", cancelledChildBookings.Select(b => b.Date.ToString("dd/MM")));
                     notifMessage = $"Chủ sân đã hủy các lịch đặt ngày: {cancelledDates} trong gói đặt sân tại '{stadiumName}'.";
                 }
-                var notificationDto = new NotificationDTO { UserId = monthlyBooking.UserId, Type = notifType, Title = notifTitle, Message = notifMessage, Parameters = JsonSerializer.Serialize(new { bookingType = "monthly", monthlyBookingId }), CreatedAt = DateTime.UtcNow, };
+                var notificationDto = new NotificationDTO { UserId = monthlyBooking.UserId, Type = notifType, Title = notifTitle, Message = notifMessage, Parameters = JsonSerializer.Serialize(new { bookingType = "monthly", monthlyBookingId }), CreatedAt = DateTime.Now, };
                 await _notificationService.SendNotificationToUserAsync(notificationDto);
             }
         }

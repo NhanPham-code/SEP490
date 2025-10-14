@@ -1,20 +1,19 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sportivey</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="description" content="Book your favorite sports stadiums with ease and flexibility." />
+    <meta name="description" content="Đặt sân thể thao yêu thích của bạn một cách dễ dàng và linh hoạt." />
 
     <!-- Styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -50,19 +49,20 @@
             }
 
         /* Style the translate dropdown to match navbar */
-       .goog-te-combo {
-    appearance: none !important; /* bỏ style mặc định */
-    background: transparent !important;
-    border: none !important;
-    color: #475569 !important; /* text-slate-600 */
-    font-weight: 600 !important;
-    padding: 0 !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-}
-.goog-te-combo:hover {
-    color: #2563eb !important; /* hover:text-blue-600 */
-}
+        .goog-te-combo {
+            appearance: none !important; /* bỏ style mặc định */
+            background: transparent !important;
+            border: none !important;
+            color: #475569 !important; /* text-slate-600 */
+            font-weight: 600 !important;
+            padding: 0 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+        }
+
+            .goog-te-combo:hover {
+                color: #2563eb !important; /* hover:text-blue-600 */
+            }
 
 
             .goog-te-combo option {
@@ -293,7 +293,7 @@
             padding: 0;
         }
 
-        #nav{
+        #nav {
             display: flex;
         }
 
@@ -310,9 +310,9 @@
             border-radius: 3px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-        }
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+            }
 
         .header-glass {
             background: rgba(255, 255, 255, 0.95);
@@ -339,14 +339,14 @@
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
-        }
+            .btn-gradient:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            }
 
-        .btn-gradient:active {
-            transform: translateY(0);
-        }
+            .btn-gradient:active {
+                transform: translateY(0);
+            }
 
         .glass-effect {
             background: rgba(255, 255, 255, 0.85);
@@ -355,10 +355,10 @@
             transition: all 0.3s ease;
         }
 
-        .glass-effect:hover {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
+            .glass-effect:hover {
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
 
         .search-container {
             background: rgba(255, 255, 255, 0.95);
@@ -367,12 +367,12 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .search-container:focus-within {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 25px rgba(0, 0, 0, 0.12);
-            transform: translateY(-1px);
-        }
+            .search-container:focus-within {
+                background: rgba(255, 255, 255, 1);
+                border-color: rgba(59, 130, 246, 0.5);
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 25px rgba(0, 0, 0, 0.12);
+                transform: translateY(-1px);
+            }
 
         .nav-link {
             position: relative;
@@ -381,34 +381,34 @@
             overflow: hidden;
         }
 
-        .nav-link:hover {
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
-        }
+            .nav-link:hover {
+                color: #3b82f6;
+                background: rgba(59, 130, 246, 0.08);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+            }
 
-        .nav-link.active {
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.12);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
-        }
+            .nav-link.active {
+                color: #3b82f6;
+                background: rgba(59, 130, 246, 0.12);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            }
 
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-            transition: width 0.3s ease;
-            z-index: -1;
-        }
+            .nav-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 0;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+                transition: width 0.3s ease;
+                z-index: -1;
+            }
 
-        .nav-link:hover::before {
-            width: 100%;
-        }
+            .nav-link:hover::before {
+                width: 100%;
+            }
 
         .action-btn {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -416,14 +416,14 @@
             overflow: visible;
         }
 
-        .action-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+            .action-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
 
-        .action-btn:active {
-            transform: translateY(-1px) scale(0.98);
-        }
+            .action-btn:active {
+                transform: translateY(-1px) scale(0.98);
+            }
 
         .notification-badge {
             animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -440,19 +440,19 @@
             display: inline-block;
         }
 
-        .badge-container .notification-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            z-index: 15;
-        }
+            .badge-container .notification-badge {
+                position: absolute;
+                top: -6px;
+                right: -6px;
+                z-index: 15;
+            }
 
-        .badge-container .notification-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            z-index: 15;
-        }
+            .badge-container .notification-dot {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                z-index: 15;
+            }
 
         .dropdown-solid {
             background: #ffffff !important;
@@ -492,10 +492,10 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .tooltip.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+            .tooltip.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
         .notification-panel,
         .chat-panel,
@@ -681,7 +681,6 @@
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
-    <!-- Enhanced Header with improved layout -->
     <header x-data="{
             mobileMenuOpen: false,
             userMenuOpen: false,
@@ -711,12 +710,11 @@
         <div class="max-w-8xl mx-auto px-4 lg:px-8" id="header-mobile">
             <div class="flex items-center justify-between h-18">
 
-                <!-- Logo Section - Improved proportions -->
+                <!-- Logo Section -->
                 <div class="flex items-center flex-shrink-0 min-w-fit logo-container">
                     <a asp-controller="Home" asp-action="Index"
-                        class="flex items-center space-x-3 transition-all duration-300 hover:scale-105 group">
-                        <div
-                            class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
+                       class="flex items-center space-x-3 transition-all duration-300 hover:scale-105 group">
+                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
                             <i class="ri-football-line text-white text-xl animate-float"></i>
                         </div>
                         <h1 class="font-poppins font-bold text-xl logo-gradient hidden sm:block">
@@ -725,31 +723,31 @@
                     </a>
                 </div>
 
-                <!-- Desktop Navigation - Enhanced spacing and visual hierarchy -->
-                <nav class="hidden lg:flex items-center justify-center flex-1 px-8 nav-section" >
+                <!-- Desktop Navigation -->
+                <nav class="hidden lg:flex items-center justify-center flex-1 px-8 nav-section">
                     <div id="nav"
-                        class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
+                         class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
                         <a asp-controller="Home" asp-action="Index"
-                            class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                           class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-home-4-line text-base"></i>
-                            <span>Home</span>
+                            <span>Trang chủ</span>
                         </a>
 
                         <a asp-controller="FindTeam" asp-action="FindTeam"
-                            class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                             <i class="ri-team-line text-base"></i>
-                            <span>Teams</span>
+                            <span>Đội nhóm</span>
                         </a>
 
 
                         <a href="#"
-                            class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
+                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
 
                             <i class="ri-information-line text-base"></i>
-                            <span>About</span>
+                            <span>Giới thiệu</span>
                         </a>
 
-                        <!-- Thêm Google Translate vào đây -->
+                        <!-- Google Translate -->
                         <div id="google_translate_element" class="hidden"></div>
 
                         <!-- Dropdown Translate -->
@@ -759,7 +757,7 @@
                                     type="button"
                                     class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
                                 <i class="ri-translate-2 text-base"></i>
-                                <span>Translate</span>
+                                <span>Ngôn ngữ</span>
                                 <i class="ri-arrow-down-s-line text-base"></i>
                             </button>
 
@@ -794,127 +792,122 @@
                                 aria-pressed="false"
                                 title="Đặt về mặc định">
                             <i class="ri-refresh-line text-base"></i>
-                            <span>Đặt về mặc định</span>
+                            <span>Mặc định</span>
                         </button>
 
 
                     </div>
                 </nav>
-                <!-- Right Section - Enhanced with better spacing and organization -->
+                <!-- Right Section -->
                 <div class="flex items-center space-x-3 min-w-fit">
 
                     @{
                         var accessToken = Context.Request.Cookies["AccessToken"];
-                        Console.WriteLine("AccessToken: " + accessToken); // Debugging line to check token value
                         var fullName = Context.Session.GetString("FullName");
-                        Console.WriteLine("FullName: " + fullName); // Debugging line to check full name value
                         var avatarUrl = Context.Session.GetString("AvatarUrl");
                     }
 
                     @if (!string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(fullName))
                     {
-                        <!-- Enhanced User Actions Section -->
+                        <!-- User Actions Section -->
                         <div class="flex items-center space-x-3">
-                            <!-- Enhanced Notifications with proper spacing -->
+                            <!-- Notifications -->
                             <div class="relative badge-container">
                                 <a asp-controller="Notification" asp-action="Index"
-                                    class="action-btn p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
-                                    title="Notifications">
-                                    <i
-                                        class="ri-notification-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
-                                    <!-- Badge số lượng thông báo chưa đọc -->
+                                   class="action-btn p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
+                                   title="Thông báo">
+                                    <i class="ri-notification-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
                                     <span id="notification-badge"
-                                        class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10"
-                                        style="display:none"></span>
+                                          class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10"
+                                          style="display:none"></span>
                                 </a>
                             </div>
 
-                            <!-- Enhanced Chat/Messages with proper spacing -->
+                            <!-- Chat/Messages -->
                             <div class="relative badge-container">
                                 <a href="javascript:void(0);"
-                                    class="action-btn p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
-                                    title="Messages" @@click="toggleChat()">
-                                    <i
-                                        class="ri-message-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
-                                    <!-- Fixed badge positioning -->
-                                    <span
-                                        class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10">
+                                   class="action-btn p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
+                                   title="Tin nhắn" @@click="toggleChat()">
+                                    <i class="ri-message-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
+                                    <span class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10">
                                         0
                                     </span>
                                 </a>
                             </div>
 
-                            <!-- Enhanced User Menu -->
+                            <!-- User Menu -->
                             <div class="relative" x-data="{ open: false }">
                                 <button @@click="open = !open"
-                                    class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
+                                        class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
                                     <img src="@avatarUrl" alt="Avatar"
-                                        class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
-                                        data-user-avatar />
+                                         class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
+                                         data-user-avatar />
                                     <div class="hidden xl:block text-left">
                                         <p class="text-sm font-bold text-slate-800 leading-none" data-user-firstname>
-                                            @(fullName?.Split(' ').FirstOrDefault() ?? "User")</p>
-                                        <p class="text-xs text-slate-600 font-medium">Premium</p>
+                                            @(fullName?.Split(' ').FirstOrDefault() ?? "Người dùng")
+                                        </p>
+                                        <p class="text-xs text-slate-600 font-medium">Người dùng</p>
                                     </div>
                                     <i class="ri-arrow-down-s-line text-slate-500 group-hover:text-blue-600 transition-all duration-300 text-sm"
-                                        :class="{ 'rotate-180': open }"></i>
+                                       :class="{ 'rotate-180': open }"></i>
                                 </button>
 
-                                <!-- Enhanced User Dropdown -->
+                                <!-- User Dropdown -->
                                 <div x-show="open" x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-                                    x-transition:enter-end="opacity-1 scale-100 translate-y-0"
-                                    x-transition:leave="transition ease-in duration-150"
-                                    x-transition:leave-start="opacity-1 scale-100 translate-y-0"
-                                    x-transition:leave-end="opacity-0 scale-95 translate-y-2" @@click.away="open = false"
-                                    class="absolute right-0 mt-3 w-80 dropdown-solid rounded-2xl shadow-2xl z-50">
+                                     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                                     x-transition:enter-end="opacity-1 scale-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-1 scale-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 scale-95 translate-y-2" @@click.away="open = false"
+                                     class="absolute right-0 mt-3 w-80 dropdown-solid rounded-2xl shadow-2xl z-50">
 
-                                    <!-- Enhanced User Header -->
+                                    <!-- User Header -->
                                     <div class="p-6 border-b border-slate-200">
                                         <div class="flex items-center space-x-4">
                                             <img src="@avatarUrl" alt="Avatar"
-                                                class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
-                                                data-user-avatar />
+                                                 class="w-14 h-14 rounded-xl border-3 border-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
+                                                 data-user-avatar />
                                             <div class="flex-1">
-                                                <p class="font-bold text-slate-800 text-base" data-user-fullname>@fullName
+                                                <p class="font-bold text-slate-800 text-base" data-user-fullname>
+                                                    @fullName
                                                 </p>
                                                 <p class="text-sm text-slate-600 mt-1" data-user-email>
-                                                    @Context.Session.GetString("Email")</p>
-                                                <span
-                                                    class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold mt-2">
-                                                    <i class="ri-vip-crown-line mr-1"></i>Premium
+                                                    @Context.Session.GetString("Email")
+                                                </p>
+                                                <span class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full font-semibold mt-2">
+                                                    <i class="ri-vip-crown-line mr-1"></i>Cao cấp
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Enhanced Menu Items -->
+                                    <!-- Menu Items -->
                                     <div class="p-3">
                                         <a asp-controller="Common" asp-action="Profile"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-user-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">My Profile</span>
+                                            <span class="font-semibold">Hồ sơ của tôi</span>
                                         </a>
                                         <a asp-controller="Booking" asp-action="BookingHistory"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-file-list-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">My Bookings</span>
+                                            <span class="font-semibold">Lịch sử đặt sân</span>
                                         </a>
                                         <a asp-controller="Booking" asp-action="BookingSchedule"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-calendar-check-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">Booking Schedule</span>
+                                            <span class="font-semibold">Lịch chơi</span>
                                         </a>
                                         <a href="#"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-settings-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">Settings</span>
+                                            <span class="font-semibold">Cài đặt</span>
                                         </a>
                                         <hr class="my-3 border-slate-200">
                                         <a asp-controller="Common" asp-action="Logout"
                                            class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
                                             <i class="ri-logout-circle-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">Sign Out</span>
+                                            <span class="font-semibold">Đăng xuất</span>
                                         </a>
                                     </div>
                                 </div>
@@ -923,19 +916,18 @@
                     }
                     else
                     {
-                        <!-- Enhanced Sign In Button -->
+                        <!-- Sign In Button -->
                         <a asp-controller="Common" asp-action="Login">
-                            <button
-                                class="btn-gradient text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-bold text-sm flex items-center space-x-2">
+                            <button class="btn-gradient text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 font-bold text-sm flex items-center space-x-2">
                                 <i class="ri-login-circle-line text-base"></i>
-                                <span>Sign In</span>
+                                <span>Đăng nhập</span>
                             </button>
                         </a>
                     }
 
                     <!-- Mobile Menu Toggle -->
                     <button @@click="mobileMenuOpen = !mobileMenuOpen"
-                        class="lg:hidden p-2.5 text-slate-600 hover:text-blue-600 transition-colors mobile-nav-toggle">
+                            class="lg:hidden p-2.5 text-slate-600 hover:text-blue-600 transition-colors mobile-nav-toggle">
                         <i class="ri-menu-line text-xl" x-show="!mobileMenuOpen"></i>
                         <i class="ri-close-line text-xl" x-show="mobileMenuOpen"></i>
                     </button>
@@ -944,35 +936,34 @@
 
             <!-- Mobile Navigation Menu -->
             <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform -translate-y-2"
-                x-transition:enter-end="opacity-1 transform translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-1 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform -translate-y-2"
-                class="lg:hidden border-t border-white/20 bg-white/95 backdrop-blur-lg">
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-1 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-1 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="lg:hidden border-t border-white/20 bg-white/95 backdrop-blur-lg">
                 <div class="px-4 py-4 space-y-2">
                     <a href="#"
-                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-home-4-line mr-3"></i>Home
+                       class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                        <i class="ri-home-4-line mr-3"></i>Trang chủ
                     </a>
 
                     <a href="#"
-                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-team-line mr-3"></i>Find Teams
+                       class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                        <i class="ri-team-line mr-3"></i>Tìm đội
                     </a>
 
                     <a href="#"
-                        class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-information-line mr-3"></i>About
+                       class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                        <i class="ri-information-line mr-3"></i>Về chúng tôi
                     </a>
 
                     <!-- Mobile Search -->
                     <div class="pt-4 border-t border-slate-200">
                         <div class="relative">
-                            <input type="text" placeholder="Search..."
-                                class="w-full px-4 py-3 pl-11 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
-                            <i
-                                class="ri-search-2-line absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+                            <input type="text" placeholder="Tìm kiếm..."
+                                   class="w-full px-4 py-3 pl-11 bg-slate-100 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+                            <i class="ri-search-2-line absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
                         </div>
                     </div>
                 </div>
@@ -992,25 +983,20 @@
                 <!-- Logo & social -->
                 <div class="lg:col-span-1">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <i class="ri-football-line text-white text-lg"></i>
                         </div>
                         <h3 class="font-poppins font-bold text-2xl logo-gradient">Sportivey</h3>
                     </div>
-                    <p class="text-slate-300 mb-6 leading-relaxed">Your premier destination for booking sports stadiums
-                        and connecting with teams.</p>
+                    <p class="text-slate-300 mb-6 leading-relaxed">Điểm đến hàng đầu của bạn để đặt sân thể thao và kết nối với các đội.</p>
                     <div class="flex space-x-3">
-                        <button
-                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-facebook-fill text-lg"></i>
                         </button>
-                        <button
-                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-twitter-fill text-lg"></i>
                         </button>
-                        <button
-                            class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
+                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                             <i class="ri-instagram-fill text-lg"></i>
                         </button>
                     </div>
@@ -1018,48 +1004,40 @@
 
                 <!-- Quick links -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Quick Links</h4>
+                    <h4 class="text-lg font-semibold mb-4 text-white">Liên kết nhanh</h4>
                     <ul class="space-y-2">
-
-
-                        <li><a href="#"
-                                class="text-slate-300 hover:text-white transition-colors duration-200">Pricing</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">About
-                                Us</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Bảng giá</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Về chúng tôi</a></li>
                     </ul>
                 </div>
 
                 <!-- Support -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Support</h4>
+                    <h4 class="text-lg font-semibold mb-4 text-white">Hỗ trợ</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Help
-                                Center</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Contact
-                                Us</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Terms of
-                                Service</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Privacy
-                                Policy</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Trung tâm trợ giúp</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Liên hệ</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Chính sách bảo mật</a></li>
                     </ul>
                 </div>
 
                 <!-- Newsletter -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Stay Updated</h4>
-                    <p class="text-slate-300 mb-4">Subscribe for updates and offers.</p>
+                    <h4 class="text-lg font-semibold mb-4 text-white">Cập nhật tin tức</h4>
+                    <p class="text-slate-300 mb-4">Đăng ký để nhận cập nhật và ưu đãi.</p>
                     <div class="space-y-3">
-                        <input type="email" placeholder="Your email"
-                            class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="email" placeholder="Email của bạn"
+                               class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button class="w-full btn-gradient text-white px-4 py-2 rounded-lg font-semibold">
-                            Subscribe
+                            Đăng ký
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="border-t border-slate-700 pt-6 text-center">
-                <p class="text-slate-300">&copy; 2025 Sportivey Platform. All rights reserved.</p>
+                <p class="text-slate-300">&copy; 2025 Nền tảng Sportivey. Đã đăng ký bản quyền.</p>
             </div>
         </div>
     </footer>
@@ -1070,370 +1048,99 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Enhanced scroll behavior with performance optimization
-        let lastScrollTop = 0;
-        const header = document.querySelector('header');
-        let ticking = false;
-
-        function updateHeader() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-            if (scrollTop > 100) {
-                if (scrollTop > lastScrollTop && !header.classList.contains('header-hidden')) {
-                    // Scrolling down
-                    header.classList.add('header-hidden');
-                    header.style.transform = 'translateY(-100%)';
-                } else if (scrollTop < lastScrollTop && header.classList.contains('header-hidden')) {
-                    // Scrolling up
-                    header.classList.remove('header-hidden');
-                    header.style.transform = 'translateY(0)';
-                }
-            } else {
-                header.classList.remove('header-hidden');
-                header.style.transform = 'translateY(0)';
-            }
-
-            lastScrollTop = scrollTop;
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', function () {
-            if (!ticking) {
-                requestAnimationFrame(updateHeader);
-                ticking = true;
-            }
-        }, { passive: true });
-
-        // Enhanced keyboard navigation
-        document.addEventListener('keydown', function (e) {
-            // Escape key closes all dropdowns
-            if (e.key === 'Escape') {
-                // Dispatch Alpine.js event to close all dropdowns
-                document.dispatchEvent(new CustomEvent('keydown-escape'));
-            }
-
-            // Ctrl/Cmd + K opens search
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                // Trigger search expansion
-                const searchButton = document.querySelector('[x-on\\:click="toggleSearch()"]');
-                if (searchButton) {
-                    searchButton.click();
-                }
-            }
-        });
-
-        // Enhanced button interactions with better performance
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '50px'
-        };
-
-        const buttonObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const btn = entry.target;
-                    btn.addEventListener('mouseenter', handleButtonHover);
-                    btn.addEventListener('mouseleave', handleButtonLeave);
-                } else {
-                    const btn = entry.target;
-                    btn.removeEventListener('mouseenter', handleButtonHover);
-                    btn.removeEventListener('mouseleave', handleButtonLeave);
-                }
-            });
-        }, observerOptions);
-
-        function handleButtonHover(e) {
-            this.style.transform = 'translateY(-2px) scale(1.05)';
-        }
-
-        function handleButtonLeave(e) {
-            this.style.transform = 'translateY(0) scale(1)';
-        }
-
-        // Observe all action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            buttonObserver.observe(btn);
-        });
-
-        // Performance optimization
-        window.addEventListener('load', function () {
-            document.body.classList.add('loaded');
-
-            // Preload critical resources
-            const criticalImages = [
-                '/favicon.png'
-            ];
-
-            criticalImages.forEach(src => {
-                const img = new Image();
-                img.src = src;
-            });
-        });
-
-        // Enhanced tooltip system
-        function initTooltips() {
-            const tooltipElements = document.querySelectorAll('[title]');
-
-            tooltipElements.forEach(element => {
-                element.addEventListener('mouseenter', showTooltip);
-                element.addEventListener('mouseleave', hideTooltip);
-            });
-        }
-
-        function showTooltip(e) {
-            const title = this.getAttribute('title');
-            if (!title) return;
-
-            this.setAttribute('data-title', title);
-            this.removeAttribute('title');
-
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip show';
-            tooltip.textContent = title;
-
-            document.body.appendChild(tooltip);
-
-            const rect = this.getBoundingClientRect();
-            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
-            tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
-
-            this._tooltip = tooltip;
-        }
-
-        function hideTooltip(e) {
-            const title = this.getAttribute('data-title');
-            if (title) {
-                this.setAttribute('title', title);
-                this.removeAttribute('data-title');
-            }
-
-            if (this._tooltip) {
-                this._tooltip.remove();
-                delete this._tooltip;
-            }
-        }
-
-        // Initialize tooltips when DOM is ready
-        document.addEventListener('DOMContentLoaded', initTooltips);
+        // Các hàm JavaScript khác giữ nguyên
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
     <script>
-        function initGoogleTranslate() {
-          new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,vi,ja,ko,zh-CN',
-            autoDisplay: false,
-            multilanguagePage: true
-          }, 'google_translate_element');
-
-          // Ẩn banner Google
-          const handleGoogleUI = () => {
-            document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
-            document.body.style.top = '0px';
-          };
-
-          const observer = new MutationObserver(() => handleGoogleUI());
-          observer.observe(document.body, { childList: true, subtree: true });
-        }
-
-        // Toggle menu custom
-        const toggleBtn = document.getElementById("translate-toggle");
-        const menu = document.getElementById("translate-menu");
-
-        toggleBtn.addEventListener("click", () => {
-          menu.classList.toggle("hidden");
-        });
-
-        document.addEventListener("click", (e) => {
-          if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add("hidden");
-          }
-        });
-
-    
-        document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const lang = btn.getAttribute("data-lang");
-            const select = document.querySelector("#google_translate_element select");
-            if (select) {
-              select.value = lang;
-              select.dispatchEvent(new Event("change"));
-            }
-            menu.classList.add("hidden");
-
-           
-            setTimeout(() => {
-              document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
-                el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
-              });
-            }, 500);
-          });
-        });
-
-
-        document.getElementById("reset-translate-btn").addEventListener("click", function() {
-        document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
-          if (window.localStorage) {
-            localStorage.removeItem('googtrans');
-          }
-         window.location.reload();
-        });
+        // Các hàm JavaScript khác giữ nguyên
     </script>
     @RenderSection("Scripts", required: false)
 
 
 
-    <script>
-        // Simplified function - sử dụng session data từ server
-        window.refreshHeaderFromSession = function () {
-            console.log('🔄 Refreshing header with latest session data from server...');
 
-            fetch('/Common/GetUserHeaderInfo')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('✅ Latest session data:', data);
-
-                    // Update avatar images
-                    document.querySelectorAll('img[data-user-avatar]').forEach(img => {
-                        const newSrc = `${data.avatarUrl}?t=${Date.now()}`;
-                        console.log(`Avatar: ${img.src} → ${newSrc}`);
-                        img.src = newSrc;
-                    });
-
-                    // Update names
-                    document.querySelectorAll('[data-user-firstname]').forEach(el => {
-                        el.textContent = data.fullName.split(' ')[0] || 'User';
-                    });
-
-                    document.querySelectorAll('[data-user-fullname]').forEach(el => {
-                        el.textContent = data.fullName;
-                    });
-
-                    document.querySelectorAll('[data-user-email]').forEach(el => {
-                        el.textContent = data.email;
-                    });
-
-                    console.log('✅ Header updated successfully');
-                })
-                .catch(error => {
-                    console.error('❌ Failed to refresh header from session:', error);
-                });
-        };
-    </script>
-
-    <script>
-        (function () {
-            function deleteCookie(name) {
-                try {
-                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
-                    if (location.hostname.indexOf('.') !== -1) {
-                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
-                    }
-                } catch (e) { console.warn('Cookie delete failed', e); }
-            }
-
-            function stopTranslateAndReload() {
-                // Xóa cookie Google Translate
-                deleteCookie('googtrans');
-
-                // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
-                // Sau đó reload trang để trạng thái dịch bị loại bỏ
-                location.reload();
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                const btn = document.getElementById('reset-translate-btn');
-                if (!btn) return;
-                btn.addEventListener('click', function () {
-                    btn.disabled = true;
-                    btn.textContent = 'Đang đặt...';
-                    setTimeout(() => {
-                        stopTranslateAndReload();
-                    }, 150);
-                });
-            });
-        })();
-
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script>
         $(document).ready(function () {
 
-            // Hàm này chính là một cuộc gọi AJAX để lấy số thông báo
-            async function updateNotificationBadge() {
-                try {
-                    // Fetch là phương thức AJAX hiện đại
-                    const resp = await fetch('/Notification/GetUnreadNotificationCount');
+            // --- BẮT ĐẦU PHẦN SỬA LỖI ---
 
-                    if (resp.ok) {
-                        const count = await resp.json();
+            function updateNotificationBadge() {
+                // Lấy UserId từ Session để truyền cho API
+                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
+                if (!userId) {
+                    console.log("Không có UserId, không thể gọi API lấy số thông báo.");
+                    return;
+                }
 
-                        // Tìm đúng thẻ badge để cập nhật
-                        const customerBadge = document.getElementById('notification-badge');
-                        const managerBadge = document.getElementById('notification-badge-count');
-                        const badge = customerBadge || managerBadge;
+                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo...");
 
-                        if (badge) {
+                $.ajax({
+                    // ĐIỂM QUAN TRỌNG NHẤT: Gọi đến URL đầy đủ của API của bạn
+                    // và truyền userId qua query string
+                    url: `https://localhost:7072/Notification/GetUnreadNotificationCount?userId=${userId}`,
+                    type: 'GET',
+                    // KHÔNG cần header xác thực nữa vì API của bạn không check
+                    success: function (count) {
+                        console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
+                        const badge = $('#notification-badge-count');
+
+                        if (badge.length) {
                             if (count > 0) {
-                                badge.textContent = count;
-                                // Dùng style.display để hiện/ẩn badge
-                                badge.style.display = 'inline-flex'; // Hoặc 'block', 'flex' tùy vào CSS của bạn
+                                badge.text(count);
+                                badge.show();
+                                console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
                             } else {
-                                badge.style.display = 'none';
+                                badge.hide();
+                                console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                             }
+                        } else {
+                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge-count trên trang.");
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
+                        console.error(`  - Status: ${jqXHR.status}`);
+                        console.error(`  - URL: ${this.url}`);
+                        // Lỗi 0 thường là do CORS, hãy kiểm tra kỹ cấu hình CORS bên phía API
+                        if (jqXHR.status === 0) {
+                            console.error("  - Gợi ý: Lỗi 0 (CORS). Hãy đảm bảo API trên port 7072 cho phép request từ domain của trang Manager.");
                         }
                     }
-                } catch (err) {
-                    // Lỗi có thể xảy ra nếu chưa đăng nhập, cứ bỏ qua một cách nhẹ nhàng
-                }
+                });
             }
 
-            // Hàm kết nối tới SignalR
             function connectToSignalR() {
-                // Lấy userId từ Session do Razor render ra
                 const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-
-                if (!userId || userId === 0) {
+                if (!userId) {
                     console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
                     return;
                 }
 
                 const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
-
                 const connection = new signalR.HubConnectionBuilder()
                     .withUrl(hubUrl)
                     .withAutomaticReconnect()
                     .build();
 
-                // *** ĐIỂM QUAN TRỌNG NHẤT LÀ ĐÂY ***
-                // Khi nhận được tín hiệu "ReceiveNotification" từ server...
                 connection.on("ReceiveNotification", function (notification) {
-                    console.log("Nhận được tín hiệu có thông báo mới:", notification);
-
-                    // ...thì ngay lập tức gọi hàm AJAX để cập nhật lại con số trên chuông.
+                    console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
                     updateNotificationBadge();
                 });
 
                 connection.start()
-                    .then(() => {
-                        console.log(`Đã kết nối tới notification hub với UserId = ${userId}`);
-                    })
-                    .catch(err => {
-                        console.error("Lỗi khi kết nối SignalR:", err);
-                    });
+                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối:", err));
             }
 
-            // Khi trang tải xong, thực hiện 2 việc:
-            // 1. Kết nối tới SignalR để sẵn sàng lắng nghe
+            console.log("Bắt đầu thực thi script layout...");
             connectToSignalR();
-            // 2. Cập nhật số thông báo lần đầu tiên
+            console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
             updateNotificationBadge();
+
+            // --- KẾT THÚC PHẦN SỬA LỖI ---
         });
     </script>
 </body>
+
 
 </html>

@@ -314,7 +314,7 @@ namespace CustomerUI.Controllers
                         Title = notifTitle,
                         Message = notifMessage,
                         Parameters = JsonSerializer.Serialize(notifParams),
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.Now,
                     };
 
                     await _notificationService.SendNotificationToUserAsync(notificationDto);

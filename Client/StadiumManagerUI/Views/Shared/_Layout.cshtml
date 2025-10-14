@@ -361,7 +361,7 @@
             <div class="sidebar-logo">S</div>
             <div>
                 <h5 class="sidebar-title">Sportivey</h5>
-                <small class="sidebar-subtitle">Stadium Owner</small>
+                <small class="sidebar-subtitle">Chủ sân vận động</small>
             </div>
         </div>
 
@@ -423,7 +423,6 @@
         var fullName = Context.Session.GetString("FullName");
         var avatarUrl = Context.Session.GetString("AvatarUrl");
 
-        // Nếu không có accessToken hoặc fullName => Người dùng chưa đăng nhập
         if (string.IsNullOrEmpty(accessToken))
         {
             Context.Response.Redirect(Url.Action("Login", "Common"));
@@ -438,15 +437,12 @@
             </div>
 
             <div class="user-info dropdown">
-                <!-- *** THAY ĐỔI Ở ĐÂY *** -->
-                <!-- Bọc toàn bộ khối thông báo bằng thẻ <a> -->
                 <a href="@Url.Action("Index", "Notification")" class="notification-container" title="Thông báo">
                     <div class="notification-icon">
                         <i class="fas fa-bell"></i>
                     </div>
                     <span id="notification-badge-count" class="badge rounded-pill bg-danger"></span>
                 </a>
-                <!-- *** HẾT THAY ĐỔI *** -->
 
                 <span class="fw-medium" title="@fullName">@fullName</span>
                 <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Menu tài khoản">
@@ -501,38 +497,31 @@
     <script>
         $(document).ready(function () {
 
-            // Hàm này chính là một cuộc gọi AJAX để lấy số thông báo
-            async function updateNotificationBadge() {
-                try {
-                    // Fetch là phương thức AJAX hiện đại
-                    const resp = await fetch('/Notification/GetUnreadNotificationCount');
 
-                    if (resp.ok) {
-                        const count = await resp.json();
+            function updateNotificationBadge() {
+                $.ajax({
+                    url: '/Notification/GetUnreadNotificationCount',
+                    type: 'GET',
+                    success: function (count) {
+                        const badge = $('#notification-badge-count'); 
 
-                        // Tìm đúng thẻ badge để cập nhật
-                        const customerBadge = document.getElementById('notification-badge');
-                        const managerBadge = document.getElementById('notification-badge-count');
-                        const badge = customerBadge || managerBadge;
-
-                        if (badge) {
+                        if (badge.length) { 
                             if (count > 0) {
-                                badge.textContent = count;
-                                // Dùng style.display để hiện/ẩn badge
-                                badge.style.display = 'inline-flex'; // Hoặc 'block', 'flex' tùy vào CSS của bạn
+                                badge.text(count);
+                                badge.show(); 
                             } else {
-                                badge.style.display = 'none';
+                                badge.hide(); 
                             }
                         }
+                    },
+                    error: function () {
+                        
                     }
-                } catch (err) {
-                    // Lỗi có thể xảy ra nếu chưa đăng nhập, cứ bỏ qua một cách nhẹ nhàng
-                }
+                });
             }
 
-            // Hàm kết nối tới SignalR
+
             function connectToSignalR() {
-                // Lấy userId từ Session do Razor render ra
                 const userId = @(Context.Session.GetInt32("UserId") ?? 0);
 
                 if (!userId || userId === 0) {
@@ -547,29 +536,23 @@
                     .withAutomaticReconnect()
                     .build();
 
-                // *** ĐIỂM QUAN TRỌNG NHẤT LÀ ĐÂY ***
-                // Khi nhận được tín hiệu "ReceiveNotification" từ server...
                 connection.on("ReceiveNotification", function (notification) {
                     console.log("Nhận được tín hiệu có thông báo mới:", notification);
-
-                    // ...thì ngay lập tức gọi hàm AJAX để cập nhật lại con số trên chuông.
                     updateNotificationBadge();
                 });
 
                 connection.start()
                     .then(() => {
-                        console.log(`Đã kết nối tới notification hub với UserId = ${userId}`);
+                        console.log(`Đã kết nối tới hub thông báo với UserId = ${userId}`);
                     })
                     .catch(err => {
                         console.error("Lỗi khi kết nối SignalR:", err);
                     });
             }
 
-            // Khi trang tải xong, thực hiện 2 việc:
-            // 1. Kết nối tới SignalR để sẵn sàng lắng nghe
             connectToSignalR();
-            // 2. Cập nhật số thông báo lần đầu tiên
             updateNotificationBadge();
+
         });
     </script>
 </body>
