@@ -125,6 +125,23 @@ namespace Service.Services
 
             return await response.Content.ReadFromJsonAsync<BookingReadDto>();
         }
+        public async Task<BookingReadDto?> CreateBookingByOwnerAsync(BookingCreateDto bookingDto, string accessToken)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _httpClient.PostAsJsonAsync("/Bookings/create-by-owner", bookingDto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<BookingReadDto>();
+            }
+
+            // Ghi log lỗi nếu cần
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Failed to create booking by owner. Status: {response.StatusCode}, Content: {errorContent}");
+
+            return null;
+        }
 
         public async Task<List<BookingReadDto>> GetBookedCourtsAsync(int stadiumId, DateTime startTime, DateTime endTime)
         {
@@ -139,11 +156,13 @@ namespace Service.Services
             string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
             string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
 
+            string statusFilter = "(Status eq 'waiting' or Status eq 'completed' or Status eq 'accepted')";
+
 
             string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
-               $"and BookingDetails/any(d: d/StartTime lt {endIso} and d/EndTime gt {startIso})" +
-               "&$expand=BookingDetails";
-
+                $"and BookingDetails/any(d: d/StartTime lt {endIso} and d/EndTime gt {startIso})" +
+                $"and {statusFilter}" + // Thêm filter trạng thái vào đây
+                "&$expand=BookingDetails";
             var response = await _httpClient.GetAsync(query);
 
             if (!response.IsSuccessStatusCode)
@@ -168,9 +187,12 @@ namespace Service.Services
             string startIso = Uri.EscapeDataString(startTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
             string endIso = Uri.EscapeDataString(endTime.ToString("yyyy-MM-ddTHH:mm:sszzz"));
 
+            string statusFilter = "(Status eq 'waiting' or Status eq 'completed' or Status eq 'accepted')";
+
             // Tạo query đúng định dạng OData
             string query = $"/bookings/booked?$filter=StadiumId eq {stadiumId} " +
-                           $"and Date ge {startIso} and Date lt {endIso}" +
+                           $"and Date ge {startIso} and Date lt {endIso} " +
+                           $"and {statusFilter}" +
                            "&$expand=BookingDetails";
 
             var response = await _httpClient.GetAsync(query);
