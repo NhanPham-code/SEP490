@@ -206,14 +206,14 @@ namespace BookingAPI.Controllers
         }
 
         [HttpGet("statistics")]
-        public async Task<ActionResult<RevenueStatisticDto>> GetRevenueStatistics([FromQuery] int? year, [FromQuery] int? month, [FromQuery] int? day)
+        public async Task<ActionResult<RevenueStatisticDto>> GetRevenueStatistics([FromQuery] int? year, [FromQuery] int? month, [FromQuery] int? day, [FromQuery] List<int>? stadiumIds)
         {
             try
             {
                 // Nếu không có năm được cung cấp, mặc định lấy năm hiện tại
                 int targetYear = year ?? DateTime.UtcNow.Year;
 
-                var statistics = await _bookingService.GetRevenueStatisticsAsync(targetYear, month, day);
+                var statistics = await _bookingService.GetRevenueStatisticsAsync(targetYear, month, day, stadiumIds);
                 return Ok(statistics);
             }
             catch (Exception ex)

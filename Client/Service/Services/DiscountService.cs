@@ -92,30 +92,44 @@ namespace Service.Services
         /// Lấy danh sách discount qua OData với lọc, phân trang, count
         /// </summary>
         public async Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
-            string accessToken,
-            int? userId,
-            int page = 1,
-            int pageSize = 5,
-            string? searchByCode = null,
-            int? stadiumId = null,
-            bool? isActive = null)
+        string accessToken,
+        int? userId = null,
+        int page = 1,
+        int pageSize = 5,
+        string? searchByCode = null,
+        int? stadiumId = null,
+        bool? isActive = null)
         {
             AddBearerAccessToken(accessToken);
-            Console.WriteLine($"------------------------------------------------{userId}");
-            var filters = new List<string> { $"userId eq '{userId}'" };
+
+
+            var filters = new List<string>();
+
+            if (userId.HasValue)
+            {
+                filters.Add($"userId eq '{userId.Value}'");
+            }
 
             if (!string.IsNullOrEmpty(searchByCode))
+            {
                 filters.Add($"contains(tolower(Code), tolower('{searchByCode}'))");
+            }
 
             if (isActive.HasValue)
+            {
                 filters.Add($"IsActive eq {isActive.Value.ToString().ToLower()}");
+            }
 
             if (stadiumId.HasValue)
+            {
                 filters.Add($"StadiumIds/any(s: s eq {stadiumId.Value})");
+            }
 
             var query = new List<string>();
             if (filters.Any())
+            {
                 query.Add($"$filter={string.Join(" and ", filters)}");
+            }
 
             var skip = (page - 1) * pageSize;
             query.Add($"$skip={skip}");

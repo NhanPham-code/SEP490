@@ -41,5 +41,13 @@ namespace Service.Interfaces
         /// <param name="stadiumId">ID của sân vận động.</param>
         /// <returns>True nếu đã tồn tại, ngược lại là false.</returns>
         Task<bool> IsFavoriteExistsAsync(int userId, int stadiumId, string accessToken);
+
+        /// <summary>
+        /// Lấy danh sách tất cả người dùng đã yêu thích một sân vận động cụ thể.
+        /// </summary>
+        /// <param name="stadiumId">ID của sân vận động.</param>
+        /// <param name="accessToken">Access token để xác thực.</param>
+        /// <returns>Danh sách các Favorite DTO.</returns>
+        Task<IEnumerable<ReadFavoriteDTO>> GetFavoritesByStadiumIdAsync(int stadiumId, string accessToken);
     }
 }

@@ -12,6 +12,7 @@ namespace DTOs.BookingDTO
         public double WaitingBookingsPercentage { get; set; }
         public int CancelledBookingsCount { get; set; }
         public double CancelledBookingsPercentage { get; set; }
+        public decimal TotalOriginalRevenue { get; set; }
         public Dictionary<int, Dictionary<int, decimal>> MonthlyRevenueChartData { get; set; } = new Dictionary<int, Dictionary<int, decimal>>();
     }
 }

@@ -12,6 +12,8 @@ using NotificationAPI.Service;
 using NotificationAPI.Service.Interface;
 using System.Text;
 
+
+using Microsoft.AspNetCore.SignalR;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -112,8 +114,11 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 // Inject Services
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// SignalR
 builder.Services.AddSignalR();
+
+
+
+builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 
 var app = builder.Build();
 

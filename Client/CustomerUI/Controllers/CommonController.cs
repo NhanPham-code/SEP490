@@ -67,6 +67,41 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetString("AvatarUrl", avatarFullUrl);
         }
 
+        // thêm hoặc cập nhật khuôn mặt
+        [HttpPost]
+        public async Task<IActionResult> AddOrUpdateFaceEmbeddings([FromForm] FaceImagesDTO faceImagesDTO)
+        {
+            // 1. Get access token from cookie
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+
+            // 2. Handle missing access token
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            // 3. Call the service to add or update face embeddings
+            try
+            {
+                var result = await _userService.AddorUpdateFaceEmbeddings(faceImagesDTO, accessToken);
+
+                if (!result)
+                {
+                    return BadRequest(new { message = "Thêm và cập nhật khuôn mặt thất bại. " });
+                }
+
+                return Ok(new { message = "Thêm và cập nhật khuôn mặt thành công." });
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new { message = $"Thêm và cập nhật khuôn mặt thất bại: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error: {ex.Message}" });
+            }
+        }
+
         // Xử lý đăng nhập bằng AI Face
         [HttpPost]
         public async Task<IActionResult> AiFaceAuth([FromForm] AiFaceLoginRequestDTO request)
@@ -666,5 +701,31 @@ namespace CustomerUI.Controllers
 
             return Json(new { success = true, message = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập với mật khẩu mới." });
         }
+
+        //public IActionResult GetSignalRToken()
+        //{
+        //    // Kiểm tra xem người dùng đã đăng nhập vào ứng dụng MVC này hay chưa
+        //    // bằng cách kiểm tra một giá trị nào đó trong Session.
+        //    // Nếu chưa đăng nhập, session sẽ không có UserId.
+        //    if (HttpContext.Session.GetInt32("UserId") == null)
+        //    {
+        //        // Trả về lỗi 401 Unauthorized để JavaScript biết và dừng lại
+        //        return Unauthorized();
+        //    }
+
+        //    // Sử dụng ITokenService đã có sẵn để đọc giá trị từ cookie.
+        //    // Đây là cách làm nhất quán và đúng đắn.
+        //    var token = _tokenService.GetAccessTokenFromCookie();
+
+        //    // Nếu vì lý do nào đó không có token (dù đã đăng nhập)
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        return NotFound(new { message = "Access Token cookie not found." });
+        //    }
+
+        //    // Trả về token dưới dạng JSON
+        //    return Ok(new { token = token });
+        //}
     }
+
 }

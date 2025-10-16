@@ -31,7 +31,7 @@ namespace AdminUI.Controllers
             {
                 // Lấy dữ liệu thống kê cho ngày hiện tại để hiển thị lần đầu
                 var today = DateTime.UtcNow;
-                var initialStats = await _bookingService.GetRevenueStatisticsAsync(accessToken, today.Year, today.Month, today.Day);
+                var initialStats = await _bookingService.GetRevenueStatisticsAsync(accessToken, today.Year, today.Month, today.Day, null);
 
                 // Truyền model vào View
                 return View(initialStats);
@@ -55,7 +55,7 @@ namespace AdminUI.Controllers
             }
             try
             {
-                var statistics = await _bookingService.GetRevenueStatisticsAsync(accessToken, year, month, day);
+                var statistics = await _bookingService.GetRevenueStatisticsAsync(accessToken, year, month, day, null);
                 return Json(statistics);
             }
             catch (Exception ex)

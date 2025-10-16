@@ -1,27 +1,61 @@
 ﻿@{
-    ViewData["Title"] = "Notifications";
+    ViewData["Title"] = "Thông Báo";
 }
 
-<div class="max-w-3xl mx-auto py-8 px-4 sm:px-8">
-    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
-        <i class="ri-notification-3-line text-blue-500 mr-2"></i>
-        Notifications
-    </h2>
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <link href="~/css/Notification/notification.css" rel="stylesheet" />
+    <style>
+        /* Thêm style cho thông báo không thể click */
+        .notify-item-no-link {
+            cursor: default;
+            display: block;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+            transition: all 0.2s ease;
+        }
 
-    <div id="notification-list" class="bg-white rounded-2xl shadow-md divide-y divide-slate-100">
-        <div id="loading" class="text-center text-slate-400 py-10">Loading...</div>
+            .notify-item-no-link:last-child {
+                border-bottom: none;
+            }
+
+            .notify-item-no-link:hover {
+                background-color: #f8fafc;
+            }
+
+            .notify-item-no-link.unread {
+                background-color: #eff6ff;
+            }
+
+                .notify-item-no-link.unread:hover {
+                    background-color: #dbeafe;
+                }
+    </style>
+}
+
+<div class="notify-container">
+    <div class="notify-header">
+        <h2 class="notify-title">
+            <i class="ri-notification-3-line"></i>
+            Thông Báo
+        </h2>
     </div>
-    <div class="flex justify-center mt-4">
-        <button id="loadMoreBtn"
-                class="px-6 py-2 rounded-xl btn-gradient text-white font-semibold shadow hover:scale-105 transition"
-                style="display:none">
-            Load More
+
+    <div class="notify-list" id="notification-list">
+        <div id="loading" class="notify-loading">
+            <i class="ri-loader-4-line"></i>
+            <div>Đang tải thông báo...</div>
+        </div>
+    </div>
+
+    <div class="notify-load-more">
+        <button id="loadMoreBtn" class="notify-btn" style="display:none">
+            Xem thêm
         </button>
     </div>
 </div>
 
 @section Scripts {
-    <link href="~/css/Notification/notification.css" rel="stylesheet" />
     <script>
         const pageSize = 6;
         let skip = 0;
@@ -31,8 +65,10 @@
 
         function getIconAndColor(type) {
             switch (type) {
+                case "MonthlyBooking.New": return ["ri-calendar-event-line", "bg-teal-100 text-teal-600"];
+                case "MonthlyBooking.Cancel": return ["ri-calendar-close-line", "bg-orange-100 text-orange-600"];
                 case "Booking.New": return ["ri-calendar-check-line", "bg-blue-100 text-blue-600"];
-                case "Booking.Status": return ["ri-checkbox-circle-line", "bg-green-100 text-green-600"];
+                case "Booking.Cancel": return ["ri-close-circle-line", "bg-red-100 text-red-600"];
                 case "Booking.Reminder": return ["ri-alarm-warning-line", "bg-yellow-100 text-yellow-600"];
                 case "Booking.Problem": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 case "Discount.New": return ["ri-price-tag-3-line", "bg-purple-100 text-purple-600"];
@@ -42,13 +78,38 @@
         }
 
         function timeAgo(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = Math.floor((now - date) / 1000);
-            if (diff < 60) return `${diff} giây trước`;
-            if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-            if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString().slice(0, 5);
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    console.warn("Invalid date:", dateString);
+                    return "Không có thời gian";
+                }
+
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000);
+                if (diff < 60) return `${diff} giây trước`;
+                if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+                if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString().slice(0, 5);
+            } catch (err) {
+                console.error("Error processing date:", err);
+                return "Không có thời gian";
+            }
+        }
+
+        function generateUrlFromParams(notification) {
+            try {
+                const params = JSON.parse(notification.parameters);
+                if (params.bookingType === 'monthly' && params.monthlyBookingId) {
+                    return `/Booking/BookingHistory`;
+                }
+                if (params.bookingType === 'daily' && params.bookingId) {
+                    return `/Booking/BookingHistory`;
+                }
+            } catch (e) {
+                // Bỏ qua lỗi nếu không có tham số
+            }
+            return `/Notification/Details/${notification.id}`;
         }
 
         function renderNotifications(notifications, append = true) {
@@ -56,18 +117,15 @@
             const loadMoreBtn = document.getElementById('loadMoreBtn');
             const loadingElement = document.getElementById('loading');
             if (!append) {
-                // Giữ lại loading element, chỉ xóa các thông báo đã render
-                if (loadingElement) loadingElement.style.display = 'none';
                 container.innerHTML = "";
-                if (loadingElement) container.appendChild(loadingElement); // Đảm bảo loading element vẫn còn
+                if (loadingElement) container.appendChild(loadingElement);
             }
 
-            // Xử lý riêng khi rỗng
             if ((!notifications || notifications.length === 0) && skip === 0) {
                 if (loadingElement) loadingElement.style.display = 'none';
-                container.innerHTML = `<div class="text-center text-slate-400 py-20">
-                                            <i class="ri-inbox-2-line text-4xl mb-3"></i><br />
-                                            No notifications yet.
+                container.innerHTML = `<div class="notify-empty">
+                                            <i class="ri-inbox-2-line"></i>
+                                            <div>Bạn chưa có thông báo nào</div>
                                         </div>`;
                 if (loadMoreBtn) loadMoreBtn.style.display = 'none';
                 return;
@@ -76,26 +134,55 @@
             if (loadingElement) loadingElement.style.display = 'none';
 
             for (const n of notifications) {
+                // Log thông tin để debug
+                console.log("Notification:", n);
+
                 const [icon, color] = getIconAndColor(n.type);
-                const readClass = n.isRead ? "" : "bg-blue-50";
-                const url = `/Notification/Details/${n.id}`;
-                container.insertAdjacentHTML('beforeend', `
-                                        <a href="${url}" class="block transition hover:bg-slate-50 ${readClass}">
-                                            <div class="flex items-start px-6 py-5">
-                                                <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center ${color} mr-4 mt-1">
-                                                    <i class="${icon} text-2xl"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center">
-                                                        <div class="font-semibold text-slate-900 truncate">${n.title ?? "Notification"}</div>
-                                                        ${!n.isRead ? `<span class="inline-block ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>` : ""}
-                                                    </div>
-                                                    <div class="text-slate-700 mt-1">${n.message ?? ""}</div>
-                                                    <div class="text-xs text-slate-400 mt-2">${timeAgo(n.createdAt)}</div>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        `);
+                const readClass = n.isRead ? "" : "unread";
+
+                // Kiểm tra các trường có thể chứa createdAt
+                const createdAtValue = n.createdAt || n.CreatedAt || n.created_at || n.CreatedDate || n.createDate || new Date().toISOString();
+
+                // Nếu là Discount.New, tạo một div không thể click thay vì thẻ a
+                if (n.type === "Discount.New") {
+                    container.insertAdjacentHTML('beforeend', `
+                        <div class="notify-item-no-link ${readClass}">
+                            <div class="notify-content">
+                                <div class="notify-icon ${color}">
+                                    <i class="${icon}"></i>
+                                </div>
+                                <div class="notify-text">
+                                    <div class="notify-text-header">
+                                        <div class="notify-text-title">${n.title ?? "Thông báo khuyến mãi"}</div>
+                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
+                                    </div>
+                                    <div class="notify-text-message">${n.message ?? ""}</div>
+                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    // Các thông báo khác vẫn có thể click như bình thường
+                    const url = generateUrlFromParams(n);
+                    container.insertAdjacentHTML('beforeend', `
+                        <a href="${url}" class="notify-item ${readClass}">
+                            <div class="notify-content">
+                                <div class="notify-icon ${color}">
+                                    <i class="${icon}"></i>
+                                </div>
+                                <div class="notify-text">
+                                    <div class="notify-text-header">
+                                        <div class="notify-text-title">${n.title ?? "Thông báo"}</div>
+                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
+                                    </div>
+                                    <div class="notify-text-message">${n.message ?? ""}</div>
+                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
+                                </div>
+                            </div>
+                        </a>
+                    `);
+                }
             }
         }
 
@@ -109,29 +196,13 @@
 
             try {
                 const resp = await fetch(`/Notification/GetMyNotifications?top=${pageSize}&skip=${skip}`);
-                if (!resp.ok) {
-                    const container = document.getElementById('notification-list');
-                    if (container)
-                        container.innerHTML = `<div class="text-center text-red-400 py-10">Error loading notifications! (HTTP ${resp.status})</div>`;
-                    isLoading = false;
-                    if (loadingElement) loadingElement.style.display = 'none';
-                    return;
-                }
-                const text = await resp.text();
-                let items = [];
-                try {
-                    items = JSON.parse(text);
-                    if (!Array.isArray(items)) {
-                        throw new Error("Response JSON is not an array.");
-                    }
-                } catch (parseErr) {
-                    const container = document.getElementById('notification-list');
-                    if (container)
-                        container.innerHTML = `<div class="text-center text-red-400 py-10">Error: Response is not valid JSON array!</div>`;
-                    isLoading = false;
-                    if (loadingElement) loadingElement.style.display = 'none';
-                    return;
-                }
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const items = await resp.json();
+
+                // Log dữ liệu để debug
+                console.log("API Response:", items);
+
+                if (!Array.isArray(items)) throw new Error("Dữ liệu trả về không phải là một mảng.");
 
                 renderNotifications(items, skip !== 0);
 
@@ -143,16 +214,16 @@
                     isEnd = true;
                     if (loadMoreBtn) loadMoreBtn.style.display = 'none';
                 }
-                // Gọi markAllAsRead sau khi load trang đầu tiên (skip == 0)
                 if (skip === 0 && !hasMarkedAllAsRead) {
                     hasMarkedAllAsRead = true;
                     markAllNotificationsAsRead();
                 }
                 skip += items.length;
             } catch (err) {
+                console.error("Error fetching notifications:", err);
                 const container = document.getElementById('notification-list');
                 if (container)
-                    container.innerHTML = `<div class="text-center text-red-400 py-10">Error loading notifications!<br/>${err}</div>`;
+                    container.innerHTML = `<div class="notify-error">Lỗi khi tải thông báo!<br/>${err.message}</div>`;
                 if (loadingElement) loadingElement.style.display = 'none';
             }
             isLoading = false;
@@ -160,11 +231,9 @@
 
         async function markAllNotificationsAsRead() {
             try {
-                // Gọi API MarkAllAsRead, xử lý không cần body
                 await fetch('/Notification/MarkAllAsRead', { method: 'POST' });
             } catch (err) {
-                // Có thể log hoặc báo lỗi nhẹ, nhưng không ảnh hưởng trải nghiệm chính
-                console.warn('Failed to mark all notifications as read:', err);
+                console.warn('Không thể đánh dấu đã đọc tất cả:', err);
             }
         }
 

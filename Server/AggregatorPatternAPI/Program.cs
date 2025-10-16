@@ -19,6 +19,10 @@ builder.Services.AddHttpClient("BookingAPI", client =>
     // Thêm !
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BookingApiUrl"]!);
 });
+builder.Services.AddHttpClient("UserAPI", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:UserApiUrl"]!);
+});
 
 // Đăng ký Aggregator Service
 builder.Services.AddScoped<IAggregatorService, AggregatorService>();

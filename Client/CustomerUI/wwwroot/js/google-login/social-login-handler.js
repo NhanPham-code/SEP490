@@ -171,69 +171,6 @@ async function handleGoogleSignIn(response) {
     }
 }
 
-// ==================== BIOMETRIC AUTHENTICATION HANDLER ====================
-
-async function handleBiometricLogin() {
-    const biometricButtonId = SOCIAL_LOGIN_CONFIG.buttonIds.biometric;
-    setSocialButtonState(biometricButtonId, 'loading');
-
-    try {
-        if (!window.PublicKeyCredential || !(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) {
-            throw new Error('Thiết bị không hỗ trợ hoặc chưa kích hoạt xác thực sinh trắc học.');
-        }
-
-        showToast('🔐 Đang lấy thông tin thử thách từ máy chủ...', 'info', false);
-        const challengeResponse = await fetch(SOCIAL_LOGIN_CONFIG.endpoints.biometricChallenge, {
-            method: 'POST',
-            signal: AbortSignal.timeout(SOCIAL_LOGIN_CONFIG.timeouts.network)
-        });
-        if (!challengeResponse.ok) throw new Error('Không thể lấy thử thách xác thực từ máy chủ.');
-
-        const challengeData = await challengeResponse.json();
-        challengeData.challenge = new Uint8Array(atob(challengeData.challenge).split("").map(c => c.charCodeAt(0)));
-
-        showToast('👆 Vui lòng xác thực bằng sinh trắc học...', 'warning', false);
-        const credential = await navigator.credentials.get({ publicKey: challengeData });
-        if (!credential) throw new Error('Xác thực sinh trắc học đã bị hủy.');
-
-        const authResponse = {
-            id: credential.id,
-            rawId: arrayBufferToBase64(credential.rawId),
-            response: {
-                authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
-                signature: arrayBufferToBase64(credential.response.signature),
-                userHandle: credential.response.userHandle ? arrayBufferToBase64(credential.response.userHandle) : null,
-                clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON)
-            },
-            type: credential.type
-        };
-
-        showToast('⚡ Đang gửi thông tin xác thực đến máy chủ...', 'info', false);
-        const verificationResponse = await fetch(SOCIAL_LOGIN_CONFIG.endpoints.biometricVerify, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(authResponse),
-            signal: AbortSignal.timeout(SOCIAL_LOGIN_CONFIG.timeouts.network)
-        });
-        const verificationResult = await verificationResponse.json();
-
-        if (verificationResult.success) {
-            setSocialButtonState(biometricButtonId, 'success');
-            clearToastMessages();
-            showToast('🎉 Xác thực sinh trắc học thành công!', 'success');
-            setTimeout(() => { window.location.href = verificationResult.redirectUrl || '/'; }, 1500);
-        } else {
-            throw new Error(verificationResult.message || 'Xác thực sinh trắc học thất bại.');
-        }
-    } catch (error) {
-        setSocialButtonState(biometricButtonId, 'error');
-        clearToastMessages();
-        let errorMessage = error.message || 'Đã có lỗi xảy ra.';
-        if (error.name === 'NotAllowedError') errorMessage = 'Bạn đã hủy bỏ xác thực sinh trắc học.';
-        showFormAlert(errorMessage);
-    }
-}
-
 // ==================== INITIALIZATION ====================
 
 async function updateBiometricButtonUI() {

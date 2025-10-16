@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DTOs.BookingDTO.RevenueViewModel;
 
 namespace Service.Services
 {
@@ -340,20 +341,27 @@ namespace Service.Services
             var errorContent = await response.Content.ReadAsStringAsync();
             throw new Exception($"Kiểm tra tình trạng sân thất bại. Lỗi từ API: {response.StatusCode} - {errorContent}");
         }
-        public async Task<RevenueStatisticViewModel> GetRevenueStatisticsAsync(string accessToken, int year, int? month, int? day)
+        public async Task<RevenueStatisticViewModel> GetRevenueStatisticsAsync(
+            string accessToken, int year, int? month, int? day, int[]? stadiumIds)
         {
             AddBearerAccessToken(accessToken);
 
             var queryParams = new List<string> { $"year={year}" };
             if (month.HasValue) queryParams.Add($"month={month.Value}");
             if (day.HasValue) queryParams.Add($"day={day.Value}");
+            if (stadiumIds != null && stadiumIds.Length > 0)
+            {
+                foreach (var id in stadiumIds)
+                {
+                    queryParams.Add($"stadiumIds={id}");
+                }
+            }
             var queryString = string.Join("&", queryParams);
 
             var response = await _httpClient.GetAsync($"/booking/statistics?{queryString}");
 
             if (!response.IsSuccessStatusCode)
             {
-                // Xử lý lỗi tùy ý (throw hoặc trả về model rỗng)
                 return new RevenueStatisticViewModel();
             }
 
@@ -369,7 +377,10 @@ namespace Service.Services
             if (year.HasValue) queryParams.Add($"year={year.Value}");
             if (month.HasValue) queryParams.Add($"month={month.Value}");
             if (day.HasValue) queryParams.Add($"day={day.Value}");
-    
+
+            // Thêm expand=Courts
+            queryParams.Add("expand=Courts");
+
             var queryString = string.Join("&", queryParams);
 
             // Gọi đến Upstream Path của Ocelot
@@ -379,7 +390,6 @@ namespace Service.Services
             {
                 var error = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Error fetching stadium revenue: {error}");
-                // Trả về danh sách rỗng để không làm crash UI
                 return new List<StadiumBookingOverviewDto>();
             }
 

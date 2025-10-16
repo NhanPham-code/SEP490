@@ -41,5 +41,7 @@ namespace UserAPI.Service.Interface
         Task UnbanUserAsync(int userId);
 
         Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
+
+        Task<bool> AddorUpdateFaceEmbeddings(int userId, FaceImagesDTO faceImagesDTO);
     }
 }

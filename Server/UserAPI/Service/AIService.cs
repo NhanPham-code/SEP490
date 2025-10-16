@@ -136,7 +136,7 @@ namespace UserAPI.Service
                 return new AiFaceLoginResponseModel
                 {
                     Success = false,
-                    Message = "Xác thực khuôn mặt thất bại hoặc không khớp dữ liệu."
+                    Message = "Xác thực khuôn mặt thất bại hoặc không khớp dữ liệu. \n Bạn hãy đăng nhập thủ công và cập nhật khuôn mặt tại hồ sơ cá nhân."
                 };
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)

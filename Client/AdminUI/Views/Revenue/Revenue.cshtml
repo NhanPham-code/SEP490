@@ -35,12 +35,26 @@
             min-width: 200px;
             /* Đặt chiều rộng tối thiểu */
         }
+
+        /* Thêm style để hỗ trợ việc gộp thông tin */
+        .stat-card-revenue {
+            height: auto;
+            /* Cho phép thẻ tự co giãn */
+            padding-bottom: 20px;
+        }
+
+        .stat-sub-value {
+            font-size: 1.1em;
+            color: #a0aec0;
+            /* Màu xám nhạt */
+            margin-top: 5px;
+            font-weight: 500;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1 class="page-title">Quản Lý Doanh Thu</h1>
             <div class="header-actions">
@@ -48,10 +62,12 @@
                     <i class="fas fa-chart-bar"></i>
                     Xem doanh thu các sân
                 </a>
-                <button class="btn btn-secondary" onclick="alert('Chức năng đang phát triển!')">
+                
+                <button class="btn btn-secondary" onclick="exportStatsToExcel()">
                     <i class="fas fa-download"></i>
                     Xuất Excel
                 </button>
+
                 <button class="btn btn-primary" onclick="filterData(true)">
                     <i class="fas fa-sync-alt"></i>
                     Làm mới
@@ -59,11 +75,20 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="stats-grid">
-            <div class="stat-card">
+            
+            <div class="stat-card stat-card-revenue">
                 <div class="stat-value" id="totalRevenue">@Model.TotalRevenue.ToString("N0")</div>
                 <div class="stat-label">Tổng doanh thu (VNĐ)</div>
+
+                @{
+                    decimal systemRevenue = Math.Round(Model.TotalOriginalRevenue * 0.02M); 
+                }
+                
+                <div class="stat-sub-value" id="systemRevenue">
+                    Tổng phí hệ thống: @systemRevenue.ToString("N0") VNĐ
+                </div>
+                <div id="systemRevenueNote" class="stat-sub-value">2% doanh thu ban đầu</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="totalCompletedBookings">@Model.TotalCompletedBookings</div>
@@ -85,7 +110,6 @@
             </div>
         </div>
 
-        <!-- Filter Section -->
         <div class="filter-section">
             <div class="filter-grid">
                 <div class="form-group">
@@ -131,7 +155,6 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
         <div class="charts-grid">
             <div class="chart-card status-card">
                 <h3 class="chart-title">Trạng thái booking</h3>
@@ -144,6 +167,7 @@
                             <div class="status-count" id="pendingCount">@Model.PendingBookingsCount</div>
                         </div>
                     </div>
+
                     <div class="status-item">
                         <div class="status-info">
                             <div class="status-dot accepted"></div><span class="status-name">Đã chấp nhận</span>
@@ -191,10 +215,33 @@
             let statusPieChart, trendChart;
 
         const formatCurrency = (value) => new Intl.NumberFormat('vi-VN').format(value);
+        
+        // HÀM CHUẨN HÓA: Chỉ giữ lại chữ số (0-9) để đảm bảo Excel nhận diện là số nguyên
+        const normalizeCurrency = (text) => {
+            if (!text) return '0';
+            // 1. Loại bỏ dấu cách (space) và khoảng trắng không ngắt dòng (&nbsp;)
+            let cleanedText = text.replace(/\s/g, ''); 
+            // 2. Loại bỏ tất cả ký tự không phải số
+            return cleanedText.replace(/[^\d]/g, ''); 
+        };
+
+        // HÀM CHUẨN HÓA PHẦN TRĂM: Thay dấu thập phân (dấu chấm) bằng dấu phẩy và loại bỏ ký tự %
+        const normalizePercentage = (text) => {
+            if (!text) return '0';
+            // 1. Loại bỏ ký tự '%' và các khoảng trắng
+            let cleanedText = text.replace(/%/g, '').replace(/\s/g, ''); 
+            // 2. Thay dấu chấm thập phân bằng dấu phẩy thập phân (chuẩn Excel VN)
+            return cleanedText.replace(/\./g, ','); 
+        };
 
         function updateDashboard(data, year, filterType) {
             // Update stat cards
             document.getElementById('totalRevenue').textContent = formatCurrency(data.totalRevenue);
+
+            const systemRevenue = Math.round(data.totalOriginalRevenue * 0.02);
+            document.getElementById('systemRevenue').innerHTML = 'Tổng phí hệ thống: ' + formatCurrency(systemRevenue) + ' VNĐ';
+            document.getElementById('systemRevenueNote').textContent = '2% doanh thu ban đầu';
+
             document.getElementById('totalCompletedBookings').textContent = data.totalCompletedBookings;
             document.getElementById('completedPercentage').textContent = data.completedBookingsPercentage.toFixed(1) + '%';
             document.getElementById('waitingCount').textContent = data.pendingBookingsCount + data.acceptedBookingsCount;
@@ -338,6 +385,76 @@
             trendChart.update();
         }
 
+        function exportStatsToExcel() {
+            // Helper loại bỏ ký tự lạ
+            const cleanValue = (text) => {
+                if (!text) return "";
+                return text.replace(/[\n\r]/g, '').trim();
+            };
+            // Helper cho phần trăm
+            const cleanPercent = (text) => {
+                if (!text) return "";
+                return text.replace(/[\n\r]/g, '').replace('%', '').trim();
+            };
+            // Helper lấy số trong chuỗi "Doanh thu hệ thống: 18.000 VNĐ"
+            const extractNumber = (text) => {
+                if (!text) return "";
+                const match = text.match(/([\d.,]+)/);
+                return match ? match[1].replace(/\./g, '').replace(',', '.') : "";
+            };
+
+            const totalRevenue = cleanValue(document.getElementById('totalRevenue').textContent);
+            const systemRevenueText = extractNumber(document.getElementById('systemRevenue').textContent); // chỉ lấy số
+            const totalCompletedBookings = cleanValue(document.getElementById('totalCompletedBookings').textContent);
+            const completedPercentage = cleanPercent(document.getElementById('completedPercentage').textContent);
+            const waitingCount = cleanValue(document.getElementById('waitingCount').textContent);
+            const waitingPercentage = cleanPercent(document.getElementById('waitingPercentage').textContent);
+            const cancelledCount = cleanValue(document.getElementById('cancelledCount').textContent);
+            const cancelledPercentage = cleanPercent(document.getElementById('cancelledPercentage').textContent);
+
+            // Lấy thông tin filter
+            const filterType = document.getElementById('filterType').value;
+            // Không lấy ngày/tháng/năm, chỉ ghi loại lọc
+            let filterValue = '';
+            if (filterType === 'day') {
+                filterValue = 'Ngày';
+            } else if (filterType === 'month') {
+                filterValue = 'Tháng';
+            } else { // year
+                filterValue = 'Năm';
+            }
+
+            // Build CSV
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Thong ke Doanh thu\n";
+            csvContent += `Thoi gian loc;${filterValue}\n`;
+
+            const stats = [
+                ["Tong Doanh thu (VND)", totalRevenue],
+                ["Doanh thu He thong (2%) (VND)", systemRevenueText],
+                ["Booking Hoan thanh", totalCompletedBookings],
+                ["Ty le Hoan thanh (%)", completedPercentage],
+                ["Booking Dang cho (Pending + Accepted)", waitingCount],
+                ["Ty le Dang cho (%)", waitingPercentage],
+                ["Booking Da huy", cancelledCount],
+                ["Ty le Da huy (%)", cancelledPercentage]
+            ];
+
+            stats.forEach(row => {
+                csvContent += row.map(cell => cell.replace(/[\n\r]/g, '').trim()).join(";") + "\n";
+            });
+
+            // Download
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            let fileName = `ThongKeDoanhThu_${filterType}_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const today = new Date();
             document.getElementById('dateInput').value = today.toISOString().split('T')[0];
@@ -380,7 +497,6 @@
                 });
             }
             trendChart = createTrendChart(trendLabels, datasets);
-
             document.getElementById("trendChartTitle").textContent = `So sánh doanh thu`;
         });
 
