@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Quản Lý Cước Phí";
+}
+
+@section Styles {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/css/fee/fee-management.css" rel="stylesheet" />
+}
+
+<div class="page-container">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1>Quản Lý Cước Phí</h1>
+        <div class="header-actions">
+            <button id="exportExcelBtn" class="btn"><i class="fas fa-file-excel me-2"></i>Xuất Excel</button>
+            <button id="refreshDataBtn" class="btn"><i class="fas fa-sync-alt me-2"></i>Làm mới</button>
+        </div>
+    </div>
+
+    <!-- ... CÁC PHẦN STATS, FILTERS, CHARTS GIỮ NGUYÊN ... -->
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="totalFeeValue">0 (VNĐ)</div><div class="stat-label">TỔNG PHÍ KỲ NÀY</div></div>
+        <div class="stat-card"><div class="stat-value" id="paidFeeValue">0 (VNĐ)</div><div class="stat-label">PHÍ ĐÃ THANH TOÁN</div></div>
+        <div class="stat-card"><div class="stat-value" id="unpaidFeeValue">0 (VNĐ)</div><div class="stat-label">PHÍ CHƯA THANH TOÁN</div></div>
+        <div class="stat-card"><div class="stat-value" id="overdueCount">0</div><div class="stat-label">SÂN QUÁ HẠN</div></div>
+    </div>
+    <div class="filter-container">
+        <form id="filterForm">
+            <div class="filter-form">
+                <div class="filter-group">
+                    <label for="stadiumNameInput">Tìm theo tên sân</label>
+                    <div class="input-wrapper"><i class="fas fa-search icon"></i><input type="text" id="stadiumNameInput" placeholder="Nhập tên sân..."></div>
+                </div>
+                <div class="filter-group">
+                    <label for="feePeriodInput">Kỳ phí</label>
+                    <div class="input-wrapper"><i class="fas fa-calendar-alt icon"></i><input type="month" id="feePeriodInput"></div>
+                </div>
+                <div class="filter-group">
+                    <label for="feeStatusSelect">Trạng thái</label>
+                    <div class="input-wrapper"><i class="fas fa-flag icon"></i><select id="feeStatusSelect"><option value="">Tất cả</option><option value="paid">Đã thanh toán</option><option value="unpaid">Chưa thanh toán</option><option value="overdue">Quá hạn</option></select></div>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i>Lọc</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="content-grid">
+        <div class="card"><h3 class="card-title">Tỷ lệ trạng thái phí</h3><div class="chart-wrapper"><canvas id="statusChart"></canvas></div></div>
+        <div class="card"><h3 class="card-title">Top 5 Sân Có Phí Cao Nhất</h3><div class="chart-wrapper"><canvas id="topStadiumsChart"></canvas></div></div>
+    </div>
+
+
+    <div class="card table-container">
+        <h3 id="tableTitle" class="card-title" style="padding: 1.5rem 1.5rem 0; margin-bottom: 0;"></h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Tên Sân</th><th>Chủ Sân</th><th>Phí Phải Trả (VNĐ)</th><th>Hạn Trả</th><th>Trạng Thái</th><th>Thao Tác</th></tr></thead>
+                <tbody id="feeTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác nhận thanh toán (giữ nguyên) -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận trạng thái thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Xác nhận khoản phí của sân <strong id="modalStadiumName"></strong> đã được thanh toán?</p>
+                <p>Số tiền: <strong id="modalFeeAmount"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="modalConfirmBtn"><i class="fas fa-check me-2"></i>Xác nhận đã thu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- THÊM MỚI: Modal để xem ảnh hóa đơn -->
+<div class="modal fade" id="viewBillModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hóa đơn thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="billImageView" src="" class="img-fluid" alt="Hóa đơn" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="~/js/fee/fee-management.js"></script>
+}
