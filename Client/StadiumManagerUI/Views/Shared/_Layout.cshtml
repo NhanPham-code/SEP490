@@ -535,7 +535,7 @@
                     .withUrl(hubUrl)
                     .withAutomaticReconnect()
                     .build();
-
+                    
                 connection.on("ReceiveNotification", function (notification) {
                     console.log("Nhận được tín hiệu có thông báo mới:", notification);
                     updateNotificationBadge();
@@ -543,6 +543,7 @@
 
                 connection.start()
                     .then(() => {
+                        await connection.invoke("RegisterGroups", "admin");
                         console.log(`Đã kết nối tới hub thông báo với UserId = ${userId}`);
                     })
                     .catch(err => {

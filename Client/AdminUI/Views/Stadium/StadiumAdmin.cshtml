@@ -8,8 +8,13 @@
 <script type="text/javascript" crossorigin="anonymous" src="https://e.fontawesome.com/static/surveys.js?v=1.268.6"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 
+<!-- Bootstrap 4 JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script src="~/js/Stadium/stadium.js"></script>
 <link rel="stylesheet" href="~/css/stadium/stadium.css" />
 <link rel="stylesheet" href="~/css/stadium/Background.css" />
 <!-- Add these to your HTML head -->
@@ -320,7 +325,7 @@
                         debounceTimer = setTimeout(() => {
                             state.filters.search = $(this).val();
                             state.currentPage = 1;
-                            loadData();
+                            loadData(); 
                         }, 3000);
                     });
 
@@ -465,43 +470,42 @@
 
                 // render nhà thi dấu chưa được duyệt
 
-                //set icon cho btn 
-                function setIcon(court){
-                    console.log(court);
-                          if(court[0].SportType.length > 0){
-                              switch (court[0].SportType) {
-        case "Bóng chuyền":
-          return `🏐`;
-          break;
+                //set icon cho btn
+                        function setIcon(court) {
+            console.log(court);
 
-        case "Tennis":
-          return `🎾`;
-          break;
+            // Check if 'court' is an array, has at least one element,
+            // and if the first element has a truthy 'SportType' property.
+            if (Array.isArray(court) && court.length > 0 && court[0].SportType) {
 
-        case "Bóng đá sân 5":
-          return `⚽`;
-          break;
+                // --- NOTE: The 'break' statements after 'return' are redundant and removed.
+                switch (court[0].SportType) {
+                    case "Bóng chuyền":
+                        return `🏐`;
 
-        case "Bóng đá sân 7" :
-          return `⚽`;
-          break;
+                    case "Tennis":
+                        return `🎾`;
 
-           case "Bóng đá sân 11":
-          return `⚽`;
-          break;
+                    case "Bóng đá sân 5":
+                    case "Bóng đá sân 7":
+                    case "Bóng đá sân 11": // Grouped all 'Bóng đá' cases
+                        return `⚽`;
 
-        case "Cầu lông":
-          return `🏸`;
-          break;
+                    case "Cầu lông":
+                        return `🏸`;
 
-        case "Bóng rổ":
-          return `🏀`;
-          break;
+                    case "Bóng rổ":
+                        return `🏀`;
 
-        default: return ``;
-                          }
-                          }
+                    default:
+                        // Fallback if SportType is a non-matching string
+                        return ``;
                 }
+            }
+
+            // Return empty string if any of the initial checks fail (null/empty array/etc.)
+            return ``;
+        }
 
                 //chấp nhận sân 
                 function confirmApprove(stadiumId) {
@@ -3396,7 +3400,7 @@
 <div class="floating-sports-icons">
     <!-- Sports icons will be generated dynamically -->
 </div>
-<script src="~/js/Stadium.js"></script>
+
 
 <div class="admin-container">
     <!-- Header Section -->
@@ -3552,7 +3556,29 @@
         </div>
 
     </section>
-    
+    <section class="glass-card stadium-grid-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="ri-layout-grid-line"></i> Danh Sách Sân Chưa Duyệt
+            </h2>
+        </div>
+        @* hiển thị các nhà thi đấu chưa được duyệt *@
+        <div id="unApproveStadium" class="stadium-grid">
+            <div id="unApproveStadium-loading-container" class="loading-container">
+                <div>
+                    <div class="loading-spinner"></div>
+                    <p style="color: white; margin-top: 1rem; font-weight: 600;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <i class="ri-information-line"></i>
+                Hiển thị <span id="showing-range">1-10</span> trong tổng số <strong id="total-count">0</strong> sân
+            </div>
+            <div class="pagination-controls pt-3" id="pagination-container-unapprove"></div>
+        </div>
+    </section>
     <!-- Stadium Grid -->
     <section class="glass-card stadium-grid-section">
         <div class="section-header">

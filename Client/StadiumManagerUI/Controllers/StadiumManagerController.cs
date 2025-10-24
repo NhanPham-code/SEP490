@@ -13,6 +13,7 @@ namespace StadiumManagerUI.Controllers
         private readonly IStadiumVideoSetvice _videoService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly INotificationService _notificationService;
 
         [BindProperty]
         public CreateStadiumRequest CreateStadiumRequest { get; set; } = new CreateStadiumRequest();
@@ -21,13 +22,14 @@ namespace StadiumManagerUI.Controllers
         public UpdateStadiumRequest updateStadiumRequest { get; set; } = new UpdateStadiumRequest();
 
         public StadiumManagerController(IStadiumService service, IStadiumImageService imageService,
-            IStadiumVideoSetvice videoService, ITokenService tokenService, IUserService userService)
+            IStadiumVideoSetvice videoService, ITokenService tokenService, IUserService userService, INotificationService notificationService)
         {
             _service = service;
             _imageService = imageService;
             _videoService = videoService;
             _tokenService = tokenService;
             _userService = userService;
+            _notificationService = notificationService;
         }
 
         public IActionResult Stadium()
@@ -84,6 +86,16 @@ namespace StadiumManagerUI.Controllers
                     var video = await _videoService.AddStadiumVideoAsync(CreateStadiumRequest.StadiumVideo);
                 }
             }
+
+            await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.NotificationDTO
+            {
+                
+                Title = "<div class=\"text-green-500\">Một nhà thi đấu mới được tạo</div>",
+                Message = $"<div><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/StadiumController/StadiumAdmin\">Nhà thi đấu '{stadium.Name}' vừa được tạo hãy tới xem</a></div>",
+                UserId = -1,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
 
             return Json(new { success = 200, value = stadium });
         }

@@ -13,6 +13,14 @@
       {
         "Path": "UserAPI\\UserAPI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookingAPI\\BookingAPI.csproj",
+        "Action": "Start"
       }
     ]
   }

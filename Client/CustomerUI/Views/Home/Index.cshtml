@@ -879,7 +879,7 @@
                                url = searchTerm += "&$filter=IsApproved eq true and IsLocked eq false ";
                             }
                             else{
-                               url = searchTerm += " and IsApproved eq true and IsLocked eq false ";
+                               url = searchTerm += " and IsApproved eq true and IsLocked eq false and Courts/any()";
                             }
                             var searchUrl = url + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);

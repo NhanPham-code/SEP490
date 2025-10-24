@@ -381,8 +381,12 @@
 }
 
 .location-info {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    height: 33px;
+    align-items: start;
+    text-align: start;
+    justify-content: start;
     gap: 0.5rem;
     color: var(--text-secondary);
     margin-bottom: 1.5rem;

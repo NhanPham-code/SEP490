@@ -15,7 +15,7 @@ namespace FindTeamAPI.Controllers
 
         [HttpGet]
         [Route("GetAllTeamMember")]
-        [Authorize(Roles = "Customer")]
+        //[Authorize(Roles = "Customer")]
         public async Task<IActionResult> GetAllTeamMemberByTeamPost([FromQuery]int postId)
         {
             
