@@ -281,7 +281,7 @@ namespace Service.Services
             var skip = (request.Page - 1) * request.PageSize;
             var top = request.PageSize;
 
-            var requestUrl = $"/adminUsers/get?$filter={odataFilter}&$skip={skip}&$top={top}&$orderby=CreatedDate desc&$count=true";
+            var requestUrl = $"/adminUsers/get?{odataFilter}&$skip={skip}&$top={top}&$orderby=CreatedDate desc&$count=true";
 
             try
             {
@@ -310,7 +310,7 @@ namespace Service.Services
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var term = request.SearchTerm.Trim().ToLower();
-                filters.Add($"(contains(tolower(email), '{term}') or contains(phoneNumber, '{term}'))");
+                filters.Add($"(contains(tolower(email), '{term}') or contains(phoneNumber, '{term}') or contains(tolower(FullName), '{term}'))");
             }
 
             // Filter theo tháng đăng ký
@@ -341,7 +341,13 @@ namespace Service.Services
                 filters.Add($"Role eq '{request.Role}'");
             }
 
-            return string.Join(" and ", filters);
+            if(filters.Count == 0)
+            {
+                return string.Join(" and ", filters);
+            } else
+            {
+                return $"$filter={string.Join(" and ", filters)}";
+            }
         }
 
         public async Task<AdminUserStatsDTO> GetUserStats(string accessToken)

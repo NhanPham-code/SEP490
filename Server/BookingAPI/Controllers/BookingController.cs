@@ -244,5 +244,19 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpPost("revenue-by-stadiums")]
+        public async Task<ActionResult<IEnumerable<StadiumRevenueDto>>> GetRevenueByStadiums([FromBody] RevenueRequestDto request)
+        {
+            try
+            {
+                var revenueData = await _bookingService.GetRevenueByStadiumsAsync(request.StadiumIds, request.Year, request.Month);
+                return Ok(revenueData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

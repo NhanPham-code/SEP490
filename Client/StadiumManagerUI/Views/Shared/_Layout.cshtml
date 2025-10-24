@@ -410,9 +410,10 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="@Url.Action("Settings", "Account")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Settings" ? "active" : "")">
-                    <i class="nav-icon fas fa-cog"></i>
-                    Cài đặt
+                <a href="@Url.Action("FeeManagement", "Fee")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Fee" && ViewContext.RouteData.Values["action"].ToString() == "FeeManagement" ? "active" : "")">
+                    <i class="nav-icon fas fa-receipt"></i>
+                    Cước Phí
                 </a>
             </div>
         </div>

@@ -1,0 +1,267 @@
+﻿/* === BIẾN MÀU VÀ BIẾN CHUNG === */
+:root {
+    --primary: #4f46e5;
+    --primary-light: #6366f1;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-page: #f3f4f6;
+    --bg-card: #ffffff;
+    --border-color: #e5e7eb;
+    --radius: 0.75rem;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    /* Màu cho viền thẻ KPI */
+    --color-orange: #f97316;
+    --color-green: #10b981;
+    --color-blue: #3b82f6;
+}
+
+/* === BỐ CỤC CHUNG === */
+body {
+    background-color: var(--bg-page);
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+    .page-header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+.header-actions .btn {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+}
+
+    .header-actions .btn:hover {
+        background-color: var(--primary-light);
+    }
+
+/* === THẺ THỐNG KÊ (KPI) === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border-top: 4px solid;
+}
+
+    /* Gán màu cho từng thẻ */
+    .stat-card.border-blue {
+        border-color: var(--color-blue);
+    }
+
+    .stat-card.border-green {
+        border-color: var(--color-green);
+    }
+
+    .stat-card.border-orange {
+        border-color: var(--color-orange);
+    }
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* === KHU VỰC BỘ LỌC === */
+.filter-container {
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 3fr auto;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.filter-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+    .input-wrapper .icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+    }
+
+.filter-group input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-size: 1rem;
+}
+
+    .filter-group input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+/* === BẢNG DỮ LIỆU === */
+.table-container {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.table-header {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+    .table-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+    .data-table th {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-light);
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    .data-table td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        background-color: var(--bg-page);
+    }
+    /* Bo góc cho các ô */
+    .data-table tr td:first-child {
+        border-top-left-radius: var(--radius);
+        border-bottom-left-radius: var(--radius);
+    }
+
+    .data-table tr td:last-child {
+        border-top-right-radius: var(--radius);
+        border-bottom-right-radius: var(--radius);
+    }
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+}
+
+/* === TAG TRẠNG THÁI === */
+.status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.status-paid {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-unpaid {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+.status-overdue {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-pending {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+/* === NÚT HÀNH ĐỘNG TRONG BẢNG === */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+    .action-btn:hover {
+        color: var(--primary);
+        border-color: var(--primary);
+        background-color: #f0f2f5;
+    }
+
+    .action-btn i {
+        font-size: 1rem;
+    }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+}

@@ -170,6 +170,17 @@
                             }
                         </a>
                     </li>
+
+                    <li>
+                        <a asp-controller="Fee" asp-action="FeeManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" data-section="users">
+                            <i class="ri-bill-line"></i>
+                            <span>Quản Lý Cước Phí</span>
+                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Users")
+                            {
+                                <div class="nav-indicator"></div>
+                            }
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="px-6 mt-8 mb-4">
