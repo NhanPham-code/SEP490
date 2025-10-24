@@ -1554,16 +1554,19 @@
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/unread/count",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7072
+       "UpstreamPathTemplate": "/notifications/unread-count",
+       "UpstreamHttpMethod": [ "GET" ],
+       "DownstreamPathTemplate": "/api/Notifications/unread/count", 
+       "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer" 
         }
-      ],
-      "UpstreamPathTemplate": "/notifications/unread-count",
-      "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
@@ -1579,16 +1582,32 @@
     },
     // AggregatorPatternAPI
     {
-      "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7175
+        "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7175
+            }
+        ],
+        "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+        "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+        "UpstreamPathTemplate": "/notifications",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "AllowedScopes": []
         }
-      ],
-      "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
-      "UpstreamHttpMethod": [ "GET" ]
     }
   ],
   "GlobalConfiguration": {

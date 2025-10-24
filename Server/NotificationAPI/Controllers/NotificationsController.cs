@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using NotificationAPI.Service.Interface;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR; // <--- 1. Thêm using này
+using NotificationAPI.Hubs;         // <--- 2. Thêm using này
 
 namespace NotificationAPI.Controllers
 {
@@ -11,12 +13,19 @@ namespace NotificationAPI.Controllers
     {
         private readonly INotificationService _notificationService;
 
-        public NotificationsController(INotificationService notificationService)
+        // 3. Thêm IHubContext
+        private readonly IHubContext<NotificationHub> _hubContext;
+
+        // 4. Inject IHubContext vào constructor
+        public NotificationsController(
+            INotificationService notificationService,
+            IHubContext<NotificationHub> hubContext) // <--- Inject ở đây
         {
             _notificationService = notificationService;
+            _hubContext = hubContext; // <--- Gán giá trị
         }
 
-        // GET: api/Notifications/unread/count/{userId}
+        // GET: api/Notifications/unread/count
         [HttpGet("unread/count")]
         public async Task<ActionResult<int>> GetUnreadNotificationCount()
         {
@@ -73,6 +82,19 @@ namespace NotificationAPI.Controllers
         public async Task<ActionResult> CreateNotification([FromBody] Model.Notification notification)
         {
             var createdNotification = await _notificationService.AddNotificationAsync(notification);
+            if (createdNotification.UserId.HasValue && createdNotification.UserId > 0)
+            {
+                await _hubContext.Clients
+                    .User(createdNotification.UserId.ToString()) 
+                    .SendAsync("ReceiveNotification", createdNotification);
+            }
+            else
+            {
+
+                await _hubContext.Clients.All
+                    .SendAsync("ReceiveNotification", createdNotification);
+            }
+
             return CreatedAtAction(nameof(GetNotificationById), new { id = createdNotification.Id }, createdNotification);
         }
 
