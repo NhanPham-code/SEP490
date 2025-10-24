@@ -1609,6 +1609,32 @@
     },
     // AggregatorPatternAPI
     {
+        "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7175
+            }
+        ],
+        "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+        "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+        "UpstreamPathTemplate": "/notifications",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "AllowedScopes": []
+        }
       "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
