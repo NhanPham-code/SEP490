@@ -1554,28 +1554,47 @@
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/unread/count",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7072
+       "UpstreamPathTemplate": "/notifications/unread-count",
+       "UpstreamHttpMethod": [ "GET" ],
+       "DownstreamPathTemplate": "/api/Notifications/unread/count", 
+       "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer" 
         }
-      ],
-      "UpstreamPathTemplate": "/notifications/unread-count",
-      "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7072
+        "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "UpstreamPathTemplate": "/notifications/mark-all-as-read",
+        "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+        "UpstreamPathTemplate": "/notifications",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "AllowedScopes": []
         }
-      ],
-      "UpstreamPathTemplate": "/notifications/mark-all-as-read",
-      "UpstreamHttpMethod": [ "PUT" ]
     },
     // AggregatorPatternAPI
     {

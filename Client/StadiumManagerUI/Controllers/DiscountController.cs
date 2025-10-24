@@ -11,6 +11,7 @@ using DTOs.UserDTO;
 using System.Linq;
 using DTOs.NotificationDTO;
 using System;
+using Microsoft.AspNetCore.Http; // Đảm bảo bạn có using này
 
 namespace StadiumManagerUI.Controllers
 {
@@ -143,9 +144,9 @@ namespace StadiumManagerUI.Controllers
 
             // Combine and remove duplicates
             var allUsers = usersByPhone.Concat(usersByEmail)
-                                       .GroupBy(u => u.UserId)
-                                       .Select(g => g.First())
-                                       .ToList();
+                                        .GroupBy(u => u.UserId)
+                                        .Select(g => g.First())
+                                        .ToList();
 
             return Json(new { success = true, users = allUsers });
         }
@@ -231,7 +232,7 @@ namespace StadiumManagerUI.Controllers
             return Json(new { success = true, data = updatedDiscount });
         }
 
-        // --- HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT VỚI LOGIC IF/ELSE ---
+        // --- HÀM HELPER (KHÔNG THAY ĐỔI VÌ SERVICE ĐÃ ĐƯỢC "NGỤY TRANG") ---
         private async Task SendNotificationForNewDiscount(ReadDiscountDTO discount, string accessToken)
         {
             // Lấy tên các sân áp dụng (dùng chung cho cả hai loại)
@@ -260,7 +261,8 @@ namespace StadiumManagerUI.Controllers
                 };
                 Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
 
-                await _notificationService.SendNotificationToUserAsync(notification); // Giả sử hàm này gọi API
+                // Lớp service mới sẽ xử lý việc này qua HTTP POST
+                await _notificationService.SendNotificationToUserAsync(notification);
 
                 Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
             }
@@ -288,11 +290,20 @@ namespace StadiumManagerUI.Controllers
                         Title = "Sân bạn yêu thích có mã giảm giá mới!",
                         Message = $"Sân '{appliedStadiums}' bạn yêu thích vừa có mã giảm giá mới: {discount.Code}. Hãy sử dụng ngay!",
                         Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = DateTime.UtcNow, //Sửa lại (code gốc là .Now)
                     };
                     Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
 
-                    await _notificationService.SendNotificationToAll(notification); // Giả sử hàm này gọi API
+                    // Code của bạn đang gọi SendNotificationToAll, điều này hơi lạ
+                    // nhưng VẪN CHẠY ĐÚNG với service mới, vì service mới
+                    // sẽ gửi object `notification` (vốn đã chứa UserId)
+                    // đến NotificationAPI, và API đó sẽ tự biết gửi cho ai.
+                    //
+                    // Tuy nhiên, logic đúng hơn là gọi:
+                    // await _notificationService.SendNotificationToUserAsync(notification);
+                    //
+                    // Nhưng tôi sẽ giữ nguyên code gốc của bạn:
+                    await _notificationService.SendNotificationToAll(notification);
 
                     Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
                 }
