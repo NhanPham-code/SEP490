@@ -679,7 +679,6 @@
         }
     </style>
 </head>
-
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
     <header x-data="{
             mobileMenuOpen: false,
@@ -704,8 +703,6 @@
         toggleChat() {
         window.location.href = '@Url.Action("Chat", "Chat")';
         }
-
-
         }" class="header-glass sticky top-0 z-50 transition-all duration-300" id="header-pc">
         <div class="max-w-8xl mx-auto px-4 lg:px-8" id="header-mobile">
             <div class="flex items-center justify-between h-18">
@@ -817,6 +814,8 @@
                                    class="action-btn p-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
                                    title="Thông báo">
                                     <i class="ri-notification-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
+
+                                    <!-- ID phải khớp với JS: "notification-badge" -->
                                     <span id="notification-badge"
                                           class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10"
                                           style="display:none"></span>
@@ -968,7 +967,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </header>
 
     <!-- Main content -->
@@ -1016,7 +1014,7 @@
                     <h4 class="text-lg font-semibold mb-4 text-white">Hỗ trợ</h4>
                     <ul class="space-y-2">
                         <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Trung tâm trợ giúp</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Liên hệ</a></li>
+                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-2JSON">Liên hệ</a></li>
                         <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Điều khoản dịch vụ</a></li>
                         <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Chính sách bảo mật</a></li>
                     </ul>
@@ -1062,27 +1060,23 @@
     <script>
         $(document).ready(function () {
 
-            // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+            // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
 
             function updateNotificationBadge() {
-                // Lấy UserId từ Session để truyền cho API
-                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-                if (!userId) {
-                    console.log("Không có UserId, không thể gọi API lấy số thông báo.");
-                    return;
-                }
-
-                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo...");
+                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
 
                 $.ajax({
-                    // ĐIỂM QUAN TRỌNG NHẤT: Gọi đến URL đầy đủ của API của bạn
-                    // và truyền userId qua query string
-                    url: `https://localhost:7072/Notification/GetUnreadNotificationCount?userId=${userId}`,
+                    // === SỬA LỖI CORS ===
+                    // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
+                    // ngay trên project UI này. Đây là đường dẫn tương đối.
+                    url: '/Notification/GetUnreadNotificationCount',
                     type: 'GET',
-                    // KHÔNG cần header xác thực nữa vì API của bạn không check
+                    // KHÔNG cần "beforeSend" (Authorization) nữa,
+                    // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
                     success: function (count) {
                         console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
-                        const badge = $('#notification-badge-count');
+
+                        const badge = $('#notification-badge');
 
                         if (badge.length) {
                             if (count > 0) {
@@ -1094,17 +1088,15 @@
                                 console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                             }
                         } else {
-                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge-count trên trang.");
+                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
                         }
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
+                        // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
+                        // chứ không còn là lỗi CORS (status 0) nữa.
                         console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
                         console.error(`  - Status: ${jqXHR.status}`);
                         console.error(`  - URL: ${this.url}`);
-                        // Lỗi 0 thường là do CORS, hãy kiểm tra kỹ cấu hình CORS bên phía API
-                        if (jqXHR.status === 0) {
-                            console.error("  - Gợi ý: Lỗi 0 (CORS). Hãy đảm bảo API trên port 7072 cho phép request từ domain của trang Manager.");
-                        }
                     }
                 });
             }
@@ -1116,20 +1108,27 @@
                     return;
                 }
 
+                // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
                 const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
                 const connection = new signalR.HubConnectionBuilder()
-                    .withUrl(hubUrl)
+                    .withUrl(hubUrl, {
+                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                         accessTokenFactory: () => {
+                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                         }
+                    })
                     .withAutomaticReconnect()
                     .build();
 
+                // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
                 connection.on("ReceiveNotification", function (notification) {
                     console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
-                    updateNotificationBadge();
+                    updateNotificationBadge(); // <-- Chính xác!
                 });
 
                 connection.start()
                     .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
-                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối:", err));
+                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
             }
 
             console.log("Bắt đầu thực thi script layout...");
@@ -1137,7 +1136,7 @@
             console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
             updateNotificationBadge();
 
-            // --- KẾT THÚC PHẦN SỬA LỖI ---
+            // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
     </script>
 </body>
