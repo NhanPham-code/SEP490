@@ -442,7 +442,8 @@
                     <div class="notification-icon">
                         <i class="fas fa-bell"></i>
                     </div>
-                    <span id="notification-badge-count" class="badge rounded-pill bg-danger"></span>
+                    <!-- ID của span phải khớp với JS: "notification-badge-count" -->
+                    <span id="notification-badge-count" class="badge rounded-pill bg-danger" style="display: none;"></span>
                 </a>
 
                 <span class="fw-medium" title="@fullName">@fullName</span>
@@ -495,66 +496,83 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
+    <!-- === BẮT ĐẦU PHẦN JAVASCRIPT XỬ LÝ NOTIFICATION === -->
     <script>
         $(document).ready(function () {
 
-
             function updateNotificationBadge() {
-                $.ajax({
-                    url: '/Notification/GetUnreadNotificationCount',
-                    type: 'GET',
-                    success: function (count) {
-                        const badge = $('#notification-badge-count'); 
+                console.log("[AJAX] 🟡 Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
 
-                        if (badge.length) { 
+                $.ajax({
+                    // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
+                    // ngay trên project ManagerUI này.
+                    url: '/Notification/GetUnreadNotificationCount', // <-- Đảm bảo bạn có Controller/Action này
+                    type: 'GET',
+                    // Không cần gửi token ở đây
+                    success: function (count) {
+                        console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
+
+                        // ID của span là "notification-badge-count"
+                        const badge = $('#notification-badge-count');
+
+                        if (badge.length) {
                             if (count > 0) {
                                 badge.text(count);
-                                badge.show(); 
+                                badge.show(); // Hiện badge lên
+                                console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
                             } else {
-                                badge.hide(); 
+                                badge.hide(); // Ẩn badge nếu không có thông báo
+                                console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                             }
+                        } else {
+                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge-count trên trang.");
                         }
                     },
-                    error: function () {
-                        
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(`[AJAX] ❌ Lỗi AJAX khi lấy số thông báo: ${textStatus}`, errorThrown);
+                        console.error(`  - Status: ${jqXHR.status}`);
+                        console.error(`  - URL: ${this.url}`);
                     }
                 });
             }
 
-
             function connectToSignalR() {
                 const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-
-                if (!userId || userId === 0) {
+                if (!userId) {
                     console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
                     return;
                 }
 
+                // Vẫn kết nối thẳng đến Hub NotificationAPI (port 7072)
                 const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
-
                 const connection = new signalR.HubConnectionBuilder()
-                    .withUrl(hubUrl)
+                    .withUrl(hubUrl, {
+                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                         accessTokenFactory: () => {
+                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                         }
+                    })
                     .withAutomaticReconnect()
                     .build();
 
+                // Logic vẫn như cũ: Nhận tín hiệu -> Gọi AJAX cập nhật badge
                 connection.on("ReceiveNotification", function (notification) {
-                    console.log("Nhận được tín hiệu có thông báo mới:", notification);
-                    updateNotificationBadge();
+                    console.log('%c[SignalR] 🔴 TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
+                    updateNotificationBadge(); // <-- Gọi hàm cập nhật badge
                 });
 
                 connection.start()
-                    .then(() => {
-                        console.log(`Đã kết nối tới hub thông báo với UserId = ${userId}`);
-                    })
-                    .catch(err => {
-                        console.error("Lỗi khi kết nối SignalR:", err);
-                    });
+                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối SignalR:", err));
             }
 
+            console.log("Bắt đầu thực thi script layout ManagerUI...");
             connectToSignalR();
+            console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang ManagerUI...");
             updateNotificationBadge();
 
         });
     </script>
+    <!-- === KẾT THÚC PHẦN JAVASCRIPT XỬ LÝ NOTIFICATION === -->
 </body>
 </html>
