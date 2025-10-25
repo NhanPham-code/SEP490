@@ -176,40 +176,6 @@ namespace NotificationAPI.Controllers
             return NoContent();
         }
 
-        // GET: api/Notifications/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Model.Notification>> GetNotificationById(int id)
-        {
-            var notification = await _notificationService.GetNotificationByIdAsync(id);
-            if (notification == null)
-            {
-                return NotFound();
-            }
-            return Ok(notification);
-        }
-
-        // POST: api/Notifications
-        [HttpPost]
-        public async Task<ActionResult> CreateNotification([FromBody] Model.Notification notification)
-        {
-            var createdNotification = await _notificationService.AddNotificationAsync(notification);
-            if (createdNotification.UserId.HasValue && createdNotification.UserId > 0)
-            {
-                await _hubContext.Clients
-                    .User(createdNotification.UserId.ToString()) 
-                    .SendAsync("ReceiveNotification", createdNotification);
-            }
-            else
-            {
-
-                await _hubContext.Clients.All
-                    .SendAsync("ReceiveNotification", createdNotification);
-            }
-
-            return CreatedAtAction(nameof(GetNotificationById), new { id = createdNotification.Id }, createdNotification);
-        }
-
-        // PUT: api/Notifications/{id}
         // PUT: api/Notifications/{id} 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateNotificationIsRead(int id, [FromBody] NotificationReadUpdateDto updateDto) // DTO chỉ chứa IsRead
