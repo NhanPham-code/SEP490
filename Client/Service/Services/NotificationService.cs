@@ -33,7 +33,7 @@ namespace Service.Services
 
         public async Task<IEnumerable<NotificationDTO>> GetNotificationsByUserIdAsync(int userId, int top, int skip)
         {
-            var response = await _httpClient.GetAsync($"/notifications/myNotification?$filter=UserId eq {userId}&$top={top}&$skip={skip}&$orderby=CreatedAt desc");
+            var response = await _httpClient.GetAsync($"/notifications/myNotification?$filter=UserId eq {userId} or UserId eq 0 &$top={top}&$skip={skip}&$orderby=CreatedAt desc");
 
             response.EnsureSuccessStatusCode();
             var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<NotificationDTO>>();
@@ -159,6 +159,81 @@ namespace Service.Services
             // HubConnection connection = await ConnectToSignalRAsync();
             // await connection.InvokeAsync("SendNotificationToAll", notification);
             // return true;
+        }
+
+        public async Task<bool> SendNotificationsBatchAsync(List<NotificationDTO> notifications, string accessToken)
+        {
+            if (notifications == null || !notifications.Any())
+            {
+                Console.WriteLine("[NotificationService] SendNotificationsBatchAsync skipped: List is empty or null.");
+                return true;
+            }
+            // Lọc bỏ những notification không hợp lệ (thiếu UserId) trước khi gửi
+            var validNotifications = notifications.Where(n => n != null && n.UserId.HasValue && n.UserId > 0).ToList();
+            if (!validNotifications.Any())
+            {
+                Console.WriteLine("[NotificationService] SendNotificationsBatchAsync skipped: No valid notifications with UserId found in the list.");
+                return true;
+            }
+
+            AddBearerAccessToken(accessToken);
+            Console.WriteLine($"[NotificationService] Attempting to send batch of {validNotifications.Count} notifications via Gateway...");
+            // Gọi endpoint batch qua Gateway
+            var response = await _httpClient.PostAsJsonAsync("/notifications/batch", validNotifications);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                Console.WriteLine($"[NotificationService] Batch notification request sent successfully to Gateway.");
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"[NotificationService] Error sending notifications batch request: {ex.Message} (StatusCode: {ex.StatusCode})");
+                try
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[NotificationService] Batch Error Response Content: {errorContent}");
+                }
+                catch { /* Ignore */ }
+                return false;
+            }
+        }
+
+        // === HÀM GỬI ALL (BROADCAST - MỚI) ===
+        public async Task<bool> SendBroadcastNotificationAsync(NotificationDTO notification, string accessToken)
+        {
+            // Kiểm tra đầu vào cơ bản (không cần UserId)
+            if (notification == null || string.IsNullOrWhiteSpace(notification.Message))
+            {
+                Console.WriteLine("[NotificationService] SendBroadcastNotificationAsync skipped: Invalid notification or missing message.");
+                return false;
+            }
+            // Không cần set UserId = null ở đây, vì NotificationAPI sẽ làm việc đó.
+
+            AddBearerAccessToken(accessToken);
+            Console.WriteLine($"[NotificationService] Attempting to send broadcast notification via Gateway...");
+
+            // Gọi endpoint broadcast mới (/notifications/all) qua Gateway
+            var response = await _httpClient.PostAsJsonAsync("/notifications/all", notification);
+
+            try
+            {
+                response.EnsureSuccessStatusCode(); // Kiểm tra lỗi trả về từ Gateway/API
+                Console.WriteLine($"[NotificationService] Broadcast notification request sent successfully to Gateway.");
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                // Ghi log lỗi chi tiết
+                Console.WriteLine($"[NotificationService] Error sending broadcast notification request: {ex.Message} (StatusCode: {ex.StatusCode})");
+                try
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[NotificationService] Broadcast Error Response Content: {errorContent}");
+                }
+                catch { /* Ignore */ }
+                return false; // Trả về false nếu request thất bại
+            }
         }
     }
 }

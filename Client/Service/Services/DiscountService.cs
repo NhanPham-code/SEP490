@@ -148,5 +148,7 @@ namespace Service.Services
 
             return await response.Content.ReadFromJsonAsync<OdataHaveCountResponse<ReadDiscountDTO>>();
         }
+
+
     }
 }
