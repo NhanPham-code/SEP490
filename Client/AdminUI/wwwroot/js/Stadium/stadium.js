@@ -3,8 +3,9 @@ const API_BASE_URL = '/api'; // Thay đổi theo cấu hình của bạn
 let allStadiums = [];
 let filteredStadiums;
 let currentPage = 1;
-let itemsPerPage = 12;
+let itemsPerPage = 3;
 let detailModal, imageModal;
+let totalItems = 0; // Biến toàn cục để lưu tổng số mục
 
 // Initialize on document ready
 $(document).ready(function () {
@@ -35,24 +36,36 @@ function hideLoading() {
 
 // Load Stadiums from API
 async function loadStadiums() {
-    let query = "&$filter=IsApproved eq false&$top=3&$skip=0";
+    let skip = (currentPage - 1) * itemsPerPage;
+    let query = `&$filter=IsApproved eq false&$top=${itemsPerPage}&$skip=${skip}`;
    
     $.ajax({
         url: CONFIG.API_ENDPOINTS.SEARCH,
         type: 'POST',
         data: { url: query },
         success: function (data) {
+            if (!data.value || data.value.length === 0) {
+                $("#unapprove-stadium").hide();
+                return;
+            }
             console.log('Data IsApproved:', data.value);
             filteredStadiums = data.value || [];
-            updatePaginationUnapprove(data["@@odata.count"]);
-            renderStadiumGridUnAppprove(data.value);
-            if (!data.value || data.value.length === 0) {
-                showEmptyState();
+            
+            $("#total-count_unapprove").html(data["@odata.count"] || 0);
+            console.log("Cout Stadium Unapprove: ", data["@odata.count"] || 0);
+            totalItems = data["@odata.count"] || 0;
+            updatePaginationUnapprove();
+            if (totalItems <= 3) {
+                $("#pagination-container-unapprove").hide();
+            } else {
+                $("#pagination-container-unapprove").show();
             }
-        },
+            renderStadiumGridUnAppprove(data.value);
+            
+        }, 
         error: function (xhr, status, error) {
             console.error('Error loading data:', error);
-
+            $("#unapprove-stadium").hide();
             showErrorState(error);
         }
     });
@@ -136,91 +149,115 @@ function renderStadiumGridUnAppprove(stadiums) {
 
 
 
-// Render Pagination
-function updatePaginationUnapprove(totalItems) {
-    state.totalItems = totalItems || 0;
-    const totalPages = Math.ceil(state.totalItems / CONFIG.PAGINATION.ITEMS_PER_PAGE);
 
-    const start = (state.currentPage - 1) * CONFIG.PAGINATION.ITEMS_PER_PAGE + 1;
-    const end = Math.min(start + CONFIG.PAGINATION.ITEMS_PER_PAGE - 1, state.totalItems);
+/**
+ * HÀM ĐƯỢC CẬP NHẬT
+ * (Sửa lỗi typo, sửa lỗi ID, bỏ 'state' để dùng biến toàn cục)
+ */
+function updatePaginationUnapprove() {
+    // SỬA Ở ĐÂY: Sửa lại console.log cho đúng
+    console.log("Update Pagination Unapprove - Total Items:", totalItems);
+    console.log("Items Per Page:", itemsPerPage); // Sửa label
+    console.log("Current Page:", currentPage);
 
-    $('#showing-range').text(`${start}-${end}`);
-    $('#total-count').text(state.totalItems);
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    console.log("Total Pages Calculated:", totalPages);
 
-    if (state.totalItems === 0) {
+    const start = (currentPage - 1) * itemsPerPage + 1;
+    const end = Math.min(start + itemsPerPage - 1, totalItems);
+
+    console.log(`Showing items from ${start} to ${end} of ${totalItems}`);
+
+    $('#showing-range-unapprove').text(totalItems > 0 ? `${start}-${end}` : '0');
+    $('#total-count_unapprove').text(totalItems);
+
+    // Logic này đã đúng. Nếu totalPages = 1, nó sẽ ẩn đi.
+    if (totalItems === 0 || totalPages <= 1) {
+        console.log("Hiding pagination (Total Pages <= 1)");
         $('.pagination-section').hide();
         return;
     } else {
+        console.log("Showing pagination");
         $('.pagination-section').show();
     }
-
     let paginationHtml = '';
+    if (totalItems > 3) {
+        
 
-    // Previous button
-    paginationHtml += `
-                        <button class="pagination-btn ${state.currentPage === 1 ? 'disabled' : ''}"
-                                onclick="changePage(${state.currentPage - 1})"
-                                ${state.currentPage === 1 ? 'disabled' : ''}>
-                            <i class="ri-arrow-left-s-line"></i>
-                        </button>
-                    `;
-
-    // Calculate page range
-    let startPage = Math.max(1, state.currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
-
-    // Adjust start if we're near the end
-    if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
-    }
-
-    // First page and ellipsis
-    if (startPage > 1) {
-        paginationHtml += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
-        if (startPage > 2) {
-            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
-        }
-    }
-
-    // Page numbers
-    for (let i = startPage; i <= endPage; i++) {
+        // Nút Previous
         paginationHtml += `
-                            <button class="pagination-btn ${i === state.currentPage ? 'active' : ''}"
-                                    onclick="changePage(${i})">
-                                ${i}
-                            </button>
-                        `;
-    }
+        <button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}"
+                onclick="changeUnapprovedPage(${currentPage - 1})" 
+                ${currentPage === 1 ? 'disabled' : ''}>
+            <i class="ri-arrow-left-s-line"></i>
+        </button>
+    `;
 
-    // Last page and ellipsis
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+        // Calculate page range
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
         }
-        paginationHtml += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
-    }
 
-    // Next button
-    paginationHtml += `
-                        <button class="pagination-btn ${state.currentPage === totalPages ? 'disabled' : ''}"
-                                onclick="changePage(${state.currentPage + 1})"
-                                ${state.currentPage === totalPages ? 'disabled' : ''}>
-                            <i class="ri-arrow-right-s-line"></i>
-                        </button>
-                    `;
+        // First page and ellipsis
+        if (startPage > 1) {
+            paginationHtml += `<button class="pagination-btn" onclick="changeUnapprovedPage(1)">1</button>`;
+            if (startPage > 2) {
+                paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+            }
+        }
+
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `
+            <button class="pagination-btn ${i === currentPage ? 'active' : ''}"
+                    onclick="changeUnapprovedPage(${i})"> 
+                ${i}
+            </button>
+        `;
+        }
+
+        // Last page and ellipsis
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+            }
+            paginationHtml += `<button class="pagination-btn" onclick="changeUnapprovedPage(${totalPages})">${totalPages}</button>`;
+        }
+
+        // Next button
+        paginationHtml += `
+        <button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}"
+                onclick="changeUnapprovedPage(${currentPage + 1})" 
+                ${currentPage === totalPages ? 'disabled' : ''}>
+            <i class="ri-arrow-right-s-line"></i>
+        </button>
+    `;
+    }
 
     $('#pagination-container-unapprove').html(paginationHtml);
 }
 
-// Change Page
-function changePage(page) {
-    const totalPages = Math.ceil(filteredStadiums.length / itemsPerPage);
-    if (page < 1 || page > totalPages) return;
+
+/**
+ * HÀM MỚI (Đã đổi tên từ changePage)
+ * (Sửa logic để gọi loadUnapprovedStadiums)
+ */
+function changeUnapprovedPage(page) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (page < 1 || page > totalPages || page === currentPage) {
+        return;
+    }
 
     currentPage = page;
-    renderStadiums();
 
-    // Scroll to top of grid
+    // SỬA Ở ĐÂY: Gọi đúng hàm loadUnapprovedStadiums
+    loadUnapprovedStadiums();
+
+    // Cuộn lên đầu lưới
     $('html, body').animate({
         scrollTop: $('#unApproveStadium').offset().top - 100
     }, 500);

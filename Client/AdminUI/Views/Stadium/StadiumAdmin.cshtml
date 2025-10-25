@@ -281,7 +281,8 @@
                     },
                     PAGINATION: {
                         ITEMS_PER_PAGE: 6,
-                        MAX_PAGES: 4
+                        MAX_PAGES: 4,
+                        ITEMS_PER_PAGE_UNAPPROVE : 3
                     },
                     DATE_FORMAT: {
                         DISPLAY: 'YYYY-MM-DD HH:mm:ss'
@@ -308,7 +309,6 @@
                     loadNewStadiumsToday();
                     loadCourtTypes();
                     loadTotalStadiums();
-                    GetUnapprovedStadiums();
                     // setInterval(updateDateTime, 10000);
                 });
 
@@ -515,7 +515,7 @@
                         success: function(response) {
                             showNotification('Duyệt nhà thi đấu thành công!', 'success');
         loadData();
-        GetUnapprovedStadiums();
+        loadStadiums();
                         },
                         error: function(xhr, status, error) {
                             console.error('Error approving stadium:', error);
@@ -3361,21 +3361,7 @@
             });
         }
 
-        //lấy số nhà thi đấu chưa được duyệt
-        function GetUnapprovedStadiums() {
-            $.ajax({
-                url: "/Stadium/GetUnapprovedStadiums",
-                method: 'GET',
-                success: function(data) {
-                    console.log('Pending stadiums count:', data);
-                    const count = data.count || 0;
-                    $('#pending-count').text(count);
-                },
-                error: function(err) {
-                    console.error('Error fetching pending stadiums count:', err);
-                }
-            });
-        }
+ 
         //lấy tổng số nhà thi đấu đã đăng ký
         function loadTotalStadiums() {
             $.ajax({
@@ -3556,7 +3542,7 @@
         </div>
 
     </section>
-    <section class="glass-card stadium-grid-section">
+    <section class="glass-card stadium-grid-section" id="unapprove-stadium">
         <div class="section-header">
             <h2 class="section-title">
                 <i class="ri-layout-grid-line"></i> Danh Sách Sân Chưa Duyệt
@@ -3571,10 +3557,10 @@
                 </div>
             </div>
         </div>
-        <div class="pagination-container">
+        <div class="pagination-container pt-4">
             <div class="pagination-info">
                 <i class="ri-information-line"></i>
-                Hiển thị <span id="showing-range">1-10</span> trong tổng số <strong id="total-count">0</strong> sân
+                Hiển thị <span id="showing-range-unapprove">1-10</span> trong tổng số <strong id="total-count_unapprove">0</strong> sân
             </div>
             <div class="pagination-controls pt-3" id="pagination-container-unapprove"></div>
         </div>

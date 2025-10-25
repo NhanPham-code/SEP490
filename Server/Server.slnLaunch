@@ -15,11 +15,7 @@
         "Action": "Start"
       },
       {
-        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "BookingAPI\\BookingAPI.csproj",
+        "Path": "NotificationAPI\\NotificationAPI.csproj",
         "Action": "Start"
       }
     ]
