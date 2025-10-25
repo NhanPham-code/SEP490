@@ -1577,6 +1577,36 @@
       "UpstreamPathTemplate": "/notifications/mark-all-as-read",
       "UpstreamHttpMethod": [ "PUT" ]
     },
+    {
+        "UpstreamPathTemplate": "/notifications/batch",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications/batch",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072 
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer"
+        }
+    },
+    {
+        "UpstreamPathTemplate": "/notifications/all", 
+        "UpstreamHttpMethod": [ "POST" ], 
+        "DownstreamPathTemplate": "/api/Notifications/all",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072 
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer" 
+        }
+    },
     // AggregatorPatternAPI
     {
       "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
