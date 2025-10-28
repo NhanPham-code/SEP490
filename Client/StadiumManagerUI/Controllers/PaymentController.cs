@@ -150,14 +150,13 @@ namespace StadiumManagerUI.Controllers
 
             var stadium = await _stadiumService.GetStadiumByIdAsync(booking.StadiumId);
             var stadiumName = stadium?.Name ?? "sân";
-            var notificationDto = new NotificationDTO
+            var notificationDto = new CreateNotificationDto
             {
                 UserId = booking.UserId,
                 Type = "Booking.Cancel",
                 Title = "Lịch đặt sân đã bị hủy",
                 Message = $"Lịch đặt của bạn tại sân '{stadiumName}' vào ngày {booking.Date:dd/MM/yyyy} đã được chủ sân hủy.",
                 Parameters = JsonSerializer.Serialize(new { bookingType = "daily", bookingId }),
-                CreatedAt = DateTime.Now,
             };
             await _notificationService.SendNotificationToUserAsync(notificationDto);
         }
@@ -203,7 +202,7 @@ namespace StadiumManagerUI.Controllers
                     var cancelledDates = string.Join(", ", cancelledChildBookings.Select(b => b.Date.ToString("dd/MM")));
                     notifMessage = $"Chủ sân đã hủy các lịch đặt ngày: {cancelledDates} trong gói đặt sân tại '{stadiumName}'.";
                 }
-                var notificationDto = new NotificationDTO { UserId = monthlyBooking.UserId, Type = notifType, Title = notifTitle, Message = notifMessage, Parameters = JsonSerializer.Serialize(new { bookingType = "monthly", monthlyBookingId }), CreatedAt = DateTime.Now, };
+                var notificationDto = new CreateNotificationDto { UserId = monthlyBooking.UserId, Type = notifType, Title = notifTitle, Message = notifMessage, Parameters = JsonSerializer.Serialize(new { bookingType = "monthly", monthlyBookingId }) };
                 await _notificationService.SendNotificationToUserAsync(notificationDto);
             }
         }

@@ -307,14 +307,13 @@ namespace CustomerUI.Controllers
                         notifParams = new { bookingType, bookingId };
                     }
 
-                    var notificationDto = new NotificationDTO
+                    var notificationDto = new CreateNotificationDto
                     {
                         UserId = ownerId,
                         Type = notifType,
                         Title = notifTitle,
                         Message = notifMessage,
                         Parameters = JsonSerializer.Serialize(notifParams),
-                        CreatedAt = DateTime.Now,
                     };
 
                     await _notificationService.SendNotificationToUserAsync(notificationDto);
