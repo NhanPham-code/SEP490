@@ -1,4 +1,6 @@
-﻿using NotificationAPI.Model;
+﻿using AutoMapper;
+using NotificationAPI.Dto;
+using NotificationAPI.Model;
 using NotificationAPI.Repository.Interface;
 using NotificationAPI.Service.Interface;
 
@@ -7,20 +9,34 @@ namespace NotificationAPI.Service
     public class NotificationService : INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
+        private readonly IMapper _mapper;
 
-        public NotificationService(INotificationRepository notificationRepository)
+        public NotificationService(INotificationRepository notificationRepository, IMapper mapper)
         {
             _notificationRepository = notificationRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Notification> AddNotificationAsync(Notification notification)
+        public async Task<Notification> AddNotificationAsync(CreateNotificationDto createNotificationDto)
         {
-            var result = await _notificationRepository.AddAsync(notification);
+            var newNotification = _mapper.Map<Notification>(createNotificationDto);
+            newNotification.IsRead = false; // Mặc định là chưa đọc
+            newNotification.CreatedAt = DateTime.Now; // Thiết lập thời gian tạo
+
+            var result = await _notificationRepository.AddAsync(newNotification);
             return result;
         }
-        public async Task<List<Notification>> AddRangeNotificationsAsync(List<Notification> notifications)
+        public async Task<List<Notification>> AddRangeNotificationsAsync(List<CreateNotificationDto> createNotificationDtos)
         {
-            var result = await _notificationRepository.AddRangeAsync(notifications);
+            var newNotifications = createNotificationDtos.Select(dto =>
+            {
+                var notification = _mapper.Map<Notification>(dto);
+                notification.IsRead = false; // Mặc định là chưa đọc
+                notification.CreatedAt = DateTime.Now; // Thiết lập thời gian tạo
+                return notification;
+            }).ToList();
+
+            var result = await _notificationRepository.AddRangeAsync(newNotifications);
             return result;
         }
 
@@ -49,11 +65,6 @@ namespace NotificationAPI.Service
         public async Task MarkAllAsReadAsync(int userId)
         {
            await _notificationRepository.MarkAllAsReadAsync(userId);
-        }
-
-        public async Task UpdateNotificationAsync(Notification notification)
-        {
-            await _notificationRepository.UpdateAsync(notification);
         }
     }
 }
