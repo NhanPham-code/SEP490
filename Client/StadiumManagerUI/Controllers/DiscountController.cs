@@ -254,14 +254,13 @@ namespace StadiumManagerUI.Controllers
                 }
                 string uniqueAppliedStadiums = uniqueStadiumNames.Any() ? string.Join(", ", uniqueStadiumNames) : "các sân được chọn";
 
-                var notification = new NotificationDTO
+                var notification = new CreateNotificationDto
                 {
                     UserId = targetUserId,
                     Type = "Discount.New",
                     Title = "Bạn có mã giảm giá cá nhân!",
                     Message = $"Bạn nhận được mã giảm giá cá nhân: {discount.Code}, áp dụng cho sân: '{uniqueAppliedStadiums}'. Mã này chỉ dành riêng cho bạn!",
                     Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
-                    CreatedAt = DateTime.UtcNow,
                 };
                 Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
 
@@ -306,21 +305,20 @@ namespace StadiumManagerUI.Controllers
                 }
 
                 // === TẠO LIST<NotificationDTO> TỪ DICTIONARY ===
-                var notificationsToSendInBatch = new List<NotificationDTO>();
+                var notificationsToSendInBatch = new List<CreateNotificationDto>();
                 if (usersAndTheirFavoriteStadiums.Any())
                 {
                     Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] === TẠO {usersAndTheirFavoriteStadiums.Count} DTOs cho batch ===");
                     foreach (var kvp in usersAndTheirFavoriteStadiums)
                     {
                         string appliedStadiumsMessage = string.Join(", ", kvp.Value);
-                        var notification = new NotificationDTO
+                        var notification = new CreateNotificationDto
                         {
                             UserId = kvp.Key, // UserId từ Dictionary key
                             Type = "Discount.New",
                             Title = "Sân bạn yêu thích có mã giảm giá mới!",
                             Message = $"Sân '{appliedStadiumsMessage}' bạn yêu thích có mã giảm giá mới: {discount.Code}.", // Rút gọn message
                             Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
-                            CreatedAt = DateTime.UtcNow,
                         };
                         notificationsToSendInBatch.Add(notification);
                         Console.WriteLine($"   - Đã tạo DTO cho UserId: {kvp.Key}");

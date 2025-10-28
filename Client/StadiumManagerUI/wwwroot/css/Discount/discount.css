@@ -575,7 +575,7 @@
 
     .discount-management-container .stadium-grid,
     .discount-management-container .user-selection-grid {
-        display: grid;
+        display: block;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;

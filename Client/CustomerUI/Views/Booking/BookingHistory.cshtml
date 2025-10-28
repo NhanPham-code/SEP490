@@ -8,7 +8,7 @@
     var userFullName = Model.DailyBookings.FirstOrDefault()?.User.FullName ?? Model.MonthlyBookings.FirstOrDefault()?.User.FullName ?? "của bạn";
 
     var sortedDailyBookings = Model.DailyBookings
-        .OrderByDescending(b => b.Booking.Date)
+        .OrderByDescending(b => b.Booking.CreatedAt)
         .ToList();
 
     var sortedMonthlyBookings = Model.MonthlyBookings
