@@ -251,13 +251,11 @@ namespace CustomerUI.Controllers
                 return Json(new { Message = 500, value = "Create team member failed" });
             }
             // signalR đăng ký group theo id bài đăng để gửi notification cho những người trong nhóm
-            _ = await _notificationService.SendNotificationToAll(new NotificationDTO
+            _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             {
                 Title = "Vừa có một nhóm được tạo",
                 Message = "A new team post has been created. Check it out!",
                 Type = "Recruitment.NewPost",
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false
             });
 
             return Json(new { Message = 200, value = result });
@@ -397,13 +395,11 @@ namespace CustomerUI.Controllers
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             }).GetAwaiter().GetResult();
-            _ = await _notificationService.SendNotificationToAll(new NotificationDTO
+            _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             {
                 Title = "Một người vừa tham gia vào nhóm",
                 Message = "Someone just joined a team. Check it out!",
                 Type = "Recruitment.NewMember",
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false
             });
             return Json(new { Message = 200, value = res });
         }
