@@ -16,9 +16,6 @@ namespace NotificationAPI.Hubs
         // Gửi notification tới một user (có thể gọi từ backend khác)
         public async Task SendNotificationToUser(Notification notification)
         {
-            // Lưu vào database
-            await _notificationService.AddNotificationAsync(notification);
-
             // Gửi realtime tới client có userId
             await Clients.User(notification.UserId.ToString()).SendAsync("ReceiveNotification", notification);
         }
@@ -45,9 +42,6 @@ namespace NotificationAPI.Hubs
         // method gửi đến 1 nhóm client
         public async Task SendNotificationToGroup(string groupName, List<Notification> notification)
         {
-            // Lưu vào database
-            await _notificationService.AddRangeNotificationsAsync(notification);
-
             // Gửi realtime tới nhóm client
             await Clients.Group(groupName).SendAsync("ReceiveNotification", notification.FirstOrDefault());
         }

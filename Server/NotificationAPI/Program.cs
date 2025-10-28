@@ -116,9 +116,10 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddSignalR();
 
-
-
 builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+
+// Inject AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
