@@ -76,7 +76,7 @@ namespace Service.Services
 
 
 
-        private async Task<bool> SendNotificationViaHttpAsync(NotificationDTO notification)
+        private async Task<bool> SendNotificationViaHttpAsync(CreateNotificationDto notification)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace Service.Services
          * Logic phân biệt "gửi cho 1 người" hay "gửi cho tất cả" 
          * đã nằm ở NotificationAPI (dựa trên notification.UserId có null hay không).
          */
-        public async Task<bool> SendNotificationToUserAsync(NotificationDTO notification)
+        public async Task<bool> SendNotificationToUserAsync(CreateNotificationDto notification)
         {
             // === CODE MỚI (PHƯƠNG ÁN 3) ===
             return await SendNotificationViaHttpAsync(notification);
@@ -120,7 +120,7 @@ namespace Service.Services
             // return true;
         }
 
-        public async Task<bool> SendNotificationToGroupUserAsync(string groupName, List<NotificationDTO> notificationDTOs)
+        public async Task<bool> SendNotificationToGroupUserAsync(string groupName, List<CreateNotificationDto> notificationDTOs)
         {
             // === CODE MỚI ===
 
@@ -148,7 +148,7 @@ namespace Service.Services
             // return true;
         }
 
-        public async Task<bool> SendNotificationToAll(NotificationDTO notification)
+        public async Task<bool> SendNotificationToAll(CreateNotificationDto notification)
         {
             // === CODE MỚI ===
             // Đặt UserId = null để NotificationAPI biết là gửi cho ALL
@@ -161,7 +161,7 @@ namespace Service.Services
             // return true;
         }
 
-        public async Task<bool> SendNotificationsBatchAsync(List<NotificationDTO> notifications, string accessToken)
+        public async Task<bool> SendNotificationsBatchAsync(List<CreateNotificationDto> notifications, string accessToken)
         {
             if (notifications == null || !notifications.Any())
             {
@@ -200,7 +200,7 @@ namespace Service.Services
         }
 
         // === HÀM GỬI ALL (BROADCAST - MỚI) ===
-        public async Task<bool> SendBroadcastNotificationAsync(NotificationDTO notification, string accessToken)
+        public async Task<bool> SendBroadcastNotificationAsync(CreateNotificationDto notification, string accessToken)
         {
             // Kiểm tra đầu vào cơ bản (không cần UserId)
             if (notification == null || string.IsNullOrWhiteSpace(notification.Message))

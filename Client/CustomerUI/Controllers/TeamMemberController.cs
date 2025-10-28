@@ -144,24 +144,20 @@ namespace CustomerUI.Controllers
                     // gửi thông báo cho thành viên được chấp nhận
        
                         _ = await _notificationService.SendNotificationToUserAsync(
-                            new NotificationDTO
+                            new CreateNotificationDto
                             {
                                 UserId = update.UserId,
                                 Type = "Recruitment.Accepted",
                                 Title = "<div class=\"text-green-500\">Yêu cầu tham gia nhóm của bạn đã được chấp nhận</div>",
                                 Message = $"<div><span>Bạn đã được chấp nhận vào nhóm <span class=\"group-name\">{updateTeamPostDTO.Title}</span></span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId={postId}\">Xem chi tiết</a></div>",
-                                CreatedAt = DateTime.UtcNow,
-                                IsRead = false
                             });
-                    _ = await _notificationService.SendNotificationToAll(new NotificationDTO
+                    _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
                     {
                         UserId = 0,
                         Type = "Test",
                         Title = "Test Notification",
                         Message = "This is a test notification sent to all users.",
                         Parameters = JsonSerializer.Serialize(post.Value),
-                        CreatedAt = DateTime.UtcNow,
-                        IsRead = false
                     });
 
                 }
@@ -176,14 +172,12 @@ namespace CustomerUI.Controllers
                         if (member.role == "Waiting")
                         {
                             _ = await _notificationService.SendNotificationToUserAsync(
-                                new NotificationDTO
+                                new CreateNotificationDto
                                 {
                                     UserId = member.UserId,
                                     Type = "Recruitment.Full",
                                     Title = "Nhóm đã đủ thành viên",
                                     Message = $"<div><span>Nhóm <span class=\"group-name\">{updateTeamPostDTO.Title}</span> đã đủ thành viên</span><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/FindTeam/FindTeam\">Tìm nhóm khác</a></div>",
-                                    CreatedAt = DateTime.UtcNow,
-                                    IsRead = false
                                 });
                             var deleteMember = await _teamMember.DeleteTeamMember(member.Id, postId);
                         }
@@ -240,14 +234,12 @@ namespace CustomerUI.Controllers
                 
                 
                 _ = await _notificationService.SendNotificationToUserAsync(
-                        new NotificationDTO
+                        new CreateNotificationDto
                         {
                             UserId = userId,
                             Type = "Recruitment.Removed",
                             Title = messageTitle,
                             Message = $"<div><span>{notifiMessage}</span><a class=\"text-blue-500\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm nhóm khác</a></div>",
-                            CreatedAt = DateTime.UtcNow,
-                            IsRead = false
                         });
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
 

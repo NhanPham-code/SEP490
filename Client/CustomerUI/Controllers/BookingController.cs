@@ -178,7 +178,7 @@ namespace CustomerUI.Controllers
             try
             {
                 // 1. Lấy tất cả booking (cả lẻ và con của tháng) của user
-                string bookingFilter = $"?$filter=UserId eq {userId}&$expand=BookingDetails&$orderby=Date desc";
+                string bookingFilter = $"?$filter=UserId eq {userId}&$expand=BookingDetails&$orderby=CreatedAt desc";
                 var allUserBookings = await _bookingService.GetBookingAsync(accessToken, bookingFilter) ?? new List<BookingReadDto>();
 
                 // 2. Lấy tất cả các gói đặt tháng của user
