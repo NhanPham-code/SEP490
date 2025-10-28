@@ -15,29 +15,26 @@ namespace UserAPI.Validator
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value == null)
+            if (value is string dateString && !string.IsNullOrEmpty(dateString))
             {
-                // cho phép null, nếu muốn bắt buộc thì dùng thêm [Required]
-                return ValidationResult.Success;
-            }
+                if (DateTime.TryParse(dateString, out DateTime dateOfBirth))
+                {
+                    // Kiểm tra không được sinh trước năm 1900
+                    if (dateOfBirth.Year < 1900)
+                    {
+                        return new ValidationResult("Năm sinh không hợp lệ.");
+                    }
 
-            string dobString = value.ToString();
-            if (!DateOnly.TryParseExact(dobString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dob))
-            {
-                return new ValidationResult("Date of birth must be in format yyyy-MM-dd.");
-            }
-
-            var today = DateOnly.FromDateTime(DateTime.Today);
-            int age = today.Year - dob.Year;
-
-            if (dob.AddYears(age) > today)
-            {
-                age--;
-            }
-
-            if (age < MinimumAge)
-            {
-                return new ValidationResult($"You must be at least {MinimumAge} years old.");
+                    // Kiểm tra tuổi tối thiểu (logic cũ của bạn)
+                    if (dateOfBirth > DateTime.Today.AddYears(MinimumAge))
+                    {
+                        return new ValidationResult($"Bạn phải đủ {MinimumAge} tuổi.");
+                    }
+                }
+                else
+                {
+                    return new ValidationResult("Định dạng ngày sinh không hợp lệ.");
+                }
             }
 
             return ValidationResult.Success;
