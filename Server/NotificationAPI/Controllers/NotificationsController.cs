@@ -48,7 +48,12 @@ namespace NotificationAPI.Controllers
 
             try
             {
-                await _hubContext.Clients.User(createdNotification.UserId.Value.ToString()).SendAsync("ReceiveNotification", createdNotification);
+                var targetUserId = createdNotification.UserId.Value.ToString();
+                Console.WriteLine($"[NotificationAPI] DEBUG: Attempting to send SignalR notification to User ID: {targetUserId}");
+
+                await _hubContext.Clients.User(targetUserId).SendAsync("ReceiveNotification", createdNotification);
+
+                Console.WriteLine($"[NotificationAPI] DEBUG: Successfully called SendAsync for User ID: {targetUserId}.");
             }
             catch (Exception ex)
             {
