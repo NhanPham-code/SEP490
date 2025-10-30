@@ -11,6 +11,7 @@ using DTOs.UserDTO;
 using System.Linq;
 using DTOs.NotificationDTO;
 using System;
+using Microsoft.AspNetCore.Http; // Đảm bảo bạn có using này
 
 namespace StadiumManagerUI.Controllers
 {
@@ -143,9 +144,9 @@ namespace StadiumManagerUI.Controllers
 
             // Combine and remove duplicates
             var allUsers = usersByPhone.Concat(usersByEmail)
-                                       .GroupBy(u => u.UserId)
-                                       .Select(g => g.First())
-                                       .ToList();
+                                        .GroupBy(u => u.UserId)
+                                        .Select(g => g.First())
+                                        .ToList();
 
             return Json(new { success = true, users = allUsers });
         }
@@ -231,71 +232,123 @@ namespace StadiumManagerUI.Controllers
             return Json(new { success = true, data = updatedDiscount });
         }
 
-        // --- HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT VỚI LOGIC IF/ELSE ---
+        // --- HÀM HELPER (KHÔNG THAY ĐỔI VÌ SERVICE ĐÃ ĐƯỢC "NGỤY TRANG") ---
         private async Task SendNotificationForNewDiscount(ReadDiscountDTO discount, string accessToken)
         {
-            // Lấy tên các sân áp dụng (dùng chung cho cả hai loại)
-            var stadiumNames = new List<string>();
-            if (discount.StadiumIds.Any())
-            {
-                foreach (var stadiumId in discount.StadiumIds)
-                {
-                    var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
-                    if (stadium != null) stadiumNames.Add(stadium.Name);
-                }
-            }
-            string appliedStadiums = stadiumNames.Any() ? string.Join(", ", stadiumNames) : "các sân được chọn";
-
             // Trường hợp 1: Gửi cho người dùng cụ thể (UNIQUE)
-            if ("Unique".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && int.TryParse(discount.TargetUserId, out int targetUserId))
+            if ("Unique".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && int.TryParse(discount.TargetUserId, out int targetUserId) && targetUserId > 0)
             {
+                // Lấy tên sân (chỉ cần khi gửi Unique)
+                var uniqueStadiumNames = new List<string>();
+                if (discount.StadiumIds != null && discount.StadiumIds.Any())
+                {
+                    foreach (var stadiumId in discount.StadiumIds)
+                    {
+                        try
+                        {
+                            var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+                            if (stadium != null) uniqueStadiumNames.Add(stadium.Name);
+                        }
+                        catch (Exception ex) { Console.WriteLine($"[NotificationError] Lỗi khi lấy tên sân {stadiumId} cho Unique: {ex.Message}"); }
+                    }
+                }
+                string uniqueAppliedStadiums = uniqueStadiumNames.Any() ? string.Join(", ", uniqueStadiumNames) : "các sân được chọn";
+
                 var notification = new NotificationDTO
                 {
                     UserId = targetUserId,
                     Type = "Discount.New",
                     Title = "Bạn có mã giảm giá cá nhân!",
-                    Message = $"Bạn nhận được mã giảm giá cá nhân: {discount.Code}, áp dụng cho sân: '{appliedStadiums}'. Mã này chỉ dành riêng cho bạn!",
+                    Message = $"Bạn nhận được mã giảm giá cá nhân: {discount.Code}, áp dụng cho sân: '{uniqueAppliedStadiums}'. Mã này chỉ dành riêng cho bạn!",
                     Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
                     CreatedAt = DateTime.UtcNow,
                 };
-                Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
+                Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
 
-                await _notificationService.SendNotificationToUserAsync(notification); // Giả sử hàm này gọi API
-
-                Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+                try
+                {
+                    await _notificationService.SendNotificationToUserAsync(notification);
+                    Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] ❌ Lỗi khi gọi NotificationService cho UserId {notification.UserId}: {ex.Message}");
+                }
             }
-            // Trường hợp 2: Gửi cho người yêu thích sân (STADIUM)
-            else if ("Stadium".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && discount.StadiumIds.Any())
+            // Trường hợp 2: Gửi cho người yêu thích sân (STADIUM) - LOGIC MỚI
+            else if ("Stadium".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && discount.StadiumIds != null && discount.StadiumIds.Any())
             {
-                var userIdsToNotify = new HashSet<int>();
+                Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] Bắt đầu xử lý batch cho sân: {string.Join(", ", discount.StadiumIds)}");
+                var usersAndTheirFavoriteStadiums = new Dictionary<int, List<string>>();
+
+                // (Lặp qua sân, lấy favorites, thêm vào Dictionary - logic cũ)
                 foreach (var stadiumId in discount.StadiumIds)
                 {
-                    var favorites = await _favoriteStadiumService.GetFavoritesByStadiumIdAsync(stadiumId, accessToken);
-                    foreach (var fav in favorites)
+                    string? currentStadiumName = null;
+                    try
                     {
-                        userIdsToNotify.Add(fav.UserId);
+                        var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+                        if (stadium != null)
+                        {
+                            currentStadiumName = stadium.Name;
+                            var favorites = await _favoriteStadiumService.GetFavoritesByStadiumIdAsync(stadiumId, accessToken);
+                            if (favorites != null && favorites.Any())
+                            {
+                                foreach (var fav in favorites)
+                                {
+                                    if (!usersAndTheirFavoriteStadiums.ContainsKey(fav.UserId)) usersAndTheirFavoriteStadiums[fav.UserId] = new List<string>();
+                                    if (!usersAndTheirFavoriteStadiums[fav.UserId].Contains(currentStadiumName)) usersAndTheirFavoriteStadiums[fav.UserId].Add(currentStadiumName);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex) { Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ❌ Lỗi xử lý sân {stadiumId}: {ex.Message}"); }
+                }
+
+                // === TẠO LIST<NotificationDTO> TỪ DICTIONARY ===
+                var notificationsToSendInBatch = new List<NotificationDTO>();
+                if (usersAndTheirFavoriteStadiums.Any())
+                {
+                    Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] === TẠO {usersAndTheirFavoriteStadiums.Count} DTOs cho batch ===");
+                    foreach (var kvp in usersAndTheirFavoriteStadiums)
+                    {
+                        string appliedStadiumsMessage = string.Join(", ", kvp.Value);
+                        var notification = new NotificationDTO
+                        {
+                            UserId = kvp.Key, // UserId từ Dictionary key
+                            Type = "Discount.New",
+                            Title = "Sân bạn yêu thích có mã giảm giá mới!",
+                            Message = $"Sân '{appliedStadiumsMessage}' bạn yêu thích có mã giảm giá mới: {discount.Code}.", // Rút gọn message
+                            Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
+                            CreatedAt = DateTime.UtcNow,
+                        };
+                        notificationsToSendInBatch.Add(notification);
+                        Console.WriteLine($"   - Đã tạo DTO cho UserId: {kvp.Key}");
                     }
                 }
-
-                if (!userIdsToNotify.Any()) return;
-
-                foreach (var userId in userIdsToNotify)
+                else
                 {
-                    var notification = new NotificationDTO
-                    {
-                        UserId = userId,
-                        Type = "Discount.New",
-                        Title = "Sân bạn yêu thích có mã giảm giá mới!",
-                        Message = $"Sân '{appliedStadiums}' bạn yêu thích vừa có mã giảm giá mới: {discount.Code}. Hãy sử dụng ngay!",
-                        Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
-                        CreatedAt = DateTime.Now,
-                    };
-                    Console.WriteLine($"[BACKEND-CONTROLLER] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
-
-                    await _notificationService.SendNotificationToAll(notification); // Giả sử hàm này gọi API
-
-                    Console.WriteLine($"[BACKEND-CONTROLLER] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+                    Console.WriteLine("[BACKEND-CONTROLLER] [Stadium Batch] === KHÔNG CÓ USER NÀO ĐỂ TẠO BATCH ===");
+                    return;
                 }
+
+                // === GỌI HÀM SendNotificationsBatchAsync MỘT LẦN ===
+                if (notificationsToSendInBatch.Any())
+                {
+                    Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] 🟡 Chuẩn bị gọi service gửi batch {notificationsToSendInBatch.Count} thông báo...");
+                    try
+                    {
+                        // Gọi hàm batch mới trong NotificationService
+                        bool batchSuccess = await _notificationService.SendNotificationsBatchAsync(notificationsToSendInBatch, accessToken);
+                        if (batchSuccess) Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] 🟢 Gọi xong service gửi batch.");
+                        else Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ⚠️ Service gửi batch trả về false.");
+                    }
+                    catch (Exception ex) { Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ❌ Lỗi khi gọi service batch: {ex.Message}"); }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[BACKEND-CONTROLLER] [Notification] Mã giảm giá '{discount.Code}' không thuộc loại 'Unique' hay 'Stadium'.");
             }
         }
     }

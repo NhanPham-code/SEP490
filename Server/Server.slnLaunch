@@ -16,6 +16,10 @@
       },
       {
         "Path": "NotificationAPI\\NotificationAPI.csproj",
+        "Action": "StartWithoutDebugging"
+      },
+      {
+        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
         "Action": "Start"
       }
     ]

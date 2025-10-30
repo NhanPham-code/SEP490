@@ -193,7 +193,7 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //get booking by user id
-            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and BookingDetails/any(m: m/StartTime ge {formatted})";
+            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and BookingDetails/any(m: m/StartTime ge {formatted}) and Status eq accepted";
             var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url);
      
             if (booking == null || !booking.Any())

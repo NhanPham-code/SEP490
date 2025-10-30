@@ -435,48 +435,70 @@ document.addEventListener('DOMContentLoaded', function () {
     const clearFiltersBtn = document.querySelector('.clear-filters');
     if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', function (e) {
+            // Ngăn sự kiện lan truyền lên các phần tử cha, giữ nguyên là một ý hay.
             e.stopPropagation();
 
-            // Clear checkboxes
+            // Xóa các checkbox đã chọn
             const checkboxes = document.querySelectorAll('.custom-checkbox');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            // Clear date input
+            // Xóa ô nhập ngày
             const dateInput = document.querySelector('.date-input');
             if (dateInput) {
                 dateInput.value = '';
             }
 
-            // Clear location input
+            // Xóa ô nhập địa điểm
             const locationInput = document.querySelector('.location-input');
             if (locationInput) {
                 locationInput.value = '';
             }
 
-            // Reset price range
-            const priceRange = document.querySelector('.range-slider');
-            if (priceRange) {
-                priceRange.value = priceRange.min;
-                updatePriceDisplay(priceRange.value);
+            // --- SỬA LOGIC XÓA BỘ LỌC THỜI GIAN ---
+            // Đặt lại giá trị cho các thẻ <select> của bộ lọc thời gian
+            const startTimeSelect = document.getElementById('startTime');
+            if (startTimeSelect) {
+                startTimeSelect.value = ''; // Giả sử option đầu tiên có value=""
+            }
+            const endTimeSelect = document.getElementById('endTime');
+            if (endTimeSelect) {
+                endTimeSelect.value = ''; // Đặt lại về giá trị mặc định
             }
 
-            // Clear selected time slots
-            const timeSlots = document.querySelectorAll('.time-slot.selected');
-            timeSlots.forEach(slot => {
-                slot.classList.remove('selected');
-            });
+            // Xóa thông báo lỗi nếu có
+            const timeErrorElement = document.getElementById('time-error-message');
+            if (timeErrorElement) {
+                timeErrorElement.textContent = '';
+            }
+            // --- KẾT THÚC SỬA LỖI ---
 
-            // Clear selected facility tags
+
+            // Đặt lại thanh trượt giá
+            const priceRange = document.querySelector('.range-slider');
+            if (priceRange) {
+                // Đặt lại giá trị về mức tối thiểu
+                priceRange.value = priceRange.max;
+                // Cập nhật hiển thị giá (giả sử bạn có hàm này)
+                if (typeof updatePriceDisplay === 'function') {
+                    updatePriceDisplay(priceRange.value);
+                }
+            }
+
+            // Xóa các thẻ tiện ích đã chọn
             const facilityTags = document.querySelectorAll('.facility-tag.active');
             facilityTags.forEach(tag => {
                 tag.classList.remove('active');
             });
 
-            showToast('Đã xóa tất cả bộ lọc');
+            // Hiển thị thông báo (giả sử bạn có hàm này)
+            if (typeof showToast === 'function') {
+                showToast('Đã xóa tất cả bộ lọc');
+            }
         });
     }
+
 
     // Time slot selection
     const timeSlots = document.querySelectorAll('.time-slot');
@@ -582,3 +604,51 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const startTimeSelect = document.getElementById('startTime');
+    const endTimeSelect = document.getElementById('endTime');
+    const filterHeader = document.querySelector('.filter-header');
+    const filterContent = document.querySelector('.filter-content');
+
+    // Function to generate time slots
+    function generateTimeSlots() {
+        const slots = [];
+        for (let hour = 0; hour < 24; hour++) {
+            for (let minute = 0; minute < 60; minute += 30) {
+                const hourStr = hour.toString().padStart(2, '0');
+                const minuteStr = minute.toString().padStart(2, '0');
+                slots.push(`${hourStr}:${minuteStr}`);
+            }
+        }
+        return slots;
+    }
+
+    // Function to populate select elements with time slots
+    function populateTimeSlots(selectElement, slots) {
+        // Add a default placeholder option
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = "";
+        placeholderOption.textContent = "Chọn giờ";
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        selectElement.appendChild(placeholderOption);
+
+        slots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot;
+            option.textContent = slot;
+            selectElement.appendChild(option);
+        });
+    }
+
+    const timeSlots = generateTimeSlots();
+    populateTimeSlots(startTimeSelect, timeSlots);
+    populateTimeSlots(endTimeSelect, timeSlots);
+
+    // Toggle filter content visibility
+    filterHeader.addEventListener('click', () => {
+        const isExpanded = filterHeader.getAttribute('aria-expanded') === 'true';
+        filterHeader.setAttribute('aria-expanded', !isExpanded);
+        filterContent.classList.toggle('active');
+    });
+});

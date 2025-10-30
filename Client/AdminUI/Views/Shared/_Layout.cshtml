@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- THÊM THƯ VIỆN SIGNALR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 
     <link href="~/css/layout_admin-dashboard.css" rel="stylesheet" />
     <script>
@@ -36,28 +38,19 @@
 
 <body class="bg-gray-50 font-sans antialiased">
     <!-- Toast Container -->
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
+    <div id="toastContainer" class="fixed top-4 right-4 z-[100] space-y-2"></div> <!-- Tăng z-index -->
     <!-- Logout Confirmation Modal -->
-    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center">
+        <!-- Tăng z-index -->
         <div class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <!-- Modal content -->
             <div class="flex items-center space-x-3 mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <i class="ri-logout-box-line text-2xl text-red-600"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Xác nhận đăng xuất</h3>
-                    <p class="text-gray-500">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
-                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"> <i class="ri-logout-box-line text-2xl text-red-600"></i> </div>
+                <div> <h3 class="text-lg font-semibold text-gray-900">Xác nhận đăng xuất</h3> <p class="text-gray-500">Bạn có chắc chắn muốn đăng xuất?</p> </div>
             </div>
             <div class="flex justify-end space-x-3">
-                <button id="cancelLogout" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                    Hủy bỏ
-                </button>
-                <button id="confirmLogout" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                    <i class="ri-logout-box-line mr-2"></i>
-                    Đăng xuất
-                </button>
+                <button id="cancelLogout" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"> Hủy </button>
+                <button id="confirmLogout" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"> <i class="ri-logout-box-line mr-1"></i> Đăng xuất </button>
             </div>
         </div>
     </div>
@@ -67,212 +60,109 @@
 
     <div class="flex h-screen bg-gray-50">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
-            <div class="flex items-center justify-between h-16 px-6 bg-admin-primary">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0 flex flex-col transition-transform duration-300">
+            <div class="flex items-center justify-between h-16 px-6 bg-admin-primary flex-shrink-0">
                 <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                        <i class="ri-dashboard-3-line text-admin-primary text-xl"></i>
-                    </div>
+                    <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center"> <i class="ri-dashboard-3-line text-admin-primary text-xl"></i> </div>
                     <h1 class="text-white text-xl font-bold">Sportivey</h1>
                 </div>
-                <button id="closeSidebar" class="text-white lg:hidden">
-                    <i class="ri-close-line text-2xl"></i>
-                </button>
+                <button id="closeSidebar" class="text-white lg:hidden"> <i class="ri-close-line text-2xl"></i> </button>
             </div>
 
-            <nav class="mt-6">
-                <div class="px-6 mb-4">
-                    <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Quản Lý Chính</h3>
-                </div>
-
-                <ul class="space-y-1 px-3">
-                    <li>
-                        <a href="/Admin/Dashboard" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" data-section="dashboard">
-                            <i class="ri-dashboard-line"></i>
-                            <span>Tổng Quan</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard")
+            <nav class="mt-6 flex-1 overflow-y-auto px-3">
+                <div class="px-3 mb-4"> <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Quản Lý Chính</h3> </div>
+                <ul class="space-y-1">
+                    <li> <a href="/Admin/Dashboard" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"> <i class="ri-dashboard-line"></i> <span>Tổng Quan</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Account" asp-action="UserManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" data-section="users">
-                            <i class="ri-user-line"></i>
-                            <span>Quản Lý Người Dùng</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Users")
+                            } </a> </li>
+                    <li> <a asp-controller="Account" asp-action="UserManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "UserManagement" ? "active" : "")"> <i class="ri-user-line"></i> <span>Quản Lý User</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "UserManagement")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/Revenue/Revenue" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Revenue" ? "active" : "")" data-section="revenue">
-                            <i class="ri-money-dollar-circle-line"></i>
-                            <span>Quản Lý Doanh Thu</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Revenue")
+                            } </a> </li>
+                    <li> <a href="/Revenue/Revenue" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Revenue" ? "active" : "")"> <i class="ri-money-dollar-circle-line"></i> <span>Doanh Thu</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Revenue")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/Stadium/StadiumAdmin" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "StadiumAdmin" ? "active" : "")" data-section="venues">
-                            <i class="ri-building-line"></i>
-                            <span>Quản Lý Nhà Thi Đấu</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Venues")
+                            } </a> </li>
+                    <li> <a href="/Stadium/StadiumAdmin" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "StadiumAdmin" ? "active" : "")"> <i class="ri-building-line"></i> <span>Sân Bãi</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "StadiumAdmin")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
-                        <a href="@Url.Action("DiscountList", "Discount")" class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Discount" && ViewContext.RouteData.Values["action"].ToString() == "DiscountList" ? "active" : "")">
-                            <i class="ri-coupon-line"></i>
-                            <span>Quản Lý Mã Giảm Giá</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Feedback"
-                           asp-action="Feedback"
-                           class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")"
-                           data-section="feedback">
-                            <i class="ri-feedback-line"></i>
-                            <span>Quản Lý Feedback</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Feedback")
+                            } </a> </li>
+                    <li> <a href="@Url.Action("DiscountList", "Discount")" class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Discount" ? "active" : "")"> <i class="ri-coupon-line"></i> <span>Mã Giảm Giá</span> @if (ViewContext.RouteData.Values["controller"].ToString() == "Discount")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-
-                    </li>
-                    <li>
-                        <a asp-controller="Chat" asp-action="Chat"
-                           class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"
-                           data-section="chat">
-                            <i class="ri-chat-3-line"></i>
-                            <span>Quản Lý Chat</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Chat")
+                            } </a> </li>
+                    <li> <a asp-controller="Feedback" asp-action="Feedback" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")"> <i class="ri-feedback-line"></i> <span>Feedback</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Feedback")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="/Admin/Notifications" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")" data-section="notifications">
-                            <i class="ri-notification-line"></i>
-                            <span>Quản Lý Thông Báo</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
+                            } </a> </li>
+                    <li> <a asp-controller="Chat" asp-action="Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"> <i class="ri-chat-3-line"></i> <span>Chat</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Chat")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-
-                    <li>
-                        <a asp-controller="Fee" asp-action="FeeManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" data-section="users">
-                            <i class="ri-bill-line"></i>
-                            <span>Quản Lý Cước Phí</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Users")
+                            } </a> </li>
+                    <li> <a href="/Admin/Notification" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")"> <i class="ri-notification-line"></i> <span>Thông Báo</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
+                            } </a> </li>
+                    <li> <a asp-controller="Fee" asp-action="FeeManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "FeeManagement" ? "active" : "")"> <i class="ri-bill-line"></i> <span>Cước Phí</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "FeeManagement")
+                            {
+                                <div class="nav-indicator"></div>
+                            } </a> </li>
                 </ul>
-
-                <div class="px-6 mt-8 mb-4">
-                    <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Hệ Thống</h3>
-                </div>
-
-                <ul class="space-y-1 px-3">
-                    <li>
-                        <a href="/Admin/Settings" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")" data-section="settings">
-                            <i class="ri-settings-3-line"></i>
-                            <span>Cài Đặt</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Settings")
+                <div class="px-3 mt-8 mb-4"> <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Hệ Thống</h3> </div>
+                <ul class="space-y-1">
+                    <li> <a href="/Admin/Settings" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")"> <i class="ri-settings-3-line"></i> <span>Cài Đặt</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Settings")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/Admin/Logs" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Logs" ? "active" : "")" data-section="logs">
-                            <i class="ri-file-list-3-line"></i>
-                            <span>Nhật Ký Hệ Thống</span>
-                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Logs")
+                            } </a> </li>
+                    <li> <a href="/Admin/Logs" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Logs" ? "active" : "")"> <i class="ri-file-list-3-line"></i> <span>Nhật Ký</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Logs")
                             {
                                 <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
+                            } </a> </li>
                 </ul>
             </nav>
 
-            <!-- User Profile -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+            @{
+                var adminName = User.Identity?.Name ?? "Admin";
+                var adminAvatarUrl = Context.Session.GetString("AvatarUrl") ?? "/uploads/avatars/default-avatar.png";
+                var loginTimeDisplay = DateTime.Now.ToString("HH:mm");
+            }
+            <div class="p-4 border-t border-gray-200 bg-white flex-shrink-0">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-admin-primary rounded-full flex items-center justify-center">
-                        <i class="ri-user-line text-white"></i>
-                    </div>
+                    <img src="@adminAvatarUrl" alt="Admin Avatar" class="w-10 h-10 rounded-full border-2 border-admin-primary" />
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">@User.Identity.Name</p>
+                        <p class="text-sm font-medium text-gray-900 truncate">@adminName</p>
                         <p class="text-xs text-gray-500">Quản trị viên</p>
-                        <p class="text-xs text-gray-400">Trực tuyến lúc <span id="loginTime">08:03</span></p>
+                        <p class="text-xs text-gray-400">Online: <span id="loginTime">@loginTimeDisplay</span></p>
                     </div>
-                    <button class="text-gray-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50" onclick="showLogoutModal()" title="Đăng xuất">
-                        <i class="ri-logout-box-line text-lg"></i>
-                    </button>
+                    <button class="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50" onclick="showLogoutModal()" title="Đăng xuất"> <i class="ri-logout-box-line text-lg"></i> </button>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Bar -->
-            <header class="bg-white shadow-sm border-b border-gray-200">
+            <header class="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
                 <div class="flex items-center justify-between h-16 px-6">
                     <div class="flex items-center">
-                        <button id="menuToggle" class="text-gray-500 hover:text-gray-600 lg:hidden">
-                            <i class="ri-menu-line text-2xl"></i>
-                        </button>
-                        <h1 id="pageTitle" class="ml-4 lg:ml-0 text-2xl font-bold text-gray-900">@ViewData["Title"]</h1>
+                        <button id="menuToggle" class="text-gray-500 hover:text-gray-600 lg:hidden mr-4"> <i class="ri-menu-line text-2xl"></i> </button>
+                        <h1 id="pageTitle" class="text-xl md:text-2xl font-bold text-gray-900">@ViewData["Title"]</h1>
                     </div>
-
                     <div class="flex items-center space-x-4">
-                        <!-- Time Display -->
-                        <div class="hidden md:flex items-center text-sm text-gray-500">
-                            <i class="ri-time-line mr-1"></i>
-                            <span id="currentTime">04/09/2025 08:03</span>
-                        </div>
-
+                        <div class="hidden md:flex items-center text-sm text-gray-500"> <i class="ri-time-line mr-1"></i> <span id="currentTime"></span> </div>
                         <!-- Notifications -->
-                        <div class="relative">
-                            <button class="text-gray-500 hover:text-gray-600 relative p-2 rounded-lg hover:bg-gray-100">
-                                <i class="ri-notification-3-line text-xl"></i>
-                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                            </button>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <button class="px-4 py-2 bg-admin-primary text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="ri-add-line mr-2"></i>
-                            Thêm Mới
-                        </button>
-
-                        <!-- Logout Button -->
-                        <button onclick="showLogoutModal()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                            <i class="ri-logout-box-line mr-2"></i>
-                            Đăng Xuất
-                        </button>
+                        <a id="notificationBellLink" href="@Url.Action("Index", "Notification")" class="relative text-gray-500 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100" title="Thông báo">
+                            <i class="ri-notification-3-line text-xl"></i>
+                            <!-- Badge hiển thị số lượng -->
+                            <span id="admin-notification-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center" style="display: none;"></span>
+                        </a>
                     </div>
                 </div>
             </header>
 
             <!-- Content Area -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
                 @RenderBody()
             </main>
         </div>
@@ -286,38 +176,44 @@
         window.AdminLayout = (function () {
             // Toast System
             function showToast(message, type = "success", duration = 4000) {
-                const icons = {
-                    success: '<i class="ri-checkbox-circle-line text-xl"></i>',
-                    error: '<i class="ri-close-circle-line text-xl"></i>',
-                    warning: '<i class="ri-alert-line text-xl"></i>',
-                    info: '<i class="ri-information-line text-xl"></i>'
+                 const icons = {
+                    success: '<i class="ri-checkbox-circle-fill text-xl text-green-500"></i>',
+                    error: '<i class="ri-close-circle-fill text-xl text-red-500"></i>',
+                    warning: '<i class="ri-error-warning-fill text-xl text-yellow-500"></i>',
+                    info: '<i class="ri-information-fill text-xl text-blue-500"></i>'
+                };
+                const borderColors = {
+                    success: 'border-green-500',
+                    error: 'border-red-500',
+                    warning: 'border-yellow-500',
+                    info: 'border-blue-500'
                 };
 
                 const toast = document.createElement("div");
-                toast.className = `flex items-center space-x-3 bg-white border-l-4 border-${type === 'success' ? 'green' : type === 'error' ? 'red' : type === 'warning' ? 'yellow' : 'blue'}-500 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+                 // Cập nhật class cho đẹp hơn
+                toast.className = `flex items-center space-x-3 bg-white border-l-4 ${borderColors[type] || 'border-blue-500'} p-4 rounded-lg shadow-lg mb-2 transform opacity-0 translate-y-2 transition-all duration-300 ease-out`;
                 toast.innerHTML = `
-                            ${icons[type] || ''}
-                            <span class="flex-1 text-gray-900">${message}</span>
-                            <button class="text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
-                                <i class="ri-close-line"></i>
-                            </button>
-                        `;
+                    ${icons[type] || icons['info']}
+                    <span class="flex-1 text-sm text-gray-800">${message}</span>
+                    <button class="text-gray-400 hover:text-gray-600" onclick="this.closest('.transition-all').remove()">
+                        <i class="ri-close-line text-lg"></i>
+                    </button>
+                `;
 
                 const container = document.getElementById("toastContainer");
                 if (container) {
                     container.appendChild(toast);
-                    setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+                    // Animation vào
+                     requestAnimationFrame(() => {
+                        toast.classList.remove('opacity-0', 'translate-y-2');
+                    });
 
                     if (duration > 0) {
                         setTimeout(() => {
-                            if (toast.parentElement) {
-                                toast.classList.add('translate-x-full');
-                                setTimeout(() => {
-                                    if (toast.parentElement) {
-                                        toast.remove();
-                                    }
-                                }, 300);
-                            }
+                            // Animation ra
+                            toast.classList.add('opacity-0', 'translate-x-full');
+                            // Xóa hẳn sau khi animation kết thúc
+                            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
                         }, duration);
                     }
                 }
@@ -327,111 +223,94 @@
             function updateTime() {
                 const now = new Date();
                 const timeString = now.toLocaleString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit' // Thêm giây
                 });
                 const timeElement = document.getElementById('currentTime');
-                if (timeElement) {
-                    timeElement.textContent = timeString;
-                }
+                if (timeElement) timeElement.textContent = timeString;
+
+                // Cập nhật cả login time nếu cần
+                 const loginTimeElement = document.getElementById('loginTime');
+                 // if (loginTimeElement) loginTimeElement.textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
             }
 
             // Logout Functions
             function showLogoutModal() {
-                document.getElementById('logoutModal').classList.remove('hidden');
+                 const modal = document.getElementById('logoutModal');
+                 if (modal) {
+                     modal.classList.remove('hidden');
+                     modal.classList.add('flex'); // Đảm bảo flex được thêm vào
+                 }
             }
 
             function hideLogoutModal() {
-                document.getElementById('logoutModal').classList.add('hidden');
+                 const modal = document.getElementById('logoutModal');
+                 if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                 }
             }
 
-            function performLogout() {
+             function performLogout() {
                 hideLogoutModal();
-                showToast('Đang đăng xuất khỏi hệ thống...', 'info');
+                showToast('Đang đăng xuất khỏi hệ thống...', 'info', 0); // Hiển thị vô hạn
 
-                setTimeout(() => {
-                    // Call logout endpoint
-                    $.ajax({
-                        url: '/Account/Logout',
-                        type: 'GET',
-                        success: function () {
-                            showToast('Đã đăng xuất thành công!', 'success', 2000);
-                            setTimeout(() => {
-                                window.location.href = '/Account/Login';
-                            }, 2000);
-                        },
-                        error: function () {
-                            showToast('Có lỗi xảy ra khi đăng xuất!', 'error');
+                 // Đổi URL Logout nếu cần
+                const logoutUrl = '@Url.Action("Logout", "Account", new { area = "" })'; // Hoặc Controller/Action tương ứng của Admin
+
+                fetch(logoutUrl, { method: 'POST' }) // Nên dùng POST cho logout
+                    .then(response => {
+                        if (response.ok) {
+                             showToast('Đã đăng xuất thành công!', 'success', 2000);
+                             setTimeout(() => {
+                                 // Đổi URL Login nếu cần
+                                 window.location.href = '@Url.Action("Login", "Account", new { area = "" })'; // Hoặc Controller/Action tương ứng
+                             }, 2000);
+                        } else {
+                            throw new Error('Logout failed');
                         }
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        showToast('Có lỗi xảy ra khi đăng xuất!', 'error');
                     });
-                }, 1500);
             }
 
             // Mobile Menu Functions
-            function toggleMobileMenu() {
+             function toggleMobileMenu() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('mobileMenuOverlay');
-
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
+                if(sidebar && overlay) {
+                    sidebar.classList.toggle('-translate-x-full');
+                    overlay.classList.toggle('hidden');
+                }
             }
 
-            function closeMobileMenu() {
+             function closeMobileMenu() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('mobileMenuOverlay');
-
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
+                if(sidebar && overlay) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
             }
 
             // Initialize Event Listeners
             function initializeEventListeners() {
-                // Mobile menu toggle
-                const menuToggle = document.getElementById('menuToggle');
-                if (menuToggle) {
-                    menuToggle.addEventListener('click', toggleMobileMenu);
-                }
+                document.getElementById('menuToggle')?.addEventListener('click', toggleMobileMenu);
+                document.getElementById('closeSidebar')?.addEventListener('click', closeMobileMenu);
+                document.getElementById('mobileMenuOverlay')?.addEventListener('click', closeMobileMenu);
+                document.getElementById('cancelLogout')?.addEventListener('click', hideLogoutModal);
+                document.getElementById('confirmLogout')?.addEventListener('click', performLogout);
 
-                // Close sidebar button
-                const closeSidebar = document.getElementById('closeSidebar');
-                if (closeSidebar) {
-                    closeSidebar.addEventListener('click', closeMobileMenu);
-                }
-
-                // Mobile menu overlay
-                const overlay = document.getElementById('mobileMenuOverlay');
-                if (overlay) {
-                    overlay.addEventListener('click', closeMobileMenu);
-                }
-
-                // Logout modal events
-                const cancelLogout = document.getElementById('cancelLogout');
-                const confirmLogout = document.getElementById('confirmLogout');
-
-                if (cancelLogout) {
-                    cancelLogout.addEventListener('click', hideLogoutModal);
-                }
-
-                if (confirmLogout) {
-                    confirmLogout.addEventListener('click', performLogout);
-                }
-
-                // Window resize handler
-                window.addEventListener('resize', function () {
-                    if (window.innerWidth >= 1024) {
-                        closeMobileMenu();
-                    }
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 1024) closeMobileMenu();
                 });
 
-                // Update time every minute
-                setInterval(updateTime, 60000);
-                updateTime(); // Initial call
-
-                // Set login time
-                document.getElementById('loginTime').textContent = '08:03';
+                 // Update time every second
+                 setInterval(updateTime, 1000);
+                 updateTime(); // Initial call
             }
 
             // Initialize Layout
@@ -441,35 +320,109 @@
             }
 
             // Public API
-            return {
-                init: init,
-                showToast: showToast,
-                showLogoutModal: showLogoutModal,
-                hideLogoutModal: hideLogoutModal
-            };
+            return { init, showToast, showLogoutModal, hideLogoutModal };
         })();
 
         // Make functions globally available
-        window.showToast = function (message, type, duration) {
-            return window.AdminLayout.showToast(message, type, duration);
-        };
-
-        window.showLogoutModal = function () {
-            window.AdminLayout.showLogoutModal();
-        };
-
-        window.hideLogoutModal = function () {
-            window.AdminLayout.hideLogoutModal();
-        };
+        window.showToast = AdminLayout.showToast;
+        window.showLogoutModal = AdminLayout.showLogoutModal;
+        window.hideLogoutModal = AdminLayout.hideLogoutModal;
 
         // Initialize when document is ready
+        $(document).ready(AdminLayout.init);
+
+    </script>
+
+
+    <script>
+        $('#notificationBellLink').on('click', function() {
+                 console.log("Notification bell clicked! Calling MarkAllAsRead...");
+                 markAllNotificationsAsReadAdmin();
+                 // KHÔNG gọi event.preventDefault(); để trình duyệt tiếp tục điều hướng
+             });
+
+             function markAllNotificationsAsReadAdmin() {
+                 console.log("[ADMIN AJAX] Attempting to mark all as read...");
+                 $.ajax({
+                     url: '/AdminNotification/MarkAllAsRead', // Gọi Action MarkAllAsRead
+                     type: 'POST', // Đảm bảo Action là [HttpPost]
+                     success: function () {
+                         console.log("[ADMIN AJAX] MarkAllAsRead successful.");
+                         // Sau khi thành công, cập nhật lại badge ngay lập tức
+                         updateNotificationBadgeAdmin();
+                     },
+                     error: function (jqXHR, textStatus) {
+                         console.error(`[ADMIN AJAX] Error marking as read: ${textStatus} (${jqXHR.status})`);
+                         // Có thể hiển thị toast lỗi nếu cần
+                         // showToast('Lỗi khi đánh dấu đã đọc!', 'error');
+                     }
+                 });
+             }
+
         $(document).ready(function () {
-            if (window.AdminLayout) {
-                window.AdminLayout.init();
-            }
-        });
+             function updateNotificationBadgeAdmin() {
+                 console.log("[ADMIN AJAX] Getting unread count...");
+                 $.ajax({
+                     url: '/Notification/GetUnreadNotificationCount', // Gọi Action local
+                     type: 'GET',
+                     success: function (count) {
+                         console.log(`[ADMIN AJAX] Success! Count: ${count}`);
+                         const badge = $('#admin-notification-badge'); // Tìm badge theo ID
+                         if (badge.length) {
+                             if (count > 0) {
+                                 badge.text(count); // Cập nhật số
+                                 badge.show();      // Hiện badge
+                             } else {
+                                 badge.hide();      // Ẩn badge
+                             }
+                             console.log(`[ADMIN UI] Badge updated (Count: ${count}).`);
+                         } else { console.warn("[ADMIN UI] #admin-notification-badge not found."); }
+                     },
+                     error: function (jqXHR, textStatus) {
+                         console.error(`[ADMIN AJAX] Error: ${textStatus} (Status: ${jqXHR.status})`);
+                         $('#admin-notification-badge').hide(); // Hide on error
+                     }
+                 });
+             }
+
+             function connectToSignalRAdmin() {
+                 const adminUserId = -1;
+                 if (!adminUserId) { console.log("[ADMIN SignalR] No UserId, skipping connection."); return; }
+
+                 const hubUrl = `https://localhost:7072/notificationHub?userId=${adminUserId}`; // Kết nối thẳng Hub
+                 const connection = new signalR.HubConnectionBuilder()
+                     .withUrl(hubUrl, {
+                          // Gửi token để xác thực kết nối SignalR
+                          accessTokenFactory: () => document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1]
+                     })
+                     .withAutomaticReconnect()
+                     .build();
+
+                 // Lắng nghe sự kiện từ Hub
+                 connection.on("ReceiveNotification", function (notification) {
+                     console.log('%c[ADMIN SignalR] Received Notification!', 'color: orange; font-weight: bold;', notification);
+                      // Hiển thị toast cho Admin
+                      if (notification && notification.message) {
+                          showToast(`Thông báo mới: ${notification.message}`, 'info');
+                      }
+                     // Cập nhật lại số lượng trên badge
+                     updateNotificationBadgeAdmin();
+                 });
+
+                 // Bắt đầu kết nối
+                 connection.start()
+                     .then(() => console.log(`[ADMIN SignalR] Connected (UserId: ${adminUserId})`))
+                     .catch(err => console.error("[ADMIN SignalR] Connection error:", err));
+             }
+
+             // --- Khởi tạo ---
+             console.log("Initializing Admin notification script...");
+             connectToSignalRAdmin();      // Kết nối SignalR
+             updateNotificationBadgeAdmin(); // Tải số lượng ban đầu
+         });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

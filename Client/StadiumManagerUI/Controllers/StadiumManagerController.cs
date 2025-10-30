@@ -92,7 +92,7 @@ namespace StadiumManagerUI.Controllers
                 
                 Title = "<div class=\"text-green-500\">Một nhà thi đấu mới được tạo</div>",
                 Message = $"<div><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/StadiumController/StadiumAdmin\">Nhà thi đấu '{stadium.Name}' vừa được tạo hãy tới xem</a></div>",
-                UserId = -1,
+                UserId = 1,
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             });

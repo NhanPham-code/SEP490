@@ -18,5 +18,6 @@ namespace Service.Interfaces
         Task<bool> SendNotificationToUserAsync(NotificationDTO notificationDTO);
         Task<bool> SendNotificationToGroupUserAsync(string groupName, List<NotificationDTO> notificationDTOs);
         Task<bool> SendNotificationToAll(NotificationDTO notificationDTO);
+        Task<bool> SendNotificationsBatchAsync(List<NotificationDTO> notifications, string accessToken);
     }
 }
