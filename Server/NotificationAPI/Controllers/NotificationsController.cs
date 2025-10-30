@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using System; // Needed for DateTime
+using System;
+using NotificationAPI.Dto; // Needed for DateTime
 
 namespace NotificationAPI.Controllers
 {
@@ -31,16 +32,15 @@ namespace NotificationAPI.Controllers
 
         // --- Tạo đơn lẻ ---
         [HttpPost]
-        public async Task<ActionResult> CreateNotification([FromBody] Model.Notification notification)
+        public async Task<ActionResult> CreateNotification([FromBody] CreateNotificationDto createNotificationDto)
         {
             // Yêu cầu UserId > 0
-            if (notification == null || string.IsNullOrWhiteSpace(notification.Message) || !notification.UserId.HasValue || notification.UserId <= 0)
+            if (createNotificationDto == null || string.IsNullOrWhiteSpace(createNotificationDto.Message) || !createNotificationDto.UserId.HasValue || createNotificationDto.UserId <= 0)
             {
                 return BadRequest(new { message = "Notification object must include a valid UserId (> 0) and Message." });
             }
-            notification.CreatedAt = DateTime.Now;
 
-            var createdNotification = await _notificationService.AddNotificationAsync(notification);
+            var createdNotification = await _notificationService.AddNotificationAsync(createNotificationDto);
             if (createdNotification == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to save notification." });
@@ -48,7 +48,12 @@ namespace NotificationAPI.Controllers
 
             try
             {
-                await _hubContext.Clients.User(createdNotification.UserId.Value.ToString()).SendAsync("ReceiveNotification", createdNotification);
+                var targetUserId = createdNotification.UserId.Value.ToString();
+                Console.WriteLine($"[NotificationAPI] DEBUG: Attempting to send SignalR notification to User ID: {targetUserId}");
+
+                await _hubContext.Clients.User(targetUserId).SendAsync("ReceiveNotification", createdNotification);
+
+                Console.WriteLine($"[NotificationAPI] DEBUG: Successfully called SendAsync for User ID: {targetUserId}.");
             }
             catch (Exception ex)
             {
@@ -60,13 +65,12 @@ namespace NotificationAPI.Controllers
 
         // --- Tạo theo nhóm (Batch) ---
         [HttpPost("batch")]
-        public async Task<ActionResult> CreateNotificationsBatch([FromBody] List<Model.Notification> notifications)
+        public async Task<ActionResult> CreateNotificationsBatch([FromBody] List<CreateNotificationDto> createNotificationDtos)
         {
-            if (notifications == null || !notifications.Any()) return BadRequest(new { message = "Notification list is empty." });
+            if (createNotificationDtos == null || !createNotificationDtos.Any()) return BadRequest(new { message = "Notification list is empty." });
 
-            var validNotifications = notifications
+            var validNotifications = createNotificationDtos
                 .Where(n => n != null && !string.IsNullOrWhiteSpace(n.Message) && n.UserId.HasValue && n.UserId > 0)
-                .Select(n => { if (n.CreatedAt == default) n.CreatedAt = DateTime.Now; return n; })
                 .ToList();
 
             if (!validNotifications.Any()) return BadRequest(new { message = "No valid notifications with UserId > 0 found." });
@@ -89,19 +93,18 @@ namespace NotificationAPI.Controllers
 
         // --- GỬI CHO TẤT CẢ ---
         [HttpPost("all")]
-        public async Task<ActionResult> CreateAllNotification([FromBody] Model.Notification notification)
+        public async Task<ActionResult> CreateAllNotification([FromBody] CreateNotificationDto createNotificationDto)
         {
-            if (notification == null || string.IsNullOrWhiteSpace(notification.Message))
+            if (createNotificationDto == null || string.IsNullOrWhiteSpace(createNotificationDto.Message))
             {
                 return BadRequest(new { message = "Notification object must include a Message." });
             }
 
             // Set UserId = 0 và CreatedAt
-            notification.UserId = 0;
-            notification.CreatedAt = DateTime.Now;
+            createNotificationDto.UserId = 0;
 
             // Lưu vào DB
-            var createdNotification = await _notificationService.AddNotificationAsync(notification);
+            var createdNotification = await _notificationService.AddNotificationAsync(createNotificationDto);
             if (createdNotification == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to save 'all' notification." });
@@ -163,8 +166,6 @@ namespace NotificationAPI.Controllers
             return Ok(notification);
         }
 
-        // --- PUT/DELETE Endpoints ---
-
         // PUT: api/Notifications/markAllAsRead
         [HttpPut("markAllAsRead")]
         public async Task<IActionResult> MarkAllAsRead()
@@ -173,31 +174,6 @@ namespace NotificationAPI.Controllers
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0) return BadRequest(new { message = "Invalid or missing user ID in token." });
 
             await _notificationService.MarkAllAsReadAsync(userId);
-            return NoContent();
-        }
-
-        // PUT: api/Notifications/{id} 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNotificationIsRead(int id, [FromBody] NotificationReadUpdateDto updateDto) // DTO chỉ chứa IsRead
-        {
-            if (id <= 0 || updateDto == null) return BadRequest(new { message = "Invalid ID or update data." });
-
-            var existingNotification = await _notificationService.GetNotificationByIdAsync(id);
-            if (existingNotification == null) return NotFound();
-
-            if (existingNotification.UserId == 0)
-            {
-                return Forbid("Cannot update 'IsRead' status for 'all' notifications via this endpoint.");
-            }
-
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int currentUserId) || existingNotification.UserId != currentUserId)
-            {
-                return Forbid(); 
-            }
-
-            existingNotification.IsRead = updateDto.IsRead;
-            await _notificationService.UpdateNotificationAsync(existingNotification); // Service/Repo chỉ update IsRead
             return NoContent();
         }
 
@@ -213,10 +189,6 @@ namespace NotificationAPI.Controllers
 
             await _notificationService.DeleteNotificationAsync(id);
             return NoContent();
-        }
-        public class NotificationReadUpdateDto
-        {
-            public bool IsRead { get; set; }
         }
     }
 }

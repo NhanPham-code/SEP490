@@ -335,29 +335,6 @@
 
 
     <script>
-        $('#notificationBellLink').on('click', function() {
-                 console.log("Notification bell clicked! Calling MarkAllAsRead...");
-                 markAllNotificationsAsReadAdmin();
-                 // KHÔNG gọi event.preventDefault(); để trình duyệt tiếp tục điều hướng
-             });
-
-             function markAllNotificationsAsReadAdmin() {
-                 console.log("[ADMIN AJAX] Attempting to mark all as read...");
-                 $.ajax({
-                     url: '/AdminNotification/MarkAllAsRead', // Gọi Action MarkAllAsRead
-                     type: 'POST', // Đảm bảo Action là [HttpPost]
-                     success: function () {
-                         console.log("[ADMIN AJAX] MarkAllAsRead successful.");
-                         // Sau khi thành công, cập nhật lại badge ngay lập tức
-                         updateNotificationBadgeAdmin();
-                     },
-                     error: function (jqXHR, textStatus) {
-                         console.error(`[ADMIN AJAX] Error marking as read: ${textStatus} (${jqXHR.status})`);
-                         // Có thể hiển thị toast lỗi nếu cần
-                         // showToast('Lỗi khi đánh dấu đã đọc!', 'error');
-                     }
-                 });
-             }
 
         $(document).ready(function () {
              function updateNotificationBadgeAdmin() {

@@ -116,9 +116,10 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddSignalR();
 
-
-
 builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+
+// Inject AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
@@ -132,6 +133,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(); // Phải đặt trước UseAuthorization và MapHub
 
+app.UseWebSockets();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -13,12 +13,33 @@ namespace NotificationAPI.Hubs
             _notificationService = notificationService;
         }
 
+        public override Task OnConnectedAsync()
+        {
+            // Context.UserIdentifier là UserId mà IUserIdProvider đã lấy từ token
+            var userId = Context.UserIdentifier;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                Console.WriteLine($"[NotificationHub] CRITICAL_ERROR: A client connected, but UserId is NULL or EMPTY. ConnectionId: {Context.ConnectionId}");
+            }
+            else
+            {
+                Console.WriteLine($"[NotificationHub] SUCCESS: Client connected with UserId: {userId}. ConnectionId: {Context.ConnectionId}");
+            }
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.UserIdentifier;
+            Console.WriteLine($"[NotificationHub] INFO: Client disconnected. UserId: {userId}, ConnectionId: {Context.ConnectionId}");
+            return base.OnDisconnectedAsync(exception);
+        }
+
         // Gửi notification tới một user (có thể gọi từ backend khác)
         public async Task SendNotificationToUser(Notification notification)
         {
-            // Lưu vào database
-            await _notificationService.AddNotificationAsync(notification);
-
             // Gửi realtime tới client có userId
             await Clients.User(notification.UserId.ToString()).SendAsync("ReceiveNotification", notification);
         }
@@ -45,9 +66,6 @@ namespace NotificationAPI.Hubs
         // method gửi đến 1 nhóm client
         public async Task SendNotificationToGroup(string groupName, List<Notification> notification)
         {
-            // Lưu vào database
-            await _notificationService.AddRangeNotificationsAsync(notification);
-
             // Gửi realtime tới nhóm client
             await Clients.Group(groupName).SendAsync("ReceiveNotification", notification.FirstOrDefault());
         }
