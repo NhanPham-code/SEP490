@@ -600,6 +600,25 @@
       //   "RequireAuthentication": true
       // }
     },
+    {
+      "DownstreamPathTemplate": "/api/Booking/check-completed/{userId}",
+      "UpstreamPathTemplate": "/booking/check-completed",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
     // === STADIUM API ===
     {
       "DownstreamPathTemplate": "/odata/OdataStadium",

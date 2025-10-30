@@ -346,5 +346,10 @@ namespace BookingAPI.Services
         {
             return await _bookingRepository.GetRevenueByStadiumsAsync(stadiumIds, year, month);
         }
+        
+        public async Task<bool> CheckUserHasCompletedBookingsAsync(int userId)
+        {
+            return await _bookingRepository.HasCompletedBookingsAsync(userId);
+        }
     }
 }

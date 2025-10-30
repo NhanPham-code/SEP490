@@ -258,5 +258,23 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
+        [HttpGet("check-completed/{userId}")]
+        [Authorize] // Đảm bảo endpoint này được bảo vệ và có thể nhận userId từ Ocelot
+        public async Task<ActionResult<bool>> CheckUserHasCompletedBookings(int userId)
+        {
+            try
+            {
+                // userId này đã được Ocelot trích xuất từ token và truyền vào
+                var hasCompleted = await _bookingService.CheckUserHasCompletedBookingsAsync(userId);
+        
+                // Trả về kết quả boolean (true hoặc false)
+                return Ok(hasCompleted);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
