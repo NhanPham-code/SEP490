@@ -9,7 +9,8 @@ namespace UserAPI.DTOs
         [Required]
         public int UserId { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required(ErrorMessage = "Họ và tên không được để trống.")]
+        [StringLength(100, ErrorMessage = "Họ và tên không được vượt quá 100 ký tự.")]
         public string FullName { get; set; } = null!;
 
         [Required, EmailAddress, MaxLength(100)]
@@ -19,10 +20,8 @@ namespace UserAPI.DTOs
         [MaxLength(200)]
         public string? Address { get; set; }
 
-        [AllowNull]
-        [MaxLength(15)]
-        [AllowEmptyPhone]
-        [RegularExpression(@"^$|^[+]?[(]?[0-9]{3}[)]?[-. ]?[0-9]{3}[-. ]?[0-9]{4,6}$", ErrorMessage = "Định dạng số điện thoại không hợp lệ.")]
+        [Required(ErrorMessage = "Số điện thoại không được để trống.")]
+        [RegularExpression(@"^(0[35789])\d{8}$", ErrorMessage = "Số điện thoại không đúng định dạng Việt Nam.")]
         public string? PhoneNumber { get; set; }
 
         [AllowNull]

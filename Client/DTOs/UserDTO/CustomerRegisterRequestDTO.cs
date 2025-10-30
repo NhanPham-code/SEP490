@@ -26,7 +26,7 @@ namespace DTOs.UserDTO
         [GenderValidator]
         public string? Gender { get; set; }
 
-        [DateOfBirth(18)] // bắt buộc >= 18 tuổi
+        [DateOfBirth(15)] // bắt buộc >= 15 tuổi
         public string? DateOfBirth { get; set; }
 
         public IFormFile? Avatar { get; set; }

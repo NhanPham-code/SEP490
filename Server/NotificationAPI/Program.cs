@@ -133,6 +133,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(); // Phải đặt trước UseAuthorization và MapHub
 
+app.UseWebSockets();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
