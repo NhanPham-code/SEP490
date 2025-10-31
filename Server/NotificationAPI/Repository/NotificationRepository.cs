@@ -34,7 +34,7 @@ namespace NotificationAPI.Repository
         }
         public async Task<int> CountUnreadAsync(int userId)
         {
-            var count = await _context.Notifications.CountAsync(n => n.UserId == userId && !n.IsRead);
+            var count = await _context.Notifications.CountAsync(n => (n.UserId == userId) && !n.IsRead);
             return count;
         }
 

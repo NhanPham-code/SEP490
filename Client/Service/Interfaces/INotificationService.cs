@@ -15,8 +15,9 @@ namespace Service.Interfaces
         Task<int> GetUnreadNotificationCountAsync(string accessToken);
         Task MarkAllAsReadAsync(string accessToken);
         Task<HubConnection> ConnectToSignalRAsync();
-        Task<bool> SendNotificationToUserAsync(NotificationDTO notificationDTO);
-        Task<bool> SendNotificationToGroupUserAsync(string groupName, List<NotificationDTO> notificationDTOs);
-        Task<bool> SendNotificationToAll(NotificationDTO notificationDTO);
+        Task<bool> SendNotificationToUserAsync(CreateNotificationDto notificationDTO);
+        Task<bool> SendNotificationToGroupUserAsync(string groupName, List<CreateNotificationDto> notificationDTOs);
+        Task<bool> SendNotificationToAll(CreateNotificationDto notificationDTO);
+        Task<bool> SendNotificationsBatchAsync(List<CreateNotificationDto> notifications, string accessToken);
     }
 }

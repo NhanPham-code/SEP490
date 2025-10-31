@@ -23,12 +23,13 @@ namespace Service.Interfaces
         Task<bool> UpdateDiscountAsync(string accessToken, UpdateDiscountDTO dto);
 
         Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
-            string accessToken,
-            int? userId,
-            int page = 1,
-            int pageSize = 5,
-            string? searchByCode = null,
-            int? stadiumId = null,
-            bool? isActive = null);
+        string accessToken,
+        int? userId = null,
+        int page = 1,
+        int pageSize = 5,
+        string? searchByCode = null,
+        int? stadiumId = null,
+        bool? isActive = null,
+        string? targetUserId = null);
     }
 }

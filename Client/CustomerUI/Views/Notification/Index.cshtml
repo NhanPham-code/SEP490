@@ -100,10 +100,15 @@
         function generateUrlFromParams(notification) {
             try {
                 const params = JSON.parse(notification.parameters);
+
+                    
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
                     return `/Booking/BookingHistory`;
                 }
                 if (params.bookingType === 'daily' && params.bookingId) {
+                    return `/Booking/BookingHistory`;
+                }
+                if (params.bookingId) {
                     return `/Booking/BookingHistory`;
                 }
             } catch (e) {

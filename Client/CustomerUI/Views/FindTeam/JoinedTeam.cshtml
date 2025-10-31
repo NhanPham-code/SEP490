@@ -704,7 +704,14 @@
                              <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
                                 <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
                          </div>
-                         <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
+                         <a href="javascript:void(0)"
+                   title="Chat với người đăng"
+                   class="chat-icon"
+                   data-receiver-id="${p.createdBy}"
+                   data-receiver-name="${profile[p.createdBy].fullName}"
+                   onclick="toggleChat(this)">
+                   <i class="ri-message-2-line"></i>
+                </a>
                      </div>
                      <div class="game-details">
                          <div class="detail-item">

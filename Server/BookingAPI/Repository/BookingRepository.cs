@@ -1,4 +1,5 @@
 ﻿using BookingAPI.Data;
+using BookingAPI.DTOs;
 using BookingAPI.Models;
 using BookingAPI.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -170,6 +171,36 @@ namespace BookingAPI.Repository
             }
 
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IEnumerable<StadiumRevenueDto>> GetRevenueByStadiumsAsync(List<int> stadiumIds, int year, int month)
+        {
+            // Tạo khoảng ngày để tối ưu index
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1);
+
+            var query = _context.Bookings
+                .AsNoTracking()
+                .Where(b =>
+                    stadiumIds.Contains(b.StadiumId) &&      // Lọc theo danh sách sân
+                    b.Date >= startDate && b.Date < endDate && // Lọc theo tháng/năm của ngày chơi (không phải ngày tạo booking)
+                    b.Status == "Completed");                // Chỉ tính booking đã hoàn thành
+
+            var result = await query
+                .GroupBy(b => b.StadiumId) // Nhóm theo từng sân
+                .Select(g => new StadiumRevenueDto
+                {
+                    StadiumId = g.Key,
+                    TotalRevenue = g.Sum(b => b.OriginalPrice ?? 0) // Tính tổng doanh thu cho mỗi sân (tính theo giá gốc trước khi trừ mã giảm giá)
+                })
+                .ToListAsync();
+
+            // Đảm bảo trả về 0 cho các sân không có doanh thu trong tháng
+            var allStadiumsResult = stadiumIds.Select(id =>
+                result.FirstOrDefault(r => r.StadiumId == id) ?? new StadiumRevenueDto { StadiumId = id, TotalRevenue = 0 }
+            ).ToList();
+
+            return allStadiumsResult;
         }
     }
 }

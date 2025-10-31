@@ -50,7 +50,13 @@ builder.Services.AddScoped<ICourtService, CourtService>();
 builder.Services.AddScoped<ICourtRelationService, CourtRelationService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+<<<<<<< HEAD
 builder.Services.AddScoped<INotificationService, NotificationService>();
+=======
+builder.Services.AddScoped<IFeesService, FeesService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+>>>>>>> 7aabb8cb8a21a40ae794c591e058e1c9e53895d1
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

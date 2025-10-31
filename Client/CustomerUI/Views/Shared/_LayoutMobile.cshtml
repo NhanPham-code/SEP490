@@ -1023,7 +1023,7 @@
         }
         document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
     </script>
-<<<<<<< HEAD
+
     <script>
         window.currentUserId = @userId;
         console.log("🔑 UserId từ Session:", @userId);
@@ -1144,84 +1144,92 @@
                 }
             }
         }
-=======
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script>
         $(document).ready(function () {
 
-            // Hàm này chính là một cuộc gọi AJAX để lấy số thông báo
-            async function updateNotificationBadge() {
-                try {
-                    // Fetch là phương thức AJAX hiện đại
-                    const resp = await fetch('/Notification/GetUnreadNotificationCount');
+            // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
 
-                    if (resp.ok) {
-                        const count = await resp.json();
+            function updateNotificationBadge() {
+                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
 
-                        // Tìm đúng thẻ badge để cập nhật
-                        const customerBadge = document.getElementById('notification-badge');
-                        const managerBadge = document.getElementById('notification-badge-count');
-                        const badge = customerBadge || managerBadge;
+                $.ajax({
+                    // === SỬA LỖI CORS ===
+                    // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
+                    // ngay trên project UI này. Đây là đường dẫn tương đối.
+                    url: '/Notification/GetUnreadNotificationCount',
+                    type: 'GET',
+                    // KHÔNG cần "beforeSend" (Authorization) nữa,
+                    // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
+                    success: function (count) {
+                        console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
 
-                        if (badge) {
+                        const badge = $('#notification-badge');
+
+                        if (badge.length) {
                             if (count > 0) {
-                                badge.textContent = count;
-                                // Dùng style.display để hiện/ẩn badge
-                                badge.style.display = 'inline-flex'; // Hoặc 'block', 'flex' tùy vào CSS của bạn
+                                badge.text(count);
+                                badge.show();
+                                console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
                             } else {
-                                badge.style.display = 'none';
+                                badge.hide();
+                                console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                             }
+                        } else {
+                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
                         }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
+                        // chứ không còn là lỗi CORS (status 0) nữa.
+                        console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
+                        console.error(`  - Status: ${jqXHR.status}`);
+                        console.error(`  - URL: ${this.url}`);
                     }
-                } catch (err) {
-                    // Lỗi có thể xảy ra nếu chưa đăng nhập, cứ bỏ qua một cách nhẹ nhàng
-                }
+                });
             }
 
-            // Hàm kết nối tới SignalR
             function connectToSignalR() {
-                // Lấy userId từ Session do Razor render ra
                 const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-
-                if (!userId || userId === 0) {
+                if (!userId) {
                     console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
                     return;
                 }
 
+                // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
                 const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
-
                 const connection = new signalR.HubConnectionBuilder()
-                    .withUrl(hubUrl)
+                    .withUrl(hubUrl, {
+                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                         accessTokenFactory: () => {
+                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                         }
+                    })
                     .withAutomaticReconnect()
                     .build();
 
-                // *** ĐIỂM QUAN TRỌNG NHẤT LÀ ĐÂY ***
-                // Khi nhận được tín hiệu "ReceiveNotification" từ server...
+                // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
                 connection.on("ReceiveNotification", function (notification) {
-                    console.log("Nhận được tín hiệu có thông báo mới:", notification);
-
-                    // ...thì ngay lập tức gọi hàm AJAX để cập nhật lại con số trên chuông.
-                    updateNotificationBadge();
+                    console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
+                    updateNotificationBadge(); // <-- Chính xác!
                 });
 
                 connection.start()
-                    .then(() => {
-                        console.log(`Đã kết nối tới notification hub với UserId = ${userId}`);
-                    })
-                    .catch(err => {
-                        console.error("Lỗi khi kết nối SignalR:", err);
-                    });
+                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
             }
 
-            // Khi trang tải xong, thực hiện 2 việc:
-            // 1. Kết nối tới SignalR để sẵn sàng lắng nghe
+            console.log("Bắt đầu thực thi script layout...");
             connectToSignalR();
-            // 2. Cập nhật số thông báo lần đầu tiên
+            console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
             updateNotificationBadge();
+
+            // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
->>>>>>> 23dbcd2b88ec76925b6678685bde1d92224e63ac
+
     </script>
 </body>
 </html>

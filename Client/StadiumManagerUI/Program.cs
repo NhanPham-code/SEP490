@@ -69,6 +69,8 @@ builder.Services.AddScoped<IStadiumEquipmentService, StadiumEquipmentService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
+builder.Services.AddScoped<IFeesService, FeesService>();
+
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 

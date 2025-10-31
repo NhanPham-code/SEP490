@@ -3,10 +3,12 @@ using System.Text.Json;
 using DTOs.BookingDTO;
 using DTOs.BookingDTO.ViewModel;
 using DTOs.Helpers;
+using DTOs.NotificationDTO;
 using DTOs.StadiumDTO;
 using DTOs.UserDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using Service.Services;
 using StadiumManagerUI.Helpers;
 
 namespace StadiumManagerUI.Controllers
@@ -18,7 +20,9 @@ namespace StadiumManagerUI.Controllers
         private readonly IStadiumService _stadiumService;
         private readonly IDiscountService _discountService;
         private readonly IUserService _userService;
+        private readonly INotificationService _notificationService;
         private readonly IConfiguration _configuration;
+
 
 
         public BookingController(
@@ -27,6 +31,7 @@ namespace StadiumManagerUI.Controllers
             IStadiumService stadiumService,
             IDiscountService discountService,
             IUserService userService,
+            INotificationService notificationService,
             IConfiguration configuration)
         {
             _tokenService = tokenService;
@@ -34,6 +39,7 @@ namespace StadiumManagerUI.Controllers
             _stadiumService = stadiumService;
             _discountService = discountService;
             _userService = userService;
+            _notificationService = notificationService;
             _configuration = configuration;
         }
 
@@ -60,14 +66,12 @@ namespace StadiumManagerUI.Controllers
             }
 
             // *** SỬA LỖI KHÁCH VÃNG LAI ***
-            // Nếu UserId từ form là 0 (khách vãng lai), chuyển nó thành null.
-            // API và cơ sở dữ liệu thường xử lý khóa ngoại nullable tốt hơn là giá trị 0.
             int customerUserId = (model.UserId == 0) ? 0 : model.UserId;
 
             var bookingToCreate = new BookingCreateDto
             {
                 StadiumId = model.StadiumId,
-                UserId = customerUserId, 
+                UserId = customerUserId,
                 Date = model.Date,
                 TotalPrice = model.TotalPrice,
                 OriginalPrice = model.OriginalPrice,
@@ -90,6 +94,12 @@ namespace StadiumManagerUI.Controllers
 
                 if (createdBooking != null)
                 {
+                    // ✅ Gửi thông báo cho người được tạo booking nếu không phải khách vãng lai
+                    if (customerUserId != 0)
+                    {
+                        await SendNotificationToCreatedUserAsync(createdBooking, customerUserId, bookingToCreate.StadiumId);
+                    }
+
                     TempData["SuccessMessage"] = "Tạo lịch đặt sân thành công!";
                     return RedirectToAction("CreateBooking");
                 }
@@ -106,6 +116,40 @@ namespace StadiumManagerUI.Controllers
                 return RedirectToAction("CreateBooking");
             }
         }
+
+        private async Task SendNotificationToCreatedUserAsync(BookingReadDto booking, int userId, int stadiumId)
+        {
+            try
+            {
+                var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+
+                if (stadium != null)
+                {
+                    string notifType = "Booking.New";
+                    string notifTitle = "Bạn có một lịch đặt sân mới";
+                    string notifMessage = $"Chủ sân '{stadium.Name}' đã tạo giúp bạn một lịch đặt sân mới vào ngày {booking.Date}";
+                    var notifParams = new { booking.Id, stadiumId };
+
+                    var notificationDto = new CreateNotificationDto
+                    {
+                        UserId = userId,
+                        Type = notifType,
+                        Title = notifTitle,
+                        Message = notifMessage,
+                        Parameters = JsonSerializer.Serialize(notifParams),
+                    };
+
+                    await _notificationService.SendNotificationToUserAsync(notificationDto);
+                    Console.WriteLine($"[Notification] Đã gửi thông báo cho userId {userId} về booking {booking.Id}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NotificationError] Lỗi khi gửi thông báo cho userId {userId} booking {booking.Id}: {ex.Message}");
+            }
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetBookedCourtsByDay(int stadiumId, DateTime date)

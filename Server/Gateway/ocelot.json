@@ -1436,36 +1436,36 @@
       }
     },
     {
-        "DownstreamPathTemplate": "/api/Favorite/{userId}/{stadiumId}",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7139
-            }
-        ],
-        "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
-        "UpstreamHttpMethod": [ "DELETE" ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer",
-            "RequireAuthentication": true
+      "DownstreamPathTemplate": "/api/Favorite/{userId}/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
         }
+      ],
+      "UpstreamPathTemplate": "/favoriteStadium/{userId}/{stadiumId}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     },
     {
-        "DownstreamPathTemplate": "/api/Favorite/stadium/{stadiumId}",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7139
-            }
-        ],
-        "UpstreamPathTemplate": "/favorite/stadium/{stadiumId}",
-        "UpstreamHttpMethod": [ "GET" ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer",
-            "RequireAuthentication": true
+      "DownstreamPathTemplate": "/api/Favorite/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7139
         }
+      ],
+      "UpstreamPathTemplate": "/favorite/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      }
     },
     //==Stadium equipment==
     {
@@ -1568,28 +1568,77 @@
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/unread/count",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7072
+       "UpstreamPathTemplate": "/notifications/unread-count",
+       "UpstreamHttpMethod": [ "GET" ],
+       "DownstreamPathTemplate": "/api/Notifications/unread/count", 
+       "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer" 
         }
-      ],
-      "UpstreamPathTemplate": "/notifications/unread-count",
-      "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7072
+        "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "UpstreamPathTemplate": "/notifications/mark-all-as-read",
+        "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+        "UpstreamPathTemplate": "/notifications",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer",
+            "AllowedScopes": []
         }
-      ],
-      "UpstreamPathTemplate": "/notifications/mark-all-as-read",
-      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+        "UpstreamPathTemplate": "/notifications/batch",
+        "UpstreamHttpMethod": [ "POST" ],
+        "DownstreamPathTemplate": "/api/Notifications/batch",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072 
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer"
+        }
+    },
+    {
+        "UpstreamPathTemplate": "/notifications/all", 
+        "UpstreamHttpMethod": [ "POST" ], 
+        "DownstreamPathTemplate": "/api/Notifications/all",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7072 
+            }
+        ],
+        "AuthenticationOptions": {
+            "AuthenticationProviderKey": "Bearer" 
+        }
     },
     // AggregatorPatternAPI
     {
@@ -1602,6 +1651,115 @@
         }
       ],
       "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    // FeesAPI
+    {
+      "DownstreamPathTemplate": "/odata/ODataFees",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/getQuery",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/all",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/{id}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/stadium/{stadiumId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/stadium/{stadiumId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/owner/{ownerId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/owner/{ownerId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/by-month-year",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/by-month-year",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/paid-update/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/paid/{id}",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Fees/bill-update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/fees/upload-bill",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7126
+        }
+      ],
+      "UpstreamPathTemplate": "/bill/{everything}",
       "UpstreamHttpMethod": [ "GET" ]
     }
   ],

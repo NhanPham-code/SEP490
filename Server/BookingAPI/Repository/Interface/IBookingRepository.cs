@@ -1,4 +1,5 @@
-﻿using BookingAPI.Models;
+﻿using BookingAPI.DTOs;
+using BookingAPI.Models;
 
 namespace BookingAPI.Repository.Interface
 {
@@ -17,5 +18,6 @@ namespace BookingAPI.Repository.Interface
         Task<List<Booking>> GetBookingsForStatisticsAsync(int year, int? month, int? day, IEnumerable<int> stadiumId);
         Task<List<Booking>> GetBookingsForStatisticsAsync(IEnumerable<int> years, IEnumerable<int> stadiumId);
         Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync( IEnumerable<int> stadiumIds, int? year, int? month, int? day);
+        Task<IEnumerable<StadiumRevenueDto>> GetRevenueByStadiumsAsync(List<int> stadiumIds, int year, int month);
     }
 }

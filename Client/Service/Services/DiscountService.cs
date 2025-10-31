@@ -98,10 +98,10 @@ namespace Service.Services
         int pageSize = 5,
         string? searchByCode = null,
         int? stadiumId = null,
-        bool? isActive = null)
+        bool? isActive = null,
+        string? targetUserId = null) // 👈 thêm tham số mới
         {
             AddBearerAccessToken(accessToken);
-
 
             var filters = new List<string>();
 
@@ -125,6 +125,11 @@ namespace Service.Services
                 filters.Add($"StadiumIds/any(s: s eq {stadiumId.Value})");
             }
 
+            if (!string.IsNullOrEmpty(targetUserId)) // 👈 thêm điều kiện filter mới
+            {
+                filters.Add($"TargetUserId eq '{targetUserId}'");
+            }
+
             var query = new List<string>();
             if (filters.Any())
             {
@@ -143,5 +148,7 @@ namespace Service.Services
 
             return await response.Content.ReadFromJsonAsync<OdataHaveCountResponse<ReadDiscountDTO>>();
         }
+
+
     }
 }

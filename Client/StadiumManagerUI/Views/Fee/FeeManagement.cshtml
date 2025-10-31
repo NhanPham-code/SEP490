@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Quản Lý Cước Phí";
+}
+
+@section Styles {
+    <link href="~/css/fee/stadium-manager-fee.css" rel="stylesheet" />
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <h1>Cước Phí Dịch Vụ</h1>
+        <div class="header-actions">
+            <button id="refreshDataBtn" class="btn btn-primary"><i class="fas fa-sync-alt me-2"></i>Làm mới</button>
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+        <!-- Thay đổi cấu trúc và thêm class cho viền màu -->
+        <div class="stat-card border-blue">
+            <div class="stat-label">TỔNG PHÍ</div>
+            <div class="stat-value" id="totalFeeValue">0 VNĐ</div>
+        </div>
+        <div class="stat-card border-green">
+            <div class="stat-label">ĐÃ THANH TOÁN</div>
+            <div class="stat-value" id="paidFeeValue">0 VNĐ</div>
+        </div>
+        <div class="stat-card border-orange">
+            <div class="stat-label">CÒN LẠI</div>
+            <div class="stat-value" id="unpaidFeeValue">0 VNĐ</div>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-container">
+        <form id="filterForm">
+            <div class="filter-form">
+                <div class="filter-group">
+                    <label for="feePeriodInput">Xem cước phí theo kỳ</label>
+                    <div class="input-wrapper"><i class="fas fa-calendar-alt icon"></i><input type="month" id="feePeriodInput"></div>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i>Xem</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="table-container">
+        <div class="table-header"><h3 id="tableTitle"></h3></div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Tên Sân</th><th>Phí Phải Trả <br/> (VNĐ) </th><th>Hạn Trả</th><th>Trạng Thái</th><th>Hành Động</th></tr></thead>
+                <tbody id="feeTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Các Modal giữ nguyên như cũ -->
+<!-- Modal để upload hóa đơn -->
+<div class="modal fade" id="uploadBillModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Tải lên hóa đơn</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="uploadBillForm">
+                <div class="modal-body">
+                    <p>Vui lòng chọn ảnh hóa đơn cho sân <strong id="modalStadiumName"></strong>.</p>
+                    <input type="hidden" id="modalFeeId" name="FeeId" />
+                    <input type="hidden" id="modalHiddenStadiumName" name="StadiumName" />
+                    <div class="mb-3">
+                        <label for="billImageInput" class="form-label">Chọn file ảnh:</label>
+                        <input class="form-control" type="file" id="billImageInput" name="BillImage" accept="image/*" required>
+                    </div>
+                    <div id="uploadError" class="text-danger"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="submitUploadBtn"><i class="fas fa-upload me-2"></i>Tải lên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal để xem ảnh hóa đơn -->
+<div class="modal fade" id="viewBillModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Hóa đơn thanh toán</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center">
+                <img id="billImageView" src="" class="img-fluid" alt="Hóa đơn" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/stadium-manager-fee.js"></script>
+}
