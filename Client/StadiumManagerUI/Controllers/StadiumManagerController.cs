@@ -87,14 +87,12 @@ namespace StadiumManagerUI.Controllers
                 }
             }
 
-            await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.NotificationDTO
+            await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.CreateNotificationDto
             {
                 
                 Title = "<div class=\"text-green-500\">Một nhà thi đấu mới được tạo</div>",
                 Message = $"<div><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/StadiumController/StadiumAdmin\">Nhà thi đấu '{stadium.Name}' vừa được tạo hãy tới xem</a></div>",
-                UserId = 1,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
+                UserId = 1
             });
 
             return Json(new { success = 200, value = stadium });
