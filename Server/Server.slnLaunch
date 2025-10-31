@@ -16,10 +16,38 @@
       },
       {
         "Path": "NotificationAPI\\NotificationAPI.csproj",
-        "Action": "StartWithoutDebugging"
+        "Action": "Start"
       },
       {
         "Path": "FindTeamAPI\\FindTeamAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookingAPI\\BookingAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "DiscountAPI\\DiscountAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FeedbackAPI\\FeedbackAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FavoriteAPI\\FavoriteAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "StadiumEquipmentAPI\\StadiumEquipmentAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AggregatorPatternAPI\\AggregatorPatternAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FeeAPI\\FeeAPI.csproj",
         "Action": "Start"
       }
     ]

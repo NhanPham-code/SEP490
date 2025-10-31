@@ -51,9 +51,6 @@
                         </p>
                         <div class="flex gap-4 mt-4">
                             <div class="stat-badge px-4 py-2 rounded-xl">
-                                <span class="text-sm font-medium text-gray-700">2 Bài Đăng Hoạt Động</span>
-                            </div>
-                            <div class="stat-badge px-4 py-2 rounded-xl">
                                 <span class="text-sm font-medium text-gray-700"><span id="count"></span> Lượt Xem Tổng</span>
                             </div>
                         </div>
@@ -792,7 +789,7 @@
                 url: `/FindTeam/DeleteTeamPost?postId=${postId}`,
                 type: 'DELETE',
                 success: function(response) {
-                    if (response.success) {
+                    if (response.message == 200) {
                         // Remove the post card from the UI with animation
                         const postCard = document.getElementById(`post-${postId}`);
                         if (postCard) {
