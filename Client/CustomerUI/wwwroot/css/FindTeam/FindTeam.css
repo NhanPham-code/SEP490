@@ -2338,3 +2338,53 @@ body {
     font-weight: 700;
     font-size: large;
 }
+
+.time-select-dropdown {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/*h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}*/
+@media (max-width: 1000px) {
+    /* --- CSS CHO FILTER SIDEBAR TRÊN MOBILE --- */
+
+    /* 1. Trạng thái mặc định: Ẩn bên ngoài màn hình */
+    #filter-sidebar {
+        position: fixed; /* QUAN TRỌNG: Để nó thoát khỏi luồng trang */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+        background-color: #fff; /* Màu nền cho sidebar */
+        /* QUAN TRỌNG: Đưa nó lên lớp trên cùng */
+        z-index: 100000000;
+        /* Dùng transform để ẩn và tạo hiệu ứng trượt */
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out; /* Hiệu ứng mượt mà */
+
+        overflow-y: auto; /* Cho phép cuộn nếu nội dung filter quá dài */
+        padding: 20px; /* Thêm khoảng đệm cho đẹp */
+        box-sizing: border-box;
+    }
+
+        /* 2. Trạng thái active: Hiển thị trên màn hình */
+        #filter-sidebar.active {
+            transform: translateX(0); /* Di chuyển vào trong màn hình */
+        }
+
+    /* 3. (Tùy chọn) Thêm một lớp phủ mờ phía sau sidebar */
+    /* Bạn có thể tạo một div khác hoặc dùng pseudo-element ::before */
+    /* Ví dụ đơn giản là ẩn body khi sidebar mở */
+    body.filter-open {
+        overflow: hidden; /* Ngăn cuộn trang chính khi sidebar đang mở */
+    }
+}

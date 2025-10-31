@@ -1,0 +1,55 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Gateway\\Gateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "StadiumAPI\\StadiumAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "UserAPI\\UserAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "NotificationAPI\\NotificationAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FindTeamAPI\\FindTeamAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookingAPI\\BookingAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "DiscountAPI\\DiscountAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FeedbackAPI\\FeedbackAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FavoriteAPI\\FavoriteAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "StadiumEquipmentAPI\\StadiumEquipmentAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AggregatorPatternAPI\\AggregatorPatternAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FeeAPI\\FeeAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

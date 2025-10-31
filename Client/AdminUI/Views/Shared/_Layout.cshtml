@@ -363,7 +363,7 @@
              }
 
              function connectToSignalRAdmin() {
-                 const adminUserId = @(Context.Session.GetInt32("UserId") ?? 0);
+                 const adminUserId = -1;
                  if (!adminUserId) { console.log("[ADMIN SignalR] No UserId, skipping connection."); return; }
 
                  const hubUrl = `https://localhost:7072/notificationHub?userId=${adminUserId}`; // Kết nối thẳng Hub
