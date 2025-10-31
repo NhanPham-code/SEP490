@@ -15,6 +15,7 @@ using DTOs.BookingDTO.ViewModel;
 using DTOs.StadiumDTO;
 using DTOs.UserDTO;
 using DTOs.DiscountDTO;
+using Newtonsoft.Json;
 
 namespace CustomerUI.Controllers
 {
@@ -563,15 +564,43 @@ namespace CustomerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBookedCourts(int stadiumId, DateTime date, int startHour, int endHour)
         {
-            //var accessToken = _tokenService.GetAccessTokenFromCookie();
-            //if (string.IsNullOrEmpty(accessToken))
-            //    return Unauthorized();
+            // var accessToken = _tokenService.GetAccessTokenFromCookie();
+            // if (string.IsNullOrEmpty(accessToken))
+            //     return Unauthorized();
 
             var startTime = date.Date.AddHours(startHour);
             var endTime = date.Date.AddHours(endHour);
 
-            var result = await _bookingService.GetBookedCourtsAsync(stadiumId, startTime, endTime);
-            return Json(result);
+            // 1. Gọi service để lấy dữ liệu gốc
+            var bookings = await _bookingService.GetBookedCourtsAsync(stadiumId, startTime, endTime);
+
+            // --- LỌC LẠI BOOKING DETAILS TRÊN CLIENT ---
+            // Giả định 'bookings' là một List<BookingReadDto>
+            if (bookings != null)
+            {
+                foreach (var booking in bookings)
+                {
+                    if (booking.BookingDetails == null) continue;
+
+                    // Lọc lại danh sách BookingDetails để chỉ giữ lại những slot
+                    // có thời gian nằm trong khoảng yêu cầu.
+                    // Logic này kiểm tra sự giao thoa (overlap) thời gian.
+                    booking.BookingDetails = booking.BookingDetails
+                        .Where(detail =>
+                            detail.StartTime < endTime && detail.EndTime > startTime
+                        )
+                        .ToList();
+                }
+
+                // 2. Loại bỏ những booking không còn detail nào sau khi lọc
+                var filteredResult = bookings.Where(b => b.BookingDetails != null && b.BookingDetails.Any()).ToList();
+
+                // 3. Trả về kết quả đã được lọc
+                return Json(filteredResult);
+            }
+
+            // Nếu kết quả từ service là null, trả về JSON rỗng
+            return Json(new List<BookingReadDto>());
         }
 
         [HttpGet]
@@ -721,22 +750,62 @@ namespace CustomerUI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime)
+        public async Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startTime,
+            int endTime)
         {
-            try
-            {
-                var result = await _bookingService.FilterByDateAndHour(year, month, days, startTime, endTime);
+            // Convert int thành "HH:mm"
+            string startTimeStr = $"{startTime:D2}:00"; // 13 -> "13:00"
+            string endTimeStr = $"{endTime:D2}:00"; // 17 -> "17:00"
 
-                // Debug logging
-                Console.WriteLine($"Service returned: {result?.GetType().Name}");
-
-                // Make sure we're returning the correct JSON structure
-                return Ok(result); // Use Ok() instead of Json() to ensure proper serialization
-            }
-            catch (Exception ex)
+            var query = new List<string>
             {
-                Console.WriteLine($"Error in FilterByDateAndHour: {ex.Message}");
-                return BadRequest(new { error = ex.Message });
+                $"year={year}",
+                $"month={month}",
+                $"startTime={Uri.EscapeDataString(startTimeStr)}",
+                $"endTime={Uri.EscapeDataString(endTimeStr)}"
+            };
+
+            foreach (var d in days)
+                query.Add($"days={d}");
+
+            var queryString = string.Join("&", query);
+            var url = $"https://localhost:7136/booking/filterbydateandhour?{queryString}";
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var data = await response.Content.ReadAsStringAsync();
+
+                var bookings = JsonConvert.DeserializeObject<List<BookingReadDto>>(data);
+
+                // --- LỌC LẠI BOOKING DETAILS TRÊN CLIENT ---
+                foreach (var booking in bookings)
+                {
+                    if (booking.BookingDetails == null) continue;
+
+                    // Lọc danh sách BookingDetails theo các điều kiện ban đầu
+                    booking.BookingDetails = booking.BookingDetails
+                        .Where(detail =>
+                        {
+                            // Giả định: BookingDetail có thuộc tính `StartTime` kiểu DateTime.
+                            // Nếu tên thuộc tính của bạn khác (ví dụ: StartDateTime), hãy đổi lại ở đây.
+                            var detailStartTime = detail.StartTime;
+
+                            // Kiểm tra tất cả điều kiện
+                            return detailStartTime.Year == year &&
+                                   detailStartTime.Month == month &&
+                                   days.Contains(detailStartTime.Day) &&
+                                   detailStartTime.Hour >= startTime &&
+                                   detailStartTime.Hour < endTime;
+                        })
+                        .ToList();
+                }
+
+                // Loại bỏ những booking không còn detail nào sau khi lọc
+                var filteredResult = bookings.Where(b => b.BookingDetails != null && b.BookingDetails.Any()).ToList();
+
+                return filteredResult;
             }
         }
 

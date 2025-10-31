@@ -210,34 +210,62 @@ namespace Service.Services
             return result?.Value ?? new List<BookingReadDto>();
         }
 
-        public async Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime)
+        public async Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startHour,
+            int endHour)
         {
-            // Convert int thành "HH:mm"
-            string startTimeStr = $"{startTime:D2}:00"; // 13 -> "13:00"
-            string endTimeStr = $"{endTime:D2}:00";   // 17 -> "17:00"
+            // --- Xây dựng các điều kiện OData cho từng ngày ---
+            var anyDayConditions = new List<string>(); // Điều kiện cho BookingDetails/any(...)
+            var expandDayConditions = new List<string>(); // Điều kiện cho $expand=BookingDetails($filter=...)
 
-            var query = new List<string>
+            foreach (var day in days)
             {
-                $"year={year}",
-                $"month={month}",
-                $"startTime={Uri.EscapeDataString(startTimeStr)}",
-                $"endTime={Uri.EscapeDataString(endTimeStr)}"
-            };
+                // Tạo thời gian bắt đầu và kết thúc cho ngày hiện tại, giả định là UTC
+                // để khớp với định dạng OData 'Z'.
+                var start = new DateTime(year, month, day, startHour, 0, 0, DateTimeKind.Utc);
+                var end = new DateTime(year, month, day, endHour, 0, 0, DateTimeKind.Utc);
 
-            foreach (var d in days)
-                query.Add($"days={d}");
+                // Chuyển sang chuỗi ISO 8601 UTC mà OData yêu cầu (ví dụ: "2025-11-09T23:00:00Z")
+                string startIso = start.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                string endIso = end.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-            var queryString = string.Join("&", query);
-            var url = $"https://localhost:7136/booking/filterbydateandhour?{queryString}";
+                // Điều kiện "overlap": một detail được tính là khớp nếu nó bắt đầu trước khi
+                // khoảng thời gian của ta kết thúc VÀ kết thúc sau khi khoảng của ta bắt đầu.
+                anyDayConditions.Add($"(d/StartTime lt {endIso} and d/EndTime gt {startIso})");
+                expandDayConditions.Add($"(StartTime lt {endIso} and EndTime gt {startIso})");
+            }
 
+            // --- Ghép các điều kiện lại thành query OData ---
+
+            // 1. Điều kiện $filter chính:
+            // - Tìm các Booking có *bất kỳ* (any) BookingDetail nào khớp với *một trong các* ngày/giờ đã cho.
+            // - Chỉ lấy các Booking có trạng thái nhất định.
+            var anyClause = $"BookingDetails/any(d: {string.Join(" or ", anyDayConditions)})";
+            var statusClause = "(Status eq 'waiting' or Status eq 'completed' or Status eq 'accepted')";
+
+            // Kết hợp các điều kiện filter (không có StadiumId)
+            var filterString = $"{anyClause} and {statusClause}";
+
+            // 2. Điều kiện $expand:
+            // - Yêu cầu server trả về các BookingDetails, nhưng chỉ những detail nào
+            //   khớp với *một trong các* khoảng thời gian.
+            var expandString = $"BookingDetails($filter={string.Join(" or ", expandDayConditions)})";
+
+            // 3. Tạo URL cuối cùng
+            // Sử dụng endpoint OData của bạn, ví dụ '/bookings/booked'
+            var baseUrl = "https://localhost:7136/bookings/booked";
+            var queryString =
+                $"$filter={Uri.EscapeDataString(filterString)}&$expand={Uri.EscapeDataString(expandString)}";
+            var url = $"{baseUrl}?{queryString}";
+
+            // --- Gọi API và xử lý kết quả ---
             using (var client = new HttpClient())
             {
                 var response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode(); // Ném lỗi nếu API trả về mã thất bại
                 var data = await response.Content.ReadAsStringAsync();
 
-                // Fix: Deserialize to the correct type instead of object
-                return JsonConvert.DeserializeObject<List<BookingReadDto>>(data);
+                // Deserialize kết quả. Server đã lọc sẵn BookingDetails nên không cần xử lý thêm.
+                return JsonConvert.DeserializeObject<List<BookingReadDto>>(data) ?? new List<BookingReadDto>();
             }
         }
 
