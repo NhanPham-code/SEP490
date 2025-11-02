@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FeeAPI.DTOs
+namespace AggregatorPatternAPI.DTOs
 {
     public class OdataHaveCountResponse <T>
     {

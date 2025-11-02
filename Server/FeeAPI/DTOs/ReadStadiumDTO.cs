@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 
-namespace DTOs
+namespace FeeAPI.DTOs
 {
     public class ReadStadiumDTO
     {
