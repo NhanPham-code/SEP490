@@ -1,5 +1,6 @@
 using AggregatorPatternAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AggregatorPatternAPI.Controllers
 {
@@ -52,5 +53,32 @@ namespace AggregatorPatternAPI.Controllers
                 return StatusCode(500, "An internal server error occurred.");
             }
         }
+
+
+        [HttpGet("stadiums-kpis")]
+        public async Task<IActionResult> GetStadiumsKpiOverview()
+        {
+            try
+            {
+                // giải mã accesstoken từ header để lấy userId
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userIdFromToken))
+                    return Unauthorized(new { message = "Không thể xác thực. " });
+
+                var result = await _aggregatorService.GetStadiumManagerDashboardAsync(userIdFromToken);
+
+                if (result == null) // Có thể trả về null nếu có lỗi
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting stadium KPI overview.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }   
     }
 }

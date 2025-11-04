@@ -124,31 +124,35 @@
 
     <!-- JavaScript -->
     <script>
-
         function connectToSignalR() {
-                    const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://localhost:7072/notificationHub")
-            .build();
+                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
+                if (!userId) {
+                    console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
+                    return;
+                }
 
-        // Lắng nghe sự kiện "ReceiveNotification"
-               connection.on("ReceiveNotification", function (notification) {
-            // Xử lý notification nhận được ở đây
-            console.log("Nhận thông báo mới:", notification);
-            if(notification.parameters.length > 0){
-                loadPost();
-        // Parse chuỗi thành object/array
-        const data = JSON.parse(notification.parameters);
-        console.log("Dữ liệu đã phân tích:", data);
-            }else{
-                setTimeout(function() {
-                loadPost(); // Tải lại bài đăng sau 3 giây
-            }, 3000);
+                // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
+                const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl(hubUrl, {
+                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                         accessTokenFactory: () => {
+                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                         }
+                    })
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
+                connection.on("ReceiveNotification", function (notification) {
+                    console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
+                    loadMember();
+                });
+
+                connection.start()
+                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
             }
-
-            // Ví dụ: Hiển thị thông báo toast
-            // showToast(notification.title, notification.message);
-        });
-        }
 
         // quay ve url truoc do 
         function goBack() {
@@ -637,12 +641,6 @@
 
         // render nút tham gia
         function renderJoinButton(newMember, isLeader, post) {
-            if(isLeader === 1){
-                 return `
-                <button onClick="invitePlayer()" class="smky-btn3 relative hover:text-[#e6e6e6] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#4b46b6] after:rounded-t-full after:w-full after:bottom-0 after:left-0 text-gray-900">Mời bạn bè tham gia</button>
-
-            `;
-            }
             if (newMember === 1) {
                 return `
                 <button onClick="joindTeam(${post.id})" 

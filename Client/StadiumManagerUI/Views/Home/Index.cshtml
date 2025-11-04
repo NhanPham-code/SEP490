@@ -3,553 +3,248 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    :root {
-        --primary-blue: #3b82f6;
-        --success-green: #10b981;
-        --warning-orange: #f59e0b;
-        --danger-red: #ef4444;
-        --gray-200: #e5e7eb;
-        --gray-600: #6b7280;
-        --gray-900: #111827;
-        --bright-red: #f43f5e;
-    }
+<!-- ======================================================= -->
+<!-- PHẦN CSS -->
+<!-- ======================================================= -->
+@section Styles {
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --gray-200: #e5e7eb;
+            --gray-600: #6b7280;
+            --gray-900: #111827;
+            --bright-red: #f43f5e;
+        }
 
-    body {
-        background-color: #e4ebfd; /* Màu nền mới */
-    }
+        body {
+            background-color: #f3f4f6;
+        }
 
-    .stats-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid var(--gray-200);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease-in-out;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Tăng đổ bóng */
-    }
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
         .stats-card:hover {
-            transform: translateY(-7px); /* Nổi lên nhiều hơn khi hover */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng lớn hơn khi hover */
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        
+        .stats-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; margin-bottom: 1rem; }
+        .stats-icon.red { background: var(--bright-red); }
+        .stats-icon.blue { background: var(--primary-blue); }
+        .stats-icon.green { background: var(--success-green); }
+        .stats-icon.orange { background: var(--warning-orange); }
 
-        .stats-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-        }
+        .stats-number { font-size: 2rem; font-weight: 700; color: var(--gray-900); margin: 0; line-height: 1; }
+        .stats-label { color: var(--gray-600); font-size: 0.875rem; margin: 0.5rem 0 0 0; }
+        
+        .card-container, .chart-container { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid var(--gray-200); height: 400px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .chart-title { font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem; }
+        .chart-content { flex-grow: 1; position: relative; }
+        
+        .feedback-list { overflow-y: auto; padding-right: 1rem; flex-grow: 1; }
+        .feedback-item { background: #f9fafb; border-radius: 8px; padding: 1rem; border: 1px solid var(--gray-200); margin-bottom: 0.75rem; }
+        .feedback-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+        .feedback-user { font-weight: 600; color: var(--gray-900); margin: 0; }
+        .feedback-stadium { font-weight: 400; color: var(--gray-600); font-size: 0.9em; }
+        .feedback-date { font-size: 0.75rem; color: var(--gray-600); }
+        .feedback-content { font-size: 0.875rem; color: var(--gray-600); margin: 0; word-wrap: break-word; }
+        .rating-stars { color: #ffc107; font-size: 0.875rem; }
 
-        .stats-card.red::before {
-            background: var(--bright-red);
-        }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .view-all-link { font-size: 0.875rem; color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .view-all-link:hover { text-decoration: underline; }
 
-        .stats-card.blue::before {
-            background: var(--primary-blue);
-        }
+        .placeholder-glow .placeholder { min-height: 1em; }
+    </style>
+}
 
-        .stats-card.green::before {
-            background: var(--success-green);
-        }
-
-        .stats-card.orange::before {
-            background: var(--warning-orange);
-        }
-
-    .stats-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        color: white;
-        margin-bottom: 1rem;
-    }
-
-        .stats-icon.red {
-            background: var(--bright-red);
-        }
-
-        .stats-icon.blue {
-            background: var(--primary-blue);
-        }
-
-        .stats-icon.green {
-            background: var(--success-green);
-        }
-
-        .stats-icon.orange {
-            background: var(--warning-orange);
-        }
-
-    .stats-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--gray-900);
-        margin: 0;
-        line-height: 1;
-    }
-
-    .stats-label {
-        color: var(--gray-600);
-        font-size: 0.875rem;
-        margin: 0.5rem 0 0 0;
-    }
-
-    .stats-change {
-        font-size: 0.75rem;
-        font-weight: 500;
-        margin-top: 0.25rem;
-    }
-
-        .stats-change.positive {
-            color: var(--success-green);
-        }
-
-        .stats-change.negative {
-            color: var(--danger-red);
-        }
-
-    .card-container,
-    .chart-container {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid var(--gray-200);
-        height: 400px;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Tăng đổ bóng */
-        transition: box-shadow 0.3s ease-in-out;
-    }
-
-        .card-container:hover,
-        .chart-container:hover {
-            transform: none;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); /* Tăng đổ bóng khi hover */
-        }
-
-    .chart-content {
-        flex-grow: 1;
-        position: relative;
-    }
-
-    .feedback-list {
-        overflow-y: auto;
-        padding-right: 1rem;
-        flex-grow: 1;
-    }
-
-    .chart-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--gray-900);
-        margin-bottom: 1rem;
-    }
-
-    .feedback-item {
-        background: #f9fafb;
-        border-radius: 8px;
-        padding: 1rem;
-        border: 1px solid var(--gray-200);
-        margin-bottom: 0.75rem;
-        white-space: normal;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); /* Thêm đổ bóng nhẹ */
-    }
-
-    .feedback-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-
-    .feedback-user {
-        font-weight: 600;
-        color: var(--gray-900);
-        margin: 0;
-    }
-
-    .feedback-date {
-        font-size: 0.75rem;
-        color: var(--gray-600);
-    }
-
-    .feedback-content {
-        font-size: 0.875rem;
-        color: var(--gray-600);
-        margin: 0;
-        word-wrap: break-word;
-    }
-
-    .rating-stars {
-        color: #ffc107;
-        font-size: 0.875rem;
-    }
-
-    .quick-action-btn {
-        background: white;
-        border: 1px solid var(--gray-200);
-        border-radius: 8px;
-        padding: 1rem;
-        text-decoration: none;
-        color: var(--gray-900);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: all 0.2s;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.06); /* Tăng đổ bóng cho button */
-    }
-
-        .quick-action-btn:hover {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-            transform: translateY(-4px); /* Nổi lên nhiều hơn */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12); /* Đổ bóng lớn hơn khi hover */
-        }
-
-    .quick-action-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        flex-shrink: 0;
-    }
-
-    .quick-action-btn:hover .quick-action-icon {
-        background: var(--primary-blue) !important;
-        color: white !important;
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--gray-900);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .view-all-link {
-        font-size: 0.875rem;
-        color: var(--primary-blue);
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-        .view-all-link:hover {
-            text-decoration: underline;
-        }
-
-    #revenueChart {
-        max-height: 300px;
-    }
-
-    #bookingChart {
-        max-height: 250px;
-    }
-
-    .quick-actions-container {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .equal-height-card {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-        .equal-height-card .card-container,
-        .equal-height-card .chart-container {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .equal-height-card .feedback-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 1rem;
-        }
-
-            .equal-height-card .feedback-list::-webkit-scrollbar {
-                width: 8px;
-            }
-
-            .equal-height-card .feedback-list::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .equal-height-card .feedback-list::-webkit-scrollbar-thumb {
-                background-color: var(--gray-600);
-                border-radius: 10px;
-                border: 2px solid white;
-            }
-</style>
-
+<!-- ======================================================= -->
+<!-- PHẦN HTML -->
+<!-- ======================================================= -->
 <div class="row mb-4">
     <div class="col-md-3 mb-3">
-        <div class="stats-card red">
-            <div class="stats-icon red">
-                <i class="fas fa-clock"></i>
-            </div>
-            <h3 class="stats-number">7</h3>
-            <p class="stats-label">Booking đang chờ</p>
-            <p class="stats-change negative">Cần xử lý ngay</p>
+        <div class="stats-card">
+            <div class="stats-icon orange"><i class="fas fa-sitemap"></i></div>
+            <h3 class="stats-number" id="managedStadiumsCount">0</h3>
+            <p class="stats-label">Sân đang quản lý</p>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="stats-card blue">
-            <div class="stats-icon blue">
-                <i class="fas fa-calendar-day"></i>
-            </div>
-            <h3 class="stats-number">24</h3>
+            <div class="stats-icon blue"><i class="fas fa-calendar-day"></i></div>
+            <h3 class="stats-number" id="bookingsToday">0</h3>
             <p class="stats-label">Đặt sân hôm nay</p>
-            <p class="stats-change positive">+12% so với hôm qua</p>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="stats-card green">
-            <div class="stats-icon green">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <h3 class="stats-number">8.5M</h3>
+            <div class="stats-icon green"><i class="fas fa-dollar-sign"></i></div>
+            <h3 class="stats-number" id="revenueToday">0</h3>
             <p class="stats-label">Doanh thu hôm nay</p>
-            <p class="stats-change positive">+8% so với hôm qua</p>
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="stats-card orange">
-            <div class="stats-icon orange">
-                <i class="fas fa-running"></i>
-            </div>
-            <h3 class="stats-number">18/24</h3>
-            <p class="stats-label">Sân đang hoạt động</p>
-            <p class="stats-change positive">75% công suất</p>
+        <div class="stats-card red">
+            <div class="stats-icon red"><i class="fas fa-check-double"></i></div>
+            <h3 class="stats-number" id="successfulBookings">0</h3>
+            <p class="stats-label">Booking thành công</p>
         </div>
     </div>
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card-container quick-actions-container">
-            <div class="section-title">Tác vụ nhanh</div>
-
-            <a href="@Url.Action("CreateDiscount", "Management")" class="quick-action-btn">
-                <div class="quick-action-icon" style="background: #eff6ff; color: var(--primary-blue);">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">Tạo mã giảm giá</h6>
-                </div>
-            </a>
-
-            <a href="@Url.Action("Reports", "Management")" class="quick-action-btn">
-                <div class="quick-action-icon" style="background: #fefbeb; color: var(--warning-orange);">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">Báo cáo doanh thu</h6>
-                </div>
-            </a>
-
-            <a href="@Url.Action("Chat", "Customer")" class="quick-action-btn">
-                <div class="quick-action-icon" style="background: #fef3f2; color: var(--danger-red);">
-                    <i class="fas fa-comments"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">Chat với khách</h6>
-                </div>
-            </a>
-        </div>
-    </div>
     <div class="col-md-8 mb-3">
         <div class="chart-container">
-            <h4 class="chart-title">Doanh thu đầu tháng tới nay</h4>
-            <canvas id="revenueChart"></canvas>
+            <h4 class="chart-title">Doanh thu 4 tuần gần nhất</h4>
+            <div class="chart-content"><canvas id="revenueChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="chart-container">
+            <h4 class="chart-title">Tỷ lệ trạng thái booking</h4>
+            <div class="chart-content"><canvas id="bookingChart"></canvas></div>
         </div>
     </div>
 </div>
 
-<div class="row align-items-stretch">
-    <div class="col-md-8 mb-3 equal-height-card">
-        <div class="card-container">
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card-container" style="height: auto;">
             <div class="section-title">
                 Feedback gần đây
-                <a href="@Url.Action("Feedback", "Management")" class="view-all-link">Xem tất cả</a>
+                <a href="#" class="view-all-link">Xem tất cả</a>
             </div>
-
-            <div class="feedback-list">
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <h6 class="feedback-user">Nguyễn Văn A</h6>
-                        <span class="feedback-date">1 giờ trước</span>
-                    </div>
-                    <div class="rating-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="feedback-content">Sân rất sạch sẽ và thoáng mát. Chắc chắn sẽ quay lại lần sau!</p>
-                </div>
-
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <h6 class="feedback-user">Trần Thị B</h6>
-                        <span class="feedback-date">Hôm qua</span>
-                    </div>
-                    <div class="rating-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                    </div>
-                    <p class="feedback-content">Dịch vụ tốt, nhân viên thân thiện. Chỉ có điều giá hơi cao một chút.</p>
-                </div>
-
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <h6 class="feedback-user">Lê Văn C</h6>
-                        <span class="feedback-date">2 ngày trước</span>
-                    </div>
-                    <div class="rating-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="feedback-content">Đặt sân online rất tiện lợi, không gặp vấn đề gì cả. Highly recommend!</p>
-                </div>
+            <div class="feedback-list" id="feedbackList">
+                <!-- Dữ liệu feedback sẽ được JS chèn vào đây -->
+                <p class="text-center text-muted">Đang tải dữ liệu...</p>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-3 equal-height-card">
-        <div class="chart-container">
-            <h4 class="chart-title">Tỷ lệ booking thành công</h4>
-            <canvas id="bookingChart"></canvas>
         </div>
     </div>
 </div>
 
+
+<!-- ======================================================= -->
+<!-- PHẦN JAVASCRIPT -->
+<!-- ======================================================= -->
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-                datasets: [{
-                    label: 'Doanh thu (triệu VNĐ)',
-                    data: [25, 32, 41, 38],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#3b82f6',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f3f4f6'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value + 'M';
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                elements: {
-                    point: {
-                        hoverRadius: 8
-                    }
-                }
+        // --- UTILITY FUNCTIONS ---
+        const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        const renderRatingStars = (rating) => {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) stars += `<i class="${i <= rating ? 'fas' : 'far'} fa-star"></i>`;
+            return stars;
+        };
+        const timeAgo = (date) => {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            if (seconds > 86400 * 30) return new Date(date).toLocaleDateString('vi-VN');
+            const intervals = { 'ngày': 86400, 'giờ': 3600, 'phút': 60 };
+            for (let unit in intervals) {
+                let interval = Math.floor(seconds / intervals[unit]);
+                if (interval >= 1) return `${interval} ${unit} trước`;
             }
-        });
+            return 'Vừa xong';
+        };
 
-        const bookingCtx = document.getElementById('bookingChart').getContext('2d');
-        new Chart(bookingCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Thành công', 'Đang chờ', 'Hủy'],
-                datasets: [{
-                    data: [85, 10, 5],
-                    backgroundColor: [
-                        '#10b981',
-                        '#f59e0b',
-                        '#ef4444'
-                    ],
-                    borderWidth: 0,
-                    cutout: '60%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
+        // --- CHART INSTANCES (to destroy and recreate) ---
+        let revenueChartInstance;
+        let bookingChartInstance;
+
+        // --- DATA UPDATE FUNCTION ---
+        function updateDashboard(data) {
+            // 1. Update stat cards
+            document.getElementById('managedStadiumsCount').textContent = data.managedStadiumsCount || 0;
+            document.getElementById('bookingsToday').textContent = data.bookingsToday || 0;
+            document.getElementById('revenueToday').textContent = formatCurrency(data.revenueToday || 0);
+            document.getElementById('successfulBookings').textContent = data.successfulBookings || 0;
+
+            // 2. Update feedback list
+            const feedbackListEl = document.getElementById('feedbackList');
+            feedbackListEl.innerHTML = '';
+            if (data.latestFeedbacks && data.latestFeedbacks.length > 0) {
+                data.latestFeedbacks.forEach(fb => {
+                    const item = document.createElement('div');
+                    item.className = 'feedback-item';
+                    item.innerHTML = `
+                        <div class="feedback-header">
+                            <h6 class="feedback-user">
+                                ${fb.user.fullName} <span class="feedback-stadium">@ ${fb.stadiumName}</span>
+                            </h6>
+                            <span class="feedback-date">${timeAgo(fb.createdAt)}</span>
+                        </div>
+                        <div class="rating-stars">${renderRatingStars(fb.rating)}</div>
+                        <p class="feedback-content">${fb.comment || ''}</p>
+                    `;
+                    feedbackListEl.appendChild(item);
+                });
+            } else {
+                feedbackListEl.innerHTML = '<p class="text-center text-muted">Chưa có feedback nào.</p>';
             }
+
+            // 3. Update Revenue Chart
+            if (revenueChartInstance) revenueChartInstance.destroy();
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChartInstance = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: data.weeklyRevenueChartData.map(d => new Date(d.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: data.weeklyRevenueChartData.map(d => d.totalPrice),
+                        borderColor: 'var(--primary-blue)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: (v) => formatCurrency(v) } } } }
+            });
+
+            // 4. Update Booking Status Chart
+            if (bookingChartInstance) bookingChartInstance.destroy();
+            const bookingCtx = document.getElementById('bookingChart').getContext('2d');
+            bookingChartInstance = new Chart(bookingCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.bookingStatusChartData.map(d => d.status),
+                    datasets: [{
+                        data: data.bookingStatusChartData.map(d => d.count),
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#6b7280'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // --- MAIN EXECUTION ---
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch data from our API endpoint
+            fetch('/Home/GetDashboardData')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateDashboard(data);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch dashboard data:', error);
+                    // Optionally show an error message on the UI
+                    document.getElementById('feedbackList').innerHTML = '<p class="text-center text-danger">Không thể tải dữ liệu dashboard.</p>';
+                });
         });
     </script>
 }

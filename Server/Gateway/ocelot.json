@@ -1573,62 +1573,62 @@
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
-       "UpstreamPathTemplate": "/notifications/unread-count",
-       "UpstreamHttpMethod": [ "GET" ],
-       "DownstreamPathTemplate": "/api/Notifications/unread/count", 
-       "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7072
-            }
-        ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer" 
+      "UpstreamPathTemplate": "/notifications/unread-count",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/api/Notifications/unread/count",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
         }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
-        "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7072
-            }
-        ],
-        "UpstreamPathTemplate": "/notifications/mark-all-as-read",
-        "UpstreamHttpMethod": [ "PUT" ]
+      "DownstreamPathTemplate": "/api/Notifications/markAllAsRead",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/notifications/mark-all-as-read",
+      "UpstreamHttpMethod": [ "PUT" ]
     },
     {
-        "UpstreamPathTemplate": "/notifications",
-        "UpstreamHttpMethod": [ "POST" ],
-        "DownstreamPathTemplate": "/api/Notifications",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7072
-            }
-        ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer",
-            "AllowedScopes": []
+      "UpstreamPathTemplate": "/notifications",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Notifications",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
         }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
-        "UpstreamPathTemplate": "/notifications/batch",
-        "UpstreamHttpMethod": [ "POST" ],
-        "DownstreamPathTemplate": "/api/Notifications/batch",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7072 
-            }
-        ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer"
+      "UpstreamPathTemplate": "/notifications/batch",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Notifications/batch",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
         }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "UpstreamPathTemplate": "/notifications/all",
@@ -1647,16 +1647,28 @@
     },
     // AggregatorPatternAPI
     {
-        "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7175
-            }
-        ],
-        "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
-        "UpstreamHttpMethod": [ "GET" ]
+      "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7175
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/aggregator/stadiums-kpis",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7175
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/stadiums-kpis",
+      "UpstreamHttpMethod": [ "GET" ]
     },
     // FeesAPI
     {

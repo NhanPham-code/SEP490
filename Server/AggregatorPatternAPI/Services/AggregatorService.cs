@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using AggregatorPatternAPI.DTOs;
 using BookingAPI.DTOs; // Cần để deserialize từ BookingAPI
+using Microsoft.Extensions.Caching.Distributed;
 using StadiumAPI.DTOs;
 
 namespace AggregatorPatternAPI.Services
@@ -11,6 +12,7 @@ namespace AggregatorPatternAPI.Services
         private readonly HttpClient _stadiumClient;
         private readonly HttpClient _bookingClient;
         private readonly HttpClient _userClient; // THÊM HTTPCLIENT CHO USER
+        private readonly HttpClient _feedbackClient;
         private readonly ILogger<AggregatorService> _logger;
 
         public AggregatorService(IHttpClientFactory clientFactory, ILogger<AggregatorService> logger)
@@ -18,6 +20,7 @@ namespace AggregatorPatternAPI.Services
             _stadiumClient = clientFactory.CreateClient("StadiumAPI");
             _bookingClient = clientFactory.CreateClient("BookingAPI");
             _userClient = clientFactory.CreateClient("UserAPI"); // KHỞI TẠO
+            _feedbackClient = clientFactory.CreateClient("FeedbackAPI");
             _logger = logger;
         }
 
@@ -156,6 +159,147 @@ namespace AggregatorPatternAPI.Services
             var odataResponse = JsonSerializer.Deserialize<ODataResponse<UserProfileDto>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             
             return odataResponse?.Value?.ToDictionary(u => u.UserId) ?? new Dictionary<int, UserProfileDto>();
+        }
+
+        // Lấy danh sách stadium theo userId bằng OData
+        private async Task<List<StadiumIdAndNameDto>> GetStadiumsByUserIdAsync(int userId)
+        {
+            // Thay đổi $select=Id thành $select=Id,Name
+            var requestUrl = $"odata/OdataStadium?$filter=CreatedBy eq {userId}&$select=Id,Name";
+            var response = await _stadiumClient.GetAsync(requestUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch stadium IDs and Names for user {UserId}. Status: {StatusCode}", userId, response.StatusCode);
+                return new List<StadiumIdAndNameDto>(); // Trả về danh sách rỗng
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Deserialize vào DTO mới
+            var odataResponse = JsonSerializer.Deserialize<ODataResponse<StadiumIdAndNameDto>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return odataResponse?.Value ?? new List<StadiumIdAndNameDto>();
+        }
+
+        // Lấy danh sách feedback theo stadiumId bằng OData
+        private async Task<OdataHaveCountResponse<ReadFeedbackDTO>> GetFeedbacksByStadiumIdAsync(int stadiumId)
+        {
+            var response = await _feedbackClient.GetAsync($"odata?$filter=StadiumId eq {stadiumId}&$top = 5&$order by CreatedAt");
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch feedbacks for stadium {StadiumId}. Status: {StatusCode}", stadiumId, response.StatusCode);
+                return new OdataHaveCountResponse<ReadFeedbackDTO>();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var odataResponse = JsonSerializer.Deserialize<OdataHaveCountResponse<ReadFeedbackDTO>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return odataResponse ?? new OdataHaveCountResponse<ReadFeedbackDTO>();
+        }
+
+        // lấy thống kê về booking (số lượng thành công, thất bại, tổng danh thu,..) theo stadiumIds từ BookingAPI
+        private async Task<DTOs.RichStadiumKpiDto?> GetBookingKpiAsync(List<int> stadiumIds)
+        {
+            if (stadiumIds == null || !stadiumIds.Any())
+            {
+                return new DTOs.RichStadiumKpiDto(); // Trả về đối tượng rỗng nếu không có ID
+            }
+
+            // Xây dựng query string: &stadiumIds=1&stadiumIds=2...
+            var queryString = string.Join("&", stadiumIds.Select(id => $"stadiumIds={id}"));
+            var requestUrl = $"api/booking/summary/kpi?{queryString}";
+
+            var response = await _bookingClient.GetAsync(requestUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch booking KPIs for stadiums. Status: {StatusCode}, URL: {Url}", response.StatusCode, requestUrl);
+                return null; // Trả về null để báo hiệu lỗi
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<DTOs.RichStadiumKpiDto>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        // tổng hợp dữ liệu từ các đầu api để hoàn thành StadiumManagerDashboardDto
+        public async Task<StadiumManagerDashboardDto?> GetStadiumManagerDashboardAsync(int userId)
+        {
+            // 1. Lấy danh sách STADIUMS (bao gồm ID và NAME) mà người dùng này quản lý
+            var managedStadiums = await GetStadiumsByUserIdAsync(userId);
+            if (managedStadiums == null || !managedStadiums.Any())
+            {
+                _logger.LogWarning("User {UserId} does not manage any stadiums.", userId);
+                return new StadiumManagerDashboardDto();
+            }
+            // Chuyển đổi sang Dictionary để tra cứu nhanh hơn (Key: stadiumId, Value: stadiumName)
+            var stadiumIdToNameMap = managedStadiums.ToDictionary(s => s.Id, s => s.Name);
+            var stadiumIds = managedStadiums.Select(s => s.Id).ToList();
+
+            // 2. Gọi song song để lấy KPI và Feedback
+            var kpiTask = GetBookingKpiAsync(stadiumIds);
+            var feedbackTasks = stadiumIds.Select(id => GetFeedbacksByStadiumIdAsync(id)).ToList();
+
+            await Task.WhenAll(kpiTask, Task.WhenAll(feedbackTasks));
+
+            var kpiResult = await kpiTask;
+            if (kpiResult == null)
+            {
+                _logger.LogError("Could not generate dashboard for user {UserId} because KPI fetching failed.", userId);
+                return null;
+            }
+
+            // 3. Tổng hợp và LÀM GIÀU DỮ LIỆU FEEDBACK
+            var allFeedbacks = new List<ReadFeedbackDTO>();
+            foreach (var feedbackTask in feedbackTasks)
+            {
+                var feedbackResult = await feedbackTask;
+                if (feedbackResult?.Value != null) allFeedbacks.AddRange(feedbackResult.Value);
+            }
+
+            var enrichedFeedbacks = new List<EnrichedFeedbackDto>();
+            if (allFeedbacks.Any())
+            {
+                var userIdsFromFeedbacks = allFeedbacks.Select(f => f.UserId).Distinct().ToList();
+                var users = await GetUsersAsync(userIdsFromFeedbacks);
+
+                foreach (var feedback in allFeedbacks)
+                {
+                    // Lấy tên user và tên sân từ các dữ liệu đã thu thập
+                    users.TryGetValue(feedback.UserId, out var userProfile);
+                    stadiumIdToNameMap.TryGetValue(feedback.StadiumId, out var stadiumName);
+
+                    enrichedFeedbacks.Add(new EnrichedFeedbackDto
+                    {
+                        // Sao chép thuộc tính gốc
+                        Id = feedback.Id,
+                        UserId = feedback.UserId,
+                        StadiumId = feedback.StadiumId,
+                        Rating = feedback.Rating,
+                        Comment = feedback.Comment,
+                        ImagePath = feedback.ImagePath,
+                        CreatedAt = feedback.CreatedAt,
+
+                        // Gán dữ liệu đã làm giàu
+                        User = userProfile ?? new UserProfileDto { UserId = feedback.UserId },
+                        StadiumName = stadiumName ?? "Sân không xác định" // Gán tên sân
+                    });
+                }
+            }
+
+            // 4. Xây dựng đối tượng DTO trả về
+            var dashboardDto = new StadiumManagerDashboardDto
+            {
+                ManagedStadiumsCount = stadiumIds.Count,
+                SuccessfulBookings = kpiResult.SuccessfulBookings,
+                FailedBookings = kpiResult.FailedBookings,
+                BookingsToday = kpiResult.BookingsToday,
+                RevenueToday = kpiResult.RevenueToday,
+                WeeklyRevenueChartData = kpiResult.WeeklyRevenueData,
+                BookingStatusChartData = kpiResult.BookingStatusData,
+                LatestFeedbacks = enrichedFeedbacks.OrderByDescending(f => f.CreatedAt).Take(5).ToList()
+            };
+
+            return dashboardDto;
         }
     }
 }

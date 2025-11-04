@@ -352,5 +352,10 @@ namespace BookingAPI.Services
             // Chuyển cả hai ID cho repository
             return await _bookingRepository.HasCompletedBookingsAsync(userId, stadiumId);
         }
+
+        public async Task<RichStadiumKpiDto> GetKpiForStadiumsAsync(List<int> stadiumIds)
+        {
+            return await _bookingRepository.GetKpiForStadiumsAsync(stadiumIds);
+        }
     }
 }
