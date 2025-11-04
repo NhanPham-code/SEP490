@@ -211,7 +211,7 @@
 
         // function when load page
         async function initializePage() {
-            calculateMinAllowedMonth();
+            // calculateMinAllowedMonth();
             await fetchStadiumData(stadiumId);
             generateCalendar(currentMonth, currentYear);
             updateSelectionUI();
@@ -341,14 +341,15 @@
             const $prevButton = $('#prevMonth');
             const $nextButton = $('#nextMonth');
 
-            // Disable nút Previous nếu không thể điều hướng về tháng trước
-            if (!canNavigateToPrevMonth()) {
-                $prevButton.prop('disabled', true).addClass('disabled-nav');
-            } else {
-                $prevButton.prop('disabled', false).removeClass('disabled-nav');
-            }
+            // // Disable nút Previous nếu không thể điều hướng về tháng trước
+            // if (!canNavigateToPrevMonth()) {
+            //     $prevButton.prop('disabled', true).addClass('disabled-nav');
+            // } else {
+            //     $prevButton.prop('disabled', false).removeClass('disabled-nav');
+            // }
 
             // Next button luôn enabled (có thể điều hướng đến tương lai)
+            $prevButton.prop('disabled', false).removeClass('disabled-nav');
             $nextButton.prop('disabled', false).removeClass('disabled-nav');
         }
 
@@ -494,23 +495,23 @@
 
         // Hàm kiểm tra xem có thể điều hướng đến tháng trước không
         function canNavigateToPrevMonth() {
-            if (currentYear < minAllowedYear) {
-                return false;
-            }
-            if (currentYear === minAllowedYear && currentMonth <= minAllowedMonth) {
-                return false;
-            }
+            // if (currentYear < minAllowedYear) {
+            //     return false;
+            // }
+            // if (currentYear === minAllowedYear && currentMonth <= minAllowedMonth) {
+            //     return false;
+            // }
             return true;
         }
 
         // Hàm kiểm tra xem tháng/năm có hợp lệ để chọn không
         function isMonthYearValid(month, year) {
-            if (year < minAllowedYear) {
-                return false;
-            }
-            if (year === minAllowedYear && month < minAllowedMonth) {
-                return false;
-            }
+            // if (year < minAllowedYear) {
+            //     return false;
+            // }
+            // if (year === minAllowedYear && month < minAllowedMonth) {
+            //     return false;
+            // }
             return true;
         }
 

@@ -601,8 +601,8 @@
       // }
     },
     {
-      "DownstreamPathTemplate": "/api/Booking/check-completed/{userId}",
-      "UpstreamPathTemplate": "/booking/check-completed",
+      "UpstreamPathTemplate": "/booking/check-completed/{stadiumId}",
+      "DownstreamPathTemplate": "/api/Booking/check-completed/{userId}/{stadiumId}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
