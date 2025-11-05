@@ -18,7 +18,8 @@ namespace BookingAPI.Data
             base.OnModelCreating(modelBuilder);
             
             // Biến "toàn cục" duy nhất để dễ dàng thay đổi UserId khi test
-            int globalUserId = 1002;
+            int globalUserId = 5;
+            int userId_alternative = 6;
             
             // Ngày tạo/cập nhật (sử dụng một mốc cố định cho seeding)
             var seedDate = new DateTime(2025, 11, 04, 15, 00, 40);
@@ -2500,6 +2501,4136 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 908, BookingId = 908, CourtId = 6, StartTime = new DateTime(2025, 1, 29, 6, 0, 0), EndTime = new DateTime(2025, 1, 29, 9, 0, 0) },
                 new BookingDetail { Id = 909, BookingId = 909, CourtId = 6, StartTime = new DateTime(2025, 1, 30, 6, 0, 0), EndTime = new DateTime(2025, 1, 30, 9, 0, 0) },
                 new BookingDetail { Id = 910, BookingId = 910, CourtId = 6, StartTime = new DateTime(2025, 1, 31, 6, 0, 0), EndTime = new DateTime(2025, 1, 31, 9, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 55 (THÁNG 12/2025, Sân 8 - Sân Bóng Rổ) =====
+            // - T2 | 12h-14h (2 tiếng), 150k/h, UserId = 6
+            // - Giá/ngày = 300,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 55, UserId = 6, StadiumId = 4, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1500000m, TotalPrice = 1500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Bóng Rổ", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 911, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 55 },
+                new Booking { Id = 912, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 55 },
+                new Booking { Id = 913, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 55 },
+                new Booking { Id = 914, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 55 },
+                new Booking { Id = 915, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 55 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 911, BookingId = 911, CourtId = 8, StartTime = new DateTime(2025, 12, 1, 12, 0, 0), EndTime = new DateTime(2025, 12, 1, 14, 0, 0) },
+                new BookingDetail { Id = 912, BookingId = 912, CourtId = 8, StartTime = new DateTime(2025, 12, 8, 12, 0, 0), EndTime = new DateTime(2025, 12, 8, 14, 0, 0) },
+                new BookingDetail { Id = 913, BookingId = 913, CourtId = 8, StartTime = new DateTime(2025, 12, 15, 12, 0, 0), EndTime = new DateTime(2025, 12, 15, 14, 0, 0) },
+                new BookingDetail { Id = 914, BookingId = 914, CourtId = 8, StartTime = new DateTime(2025, 12, 22, 12, 0, 0), EndTime = new DateTime(2025, 12, 22, 14, 0, 0) },
+                new BookingDetail { Id = 915, BookingId = 915, CourtId = 8, StartTime = new DateTime(2025, 12, 29, 12, 0, 0), EndTime = new DateTime(2025, 12, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 56 (THÁNG 10/2025, Sân 8 - Sân Bóng Rổ) =====
+            // - T7 | 12h-15h (3 tiếng), 150k/h, UserId = 6
+            // - Giá/ngày = 450,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 56, UserId = 6, StadiumId = 4, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Bóng Rổ", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 916, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 56 },
+                new Booking { Id = 917, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 56 },
+                new Booking { Id = 918, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 56 },
+                new Booking { Id = 919, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 56 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 916, BookingId = 916, CourtId = 8, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 917, BookingId = 917, CourtId = 8, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 918, BookingId = 918, CourtId = 8, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 919, BookingId = 919, CourtId = 8, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 57 (THÁNG 7/2025, Sân 8 - Sân Bóng Rổ) =====
+            // - T7, CN | 12h-14h (2 tiếng), 150k/h, UserId = 6
+            // - Giá/ngày = 300,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 57, UserId = 6, StadiumId = 4, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Bóng Rổ", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 920, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 921, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 922, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 923, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 924, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 925, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 926, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 },
+                new Booking { Id = 927, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 57 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 920, BookingId = 920, CourtId = 8, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 921, BookingId = 921, CourtId = 8, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 922, BookingId = 922, CourtId = 8, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 923, BookingId = 923, CourtId = 8, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 924, BookingId = 924, CourtId = 8, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 925, BookingId = 925, CourtId = 8, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 926, BookingId = 926, CourtId = 8, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 927, BookingId = 927, CourtId = 8, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 58 (THÁNG 3/2025, Sân 8 - Sân Bóng Rổ) =====
+            // - T7 | 12h-13h (1 tiếng), 150k/h, UserId = 6
+            // - Giá/ngày = 150,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 58, UserId = 6, StadiumId = 4, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 750000m, TotalPrice = 750000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Bóng Rổ", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 928, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 58 },
+                new Booking { Id = 929, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 58 },
+                new Booking { Id = 930, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 58 },
+                new Booking { Id = 931, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 58 },
+                new Booking { Id = 932, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 4, MonthlyBookingId = 58 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 928, BookingId = 928, CourtId = 8, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 929, BookingId = 929, CourtId = 8, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 930, BookingId = 930, CourtId = 8, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 931, BookingId = 931, CourtId = 8, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 932, BookingId = 932, CourtId = 8, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 59 (THÁNG 12/2025, Sân 9 - Sân Cầu Lông) =====
+            // - T2 | 12h-14h (2 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 140,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 59, UserId = 6, StadiumId = 5, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 700000m, TotalPrice = 700000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Cầu Lông 1", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 933, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 59 },
+                new Booking { Id = 934, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 59 },
+                new Booking { Id = 935, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 59 },
+                new Booking { Id = 936, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 59 },
+                new Booking { Id = 937, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 59 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 933, BookingId = 933, CourtId = 9, StartTime = new DateTime(2025, 12, 1, 12, 0, 0), EndTime = new DateTime(2025, 12, 1, 14, 0, 0) },
+                new BookingDetail { Id = 934, BookingId = 934, CourtId = 9, StartTime = new DateTime(2025, 12, 8, 12, 0, 0), EndTime = new DateTime(2025, 12, 8, 14, 0, 0) },
+                new BookingDetail { Id = 935, BookingId = 935, CourtId = 9, StartTime = new DateTime(2025, 12, 15, 12, 0, 0), EndTime = new DateTime(2025, 12, 15, 14, 0, 0) },
+                new BookingDetail { Id = 936, BookingId = 936, CourtId = 9, StartTime = new DateTime(2025, 12, 22, 12, 0, 0), EndTime = new DateTime(2025, 12, 22, 14, 0, 0) },
+                new BookingDetail { Id = 937, BookingId = 937, CourtId = 9, StartTime = new DateTime(2025, 12, 29, 12, 0, 0), EndTime = new DateTime(2025, 12, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 60 (THÁNG 10/2025, Sân 9 - Sân Cầu Lông) =====
+            // - T7 | 12h-15h (3 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 210,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 60, UserId = 6, StadiumId = 5, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 840000m, TotalPrice = 840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Cầu Lông 1", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 938, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 60 },
+                new Booking { Id = 939, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 60 },
+                new Booking { Id = 940, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 60 },
+                new Booking { Id = 941, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 60 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 938, BookingId = 938, CourtId = 9, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 939, BookingId = 939, CourtId = 9, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 940, BookingId = 940, CourtId = 9, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 941, BookingId = 941, CourtId = 9, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 61 (THÁNG 7/2025, Sân 9 - Sân Cầu Lông) =====
+            // - T7, CN | 12h-14h (2 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 140,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 61, UserId = 6, StadiumId = 5, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1120000m, TotalPrice = 1120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Cầu Lông 1", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 942, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 943, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 944, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 945, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 946, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 947, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 948, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 },
+                new Booking { Id = 949, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 61 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 942, BookingId = 942, CourtId = 9, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 943, BookingId = 943, CourtId = 9, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 944, BookingId = 944, CourtId = 9, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 945, BookingId = 945, CourtId = 9, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 946, BookingId = 946, CourtId = 9, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 947, BookingId = 947, CourtId = 9, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 948, BookingId = 948, CourtId = 9, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 949, BookingId = 949, CourtId = 9, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 62 (THÁNG 3/2025, Sân 9 - Sân Cầu Lông) =====
+            // - T7 | 12h-13h (1 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 70,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 62, UserId = 6, StadiumId = 5, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 350000m, TotalPrice = 350000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Cầu Lông 1", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 950, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 62 },
+                new Booking { Id = 951, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 62 },
+                new Booking { Id = 952, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 62 },
+                new Booking { Id = 953, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 62 },
+                new Booking { Id = 954, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 5, MonthlyBookingId = 62 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 950, BookingId = 950, CourtId = 9, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 951, BookingId = 951, CourtId = 9, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 952, BookingId = 952, CourtId = 9, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 953, BookingId = 953, CourtId = 9, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 954, BookingId = 954, CourtId = 9, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 63 (THÁNG 12/2025, Sân 11 - Sân 11 người) =====
+            // - T2 | 12h-14h (2 tiếng), 500k/h, UserId = 6
+            // - Giá/ngày = 1,000,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 63, UserId = 6, StadiumId = 6, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 5000000m, TotalPrice = 5000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân 11", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 955, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 63 },
+                new Booking { Id = 956, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 63 },
+                new Booking { Id = 957, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 63 },
+                new Booking { Id = 958, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 63 },
+                new Booking { Id = 959, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 63 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 955, BookingId = 955, CourtId = 11, StartTime = new DateTime(2025, 12, 1, 12, 0, 0), EndTime = new DateTime(2025, 12, 1, 14, 0, 0) },
+                new BookingDetail { Id = 956, BookingId = 956, CourtId = 11, StartTime = new DateTime(2025, 12, 8, 12, 0, 0), EndTime = new DateTime(2025, 12, 8, 14, 0, 0) },
+                new BookingDetail { Id = 957, BookingId = 957, CourtId = 11, StartTime = new DateTime(2025, 12, 15, 12, 0, 0), EndTime = new DateTime(2025, 12, 15, 14, 0, 0) },
+                new BookingDetail { Id = 958, BookingId = 958, CourtId = 11, StartTime = new DateTime(2025, 12, 22, 12, 0, 0), EndTime = new DateTime(2025, 12, 22, 14, 0, 0) },
+                new BookingDetail { Id = 959, BookingId = 959, CourtId = 11, StartTime = new DateTime(2025, 12, 29, 12, 0, 0), EndTime = new DateTime(2025, 12, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 64 (THÁNG 10/2025, Sân 11 - Sân 11 người) =====
+            // - T7 | 12h-15h (3 tiếng), 500k/h, UserId = 6
+            // - Giá/ngày = 1,500,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 64, UserId = 6, StadiumId = 6, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 6000000m, TotalPrice = 6000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân 11", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 960, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 1500000m, OriginalPrice = 1500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 64 },
+                new Booking { Id = 961, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 1500000m, OriginalPrice = 1500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 64 },
+                new Booking { Id = 962, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 1500000m, OriginalPrice = 1500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 64 },
+                new Booking { Id = 963, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 1500000m, OriginalPrice = 1500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 64 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 960, BookingId = 960, CourtId = 11, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 961, BookingId = 961, CourtId = 11, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 962, BookingId = 962, CourtId = 11, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 963, BookingId = 963, CourtId = 11, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 65 (THÁNG 7/2025, Sân 11 - Sân 11 người) =====
+            // - T7, CN | 12h-14h (2 tiếng), 500k/h, UserId = 6
+            // - Giá/ngày = 1,000,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 65, UserId = 6, StadiumId = 6, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 8000000m, TotalPrice = 8000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân 11", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 964, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 965, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 966, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 967, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 968, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 969, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 970, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 },
+                new Booking { Id = 971, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 1000000m, OriginalPrice = 1000000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 65 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 964, BookingId = 964, CourtId = 11, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 965, BookingId = 965, CourtId = 11, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 966, BookingId = 966, CourtId = 11, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 967, BookingId = 967, CourtId = 11, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 968, BookingId = 968, CourtId = 11, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 969, BookingId = 969, CourtId = 11, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 970, BookingId = 970, CourtId = 11, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 971, BookingId = 971, CourtId = 11, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 66 (THÁNG 3/2025, Sân 11 - Sân 11 người) =====
+            // - T7 | 12h-13h (1 tiếng), 500k/h, UserId = 6
+            // - Giá/ngày = 500,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 66, UserId = 6, StadiumId = 6, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2500000m, TotalPrice = 2500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân 11", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 972, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 66 },
+                new Booking { Id = 973, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 66 },
+                new Booking { Id = 974, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 66 },
+                new Booking { Id = 975, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 66 },
+                new Booking { Id = 976, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 6, MonthlyBookingId = 66 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 972, BookingId = 972, CourtId = 11, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 973, BookingId = 973, CourtId = 11, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 974, BookingId = 974, CourtId = 11, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 975, BookingId = 975, CourtId = 11, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 976, BookingId = 976, CourtId = 11, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 67 (THÁNG 12/2025, Sân 12 - Sân Tennis 1) =====
+            // - T2 | 12h-14h (2 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 240,000 | 5 ngày (T2: 2, 9, 16, 23, 30)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 67, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Tennis 1 (Sân 12)", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 977, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 67 },
+                new Booking { Id = 978, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 67 },
+                new Booking { Id = 979, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 67 },
+                new Booking { Id = 980, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 67 },
+                new Booking { Id = 981, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 67 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 977, BookingId = 977, CourtId = 12, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 978, BookingId = 978, CourtId = 12, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 979, BookingId = 979, CourtId = 12, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 980, BookingId = 980, CourtId = 12, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 981, BookingId = 981, CourtId = 12, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 68 (THÁNG 10/2025, Sân 12 - Sân Tennis 1) =====
+            // - T7 | 12h-15h (3 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 360,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 68, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1440000m, TotalPrice = 1440000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Tennis 1 (Sân 12)", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 982, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 68 },
+                new Booking { Id = 983, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 68 },
+                new Booking { Id = 984, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 68 },
+                new Booking { Id = 985, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 68 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 982, BookingId = 982, CourtId = 12, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 983, BookingId = 983, CourtId = 12, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 984, BookingId = 984, CourtId = 12, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 985, BookingId = 985, CourtId = 12, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 69 (THÁNG 7/2025, Sân 12 - Sân Tennis 1) =====
+            // - T7, CN | 12h-14h (2 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 240,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 69, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1920000m, TotalPrice = 1920000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Tennis 1 (Sân 12)", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 986, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 987, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 988, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 989, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 990, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 991, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 992, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 },
+                new Booking { Id = 993, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 69 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 986, BookingId = 986, CourtId = 12, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 987, BookingId = 987, CourtId = 12, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 988, BookingId = 988, CourtId = 12, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 989, BookingId = 989, CourtId = 12, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 990, BookingId = 990, CourtId = 12, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 991, BookingId = 991, CourtId = 12, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 992, BookingId = 992, CourtId = 12, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 993, BookingId = 993, CourtId = 12, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 70 (THÁNG 3/2025, Sân 12 - Sân Tennis 1) =====
+            // - T7 | 12h-13h (1 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 120,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 70, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Tennis 1 (Sân 12)", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 994, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 70 },
+                new Booking { Id = 995, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 70 },
+                new Booking { Id = 996, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 70 },
+                new Booking { Id = 997, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 70 },
+                new Booking { Id = 998, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 70 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 994, BookingId = 994, CourtId = 12, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 995, BookingId = 995, CourtId = 12, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 996, BookingId = 996, CourtId = 12, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 997, BookingId = 997, CourtId = 12, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 998, BookingId = 998, CourtId = 12, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 71 (THÁNG 12/2025, Sân 13 - Sân Tennis 2) =====
+            // - T2 | 12h-14h (2 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 240,000 | 5 ngày (T2: 2, 9, 16, 23, 30)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 71, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Tennis 2 (Sân 13)", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 999, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 71 },
+                new Booking { Id = 1000, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 71 },
+                new Booking { Id = 1001, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 71 },
+                new Booking { Id = 1002, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 71 },
+                new Booking { Id = 1003, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 71 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 999, BookingId = 999, CourtId = 13, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1000, BookingId = 1000, CourtId = 13, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1001, BookingId = 1001, CourtId = 13, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1002, BookingId = 1002, CourtId = 13, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1003, BookingId = 1003, CourtId = 13, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 72 (THÁNG 10/2025, Sân 13 - Sân Tennis 2) =====
+            // - T7 | 12h-15h (3 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 360,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 72, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1440000m, TotalPrice = 1440000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Tennis 2 (Sân 13)", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1004, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 72 },
+                new Booking { Id = 1005, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 72 },
+                new Booking { Id = 1006, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 72 },
+                new Booking { Id = 1007, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 72 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1004, BookingId = 1004, CourtId = 13, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1005, BookingId = 1005, CourtId = 13, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1006, BookingId = 1006, CourtId = 13, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1007, BookingId = 1007, CourtId = 13, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 73 (THÁNG 7/2025, Sân 13 - Sân Tennis 2) =====
+            // - T7, CN | 12h-14h (2 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 240,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 73, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1920000m, TotalPrice = 1920000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Tennis 2 (Sân 13)", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1008, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1009, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1010, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1011, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1012, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1013, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1014, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 },
+                new Booking { Id = 1015, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 73 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1008, BookingId = 1008, CourtId = 13, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1009, BookingId = 1009, CourtId = 13, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1010, BookingId = 1010, CourtId = 13, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1011, BookingId = 1011, CourtId = 13, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1012, BookingId = 1012, CourtId = 13, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1013, BookingId = 1013, CourtId = 13, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1014, BookingId = 1014, CourtId = 13, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1015, BookingId = 1015, CourtId = 13, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 74 (THÁNG 3/2025, Sân 13 - Sân Tennis 2) =====
+            // - T7 | 12h-13h (1 tiếng), 120k/h, UserId = 6
+            // - Giá/ngày = 120,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 74, UserId = 6, StadiumId = 8, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Tennis 2 (Sân 13)", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1016, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 74 },
+                new Booking { Id = 1017, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 74 },
+                new Booking { Id = 1018, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 74 },
+                new Booking { Id = 1019, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 74 },
+                new Booking { Id = 1020, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 8, MonthlyBookingId = 74 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1016, BookingId = 1016, CourtId = 13, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1017, BookingId = 1017, CourtId = 13, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1018, BookingId = 1018, CourtId = 13, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1019, BookingId = 1019, CourtId = 13, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1020, BookingId = 1020, CourtId = 13, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 75 (THÁNG 12/2025, Sân 14 - Sân Cầu Lông 1) =====
+            // - T2 | 12h-14h (2 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 120,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 75, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Cầu Lông 1 (Sân 14)", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1021, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 75 },
+                new Booking { Id = 1022, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 75 },
+                new Booking { Id = 1023, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 75 },
+                new Booking { Id = 1024, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 75 },
+                new Booking { Id = 1025, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 75 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1021, BookingId = 1021, CourtId = 14, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1022, BookingId = 1022, CourtId = 14, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1023, BookingId = 1023, CourtId = 14, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1024, BookingId = 1024, CourtId = 14, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1025, BookingId = 1025, CourtId = 14, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 76 (THÁNG 10/2025, Sân 14 - Sân Cầu Lông 1) =====
+            // - T7 | 12h-15h (3 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 180,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 76, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 720000m, TotalPrice = 720000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Cầu Lông 1 (Sân 14)", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1026, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 76 },
+                new Booking { Id = 1027, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 76 },
+                new Booking { Id = 1028, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 76 },
+                new Booking { Id = 1029, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 76 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1026, BookingId = 1026, CourtId = 14, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1027, BookingId = 1027, CourtId = 14, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1028, BookingId = 1028, CourtId = 14, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1029, BookingId = 1029, CourtId = 14, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 77 (THÁNG 7/2025, Sân 14 - Sân Cầu Lông 1) =====
+            // - T7, CN | 12h-14h (2 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 120,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 77, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 960000m, TotalPrice = 960000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Cầu Lông 1 (Sân 14)", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1030, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1031, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1032, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1033, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1034, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1035, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1036, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 },
+                new Booking { Id = 1037, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 77 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1030, BookingId = 1030, CourtId = 14, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1031, BookingId = 1031, CourtId = 14, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1032, BookingId = 1032, CourtId = 14, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1033, BookingId = 1033, CourtId = 14, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1034, BookingId = 1034, CourtId = 14, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1035, BookingId = 1035, CourtId = 14, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1036, BookingId = 1036, CourtId = 14, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1037, BookingId = 1037, CourtId = 14, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 78 (THÁNG 3/2025, Sân 14 - Sân Cầu Lông 1) =====
+            // - T7 | 12h-13h (1 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 60,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 78, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 300000m, TotalPrice = 300000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Cầu Lông 1 (Sân 14)", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1038, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 78 },
+                new Booking { Id = 1039, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 78 },
+                new Booking { Id = 1040, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 78 },
+                new Booking { Id = 1041, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 78 },
+                new Booking { Id = 1042, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 78 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1038, BookingId = 1038, CourtId = 14, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1039, BookingId = 1039, CourtId = 14, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1040, BookingId = 1040, CourtId = 14, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1041, BookingId = 1041, CourtId = 14, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1042, BookingId = 1042, CourtId = 14, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 79 (THÁNG 12/2025, Sân 15 - Sân Cầu Lông 2) =====
+            // - T2 | 12h-14h (2 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 120,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 79, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân Cầu Lông 2 (Sân 15)", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1043, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 79 },
+                new Booking { Id = 1044, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 79 },
+                new Booking { Id = 1045, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 79 },
+                new Booking { Id = 1046, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 79 },
+                new Booking { Id = 1047, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 79 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1043, BookingId = 1043, CourtId = 15, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1044, BookingId = 1044, CourtId = 15, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1045, BookingId = 1045, CourtId = 15, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1046, BookingId = 1046, CourtId = 15, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1047, BookingId = 1047, CourtId = 15, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 80 (THÁNG 10/2025, Sân 15 - Sân Cầu Lông 2) =====
+            // - T7 | 12h-15h (3 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 180,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 80, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 720000m, TotalPrice = 720000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân Cầu Lông 2 (Sân 15)", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1048, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 80 },
+                new Booking { Id = 1049, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 80 },
+                new Booking { Id = 1050, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 80 },
+                new Booking { Id = 1051, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 80 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1048, BookingId = 1048, CourtId = 15, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1049, BookingId = 1049, CourtId = 15, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1050, BookingId = 1050, CourtId = 15, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1051, BookingId = 1051, CourtId = 15, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 81 (THÁNG 7/2025, Sân 15 - Sân Cầu Lông 2) =====
+            // - T7, CN | 12h-14h (2 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 120,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 81, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 960000m, TotalPrice = 960000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân Cầu Lông 2 (Sân 15)", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1052, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1053, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1054, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1055, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1056, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1057, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1058, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 },
+                new Booking { Id = 1059, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_1Do", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 81 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1052, BookingId = 1052, CourtId = 15, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1053, BookingId = 1053, CourtId = 15, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1054, BookingId = 1054, CourtId = 15, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1055, BookingId = 1055, CourtId = 15, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1056, BookingId = 1056, CourtId = 15, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1057, BookingId = 1057, CourtId = 15, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1058, BookingId = 1058, CourtId = 15, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1059, BookingId = 1059, CourtId = 15, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 82 (THÁNG 3/2025, Sân 15 - Sân Cầu Lông 2) =====
+            // - T7 | 12h-13h (1 tiếng), 60k/h, globalUserId
+            // - Giá/ngày = 60,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 82, UserId = globalUserId, StadiumId = 9, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 300000m, TotalPrice = 300000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân Cầu Lông 2 (Sân 15)", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1060, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 82 },
+                new Booking { Id = 1061, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 82 },
+                new Booking { Id = 1062, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_1G0", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 82 },
+                new Booking { Id = 1063, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 82 },
+                new Booking { Id = 1064, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 60000m, OriginalPrice = 60000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 9, MonthlyBookingId = 82 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1060, BookingId = 1060, CourtId = 15, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1061, BookingId = 1061, CourtId = 15, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1062, BookingId = 1062, CourtId = 15, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1063, BookingId = 1063, CourtId = 15, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1064, BookingId = 1064, CourtId = 15, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 83 (THÁNG 9/2025, Sân 16 - Sân Đơn Tennis) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 83, UserId = globalUserId, StadiumId = 10, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3900000m, TotalPrice = 3900000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T9/2025 Sân Đơn", TotalHour = 26, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1065, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1066, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1067, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 5), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1068, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1069, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1070, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 12), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1071, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1072, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1073, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 19), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1074, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1075, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1076, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 26), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 },
+                new Booking { Id = 1077, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 29), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 83 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1065, BookingId = 1065, CourtId = 16, StartTime = new DateTime(2025, 9, 1, 12, 0, 0), EndTime = new DateTime(2025, 9, 1, 14, 0, 0) },
+                new BookingDetail { Id = 1066, BookingId = 1066, CourtId = 16, StartTime = new DateTime(2025, 9, 3, 12, 0, 0), EndTime = new DateTime(2025, 9, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1067, BookingId = 1067, CourtId = 16, StartTime = new DateTime(2025, 9, 5, 12, 0, 0), EndTime = new DateTime(2025, 9, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1068, BookingId = 1068, CourtId = 16, StartTime = new DateTime(2025, 9, 8, 12, 0, 0), EndTime = new DateTime(2025, 9, 8, 14, 0, 0) },
+                new BookingDetail { Id = 1069, BookingId = 1069, CourtId = 16, StartTime = new DateTime(2025, 9, 10, 12, 0, 0), EndTime = new DateTime(2025, 9, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1070, BookingId = 1070, CourtId = 16, StartTime = new DateTime(2025, 9, 12, 12, 0, 0), EndTime = new DateTime(2025, 9, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1071, BookingId = 1071, CourtId = 16, StartTime = new DateTime(2025, 9, 15, 12, 0, 0), EndTime = new DateTime(2025, 9, 15, 14, 0, 0) },
+                new BookingDetail { Id = 1072, BookingId = 1072, CourtId = 16, StartTime = new DateTime(2025, 9, 17, 12, 0, 0), EndTime = new DateTime(2025, 9, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1073, BookingId = 1073, CourtId = 16, StartTime = new DateTime(2025, 9, 19, 12, 0, 0), EndTime = new DateTime(2025, 9, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1074, BookingId = 1074, CourtId = 16, StartTime = new DateTime(2025, 9, 22, 12, 0, 0), EndTime = new DateTime(2025, 9, 22, 14, 0, 0) },
+                new BookingDetail { Id = 1075, BookingId = 1075, CourtId = 16, StartTime = new DateTime(2025, 9, 24, 12, 0, 0), EndTime = new DateTime(2025, 9, 24, 14, 0, 0) },
+                new BookingDetail { Id = 1076, BookingId = 1076, CourtId = 16, StartTime = new DateTime(2025, 9, 26, 12, 0, 0), EndTime = new DateTime(2025, 9, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1077, BookingId = 1077, CourtId = 16, StartTime = new DateTime(2025, 9, 29, 12, 0, 0), EndTime = new DateTime(2025, 9, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 84 (THÁNG 8/2025, Sân 16 - Sân Đơn Tennis) =====
+            // - T7, CN | 12h-15h (3 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 450,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 84, UserId = globalUserId, StadiumId = 10, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4500000m, TotalPrice = 4500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân Đơn", TotalHour = 30, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1078, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1079, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1080, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1081, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1082, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1083, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1084, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1085, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1086, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 },
+                new Booking { Id = 1087, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 84 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1078, BookingId = 1078, CourtId = 16, StartTime = new DateTime(2025, 8, 2, 12, 0, 0), EndTime = new DateTime(2025, 8, 2, 15, 0, 0) },
+                new BookingDetail { Id = 1079, BookingId = 1079, CourtId = 16, StartTime = new DateTime(2025, 8, 3, 12, 0, 0), EndTime = new DateTime(2025, 8, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1080, BookingId = 1080, CourtId = 16, StartTime = new DateTime(2025, 8, 9, 12, 0, 0), EndTime = new DateTime(2025, 8, 9, 15, 0, 0) },
+                new BookingDetail { Id = 1081, BookingId = 1081, CourtId = 16, StartTime = new DateTime(2025, 8, 10, 12, 0, 0), EndTime = new DateTime(2025, 8, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1082, BookingId = 1082, CourtId = 16, StartTime = new DateTime(2025, 8, 16, 12, 0, 0), EndTime = new DateTime(2025, 8, 16, 15, 0, 0) },
+                new BookingDetail { Id = 1083, BookingId = 1083, CourtId = 16, StartTime = new DateTime(2025, 8, 17, 12, 0, 0), EndTime = new DateTime(2025, 8, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1084, BookingId = 1084, CourtId = 16, StartTime = new DateTime(2025, 8, 23, 12, 0, 0), EndTime = new DateTime(2025, 8, 23, 15, 0, 0) },
+                new BookingDetail { Id = 1085, BookingId = 1085, CourtId = 16, StartTime = new DateTime(2025, 8, 24, 12, 0, 0), EndTime = new DateTime(2025, 8, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1086, BookingId = 1086, CourtId = 16, StartTime = new DateTime(2025, 8, 30, 12, 0, 0), EndTime = new DateTime(2025, 8, 30, 15, 0, 0) },
+                new BookingDetail { Id = 1087, BookingId = 1087, CourtId = 16, StartTime = new DateTime(2025, 8, 31, 12, 0, 0), EndTime = new DateTime(2025, 8, 31, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 85 (THÁNG 6/2025, Sân 16 - Sân Đơn Tennis) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 85, UserId = globalUserId, StadiumId = 10, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3600000m, TotalPrice = 3600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T6/2025 Sân Đơn", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1088, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 2), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1089, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 4), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1090, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 6), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1091, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 9), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1092, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 11), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1093, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 13), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1094, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 16), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1095, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 18), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1096, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 20), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1097, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 23), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1098, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 25), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 },
+                new Booking { Id = 1099, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 27), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 85 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1088, BookingId = 1088, CourtId = 16, StartTime = new DateTime(2025, 6, 2, 12, 0, 0), EndTime = new DateTime(2025, 6, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1089, BookingId = 1089, CourtId = 16, StartTime = new DateTime(2025, 6, 4, 12, 0, 0), EndTime = new DateTime(2025, 6, 4, 14, 0, 0) },
+                new BookingDetail { Id = 1090, BookingId = 1090, CourtId = 16, StartTime = new DateTime(2025, 6, 6, 12, 0, 0), EndTime = new DateTime(2025, 6, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1091, BookingId = 1091, CourtId = 16, StartTime = new DateTime(2025, 6, 9, 12, 0, 0), EndTime = new DateTime(2025, 6, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1092, BookingId = 1092, CourtId = 16, StartTime = new DateTime(2025, 6, 11, 12, 0, 0), EndTime = new DateTime(2025, 6, 11, 14, 0, 0) },
+                new BookingDetail { Id = 1093, BookingId = 1093, CourtId = 16, StartTime = new DateTime(2025, 6, 13, 12, 0, 0), EndTime = new DateTime(2025, 6, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1094, BookingId = 1094, CourtId = 16, StartTime = new DateTime(2025, 6, 16, 12, 0, 0), EndTime = new DateTime(2025, 6, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1095, BookingId = 1095, CourtId = 16, StartTime = new DateTime(2025, 6, 18, 12, 0, 0), EndTime = new DateTime(2025, 6, 18, 14, 0, 0) },
+                new BookingDetail { Id = 1096, BookingId = 1096, CourtId = 16, StartTime = new DateTime(2025, 6, 20, 12, 0, 0), EndTime = new DateTime(2025, 6, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1097, BookingId = 1097, CourtId = 16, StartTime = new DateTime(2025, 6, 23, 12, 0, 0), EndTime = new DateTime(2025, 6, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1098, BookingId = 1098, CourtId = 16, StartTime = new DateTime(2025, 6, 25, 12, 0, 0), EndTime = new DateTime(2025, 6, 25, 14, 0, 0) },
+                new BookingDetail { Id = 1099, BookingId = 1099, CourtId = 16, StartTime = new DateTime(2025, 6, 27, 12, 0, 0), EndTime = new DateTime(2025, 6, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 86 (THÁNG 5/2025, Sân 16 - Sân Đơn Tennis) =====
+            // - T7, CN | 12h-15h (3 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 450,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 86, UserId = globalUserId, StadiumId = 10, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4050000m, TotalPrice = 4050000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T5/2025 Sân Đơn", TotalHour = 27, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1100, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 3), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1101, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1102, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 10), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1103, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1104, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 17), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1105, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1106, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 24), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1107, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 },
+                new Booking { Id = 1108, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 31), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 10, MonthlyBookingId = 86 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1100, BookingId = 1100, CourtId = 16, StartTime = new DateTime(2025, 5, 3, 12, 0, 0), EndTime = new DateTime(2025, 5, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1101, BookingId = 1101, CourtId = 16, StartTime = new DateTime(2025, 5, 4, 12, 0, 0), EndTime = new DateTime(2025, 5, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1102, BookingId = 1102, CourtId = 16, StartTime = new DateTime(2025, 5, 10, 12, 0, 0), EndTime = new DateTime(2025, 5, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1103, BookingId = 1103, CourtId = 16, StartTime = new DateTime(2025, 5, 11, 12, 0, 0), EndTime = new DateTime(2025, 5, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1104, BookingId = 1104, CourtId = 16, StartTime = new DateTime(2025, 5, 17, 12, 0, 0), EndTime = new DateTime(2025, 5, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1105, BookingId = 1105, CourtId = 16, StartTime = new DateTime(2025, 5, 18, 12, 0, 0), EndTime = new DateTime(2025, 5, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1106, BookingId = 1106, CourtId = 16, StartTime = new DateTime(2025, 5, 24, 12, 0, 0), EndTime = new DateTime(2025, 5, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1107, BookingId = 1107, CourtId = 16, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
+                new BookingDetail { Id = 1108, BookingId = 1108, CourtId = 16, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 87 (THÁNG 9/2025, Sân 17 - Sân Bóng Chuyền) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 80k/h, globalUserId
+            // - Giá/ngày = 160,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 87, UserId = globalUserId, StadiumId = 11, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2080000m, TotalPrice = 2080000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T9/2025 Sân Bóng Chuyền", TotalHour = 26, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1109, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 1), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1110, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 3), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1111, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 5), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1112, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 8), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1113, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 10), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1114, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 12), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1115, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 15), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1116, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 17), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1117, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 19), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1118, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 22), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1119, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 24), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1120, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 26), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 },
+                new Booking { Id = 1121, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 29), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 87 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1109, BookingId = 1109, CourtId = 17, StartTime = new DateTime(2025, 9, 1, 12, 0, 0), EndTime = new DateTime(2025, 9, 1, 14, 0, 0) },
+                new BookingDetail { Id = 1110, BookingId = 1110, CourtId = 17, StartTime = new DateTime(2025, 9, 3, 12, 0, 0), EndTime = new DateTime(2025, 9, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1111, BookingId = 1111, CourtId = 17, StartTime = new DateTime(2025, 9, 5, 12, 0, 0), EndTime = new DateTime(2025, 9, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1112, BookingId = 1112, CourtId = 17, StartTime = new DateTime(2025, 9, 8, 12, 0, 0), EndTime = new DateTime(2025, 9, 8, 14, 0, 0) },
+                new BookingDetail { Id = 1113, BookingId = 1113, CourtId = 17, StartTime = new DateTime(2025, 9, 10, 12, 0, 0), EndTime = new DateTime(2025, 9, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1114, BookingId = 1114, CourtId = 17, StartTime = new DateTime(2025, 9, 12, 12, 0, 0), EndTime = new DateTime(2025, 9, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1115, BookingId = 1115, CourtId = 17, StartTime = new DateTime(2025, 9, 15, 12, 0, 0), EndTime = new DateTime(2025, 9, 15, 14, 0, 0) },
+                new BookingDetail { Id = 1116, BookingId = 1116, CourtId = 17, StartTime = new DateTime(2025, 9, 17, 12, 0, 0), EndTime = new DateTime(2025, 9, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1117, BookingId = 1117, CourtId = 17, StartTime = new DateTime(2025, 9, 19, 12, 0, 0), EndTime = new DateTime(2025, 9, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1118, BookingId = 1118, CourtId = 17, StartTime = new DateTime(2025, 9, 22, 12, 0, 0), EndTime = new DateTime(2025, 9, 22, 14, 0, 0) },
+                new BookingDetail { Id = 1119, BookingId = 1119, CourtId = 17, StartTime = new DateTime(2025, 9, 24, 12, 0, 0), EndTime = new DateTime(2025, 9, 24, 14, 0, 0) },
+                new BookingDetail { Id = 1120, BookingId = 1120, CourtId = 17, StartTime = new DateTime(2025, 9, 26, 12, 0, 0), EndTime = new DateTime(2025, 9, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1121, BookingId = 1121, CourtId = 17, StartTime = new DateTime(2025, 9, 29, 12, 0, 0), EndTime = new DateTime(2025, 9, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 88 (THÁNG 8/2025, Sân 17 - Sân Bóng Chuyền) =====
+            // - T7, CN | 12h-15h (3 tiếng), 80k/h, globalUserId
+            // - Giá/ngày = 240,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 88, UserId = globalUserId, StadiumId = 11, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân Bóng Chuyền", TotalHour = 30, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1122, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1123, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1124, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1125, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1126, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1127, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1128, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1129, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1130, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 },
+                new Booking { Id = 1131, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 88 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1122, BookingId = 1122, CourtId = 17, StartTime = new DateTime(2025, 8, 2, 12, 0, 0), EndTime = new DateTime(2025, 8, 2, 15, 0, 0) },
+                new BookingDetail { Id = 1123, BookingId = 1123, CourtId = 17, StartTime = new DateTime(2025, 8, 3, 12, 0, 0), EndTime = new DateTime(2025, 8, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1124, BookingId = 1124, CourtId = 17, StartTime = new DateTime(2025, 8, 9, 12, 0, 0), EndTime = new DateTime(2025, 8, 9, 15, 0, 0) },
+                new BookingDetail { Id = 1125, BookingId = 1125, CourtId = 17, StartTime = new DateTime(2025, 8, 10, 12, 0, 0), EndTime = new DateTime(2025, 8, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1126, BookingId = 1126, CourtId = 17, StartTime = new DateTime(2025, 8, 16, 12, 0, 0), EndTime = new DateTime(2025, 8, 16, 15, 0, 0) },
+                new BookingDetail { Id = 1127, BookingId = 1127, CourtId = 17, StartTime = new DateTime(2025, 8, 17, 12, 0, 0), EndTime = new DateTime(2025, 8, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1128, BookingId = 1128, CourtId = 17, StartTime = new DateTime(2025, 8, 23, 12, 0, 0), EndTime = new DateTime(2025, 8, 23, 15, 0, 0) },
+                new BookingDetail { Id = 1129, BookingId = 1129, CourtId = 17, StartTime = new DateTime(2025, 8, 24, 12, 0, 0), EndTime = new DateTime(2025, 8, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1130, BookingId = 1130, CourtId = 17, StartTime = new DateTime(2025, 8, 30, 12, 0, 0), EndTime = new DateTime(2025, 8, 30, 15, 0, 0) },
+                new BookingDetail { Id = 1131, BookingId = 1131, CourtId = 17, StartTime = new DateTime(2025, 8, 31, 12, 0, 0), EndTime = new DateTime(2025, 8, 31, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 89 (THÁNG 6/2025, Sân 17 - Sân Bóng Chuyền) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 80k/h, globalUserId
+            // - Giá/ngày = 160,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 89, UserId = globalUserId, StadiumId = 11, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1920000m, TotalPrice = 1920000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T6/2025 Sân Bóng Chuyền", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1132, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 2), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1133, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 4), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1134, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 6), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1135, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 9), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1136, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 11), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1137, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 13), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1138, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 16), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1139, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 18), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1140, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 20), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1141, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 23), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1142, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 25), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 },
+                new Booking { Id = 1143, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 27), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 89 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1132, BookingId = 1132, CourtId = 17, StartTime = new DateTime(2025, 6, 2, 12, 0, 0), EndTime = new DateTime(2025, 6, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1133, BookingId = 1133, CourtId = 17, StartTime = new DateTime(2025, 6, 4, 12, 0, 0), EndTime = new DateTime(2025, 6, 4, 14, 0, 0) },
+                new BookingDetail { Id = 1134, BookingId = 1134, CourtId = 17, StartTime = new DateTime(2025, 6, 6, 12, 0, 0), EndTime = new DateTime(2025, 6, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1135, BookingId = 1135, CourtId = 17, StartTime = new DateTime(2025, 6, 9, 12, 0, 0), EndTime = new DateTime(2025, 6, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1136, BookingId = 1136, CourtId = 17, StartTime = new DateTime(2025, 6, 11, 12, 0, 0), EndTime = new DateTime(2025, 6, 11, 14, 0, 0) },
+                new BookingDetail { Id = 1137, BookingId = 1137, CourtId = 17, StartTime = new DateTime(2025, 6, 13, 12, 0, 0), EndTime = new DateTime(2025, 6, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1138, BookingId = 1138, CourtId = 17, StartTime = new DateTime(2025, 6, 16, 12, 0, 0), EndTime = new DateTime(2025, 6, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1139, BookingId = 1139, CourtId = 17, StartTime = new DateTime(2025, 6, 18, 12, 0, 0), EndTime = new DateTime(2025, 6, 18, 14, 0, 0) },
+                new BookingDetail { Id = 1140, BookingId = 1140, CourtId = 17, StartTime = new DateTime(2025, 6, 20, 12, 0, 0), EndTime = new DateTime(2025, 6, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1141, BookingId = 1141, CourtId = 17, StartTime = new DateTime(2025, 6, 23, 12, 0, 0), EndTime = new DateTime(2025, 6, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1142, BookingId = 1142, CourtId = 17, StartTime = new DateTime(2025, 6, 25, 12, 0, 0), EndTime = new DateTime(2025, 6, 25, 14, 0, 0) },
+                new BookingDetail { Id = 1143, BookingId = 1143, CourtId = 17, StartTime = new DateTime(2025, 6, 27, 12, 0, 0), EndTime = new DateTime(2025, 6, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 90 (THÁNG 5/2025, Sân 17 - Sân Bóng Chuyền) =====
+            // - T7, CN | 12h-15h (3 tiếng), 80k/h, globalUserId
+            // - Giá/ngày = 240,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 90, UserId = globalUserId, StadiumId = 11, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2160000m, TotalPrice = 2160000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T5/2025 Sân Bóng Chuyền", TotalHour = 27, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1144, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 3), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1145, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1146, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 10), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1147, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1148, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 17), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1149, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1150, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 24), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1151, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 },
+                new Booking { Id = 1152, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 31), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 11, MonthlyBookingId = 90 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1144, BookingId = 1144, CourtId = 17, StartTime = new DateTime(2025, 5, 3, 12, 0, 0), EndTime = new DateTime(2025, 5, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1145, BookingId = 1145, CourtId = 17, StartTime = new DateTime(2025, 5, 4, 12, 0, 0), EndTime = new DateTime(2025, 5, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1146, BookingId = 1146, CourtId = 17, StartTime = new DateTime(2025, 5, 10, 12, 0, 0), EndTime = new DateTime(2025, 5, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1147, BookingId = 1147, CourtId = 17, StartTime = new DateTime(2025, 5, 11, 12, 0, 0), EndTime = new DateTime(2025, 5, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1148, BookingId = 1148, CourtId = 17, StartTime = new DateTime(2025, 5, 17, 12, 0, 0), EndTime = new DateTime(2025, 5, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1149, BookingId = 1149, CourtId = 17, StartTime = new DateTime(2025, 5, 18, 12, 0, 0), EndTime = new DateTime(2025, 5, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1150, BookingId = 1150, CourtId = 17, StartTime = new DateTime(2025, 5, 24, 12, 0, 0), EndTime = new DateTime(2025, 5, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1151, BookingId = 1151, CourtId = 17, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
+                new BookingDetail { Id = 1152, BookingId = 1152, CourtId = 17, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 91 (THÁNG 9/2025, Sân 18 - Sân Cầu Lông) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 75k/h, globalUserId
+            // - Giá/ngày = 150,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 91, UserId = globalUserId, StadiumId = 13, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1950000m, TotalPrice = 1950000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T9/2025 Sân 18", TotalHour = 26, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1153, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 1), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1154, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 3), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1155, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 5), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1156, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 8), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1157, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 10), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1158, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 12), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1159, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 15), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1160, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 17), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1161, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 19), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1162, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 22), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1163, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 24), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1164, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 26), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 },
+                new Booking { Id = 1165, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 29), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 91 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1153, BookingId = 1153, CourtId = 18, StartTime = new DateTime(2025, 9, 1, 12, 0, 0), EndTime = new DateTime(2025, 9, 1, 14, 0, 0) },
+                new BookingDetail { Id = 1154, BookingId = 1154, CourtId = 18, StartTime = new DateTime(2025, 9, 3, 12, 0, 0), EndTime = new DateTime(2025, 9, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1155, BookingId = 1155, CourtId = 18, StartTime = new DateTime(2025, 9, 5, 12, 0, 0), EndTime = new DateTime(2025, 9, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1156, BookingId = 1156, CourtId = 18, StartTime = new DateTime(2025, 9, 8, 12, 0, 0), EndTime = new DateTime(2025, 9, 8, 14, 0, 0) },
+                new BookingDetail { Id = 1157, BookingId = 1157, CourtId = 18, StartTime = new DateTime(2025, 9, 10, 12, 0, 0), EndTime = new DateTime(2025, 9, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1158, BookingId = 1158, CourtId = 18, StartTime = new DateTime(2025, 9, 12, 12, 0, 0), EndTime = new DateTime(2025, 9, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1159, BookingId = 1159, CourtId = 18, StartTime = new DateTime(2025, 9, 15, 12, 0, 0), EndTime = new DateTime(2025, 9, 15, 14, 0, 0) },
+                new BookingDetail { Id = 1160, BookingId = 1160, CourtId = 18, StartTime = new DateTime(2025, 9, 17, 12, 0, 0), EndTime = new DateTime(2025, 9, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1161, BookingId = 1161, CourtId = 18, StartTime = new DateTime(2025, 9, 19, 12, 0, 0), EndTime = new DateTime(2025, 9, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1162, BookingId = 1162, CourtId = 18, StartTime = new DateTime(2025, 9, 22, 12, 0, 0), EndTime = new DateTime(2025, 9, 22, 14, 0, 0) },
+                new BookingDetail { Id = 1163, BookingId = 1163, CourtId = 18, StartTime = new DateTime(2025, 9, 24, 12, 0, 0), EndTime = new DateTime(2025, 9, 24, 14, 0, 0) },
+                new BookingDetail { Id = 1164, BookingId = 1164, CourtId = 18, StartTime = new DateTime(2025, 9, 26, 12, 0, 0), EndTime = new DateTime(2025, 9, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1165, BookingId = 1165, CourtId = 18, StartTime = new DateTime(2025, 9, 29, 12, 0, 0), EndTime = new DateTime(2025, 9, 29, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 92 (THÁNG 8/2025, Sân 18 - Sân Cầu Lông) =====
+            // - T7, CN | 12h-15h (3 tiếng), 75k/h, globalUserId
+            // - Giá/ngày = 225,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 92, UserId = globalUserId, StadiumId = 13, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2250000m, TotalPrice = 2250000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân 18", TotalHour = 30, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1166, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1167, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1168, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1169, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1170, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1171, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1172, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1173, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1174, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 },
+                new Booking { Id = 1175, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 92 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1166, BookingId = 1166, CourtId = 18, StartTime = new DateTime(2025, 8, 2, 12, 0, 0), EndTime = new DateTime(2025, 8, 2, 15, 0, 0) },
+                new BookingDetail { Id = 1167, BookingId = 1167, CourtId = 18, StartTime = new DateTime(2025, 8, 3, 12, 0, 0), EndTime = new DateTime(2025, 8, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1168, BookingId = 1168, CourtId = 18, StartTime = new DateTime(2025, 8, 9, 12, 0, 0), EndTime = new DateTime(2025, 8, 9, 15, 0, 0) },
+                new BookingDetail { Id = 1169, BookingId = 1169, CourtId = 18, StartTime = new DateTime(2025, 8, 10, 12, 0, 0), EndTime = new DateTime(2025, 8, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1170, BookingId = 1170, CourtId = 18, StartTime = new DateTime(2025, 8, 16, 12, 0, 0), EndTime = new DateTime(2025, 8, 16, 15, 0, 0) },
+                new BookingDetail { Id = 1171, BookingId = 1171, CourtId = 18, StartTime = new DateTime(2025, 8, 17, 12, 0, 0), EndTime = new DateTime(2025, 8, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1172, BookingId = 1172, CourtId = 18, StartTime = new DateTime(2025, 8, 23, 12, 0, 0), EndTime = new DateTime(2025, 8, 23, 15, 0, 0) },
+                new BookingDetail { Id = 1173, BookingId = 1173, CourtId = 18, StartTime = new DateTime(2025, 8, 24, 12, 0, 0), EndTime = new DateTime(2025, 8, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1174, BookingId = 1174, CourtId = 18, StartTime = new DateTime(2025, 8, 30, 12, 0, 0), EndTime = new DateTime(2025, 8, 30, 15, 0, 0) },
+                new BookingDetail { Id = 1175, BookingId = 1175, CourtId = 18, StartTime = new DateTime(2025, 8, 31, 12, 0, 0), EndTime = new DateTime(2025, 8, 31, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 93 (THÁNG 6/2025, Sân 18 - Sân Cầu Lông) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 75k/h, globalUserId
+            // - Giá/ngày = 150,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 93, UserId = globalUserId, StadiumId = 13, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T6/2025 Sân 18", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1176, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 2), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1177, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 4), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1178, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 6), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1179, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 9), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1180, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 11), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1181, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 13), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1182, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 16), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1183, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 18), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1184, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 20), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1185, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 23), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1186, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 25), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 },
+                new Booking { Id = 1187, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 27), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 93 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1176, BookingId = 1176, CourtId = 18, StartTime = new DateTime(2025, 6, 2, 12, 0, 0), EndTime = new DateTime(2025, 6, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1177, BookingId = 1177, CourtId = 18, StartTime = new DateTime(2025, 6, 4, 12, 0, 0), EndTime = new DateTime(2025, 6, 4, 14, 0, 0) },
+                new BookingDetail { Id = 1178, BookingId = 1178, CourtId = 18, StartTime = new DateTime(2025, 6, 6, 12, 0, 0), EndTime = new DateTime(2025, 6, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1179, BookingId = 1179, CourtId = 18, StartTime = new DateTime(2025, 6, 9, 12, 0, 0), EndTime = new DateTime(2025, 6, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1180, BookingId = 1180, CourtId = 18, StartTime = new DateTime(2025, 6, 11, 12, 0, 0), EndTime = new DateTime(2025, 6, 11, 14, 0, 0) },
+                new BookingDetail { Id = 1181, BookingId = 1181, CourtId = 18, StartTime = new DateTime(2025, 6, 13, 12, 0, 0), EndTime = new DateTime(2025, 6, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1182, BookingId = 1182, CourtId = 18, StartTime = new DateTime(2025, 6, 16, 12, 0, 0), EndTime = new DateTime(2025, 6, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1183, BookingId = 1183, CourtId = 18, StartTime = new DateTime(2025, 6, 18, 12, 0, 0), EndTime = new DateTime(2025, 6, 18, 14, 0, 0) },
+                new BookingDetail { Id = 1184, BookingId = 1184, CourtId = 18, StartTime = new DateTime(2025, 6, 20, 12, 0, 0), EndTime = new DateTime(2025, 6, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1185, BookingId = 1185, CourtId = 18, StartTime = new DateTime(2025, 6, 23, 12, 0, 0), EndTime = new DateTime(2025, 6, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1186, BookingId = 1186, CourtId = 18, StartTime = new DateTime(2025, 6, 25, 12, 0, 0), EndTime = new DateTime(2025, 6, 25, 14, 0, 0) },
+                new BookingDetail { Id = 1187, BookingId = 1187, CourtId = 18, StartTime = new DateTime(2025, 6, 27, 12, 0, 0), EndTime = new DateTime(2025, 6, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 94 (THÁNG 5/2025, Sân 18 - Sân Cầu Lông) =====
+            // - T7, CN | 12h-15h (3 tiếng), 75k/h, globalUserId
+            // - Giá/ngày = 225,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 94, UserId = globalUserId, StadiumId = 13, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2025000m, TotalPrice = 2025000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T5/2025 Sân 18", TotalHour = 27, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1188, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 3), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1189, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1190, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 10), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1191, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1192, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 17), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1193, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1194, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 24), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1195, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 },
+                new Booking { Id = 1196, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 31), TotalPrice = 225000m, OriginalPrice = 225000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 13, MonthlyBookingId = 94 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1188, BookingId = 1188, CourtId = 18, StartTime = new DateTime(2025, 5, 3, 12, 0, 0), EndTime = new DateTime(2025, 5, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1189, BookingId = 1189, CourtId = 18, StartTime = new DateTime(2025, 5, 4, 12, 0, 0), EndTime = new DateTime(2025, 5, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1190, BookingId = 1190, CourtId = 18, StartTime = new DateTime(2025, 5, 10, 12, 0, 0), EndTime = new DateTime(2025, 5, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1191, BookingId = 1191, CourtId = 18, StartTime = new DateTime(2025, 5, 11, 12, 0, 0), EndTime = new DateTime(2025, 5, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1192, BookingId = 1192, CourtId = 18, StartTime = new DateTime(2025, 5, 17, 12, 0, 0), EndTime = new DateTime(2025, 5, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1193, BookingId = 1193, CourtId = 18, StartTime = new DateTime(2025, 5, 18, 12, 0, 0), EndTime = new DateTime(2025, 5, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1194, BookingId = 1194, CourtId = 18, StartTime = new DateTime(2025, 5, 24, 12, 0, 0), EndTime = new DateTime(2025, 5, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1195, BookingId = 1195, CourtId = 18, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
+                new BookingDetail { Id = 1196, BookingId = 1196, CourtId = 18, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 100 (THÁNG 6/2025, Sân 19 - Sân 7) =====
+            // - T7 | 12h-13h (1 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 280,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 100, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1120000m, TotalPrice = 1120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T6/2025 Sân 7", TotalHour = 4, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1243, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 100 },
+                new Booking { Id = 1244, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 100 },
+                new Booking { Id = 1245, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 100 },
+                new Booking { Id = 1246, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 100 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1243, BookingId = 1243, CourtId = 19, StartTime = new DateTime(2025, 6, 7, 12, 0, 0), EndTime = new DateTime(2025, 6, 7, 13, 0, 0) },
+                new BookingDetail { Id = 1244, BookingId = 1244, CourtId = 19, StartTime = new DateTime(2025, 6, 14, 12, 0, 0), EndTime = new DateTime(2025, 6, 14, 13, 0, 0) },
+                new BookingDetail { Id = 1245, BookingId = 1245, CourtId = 19, StartTime = new DateTime(2025, 6, 21, 12, 0, 0), EndTime = new DateTime(2025, 6, 21, 13, 0, 0) },
+                new BookingDetail { Id = 1246, BookingId = 1246, CourtId = 19, StartTime = new DateTime(2025, 6, 28, 12, 0, 0), EndTime = new DateTime(2025, 6, 28, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 101 (THÁNG 7/2025, Sân 19 - Sân 7) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 560,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 101, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 7280000m, TotalPrice = 7280000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T7/2025 Sân 7", TotalHour = 26, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1247, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 2), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1248, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 4), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1249, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 7), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1250, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 9), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1251, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 11), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1252, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 14), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1253, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 16), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1254, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 18), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1255, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 21), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1256, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 23), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1257, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 25), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1258, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 28), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 },
+                new Booking { Id = 1259, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 30), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 101 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1247, BookingId = 1247, CourtId = 19, StartTime = new DateTime(2025, 7, 2, 12, 0, 0), EndTime = new DateTime(2025, 7, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1248, BookingId = 1248, CourtId = 19, StartTime = new DateTime(2025, 7, 4, 12, 0, 0), EndTime = new DateTime(2025, 7, 4, 14, 0, 0) },
+                new BookingDetail { Id = 1249, BookingId = 1249, CourtId = 19, StartTime = new DateTime(2025, 7, 7, 12, 0, 0), EndTime = new DateTime(2025, 7, 7, 14, 0, 0) },
+                new BookingDetail { Id = 1250, BookingId = 1250, CourtId = 19, StartTime = new DateTime(2025, 7, 9, 12, 0, 0), EndTime = new DateTime(2025, 7, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1251, BookingId = 1251, CourtId = 19, StartTime = new DateTime(2025, 7, 11, 12, 0, 0), EndTime = new DateTime(2025, 7, 11, 14, 0, 0) },
+                new BookingDetail { Id = 1252, BookingId = 1252, CourtId = 19, StartTime = new DateTime(2025, 7, 14, 12, 0, 0), EndTime = new DateTime(2025, 7, 14, 14, 0, 0) },
+                new BookingDetail { Id = 1253, BookingId = 1253, CourtId = 19, StartTime = new DateTime(2025, 7, 16, 12, 0, 0), EndTime = new DateTime(2025, 7, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1254, BookingId = 1254, CourtId = 19, StartTime = new DateTime(2025, 7, 18, 12, 0, 0), EndTime = new DateTime(2025, 7, 18, 14, 0, 0) },
+                new BookingDetail { Id = 1255, BookingId = 1255, CourtId = 19, StartTime = new DateTime(2025, 7, 21, 12, 0, 0), EndTime = new DateTime(2025, 7, 21, 14, 0, 0) },
+                new BookingDetail { Id = 1256, BookingId = 1256, CourtId = 19, StartTime = new DateTime(2025, 7, 23, 12, 0, 0), EndTime = new DateTime(2025, 7, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1257, BookingId = 1257, CourtId = 19, StartTime = new DateTime(2025, 7, 25, 12, 0, 0), EndTime = new DateTime(2025, 7, 25, 14, 0, 0) },
+                new BookingDetail { Id = 1258, BookingId = 1258, CourtId = 19, StartTime = new DateTime(2025, 7, 28, 12, 0, 0), EndTime = new DateTime(2025, 7, 28, 14, 0, 0) },
+                new BookingDetail { Id = 1259, BookingId = 1259, CourtId = 19, StartTime = new DateTime(2025, 7, 30, 12, 0, 0), EndTime = new DateTime(2025, 7, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 102 (THÁNG 8/2025, Sân 19 - Sân 7) =====
+            // - T7, CN | 12h-15h (3 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 840,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 102, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 8400000m, TotalPrice = 8400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân 7", TotalHour = 30, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1260, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1261, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1262, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1263, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1264, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1265, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1266, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1267, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1268, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 },
+                new Booking { Id = 1269, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 102 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1260, BookingId = 1260, CourtId = 19, StartTime = new DateTime(2025, 8, 2, 12, 0, 0), EndTime = new DateTime(2025, 8, 2, 15, 0, 0) },
+                new BookingDetail { Id = 1261, BookingId = 1261, CourtId = 19, StartTime = new DateTime(2025, 8, 3, 12, 0, 0), EndTime = new DateTime(2025, 8, 3, 15, 0, 0) },
+                new BookingDetail { Id = 1262, BookingId = 1262, CourtId = 19, StartTime = new DateTime(2025, 8, 9, 12, 0, 0), EndTime = new DateTime(2025, 8, 9, 15, 0, 0) },
+                new BookingDetail { Id = 1263, BookingId = 1263, CourtId = 19, StartTime = new DateTime(2025, 8, 10, 12, 0, 0), EndTime = new DateTime(2025, 8, 10, 15, 0, 0) },
+                new BookingDetail { Id = 1264, BookingId = 1264, CourtId = 19, StartTime = new DateTime(2025, 8, 16, 12, 0, 0), EndTime = new DateTime(2025, 8, 16, 15, 0, 0) },
+                new BookingDetail { Id = 1265, BookingId = 1265, CourtId = 19, StartTime = new DateTime(2025, 8, 17, 12, 0, 0), EndTime = new DateTime(2025, 8, 17, 15, 0, 0) },
+                new BookingDetail { Id = 1266, BookingId = 1266, CourtId = 19, StartTime = new DateTime(2025, 8, 23, 12, 0, 0), EndTime = new DateTime(2025, 8, 23, 15, 0, 0) },
+                new BookingDetail { Id = 1267, BookingId = 1267, CourtId = 19, StartTime = new DateTime(2025, 8, 24, 12, 0, 0), EndTime = new DateTime(2025, 8, 24, 15, 0, 0) },
+                new BookingDetail { Id = 1268, BookingId = 1268, CourtId = 19, StartTime = new DateTime(2025, 8, 30, 12, 0, 0), EndTime = new DateTime(2025, 8, 30, 15, 0, 0) },
+                new BookingDetail { Id = 1269, BookingId = 1269, CourtId = 19, StartTime = new DateTime(2025, 8, 31, 12, 0, 0), EndTime = new DateTime(2025, 8, 31, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 103 (THÁNG 9/2025, Sân 19 - Sân 7) =====
+            // - T7 | 12h-13h (1 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 280,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 103, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1120000m, TotalPrice = 1120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T9/2025 Sân 7", TotalHour = 4, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1270, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 6), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 103 },
+                new Booking { Id = 1271, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 13), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 103 },
+                new Booking { Id = 1272, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 20), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 103 },
+                new Booking { Id = 1273, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 27), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 103 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1270, BookingId = 1270, CourtId = 19, StartTime = new DateTime(2025, 9, 6, 12, 0, 0), EndTime = new DateTime(2025, 9, 6, 13, 0, 0) },
+                new BookingDetail { Id = 1271, BookingId = 1271, CourtId = 19, StartTime = new DateTime(2025, 9, 13, 12, 0, 0), EndTime = new DateTime(2025, 9, 13, 13, 0, 0) },
+                new BookingDetail { Id = 1272, BookingId = 1272, CourtId = 19, StartTime = new DateTime(2025, 9, 20, 12, 0, 0), EndTime = new DateTime(2025, 9, 20, 13, 0, 0) },
+                new BookingDetail { Id = 1273, BookingId = 1273, CourtId = 19, StartTime = new DateTime(2025, 9, 27, 12, 0, 0), EndTime = new DateTime(2025, 9, 27, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 104 (THÁNG 10/2025, Sân 19 - Sân 7) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 560,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 104, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 7840000m, TotalPrice = 7840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T10/2025 Sân 7", TotalHour = 28, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1274, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 1), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1275, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 3), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1276, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 6), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1277, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 8), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1278, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 10), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1279, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 13), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1280, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 15), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1281, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 17), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1282, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 20), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1283, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 22), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1284, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 24), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1285, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 27), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1286, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 29), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 },
+                new Booking { Id = 1287, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 31), TotalPrice = 560000m, OriginalPrice = 560000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 104 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1274, BookingId = 1274, CourtId = 19, StartTime = new DateTime(2025, 10, 1, 12, 0, 0), EndTime = new DateTime(2025, 10, 1, 14, 0, 0) },
+                new BookingDetail { Id = 1275, BookingId = 1275, CourtId = 19, StartTime = new DateTime(2025, 10, 3, 12, 0, 0), EndTime = new DateTime(2025, 10, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1276, BookingId = 1276, CourtId = 19, StartTime = new DateTime(2025, 10, 6, 12, 0, 0), EndTime = new DateTime(2025, 10, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1277, BookingId = 1277, CourtId = 19, StartTime = new DateTime(2025, 10, 8, 12, 0, 0), EndTime = new DateTime(2025, 10, 8, 14, 0, 0) },
+                new BookingDetail { Id = 1278, BookingId = 1278, CourtId = 19, StartTime = new DateTime(2025, 10, 10, 12, 0, 0), EndTime = new DateTime(2025, 10, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1279, BookingId = 1279, CourtId = 19, StartTime = new DateTime(2025, 10, 13, 12, 0, 0), EndTime = new DateTime(2025, 10, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1280, BookingId = 1280, CourtId = 19, StartTime = new DateTime(2025, 10, 15, 12, 0, 0), EndTime = new DateTime(2025, 10, 15, 14, 0, 0) },
+                new BookingDetail { Id = 1281, BookingId = 1281, CourtId = 19, StartTime = new DateTime(2025, 10, 17, 12, 0, 0), EndTime = new DateTime(2025, 10, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1282, BookingId = 1282, CourtId = 19, StartTime = new DateTime(2025, 10, 20, 12, 0, 0), EndTime = new DateTime(2025, 10, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1283, BookingId = 1283, CourtId = 19, StartTime = new DateTime(2025, 10, 22, 12, 0, 0), EndTime = new DateTime(2025, 10, 22, 14, 0, 0) },
+                new BookingDetail { Id = 1284, BookingId = 1284, CourtId = 19, StartTime = new DateTime(2025, 10, 24, 12, 0, 0), EndTime = new DateTime(2025, 10, 24, 14, 0, 0) },
+                new BookingDetail { Id = 1285, BookingId = 1285, CourtId = 19, StartTime = new DateTime(2025, 10, 27, 12, 0, 0), EndTime = new DateTime(2025, 10, 27, 14, 0, 0) },
+                new BookingDetail { Id = 1286, BookingId = 1286, CourtId = 19, StartTime = new DateTime(2025, 10, 29, 12, 0, 0), EndTime = new DateTime(2025, 10, 29, 14, 0, 0) },
+                new BookingDetail { Id = 1287, BookingId = 1287, CourtId = 19, StartTime = new DateTime(2025, 10, 31, 12, 0, 0), EndTime = new DateTime(2025, 10, 31, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 105 (THÁNG 11/2025, Sân 19 - Sân 7) =====
+            // - T7, CN | 12h-15h (3 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 840,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 105, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 7560000m, TotalPrice = 7560000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 7", TotalHour = 27, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1288, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1289, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1290, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1291, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1292, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1293, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1294, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1295, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 },
+                new Booking { Id = 1296, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 840000m, OriginalPrice = 840000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 105 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1288, BookingId = 1288, CourtId = 19, StartTime = new DateTime(2025, 11, 1, 12, 0, 0), EndTime = new DateTime(2025, 11, 1, 15, 0, 0) },
+                new BookingDetail { Id = 1289, BookingId = 1289, CourtId = 19, StartTime = new DateTime(2025, 11, 2, 12, 0, 0), EndTime = new DateTime(2025, 11, 2, 15, 0, 0) },
+                new BookingDetail { Id = 1290, BookingId = 1290, CourtId = 19, StartTime = new DateTime(2025, 11, 8, 12, 0, 0), EndTime = new DateTime(2025, 11, 8, 15, 0, 0) },
+                new BookingDetail { Id = 1291, BookingId = 1291, CourtId = 19, StartTime = new DateTime(2025, 11, 9, 12, 0, 0), EndTime = new DateTime(2025, 11, 9, 15, 0, 0) },
+                new BookingDetail { Id = 1292, BookingId = 1292, CourtId = 19, StartTime = new DateTime(2025, 11, 15, 12, 0, 0), EndTime = new DateTime(2025, 11, 15, 15, 0, 0) },
+                new BookingDetail { Id = 1293, BookingId = 1293, CourtId = 19, StartTime = new DateTime(2025, 11, 16, 12, 0, 0), EndTime = new DateTime(2025, 11, 16, 15, 0, 0) },
+                new BookingDetail { Id = 1294, BookingId = 1294, CourtId = 19, StartTime = new DateTime(2025, 11, 22, 12, 0, 0), EndTime = new DateTime(2025, 11, 22, 15, 0, 0) },
+                new BookingDetail { Id = 1295, BookingId = 1295, CourtId = 19, StartTime = new DateTime(2025, 11, 23, 12, 0, 0), EndTime = new DateTime(2025, 11, 23, 15, 0, 0) },
+                new BookingDetail { Id = 1296, BookingId = 1296, CourtId = 19, StartTime = new DateTime(2025, 11, 29, 12, 0, 0), EndTime = new DateTime(2025, 11, 29, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 106 (THÁNG 12/2025, Sân 19 - Sân 7) =====
+            // - T7 | 12h-13h (1 tiếng), 280k/h, UserId = 6
+            // - Giá/ngày = 280,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 106, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1120000m, TotalPrice = 1120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T12/2025 Sân 7", TotalHour = 4, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1297, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 6), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 106 },
+                new Booking { Id = 1298, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 13), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 106 },
+                new Booking { Id = 1299, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 20), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 106 },
+                new Booking { Id = 1300, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 27), TotalPrice = 280000m, OriginalPrice = 280000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 106 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1297, BookingId = 1297, CourtId = 19, StartTime = new DateTime(2025, 12, 6, 12, 0, 0), EndTime = new DateTime(2025, 12, 6, 13, 0, 0) },
+                new BookingDetail { Id = 1298, BookingId = 1298, CourtId = 19, StartTime = new DateTime(2025, 12, 13, 12, 0, 0), EndTime = new DateTime(2025, 12, 13, 13, 0, 0) },
+                new BookingDetail { Id = 1299, BookingId = 1299, CourtId = 19, StartTime = new DateTime(2025, 12, 20, 12, 0, 0), EndTime = new DateTime(2025, 12, 20, 13, 0, 0) },
+                new BookingDetail { Id = 1300, BookingId = 1300, CourtId = 19, StartTime = new DateTime(2025, 12, 27, 12, 0, 0), EndTime = new DateTime(2025, 12, 27, 13, 0, 0) }
+            );
+            
+            // ========== STADIUM 14 (ID 20, 21) - UserId 6 ==========
+            // ===== SEED DATA - SET 95 (THÁNG 1/2025, Sân 20 - Sân 5A) =====
+            // - T7, CN | 12h-15h (3 tiếng), 180k/h, UserId = 6
+            // - Giá/ngày = 540,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 95, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4320000m, TotalPrice = 4320000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T1/2025 Sân 5A", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1197, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 4), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1198, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 5), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1199, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 11), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1200, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 12), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1201, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 18), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1202, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 19), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1203, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 25), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 },
+                new Booking { Id = 1204, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 26), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 95 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1197, BookingId = 1197, CourtId = 20, StartTime = new DateTime(2025, 1, 4, 12, 0, 0), EndTime = new DateTime(2025, 1, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1198, BookingId = 1198, CourtId = 20, StartTime = new DateTime(2025, 1, 5, 12, 0, 0), EndTime = new DateTime(2025, 1, 5, 15, 0, 0) },
+                new BookingDetail { Id = 1199, BookingId = 1199, CourtId = 20, StartTime = new DateTime(2025, 1, 11, 12, 0, 0), EndTime = new DateTime(2025, 1, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1200, BookingId = 1200, CourtId = 20, StartTime = new DateTime(2025, 1, 12, 12, 0, 0), EndTime = new DateTime(2025, 1, 12, 15, 0, 0) },
+                new BookingDetail { Id = 1201, BookingId = 1201, CourtId = 20, StartTime = new DateTime(2025, 1, 18, 12, 0, 0), EndTime = new DateTime(2025, 1, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1202, BookingId = 1202, CourtId = 20, StartTime = new DateTime(2025, 1, 19, 12, 0, 0), EndTime = new DateTime(2025, 1, 19, 15, 0, 0) },
+                new BookingDetail { Id = 1203, BookingId = 1203, CourtId = 20, StartTime = new DateTime(2025, 1, 25, 12, 0, 0), EndTime = new DateTime(2025, 1, 25, 15, 0, 0) },
+                new BookingDetail { Id = 1204, BookingId = 1204, CourtId = 20, StartTime = new DateTime(2025, 1, 26, 12, 0, 0), EndTime = new DateTime(2025, 1, 26, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 96 (THÁNG 2/2025, Sân 21 - Sân 5B) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 180k/h, UserId = 6
+            // - Giá/ngày = 360,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 96, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4320000m, TotalPrice = 4320000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T2/2025 Sân 5B", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1205, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 3), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1206, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 5), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1207, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 7), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1208, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 10), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1209, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 12), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1210, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 14), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1211, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 17), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1212, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 19), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1213, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 21), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1214, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 24), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1215, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 26), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 },
+                new Booking { Id = 1216, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 28), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 96 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1205, BookingId = 1205, CourtId = 21, StartTime = new DateTime(2025, 2, 3, 12, 0, 0), EndTime = new DateTime(2025, 2, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1206, BookingId = 1206, CourtId = 21, StartTime = new DateTime(2025, 2, 5, 12, 0, 0), EndTime = new DateTime(2025, 2, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1207, BookingId = 1207, CourtId = 21, StartTime = new DateTime(2025, 2, 7, 12, 0, 0), EndTime = new DateTime(2025, 2, 7, 14, 0, 0) },
+                new BookingDetail { Id = 1208, BookingId = 1208, CourtId = 21, StartTime = new DateTime(2025, 2, 10, 12, 0, 0), EndTime = new DateTime(2025, 2, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1209, BookingId = 1209, CourtId = 21, StartTime = new DateTime(2025, 2, 12, 12, 0, 0), EndTime = new DateTime(2025, 2, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1210, BookingId = 1210, CourtId = 21, StartTime = new DateTime(2025, 2, 14, 12, 0, 0), EndTime = new DateTime(2025, 2, 14, 14, 0, 0) },
+                new BookingDetail { Id = 1211, BookingId = 1211, CourtId = 21, StartTime = new DateTime(2025, 2, 17, 12, 0, 0), EndTime = new DateTime(2025, 2, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1212, BookingId = 1212, CourtId = 21, StartTime = new DateTime(2025, 2, 19, 12, 0, 0), EndTime = new DateTime(2025, 2, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1213, BookingId = 1213, CourtId = 21, StartTime = new DateTime(2025, 2, 21, 12, 0, 0), EndTime = new DateTime(2025, 2, 21, 14, 0, 0) },
+                new BookingDetail { Id = 1214, BookingId = 1214, CourtId = 21, StartTime = new DateTime(2025, 2, 24, 12, 0, 0), EndTime = new DateTime(2025, 2, 24, 14, 0, 0) },
+                new BookingDetail { Id = 1215, BookingId = 1215, CourtId = 21, StartTime = new DateTime(2025, 2, 26, 12, 0, 0), EndTime = new DateTime(2025, 2, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1216, BookingId = 1216, CourtId = 21, StartTime = new DateTime(2025, 2, 28, 12, 0, 0), EndTime = new DateTime(2025, 2, 28, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 97 (THÁNG 3/2025, Sân 20 - Sân 5A) =====
+            // - T7 | 12h-13h (1 tiếng), 180k/h, UserId = 6
+            // - Giá/ngày = 180,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 97, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 900000m, TotalPrice = 900000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân 5A", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1217, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 97 },
+                new Booking { Id = 1218, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 97 },
+                new Booking { Id = 1219, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 97 },
+                new Booking { Id = 1220, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 97 },
+                new Booking { Id = 1221, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 97 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1217, BookingId = 1217, CourtId = 20, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1218, BookingId = 1218, CourtId = 20, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1219, BookingId = 1219, CourtId = 20, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1220, BookingId = 1220, CourtId = 20, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1221, BookingId = 1221, CourtId = 20, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 98 (THÁNG 4/2025, Sân 21 - Sân 5B) =====
+            // - T7, CN | 12h-15h (3 tiếng), 180k/h, UserId = 6
+            // - Giá/ngày = 540,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 98, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4320000m, TotalPrice = 4320000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T4/2025 Sân 5B", TotalHour = 24, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1222, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 5), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1223, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 6), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1224, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 12), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1225, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 13), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1226, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 19), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1227, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 20), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1228, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 26), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 },
+                new Booking { Id = 1229, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 27), TotalPrice = 540000m, OriginalPrice = 540000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 98 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1222, BookingId = 1222, CourtId = 21, StartTime = new DateTime(2025, 4, 5, 12, 0, 0), EndTime = new DateTime(2025, 4, 5, 15, 0, 0) },
+                new BookingDetail { Id = 1223, BookingId = 1223, CourtId = 21, StartTime = new DateTime(2025, 4, 6, 12, 0, 0), EndTime = new DateTime(2025, 4, 6, 15, 0, 0) },
+                new BookingDetail { Id = 1224, BookingId = 1224, CourtId = 21, StartTime = new DateTime(2025, 4, 12, 12, 0, 0), EndTime = new DateTime(2025, 4, 12, 15, 0, 0) },
+                new BookingDetail { Id = 1225, BookingId = 1225, CourtId = 21, StartTime = new DateTime(2025, 4, 13, 12, 0, 0), EndTime = new DateTime(2025, 4, 13, 15, 0, 0) },
+                new BookingDetail { Id = 1226, BookingId = 1226, CourtId = 21, StartTime = new DateTime(2025, 4, 19, 12, 0, 0), EndTime = new DateTime(2025, 4, 19, 15, 0, 0) },
+                new BookingDetail { Id = 1227, BookingId = 1227, CourtId = 21, StartTime = new DateTime(2025, 4, 20, 12, 0, 0), EndTime = new DateTime(2025, 4, 20, 15, 0, 0) },
+                new BookingDetail { Id = 1228, BookingId = 1228, CourtId = 21, StartTime = new DateTime(2025, 4, 26, 12, 0, 0), EndTime = new DateTime(2025, 4, 26, 15, 0, 0) },
+                new BookingDetail { Id = 1229, BookingId = 1229, CourtId = 21, StartTime = new DateTime(2025, 4, 27, 12, 0, 0), EndTime = new DateTime(2025, 4, 27, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 99 (THÁNG 5/2025, Sân 20 - Sân 5A) =====
+            // - T2, 4, 6 | 12h-14h (2 tiếng), 180k/h, UserId = 6
+            // - Giá/ngày = 360,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 99, UserId = userId_alternative, StadiumId = 14, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4680000m, TotalPrice = 4680000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T5/2025 Sân 5A", TotalHour = 26, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1230, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 2), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1231, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 5), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1232, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 7), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1233, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 9), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1234, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 12), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1235, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 14), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1236, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 16), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1237, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 19), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1238, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 21), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1239, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 23), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1240, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 26), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1241, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 28), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 },
+                new Booking { Id = 1242, UserId = userId_alternative, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 30), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 14, MonthlyBookingId = 99 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1230, BookingId = 1230, CourtId = 20, StartTime = new DateTime(2025, 5, 2, 12, 0, 0), EndTime = new DateTime(2025, 5, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1231, BookingId = 1231, CourtId = 20, StartTime = new DateTime(2025, 5, 5, 12, 0, 0), EndTime = new DateTime(2025, 5, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1232, BookingId = 1232, CourtId = 20, StartTime = new DateTime(2025, 5, 7, 12, 0, 0), EndTime = new DateTime(2025, 5, 7, 14, 0, 0) },
+                new BookingDetail { Id = 1233, BookingId = 1233, CourtId = 20, StartTime = new DateTime(2025, 5, 9, 12, 0, 0), EndTime = new DateTime(2025, 5, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1234, BookingId = 1234, CourtId = 20, StartTime = new DateTime(2025, 5, 12, 12, 0, 0), EndTime = new DateTime(2025, 5, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1235, BookingId = 1235, CourtId = 20, StartTime = new DateTime(2025, 5, 14, 12, 0, 0), EndTime = new DateTime(2025, 5, 14, 14, 0, 0) },
+                new BookingDetail { Id = 1236, BookingId = 1236, CourtId = 20, StartTime = new DateTime(2025, 5, 16, 12, 0, 0), EndTime = new DateTime(2025, 5, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1237, BookingId = 1237, CourtId = 20, StartTime = new DateTime(2025, 5, 19, 12, 0, 0), EndTime = new DateTime(2025, 5, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1238, BookingId = 1238, CourtId = 20, StartTime = new DateTime(2025, 5, 21, 12, 0, 0), EndTime = new DateTime(2025, 5, 21, 14, 0, 0) },
+                new BookingDetail { Id = 1239, BookingId = 1239, CourtId = 20, StartTime = new DateTime(2025, 5, 23, 12, 0, 0), EndTime = new DateTime(2025, 5, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1240, BookingId = 1240, CourtId = 20, StartTime = new DateTime(2025, 5, 26, 12, 0, 0), EndTime = new DateTime(2025, 5, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1241, BookingId = 1241, CourtId = 20, StartTime = new DateTime(2025, 5, 28, 12, 0, 0), EndTime = new DateTime(2025, 5, 28, 14, 0, 0) },
+                new BookingDetail { Id = 1242, BookingId = 1242, CourtId = 20, StartTime = new DateTime(2025, 5, 30, 12, 0, 0), EndTime = new DateTime(2025, 5, 30, 14, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 107 (THÁNG 12/2025, Sân 22 - Sân Công an 1) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 220,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 107, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3080000m, TotalPrice = 3080000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T12/2025 Sân 22", TotalHour = 28, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1301, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1302, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 3), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1303, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 5), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1304, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1305, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 10), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1306, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 12), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1307, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1308, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 17), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1309, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 19), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1310, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1311, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 24), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1312, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 26), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1313, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 },
+                new Booking { Id = 1314, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 31), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 107 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1301, BookingId = 1301, CourtId = 22, StartTime = new DateTime(2025, 12, 1, 18, 0, 0), EndTime = new DateTime(2025, 12, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1302, BookingId = 1302, CourtId = 22, StartTime = new DateTime(2025, 12, 3, 18, 0, 0), EndTime = new DateTime(2025, 12, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1303, BookingId = 1303, CourtId = 22, StartTime = new DateTime(2025, 12, 5, 18, 0, 0), EndTime = new DateTime(2025, 12, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1304, BookingId = 1304, CourtId = 22, StartTime = new DateTime(2025, 12, 8, 18, 0, 0), EndTime = new DateTime(2025, 12, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1305, BookingId = 1305, CourtId = 22, StartTime = new DateTime(2025, 12, 10, 18, 0, 0), EndTime = new DateTime(2025, 12, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1306, BookingId = 1306, CourtId = 22, StartTime = new DateTime(2025, 12, 12, 18, 0, 0), EndTime = new DateTime(2025, 12, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1307, BookingId = 1307, CourtId = 22, StartTime = new DateTime(2025, 12, 15, 18, 0, 0), EndTime = new DateTime(2025, 12, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1308, BookingId = 1308, CourtId = 22, StartTime = new DateTime(2025, 12, 17, 18, 0, 0), EndTime = new DateTime(2025, 12, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1309, BookingId = 1309, CourtId = 22, StartTime = new DateTime(2025, 12, 19, 18, 0, 0), EndTime = new DateTime(2025, 12, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1310, BookingId = 1310, CourtId = 22, StartTime = new DateTime(2025, 12, 22, 18, 0, 0), EndTime = new DateTime(2025, 12, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1311, BookingId = 1311, CourtId = 22, StartTime = new DateTime(2025, 12, 24, 18, 0, 0), EndTime = new DateTime(2025, 12, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1312, BookingId = 1312, CourtId = 22, StartTime = new DateTime(2025, 12, 26, 18, 0, 0), EndTime = new DateTime(2025, 12, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1313, BookingId = 1313, CourtId = 22, StartTime = new DateTime(2025, 12, 29, 18, 0, 0), EndTime = new DateTime(2025, 12, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1314, BookingId = 1314, CourtId = 22, StartTime = new DateTime(2025, 12, 31, 18, 0, 0), EndTime = new DateTime(2025, 12, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 108 (THÁNG 11/2025, Sân 22 - Sân Công an 1) =====
+            // - T7, CN | 17h-19h (2 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 220,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 108, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2200000m, TotalPrice = 2200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 22", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1315, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1316, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1317, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1318, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1319, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1320, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1321, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1322, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1323, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 },
+                new Booking { Id = 1324, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 30), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 108 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1315, BookingId = 1315, CourtId = 22, StartTime = new DateTime(2025, 11, 1, 17, 0, 0), EndTime = new DateTime(2025, 11, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1316, BookingId = 1316, CourtId = 22, StartTime = new DateTime(2025, 11, 2, 17, 0, 0), EndTime = new DateTime(2025, 11, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1317, BookingId = 1317, CourtId = 22, StartTime = new DateTime(2025, 11, 8, 17, 0, 0), EndTime = new DateTime(2025, 11, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1318, BookingId = 1318, CourtId = 22, StartTime = new DateTime(2025, 11, 9, 17, 0, 0), EndTime = new DateTime(2025, 11, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1319, BookingId = 1319, CourtId = 22, StartTime = new DateTime(2025, 11, 15, 17, 0, 0), EndTime = new DateTime(2025, 11, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1320, BookingId = 1320, CourtId = 22, StartTime = new DateTime(2025, 11, 16, 17, 0, 0), EndTime = new DateTime(2025, 11, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1321, BookingId = 1321, CourtId = 22, StartTime = new DateTime(2025, 11, 22, 17, 0, 0), EndTime = new DateTime(2025, 11, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1322, BookingId = 1322, CourtId = 22, StartTime = new DateTime(2025, 11, 23, 17, 0, 0), EndTime = new DateTime(2025, 11, 23, 19, 0, 0) },
+                new BookingDetail { Id = 1323, BookingId = 1323, CourtId = 22, StartTime = new DateTime(2025, 11, 29, 17, 0, 0), EndTime = new DateTime(2025, 11, 29, 19, 0, 0) },
+                new BookingDetail { Id = 1324, BookingId = 1324, CourtId = 22, StartTime = new DateTime(2025, 11, 30, 17, 0, 0), EndTime = new DateTime(2025, 11, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 109 (THÁNG 10/2025, Sân 22 - Sân Công an 1) =====
+            // - Cả tháng | 19h-20h (1 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 110,000 | 31 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 109, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3410000m, TotalPrice = 3410000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt cả tháng T10/2025 Sân 22", TotalHour = 31, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1325, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 1), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1326, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 2), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1327, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 3), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1328, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1329, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 5), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1330, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 6), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1331, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 7), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1332, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 8), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1333, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 9), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1334, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 10), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1335, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1336, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 12), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1337, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 13), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1338, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 14), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1339, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 15), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1340, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 16), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1341, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 17), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1342, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1343, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 19), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1344, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 20), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1345, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 21), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1346, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 22), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1347, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 23), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1348, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 24), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1349, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1350, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 26), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1351, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 27), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1352, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 28), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1353, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 29), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1354, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 30), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 },
+                new Booking { Id = 1355, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 31), TotalPrice = 110000m, OriginalPrice = 110000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 109 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1325, BookingId = 1325, CourtId = 22, StartTime = new DateTime(2025, 10, 1, 19, 0, 0), EndTime = new DateTime(2025, 10, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1326, BookingId = 1326, CourtId = 22, StartTime = new DateTime(2025, 10, 2, 19, 0, 0), EndTime = new DateTime(2025, 10, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1327, BookingId = 1327, CourtId = 22, StartTime = new DateTime(2025, 10, 3, 19, 0, 0), EndTime = new DateTime(2025, 10, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1328, BookingId = 1328, CourtId = 22, StartTime = new DateTime(2025, 10, 4, 19, 0, 0), EndTime = new DateTime(2025, 10, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1329, BookingId = 1329, CourtId = 22, StartTime = new DateTime(2025, 10, 5, 19, 0, 0), EndTime = new DateTime(2025, 10, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1330, BookingId = 1330, CourtId = 22, StartTime = new DateTime(2025, 10, 6, 19, 0, 0), EndTime = new DateTime(2025, 10, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1331, BookingId = 1331, CourtId = 22, StartTime = new DateTime(2025, 10, 7, 19, 0, 0), EndTime = new DateTime(2025, 10, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1332, BookingId = 1332, CourtId = 22, StartTime = new DateTime(2025, 10, 8, 19, 0, 0), EndTime = new DateTime(2025, 10, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1333, BookingId = 1333, CourtId = 22, StartTime = new DateTime(2025, 10, 9, 19, 0, 0), EndTime = new DateTime(2025, 10, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1334, BookingId = 1334, CourtId = 22, StartTime = new DateTime(2025, 10, 10, 19, 0, 0), EndTime = new DateTime(2025, 10, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1335, BookingId = 1335, CourtId = 22, StartTime = new DateTime(2025, 10, 11, 19, 0, 0), EndTime = new DateTime(2025, 10, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1336, BookingId = 1336, CourtId = 22, StartTime = new DateTime(2025, 10, 12, 19, 0, 0), EndTime = new DateTime(2025, 10, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1337, BookingId = 1337, CourtId = 22, StartTime = new DateTime(2025, 10, 13, 19, 0, 0), EndTime = new DateTime(2025, 10, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1338, BookingId = 1338, CourtId = 22, StartTime = new DateTime(2025, 10, 14, 19, 0, 0), EndTime = new DateTime(2025, 10, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1339, BookingId = 1339, CourtId = 22, StartTime = new DateTime(2025, 10, 15, 19, 0, 0), EndTime = new DateTime(2025, 10, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1340, BookingId = 1340, CourtId = 22, StartTime = new DateTime(2025, 10, 16, 19, 0, 0), EndTime = new DateTime(2025, 10, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1341, BookingId = 1341, CourtId = 22, StartTime = new DateTime(2025, 10, 17, 19, 0, 0), EndTime = new DateTime(2025, 10, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1342, BookingId = 1342, CourtId = 22, StartTime = new DateTime(2025, 10, 18, 19, 0, 0), EndTime = new DateTime(2025, 10, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1343, BookingId = 1343, CourtId = 22, StartTime = new DateTime(2025, 10, 19, 19, 0, 0), EndTime = new DateTime(2025, 10, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1344, BookingId = 1344, CourtId = 22, StartTime = new DateTime(2025, 10, 20, 19, 0, 0), EndTime = new DateTime(2025, 10, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1345, BookingId = 1345, CourtId = 22, StartTime = new DateTime(2025, 10, 21, 19, 0, 0), EndTime = new DateTime(2025, 10, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1346, BookingId = 1346, CourtId = 22, StartTime = new DateTime(2025, 10, 22, 19, 0, 0), EndTime = new DateTime(2025, 10, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1347, BookingId = 1347, CourtId = 22, StartTime = new DateTime(2025, 10, 23, 19, 0, 0), EndTime = new DateTime(2025, 10, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1348, BookingId = 1348, CourtId = 22, StartTime = new DateTime(2025, 10, 24, 19, 0, 0), EndTime = new DateTime(2025, 10, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1349, BookingId = 1349, CourtId = 22, StartTime = new DateTime(2025, 10, 25, 19, 0, 0), EndTime = new DateTime(2025, 10, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1350, BookingId = 1350, CourtId = 22, StartTime = new DateTime(2025, 10, 26, 19, 0, 0), EndTime = new DateTime(2025, 10, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1351, BookingId = 1351, CourtId = 22, StartTime = new DateTime(2025, 10, 27, 19, 0, 0), EndTime = new DateTime(2025, 10, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1352, BookingId = 1352, CourtId = 22, StartTime = new DateTime(2025, 10, 28, 19, 0, 0), EndTime = new DateTime(2025, 10, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1353, BookingId = 1353, CourtId = 22, StartTime = new DateTime(2025, 10, 29, 19, 0, 0), EndTime = new DateTime(2025, 10, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1354, BookingId = 1354, CourtId = 22, StartTime = new DateTime(2025, 10, 30, 19, 0, 0), EndTime = new DateTime(2025, 10, 30, 20, 0, 0) },
+                new BookingDetail { Id = 1355, BookingId = 1355, CourtId = 22, StartTime = new DateTime(2025, 10, 31, 19, 0, 0), EndTime = new DateTime(2025, 10, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 110 (THÁNG 9/2025, Sân 22 - Sân Công an 1) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 220,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 110, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1980000m, TotalPrice = 1980000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T9/2025 Sân 22", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1356, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 2), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1357, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 4), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1358, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 9), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1359, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 11), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1360, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 16), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1361, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 18), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1362, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 23), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1363, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 25), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 },
+                new Booking { Id = 1364, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 30), TotalPrice = 220000m, OriginalPrice = 220000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 110 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1356, BookingId = 1356, CourtId = 22, StartTime = new DateTime(2025, 9, 2, 18, 0, 0), EndTime = new DateTime(2025, 9, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1357, BookingId = 1357, CourtId = 22, StartTime = new DateTime(2025, 9, 4, 18, 0, 0), EndTime = new DateTime(2025, 9, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1358, BookingId = 1358, CourtId = 22, StartTime = new DateTime(2025, 9, 9, 18, 0, 0), EndTime = new DateTime(2025, 9, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1359, BookingId = 1359, CourtId = 22, StartTime = new DateTime(2025, 9, 11, 18, 0, 0), EndTime = new DateTime(2025, 9, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1360, BookingId = 1360, CourtId = 22, StartTime = new DateTime(2025, 9, 16, 18, 0, 0), EndTime = new DateTime(2025, 9, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1361, BookingId = 1361, CourtId = 22, StartTime = new DateTime(2025, 9, 18, 18, 0, 0), EndTime = new DateTime(2025, 9, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1362, BookingId = 1362, CourtId = 22, StartTime = new DateTime(2025, 9, 23, 18, 0, 0), EndTime = new DateTime(2025, 9, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1363, BookingId = 1363, CourtId = 22, StartTime = new DateTime(2025, 9, 25, 18, 0, 0), EndTime = new DateTime(2025, 9, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1364, BookingId = 1364, CourtId = 22, StartTime = new DateTime(2025, 9, 30, 18, 0, 0), EndTime = new DateTime(2025, 9, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 111 (THÁNG 8/2025, Sân 22 - Sân Công an 1) =====
+            // - CN | 17h-20h (3 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 330,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 111, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1650000m, TotalPrice = 1650000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T8/2025 Sân 22", TotalHour = 15, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1365, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 111 },
+                new Booking { Id = 1366, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 111 },
+                new Booking { Id = 1367, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 111 },
+                new Booking { Id = 1368, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 111 },
+                new Booking { Id = 1369, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 111 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1365, BookingId = 1365, CourtId = 22, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1366, BookingId = 1366, CourtId = 22, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1367, BookingId = 1367, CourtId = 22, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1368, BookingId = 1368, CourtId = 22, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1369, BookingId = 1369, CourtId = 22, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 112 (THÁNG 7/2025, Sân 22 - Sân Công an 1) =====
+            // - T7 | 17h-20h (3 tiếng), 110k/h, globalUserId
+            // - Giá/ngày = 330,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 112, UserId = globalUserId, StadiumId = 15, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1320000m, TotalPrice = 1320000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T7/2025 Sân 22", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1370, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 112 },
+                new Booking { Id = 1371, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 112 },
+                new Booking { Id = 1372, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 112 },
+                new Booking { Id = 1373, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 330000m, OriginalPrice = 330000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 15, MonthlyBookingId = 112 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1370, BookingId = 1370, CourtId = 22, StartTime = new DateTime(2025, 7, 5, 17, 0, 0), EndTime = new DateTime(2025, 7, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1371, BookingId = 1371, CourtId = 22, StartTime = new DateTime(2025, 7, 12, 17, 0, 0), EndTime = new DateTime(2025, 7, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1372, BookingId = 1372, CourtId = 22, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1373, BookingId = 1373, CourtId = 22, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
+            );
+            
+            
+            // ===== SEED DATA - SET 113 (THÁNG 1/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 200,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 113, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2600000m, TotalPrice = 2600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T1/2025 Sân 23", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1374, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 1), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1375, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 3), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1376, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 6), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1377, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 8), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1378, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 10), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1379, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 13), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1380, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 15), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1381, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 17), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1382, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 20), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1383, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 22), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1384, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 24), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1385, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 27), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 },
+                new Booking { Id = 1386, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 29), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 113 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1374, BookingId = 1374, CourtId = 23, StartTime = new DateTime(2025, 1, 1, 18, 0, 0), EndTime = new DateTime(2025, 1, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1375, BookingId = 1375, CourtId = 23, StartTime = new DateTime(2025, 1, 3, 18, 0, 0), EndTime = new DateTime(2025, 1, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1376, BookingId = 1376, CourtId = 23, StartTime = new DateTime(2025, 1, 6, 18, 0, 0), EndTime = new DateTime(2025, 1, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1377, BookingId = 1377, CourtId = 23, StartTime = new DateTime(2025, 1, 8, 18, 0, 0), EndTime = new DateTime(2025, 1, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1378, BookingId = 1378, CourtId = 23, StartTime = new DateTime(2025, 1, 10, 18, 0, 0), EndTime = new DateTime(2025, 1, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1379, BookingId = 1379, CourtId = 23, StartTime = new DateTime(2025, 1, 13, 18, 0, 0), EndTime = new DateTime(2025, 1, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1380, BookingId = 1380, CourtId = 23, StartTime = new DateTime(2025, 1, 15, 18, 0, 0), EndTime = new DateTime(2025, 1, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1381, BookingId = 1381, CourtId = 23, StartTime = new DateTime(2025, 1, 17, 18, 0, 0), EndTime = new DateTime(2025, 1, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1382, BookingId = 1382, CourtId = 23, StartTime = new DateTime(2025, 1, 20, 18, 0, 0), EndTime = new DateTime(2025, 1, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1383, BookingId = 1383, CourtId = 23, StartTime = new DateTime(2025, 1, 22, 18, 0, 0), EndTime = new DateTime(2025, 1, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1384, BookingId = 1384, CourtId = 23, StartTime = new DateTime(2025, 1, 24, 18, 0, 0), EndTime = new DateTime(2025, 1, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1385, BookingId = 1385, CourtId = 23, StartTime = new DateTime(2025, 1, 27, 18, 0, 0), EndTime = new DateTime(2025, 1, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1386, BookingId = 1386, CourtId = 23, StartTime = new DateTime(2025, 1, 29, 18, 0, 0), EndTime = new DateTime(2025, 1, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 114 (THÁNG 2/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - T7, CN | 17h-19h (2 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 200,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 114, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1600000m, TotalPrice = 1600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T2/2025 Sân 23", TotalHour = 16, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1387, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 1), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1388, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 2), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1389, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 8), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1390, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 9), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1391, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 15), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1392, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 16), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1393, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 22), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 },
+                new Booking { Id = 1394, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 23), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 114 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1387, BookingId = 1387, CourtId = 23, StartTime = new DateTime(2025, 2, 1, 17, 0, 0), EndTime = new DateTime(2025, 2, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1388, BookingId = 1388, CourtId = 23, StartTime = new DateTime(2025, 2, 2, 17, 0, 0), EndTime = new DateTime(2025, 2, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1389, BookingId = 1389, CourtId = 23, StartTime = new DateTime(2025, 2, 8, 17, 0, 0), EndTime = new DateTime(2025, 2, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1390, BookingId = 1390, CourtId = 23, StartTime = new DateTime(2025, 2, 9, 17, 0, 0), EndTime = new DateTime(2025, 2, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1391, BookingId = 1391, CourtId = 23, StartTime = new DateTime(2025, 2, 15, 17, 0, 0), EndTime = new DateTime(2025, 2, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1392, BookingId = 1392, CourtId = 23, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1393, BookingId = 1393, CourtId = 23, StartTime = new DateTime(2025, 2, 22, 17, 0, 0), EndTime = new DateTime(2025, 2, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1394, BookingId = 1394, CourtId = 23, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 115 (THÁNG 3/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - Cả tháng | 19h-20h (1 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 100,000 | 31 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 115, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3100000m, TotalPrice = 3100000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt cả tháng T3/2025 Sân 23", TotalHour = 31, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1395, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1396, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 2), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1397, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 3), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1398, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 4), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1399, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 5), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1400, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 6), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1401, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 7), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1402, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1403, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 9), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1404, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 10), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1405, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 11), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1406, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 12), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1407, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 13), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1408, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 14), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1409, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1410, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 16), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1411, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 17), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1412, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 18), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1413, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 19), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1414, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 20), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1415, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 21), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1416, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1417, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 23), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1418, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 24), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1419, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 25), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1420, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 26), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1421, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 27), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1422, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 28), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1423, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1424, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 30), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 },
+                new Booking { Id = 1425, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 31), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 115 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1395, BookingId = 1395, CourtId = 23, StartTime = new DateTime(2025, 3, 1, 19, 0, 0), EndTime = new DateTime(2025, 3, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1396, BookingId = 1396, CourtId = 23, StartTime = new DateTime(2025, 3, 2, 19, 0, 0), EndTime = new DateTime(2025, 3, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1397, BookingId = 1397, CourtId = 23, StartTime = new DateTime(2025, 3, 3, 19, 0, 0), EndTime = new DateTime(2025, 3, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1398, BookingId = 1398, CourtId = 23, StartTime = new DateTime(2025, 3, 4, 19, 0, 0), EndTime = new DateTime(2025, 3, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1399, BookingId = 1399, CourtId = 23, StartTime = new DateTime(2025, 3, 5, 19, 0, 0), EndTime = new DateTime(2025, 3, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1400, BookingId = 1400, CourtId = 23, StartTime = new DateTime(2025, 3, 6, 19, 0, 0), EndTime = new DateTime(2025, 3, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1401, BookingId = 1401, CourtId = 23, StartTime = new DateTime(2025, 3, 7, 19, 0, 0), EndTime = new DateTime(2025, 3, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1402, BookingId = 1402, CourtId = 23, StartTime = new DateTime(2025, 3, 8, 19, 0, 0), EndTime = new DateTime(2025, 3, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1403, BookingId = 1403, CourtId = 23, StartTime = new DateTime(2025, 3, 9, 19, 0, 0), EndTime = new DateTime(2025, 3, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1404, BookingId = 1404, CourtId = 23, StartTime = new DateTime(2025, 3, 10, 19, 0, 0), EndTime = new DateTime(2025, 3, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1405, BookingId = 1405, CourtId = 23, StartTime = new DateTime(2025, 3, 11, 19, 0, 0), EndTime = new DateTime(2025, 3, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1406, BookingId = 1406, CourtId = 23, StartTime = new DateTime(2025, 3, 12, 19, 0, 0), EndTime = new DateTime(2025, 3, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1407, BookingId = 1407, CourtId = 23, StartTime = new DateTime(2025, 3, 13, 19, 0, 0), EndTime = new DateTime(2025, 3, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1408, BookingId = 1408, CourtId = 23, StartTime = new DateTime(2025, 3, 14, 19, 0, 0), EndTime = new DateTime(2025, 3, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1409, BookingId = 1409, CourtId = 23, StartTime = new DateTime(2025, 3, 15, 19, 0, 0), EndTime = new DateTime(2025, 3, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1410, BookingId = 1410, CourtId = 23, StartTime = new DateTime(2025, 3, 16, 19, 0, 0), EndTime = new DateTime(2025, 3, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1411, BookingId = 1411, CourtId = 23, StartTime = new DateTime(2025, 3, 17, 19, 0, 0), EndTime = new DateTime(2025, 3, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1412, BookingId = 1412, CourtId = 23, StartTime = new DateTime(2025, 3, 18, 19, 0, 0), EndTime = new DateTime(2025, 3, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1413, BookingId = 1413, CourtId = 23, StartTime = new DateTime(2025, 3, 19, 19, 0, 0), EndTime = new DateTime(2025, 3, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1414, BookingId = 1414, CourtId = 23, StartTime = new DateTime(2025, 3, 20, 19, 0, 0), EndTime = new DateTime(2025, 3, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1415, BookingId = 1415, CourtId = 23, StartTime = new DateTime(2025, 3, 21, 19, 0, 0), EndTime = new DateTime(2025, 3, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1416, BookingId = 1416, CourtId = 23, StartTime = new DateTime(2025, 3, 22, 19, 0, 0), EndTime = new DateTime(2025, 3, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1417, BookingId = 1417, CourtId = 23, StartTime = new DateTime(2025, 3, 23, 19, 0, 0), EndTime = new DateTime(2025, 3, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1418, BookingId = 1418, CourtId = 23, StartTime = new DateTime(2025, 3, 24, 19, 0, 0), EndTime = new DateTime(2025, 3, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1419, BookingId = 1419, CourtId = 23, StartTime = new DateTime(2025, 3, 25, 19, 0, 0), EndTime = new DateTime(2025, 3, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1420, BookingId = 1420, CourtId = 23, StartTime = new DateTime(2025, 3, 26, 19, 0, 0), EndTime = new DateTime(2025, 3, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1421, BookingId = 1421, CourtId = 23, StartTime = new DateTime(2025, 3, 27, 19, 0, 0), EndTime = new DateTime(2025, 3, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1422, BookingId = 1422, CourtId = 23, StartTime = new DateTime(2025, 3, 28, 19, 0, 0), EndTime = new DateTime(2025, 3, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1423, BookingId = 1423, CourtId = 23, StartTime = new DateTime(2025, 3, 29, 19, 0, 0), EndTime = new DateTime(2025, 3, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1424, BookingId = 1424, CourtId = 23, StartTime = new DateTime(2025, 3, 30, 19, 0, 0), EndTime = new DateTime(2025, 3, 30, 20, 0, 0) },
+                new BookingDetail { Id = 1425, BookingId = 1425, CourtId = 23, StartTime = new DateTime(2025, 3, 31, 19, 0, 0), EndTime = new DateTime(2025, 3, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 116 (THÁNG 4/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 200,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 116, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 23", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1426, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1427, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1428, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1429, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1430, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1431, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1432, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1433, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 },
+                new Booking { Id = 1434, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 116 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1426, BookingId = 1426, CourtId = 23, StartTime = new DateTime(2025, 4, 1, 18, 0, 0), EndTime = new DateTime(2025, 4, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1427, BookingId = 1427, CourtId = 23, StartTime = new DateTime(2025, 4, 3, 18, 0, 0), EndTime = new DateTime(2025, 4, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1428, BookingId = 1428, CourtId = 23, StartTime = new DateTime(2025, 4, 8, 18, 0, 0), EndTime = new DateTime(2025, 4, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1429, BookingId = 1429, CourtId = 23, StartTime = new DateTime(2025, 4, 10, 18, 0, 0), EndTime = new DateTime(2025, 4, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1430, BookingId = 1430, CourtId = 23, StartTime = new DateTime(2025, 4, 15, 18, 0, 0), EndTime = new DateTime(2025, 4, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1431, BookingId = 1431, CourtId = 23, StartTime = new DateTime(2025, 4, 17, 18, 0, 0), EndTime = new DateTime(2025, 4, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1432, BookingId = 1432, CourtId = 23, StartTime = new DateTime(2025, 4, 22, 18, 0, 0), EndTime = new DateTime(2025, 4, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1433, BookingId = 1433, CourtId = 23, StartTime = new DateTime(2025, 4, 24, 18, 0, 0), EndTime = new DateTime(2025, 4, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1434, BookingId = 1434, CourtId = 23, StartTime = new DateTime(2025, 4, 29, 18, 0, 0), EndTime = new DateTime(2025, 4, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 117 (THÁNG 5/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - CN | 17h-20h (3 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 300,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 117, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T5/2025 Sân 23", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1435, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 117 },
+                new Booking { Id = 1436, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 117 },
+                new Booking { Id = 1437, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 117 },
+                new Booking { Id = 1438, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 117 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1435, BookingId = 1435, CourtId = 23, StartTime = new DateTime(2025, 5, 4, 17, 0, 0), EndTime = new DateTime(2025, 5, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1436, BookingId = 1436, CourtId = 23, StartTime = new DateTime(2025, 5, 11, 17, 0, 0), EndTime = new DateTime(2025, 5, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1437, BookingId = 1437, CourtId = 23, StartTime = new DateTime(2025, 5, 18, 17, 0, 0), EndTime = new DateTime(2025, 5, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1438, BookingId = 1438, CourtId = 23, StartTime = new DateTime(2025, 5, 25, 17, 0, 0), EndTime = new DateTime(2025, 5, 25, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 118 (THÁNG 6/2025, Sân 23 - Sân Bóng Rổ) =====
+            // - T7 | 17h-20h (3 tiếng), 100k/h, UserId = 6
+            // - Giá/ngày = 300,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 118, UserId = 6, StadiumId = 16, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T6/2025 Sân 23", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1439, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 118 },
+                new Booking { Id = 1440, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 118 },
+                new Booking { Id = 1441, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 118 },
+                new Booking { Id = 1442, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 16, MonthlyBookingId = 118 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1439, BookingId = 1439, CourtId = 23, StartTime = new DateTime(2025, 6, 7, 17, 0, 0), EndTime = new DateTime(2025, 6, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1440, BookingId = 1440, CourtId = 23, StartTime = new DateTime(2025, 6, 14, 17, 0, 0), EndTime = new DateTime(2025, 6, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1441, BookingId = 1441, CourtId = 23, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1442, BookingId = 1442, CourtId = 23, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 119 (THÁNG 12/2025, Sân 24 - Sân Cầu Lông) =====
+            // - T2 | 12h-14h (2 tiếng), 50k/h, globalUserId
+            // - Giá/ngày = 100,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 119, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 500000m, TotalPrice = 500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân 24", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1443, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 119 },
+                new Booking { Id = 1444, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 119 },
+                new Booking { Id = 1445, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 119 },
+                new Booking { Id = 1446, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 119 },
+                new Booking { Id = 1447, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 119 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1443, BookingId = 1443, CourtId = 24, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1444, BookingId = 1444, CourtId = 24, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1445, BookingId = 1445, CourtId = 24, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1446, BookingId = 1446, CourtId = 24, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1447, BookingId = 1447, CourtId = 24, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 120 (THÁNG 10/2025, Sân 24 - Sân Cầu Lông) =====
+            // - T7 | 12h-15h (3 tiếng), 50k/h, globalUserId
+            // - Giá/ngày = 150,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 120, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân 24", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1448, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 120 },
+                new Booking { Id = 1449, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 120 },
+                new Booking { Id = 1450, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 120 },
+                new Booking { Id = 1451, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 120 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1448, BookingId = 1448, CourtId = 24, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1449, BookingId = 1449, CourtId = 24, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1450, BookingId = 1450, CourtId = 24, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1451, BookingId = 1451, CourtId = 24, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 121 (THÁNG 7/2025, Sân 24 - Sân Cầu Lông) =====
+            // - T7, CN | 12h-14h (2 tiếng), 50k/h, globalUserId
+            // - Giá/ngày = 100,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 121, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 800000m, TotalPrice = 800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân 24", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1452, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1453, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1454, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1455, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1456, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1457, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1458, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 },
+                new Booking { Id = 1459, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 121 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1452, BookingId = 1452, CourtId = 24, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1453, BookingId = 1453, CourtId = 24, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1454, BookingId = 1454, CourtId = 24, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1455, BookingId = 1455, CourtId = 24, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1456, BookingId = 1456, CourtId = 24, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1457, BookingId = 1457, CourtId = 24, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1458, BookingId = 1458, CourtId = 24, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1459, BookingId = 1459, CourtId = 24, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 122 (THÁNG 3/2025, Sân 24 - Sân Cầu Lông) =====
+            // - T7 | 12h-13h (1 tiếng), 50k/h, globalUserId
+            // - Giá/ngày = 50,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 122, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 250000m, TotalPrice = 250000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân 24", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1460, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 50000m, OriginalPrice = 50000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 122 },
+                new Booking { Id = 1461, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 50000m, OriginalPrice = 50000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 122 },
+                new Booking { Id = 1462, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 50000m, OriginalPrice = 50000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 122 },
+                new Booking { Id = 1463, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 50000m, OriginalPrice = 50000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 122 },
+                new Booking { Id = 1464, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 50000m, OriginalPrice = 50000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 122 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1460, BookingId = 1460, CourtId = 24, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1461, BookingId = 1461, CourtId = 24, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1462, BookingId = 1462, CourtId = 24, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1463, BookingId = 1463, CourtId = 24, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1464, BookingId = 1464, CourtId = 24, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 123 (THÁNG 12/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T2 | 12h-14h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 123, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 700000m, TotalPrice = 700000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân 25", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1465, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 123 },
+                new Booking { Id = 1466, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 123 },
+                new Booking { Id = 1467, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 123 },
+                new Booking { Id = 1468, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 123 },
+                new Booking { Id = 1469, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 123 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1465, BookingId = 1465, CourtId = 25, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1466, BookingId = 1466, CourtId = 25, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1467, BookingId = 1467, CourtId = 25, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1468, BookingId = 1468, CourtId = 25, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1469, BookingId = 1469, CourtId = 25, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 124 (THÁNG 10/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T7 | 12h-15h (3 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 210,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 124, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 840000m, TotalPrice = 840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân 25", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1470, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 124 },
+                new Booking { Id = 1471, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 124 },
+                new Booking { Id = 1472, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 124 },
+                new Booking { Id = 1473, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 124 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1470, BookingId = 1470, CourtId = 25, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1471, BookingId = 1471, CourtId = 25, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1472, BookingId = 1472, CourtId = 25, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1473, BookingId = 1473, CourtId = 25, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 125 (THÁNG 7/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T7, CN | 12h-14h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 125, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1120000m, TotalPrice = 1120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân 25", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1474, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1475, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1476, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1477, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1478, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1479, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1480, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 },
+                new Booking { Id = 1481, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 125 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1474, BookingId = 1474, CourtId = 25, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1475, BookingId = 1475, CourtId = 25, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1476, BookingId = 1476, CourtId = 25, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1477, BookingId = 1477, CourtId = 25, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1478, BookingId = 1478, CourtId = 25, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1479, BookingId = 1479, CourtId = 25, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1480, BookingId = 1480, CourtId = 25, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1481, BookingId = 1481, CourtId = 25, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 126 (THÁNG 3/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T7 | 12h-13h (1 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 70,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 126, UserId = globalUserId, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 350000m, TotalPrice = 350000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân 25", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1482, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 126 },
+                new Booking { Id = 1483, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 126 },
+                new Booking { Id = 1484, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 126 },
+                new Booking { Id = 1485, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 126 },
+                new Booking { Id = 1486, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 70000m, OriginalPrice = 70000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 126 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1482, BookingId = 1482, CourtId = 25, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1483, BookingId = 1483, CourtId = 25, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1484, BookingId = 1484, CourtId = 25, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1485, BookingId = 1485, CourtId = 25, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1486, BookingId = 1486, CourtId = 25, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 127 (THÁNG 12/2025, Sân 26 - Sân 7) =====
+            // - T2 | 12h-14h (2 tiếng), 250k/h, globalUserId
+            // - Giá/ngày = 500,000 | 5 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 127, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2500000m, TotalPrice = 2500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T12/2025 Sân 26", TotalHour = 10, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1487, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 2), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 127 },
+                new Booking { Id = 1488, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 9), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 127 },
+                new Booking { Id = 1489, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 16), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 127 },
+                new Booking { Id = 1490, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 23), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 127 },
+                new Booking { Id = 1491, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 30), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 127 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1487, BookingId = 1487, CourtId = 26, StartTime = new DateTime(2025, 12, 2, 12, 0, 0), EndTime = new DateTime(2025, 12, 2, 14, 0, 0) },
+                new BookingDetail { Id = 1488, BookingId = 1488, CourtId = 26, StartTime = new DateTime(2025, 12, 9, 12, 0, 0), EndTime = new DateTime(2025, 12, 9, 14, 0, 0) },
+                new BookingDetail { Id = 1489, BookingId = 1489, CourtId = 26, StartTime = new DateTime(2025, 12, 16, 12, 0, 0), EndTime = new DateTime(2025, 12, 16, 14, 0, 0) },
+                new BookingDetail { Id = 1490, BookingId = 1490, CourtId = 26, StartTime = new DateTime(2025, 12, 23, 12, 0, 0), EndTime = new DateTime(2025, 12, 23, 14, 0, 0) },
+                new BookingDetail { Id = 1491, BookingId = 1491, CourtId = 26, StartTime = new DateTime(2025, 12, 30, 12, 0, 0), EndTime = new DateTime(2025, 12, 30, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 128 (THÁNG 10/2025, Sân 26 - Sân 7) =====
+            // - T7 | 12h-15h (3 tiếng), 250k/h, globalUserId
+            // - Giá/ngày = 750,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 128, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3000000m, TotalPrice = 3000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân 26", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1492, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 750000m, OriginalPrice = 750000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 128 },
+                new Booking { Id = 1493, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 750000m, OriginalPrice = 750000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 128 },
+                new Booking { Id = 1494, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 750000m, OriginalPrice = 750000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 128 },
+                new Booking { Id = 1495, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 750000m, OriginalPrice = 750000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 128 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1492, BookingId = 1492, CourtId = 26, StartTime = new DateTime(2025, 10, 4, 12, 0, 0), EndTime = new DateTime(2025, 10, 4, 15, 0, 0) },
+                new BookingDetail { Id = 1493, BookingId = 1493, CourtId = 26, StartTime = new DateTime(2025, 10, 11, 12, 0, 0), EndTime = new DateTime(2025, 10, 11, 15, 0, 0) },
+                new BookingDetail { Id = 1494, BookingId = 1494, CourtId = 26, StartTime = new DateTime(2025, 10, 18, 12, 0, 0), EndTime = new DateTime(2025, 10, 18, 15, 0, 0) },
+                new BookingDetail { Id = 1495, BookingId = 1495, CourtId = 26, StartTime = new DateTime(2025, 10, 25, 12, 0, 0), EndTime = new DateTime(2025, 10, 25, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 129 (THÁNG 7/2025, Sân 26 - Sân 7) =====
+            // - T7, CN | 12h-14h (2 tiếng), 250k/h, globalUserId
+            // - Giá/ngày = 500,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 129, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4000000m, TotalPrice = 4000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân 26", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1496, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1497, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1498, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1499, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1500, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1501, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1502, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 },
+                new Booking { Id = 1503, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 500000m, OriginalPrice = 500000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 129 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1496, BookingId = 1496, CourtId = 26, StartTime = new DateTime(2025, 7, 5, 12, 0, 0), EndTime = new DateTime(2025, 7, 5, 14, 0, 0) },
+                new BookingDetail { Id = 1497, BookingId = 1497, CourtId = 26, StartTime = new DateTime(2025, 7, 6, 12, 0, 0), EndTime = new DateTime(2025, 7, 6, 14, 0, 0) },
+                new BookingDetail { Id = 1498, BookingId = 1498, CourtId = 26, StartTime = new DateTime(2025, 7, 12, 12, 0, 0), EndTime = new DateTime(2025, 7, 12, 14, 0, 0) },
+                new BookingDetail { Id = 1499, BookingId = 1499, CourtId = 26, StartTime = new DateTime(2025, 7, 13, 12, 0, 0), EndTime = new DateTime(2025, 7, 13, 14, 0, 0) },
+                new BookingDetail { Id = 1500, BookingId = 1500, CourtId = 26, StartTime = new DateTime(2025, 7, 19, 12, 0, 0), EndTime = new DateTime(2025, 7, 19, 14, 0, 0) },
+                new BookingDetail { Id = 1501, BookingId = 1501, CourtId = 26, StartTime = new DateTime(2025, 7, 20, 12, 0, 0), EndTime = new DateTime(2025, 7, 20, 14, 0, 0) },
+                new BookingDetail { Id = 1502, BookingId = 1502, CourtId = 26, StartTime = new DateTime(2025, 7, 26, 12, 0, 0), EndTime = new DateTime(2025, 7, 26, 14, 0, 0) },
+                new BookingDetail { Id = 1503, BookingId = 1503, CourtId = 26, StartTime = new DateTime(2025, 7, 27, 12, 0, 0), EndTime = new DateTime(2025, 7, 27, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 130 (THÁNG 3/2025, Sân 26 - Sân 7) =====
+            // - T7 | 12h-13h (1 tiếng), 250k/h, globalUserId
+            // - Giá/ngày = 250,000 | 5 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 130, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1250000m, TotalPrice = 1250000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T3/2025 Sân 26", TotalHour = 5, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1504, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 250000m, OriginalPrice = 250000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 130 },
+                new Booking { Id = 1505, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 250000m, OriginalPrice = 250000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 130 },
+                new Booking { Id = 1506, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 250000m, OriginalPrice = 250000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 130 },
+                new Booking { Id = 1507, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 250000m, OriginalPrice = 250000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 130 },
+                new Booking { Id = 1508, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 250000m, OriginalPrice = 250000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 130 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1504, BookingId = 1504, CourtId = 26, StartTime = new DateTime(2025, 3, 1, 12, 0, 0), EndTime = new DateTime(2025, 3, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1505, BookingId = 1505, CourtId = 26, StartTime = new DateTime(2025, 3, 8, 12, 0, 0), EndTime = new DateTime(2025, 3, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1506, BookingId = 1506, CourtId = 26, StartTime = new DateTime(2025, 3, 15, 12, 0, 0), EndTime = new DateTime(2025, 3, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1507, BookingId = 1507, CourtId = 26, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
+                new BookingDetail { Id = 1508, BookingId = 1508, CourtId = 26, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 131 (THÁNG 11/2025, Sân 27 - Sân 5) =====
+            // - T2 | 12h-14h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 4 ngày (T2)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 131, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2 T11/2025 Sân 27", TotalHour = 8, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1509, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 131 },
+                new Booking { Id = 1510, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 131 },
+                new Booking { Id = 1511, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 131 },
+                new Booking { Id = 1512, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 131 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1509, BookingId = 1509, CourtId = 27, StartTime = new DateTime(2025, 11, 3, 12, 0, 0), EndTime = new DateTime(2025, 11, 3, 14, 0, 0) },
+                new BookingDetail { Id = 1510, BookingId = 1510, CourtId = 27, StartTime = new DateTime(2025, 11, 10, 12, 0, 0), EndTime = new DateTime(2025, 11, 10, 14, 0, 0) },
+                new BookingDetail { Id = 1511, BookingId = 1511, CourtId = 27, StartTime = new DateTime(2025, 11, 17, 12, 0, 0), EndTime = new DateTime(2025, 11, 17, 14, 0, 0) },
+                new BookingDetail { Id = 1512, BookingId = 1512, CourtId = 27, StartTime = new DateTime(2025, 11, 24, 12, 0, 0), EndTime = new DateTime(2025, 11, 24, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 132 (THÁNG 9/2025, Sân 27 - Sân 5) =====
+            // - T7 | 12h-15h (3 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 450,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 132, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T9/2025 Sân 27", TotalHour = 12, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(15, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1513, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 6), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 132 },
+                new Booking { Id = 1514, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 13), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 132 },
+                new Booking { Id = 1515, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 20), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 132 },
+                new Booking { Id = 1516, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 27), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 132 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1513, BookingId = 1513, CourtId = 27, StartTime = new DateTime(2025, 9, 6, 12, 0, 0), EndTime = new DateTime(2025, 9, 6, 15, 0, 0) },
+                new BookingDetail { Id = 1514, BookingId = 1514, CourtId = 27, StartTime = new DateTime(2025, 9, 13, 12, 0, 0), EndTime = new DateTime(2025, 9, 13, 15, 0, 0) },
+                new BookingDetail { Id = 1515, BookingId = 1515, CourtId = 27, StartTime = new DateTime(2025, 9, 20, 12, 0, 0), EndTime = new DateTime(2025, 9, 20, 15, 0, 0) },
+                new BookingDetail { Id = 1516, BookingId = 1516, CourtId = 27, StartTime = new DateTime(2025, 9, 27, 12, 0, 0), EndTime = new DateTime(2025, 9, 27, 15, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 133 (THÁNG 6/2025, Sân 27 - Sân 5) =====
+            // - T7, CN | 12h-14h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 133, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T6/2025 Sân 27", TotalHour = 16, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(14, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1517, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1518, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1519, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1520, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1521, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1522, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1523, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 },
+                new Booking { Id = 1524, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 133 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1517, BookingId = 1517, CourtId = 27, StartTime = new DateTime(2025, 6, 1, 12, 0, 0), EndTime = new DateTime(2025, 6, 1, 14, 0, 0) },
+                new BookingDetail { Id = 1518, BookingId = 1518, CourtId = 27, StartTime = new DateTime(2025, 6, 7, 12, 0, 0), EndTime = new DateTime(2025, 6, 7, 14, 0, 0) },
+                new BookingDetail { Id = 1519, BookingId = 1519, CourtId = 27, StartTime = new DateTime(2025, 6, 8, 12, 0, 0), EndTime = new DateTime(2025, 6, 8, 14, 0, 0) },
+                new BookingDetail { Id = 1520, BookingId = 1520, CourtId = 27, StartTime = new DateTime(2025, 6, 14, 12, 0, 0), EndTime = new DateTime(2025, 6, 14, 14, 0, 0) },
+                new BookingDetail { Id = 1521, BookingId = 1521, CourtId = 27, StartTime = new DateTime(2025, 6, 15, 12, 0, 0), EndTime = new DateTime(2025, 6, 15, 14, 0, 0) },
+                new BookingDetail { Id = 1522, BookingId = 1522, CourtId = 27, StartTime = new DateTime(2025, 6, 21, 12, 0, 0), EndTime = new DateTime(2025, 6, 21, 14, 0, 0) },
+                new BookingDetail { Id = 1523, BookingId = 1523, CourtId = 27, StartTime = new DateTime(2025, 6, 22, 12, 0, 0), EndTime = new DateTime(2025, 6, 22, 14, 0, 0) },
+                new BookingDetail { Id = 1524, BookingId = 1524, CourtId = 27, StartTime = new DateTime(2025, 6, 28, 12, 0, 0), EndTime = new DateTime(2025, 6, 28, 14, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 134 (THÁNG 2/2025, Sân 27 - Sân 5) =====
+            // - T7 | 12h-13h (1 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 150,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 134, UserId = globalUserId, StadiumId = 18, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 600000m, TotalPrice = 600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T2/2025 Sân 27", TotalHour = 4, StartTime = new TimeSpan(12, 0, 0), EndTime = new TimeSpan(13, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1525, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 1), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 134 },
+                new Booking { Id = 1526, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 8), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 134 },
+                new Booking { Id = 1527, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 15), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 134 },
+                new Booking { Id = 1528, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 22), TotalPrice = 150000m, OriginalPrice = 150000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 18, MonthlyBookingId = 134 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1525, BookingId = 1525, CourtId = 27, StartTime = new DateTime(2025, 2, 1, 12, 0, 0), EndTime = new DateTime(2025, 2, 1, 13, 0, 0) },
+                new BookingDetail { Id = 1526, BookingId = 1526, CourtId = 27, StartTime = new DateTime(2025, 2, 8, 12, 0, 0), EndTime = new DateTime(2025, 2, 8, 13, 0, 0) },
+                new BookingDetail { Id = 1527, BookingId = 1527, CourtId = 27, StartTime = new DateTime(2025, 2, 15, 12, 0, 0), EndTime = new DateTime(2025, 2, 15, 13, 0, 0) },
+                new BookingDetail { Id = 1528, BookingId = 1528, CourtId = 27, StartTime = new DateTime(2025, 2, 22, 12, 0, 0), EndTime = new DateTime(2025, 2, 22, 13, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 135 (THÁNG 12/2025, Sân 28 - Sân Tennis) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 180,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 135, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2520000m, TotalPrice = 2520000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T12/2025 Sân 28", TotalHour = 28, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1529, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1530, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 3), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1531, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 5), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1532, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1533, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 10), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1534, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 12), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1535, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1536, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 17), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1537, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 19), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1538, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1539, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 24), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1540, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 26), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1541, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 },
+                new Booking { Id = 1542, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 31), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 135 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1529, BookingId = 1529, CourtId = 28, StartTime = new DateTime(2025, 12, 1, 18, 0, 0), EndTime = new DateTime(2025, 12, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1530, BookingId = 1530, CourtId = 28, StartTime = new DateTime(2025, 12, 3, 18, 0, 0), EndTime = new DateTime(2025, 12, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1531, BookingId = 1531, CourtId = 28, StartTime = new DateTime(2025, 12, 5, 18, 0, 0), EndTime = new DateTime(2025, 12, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1532, BookingId = 1532, CourtId = 28, StartTime = new DateTime(2025, 12, 8, 18, 0, 0), EndTime = new DateTime(2025, 12, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1533, BookingId = 1533, CourtId = 28, StartTime = new DateTime(2025, 12, 10, 18, 0, 0), EndTime = new DateTime(2025, 12, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1534, BookingId = 1534, CourtId = 28, StartTime = new DateTime(2025, 12, 12, 18, 0, 0), EndTime = new DateTime(2025, 12, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1535, BookingId = 1535, CourtId = 28, StartTime = new DateTime(2025, 12, 15, 18, 0, 0), EndTime = new DateTime(2025, 12, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1536, BookingId = 1536, CourtId = 28, StartTime = new DateTime(2025, 12, 17, 18, 0, 0), EndTime = new DateTime(2025, 12, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1537, BookingId = 1537, CourtId = 28, StartTime = new DateTime(2025, 12, 19, 18, 0, 0), EndTime = new DateTime(2025, 12, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1538, BookingId = 1538, CourtId = 28, StartTime = new DateTime(2025, 12, 22, 18, 0, 0), EndTime = new DateTime(2025, 12, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1539, BookingId = 1539, CourtId = 28, StartTime = new DateTime(2025, 12, 24, 18, 0, 0), EndTime = new DateTime(2025, 12, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1540, BookingId = 1540, CourtId = 28, StartTime = new DateTime(2025, 12, 26, 18, 0, 0), EndTime = new DateTime(2025, 12, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1541, BookingId = 1541, CourtId = 28, StartTime = new DateTime(2025, 12, 29, 18, 0, 0), EndTime = new DateTime(2025, 12, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1542, BookingId = 1542, CourtId = 28, StartTime = new DateTime(2025, 12, 31, 18, 0, 0), EndTime = new DateTime(2025, 12, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 136 (THÁNG 11/2025, Sân 28 - Sân Tennis) =====
+            // - T7, CN | 17h-19h (2 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 180,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 136, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 28", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1543, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1544, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1545, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1546, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1547, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1548, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1549, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1550, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1551, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 },
+                new Booking { Id = 1552, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 30), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 136 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1543, BookingId = 1543, CourtId = 28, StartTime = new DateTime(2025, 11, 1, 17, 0, 0), EndTime = new DateTime(2025, 11, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1544, BookingId = 1544, CourtId = 28, StartTime = new DateTime(2025, 11, 2, 17, 0, 0), EndTime = new DateTime(2025, 11, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1545, BookingId = 1545, CourtId = 28, StartTime = new DateTime(2025, 11, 8, 17, 0, 0), EndTime = new DateTime(2025, 11, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1546, BookingId = 1546, CourtId = 28, StartTime = new DateTime(2025, 11, 9, 17, 0, 0), EndTime = new DateTime(2025, 11, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1547, BookingId = 1547, CourtId = 28, StartTime = new DateTime(2025, 11, 15, 17, 0, 0), EndTime = new DateTime(2025, 11, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1548, BookingId = 1548, CourtId = 28, StartTime = new DateTime(2025, 11, 16, 17, 0, 0), EndTime = new DateTime(2025, 11, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1549, BookingId = 1549, CourtId = 28, StartTime = new DateTime(2025, 11, 22, 17, 0, 0), EndTime = new DateTime(2025, 11, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1550, BookingId = 1550, CourtId = 28, StartTime = new DateTime(2025, 11, 23, 17, 0, 0), EndTime = new DateTime(2025, 11, 23, 19, 0, 0) },
+                new BookingDetail { Id = 1551, BookingId = 1551, CourtId = 28, StartTime = new DateTime(2025, 11, 29, 17, 0, 0), EndTime = new DateTime(2025, 11, 29, 19, 0, 0) },
+                new BookingDetail { Id = 1552, BookingId = 1552, CourtId = 28, StartTime = new DateTime(2025, 11, 30, 17, 0, 0), EndTime = new DateTime(2025, 11, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 137 (THÁNG 10/2025, Sân 28 - Sân Tennis) =====
+            // - Cả tháng | 19h-20h (1 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 90,000 | 31 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 137, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2790000m, TotalPrice = 2790000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt cả tháng T10/2025 Sân 28", TotalHour = 31, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1553, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 1), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1554, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 2), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1555, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 3), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1556, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1557, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 5), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1558, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 6), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1559, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 7), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1560, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 8), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1561, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 9), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1562, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 10), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1563, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1564, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 12), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1565, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 13), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1566, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 14), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1567, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 15), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1568, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 16), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1569, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 17), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1570, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1571, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 19), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1572, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 20), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1573, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 21), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1574, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 22), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1575, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 23), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1576, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 24), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1577, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1578, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 26), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1579, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 27), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1580, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 28), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1581, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 29), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1582, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 30), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 },
+                new Booking { Id = 1583, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 31), TotalPrice = 90000m, OriginalPrice = 90000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 137 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1553, BookingId = 1553, CourtId = 28, StartTime = new DateTime(2025, 10, 1, 19, 0, 0), EndTime = new DateTime(2025, 10, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1554, BookingId = 1554, CourtId = 28, StartTime = new DateTime(2025, 10, 2, 19, 0, 0), EndTime = new DateTime(2025, 10, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1555, BookingId = 1555, CourtId = 28, StartTime = new DateTime(2025, 10, 3, 19, 0, 0), EndTime = new DateTime(2025, 10, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1556, BookingId = 1556, CourtId = 28, StartTime = new DateTime(2025, 10, 4, 19, 0, 0), EndTime = new DateTime(2025, 10, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1557, BookingId = 1557, CourtId = 28, StartTime = new DateTime(2025, 10, 5, 19, 0, 0), EndTime = new DateTime(2025, 10, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1558, BookingId = 1558, CourtId = 28, StartTime = new DateTime(2025, 10, 6, 19, 0, 0), EndTime = new DateTime(2025, 10, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1559, BookingId = 1559, CourtId = 28, StartTime = new DateTime(2025, 10, 7, 19, 0, 0), EndTime = new DateTime(2025, 10, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1560, BookingId = 1560, CourtId = 28, StartTime = new DateTime(2025, 10, 8, 19, 0, 0), EndTime = new DateTime(2025, 10, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1561, BookingId = 1561, CourtId = 28, StartTime = new DateTime(2025, 10, 9, 19, 0, 0), EndTime = new DateTime(2025, 10, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1562, BookingId = 1562, CourtId = 28, StartTime = new DateTime(2025, 10, 10, 19, 0, 0), EndTime = new DateTime(2025, 10, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1563, BookingId = 1563, CourtId = 28, StartTime = new DateTime(2025, 10, 11, 19, 0, 0), EndTime = new DateTime(2025, 10, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1564, BookingId = 1564, CourtId = 28, StartTime = new DateTime(2025, 10, 12, 19, 0, 0), EndTime = new DateTime(2025, 10, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1565, BookingId = 1565, CourtId = 28, StartTime = new DateTime(2025, 10, 13, 19, 0, 0), EndTime = new DateTime(2025, 10, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1566, BookingId = 1566, CourtId = 28, StartTime = new DateTime(2025, 10, 14, 19, 0, 0), EndTime = new DateTime(2025, 10, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1567, BookingId = 1567, CourtId = 28, StartTime = new DateTime(2025, 10, 15, 19, 0, 0), EndTime = new DateTime(2025, 10, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1568, BookingId = 1568, CourtId = 28, StartTime = new DateTime(2025, 10, 16, 19, 0, 0), EndTime = new DateTime(2025, 10, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1569, BookingId = 1569, CourtId = 28, StartTime = new DateTime(2025, 10, 17, 19, 0, 0), EndTime = new DateTime(2025, 10, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1570, BookingId = 1570, CourtId = 28, StartTime = new DateTime(2025, 10, 18, 19, 0, 0), EndTime = new DateTime(2025, 10, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1571, BookingId = 1571, CourtId = 28, StartTime = new DateTime(2025, 10, 19, 19, 0, 0), EndTime = new DateTime(2025, 10, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1572, BookingId = 1572, CourtId = 28, StartTime = new DateTime(2025, 10, 20, 19, 0, 0), EndTime = new DateTime(2025, 10, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1573, BookingId = 1573, CourtId = 28, StartTime = new DateTime(2025, 10, 21, 19, 0, 0), EndTime = new DateTime(2025, 10, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1574, BookingId = 1574, CourtId = 28, StartTime = new DateTime(2025, 10, 22, 19, 0, 0), EndTime = new DateTime(2025, 10, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1575, BookingId = 1575, CourtId = 28, StartTime = new DateTime(2025, 10, 23, 19, 0, 0), EndTime = new DateTime(2025, 10, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1576, BookingId = 1576, CourtId = 28, StartTime = new DateTime(2025, 10, 24, 19, 0, 0), EndTime = new DateTime(2025, 10, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1577, BookingId = 1577, CourtId = 28, StartTime = new DateTime(2025, 10, 25, 19, 0, 0), EndTime = new DateTime(2025, 10, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1578, BookingId = 1578, CourtId = 28, StartTime = new DateTime(2025, 10, 26, 19, 0, 0), EndTime = new DateTime(2025, 10, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1579, BookingId = 1579, CourtId = 28, StartTime = new DateTime(2025, 10, 27, 19, 0, 0), EndTime = new DateTime(2025, 10, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1580, BookingId = 1580, CourtId = 28, StartTime = new DateTime(2025, 10, 28, 19, 0, 0), EndTime = new DateTime(2025, 10, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1581, BookingId = 1581, CourtId = 28, StartTime = new DateTime(2025, 10, 29, 19, 0, 0), EndTime = new DateTime(2025, 10, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1582, BookingId = 1582, CourtId = 28, StartTime = new DateTime(2025, 10, 30, 19, 0, 0), EndTime = new DateTime(2025, 10, 30, 20, 0, 0) },
+                new BookingDetail { Id = 1583, BookingId = 1583, CourtId = 28, StartTime = new DateTime(2025, 10, 31, 19, 0, 0), EndTime = new DateTime(2025, 10, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 138 (THÁNG 9/2025, Sân 28 - Sân Tennis) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 180,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 138, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1620000m, TotalPrice = 1620000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T9/2025 Sân 28", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1584, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 2), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1585, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 4), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1586, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 9), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1587, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 11), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1588, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 16), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1589, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 18), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1590, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 23), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1591, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 25), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 },
+                new Booking { Id = 1592, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 30), TotalPrice = 180000m, OriginalPrice = 180000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 138 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1584, BookingId = 1584, CourtId = 28, StartTime = new DateTime(2025, 9, 2, 18, 0, 0), EndTime = new DateTime(2025, 9, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1585, BookingId = 1585, CourtId = 28, StartTime = new DateTime(2025, 9, 4, 18, 0, 0), EndTime = new DateTime(2025, 9, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1586, BookingId = 1586, CourtId = 28, StartTime = new DateTime(2025, 9, 9, 18, 0, 0), EndTime = new DateTime(2025, 9, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1587, BookingId = 1587, CourtId = 28, StartTime = new DateTime(2025, 9, 11, 18, 0, 0), EndTime = new DateTime(2025, 9, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1588, BookingId = 1588, CourtId = 28, StartTime = new DateTime(2025, 9, 16, 18, 0, 0), EndTime = new DateTime(2025, 9, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1589, BookingId = 1589, CourtId = 28, StartTime = new DateTime(2025, 9, 18, 18, 0, 0), EndTime = new DateTime(2025, 9, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1590, BookingId = 1590, CourtId = 28, StartTime = new DateTime(2025, 9, 23, 18, 0, 0), EndTime = new DateTime(2025, 9, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1591, BookingId = 1591, CourtId = 28, StartTime = new DateTime(2025, 9, 25, 18, 0, 0), EndTime = new DateTime(2025, 9, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1592, BookingId = 1592, CourtId = 28, StartTime = new DateTime(2025, 9, 30, 18, 0, 0), EndTime = new DateTime(2025, 9, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 139 (THÁNG 8/2025, Sân 28 - Sân Tennis) =====
+            // - CN | 17h-20h (3 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 270,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 139, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1350000m, TotalPrice = 1350000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T8/2025 Sân 28", TotalHour = 15, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1593, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 139 },
+                new Booking { Id = 1594, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 139 },
+                new Booking { Id = 1595, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 139 },
+                new Booking { Id = 1596, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 139 },
+                new Booking { Id = 1597, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 139 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1593, BookingId = 1593, CourtId = 28, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1594, BookingId = 1594, CourtId = 28, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1595, BookingId = 1595, CourtId = 28, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1596, BookingId = 1596, CourtId = 28, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1597, BookingId = 1597, CourtId = 28, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 140 (THÁNG 7/2025, Sân 28 - Sân Tennis) =====
+            // - T7 | 17h-20h (3 tiếng), 90k/h, globalUserId
+            // - Giá/ngày = 270,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 140, UserId = globalUserId, StadiumId = 19, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1080000m, TotalPrice = 1080000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T7/2025 Sân 28", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1598, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 140 },
+                new Booking { Id = 1599, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 140 },
+                new Booking { Id = 1600, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 140 },
+                new Booking { Id = 1601, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 270000m, OriginalPrice = 270000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 19, MonthlyBookingId = 140 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1598, BookingId = 1598, CourtId = 28, StartTime = new DateTime(2025, 7, 5, 17, 0, 0), EndTime = new DateTime(2025, 7, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1599, BookingId = 1599, CourtId = 28, StartTime = new DateTime(2025, 7, 12, 17, 0, 0), EndTime = new DateTime(2025, 7, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1600, BookingId = 1600, CourtId = 28, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1601, BookingId = 1601, CourtId = 28, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 141 (THÁNG 1/2025, Sân 29 - Sân Bóng Chuyền) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 80k/h, UserId = 6
+            // - Giá/ngày = 160,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 141, UserId = 6, StadiumId = 20, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2080000m, TotalPrice = 2080000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T1/2025 Sân 29", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1602, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 1), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1603, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 3), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1604, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 6), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1605, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 8), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1606, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 10), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1607, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 13), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1608, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 15), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1609, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 17), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1610, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 20), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1611, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 22), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1612, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 24), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1613, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 27), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 },
+                new Booking { Id = 1614, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 29), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 141 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1602, BookingId = 1602, CourtId = 29, StartTime = new DateTime(2025, 1, 1, 18, 0, 0), EndTime = new DateTime(2025, 1, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1603, BookingId = 1603, CourtId = 29, StartTime = new DateTime(2025, 1, 3, 18, 0, 0), EndTime = new DateTime(2025, 1, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1604, BookingId = 1604, CourtId = 29, StartTime = new DateTime(2025, 1, 6, 18, 0, 0), EndTime = new DateTime(2025, 1, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1605, BookingId = 1605, CourtId = 29, StartTime = new DateTime(2025, 1, 8, 18, 0, 0), EndTime = new DateTime(2025, 1, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1606, BookingId = 1606, CourtId = 29, StartTime = new DateTime(2025, 1, 10, 18, 0, 0), EndTime = new DateTime(2025, 1, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1607, BookingId = 1607, CourtId = 29, StartTime = new DateTime(2025, 1, 13, 18, 0, 0), EndTime = new DateTime(2025, 1, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1608, BookingId = 1608, CourtId = 29, StartTime = new DateTime(2025, 1, 15, 18, 0, 0), EndTime = new DateTime(2025, 1, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1609, BookingId = 1609, CourtId = 29, StartTime = new DateTime(2025, 1, 17, 18, 0, 0), EndTime = new DateTime(2025, 1, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1610, BookingId = 1610, CourtId = 29, StartTime = new DateTime(2025, 1, 20, 18, 0, 0), EndTime = new DateTime(2025, 1, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1611, BookingId = 1611, CourtId = 29, StartTime = new DateTime(2025, 1, 22, 18, 0, 0), EndTime = new DateTime(2025, 1, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1612, BookingId = 1612, CourtId = 29, StartTime = new DateTime(2025, 1, 24, 18, 0, 0), EndTime = new DateTime(2025, 1, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1613, BookingId = 1613, CourtId = 29, StartTime = new DateTime(2025, 1, 27, 18, 0, 0), EndTime = new DateTime(2025, 1, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1614, BookingId = 1614, CourtId = 29, StartTime = new DateTime(2025, 1, 29, 18, 0, 0), EndTime = new DateTime(2025, 1, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 142 (THÁNG 2/2025, Sân 29 - Sân Bóng Chuyền) =====
+            // - T7, CN | 17h-19h (2 tiếng), 80k/h, UserId = 6
+            // - Giá/ngày = 160,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 142, UserId = 6, StadiumId = 20, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1280000m, TotalPrice = 1280000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T2/2025 Sân 29", TotalHour = 16, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1615, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 1), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1616, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 2), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1617, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 8), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1618, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 9), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1619, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 15), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1620, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 16), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1621, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 22), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 },
+                new Booking { Id = 1622, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 23), TotalPrice = 160000m, OriginalPrice = 160000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 142 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1615, BookingId = 1615, CourtId = 29, StartTime = new DateTime(2025, 2, 1, 17, 0, 0), EndTime = new DateTime(2025, 2, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1616, BookingId = 1616, CourtId = 29, StartTime = new DateTime(2025, 2, 2, 17, 0, 0), EndTime = new DateTime(2025, 2, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1617, BookingId = 1617, CourtId = 29, StartTime = new DateTime(2025, 2, 8, 17, 0, 0), EndTime = new DateTime(2025, 2, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1618, BookingId = 1618, CourtId = 29, StartTime = new DateTime(2025, 2, 9, 17, 0, 0), EndTime = new DateTime(2025, 2, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1619, BookingId = 1619, CourtId = 29, StartTime = new DateTime(2025, 2, 15, 17, 0, 0), EndTime = new DateTime(2025, 2, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1620, BookingId = 1620, CourtId = 29, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1621, BookingId = 1621, CourtId = 29, StartTime = new DateTime(2025, 2, 22, 17, 0, 0), EndTime = new DateTime(2025, 2, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1622, BookingId = 1622, CourtId = 29, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 143 (THÁNG 3/2025, Sân 29 - Sân Bóng Chuyền) =====
+            // - Cả tháng | 19h-20h (1 tiếng), 80k/h, UserId = 6
+            // - Giá/ngày = 80,000 | 31 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 143, UserId = 6, StadiumId = 20, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2480000m, TotalPrice = 2480000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt cả tháng T3/2025 Sân 29", TotalHour = 31, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1623, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 1), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1624, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 2), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1625, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 3), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1626, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 4), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1627, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 5), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1628, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 6), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1629, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 7), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1630, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 8), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1631, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 9), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1632, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 10), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1633, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 11), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1634, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 12), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1635, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 13), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1636, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 14), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1637, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 15), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1638, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 16), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1639, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 17), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1640, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 18), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1641, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 19), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1642, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 20), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1643, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 21), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1644, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 22), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1645, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 23), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1646, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 24), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1647, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 25), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1648, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 26), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1649, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 27), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1650, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 28), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1651, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 29), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1652, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 30), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 },
+                new Booking { Id = 1653, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 31), TotalPrice = 80000m, OriginalPrice = 80000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 20, MonthlyBookingId = 143 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1623, BookingId = 1623, CourtId = 29, StartTime = new DateTime(2025, 3, 1, 19, 0, 0), EndTime = new DateTime(2025, 3, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1624, BookingId = 1624, CourtId = 29, StartTime = new DateTime(2025, 3, 2, 19, 0, 0), EndTime = new DateTime(2025, 3, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1625, BookingId = 1625, CourtId = 29, StartTime = new DateTime(2025, 3, 3, 19, 0, 0), EndTime = new DateTime(2025, 3, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1626, BookingId = 1626, CourtId = 29, StartTime = new DateTime(2025, 3, 4, 19, 0, 0), EndTime = new DateTime(2025, 3, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1627, BookingId = 1627, CourtId = 29, StartTime = new DateTime(2025, 3, 5, 19, 0, 0), EndTime = new DateTime(2025, 3, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1628, BookingId = 1628, CourtId = 29, StartTime = new DateTime(2025, 3, 6, 19, 0, 0), EndTime = new DateTime(2025, 3, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1629, BookingId = 1629, CourtId = 29, StartTime = new DateTime(2025, 3, 7, 19, 0, 0), EndTime = new DateTime(2025, 3, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1630, BookingId = 1630, CourtId = 29, StartTime = new DateTime(2025, 3, 8, 19, 0, 0), EndTime = new DateTime(2025, 3, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1631, BookingId = 1631, CourtId = 29, StartTime = new DateTime(2025, 3, 9, 19, 0, 0), EndTime = new DateTime(2025, 3, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1632, BookingId = 1632, CourtId = 29, StartTime = new DateTime(2025, 3, 10, 19, 0, 0), EndTime = new DateTime(2025, 3, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1633, BookingId = 1633, CourtId = 29, StartTime = new DateTime(2025, 3, 11, 19, 0, 0), EndTime = new DateTime(2025, 3, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1634, BookingId = 1634, CourtId = 29, StartTime = new DateTime(2025, 3, 12, 19, 0, 0), EndTime = new DateTime(2025, 3, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1635, BookingId = 1635, CourtId = 29, StartTime = new DateTime(2025, 3, 13, 19, 0, 0), EndTime = new DateTime(2025, 3, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1636, BookingId = 1636, CourtId = 29, StartTime = new DateTime(2025, 3, 14, 19, 0, 0), EndTime = new DateTime(2025, 3, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1637, BookingId = 1637, CourtId = 29, StartTime = new DateTime(2025, 3, 15, 19, 0, 0), EndTime = new DateTime(2025, 3, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1638, BookingId = 1638, CourtId = 29, StartTime = new DateTime(2025, 3, 16, 19, 0, 0), EndTime = new DateTime(2025, 3, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1639, BookingId = 1639, CourtId = 29, StartTime = new DateTime(2025, 3, 17, 19, 0, 0), EndTime = new DateTime(2025, 3, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1640, BookingId = 1640, CourtId = 29, StartTime = new DateTime(2025, 3, 18, 19, 0, 0), EndTime = new DateTime(2025, 3, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1641, BookingId = 1641, CourtId = 29, StartTime = new DateTime(2025, 3, 19, 19, 0, 0), EndTime = new DateTime(2025, 3, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1642, BookingId = 1642, CourtId = 29, StartTime = new DateTime(2025, 3, 20, 19, 0, 0), EndTime = new DateTime(2025, 3, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1643, BookingId = 1643, CourtId = 29, StartTime = new DateTime(2025, 3, 21, 19, 0, 0), EndTime = new DateTime(2025, 3, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1644, BookingId = 1644, CourtId = 29, StartTime = new DateTime(2025, 3, 22, 19, 0, 0), EndTime = new DateTime(2025, 3, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1645, BookingId = 1645, CourtId = 29, StartTime = new DateTime(2025, 3, 23, 19, 0, 0), EndTime = new DateTime(2025, 3, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1646, BookingId = 1646, CourtId = 29, StartTime = new DateTime(2025, 3, 24, 19, 0, 0), EndTime = new DateTime(2025, 3, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1647, BookingId = 1647, CourtId = 29, StartTime = new DateTime(2025, 3, 25, 19, 0, 0), EndTime = new DateTime(2025, 3, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1648, BookingId = 1648, CourtId = 29, StartTime = new DateTime(2025, 3, 26, 19, 0, 0), EndTime = new DateTime(2025, 3, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1649, BookingId = 1649, CourtId = 29, StartTime = new DateTime(2025, 3, 27, 19, 0, 0), EndTime = new DateTime(2025, 3, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1650, BookingId = 1650, CourtId = 29, StartTime = new DateTime(2025, 3, 28, 19, 0, 0), EndTime = new DateTime(2025, 3, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1651, BookingId = 1651, CourtId = 29, StartTime = new DateTime(2025, 3, 29, 19, 0, 0), EndTime = new DateTime(2025, 3, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1652, BookingId = 1652, CourtId = 29, StartTime = new DateTime(2025, 3, 30, 19, 0, 0), EndTime = new DateTime(2025, 3, 30, 20, 0, 0) },
+                new BookingDetail { Id = 1653, BookingId = 1653, CourtId = 29, StartTime = new DateTime(2025, 3, 31, 19, 0, 0), EndTime = new DateTime(2025, 3, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 144 (THÁNG 4/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 140,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 144, UserId = 6, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1260000m, TotalPrice = 1260000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 25", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1654, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1655, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1656, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1657, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1658, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1659, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1660, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1661, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 },
+                new Booking { Id = 1662, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 144 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1654, BookingId = 1654, CourtId = 25, StartTime = new DateTime(2025, 4, 1, 18, 0, 0), EndTime = new DateTime(2025, 4, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1655, BookingId = 1655, CourtId = 25, StartTime = new DateTime(2025, 4, 3, 18, 0, 0), EndTime = new DateTime(2025, 4, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1656, BookingId = 1656, CourtId = 25, StartTime = new DateTime(2025, 4, 8, 18, 0, 0), EndTime = new DateTime(2025, 4, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1657, BookingId = 1657, CourtId = 25, StartTime = new DateTime(2025, 4, 10, 18, 0, 0), EndTime = new DateTime(2025, 4, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1658, BookingId = 1658, CourtId = 25, StartTime = new DateTime(2025, 4, 15, 18, 0, 0), EndTime = new DateTime(2025, 4, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1659, BookingId = 1659, CourtId = 25, StartTime = new DateTime(2025, 4, 17, 18, 0, 0), EndTime = new DateTime(2025, 4, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1660, BookingId = 1660, CourtId = 25, StartTime = new DateTime(2025, 4, 22, 18, 0, 0), EndTime = new DateTime(2025, 4, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1661, BookingId = 1661, CourtId = 25, StartTime = new DateTime(2025, 4, 24, 18, 0, 0), EndTime = new DateTime(2025, 4, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1662, BookingId = 1662, CourtId = 25, StartTime = new DateTime(2025, 4, 29, 18, 0, 0), EndTime = new DateTime(2025, 4, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 145 (THÁNG 5/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - CN | 17h-20h (3 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 210,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 145, UserId = 6, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 840000m, TotalPrice = 840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T5/2025 Sân 25", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1663, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 145 },
+                new Booking { Id = 1664, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 145 },
+                new Booking { Id = 1665, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 145 },
+                new Booking { Id = 1666, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 145 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1663, BookingId = 1663, CourtId = 25, StartTime = new DateTime(2025, 5, 4, 17, 0, 0), EndTime = new DateTime(2025, 5, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1664, BookingId = 1664, CourtId = 25, StartTime = new DateTime(2025, 5, 11, 17, 0, 0), EndTime = new DateTime(2025, 5, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1665, BookingId = 1665, CourtId = 25, StartTime = new DateTime(2025, 5, 18, 17, 0, 0), EndTime = new DateTime(2025, 5, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1666, BookingId = 1666, CourtId = 25, StartTime = new DateTime(2025, 5, 25, 17, 0, 0), EndTime = new DateTime(2025, 5, 25, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 146 (THÁNG 6/2025, Sân 25 - Sân Bóng Chuyền) =====
+            // - T7 | 17h-20h (3 tiếng), 70k/h, UserId = 6
+            // - Giá/ngày = 210,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 146, UserId = 6, StadiumId = 17, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 840000m, TotalPrice = 840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T6/2025 Sân 25", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1667, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 146 },
+                new Booking { Id = 1668, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 146 },
+                new Booking { Id = 1669, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 146 },
+                new Booking { Id = 1670, UserId = 6, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 17, MonthlyBookingId = 146 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1667, BookingId = 1667, CourtId = 25, StartTime = new DateTime(2025, 6, 7, 17, 0, 0), EndTime = new DateTime(2025, 6, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1668, BookingId = 1668, CourtId = 25, StartTime = new DateTime(2025, 6, 14, 17, 0, 0), EndTime = new DateTime(2025, 6, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1669, BookingId = 1669, CourtId = 25, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1670, BookingId = 1670, CourtId = 25, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 147 (THÁNG 12/2025, Sân 30 - Sân Pickleball) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 200,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 147, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2800000m, TotalPrice = 2800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T12/2025 Sân 30", TotalHour = 28, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1671, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1672, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 3), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1673, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 5), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1674, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1675, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 10), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1676, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 12), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1677, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1678, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 17), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1679, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 19), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1680, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1681, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 24), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1682, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 26), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1683, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 },
+                new Booking { Id = 1684, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 31), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 147 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1671, BookingId = 1671, CourtId = 30, StartTime = new DateTime(2025, 12, 1, 18, 0, 0), EndTime = new DateTime(2025, 12, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1672, BookingId = 1672, CourtId = 30, StartTime = new DateTime(2025, 12, 3, 18, 0, 0), EndTime = new DateTime(2025, 12, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1673, BookingId = 1673, CourtId = 30, StartTime = new DateTime(2025, 12, 5, 18, 0, 0), EndTime = new DateTime(2025, 12, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1674, BookingId = 1674, CourtId = 30, StartTime = new DateTime(2025, 12, 8, 18, 0, 0), EndTime = new DateTime(2025, 12, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1675, BookingId = 1675, CourtId = 30, StartTime = new DateTime(2025, 12, 10, 18, 0, 0), EndTime = new DateTime(2025, 12, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1676, BookingId = 1676, CourtId = 30, StartTime = new DateTime(2025, 12, 12, 18, 0, 0), EndTime = new DateTime(2025, 12, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1677, BookingId = 1677, CourtId = 30, StartTime = new DateTime(2025, 12, 15, 18, 0, 0), EndTime = new DateTime(2025, 12, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1678, BookingId = 1678, CourtId = 30, StartTime = new DateTime(2025, 12, 17, 18, 0, 0), EndTime = new DateTime(2025, 12, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1679, BookingId = 1679, CourtId = 30, StartTime = new DateTime(2025, 12, 19, 18, 0, 0), EndTime = new DateTime(2025, 12, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1680, BookingId = 1680, CourtId = 30, StartTime = new DateTime(2025, 12, 22, 18, 0, 0), EndTime = new DateTime(2025, 12, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1681, BookingId = 1681, CourtId = 30, StartTime = new DateTime(2025, 12, 24, 18, 0, 0), EndTime = new DateTime(2025, 12, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1682, BookingId = 1682, CourtId = 30, StartTime = new DateTime(2025, 12, 26, 18, 0, 0), EndTime = new DateTime(2025, 12, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1683, BookingId = 1683, CourtId = 30, StartTime = new DateTime(2025, 12, 29, 18, 0, 0), EndTime = new DateTime(2025, 12, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1684, BookingId = 1684, CourtId = 30, StartTime = new DateTime(2025, 12, 31, 18, 0, 0), EndTime = new DateTime(2025, 12, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 148 (THÁNG 11/2025, Sân 30 - Sân Pickleball) =====
+            // - T7, CN | 17h-19h (2 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 200,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 148, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2000000m, TotalPrice = 2000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 30", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1685, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1686, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1687, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1688, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1689, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1690, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1691, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1692, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1693, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 },
+                new Booking { Id = 1694, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 30), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 148 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1685, BookingId = 1685, CourtId = 30, StartTime = new DateTime(2025, 11, 1, 17, 0, 0), EndTime = new DateTime(2025, 11, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1686, BookingId = 1686, CourtId = 30, StartTime = new DateTime(2025, 11, 2, 17, 0, 0), EndTime = new DateTime(2025, 11, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1687, BookingId = 1687, CourtId = 30, StartTime = new DateTime(2025, 11, 8, 17, 0, 0), EndTime = new DateTime(2025, 11, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1688, BookingId = 1688, CourtId = 30, StartTime = new DateTime(2025, 11, 9, 17, 0, 0), EndTime = new DateTime(2025, 11, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1689, BookingId = 1689, CourtId = 30, StartTime = new DateTime(2025, 11, 15, 17, 0, 0), EndTime = new DateTime(2025, 11, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1690, BookingId = 1690, CourtId = 30, StartTime = new DateTime(2025, 11, 16, 17, 0, 0), EndTime = new DateTime(2025, 11, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1691, BookingId = 1691, CourtId = 30, StartTime = new DateTime(2025, 11, 22, 17, 0, 0), EndTime = new DateTime(2025, 11, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1692, BookingId = 1692, CourtId = 30, StartTime = new DateTime(2025, 11, 23, 17, 0, 0), EndTime = new DateTime(2025, 11, 23, 19, 0, 0) },
+                new BookingDetail { Id = 1693, BookingId = 1693, CourtId = 30, StartTime = new DateTime(2025, 11, 29, 17, 0, 0), EndTime = new DateTime(2025, 11, 29, 19, 0, 0) },
+                new BookingDetail { Id = 1694, BookingId = 1694, CourtId = 30, StartTime = new DateTime(2025, 11, 30, 17, 0, 0), EndTime = new DateTime(2025, 11, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 149 (THÁNG 10/2025, Sân 30 - Sân Pickleball) =====
+            // - Cả tháng | 19h-20h (1 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 100,000 | 31 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 149, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3100000m, TotalPrice = 3100000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt cả tháng T10/2025 Sân 30", TotalHour = 31, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1695, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 1), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1696, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 2), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1697, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 3), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1698, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1699, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 5), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1700, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 6), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1701, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 7), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1702, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 8), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1703, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 9), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1704, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 10), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1705, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1706, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 12), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1707, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 13), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1708, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 14), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1709, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 15), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1710, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 16), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1711, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 17), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1712, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1713, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 19), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1714, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 20), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1715, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 21), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1716, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 22), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1717, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 23), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1718, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 24), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1719, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1720, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 26), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1721, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 27), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1722, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 28), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1723, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 29), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1724, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 30), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 },
+                new Booking { Id = 1725, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 31), TotalPrice = 100000m, OriginalPrice = 100000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 149 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1695, BookingId = 1695, CourtId = 30, StartTime = new DateTime(2025, 10, 1, 19, 0, 0), EndTime = new DateTime(2025, 10, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1696, BookingId = 1696, CourtId = 30, StartTime = new DateTime(2025, 10, 2, 19, 0, 0), EndTime = new DateTime(2025, 10, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1697, BookingId = 1697, CourtId = 30, StartTime = new DateTime(2025, 10, 3, 19, 0, 0), EndTime = new DateTime(2025, 10, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1698, BookingId = 1698, CourtId = 30, StartTime = new DateTime(2025, 10, 4, 19, 0, 0), EndTime = new DateTime(2025, 10, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1699, BookingId = 1699, CourtId = 30, StartTime = new DateTime(2025, 10, 5, 19, 0, 0), EndTime = new DateTime(2025, 10, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1700, BookingId = 1700, CourtId = 30, StartTime = new DateTime(2025, 10, 6, 19, 0, 0), EndTime = new DateTime(2025, 10, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1701, BookingId = 1701, CourtId = 30, StartTime = new DateTime(2025, 10, 7, 19, 0, 0), EndTime = new DateTime(2025, 10, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1702, BookingId = 1702, CourtId = 30, StartTime = new DateTime(2025, 10, 8, 19, 0, 0), EndTime = new DateTime(2025, 10, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1703, BookingId = 1703, CourtId = 30, StartTime = new DateTime(2025, 10, 9, 19, 0, 0), EndTime = new DateTime(2025, 10, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1704, BookingId = 1704, CourtId = 30, StartTime = new DateTime(2025, 10, 10, 19, 0, 0), EndTime = new DateTime(2025, 10, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1705, BookingId = 1705, CourtId = 30, StartTime = new DateTime(2025, 10, 11, 19, 0, 0), EndTime = new DateTime(2025, 10, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1706, BookingId = 1706, CourtId = 30, StartTime = new DateTime(2025, 10, 12, 19, 0, 0), EndTime = new DateTime(2025, 10, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1707, BookingId = 1707, CourtId = 30, StartTime = new DateTime(2025, 10, 13, 19, 0, 0), EndTime = new DateTime(2025, 10, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1708, BookingId = 1708, CourtId = 30, StartTime = new DateTime(2025, 10, 14, 19, 0, 0), EndTime = new DateTime(2025, 10, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1709, BookingId = 1709, CourtId = 30, StartTime = new DateTime(2025, 10, 15, 19, 0, 0), EndTime = new DateTime(2025, 10, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1710, BookingId = 1710, CourtId = 30, StartTime = new DateTime(2025, 10, 16, 19, 0, 0), EndTime = new DateTime(2025, 10, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1711, BookingId = 1711, CourtId = 30, StartTime = new DateTime(2025, 10, 17, 19, 0, 0), EndTime = new DateTime(2025, 10, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1712, BookingId = 1712, CourtId = 30, StartTime = new DateTime(2025, 10, 18, 19, 0, 0), EndTime = new DateTime(2025, 10, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1713, BookingId = 1713, CourtId = 30, StartTime = new DateTime(2025, 10, 19, 19, 0, 0), EndTime = new DateTime(2025, 10, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1714, BookingId = 1714, CourtId = 30, StartTime = new DateTime(2025, 10, 20, 19, 0, 0), EndTime = new DateTime(2025, 10, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1715, BookingId = 1715, CourtId = 30, StartTime = new DateTime(2025, 10, 21, 19, 0, 0), EndTime = new DateTime(2025, 10, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1716, BookingId = 1716, CourtId = 30, StartTime = new DateTime(2025, 10, 22, 19, 0, 0), EndTime = new DateTime(2025, 10, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1717, BookingId = 1717, CourtId = 30, StartTime = new DateTime(2025, 10, 23, 19, 0, 0), EndTime = new DateTime(2025, 10, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1718, BookingId = 1718, CourtId = 30, StartTime = new DateTime(2025, 10, 24, 19, 0, 0), EndTime = new DateTime(2025, 10, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1719, BookingId = 1719, CourtId = 30, StartTime = new DateTime(2025, 10, 25, 19, 0, 0), EndTime = new DateTime(2025, 10, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1720, BookingId = 1720, CourtId = 30, StartTime = new DateTime(2025, 10, 26, 19, 0, 0), EndTime = new DateTime(2025, 10, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1721, BookingId = 1721, CourtId = 30, StartTime = new DateTime(2025, 10, 27, 19, 0, 0), EndTime = new DateTime(2025, 10, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1722, BookingId = 1722, CourtId = 30, StartTime = new DateTime(2025, 10, 28, 19, 0, 0), EndTime = new DateTime(2025, 10, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1723, BookingId = 1723, CourtId = 30, StartTime = new DateTime(2025, 10, 29, 19, 0, 0), EndTime = new DateTime(2025, 10, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1724, BookingId = 1724, CourtId = 30, StartTime = new DateTime(2025, 10, 30, 19, 0, 0), EndTime = new DateTime(2025, 10, 30, 20, 0, 0) },
+                new BookingDetail { Id = 1725, BookingId = 1725, CourtId = 30, StartTime = new DateTime(2025, 10, 31, 19, 0, 0), EndTime = new DateTime(2025, 10, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 150 (THÁNG 9/2025, Sân 30 - Sân Pickleball) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 200,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 150, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T9/2025 Sân 30", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1726, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 2), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1727, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 4), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1728, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 9), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1729, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 11), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1730, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 16), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1731, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 18), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1732, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 23), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1733, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 25), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 },
+                new Booking { Id = 1734, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 30), TotalPrice = 200000m, OriginalPrice = 200000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 150 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1726, BookingId = 1726, CourtId = 30, StartTime = new DateTime(2025, 9, 2, 18, 0, 0), EndTime = new DateTime(2025, 9, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1727, BookingId = 1727, CourtId = 30, StartTime = new DateTime(2025, 9, 4, 18, 0, 0), EndTime = new DateTime(2025, 9, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1728, BookingId = 1728, CourtId = 30, StartTime = new DateTime(2025, 9, 9, 18, 0, 0), EndTime = new DateTime(2025, 9, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1729, BookingId = 1729, CourtId = 30, StartTime = new DateTime(2025, 9, 11, 18, 0, 0), EndTime = new DateTime(2025, 9, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1730, BookingId = 1730, CourtId = 30, StartTime = new DateTime(2025, 9, 16, 18, 0, 0), EndTime = new DateTime(2025, 9, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1731, BookingId = 1731, CourtId = 30, StartTime = new DateTime(2025, 9, 18, 18, 0, 0), EndTime = new DateTime(2025, 9, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1732, BookingId = 1732, CourtId = 30, StartTime = new DateTime(2025, 9, 23, 18, 0, 0), EndTime = new DateTime(2025, 9, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1733, BookingId = 1733, CourtId = 30, StartTime = new DateTime(2025, 9, 25, 18, 0, 0), EndTime = new DateTime(2025, 9, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1734, BookingId = 1734, CourtId = 30, StartTime = new DateTime(2025, 9, 30, 18, 0, 0), EndTime = new DateTime(2025, 9, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 151 (THÁNG 8/2025, Sân 30 - Sân Pickleball) =====
+            // - CN | 17h-20h (3 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 300,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 151, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1500000m, TotalPrice = 1500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T8/2025 Sân 30", TotalHour = 15, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1735, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 151 },
+                new Booking { Id = 1736, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 151 },
+                new Booking { Id = 1737, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 151 },
+                new Booking { Id = 1738, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 151 },
+                new Booking { Id = 1739, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 151 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1735, BookingId = 1735, CourtId = 30, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1736, BookingId = 1736, CourtId = 30, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1737, BookingId = 1737, CourtId = 30, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1738, BookingId = 1738, CourtId = 30, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1739, BookingId = 1739, CourtId = 30, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 152 (THÁNG 7/2025, Sân 30 - Sân Pickleball) =====
+            // - T7 | 17h-20h (3 tiếng), 100k/h, globalUserId
+            // - Giá/ngày = 300,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 152, UserId = globalUserId, StadiumId = 22, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T7/2025 Sân 30", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1740, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 152 },
+                new Booking { Id = 1741, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 152 },
+                new Booking { Id = 1742, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 152 },
+                new Booking { Id = 1743, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 22, MonthlyBookingId = 152 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1740, BookingId = 1740, CourtId = 30, StartTime = new DateTime(2025, 7, 5, 17, 0, 0), EndTime = new DateTime(2025, 7, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1741, BookingId = 1741, CourtId = 30, StartTime = new DateTime(2025, 7, 12, 17, 0, 0), EndTime = new DateTime(2025, 7, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1742, BookingId = 1742, CourtId = 30, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1743, BookingId = 1743, CourtId = 30, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 153 (THÁNG 12/2025, Sân 31 - Sân Cầu Lông) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 153, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1960000m, TotalPrice = 1960000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T12/2025 Sân 31", TotalHour = 28, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1744, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1745, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 3), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1746, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 5), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1747, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1748, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 10), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1749, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 12), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1750, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1751, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 17), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1752, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 19), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1753, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1754, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 24), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1755, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 26), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1756, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 },
+                new Booking { Id = 1757, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 31), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 153 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1744, BookingId = 1744, CourtId = 31, StartTime = new DateTime(2025, 12, 1, 18, 0, 0), EndTime = new DateTime(2025, 12, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1745, BookingId = 1745, CourtId = 31, StartTime = new DateTime(2025, 12, 3, 18, 0, 0), EndTime = new DateTime(2025, 12, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1746, BookingId = 1746, CourtId = 31, StartTime = new DateTime(2025, 12, 5, 18, 0, 0), EndTime = new DateTime(2025, 12, 5, 20, 0, 0) },
+                new BookingDetail { Id = 1747, BookingId = 1747, CourtId = 31, StartTime = new DateTime(2025, 12, 8, 18, 0, 0), EndTime = new DateTime(2025, 12, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1748, BookingId = 1748, CourtId = 31, StartTime = new DateTime(2025, 12, 10, 18, 0, 0), EndTime = new DateTime(2025, 12, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1749, BookingId = 1749, CourtId = 31, StartTime = new DateTime(2025, 12, 12, 18, 0, 0), EndTime = new DateTime(2025, 12, 12, 20, 0, 0) },
+                new BookingDetail { Id = 1750, BookingId = 1750, CourtId = 31, StartTime = new DateTime(2025, 12, 15, 18, 0, 0), EndTime = new DateTime(2025, 12, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1751, BookingId = 1751, CourtId = 31, StartTime = new DateTime(2025, 12, 17, 18, 0, 0), EndTime = new DateTime(2025, 12, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1752, BookingId = 1752, CourtId = 31, StartTime = new DateTime(2025, 12, 19, 18, 0, 0), EndTime = new DateTime(2025, 12, 19, 20, 0, 0) },
+                new BookingDetail { Id = 1753, BookingId = 1753, CourtId = 31, StartTime = new DateTime(2025, 12, 22, 18, 0, 0), EndTime = new DateTime(2025, 12, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1754, BookingId = 1754, CourtId = 31, StartTime = new DateTime(2025, 12, 24, 18, 0, 0), EndTime = new DateTime(2025, 12, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1755, BookingId = 1755, CourtId = 31, StartTime = new DateTime(2025, 12, 26, 18, 0, 0), EndTime = new DateTime(2025, 12, 26, 20, 0, 0) },
+                new BookingDetail { Id = 1756, BookingId = 1756, CourtId = 31, StartTime = new DateTime(2025, 12, 29, 18, 0, 0), EndTime = new DateTime(2025, 12, 29, 20, 0, 0) },
+                new BookingDetail { Id = 1757, BookingId = 1757, CourtId = 31, StartTime = new DateTime(2025, 12, 31, 18, 0, 0), EndTime = new DateTime(2025, 12, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 154 (THÁNG 11/2025, Sân 31 - Sân Cầu Lông) =====
+            // - T7, CN | 17h-19h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 154, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1400000m, TotalPrice = 1400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 31", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1758, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1759, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1760, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1761, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1762, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1763, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1764, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1765, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1766, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 },
+                new Booking { Id = 1767, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 30), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 154 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1758, BookingId = 1758, CourtId = 31, StartTime = new DateTime(2025, 11, 1, 17, 0, 0), EndTime = new DateTime(2025, 11, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1759, BookingId = 1759, CourtId = 31, StartTime = new DateTime(2025, 11, 2, 17, 0, 0), EndTime = new DateTime(2025, 11, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1760, BookingId = 1760, CourtId = 31, StartTime = new DateTime(2025, 11, 8, 17, 0, 0), EndTime = new DateTime(2025, 11, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1761, BookingId = 1761, CourtId = 31, StartTime = new DateTime(2025, 11, 9, 17, 0, 0), EndTime = new DateTime(2025, 11, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1762, BookingId = 1762, CourtId = 31, StartTime = new DateTime(2025, 11, 15, 17, 0, 0), EndTime = new DateTime(2025, 11, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1763, BookingId = 1763, CourtId = 31, StartTime = new DateTime(2025, 11, 16, 17, 0, 0), EndTime = new DateTime(2025, 11, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1764, BookingId = 1764, CourtId = 31, StartTime = new DateTime(2025, 11, 22, 17, 0, 0), EndTime = new DateTime(2025, 11, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1765, BookingId = 1765, CourtId = 31, StartTime = new DateTime(2025, 11, 23, 17, 0, 0), EndTime = new DateTime(2025, 11, 23, 19, 0, 0) },
+                new BookingDetail { Id = 1766, BookingId = 1766, CourtId = 31, StartTime = new DateTime(2025, 11, 29, 17, 0, 0), EndTime = new DateTime(2025, 11, 29, 19, 0, 0) },
+                new BookingDetail { Id = 1767, BookingId = 1767, CourtId = 31, StartTime = new DateTime(2025, 11, 30, 17, 0, 0), EndTime = new DateTime(2025, 11, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 155 (THÁNG 9/2025, Sân 31 - Sân Cầu Lông) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 155, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1260000m, TotalPrice = 1260000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T9/2025 Sân 31", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1768, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 2), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1769, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 4), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1770, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 9), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1771, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 11), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1772, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 16), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1773, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 18), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1774, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 23), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1775, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 25), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 },
+                new Booking { Id = 1776, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 30), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 155 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1768, BookingId = 1768, CourtId = 31, StartTime = new DateTime(2025, 9, 2, 18, 0, 0), EndTime = new DateTime(2025, 9, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1769, BookingId = 1769, CourtId = 31, StartTime = new DateTime(2025, 9, 4, 18, 0, 0), EndTime = new DateTime(2025, 9, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1770, BookingId = 1770, CourtId = 31, StartTime = new DateTime(2025, 9, 9, 18, 0, 0), EndTime = new DateTime(2025, 9, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1771, BookingId = 1771, CourtId = 31, StartTime = new DateTime(2025, 9, 11, 18, 0, 0), EndTime = new DateTime(2025, 9, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1772, BookingId = 1772, CourtId = 31, StartTime = new DateTime(2025, 9, 16, 18, 0, 0), EndTime = new DateTime(2025, 9, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1773, BookingId = 1773, CourtId = 31, StartTime = new DateTime(2025, 9, 18, 18, 0, 0), EndTime = new DateTime(2025, 9, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1774, BookingId = 1774, CourtId = 31, StartTime = new DateTime(2025, 9, 23, 18, 0, 0), EndTime = new DateTime(2025, 9, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1775, BookingId = 1775, CourtId = 31, StartTime = new DateTime(2025, 9, 25, 18, 0, 0), EndTime = new DateTime(2025, 9, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1776, BookingId = 1776, CourtId = 31, StartTime = new DateTime(2025, 9, 30, 18, 0, 0), EndTime = new DateTime(2025, 9, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 156 (THÁNG 8/2025, Sân 31 - Sân Cầu Lông) =====
+            // - CN | 17h-20h (3 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 210,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 156, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1050000m, TotalPrice = 1050000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T8/2025 Sân 31", TotalHour = 15, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1777, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 156 },
+                new Booking { Id = 1778, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 156 },
+                new Booking { Id = 1779, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 156 },
+                new Booking { Id = 1780, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 156 },
+                new Booking { Id = 1781, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 156 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1777, BookingId = 1777, CourtId = 31, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1778, BookingId = 1778, CourtId = 31, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1779, BookingId = 1779, CourtId = 31, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1780, BookingId = 1780, CourtId = 31, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1781, BookingId = 1781, CourtId = 31, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 157 (THÁNG 7/2025, Sân 32 - Sân Cầu Lông 2) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 157, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1820000m, TotalPrice = 1820000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T7/2025 Sân 32", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1782, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 2), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1783, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 4), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1784, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 7), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1785, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 9), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1786, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 11), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1787, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 14), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1788, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 16), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1789, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 18), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1790, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 21), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1791, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 23), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1792, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 25), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1793, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 28), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 },
+                new Booking { Id = 1794, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 30), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 157 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1782, BookingId = 1782, CourtId = 32, StartTime = new DateTime(2025, 7, 2, 18, 0, 0), EndTime = new DateTime(2025, 7, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1783, BookingId = 1783, CourtId = 32, StartTime = new DateTime(2025, 7, 4, 18, 0, 0), EndTime = new DateTime(2025, 7, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1784, BookingId = 1784, CourtId = 32, StartTime = new DateTime(2025, 7, 7, 18, 0, 0), EndTime = new DateTime(2025, 7, 7, 20, 0, 0) },
+                new BookingDetail { Id = 1785, BookingId = 1785, CourtId = 32, StartTime = new DateTime(2025, 7, 9, 18, 0, 0), EndTime = new DateTime(2025, 7, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1786, BookingId = 1786, CourtId = 32, StartTime = new DateTime(2025, 7, 11, 18, 0, 0), EndTime = new DateTime(2025, 7, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1787, BookingId = 1787, CourtId = 32, StartTime = new DateTime(2025, 7, 14, 18, 0, 0), EndTime = new DateTime(2025, 7, 14, 20, 0, 0) },
+                new BookingDetail { Id = 1788, BookingId = 1788, CourtId = 32, StartTime = new DateTime(2025, 7, 16, 18, 0, 0), EndTime = new DateTime(2025, 7, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1789, BookingId = 1789, CourtId = 32, StartTime = new DateTime(2025, 7, 18, 18, 0, 0), EndTime = new DateTime(2025, 7, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1790, BookingId = 1790, CourtId = 32, StartTime = new DateTime(2025, 7, 21, 18, 0, 0), EndTime = new DateTime(2025, 7, 21, 20, 0, 0) },
+                new BookingDetail { Id = 1791, BookingId = 1791, CourtId = 32, StartTime = new DateTime(2025, 7, 23, 18, 0, 0), EndTime = new DateTime(2025, 7, 23, 20, 0, 0) },
+                new BookingDetail { Id = 1792, BookingId = 1792, CourtId = 32, StartTime = new DateTime(2025, 7, 25, 18, 0, 0), EndTime = new DateTime(2025, 7, 25, 20, 0, 0) },
+                new BookingDetail { Id = 1793, BookingId = 1793, CourtId = 32, StartTime = new DateTime(2025, 7, 28, 18, 0, 0), EndTime = new DateTime(2025, 7, 28, 20, 0, 0) },
+                new BookingDetail { Id = 1794, BookingId = 1794, CourtId = 32, StartTime = new DateTime(2025, 7, 30, 18, 0, 0), EndTime = new DateTime(2025, 7, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 158 (THÁNG 6/2025, Sân 32 - Sân Cầu Lông 2) =====
+            // - T7, CN | 17h-19h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 158, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1260000m, TotalPrice = 1260000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T6/2025 Sân 32", TotalHour = 18, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1795, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1796, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1797, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1798, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1799, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1800, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1801, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1802, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 },
+                new Booking { Id = 1803, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 158 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1795, BookingId = 1795, CourtId = 32, StartTime = new DateTime(2025, 6, 1, 17, 0, 0), EndTime = new DateTime(2025, 6, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1796, BookingId = 1796, CourtId = 32, StartTime = new DateTime(2025, 6, 7, 17, 0, 0), EndTime = new DateTime(2025, 6, 7, 19, 0, 0) },
+                new BookingDetail { Id = 1797, BookingId = 1797, CourtId = 32, StartTime = new DateTime(2025, 6, 8, 17, 0, 0), EndTime = new DateTime(2025, 6, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1798, BookingId = 1798, CourtId = 32, StartTime = new DateTime(2025, 6, 14, 17, 0, 0), EndTime = new DateTime(2025, 6, 14, 19, 0, 0) },
+                new BookingDetail { Id = 1799, BookingId = 1799, CourtId = 32, StartTime = new DateTime(2025, 6, 15, 17, 0, 0), EndTime = new DateTime(2025, 6, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1800, BookingId = 1800, CourtId = 32, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 19, 0, 0) },
+                new BookingDetail { Id = 1801, BookingId = 1801, CourtId = 32, StartTime = new DateTime(2025, 6, 22, 17, 0, 0), EndTime = new DateTime(2025, 6, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1802, BookingId = 1802, CourtId = 32, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 19, 0, 0) },
+                new BookingDetail { Id = 1803, BookingId = 1803, CourtId = 32, StartTime = new DateTime(2025, 6, 29, 17, 0, 0), EndTime = new DateTime(2025, 6, 29, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 159 (THÁNG 4/2025, Sân 32 - Sân Cầu Lông 2) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 140,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 159, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1260000m, TotalPrice = 1260000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 32", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1804, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1805, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1806, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1807, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1808, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1809, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1810, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1811, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 },
+                new Booking { Id = 1812, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 140000m, OriginalPrice = 140000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 159 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1804, BookingId = 1804, CourtId = 32, StartTime = new DateTime(2025, 4, 1, 18, 0, 0), EndTime = new DateTime(2025, 4, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1805, BookingId = 1805, CourtId = 32, StartTime = new DateTime(2025, 4, 3, 18, 0, 0), EndTime = new DateTime(2025, 4, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1806, BookingId = 1806, CourtId = 32, StartTime = new DateTime(2025, 4, 8, 18, 0, 0), EndTime = new DateTime(2025, 4, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1807, BookingId = 1807, CourtId = 32, StartTime = new DateTime(2025, 4, 10, 18, 0, 0), EndTime = new DateTime(2025, 4, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1808, BookingId = 1808, CourtId = 32, StartTime = new DateTime(2025, 4, 15, 18, 0, 0), EndTime = new DateTime(2025, 4, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1809, BookingId = 1809, CourtId = 32, StartTime = new DateTime(2025, 4, 17, 18, 0, 0), EndTime = new DateTime(2025, 4, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1810, BookingId = 1810, CourtId = 32, StartTime = new DateTime(2025, 4, 22, 18, 0, 0), EndTime = new DateTime(2025, 4, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1811, BookingId = 1811, CourtId = 32, StartTime = new DateTime(2025, 4, 24, 18, 0, 0), EndTime = new DateTime(2025, 4, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1812, BookingId = 1812, CourtId = 32, StartTime = new DateTime(2025, 4, 29, 18, 0, 0), EndTime = new DateTime(2025, 4, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 160 (THÁNG 2/2025, Sân 32 - Sân Cầu Lông 2) =====
+            // - CN | 17h-20h (3 tiếng), 70k/h, globalUserId
+            // - Giá/ngày = 210,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 160, UserId = globalUserId, StadiumId = 23, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 840000m, TotalPrice = 840000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T2/2025 Sân 32", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1813, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 2), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 160 },
+                new Booking { Id = 1814, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 9), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 160 },
+                new Booking { Id = 1815, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 16), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 160 },
+                new Booking { Id = 1816, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 23), TotalPrice = 210000m, OriginalPrice = 210000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 23, MonthlyBookingId = 160 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1813, BookingId = 1813, CourtId = 32, StartTime = new DateTime(2025, 2, 2, 17, 0, 0), EndTime = new DateTime(2025, 2, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1814, BookingId = 1814, CourtId = 32, StartTime = new DateTime(2025, 2, 9, 17, 0, 0), EndTime = new DateTime(2025, 2, 9, 20, 0, 0) },
+                new BookingDetail { Id = 1815, BookingId = 1815, CourtId = 32, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 20, 0, 0) },
+                new BookingDetail { Id = 1816, BookingId = 1816, CourtId = 32, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 161 (THÁNG 1/2025, Sân 33 - Sân Bóng Chuyền) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 161, UserId = globalUserId, StadiumId = 24, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3900000m, TotalPrice = 3900000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T1/2025 Sân 33", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1817, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1818, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1819, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 6), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1820, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1821, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1822, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 13), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1823, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1824, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1825, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 20), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1826, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1827, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1828, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 27), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 },
+                new Booking { Id = 1829, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 29), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 161 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1817, BookingId = 1817, CourtId = 33, StartTime = new DateTime(2025, 1, 1, 18, 0, 0), EndTime = new DateTime(2025, 1, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1818, BookingId = 1818, CourtId = 33, StartTime = new DateTime(2025, 1, 3, 18, 0, 0), EndTime = new DateTime(2025, 1, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1819, BookingId = 1819, CourtId = 33, StartTime = new DateTime(2025, 1, 6, 18, 0, 0), EndTime = new DateTime(2025, 1, 6, 20, 0, 0) },
+                new BookingDetail { Id = 1820, BookingId = 1820, CourtId = 33, StartTime = new DateTime(2025, 1, 8, 18, 0, 0), EndTime = new DateTime(2025, 1, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1821, BookingId = 1821, CourtId = 33, StartTime = new DateTime(2025, 1, 10, 18, 0, 0), EndTime = new DateTime(2025, 1, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1822, BookingId = 1822, CourtId = 33, StartTime = new DateTime(2025, 1, 13, 18, 0, 0), EndTime = new DateTime(2025, 1, 13, 20, 0, 0) },
+                new BookingDetail { Id = 1823, BookingId = 1823, CourtId = 33, StartTime = new DateTime(2025, 1, 15, 18, 0, 0), EndTime = new DateTime(2025, 1, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1824, BookingId = 1824, CourtId = 33, StartTime = new DateTime(2025, 1, 17, 18, 0, 0), EndTime = new DateTime(2025, 1, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1825, BookingId = 1825, CourtId = 33, StartTime = new DateTime(2025, 1, 20, 18, 0, 0), EndTime = new DateTime(2025, 1, 20, 20, 0, 0) },
+                new BookingDetail { Id = 1826, BookingId = 1826, CourtId = 33, StartTime = new DateTime(2025, 1, 22, 18, 0, 0), EndTime = new DateTime(2025, 1, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1827, BookingId = 1827, CourtId = 33, StartTime = new DateTime(2025, 1, 24, 18, 0, 0), EndTime = new DateTime(2025, 1, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1828, BookingId = 1828, CourtId = 33, StartTime = new DateTime(2025, 1, 27, 18, 0, 0), EndTime = new DateTime(2025, 1, 27, 20, 0, 0) },
+                new BookingDetail { Id = 1829, BookingId = 1829, CourtId = 33, StartTime = new DateTime(2025, 1, 29, 18, 0, 0), EndTime = new DateTime(2025, 1, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 162 (THÁNG 2/2025, Sân 33 - Sân Bóng Chuyền) =====
+            // - T7, CN | 17h-19h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 162, UserId = globalUserId, StadiumId = 24, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T2/2025 Sân 33", TotalHour = 16, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1830, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1831, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 2), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1832, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1833, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 9), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1834, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1835, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 16), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1836, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 },
+                new Booking { Id = 1837, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 23), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 162 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1830, BookingId = 1830, CourtId = 33, StartTime = new DateTime(2025, 2, 1, 17, 0, 0), EndTime = new DateTime(2025, 2, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1831, BookingId = 1831, CourtId = 33, StartTime = new DateTime(2025, 2, 2, 17, 0, 0), EndTime = new DateTime(2025, 2, 2, 19, 0, 0) },
+                new BookingDetail { Id = 1832, BookingId = 1832, CourtId = 33, StartTime = new DateTime(2025, 2, 8, 17, 0, 0), EndTime = new DateTime(2025, 2, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1833, BookingId = 1833, CourtId = 33, StartTime = new DateTime(2025, 2, 9, 17, 0, 0), EndTime = new DateTime(2025, 2, 9, 19, 0, 0) },
+                new BookingDetail { Id = 1834, BookingId = 1834, CourtId = 33, StartTime = new DateTime(2025, 2, 15, 17, 0, 0), EndTime = new DateTime(2025, 2, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1835, BookingId = 1835, CourtId = 33, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 19, 0, 0) },
+                new BookingDetail { Id = 1836, BookingId = 1836, CourtId = 33, StartTime = new DateTime(2025, 2, 22, 17, 0, 0), EndTime = new DateTime(2025, 2, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1837, BookingId = 1837, CourtId = 33, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 163 (THÁNG 4/2025, Sân 33 - Sân Bóng Chuyền) =====
+            // - T3, 5 | 18h-20h (2 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 300,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 163, UserId = globalUserId, StadiumId = 24, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2700000m, TotalPrice = 2700000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 33", TotalHour = 18, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1838, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1839, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1840, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1841, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1842, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1843, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1844, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1845, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 },
+                new Booking { Id = 1846, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 163 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1838, BookingId = 1838, CourtId = 33, StartTime = new DateTime(2025, 4, 1, 18, 0, 0), EndTime = new DateTime(2025, 4, 1, 20, 0, 0) },
+                new BookingDetail { Id = 1839, BookingId = 1839, CourtId = 33, StartTime = new DateTime(2025, 4, 3, 18, 0, 0), EndTime = new DateTime(2025, 4, 3, 20, 0, 0) },
+                new BookingDetail { Id = 1840, BookingId = 1840, CourtId = 33, StartTime = new DateTime(2025, 4, 8, 18, 0, 0), EndTime = new DateTime(2025, 4, 8, 20, 0, 0) },
+                new BookingDetail { Id = 1841, BookingId = 1841, CourtId = 33, StartTime = new DateTime(2025, 4, 10, 18, 0, 0), EndTime = new DateTime(2025, 4, 10, 20, 0, 0) },
+                new BookingDetail { Id = 1842, BookingId = 1842, CourtId = 33, StartTime = new DateTime(2025, 4, 15, 18, 0, 0), EndTime = new DateTime(2025, 4, 15, 20, 0, 0) },
+                new BookingDetail { Id = 1843, BookingId = 1843, CourtId = 33, StartTime = new DateTime(2025, 4, 17, 18, 0, 0), EndTime = new DateTime(2025, 4, 17, 20, 0, 0) },
+                new BookingDetail { Id = 1844, BookingId = 1844, CourtId = 33, StartTime = new DateTime(2025, 4, 22, 18, 0, 0), EndTime = new DateTime(2025, 4, 22, 20, 0, 0) },
+                new BookingDetail { Id = 1845, BookingId = 1845, CourtId = 33, StartTime = new DateTime(2025, 4, 24, 18, 0, 0), EndTime = new DateTime(2025, 4, 24, 20, 0, 0) },
+                new BookingDetail { Id = 1846, BookingId = 1846, CourtId = 33, StartTime = new DateTime(2025, 4, 29, 18, 0, 0), EndTime = new DateTime(2025, 4, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 164 (THÁNG 5/2025, Sân 33 - Sân Bóng Chuyền) =====
+            // - CN | 17h-20h (3 tiếng), 150k/h, globalUserId
+            // - Giá/ngày = 450,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 164, UserId = globalUserId, StadiumId = 24, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T5/2025 Sân 33", TotalHour = 12, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1847, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 4), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 164 },
+                new Booking { Id = 1848, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 11), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 164 },
+                new Booking { Id = 1849, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 18), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 164 },
+                new Booking { Id = 1850, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 25), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 24, MonthlyBookingId = 164 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1847, BookingId = 1847, CourtId = 33, StartTime = new DateTime(2025, 5, 4, 17, 0, 0), EndTime = new DateTime(2025, 5, 4, 20, 0, 0) },
+                new BookingDetail { Id = 1848, BookingId = 1848, CourtId = 33, StartTime = new DateTime(2025, 5, 11, 17, 0, 0), EndTime = new DateTime(2025, 5, 11, 20, 0, 0) },
+                new BookingDetail { Id = 1849, BookingId = 1849, CourtId = 33, StartTime = new DateTime(2025, 5, 18, 17, 0, 0), EndTime = new DateTime(2025, 5, 18, 20, 0, 0) },
+                new BookingDetail { Id = 1850, BookingId = 1850, CourtId = 33, StartTime = new DateTime(2025, 5, 25, 17, 0, 0), EndTime = new DateTime(2025, 5, 25, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 165 (THÁNG 8/2025, Sân 34 - Sân 11 người) =====
+            // - T7, CN | 16h-18h (2 tiếng), 450k/h, globalUserId
+            // - Giá/ngày = 900,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 165, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 9000000m, TotalPrice = 9000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân 34", TotalHour = 20, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1851, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1852, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1853, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1854, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1855, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1856, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1857, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1858, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1859, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 },
+                new Booking { Id = 1860, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 165 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1851, BookingId = 1851, CourtId = 34, StartTime = new DateTime(2025, 8, 2, 16, 0, 0), EndTime = new DateTime(2025, 8, 2, 18, 0, 0) },
+                new BookingDetail { Id = 1852, BookingId = 1852, CourtId = 34, StartTime = new DateTime(2025, 8, 3, 16, 0, 0), EndTime = new DateTime(2025, 8, 3, 18, 0, 0) },
+                new BookingDetail { Id = 1853, BookingId = 1853, CourtId = 34, StartTime = new DateTime(2025, 8, 9, 16, 0, 0), EndTime = new DateTime(2025, 8, 9, 18, 0, 0) },
+                new BookingDetail { Id = 1854, BookingId = 1854, CourtId = 34, StartTime = new DateTime(2025, 8, 10, 16, 0, 0), EndTime = new DateTime(2025, 8, 10, 18, 0, 0) },
+                new BookingDetail { Id = 1855, BookingId = 1855, CourtId = 34, StartTime = new DateTime(2025, 8, 16, 16, 0, 0), EndTime = new DateTime(2025, 8, 16, 18, 0, 0) },
+                new BookingDetail { Id = 1856, BookingId = 1856, CourtId = 34, StartTime = new DateTime(2025, 8, 17, 16, 0, 0), EndTime = new DateTime(2025, 8, 17, 18, 0, 0) },
+                new BookingDetail { Id = 1857, BookingId = 1857, CourtId = 34, StartTime = new DateTime(2025, 8, 23, 16, 0, 0), EndTime = new DateTime(2025, 8, 23, 18, 0, 0) },
+                new BookingDetail { Id = 1858, BookingId = 1858, CourtId = 34, StartTime = new DateTime(2025, 8, 24, 16, 0, 0), EndTime = new DateTime(2025, 8, 24, 18, 0, 0) },
+                new BookingDetail { Id = 1859, BookingId = 1859, CourtId = 34, StartTime = new DateTime(2025, 8, 30, 16, 0, 0), EndTime = new DateTime(2025, 8, 30, 18, 0, 0) },
+                new BookingDetail { Id = 1860, BookingId = 1860, CourtId = 34, StartTime = new DateTime(2025, 8, 31, 16, 0, 0), EndTime = new DateTime(2025, 8, 31, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 166 (THÁNG 9/2025, Sân 34 - Sân 11 người) =====
+            // - T2, 4, 6 | 17h-19h (2 tiếng), 450k/h, globalUserId
+            // - Giá/ngày = 900,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 166, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 11700000m, TotalPrice = 11700000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T9/2025 Sân 34", TotalHour = 26, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1861, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 1), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1862, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 3), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1863, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 5), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1864, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 8), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1865, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 10), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1866, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 12), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1867, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 15), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1868, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 17), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1869, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 19), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1870, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 22), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1871, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 24), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1872, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 26), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 },
+                new Booking { Id = 1873, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 29), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 166 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1861, BookingId = 1861, CourtId = 34, StartTime = new DateTime(2025, 9, 1, 17, 0, 0), EndTime = new DateTime(2025, 9, 1, 19, 0, 0) },
+                new BookingDetail { Id = 1862, BookingId = 1862, CourtId = 34, StartTime = new DateTime(2025, 9, 3, 17, 0, 0), EndTime = new DateTime(2025, 9, 3, 19, 0, 0) },
+                new BookingDetail { Id = 1863, BookingId = 1863, CourtId = 34, StartTime = new DateTime(2025, 9, 5, 17, 0, 0), EndTime = new DateTime(2025, 9, 5, 19, 0, 0) },
+                new BookingDetail { Id = 1864, BookingId = 1864, CourtId = 34, StartTime = new DateTime(2025, 9, 8, 17, 0, 0), EndTime = new DateTime(2025, 9, 8, 19, 0, 0) },
+                new BookingDetail { Id = 1865, BookingId = 1865, CourtId = 34, StartTime = new DateTime(2025, 9, 10, 17, 0, 0), EndTime = new DateTime(2025, 9, 10, 19, 0, 0) },
+                new BookingDetail { Id = 1866, BookingId = 1866, CourtId = 34, StartTime = new DateTime(2025, 9, 12, 17, 0, 0), EndTime = new DateTime(2025, 9, 12, 19, 0, 0) },
+                new BookingDetail { Id = 1867, BookingId = 1867, CourtId = 34, StartTime = new DateTime(2025, 9, 15, 17, 0, 0), EndTime = new DateTime(2025, 9, 15, 19, 0, 0) },
+                new BookingDetail { Id = 1868, BookingId = 1868, CourtId = 34, StartTime = new DateTime(2025, 9, 17, 17, 0, 0), EndTime = new DateTime(2025, 9, 17, 19, 0, 0) },
+                new BookingDetail { Id = 1869, BookingId = 1869, CourtId = 34, StartTime = new DateTime(2025, 9, 19, 17, 0, 0), EndTime = new DateTime(2025, 9, 19, 19, 0, 0) },
+                new BookingDetail { Id = 1870, BookingId = 1870, CourtId = 34, StartTime = new DateTime(2025, 9, 22, 17, 0, 0), EndTime = new DateTime(2025, 9, 22, 19, 0, 0) },
+                new BookingDetail { Id = 1871, BookingId = 1871, CourtId = 34, StartTime = new DateTime(2025, 9, 24, 17, 0, 0), EndTime = new DateTime(2025, 9, 24, 19, 0, 0) },
+                new BookingDetail { Id = 1872, BookingId = 1872, CourtId = 34, StartTime = new DateTime(2025, 9, 26, 17, 0, 0), EndTime = new DateTime(2025, 9, 26, 19, 0, 0) },
+                new BookingDetail { Id = 1873, BookingId = 1873, CourtId = 34, StartTime = new DateTime(2025, 9, 29, 17, 0, 0), EndTime = new DateTime(2025, 9, 29, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 167 (THÁNG 10/2025, Sân 34 - Sân 11 người) =====
+            // - T7 | 15h-18h (3 tiếng), 450k/h, globalUserId
+            // - Giá/ngày = 1,350,000 | 4 ngày (T7)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 167, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 5400000m, TotalPrice = 5400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T10/2025 Sân 34", TotalHour = 12, StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1874, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 1350000m, OriginalPrice = 1350000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 167 },
+                new Booking { Id = 1875, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 1350000m, OriginalPrice = 1350000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 167 },
+                new Booking { Id = 1876, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 1350000m, OriginalPrice = 1350000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 167 },
+                new Booking { Id = 1877, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 1350000m, OriginalPrice = 1350000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 167 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1874, BookingId = 1874, CourtId = 34, StartTime = new DateTime(2025, 10, 4, 15, 0, 0), EndTime = new DateTime(2025, 10, 4, 18, 0, 0) },
+                new BookingDetail { Id = 1875, BookingId = 1875, CourtId = 34, StartTime = new DateTime(2025, 10, 11, 15, 0, 0), EndTime = new DateTime(2025, 10, 11, 18, 0, 0) },
+                new BookingDetail { Id = 1876, BookingId = 1876, CourtId = 34, StartTime = new DateTime(2025, 10, 18, 15, 0, 0), EndTime = new DateTime(2025, 10, 18, 18, 0, 0) },
+                new BookingDetail { Id = 1877, BookingId = 1877, CourtId = 34, StartTime = new DateTime(2025, 10, 25, 15, 0, 0), EndTime = new DateTime(2025, 10, 25, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 168 (THÁNG 11/2025, Sân 34 - Sân 11 người) =====
+            // - T3, 5 | 17h-18h (1 tiếng), 450k/h, globalUserId
+            // - Giá/ngày = 450,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 168, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3600000m, TotalPrice = 3600000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T11/2025 Sân 34", TotalHour = 8, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1878, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 4), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1879, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 6), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1880, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 11), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1881, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 13), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1882, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 18), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1883, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 20), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1884, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 25), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 },
+                new Booking { Id = 1885, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 27), TotalPrice = 450000m, OriginalPrice = 450000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 168 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1878, BookingId = 1878, CourtId = 34, StartTime = new DateTime(2025, 11, 4, 17, 0, 0), EndTime = new DateTime(2025, 11, 4, 18, 0, 0) },
+                new BookingDetail { Id = 1879, BookingId = 1879, CourtId = 34, StartTime = new DateTime(2025, 11, 6, 17, 0, 0), EndTime = new DateTime(2025, 11, 6, 18, 0, 0) },
+                new BookingDetail { Id = 1880, BookingId = 1880, CourtId = 34, StartTime = new DateTime(2025, 11, 11, 17, 0, 0), EndTime = new DateTime(2025, 11, 11, 18, 0, 0) },
+                new BookingDetail { Id = 1881, BookingId = 1881, CourtId = 34, StartTime = new DateTime(2025, 11, 13, 17, 0, 0), EndTime = new DateTime(2025, 11, 13, 18, 0, 0) },
+                new BookingDetail { Id = 1882, BookingId = 1882, CourtId = 34, StartTime = new DateTime(2025, 11, 18, 17, 0, 0), EndTime = new DateTime(2025, 11, 18, 18, 0, 0) },
+                new BookingDetail { Id = 1883, BookingId = 1883, CourtId = 34, StartTime = new DateTime(2025, 11, 20, 17, 0, 0), EndTime = new DateTime(2025, 11, 20, 18, 0, 0) },
+                new BookingDetail { Id = 1884, BookingId = 1884, CourtId = 34, StartTime = new DateTime(2025, 11, 25, 17, 0, 0), EndTime = new DateTime(2025, 11, 25, 18, 0, 0) },
+                new BookingDetail { Id = 1885, BookingId = 1885, CourtId = 34, StartTime = new DateTime(2025, 11, 27, 17, 0, 0), EndTime = new DateTime(2025, 11, 27, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 169 (THÁNG 12/2025, Sân 34 - Sân 11 người) =====
+            // - T7, CN | 08h-10h (2 tiếng), 450k/h, globalUserId
+            // - Giá/ngày = 900,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 169, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 7200000m, TotalPrice = 7200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T12/2025 Sân 34", TotalHour = 16, StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(10, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1886, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 6), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1887, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 7), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1888, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 13), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1889, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 14), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1890, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 20), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1891, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 21), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1892, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 27), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 },
+                new Booking { Id = 1893, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 28), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 169 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1886, BookingId = 1886, CourtId = 34, StartTime = new DateTime(2025, 12, 6, 8, 0, 0), EndTime = new DateTime(2025, 12, 6, 10, 0, 0) },
+                new BookingDetail { Id = 1887, BookingId = 1887, CourtId = 34, StartTime = new DateTime(2025, 12, 7, 8, 0, 0), EndTime = new DateTime(2025, 12, 7, 10, 0, 0) },
+                new BookingDetail { Id = 1888, BookingId = 1888, CourtId = 34, StartTime = new DateTime(2025, 12, 13, 8, 0, 0), EndTime = new DateTime(2025, 12, 13, 10, 0, 0) },
+                new BookingDetail { Id = 1889, BookingId = 1889, CourtId = 34, StartTime = new DateTime(2025, 12, 14, 8, 0, 0), EndTime = new DateTime(2025, 12, 14, 10, 0, 0) },
+                new BookingDetail { Id = 1890, BookingId = 1890, CourtId = 34, StartTime = new DateTime(2025, 12, 20, 8, 0, 0), EndTime = new DateTime(2025, 12, 20, 10, 0, 0) },
+                new BookingDetail { Id = 1891, BookingId = 1891, CourtId = 34, StartTime = new DateTime(2025, 12, 21, 8, 0, 0), EndTime = new DateTime(2025, 12, 21, 10, 0, 0) },
+                new BookingDetail { Id = 1892, BookingId = 1892, CourtId = 34, StartTime = new DateTime(2025, 12, 27, 8, 0, 0), EndTime = new DateTime(2025, 12, 27, 10, 0, 0) },
+                new BookingDetail { Id = 1893, BookingId = 1893, CourtId = 34, StartTime = new DateTime(2025, 12, 28, 8, 0, 0), EndTime = new DateTime(2025, 12, 28, 10, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 170 (THÁNG 1/2025, Sân 35 - Sân 7A) =====
+            // - T7, CN | 16h-18h (2 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 600,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 170, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4800000m, TotalPrice = 4800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T1/2025 Sân 35", TotalHour = 16, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1894, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 4), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1895, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 5), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1896, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 11), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1897, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 12), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1898, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 18), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1899, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 19), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1900, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 25), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 },
+                new Booking { Id = 1901, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 26), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 170 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1894, BookingId = 1894, CourtId = 35, StartTime = new DateTime(2025, 1, 4, 16, 0, 0), EndTime = new DateTime(2025, 1, 4, 18, 0, 0) },
+                new BookingDetail { Id = 1895, BookingId = 1895, CourtId = 35, StartTime = new DateTime(2025, 1, 5, 16, 0, 0), EndTime = new DateTime(2025, 1, 5, 18, 0, 0) },
+                new BookingDetail { Id = 1896, BookingId = 1896, CourtId = 35, StartTime = new DateTime(2025, 1, 11, 16, 0, 0), EndTime = new DateTime(2025, 1, 11, 18, 0, 0) },
+                new BookingDetail { Id = 1897, BookingId = 1897, CourtId = 35, StartTime = new DateTime(2025, 1, 12, 16, 0, 0), EndTime = new DateTime(2025, 1, 12, 18, 0, 0) },
+                new BookingDetail { Id = 1898, BookingId = 1898, CourtId = 35, StartTime = new DateTime(2025, 1, 18, 16, 0, 0), EndTime = new DateTime(2025, 1, 18, 18, 0, 0) },
+                new BookingDetail { Id = 1899, BookingId = 1899, CourtId = 35, StartTime = new DateTime(2025, 1, 19, 16, 0, 0), EndTime = new DateTime(2025, 1, 19, 18, 0, 0) },
+                new BookingDetail { Id = 1900, BookingId = 1900, CourtId = 35, StartTime = new DateTime(2025, 1, 25, 16, 0, 0), EndTime = new DateTime(2025, 1, 25, 18, 0, 0) },
+                new BookingDetail { Id = 1901, BookingId = 1901, CourtId = 35, StartTime = new DateTime(2025, 1, 26, 16, 0, 0), EndTime = new DateTime(2025, 1, 26, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 171 (THÁNG 2/2025, Sân 36 - Sân 7B) =====
+            // - T2, 4, 6 | 17h-19h (2 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 600,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 171, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 7200000m, TotalPrice = 7200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T2/2025 Sân 36", TotalHour = 24, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1902, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 3), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1903, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 5), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1904, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 7), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1905, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 10), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1906, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 12), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1907, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 14), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1908, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 17), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1909, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 19), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1910, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 21), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1911, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 24), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1912, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 26), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 },
+                new Booking { Id = 1913, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 28), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 171 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1902, BookingId = 1902, CourtId = 36, StartTime = new DateTime(2025, 2, 3, 17, 0, 0), EndTime = new DateTime(2025, 2, 3, 19, 0, 0) },
+                new BookingDetail { Id = 1903, BookingId = 1903, CourtId = 36, StartTime = new DateTime(2025, 2, 5, 17, 0, 0), EndTime = new DateTime(2025, 2, 5, 19, 0, 0) },
+                new BookingDetail { Id = 1904, BookingId = 1904, CourtId = 36, StartTime = new DateTime(2025, 2, 7, 17, 0, 0), EndTime = new DateTime(2025, 2, 7, 19, 0, 0) },
+                new BookingDetail { Id = 1905, BookingId = 1905, CourtId = 36, StartTime = new DateTime(2025, 2, 10, 17, 0, 0), EndTime = new DateTime(2025, 2, 10, 19, 0, 0) },
+                new BookingDetail { Id = 1906, BookingId = 1906, CourtId = 36, StartTime = new DateTime(2025, 2, 12, 17, 0, 0), EndTime = new DateTime(2025, 2, 12, 19, 0, 0) },
+                new BookingDetail { Id = 1907, BookingId = 1907, CourtId = 36, StartTime = new DateTime(2025, 2, 14, 17, 0, 0), EndTime = new DateTime(2025, 2, 14, 19, 0, 0) },
+                new BookingDetail { Id = 1908, BookingId = 1908, CourtId = 36, StartTime = new DateTime(2025, 2, 17, 17, 0, 0), EndTime = new DateTime(2025, 2, 17, 19, 0, 0) },
+                new BookingDetail { Id = 1909, BookingId = 1909, CourtId = 36, StartTime = new DateTime(2025, 2, 19, 17, 0, 0), EndTime = new DateTime(2025, 2, 19, 19, 0, 0) },
+                new BookingDetail { Id = 1910, BookingId = 1910, CourtId = 36, StartTime = new DateTime(2025, 2, 21, 17, 0, 0), EndTime = new DateTime(2025, 2, 21, 19, 0, 0) },
+                new BookingDetail { Id = 1911, BookingId = 1911, CourtId = 36, StartTime = new DateTime(2025, 2, 24, 17, 0, 0), EndTime = new DateTime(2025, 2, 24, 19, 0, 0) },
+                new BookingDetail { Id = 1912, BookingId = 1912, CourtId = 36, StartTime = new DateTime(2025, 2, 26, 17, 0, 0), EndTime = new DateTime(2025, 2, 26, 19, 0, 0) },
+                new BookingDetail { Id = 1913, BookingId = 1913, CourtId = 36, StartTime = new DateTime(2025, 2, 28, 17, 0, 0), EndTime = new DateTime(2025, 2, 28, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 172 (THÁNG 3/2025, Sân 35 - Sân 7A) =====
+            // - CN | 08h-10h (2 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 600,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 172, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3000000m, TotalPrice = 3000000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T3/2025 Sân 35", TotalHour = 10, StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(10, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1914, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 2), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 172 },
+                new Booking { Id = 1915, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 9), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 172 },
+                new Booking { Id = 1916, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 16), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 172 },
+                new Booking { Id = 1917, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 23), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 172 },
+                new Booking { Id = 1918, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 30), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 172 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1914, BookingId = 1914, CourtId = 35, StartTime = new DateTime(2025, 3, 2, 8, 0, 0), EndTime = new DateTime(2025, 3, 2, 10, 0, 0) },
+                new BookingDetail { Id = 1915, BookingId = 1915, CourtId = 35, StartTime = new DateTime(2025, 3, 9, 8, 0, 0), EndTime = new DateTime(2025, 3, 9, 10, 0, 0) },
+                new BookingDetail { Id = 1916, BookingId = 1916, CourtId = 35, StartTime = new DateTime(2025, 3, 16, 8, 0, 0), EndTime = new DateTime(2025, 3, 16, 10, 0, 0) },
+                new BookingDetail { Id = 1917, BookingId = 1917, CourtId = 35, StartTime = new DateTime(2025, 3, 23, 8, 0, 0), EndTime = new DateTime(2025, 3, 23, 10, 0, 0) },
+                new BookingDetail { Id = 1918, BookingId = 1918, CourtId = 35, StartTime = new DateTime(2025, 3, 30, 8, 0, 0), EndTime = new DateTime(2025, 3, 30, 10, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 173 (THÁNG 4/2025, Sân 36 - Sân 7B) =====
+            // - T3, 5 | 17h-18h (1 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 300,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 173, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2700000m, TotalPrice = 2700000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 36", TotalHour = 9, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1919, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1920, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1921, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1922, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1923, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1924, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1925, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1926, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 },
+                new Booking { Id = 1927, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 300000m, OriginalPrice = 300000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 173 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1919, BookingId = 1919, CourtId = 36, StartTime = new DateTime(2025, 4, 1, 17, 0, 0), EndTime = new DateTime(2025, 4, 1, 18, 0, 0) },
+                new BookingDetail { Id = 1920, BookingId = 1920, CourtId = 36, StartTime = new DateTime(2025, 4, 3, 17, 0, 0), EndTime = new DateTime(2025, 4, 3, 18, 0, 0) },
+                new BookingDetail { Id = 1921, BookingId = 1921, CourtId = 36, StartTime = new DateTime(2025, 4, 8, 17, 0, 0), EndTime = new DateTime(2025, 4, 8, 18, 0, 0) },
+                new BookingDetail { Id = 1922, BookingId = 1922, CourtId = 36, StartTime = new DateTime(2025, 4, 10, 17, 0, 0), EndTime = new DateTime(2025, 4, 10, 18, 0, 0) },
+                new BookingDetail { Id = 1923, BookingId = 1923, CourtId = 36, StartTime = new DateTime(2025, 4, 15, 17, 0, 0), EndTime = new DateTime(2025, 4, 15, 18, 0, 0) },
+                new BookingDetail { Id = 1924, BookingId = 1924, CourtId = 36, StartTime = new DateTime(2025, 4, 17, 17, 0, 0), EndTime = new DateTime(2025, 4, 17, 18, 0, 0) },
+                new BookingDetail { Id = 1925, BookingId = 1925, CourtId = 36, StartTime = new DateTime(2025, 4, 22, 17, 0, 0), EndTime = new DateTime(2025, 4, 22, 18, 0, 0) },
+                new BookingDetail { Id = 1926, BookingId = 1926, CourtId = 36, StartTime = new DateTime(2025, 4, 24, 17, 0, 0), EndTime = new DateTime(2025, 4, 24, 18, 0, 0) },
+                new BookingDetail { Id = 1927, BookingId = 1927, CourtId = 36, StartTime = new DateTime(2025, 4, 29, 17, 0, 0), EndTime = new DateTime(2025, 4, 29, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 174 (THÁNG 5/2025, Sân 35 - Sân 7A) =====
+            // - T7 | 15h-18h (3 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 900,000 | 5 days
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 174, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4500000m, TotalPrice = 4500000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T5/2025 Sân 35", TotalHour = 15, StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1928, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 3), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 174 },
+                new Booking { Id = 1929, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 10), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 174 },
+                new Booking { Id = 1930, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 17), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 174 },
+                new Booking { Id = 1931, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 24), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 174 },
+                new Booking { Id = 1932, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 31), TotalPrice = 900000m, OriginalPrice = 900000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 174 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1928, BookingId = 1928, CourtId = 35, StartTime = new DateTime(2025, 5, 3, 15, 0, 0), EndTime = new DateTime(2025, 5, 3, 18, 0, 0) },
+                new BookingDetail { Id = 1929, BookingId = 1929, CourtId = 35, StartTime = new DateTime(2025, 5, 10, 15, 0, 0), EndTime = new DateTime(2025, 5, 10, 18, 0, 0) },
+                new BookingDetail { Id = 1930, BookingId = 1930, CourtId = 35, StartTime = new DateTime(2025, 5, 17, 15, 0, 0), EndTime = new DateTime(2025, 5, 17, 18, 0, 0) },
+                new BookingDetail { Id = 1931, BookingId = 1931, CourtId = 35, StartTime = new DateTime(2025, 5, 24, 15, 0, 0), EndTime = new DateTime(2025, 5, 24, 18, 0, 0) },
+                new BookingDetail { Id = 1932, BookingId = 1932, CourtId = 35, StartTime = new DateTime(2025, 5, 31, 15, 0, 0), EndTime = new DateTime(2025, 5, 31, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 175 (THÁNG 6/2025, Sân 36 - Sân 7B) =====
+            // - T7, CN | 08h-10h (2 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 600,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 175, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 5400000m, TotalPrice = 5400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T6/2025 Sân 36", TotalHour = 18, StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(10, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1933, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 1), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1934, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1935, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 8), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1936, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1937, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 15), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1938, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1939, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 22), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1940, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 },
+                new Booking { Id = 1941, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 29), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 175 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1933, BookingId = 1933, CourtId = 36, StartTime = new DateTime(2025, 6, 1, 8, 0, 0), EndTime = new DateTime(2025, 6, 1, 10, 0, 0) },
+                new BookingDetail { Id = 1934, BookingId = 1934, CourtId = 36, StartTime = new DateTime(2025, 6, 7, 8, 0, 0), EndTime = new DateTime(2025, 6, 7, 10, 0, 0) },
+                new BookingDetail { Id = 1935, BookingId = 1935, CourtId = 36, StartTime = new DateTime(2025, 6, 8, 8, 0, 0), EndTime = new DateTime(2025, 6, 8, 10, 0, 0) },
+                new BookingDetail { Id = 1936, BookingId = 1936, CourtId = 36, StartTime = new DateTime(2025, 6, 14, 8, 0, 0), EndTime = new DateTime(2025, 6, 14, 10, 0, 0) },
+                new BookingDetail { Id = 1937, BookingId = 1937, CourtId = 36, StartTime = new DateTime(2025, 6, 15, 8, 0, 0), EndTime = new DateTime(2025, 6, 15, 10, 0, 0) },
+                new BookingDetail { Id = 1938, BookingId = 1938, CourtId = 36, StartTime = new DateTime(2025, 6, 21, 8, 0, 0), EndTime = new DateTime(2025, 6, 21, 10, 0, 0) },
+                new BookingDetail { Id = 1939, BookingId = 1939, CourtId = 36, StartTime = new DateTime(2025, 6, 22, 8, 0, 0), EndTime = new DateTime(2025, 6, 22, 10, 0, 0) },
+                new BookingDetail { Id = 1940, BookingId = 1940, CourtId = 36, StartTime = new DateTime(2025, 6, 28, 8, 0, 0), EndTime = new DateTime(2025, 6, 28, 10, 0, 0) },
+                new BookingDetail { Id = 1941, BookingId = 1941, CourtId = 36, StartTime = new DateTime(2025, 6, 29, 8, 0, 0), EndTime = new DateTime(2025, 6, 29, 10, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 176 (THÁNG 7/2025, Sân 35 - Sân 7A) =====
+            // - T7, CN | 16h-18h (2 tiếng), 300k/h, globalUserId
+            // - Giá/ngày = 600,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 176, UserId = globalUserId, StadiumId = 25, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 4800000m, TotalPrice = 4800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T7/2025 Sân 35", TotalHour = 16, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1942, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 5), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1943, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 6), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1944, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 12), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1945, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 13), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1946, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 19), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1947, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 20), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1948, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 26), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 },
+                new Booking { Id = 1949, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 27), TotalPrice = 600000m, OriginalPrice = 600000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 25, MonthlyBookingId = 176 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1942, BookingId = 1942, CourtId = 35, StartTime = new DateTime(2025, 7, 5, 16, 0, 0), EndTime = new DateTime(2025, 7, 5, 18, 0, 0) },
+                new BookingDetail { Id = 1943, BookingId = 1943, CourtId = 35, StartTime = new DateTime(2025, 7, 6, 16, 0, 0), EndTime = new DateTime(2025, 7, 6, 18, 0, 0) },
+                new BookingDetail { Id = 1944, BookingId = 1944, CourtId = 35, StartTime = new DateTime(2025, 7, 12, 16, 0, 0), EndTime = new DateTime(2025, 7, 12, 18, 0, 0) },
+                new BookingDetail { Id = 1945, BookingId = 1945, CourtId = 35, StartTime = new DateTime(2025, 7, 13, 16, 0, 0), EndTime = new DateTime(2025, 7, 13, 18, 0, 0) },
+                new BookingDetail { Id = 1946, BookingId = 1946, CourtId = 35, StartTime = new DateTime(2025, 7, 19, 16, 0, 0), EndTime = new DateTime(2025, 7, 19, 18, 0, 0) },
+                new BookingDetail { Id = 1947, BookingId = 1947, CourtId = 35, StartTime = new DateTime(2025, 7, 20, 16, 0, 0), EndTime = new DateTime(2025, 7, 20, 18, 0, 0) },
+                new BookingDetail { Id = 1948, BookingId = 1948, CourtId = 35, StartTime = new DateTime(2025, 7, 26, 16, 0, 0), EndTime = new DateTime(2025, 7, 26, 18, 0, 0) },
+                new BookingDetail { Id = 1949, BookingId = 1949, CourtId = 35, StartTime = new DateTime(2025, 7, 27, 16, 0, 0), EndTime = new DateTime(2025, 7, 27, 18, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 177 (THÁNG 1/2025, Sân 37 - Pickleball 1) =====
+            // - T7, CN | 16h-18h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 177, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1920000m, TotalPrice = 1920000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T1/2025 Sân 37", TotalHour = 16, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1950, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 4), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1951, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 5), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1952, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 11), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1953, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 12), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1954, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 18), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1955, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 19), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1956, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 25), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 },
+                new Booking { Id = 1957, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 26), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 177 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1950, BookingId = 1950, CourtId = 37, StartTime = new DateTime(2025, 1, 4, 16, 0, 0), EndTime = new DateTime(2025, 1, 4, 18, 0, 0) },
+                new BookingDetail { Id = 1951, BookingId = 1951, CourtId = 37, StartTime = new DateTime(2025, 1, 5, 16, 0, 0), EndTime = new DateTime(2025, 1, 5, 18, 0, 0) },
+                new BookingDetail { Id = 1952, BookingId = 1952, CourtId = 37, StartTime = new DateTime(2025, 1, 11, 16, 0, 0), EndTime = new DateTime(2025, 1, 11, 18, 0, 0) },
+                new BookingDetail { Id = 1953, BookingId = 1953, CourtId = 37, StartTime = new DateTime(2025, 1, 12, 16, 0, 0), EndTime = new DateTime(2025, 1, 12, 18, 0, 0) },
+                new BookingDetail { Id = 1954, BookingId = 1954, CourtId = 37, StartTime = new DateTime(2025, 1, 18, 16, 0, 0), EndTime = new DateTime(2025, 1, 18, 18, 0, 0) },
+                new BookingDetail { Id = 1955, BookingId = 1955, CourtId = 37, StartTime = new DateTime(2025, 1, 19, 16, 0, 0), EndTime = new DateTime(2025, 1, 19, 18, 0, 0) },
+                new BookingDetail { Id = 1956, BookingId = 1956, CourtId = 37, StartTime = new DateTime(2025, 1, 25, 16, 0, 0), EndTime = new DateTime(2025, 1, 25, 18, 0, 0) },
+                new BookingDetail { Id = 1957, BookingId = 1957, CourtId = 37, StartTime = new DateTime(2025, 1, 26, 16, 0, 0), EndTime = new DateTime(2025, 1, 26, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 178 (THÁNG 2/2025, Sân 38 - Pickleball 2) =====
+            // - T2, 4, 6 | 17h-19h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 178, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2880000m, TotalPrice = 2880000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T2/2025 Sân 38", TotalHour = 24, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1958, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 3), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1959, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 5), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1960, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 7), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1961, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 10), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1962, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 12), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1963, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 14), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1964, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 17), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1965, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 19), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1966, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 21), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1967, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 24), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1968, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 26), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 },
+                new Booking { Id = 1969, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 28), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 178 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1958, BookingId = 1958, CourtId = 38, StartTime = new DateTime(2025, 2, 3, 17, 0, 0), EndTime = new DateTime(2025, 2, 3, 19, 0, 0) },
+                new BookingDetail { Id = 1959, BookingId = 1959, CourtId = 38, StartTime = new DateTime(2025, 2, 5, 17, 0, 0), EndTime = new DateTime(2025, 2, 5, 19, 0, 0) },
+                new BookingDetail { Id = 1960, BookingId = 1960, CourtId = 38, StartTime = new DateTime(2025, 2, 7, 17, 0, 0), EndTime = new DateTime(2025, 2, 7, 19, 0, 0) },
+                new BookingDetail { Id = 1961, BookingId = 1961, CourtId = 38, StartTime = new DateTime(2025, 2, 10, 17, 0, 0), EndTime = new DateTime(2025, 2, 10, 19, 0, 0) },
+                new BookingDetail { Id = 1962, BookingId = 1962, CourtId = 38, StartTime = new DateTime(2025, 2, 12, 17, 0, 0), EndTime = new DateTime(2025, 2, 12, 19, 0, 0) },
+                new BookingDetail { Id = 1963, BookingId = 1963, CourtId = 38, StartTime = new DateTime(2025, 2, 14, 17, 0, 0), EndTime = new DateTime(2025, 2, 14, 19, 0, 0) },
+                new BookingDetail { Id = 1964, BookingId = 1964, CourtId = 38, StartTime = new DateTime(2025, 2, 17, 17, 0, 0), EndTime = new DateTime(2025, 2, 17, 19, 0, 0) },
+                new BookingDetail { Id = 1965, BookingId = 1965, CourtId = 38, StartTime = new DateTime(2025, 2, 19, 17, 0, 0), EndTime = new DateTime(2025, 2, 19, 19, 0, 0) },
+                new BookingDetail { Id = 1966, BookingId = 1966, CourtId = 38, StartTime = new DateTime(2025, 2, 21, 17, 0, 0), EndTime = new DateTime(2025, 2, 21, 19, 0, 0) },
+                new BookingDetail { Id = 1967, BookingId = 1967, CourtId = 38, StartTime = new DateTime(2025, 2, 24, 17, 0, 0), EndTime = new DateTime(2025, 2, 24, 19, 0, 0) },
+                new BookingDetail { Id = 1968, BookingId = 1968, CourtId = 38, StartTime = new DateTime(2025, 2, 26, 17, 0, 0), EndTime = new DateTime(2025, 2, 26, 19, 0, 0) },
+                new BookingDetail { Id = 1969, BookingId = 1969, CourtId = 38, StartTime = new DateTime(2025, 2, 28, 17, 0, 0), EndTime = new DateTime(2025, 2, 28, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 179 (THÁNG 3/2025, Sân 37 - Pickleball 1) =====
+            // - CN | 08h-10h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 5 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 179, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1200000m, TotalPrice = 1200000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt CN T3/2025 Sân 37", TotalHour = 10, StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(10, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1970, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 179 },
+                new Booking { Id = 1971, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 179 },
+                new Booking { Id = 1972, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 179 },
+                new Booking { Id = 1973, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 179 },
+                new Booking { Id = 1974, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 179 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1970, BookingId = 1970, CourtId = 37, StartTime = new DateTime(2025, 3, 2, 8, 0, 0), EndTime = new DateTime(2025, 3, 2, 10, 0, 0) },
+                new BookingDetail { Id = 1971, BookingId = 1971, CourtId = 37, StartTime = new DateTime(2025, 3, 9, 8, 0, 0), EndTime = new DateTime(2025, 3, 9, 10, 0, 0) },
+                new BookingDetail { Id = 1972, BookingId = 1972, CourtId = 37, StartTime = new DateTime(2025, 3, 16, 8, 0, 0), EndTime = new DateTime(2025, 3, 16, 10, 0, 0) },
+                new BookingDetail { Id = 1973, BookingId = 1973, CourtId = 37, StartTime = new DateTime(2025, 3, 23, 8, 0, 0), EndTime = new DateTime(2025, 3, 23, 10, 0, 0) },
+                new BookingDetail { Id = 1974, BookingId = 1974, CourtId = 37, StartTime = new DateTime(2025, 3, 30, 8, 0, 0), EndTime = new DateTime(2025, 3, 30, 10, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 180 (THÁNG 4/2025, Sân 38 - Pickleball 2) =====
+            // - T3, 5 | 17h-18h (1 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 120,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 180, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1080000m, TotalPrice = 1080000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T4/2025 Sân 38", TotalHour = 9, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1975, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 1), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1976, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 3), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1977, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 8), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1978, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 10), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1979, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 15), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1980, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 17), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1981, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 22), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1982, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 24), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 },
+                new Booking { Id = 1983, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 29), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 180 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1975, BookingId = 1975, CourtId = 38, StartTime = new DateTime(2025, 4, 1, 17, 0, 0), EndTime = new DateTime(2025, 4, 1, 18, 0, 0) },
+                new BookingDetail { Id = 1976, BookingId = 1976, CourtId = 38, StartTime = new DateTime(2025, 4, 3, 17, 0, 0), EndTime = new DateTime(2025, 4, 3, 18, 0, 0) },
+                new BookingDetail { Id = 1977, BookingId = 1977, CourtId = 38, StartTime = new DateTime(2025, 4, 8, 17, 0, 0), EndTime = new DateTime(2025, 4, 8, 18, 0, 0) },
+                new BookingDetail { Id = 1978, BookingId = 1978, CourtId = 38, StartTime = new DateTime(2025, 4, 10, 17, 0, 0), EndTime = new DateTime(2025, 4, 10, 18, 0, 0) },
+                new BookingDetail { Id = 1979, BookingId = 1979, CourtId = 38, StartTime = new DateTime(2025, 4, 15, 17, 0, 0), EndTime = new DateTime(2025, 4, 15, 18, 0, 0) },
+                new BookingDetail { Id = 1980, BookingId = 1980, CourtId = 38, StartTime = new DateTime(2025, 4, 17, 17, 0, 0), EndTime = new DateTime(2025, 4, 17, 18, 0, 0) },
+                new BookingDetail { Id = 1981, BookingId = 1981, CourtId = 38, StartTime = new DateTime(2025, 4, 22, 17, 0, 0), EndTime = new DateTime(2025, 4, 22, 18, 0, 0) },
+                new BookingDetail { Id = 1982, BookingId = 1982, CourtId = 38, StartTime = new DateTime(2025, 4, 24, 17, 0, 0), EndTime = new DateTime(2025, 4, 24, 18, 0, 0) },
+                new BookingDetail { Id = 1983, BookingId = 1983, CourtId = 38, StartTime = new DateTime(2025, 4, 29, 17, 0, 0), EndTime = new DateTime(2025, 4, 29, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 181 (THÁNG 5/2025, Sân 37 - Pickleball 1) =====
+            // - T7 | 15h-18h (3 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 360,000 | 5 days
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 181, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1800000m, TotalPrice = 1800000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T5/2025 Sân 37", TotalHour = 15, StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1984, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 3), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 181 },
+                new Booking { Id = 1985, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 10), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 181 },
+                new Booking { Id = 1986, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 17), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 181 },
+                new Booking { Id = 1987, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 24), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 181 },
+                new Booking { Id = 1988, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 31), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 181 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1984, BookingId = 1984, CourtId = 37, StartTime = new DateTime(2025, 5, 3, 15, 0, 0), EndTime = new DateTime(2025, 5, 3, 18, 0, 0) },
+                new BookingDetail { Id = 1985, BookingId = 1985, CourtId = 37, StartTime = new DateTime(2025, 5, 10, 15, 0, 0), EndTime = new DateTime(2025, 5, 10, 18, 0, 0) },
+                new BookingDetail { Id = 1986, BookingId = 1986, CourtId = 37, StartTime = new DateTime(2025, 5, 17, 15, 0, 0), EndTime = new DateTime(2025, 5, 17, 18, 0, 0) },
+                new BookingDetail { Id = 1987, BookingId = 1987, CourtId = 37, StartTime = new DateTime(2025, 5, 24, 15, 0, 0), EndTime = new DateTime(2025, 5, 24, 18, 0, 0) },
+                new BookingDetail { Id = 1988, BookingId = 1988, CourtId = 37, StartTime = new DateTime(2025, 5, 31, 15, 0, 0), EndTime = new DateTime(2025, 5, 31, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 182 (THÁNG 6/2025, Sân 38 - Pickleball 2) =====
+            // - T7, CN | 08h-10h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 182, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2160000m, TotalPrice = 2160000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T6/2025 Sân 38", TotalHour = 18, StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(10, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1989, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 1), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1990, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1991, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 8), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1992, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1993, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 15), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1994, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1995, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 22), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1996, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 },
+                new Booking { Id = 1997, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 29), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 182 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1989, BookingId = 1989, CourtId = 38, StartTime = new DateTime(2025, 6, 1, 8, 0, 0), EndTime = new DateTime(2025, 6, 1, 10, 0, 0) },
+                new BookingDetail { Id = 1990, BookingId = 1990, CourtId = 38, StartTime = new DateTime(2025, 6, 7, 8, 0, 0), EndTime = new DateTime(2025, 6, 7, 10, 0, 0) },
+                new BookingDetail { Id = 1991, BookingId = 1991, CourtId = 38, StartTime = new DateTime(2025, 6, 8, 8, 0, 0), EndTime = new DateTime(2025, 6, 8, 10, 0, 0) },
+                new BookingDetail { Id = 1992, BookingId = 1992, CourtId = 38, StartTime = new DateTime(2025, 6, 14, 8, 0, 0), EndTime = new DateTime(2025, 6, 14, 10, 0, 0) },
+                new BookingDetail { Id = 1993, BookingId = 1993, CourtId = 38, StartTime = new DateTime(2025, 6, 15, 8, 0, 0), EndTime = new DateTime(2025, 6, 15, 10, 0, 0) },
+                new BookingDetail { Id = 1994, BookingId = 1994, CourtId = 38, StartTime = new DateTime(2025, 6, 21, 8, 0, 0), EndTime = new DateTime(2025, 6, 21, 10, 0, 0) },
+                new BookingDetail { Id = 1995, BookingId = 1995, CourtId = 38, StartTime = new DateTime(2025, 6, 22, 8, 0, 0), EndTime = new DateTime(2025, 6, 22, 10, 0, 0) },
+                new BookingDetail { Id = 1996, BookingId = 1996, CourtId = 38, StartTime = new DateTime(2025, 6, 28, 8, 0, 0), EndTime = new DateTime(2025, 6, 28, 10, 0, 0) },
+                new BookingDetail { Id = 1997, BookingId = 1997, CourtId = 38, StartTime = new DateTime(2025, 6, 29, 8, 0, 0), EndTime = new DateTime(2025, 6, 29, 10, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 183 (THÁNG 7/2025, Sân 39 - Pickleball 3) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 183, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3120000m, TotalPrice = 3120000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T7/2025 Sân 39", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 1998, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 1999, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 4), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2000, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 7), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2001, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2002, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 11), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2003, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 14), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2004, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2005, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 18), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2006, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 21), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2007, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2008, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 25), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2009, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 28), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 },
+                new Booking { Id = 2010, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 183 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 1998, BookingId = 1998, CourtId = 39, StartTime = new DateTime(2025, 7, 2, 18, 0, 0), EndTime = new DateTime(2025, 7, 2, 20, 0, 0) },
+                new BookingDetail { Id = 1999, BookingId = 1999, CourtId = 39, StartTime = new DateTime(2025, 7, 4, 18, 0, 0), EndTime = new DateTime(2025, 7, 4, 20, 0, 0) },
+                new BookingDetail { Id = 2000, BookingId = 2000, CourtId = 39, StartTime = new DateTime(2025, 7, 7, 18, 0, 0), EndTime = new DateTime(2025, 7, 7, 20, 0, 0) },
+                new BookingDetail { Id = 2001, BookingId = 2001, CourtId = 39, StartTime = new DateTime(2025, 7, 9, 18, 0, 0), EndTime = new DateTime(2025, 7, 9, 20, 0, 0) },
+                new BookingDetail { Id = 2002, BookingId = 2002, CourtId = 39, StartTime = new DateTime(2025, 7, 11, 18, 0, 0), EndTime = new DateTime(2025, 7, 11, 20, 0, 0) },
+                new BookingDetail { Id = 2003, BookingId = 2003, CourtId = 39, StartTime = new DateTime(2025, 7, 14, 18, 0, 0), EndTime = new DateTime(2025, 7, 14, 20, 0, 0) },
+                new BookingDetail { Id = 2004, BookingId = 2004, CourtId = 39, StartTime = new DateTime(2025, 7, 16, 18, 0, 0), EndTime = new DateTime(2025, 7, 16, 20, 0, 0) },
+                new BookingDetail { Id = 2005, BookingId = 2005, CourtId = 39, StartTime = new DateTime(2025, 7, 18, 18, 0, 0), EndTime = new DateTime(2025, 7, 18, 20, 0, 0) },
+                new BookingDetail { Id = 2006, BookingId = 2006, CourtId = 39, StartTime = new DateTime(2025, 7, 21, 18, 0, 0), EndTime = new DateTime(2025, 7, 21, 20, 0, 0) },
+                new BookingDetail { Id = 2007, BookingId = 2007, CourtId = 39, StartTime = new DateTime(2025, 7, 23, 18, 0, 0), EndTime = new DateTime(2025, 7, 23, 20, 0, 0) },
+                new BookingDetail { Id = 2008, BookingId = 2008, CourtId = 39, StartTime = new DateTime(2025, 7, 25, 18, 0, 0), EndTime = new DateTime(2025, 7, 25, 20, 0, 0) },
+                new BookingDetail { Id = 2009, BookingId = 2009, CourtId = 39, StartTime = new DateTime(2025, 7, 28, 18, 0, 0), EndTime = new DateTime(2025, 7, 28, 20, 0, 0) },
+                new BookingDetail { Id = 2010, BookingId = 2010, CourtId = 39, StartTime = new DateTime(2025, 7, 30, 18, 0, 0), EndTime = new DateTime(2025, 7, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 184 (THÁNG 8/2025, Sân 39 - Pickleball 3) =====
+            // - T7, CN | 17h-19h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 184, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân 39", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2011, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2012, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2013, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2014, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2015, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2016, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2017, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2018, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2019, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 },
+                new Booking { Id = 2020, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 184 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2011, BookingId = 2011, CourtId = 39, StartTime = new DateTime(2025, 8, 2, 17, 0, 0), EndTime = new DateTime(2025, 8, 2, 19, 0, 0) },
+                new BookingDetail { Id = 2012, BookingId = 2012, CourtId = 39, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 19, 0, 0) },
+                new BookingDetail { Id = 2013, BookingId = 2013, CourtId = 39, StartTime = new DateTime(2025, 8, 9, 17, 0, 0), EndTime = new DateTime(2025, 8, 9, 19, 0, 0) },
+                new BookingDetail { Id = 2014, BookingId = 2014, CourtId = 39, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 19, 0, 0) },
+                new BookingDetail { Id = 2015, BookingId = 2015, CourtId = 39, StartTime = new DateTime(2025, 8, 16, 17, 0, 0), EndTime = new DateTime(2025, 8, 16, 19, 0, 0) },
+                new BookingDetail { Id = 2016, BookingId = 2016, CourtId = 39, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 19, 0, 0) },
+                new BookingDetail { Id = 2017, BookingId = 2017, CourtId = 39, StartTime = new DateTime(2025, 8, 23, 17, 0, 0), EndTime = new DateTime(2025, 8, 23, 19, 0, 0) },
+                new BookingDetail { Id = 2018, BookingId = 2018, CourtId = 39, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 19, 0, 0) },
+                new BookingDetail { Id = 2019, BookingId = 2019, CourtId = 39, StartTime = new DateTime(2025, 8, 30, 17, 0, 0), EndTime = new DateTime(2025, 8, 30, 19, 0, 0) },
+                new BookingDetail { Id = 2020, BookingId = 2020, CourtId = 39, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 185 (THÁNG 9/2025, Sân 39 - Pickleball 3) =====
+            // - T7 | 15h-18h (3 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 360,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 185, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1440000m, TotalPrice = 1440000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T9/2025 Sân 39", TotalHour = 12, StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2021, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 6), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 185 },
+                new Booking { Id = 2022, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 13), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 185 },
+                new Booking { Id = 2023, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 20), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 185 },
+                new Booking { Id = 2024, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 27), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 185 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2021, BookingId = 2021, CourtId = 39, StartTime = new DateTime(2025, 9, 6, 15, 0, 0), EndTime = new DateTime(2025, 9, 6, 18, 0, 0) },
+                new BookingDetail { Id = 2022, BookingId = 2022, CourtId = 39, StartTime = new DateTime(2025, 9, 13, 15, 0, 0), EndTime = new DateTime(2025, 9, 13, 18, 0, 0) },
+                new BookingDetail { Id = 2023, BookingId = 2023, CourtId = 39, StartTime = new DateTime(2025, 9, 20, 15, 0, 0), EndTime = new DateTime(2025, 9, 20, 18, 0, 0) },
+                new BookingDetail { Id = 2024, BookingId = 2024, CourtId = 39, StartTime = new DateTime(2025, 9, 27, 15, 0, 0), EndTime = new DateTime(2025, 9, 27, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 186 (THÁNG 10/2025, Sân 40 - Pickleball 4) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 14 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 186, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3360000m, TotalPrice = 3360000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T10/2025 Sân 40", TotalHour = 28, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2025, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 1), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2026, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 3), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2027, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 6), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2028, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 8), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2029, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 10), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2030, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 13), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2031, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 15), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2032, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 17), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2033, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 20), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2034, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 22), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2035, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 24), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2036, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 27), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2037, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 29), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 },
+                new Booking { Id = 2038, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 31), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 186 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2025, BookingId = 2025, CourtId = 40, StartTime = new DateTime(2025, 10, 1, 18, 0, 0), EndTime = new DateTime(2025, 10, 1, 20, 0, 0) },
+                new BookingDetail { Id = 2026, BookingId = 2026, CourtId = 40, StartTime = new DateTime(2025, 10, 3, 18, 0, 0), EndTime = new DateTime(2025, 10, 3, 20, 0, 0) },
+                new BookingDetail { Id = 2027, BookingId = 2027, CourtId = 40, StartTime = new DateTime(2025, 10, 6, 18, 0, 0), EndTime = new DateTime(2025, 10, 6, 20, 0, 0) },
+                new BookingDetail { Id = 2028, BookingId = 2028, CourtId = 40, StartTime = new DateTime(2025, 10, 8, 18, 0, 0), EndTime = new DateTime(2025, 10, 8, 20, 0, 0) },
+                new BookingDetail { Id = 2029, BookingId = 2029, CourtId = 40, StartTime = new DateTime(2025, 10, 10, 18, 0, 0), EndTime = new DateTime(2025, 10, 10, 20, 0, 0) },
+                new BookingDetail { Id = 2030, BookingId = 2030, CourtId = 40, StartTime = new DateTime(2025, 10, 13, 18, 0, 0), EndTime = new DateTime(2025, 10, 13, 20, 0, 0) },
+                new BookingDetail { Id = 2031, BookingId = 2031, CourtId = 40, StartTime = new DateTime(2025, 10, 15, 18, 0, 0), EndTime = new DateTime(2025, 10, 15, 20, 0, 0) },
+                new BookingDetail { Id = 2032, BookingId = 2032, CourtId = 40, StartTime = new DateTime(2025, 10, 17, 18, 0, 0), EndTime = new DateTime(2025, 10, 17, 20, 0, 0) },
+                new BookingDetail { Id = 2033, BookingId = 2033, CourtId = 40, StartTime = new DateTime(2025, 10, 20, 18, 0, 0), EndTime = new DateTime(2025, 10, 20, 20, 0, 0) },
+                new BookingDetail { Id = 2034, BookingId = 2034, CourtId = 40, StartTime = new DateTime(2025, 10, 22, 18, 0, 0), EndTime = new DateTime(2025, 10, 22, 20, 0, 0) },
+                new BookingDetail { Id = 2035, BookingId = 2035, CourtId = 40, StartTime = new DateTime(2025, 10, 24, 18, 0, 0), EndTime = new DateTime(2025, 10, 24, 20, 0, 0) },
+                new BookingDetail { Id = 2036, BookingId = 2036, CourtId = 40, StartTime = new DateTime(2025, 10, 27, 18, 0, 0), EndTime = new DateTime(2025, 10, 27, 20, 0, 0) },
+                new BookingDetail { Id = 2037, BookingId = 2037, CourtId = 40, StartTime = new DateTime(2025, 10, 29, 18, 0, 0), EndTime = new DateTime(2025, 10, 29, 20, 0, 0) },
+                new BookingDetail { Id = 2038, BookingId = 2038, CourtId = 40, StartTime = new DateTime(2025, 10, 31, 18, 0, 0), EndTime = new DateTime(2025, 10, 31, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 187 (THÁNG 11/2025, Sân 40 - Pickleball 4) =====
+            // - T7, CN | 17h-19h (2 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 240,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 187, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2400000m, TotalPrice = 2400000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T11/2025 Sân 40", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2039, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 1), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2040, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 2), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2041, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 8), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2042, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 9), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2043, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 15), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2044, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 16), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2045, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 22), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2046, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 23), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2047, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 29), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 },
+                new Booking { Id = 2048, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 30), TotalPrice = 240000m, OriginalPrice = 240000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 187 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2039, BookingId = 2039, CourtId = 40, StartTime = new DateTime(2025, 11, 1, 17, 0, 0), EndTime = new DateTime(2025, 11, 1, 19, 0, 0) },
+                new BookingDetail { Id = 2040, BookingId = 2040, CourtId = 40, StartTime = new DateTime(2025, 11, 2, 17, 0, 0), EndTime = new DateTime(2025, 11, 2, 19, 0, 0) },
+                new BookingDetail { Id = 2041, BookingId = 2041, CourtId = 40, StartTime = new DateTime(2025, 11, 8, 17, 0, 0), EndTime = new DateTime(2025, 11, 8, 19, 0, 0) },
+                new BookingDetail { Id = 2042, BookingId = 2042, CourtId = 40, StartTime = new DateTime(2025, 11, 9, 17, 0, 0), EndTime = new DateTime(2025, 11, 9, 19, 0, 0) },
+                new BookingDetail { Id = 2043, BookingId = 2043, CourtId = 40, StartTime = new DateTime(2025, 11, 15, 17, 0, 0), EndTime = new DateTime(2025, 11, 15, 19, 0, 0) },
+                new BookingDetail { Id = 2044, BookingId = 2044, CourtId = 40, StartTime = new DateTime(2025, 11, 16, 17, 0, 0), EndTime = new DateTime(2025, 11, 16, 19, 0, 0) },
+                new BookingDetail { Id = 2045, BookingId = 2045, CourtId = 40, StartTime = new DateTime(2025, 11, 22, 17, 0, 0), EndTime = new DateTime(2025, 11, 22, 19, 0, 0) },
+                new BookingDetail { Id = 2046, BookingId = 2046, CourtId = 40, StartTime = new DateTime(2025, 11, 23, 17, 0, 0), EndTime = new DateTime(2025, 11, 23, 19, 0, 0) },
+                new BookingDetail { Id = 2047, BookingId = 2047, CourtId = 40, StartTime = new DateTime(2025, 11, 29, 17, 0, 0), EndTime = new DateTime(2025, 11, 29, 19, 0, 0) },
+                new BookingDetail { Id = 2048, BookingId = 2048, CourtId = 40, StartTime = new DateTime(2025, 11, 30, 17, 0, 0), EndTime = new DateTime(2025, 11, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 188 (THÁNG 12/2025, Sân 40 - Pickleball 4) =====
+            // - T7 | 15h-18h (3 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 360,000 | 4 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 188, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1440000m, TotalPrice = 1440000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7 T12/2025 Sân 40", TotalHour = 12, StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2049, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 6), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 188 },
+                new Booking { Id = 2050, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 13), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 188 },
+                new Booking { Id = 2051, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 20), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 188 },
+                new Booking { Id = 2052, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 27), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 188 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2049, BookingId = 2049, CourtId = 40, StartTime = new DateTime(2025, 12, 6, 15, 0, 0), EndTime = new DateTime(2025, 12, 6, 18, 0, 0) },
+                new BookingDetail { Id = 2050, BookingId = 2050, CourtId = 40, StartTime = new DateTime(2025, 12, 13, 15, 0, 0), EndTime = new DateTime(2025, 12, 13, 18, 0, 0) },
+                new BookingDetail { Id = 2051, BookingId = 2051, CourtId = 40, StartTime = new DateTime(2025, 12, 20, 15, 0, 0), EndTime = new DateTime(2025, 12, 20, 18, 0, 0) },
+                new BookingDetail { Id = 2052, BookingId = 2052, CourtId = 40, StartTime = new DateTime(2025, 12, 27, 15, 0, 0), EndTime = new DateTime(2025, 12, 27, 18, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 189 (THÁNG 1/2025, Sân 41 - Pickleball A) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 189, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2470000m, TotalPrice = 2470000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T1/2025 Sân 41", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 1, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2053, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 1), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2054, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 3), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2055, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 6), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2056, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 8), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2057, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 10), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2058, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 13), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2059, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 15), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2060, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 17), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2061, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 20), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2062, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 22), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2063, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 24), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2064, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 27), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 },
+                new Booking { Id = 2065, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 1, 29), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 189 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2053, BookingId = 2053, CourtId = 41, StartTime = new DateTime(2025, 1, 1, 18, 0, 0), EndTime = new DateTime(2025, 1, 1, 20, 0, 0) },
+                new BookingDetail { Id = 2054, BookingId = 2054, CourtId = 41, StartTime = new DateTime(2025, 1, 3, 18, 0, 0), EndTime = new DateTime(2025, 1, 3, 20, 0, 0) },
+                new BookingDetail { Id = 2055, BookingId = 2055, CourtId = 41, StartTime = new DateTime(2025, 1, 6, 18, 0, 0), EndTime = new DateTime(2025, 1, 6, 20, 0, 0) },
+                new BookingDetail { Id = 2056, BookingId = 2056, CourtId = 41, StartTime = new DateTime(2025, 1, 8, 18, 0, 0), EndTime = new DateTime(2025, 1, 8, 20, 0, 0) },
+                new BookingDetail { Id = 2057, BookingId = 2057, CourtId = 41, StartTime = new DateTime(2025, 1, 10, 18, 0, 0), EndTime = new DateTime(2025, 1, 10, 20, 0, 0) },
+                new BookingDetail { Id = 2058, BookingId = 2058, CourtId = 41, StartTime = new DateTime(2025, 1, 13, 18, 0, 0), EndTime = new DateTime(2025, 1, 13, 20, 0, 0) },
+                new BookingDetail { Id = 2059, BookingId = 2059, CourtId = 41, StartTime = new DateTime(2025, 1, 15, 18, 0, 0), EndTime = new DateTime(2025, 1, 15, 20, 0, 0) },
+                new BookingDetail { Id = 2060, BookingId = 2060, CourtId = 41, StartTime = new DateTime(2025, 1, 17, 18, 0, 0), EndTime = new DateTime(2025, 1, 17, 20, 0, 0) },
+                new BookingDetail { Id = 2061, BookingId = 2061, CourtId = 41, StartTime = new DateTime(2025, 1, 20, 18, 0, 0), EndTime = new DateTime(2025, 1, 20, 20, 0, 0) },
+                new BookingDetail { Id = 2062, BookingId = 2062, CourtId = 41, StartTime = new DateTime(2025, 1, 22, 18, 0, 0), EndTime = new DateTime(2025, 1, 22, 20, 0, 0) },
+                new BookingDetail { Id = 2063, BookingId = 2063, CourtId = 41, StartTime = new DateTime(2025, 1, 24, 18, 0, 0), EndTime = new DateTime(2025, 1, 24, 20, 0, 0) },
+                new BookingDetail { Id = 2064, BookingId = 2064, CourtId = 41, StartTime = new DateTime(2025, 1, 27, 18, 0, 0), EndTime = new DateTime(2025, 1, 27, 20, 0, 0) },
+                new BookingDetail { Id = 2065, BookingId = 2065, CourtId = 41, StartTime = new DateTime(2025, 1, 29, 18, 0, 0), EndTime = new DateTime(2025, 1, 29, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 190 (THÁNG 2/2025, Sân 41 - Pickleball A) =====
+            // - T7, CN | 17h-19h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 190, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1520000m, TotalPrice = 1520000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T2/2025 Sân 41", TotalHour = 16, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 2, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2066, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 1), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2067, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 2), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2068, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 8), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2069, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 9), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2070, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 15), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2071, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 16), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2072, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 22), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 },
+                new Booking { Id = 2073, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 2, 23), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 190 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2066, BookingId = 2066, CourtId = 41, StartTime = new DateTime(2025, 2, 1, 17, 0, 0), EndTime = new DateTime(2025, 2, 1, 19, 0, 0) },
+                new BookingDetail { Id = 2067, BookingId = 2067, CourtId = 41, StartTime = new DateTime(2025, 2, 2, 17, 0, 0), EndTime = new DateTime(2025, 2, 2, 19, 0, 0) },
+                new BookingDetail { Id = 2068, BookingId = 2068, CourtId = 41, StartTime = new DateTime(2025, 2, 8, 17, 0, 0), EndTime = new DateTime(2025, 2, 8, 19, 0, 0) },
+                new BookingDetail { Id = 2069, BookingId = 2069, CourtId = 41, StartTime = new DateTime(2025, 2, 9, 17, 0, 0), EndTime = new DateTime(2025, 2, 9, 19, 0, 0) },
+                new BookingDetail { Id = 2070, BookingId = 2070, CourtId = 41, StartTime = new DateTime(2025, 2, 15, 17, 0, 0), EndTime = new DateTime(2025, 2, 15, 19, 0, 0) },
+                new BookingDetail { Id = 2071, BookingId = 2071, CourtId = 41, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 19, 0, 0) },
+                new BookingDetail { Id = 2072, BookingId = 2072, CourtId = 41, StartTime = new DateTime(2025, 2, 22, 17, 0, 0), EndTime = new DateTime(2025, 2, 22, 19, 0, 0) },
+                new BookingDetail { Id = 2073, BookingId = 2073, CourtId = 41, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 191 (THÁNG 3/2025, Sân 41 - Pickleball A) =====
+            // - T3, 5 | 19h-20h (1 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 95,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 191, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 760000m, TotalPrice = 760000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T3/2025 Sân 41", TotalHour = 8, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 3, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2074, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 4), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2075, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 6), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2076, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 11), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2077, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 13), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2078, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 18), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2079, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 20), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2080, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 25), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 },
+                new Booking { Id = 2081, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 3, 27), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 191 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2074, BookingId = 2074, CourtId = 41, StartTime = new DateTime(2025, 3, 4, 19, 0, 0), EndTime = new DateTime(2025, 3, 4, 20, 0, 0) },
+                new BookingDetail { Id = 2075, BookingId = 2075, CourtId = 41, StartTime = new DateTime(2025, 3, 6, 19, 0, 0), EndTime = new DateTime(2025, 3, 6, 20, 0, 0) },
+                new BookingDetail { Id = 2076, BookingId = 2076, CourtId = 41, StartTime = new DateTime(2025, 3, 11, 19, 0, 0), EndTime = new DateTime(2025, 3, 11, 20, 0, 0) },
+                new BookingDetail { Id = 2077, BookingId = 2077, CourtId = 41, StartTime = new DateTime(2025, 3, 13, 19, 0, 0), EndTime = new DateTime(2025, 3, 13, 20, 0, 0) },
+                new BookingDetail { Id = 2078, BookingId = 2078, CourtId = 41, StartTime = new DateTime(2025, 3, 18, 19, 0, 0), EndTime = new DateTime(2025, 3, 18, 20, 0, 0) },
+                new BookingDetail { Id = 2079, BookingId = 2079, CourtId = 41, StartTime = new DateTime(2025, 3, 20, 19, 0, 0), EndTime = new DateTime(2025, 3, 20, 20, 0, 0) },
+                new BookingDetail { Id = 2080, BookingId = 2080, CourtId = 41, StartTime = new DateTime(2025, 3, 25, 19, 0, 0), EndTime = new DateTime(2025, 3, 25, 20, 0, 0) },
+                new BookingDetail { Id = 2081, BookingId = 2081, CourtId = 41, StartTime = new DateTime(2025, 3, 27, 19, 0, 0), EndTime = new DateTime(2025, 3, 27, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 192 (THÁNG 4/2025, Sân 41 - Pickleball A) =====
+            // - T7, CN | 16h-18h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 192, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1520000m, TotalPrice = 1520000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T4/2025 Sân 41", TotalHour = 16, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 4, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2082, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 5), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2083, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 6), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2084, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 12), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2085, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 13), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2086, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 19), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2087, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 20), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2088, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 26), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 },
+                new Booking { Id = 2089, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 4, 27), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 192 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2082, BookingId = 2082, CourtId = 41, StartTime = new DateTime(2025, 4, 5, 16, 0, 0), EndTime = new DateTime(2025, 4, 5, 18, 0, 0) },
+                new BookingDetail { Id = 2083, BookingId = 2083, CourtId = 41, StartTime = new DateTime(2025, 4, 6, 16, 0, 0), EndTime = new DateTime(2025, 4, 6, 18, 0, 0) },
+                new BookingDetail { Id = 2084, BookingId = 2084, CourtId = 41, StartTime = new DateTime(2025, 4, 12, 16, 0, 0), EndTime = new DateTime(2025, 4, 12, 18, 0, 0) },
+                new BookingDetail { Id = 2085, BookingId = 2085, CourtId = 41, StartTime = new DateTime(2025, 4, 13, 16, 0, 0), EndTime = new DateTime(2025, 4, 13, 18, 0, 0) },
+                new BookingDetail { Id = 2086, BookingId = 2086, CourtId = 41, StartTime = new DateTime(2025, 4, 19, 16, 0, 0), EndTime = new DateTime(2025, 4, 19, 18, 0, 0) },
+                new BookingDetail { Id = 2087, BookingId = 2087, CourtId = 41, StartTime = new DateTime(2025, 4, 20, 16, 0, 0), EndTime = new DateTime(2025, 4, 20, 18, 0, 0) },
+                new BookingDetail { Id = 2088, BookingId = 2088, CourtId = 41, StartTime = new DateTime(2025, 4, 26, 16, 0, 0), EndTime = new DateTime(2025, 4, 26, 18, 0, 0) },
+                new BookingDetail { Id = 2089, BookingId = 2089, CourtId = 41, StartTime = new DateTime(2025, 4, 27, 16, 0, 0), EndTime = new DateTime(2025, 4, 27, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 193 (THÁNG 5/2025, Sân 38 - Pickleball 2) =====
+            // - T2, 4, 6 | 18h-19h (1 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 120,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 193, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1560000m, TotalPrice = 1560000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T5/2025 Sân 38", TotalHour = 13, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 5, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2090, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 2), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2091, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 5), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2092, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 7), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2093, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 9), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2094, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 12), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2095, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 14), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2096, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 16), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2097, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 19), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2098, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 21), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2099, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 23), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2100, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 26), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2101, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 28), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 },
+                new Booking { Id = 2102, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 5, 30), TotalPrice = 120000m, OriginalPrice = 120000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 193 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2090, BookingId = 2090, CourtId = 38, StartTime = new DateTime(2025, 5, 2, 18, 0, 0), EndTime = new DateTime(2025, 5, 2, 19, 0, 0) },
+                new BookingDetail { Id = 2091, BookingId = 2091, CourtId = 38, StartTime = new DateTime(2025, 5, 5, 18, 0, 0), EndTime = new DateTime(2025, 5, 5, 19, 0, 0) },
+                new BookingDetail { Id = 2092, BookingId = 2092, CourtId = 38, StartTime = new DateTime(2025, 5, 7, 18, 0, 0), EndTime = new DateTime(2025, 5, 7, 19, 0, 0) },
+                new BookingDetail { Id = 2093, BookingId = 2093, CourtId = 38, StartTime = new DateTime(2025, 5, 9, 18, 0, 0), EndTime = new DateTime(2025, 5, 9, 19, 0, 0) },
+                new BookingDetail { Id = 2094, BookingId = 2094, CourtId = 38, StartTime = new DateTime(2025, 5, 12, 18, 0, 0), EndTime = new DateTime(2025, 5, 12, 19, 0, 0) },
+                new BookingDetail { Id = 2095, BookingId = 2095, CourtId = 38, StartTime = new DateTime(2025, 5, 14, 18, 0, 0), EndTime = new DateTime(2025, 5, 14, 19, 0, 0) },
+                new BookingDetail { Id = 2096, BookingId = 2096, CourtId = 38, StartTime = new DateTime(2025, 5, 16, 18, 0, 0), EndTime = new DateTime(2025, 5, 16, 19, 0, 0) },
+                new BookingDetail { Id = 2097, BookingId = 2097, CourtId = 38, StartTime = new DateTime(2025, 5, 19, 18, 0, 0), EndTime = new DateTime(2025, 5, 19, 19, 0, 0) },
+                new BookingDetail { Id = 2098, BookingId = 2098, CourtId = 38, StartTime = new DateTime(2025, 5, 21, 18, 0, 0), EndTime = new DateTime(2025, 5, 21, 19, 0, 0) },
+                new BookingDetail { Id = 2099, BookingId = 2099, CourtId = 38, StartTime = new DateTime(2025, 5, 23, 18, 0, 0), EndTime = new DateTime(2025, 5, 23, 19, 0, 0) },
+                new BookingDetail { Id = 2100, BookingId = 2100, CourtId = 38, StartTime = new DateTime(2025, 5, 26, 18, 0, 0), EndTime = new DateTime(2025, 5, 26, 19, 0, 0) },
+                new BookingDetail { Id = 2101, BookingId = 2101, CourtId = 38, StartTime = new DateTime(2025, 5, 28, 18, 0, 0), EndTime = new DateTime(2025, 5, 28, 19, 0, 0) },
+                new BookingDetail { Id = 2102, BookingId = 2102, CourtId = 38, StartTime = new DateTime(2025, 5, 30, 18, 0, 0), EndTime = new DateTime(2025, 5, 30, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 194 (THÁNG 6/2025, Sân 41 - Pickleball 1) =====
+            // - T7, CN | 17h-20h (3 tiếng), 120k/h, globalUserId
+            // - Giá/ngày = 360,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 194, UserId = globalUserId, StadiumId = 26, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 3240000m, TotalPrice = 3240000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T6/2025 Sân 41", TotalHour = 27, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 6, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2103, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 1), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2104, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 7), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2105, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 8), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2106, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 14), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2107, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 15), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2108, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 21), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2109, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 22), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2110, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 28), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 },
+                new Booking { Id = 2111, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 6, 29), TotalPrice = 360000m, OriginalPrice = 360000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 26, MonthlyBookingId = 194 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2103, BookingId = 2103, CourtId = 41, StartTime = new DateTime(2025, 6, 1, 17, 0, 0), EndTime = new DateTime(2025, 6, 1, 20, 0, 0) },
+                new BookingDetail { Id = 2104, BookingId = 2104, CourtId = 41, StartTime = new DateTime(2025, 6, 7, 17, 0, 0), EndTime = new DateTime(2025, 6, 7, 20, 0, 0) },
+                new BookingDetail { Id = 2105, BookingId = 2105, CourtId = 41, StartTime = new DateTime(2025, 6, 8, 17, 0, 0), EndTime = new DateTime(2025, 6, 8, 20, 0, 0) },
+                new BookingDetail { Id = 2106, BookingId = 2106, CourtId = 41, StartTime = new DateTime(2025, 6, 14, 17, 0, 0), EndTime = new DateTime(2025, 6, 14, 20, 0, 0) },
+                new BookingDetail { Id = 2107, BookingId = 2107, CourtId = 41, StartTime = new DateTime(2025, 6, 15, 17, 0, 0), EndTime = new DateTime(2025, 6, 15, 20, 0, 0) },
+                new BookingDetail { Id = 2108, BookingId = 2108, CourtId = 41, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 20, 0, 0) },
+                new BookingDetail { Id = 2109, BookingId = 2109, CourtId = 41, StartTime = new DateTime(2025, 6, 22, 17, 0, 0), EndTime = new DateTime(2025, 6, 22, 20, 0, 0) },
+                new BookingDetail { Id = 2110, BookingId = 2110, CourtId = 41, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) },
+                new BookingDetail { Id = 2111, BookingId = 2111, CourtId = 41, StartTime = new DateTime(2025, 6, 29, 17, 0, 0), EndTime = new DateTime(2025, 6, 29, 20, 0, 0) }
+            );
+            
+            // ===== SEED DATA - SET 195 (THÁNG 7/2025, Sân 41 - Pickleball A) =====
+            // - T2, 4, 6 | 18h-20h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 13 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 195, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2470000m, TotalPrice = 2470000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T7/2025 Sân 41", TotalHour = 26, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 7, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2112, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 2), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2113, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 4), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2114, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 7), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2115, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 9), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2116, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 11), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2117, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 14), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2118, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 16), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2119, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 18), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2120, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 21), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2121, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 23), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2122, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 25), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2123, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 28), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 },
+                new Booking { Id = 2124, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 7, 30), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 195 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2112, BookingId = 2112, CourtId = 41, StartTime = new DateTime(2025, 7, 2, 18, 0, 0), EndTime = new DateTime(2025, 7, 2, 20, 0, 0) },
+                new BookingDetail { Id = 2113, BookingId = 2113, CourtId = 41, StartTime = new DateTime(2025, 7, 4, 18, 0, 0), EndTime = new DateTime(2025, 7, 4, 20, 0, 0) },
+                new BookingDetail { Id = 2114, BookingId = 2114, CourtId = 41, StartTime = new DateTime(2025, 7, 7, 18, 0, 0), EndTime = new DateTime(2025, 7, 7, 20, 0, 0) },
+                new BookingDetail { Id = 2115, BookingId = 2115, CourtId = 41, StartTime = new DateTime(2025, 7, 9, 18, 0, 0), EndTime = new DateTime(2025, 7, 9, 20, 0, 0) },
+                new BookingDetail { Id = 2116, BookingId = 2116, CourtId = 41, StartTime = new DateTime(2025, 7, 11, 18, 0, 0), EndTime = new DateTime(2025, 7, 11, 20, 0, 0) },
+                new BookingDetail { Id = 2117, BookingId = 2117, CourtId = 41, StartTime = new DateTime(2025, 7, 14, 18, 0, 0), EndTime = new DateTime(2025, 7, 14, 20, 0, 0) },
+                new BookingDetail { Id = 2118, BookingId = 2118, CourtId = 41, StartTime = new DateTime(2025, 7, 16, 18, 0, 0), EndTime = new DateTime(2025, 7, 16, 20, 0, 0) },
+                new BookingDetail { Id = 2119, BookingId = 2119, CourtId = 41, StartTime = new DateTime(2025, 7, 18, 18, 0, 0), EndTime = new DateTime(2025, 7, 18, 20, 0, 0) },
+                new BookingDetail { Id = 2120, BookingId = 2120, CourtId = 41, StartTime = new DateTime(2025, 7, 21, 18, 0, 0), EndTime = new DateTime(2025, 7, 21, 20, 0, 0) },
+                new BookingDetail { Id = 2121, BookingId = 2121, CourtId = 41, StartTime = new DateTime(2025, 7, 23, 18, 0, 0), EndTime = new DateTime(2025, 7, 23, 20, 0, 0) },
+                new BookingDetail { Id = 2122, BookingId = 2122, CourtId = 41, StartTime = new DateTime(2025, 7, 25, 18, 0, 0), EndTime = new DateTime(2025, 7, 25, 20, 0, 0) },
+                new BookingDetail { Id = 2123, BookingId = 2123, CourtId = 41, StartTime = new DateTime(2025, 7, 28, 18, 0, 0), EndTime = new DateTime(2025, 7, 28, 20, 0, 0) },
+                new BookingDetail { Id = 2124, BookingId = 2124, CourtId = 41, StartTime = new DateTime(2025, 7, 30, 18, 0, 0), EndTime = new DateTime(2025, 7, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 196 (THÁNG 8/2025, Sân 41 - Pickleball A) =====
+            // - T7, CN | 17h-19h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 10 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 196, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1900000m, TotalPrice = 1900000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T8/2025 Sân 41", TotalHour = 20, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 8, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2125, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 2), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2126, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 3), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2127, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 9), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2128, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 10), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2129, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 16), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2130, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 17), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2131, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 23), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2132, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 24), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2133, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 30), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 },
+                new Booking { Id = 2134, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 8, 31), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 196 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2125, BookingId = 2125, CourtId = 41, StartTime = new DateTime(2025, 8, 2, 17, 0, 0), EndTime = new DateTime(2025, 8, 2, 19, 0, 0) },
+                new BookingDetail { Id = 2126, BookingId = 2126, CourtId = 41, StartTime = new DateTime(2025, 8, 3, 17, 0, 0), EndTime = new DateTime(2025, 8, 3, 19, 0, 0) },
+                new BookingDetail { Id = 2127, BookingId = 2127, CourtId = 41, StartTime = new DateTime(2025, 8, 9, 17, 0, 0), EndTime = new DateTime(2025, 8, 9, 19, 0, 0) },
+                new BookingDetail { Id = 2128, BookingId = 2128, CourtId = 41, StartTime = new DateTime(2025, 8, 10, 17, 0, 0), EndTime = new DateTime(2025, 8, 10, 19, 0, 0) },
+                new BookingDetail { Id = 2129, BookingId = 2129, CourtId = 41, StartTime = new DateTime(2025, 8, 16, 17, 0, 0), EndTime = new DateTime(2025, 8, 16, 19, 0, 0) },
+                new BookingDetail { Id = 2130, BookingId = 2130, CourtId = 41, StartTime = new DateTime(2025, 8, 17, 17, 0, 0), EndTime = new DateTime(2025, 8, 17, 19, 0, 0) },
+                new BookingDetail { Id = 2131, BookingId = 2131, CourtId = 41, StartTime = new DateTime(2025, 8, 23, 17, 0, 0), EndTime = new DateTime(2025, 8, 23, 19, 0, 0) },
+                new BookingDetail { Id = 2132, BookingId = 2132, CourtId = 41, StartTime = new DateTime(2025, 8, 24, 17, 0, 0), EndTime = new DateTime(2025, 8, 24, 19, 0, 0) },
+                new BookingDetail { Id = 2133, BookingId = 2133, CourtId = 41, StartTime = new DateTime(2025, 8, 30, 17, 0, 0), EndTime = new DateTime(2025, 8, 30, 19, 0, 0) },
+                new BookingDetail { Id = 2134, BookingId = 2134, CourtId = 41, StartTime = new DateTime(2025, 8, 31, 17, 0, 0), EndTime = new DateTime(2025, 8, 31, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 197 (THÁNG 9/2025, Sân 41 - Pickleball A) =====
+            // - T3, 5 | 19h-20h (1 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 95,000 | 9 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 197, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 855000m, TotalPrice = 855000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T3-T5 T9/2025 Sân 41", TotalHour = 9, StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 9, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2135, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 2), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2136, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 4), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2137, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 9), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2138, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 11), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2139, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 16), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2140, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 18), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2141, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 23), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2142, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 25), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 },
+                new Booking { Id = 2143, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 9, 30), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 197 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2135, BookingId = 2135, CourtId = 41, StartTime = new DateTime(2025, 9, 2, 19, 0, 0), EndTime = new DateTime(2025, 9, 2, 20, 0, 0) },
+                new BookingDetail { Id = 2136, BookingId = 2136, CourtId = 41, StartTime = new DateTime(2025, 9, 4, 19, 0, 0), EndTime = new DateTime(2025, 9, 4, 20, 0, 0) },
+                new BookingDetail { Id = 2137, BookingId = 2137, CourtId = 41, StartTime = new DateTime(2025, 9, 9, 19, 0, 0), EndTime = new DateTime(2025, 9, 9, 20, 0, 0) },
+                new BookingDetail { Id = 2138, BookingId = 2138, CourtId = 41, StartTime = new DateTime(2025, 9, 11, 19, 0, 0), EndTime = new DateTime(2025, 9, 11, 20, 0, 0) },
+                new BookingDetail { Id = 2139, BookingId = 2139, CourtId = 41, StartTime = new DateTime(2025, 9, 16, 19, 0, 0), EndTime = new DateTime(2025, 9, 16, 20, 0, 0) },
+                new BookingDetail { Id = 2140, BookingId = 2140, CourtId = 41, StartTime = new DateTime(2025, 9, 18, 19, 0, 0), EndTime = new DateTime(2025, 9, 18, 20, 0, 0) },
+                new BookingDetail { Id = 2141, BookingId = 2141, CourtId = 41, StartTime = new DateTime(2025, 9, 23, 19, 0, 0), EndTime = new DateTime(2025, 9, 23, 20, 0, 0) },
+                new BookingDetail { Id = 2142, BookingId = 2142, CourtId = 41, StartTime = new DateTime(2025, 9, 25, 19, 0, 0), EndTime = new DateTime(2025, 9, 25, 20, 0, 0) },
+                new BookingDetail { Id = 2143, BookingId = 2143, CourtId = 41, StartTime = new DateTime(2025, 9, 30, 19, 0, 0), EndTime = new DateTime(2025, 9, 30, 20, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 198 (THÁNG 10/2025, Sân 41 - Pickleball A) =====
+            // - T7, CN | 16h-18h (2 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 190,000 | 8 ngày (T7, CN)
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 198, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1520000m, TotalPrice = 1520000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T10/2025 Sân 41", TotalHour = 16, StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(18, 0, 0), Month = 10, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2144, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 4), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2145, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 5), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2146, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 11), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2147, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 12), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2148, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 18), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2149, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 19), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2150, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 25), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 },
+                new Booking { Id = 2151, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 10, 26), TotalPrice = 190000m, OriginalPrice = 190000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 198 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2144, BookingId = 2144, CourtId = 41, StartTime = new DateTime(2025, 10, 4, 16, 0, 0), EndTime = new DateTime(2025, 10, 4, 18, 0, 0) },
+                new BookingDetail { Id = 2145, BookingId = 2145, CourtId = 41, StartTime = new DateTime(2025, 10, 5, 16, 0, 0), EndTime = new DateTime(2025, 10, 5, 18, 0, 0) },
+                new BookingDetail { Id = 2146, BookingId = 2146, CourtId = 41, StartTime = new DateTime(2025, 10, 11, 16, 0, 0), EndTime = new DateTime(2025, 10, 11, 18, 0, 0) },
+                new BookingDetail { Id = 2147, BookingId = 2147, CourtId = 41, StartTime = new DateTime(2025, 10, 12, 16, 0, 0), EndTime = new DateTime(2025, 10, 12, 18, 0, 0) },
+                new BookingDetail { Id = 2148, BookingId = 2148, CourtId = 41, StartTime = new DateTime(2025, 10, 18, 16, 0, 0), EndTime = new DateTime(2025, 10, 18, 18, 0, 0) },
+                new BookingDetail { Id = 2149, BookingId = 2149, CourtId = 41, StartTime = new DateTime(2025, 10, 19, 16, 0, 0), EndTime = new DateTime(2025, 10, 19, 18, 0, 0) },
+                new BookingDetail { Id = 2150, BookingId = 2150, CourtId = 41, StartTime = new DateTime(2025, 10, 25, 16, 0, 0), EndTime = new DateTime(2025, 10, 25, 18, 0, 0) },
+                new BookingDetail { Id = 2151, BookingId = 2151, CourtId = 41, StartTime = new DateTime(2025, 10, 26, 16, 0, 0), EndTime = new DateTime(2025, 10, 26, 18, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 199 (THÁNG 11/2025, Sân 41 - Pickleball A) =====
+            // - T2, 4, 6 | 18h-19h (1 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 95,000 | 12 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 199, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 1140000m, TotalPrice = 1140000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T2-T4-T6 T11/2025 Sân 41", TotalHour = 12, StartTime = new TimeSpan(18, 0, 0), EndTime = new TimeSpan(19, 0, 0), Month = 11, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2152, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 3), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2153, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 5), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2154, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 7), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2155, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 10), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2156, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 12), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2157, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 14), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2158, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 17), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2159, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 19), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2160, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 21), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2161, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 24), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2162, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 26), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 },
+                new Booking { Id = 2163, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 11, 28), TotalPrice = 95000m, OriginalPrice = 95000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 199 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2152, BookingId = 2152, CourtId = 41, StartTime = new DateTime(2025, 11, 3, 18, 0, 0), EndTime = new DateTime(2025, 11, 3, 19, 0, 0) },
+                new BookingDetail { Id = 2153, BookingId = 2153, CourtId = 41, StartTime = new DateTime(2025, 11, 5, 18, 0, 0), EndTime = new DateTime(2025, 11, 5, 19, 0, 0) },
+                new BookingDetail { Id = 2154, BookingId = 2154, CourtId = 41, StartTime = new DateTime(2025, 11, 7, 18, 0, 0), EndTime = new DateTime(2025, 11, 7, 19, 0, 0) },
+                new BookingDetail { Id = 2155, BookingId = 2155, CourtId = 41, StartTime = new DateTime(2025, 11, 10, 18, 0, 0), EndTime = new DateTime(2025, 11, 10, 19, 0, 0) },
+                new BookingDetail { Id = 2156, BookingId = 2156, CourtId = 41, StartTime = new DateTime(2025, 11, 12, 18, 0, 0), EndTime = new DateTime(2025, 11, 12, 19, 0, 0) },
+                new BookingDetail { Id = 2157, BookingId = 2157, CourtId = 41, StartTime = new DateTime(2025, 11, 14, 18, 0, 0), EndTime = new DateTime(2025, 11, 14, 19, 0, 0) },
+                new BookingDetail { Id = 2158, BookingId = 2158, CourtId = 41, StartTime = new DateTime(2025, 11, 17, 18, 0, 0), EndTime = new DateTime(2025, 11, 17, 19, 0, 0) },
+                new BookingDetail { Id = 2159, BookingId = 2159, CourtId = 41, StartTime = new DateTime(2025, 11, 19, 18, 0, 0), EndTime = new DateTime(2025, 11, 19, 19, 0, 0) },
+                new BookingDetail { Id = 2160, BookingId = 2160, CourtId = 41, StartTime = new DateTime(2025, 11, 21, 18, 0, 0), EndTime = new DateTime(2025, 11, 21, 19, 0, 0) },
+                new BookingDetail { Id = 2161, BookingId = 2161, CourtId = 41, StartTime = new DateTime(2025, 11, 24, 18, 0, 0), EndTime = new DateTime(2025, 11, 24, 19, 0, 0) },
+                new BookingDetail { Id = 2162, BookingId = 2162, CourtId = 41, StartTime = new DateTime(2025, 11, 26, 18, 0, 0), EndTime = new DateTime(2025, 11, 26, 19, 0, 0) },
+                new BookingDetail { Id = 2163, BookingId = 2163, CourtId = 41, StartTime = new DateTime(2025, 11, 28, 18, 0, 0), EndTime = new DateTime(2025, 11, 28, 19, 0, 0) }
+            );
+
+            // ===== SEED DATA - SET 200 (THÁNG 12/2025, Sân 41 - Pickleball A) =====
+            // - T7, CN | 17h-20h (3 tiếng), 95k/h, globalUserId
+            // - Giá/ngày = 285,000 | 8 ngày
+            modelBuilder.Entity<MonthlyBooking>().HasData(
+                new MonthlyBooking { Id = 200, UserId = globalUserId, StadiumId = 27, DiscountId = null, CreatedAt = seedDate, UpdatedAt = seedDate, OriginalPrice = 2280000m, TotalPrice = 2280000m, Status = "accepted", PaymentMethod = "vnpay_100", Note = "Đặt T7-CN T12/2025 Sân 41", TotalHour = 24, StartTime = new TimeSpan(17, 0, 0), EndTime = new TimeSpan(20, 0, 0), Month = 12, Year = 2025 }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking { Id = 2164, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 6), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2165, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 7), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2166, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 13), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2167, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 14), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2168, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 20), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2169, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 21), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2170, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 27), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 },
+                new Booking { Id = 2171, UserId = globalUserId, CreatedById = 0, Status = "accepted", Date = new DateTime(2025, 12, 28), TotalPrice = 285000m, OriginalPrice = 285000m, Note = null, PaymentMethod = "vnpay_100", CreatedAt = seedDate, UpdatedAt = seedDate, DiscountId = null, StadiumId = 27, MonthlyBookingId = 200 }
+            );
+            modelBuilder.Entity<BookingDetail>().HasData(
+                new BookingDetail { Id = 2164, BookingId = 2164, CourtId = 41, StartTime = new DateTime(2025, 12, 6, 17, 0, 0), EndTime = new DateTime(2025, 12, 6, 20, 0, 0) },
+                new BookingDetail { Id = 2165, BookingId = 2165, CourtId = 41, StartTime = new DateTime(2025, 12, 7, 17, 0, 0), EndTime = new DateTime(2025, 12, 7, 20, 0, 0) },
+                new BookingDetail { Id = 2166, BookingId = 2166, CourtId = 41, StartTime = new DateTime(2025, 12, 13, 17, 0, 0), EndTime = new DateTime(2025, 12, 13, 20, 0, 0) },
+                new BookingDetail { Id = 2167, BookingId = 2167, CourtId = 41, StartTime = new DateTime(2025, 12, 14, 17, 0, 0), EndTime = new DateTime(2025, 12, 14, 20, 0, 0) },
+                new BookingDetail { Id = 2168, BookingId = 2168, CourtId = 41, StartTime = new DateTime(2025, 12, 20, 17, 0, 0), EndTime = new DateTime(2025, 12, 20, 20, 0, 0) },
+                new BookingDetail { Id = 2169, BookingId = 2169, CourtId = 41, StartTime = new DateTime(2025, 12, 21, 17, 0, 0), EndTime = new DateTime(2025, 12, 21, 20, 0, 0) },
+                new BookingDetail { Id = 2170, BookingId = 2170, CourtId = 41, StartTime = new DateTime(2025, 12, 27, 17, 0, 0), EndTime = new DateTime(2025, 12, 27, 20, 0, 0) },
+                new BookingDetail { Id = 2171, BookingId = 2171, CourtId = 41, StartTime = new DateTime(2025, 12, 28, 17, 0, 0), EndTime = new DateTime(2025, 12, 28, 20, 0, 0) }
             );
         }
     }
