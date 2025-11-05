@@ -215,7 +215,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0396m,
                     Longitude = 105.7725m,
                     IsApproved = true,
-                    CreatedBy = 8,
+                    CreatedBy = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -233,7 +233,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0094m,
                     Longitude = 105.7877m,
                     IsApproved = true,
-                    CreatedBy = 8,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false

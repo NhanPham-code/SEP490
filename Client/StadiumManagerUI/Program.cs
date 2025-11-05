@@ -70,6 +70,7 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
 builder.Services.AddScoped<IFeesService, FeesService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
