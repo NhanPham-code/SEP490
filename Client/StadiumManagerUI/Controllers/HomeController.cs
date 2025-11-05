@@ -22,7 +22,7 @@ namespace StadiumManagerUI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Dashboard()
+        public IActionResult Index()
         {
             // Kiểm tra session hoặc cookie để đảm bảo người dùng đã đăng nhập
             var userId = HttpContext.Session.GetInt32("UserId");
