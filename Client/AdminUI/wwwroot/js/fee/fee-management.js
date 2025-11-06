@@ -150,14 +150,14 @@
             }
 
             return `
-                <tr>
-                    <td>${item.stadiumName || 'N/A'}</td>
-                    <td>${item.ownerName || 'N/A'}</td>
-                    <td>${numberFormatter.format(fee.feeAmount)} VNĐ</td>
-                    <td>${dateFormatter.format(new Date(fee.dueDate))}</td>
-                    <td><span class="status-tag status-${status}"><i class="fas fa-${statusIcon[status]}"></i> ${statusText[status]}</span></td>
-                    <td><div class="d-flex">${actionHtml}</div></td>
-                </tr>`;
+            <tr>
+                <td><strong>${item.stadiumName || 'N/A'}</strong></td>
+                <td>${item.ownerName || 'N/A'}</td>
+                <td><span class="fee-amount">${numberFormatter.format(fee.feeAmount)} VNĐ</span></td>
+                <td>${dateFormatter.format(new Date(fee.dueDate))}</td>
+                <td><span class="status-tag status-${status}"><i class="fas fa-${statusIcon[status]}"></i> ${statusText[status]}</span></td>
+                <td><div class="d-flex">${actionHtml}</div></td>
+            </tr>`;
         }).join('');
     }
 

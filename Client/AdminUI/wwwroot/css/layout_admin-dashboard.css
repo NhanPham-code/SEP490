@@ -1,27 +1,66 @@
 ﻿/* Admin Dashboard Styles */
-body{
+body {
     overflow: hidden;
 }
-/* Navigation Styles */
+
+/* === NAVIGATION STYLES - PURE CSS VERSION === */
 .nav-item {
-    @apply flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 relative group;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* space-x-3 */
+    padding: 0.75rem 1rem; /* px-4 py-3 */
+    border-radius: 0.5rem; /* rounded-lg */
+    color: #4b5563; /* text-gray-600 */
+    font-weight: 500; /* font-medium */
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
 }
 
-    .nav-item.active {
-        @apply bg-blue-50 text-blue-700 font-medium;
+    /* Hover cho các mục không active */
+    .nav-item:not(.active):hover {
+        background-color: #f3f4f6; /* bg-gray-100 */
+        color: #111827; /* text-gray-900 */
+        transform: translateX(4px);
     }
 
-        .nav-item.active .nav-indicator {
-            @apply absolute right-0 top-0 bottom-0 w-1 bg-blue-600 rounded-l-full;
+    /* Mục được chọn (active) */
+    .nav-item.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: #ffffff; /* text-white */
+        font-weight: 600; /* font-semibold */
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2); /* shadow-md with blue tint */
+        transform: scale(1.02);
+    }
+
+        /* Hover cho mục active */
+        .nav-item.active:hover {
+            transform: scale(1.03);
+            filter: brightness(1.1);
         }
 
+        /* Icon của mục active */
+        .nav-item.active i {
+            color: #ffffff; /* text-white */
+        }
+
+    /* Icon mặc định */
     .nav-item i {
-        @apply text-xl flex-shrink-0;
+        font-size: 1.25rem; /* text-xl */
+        flex-shrink: 0;
     }
 
-    .nav-item:hover {
-        transform: translateX(2px);
+    /* Ẩn indicator cũ */
+    .nav-item .nav-indicator {
+        display: none;
     }
+
+    /* Thêm hiệu ứng cho text */
+    .nav-item span {
+        flex: 1;
+        font-size: 0.9375rem; /* ~15px */
+    }
+/* === END NAVIGATION STYLES === */
+
 
 /* Content Sections */
 .content-section {
@@ -53,7 +92,19 @@ body{
 
 /* Loading States */
 .loading-spinner {
-    @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin;
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid white;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Toast Animations */
@@ -120,16 +171,17 @@ body{
 
 /* Table Styles */
 table {
-    @apply min-w-full divide-y divide-gray-200;
+    min-width: 100%;
+    border-collapse: collapse;
 }
 
 tbody tr:hover {
-    @apply bg-gray-50;
+    background-color: #f9fafb;
 }
 
 /* Button Hover Effects */
 button {
-    @apply transition-all duration-200;
+    transition: all 0.2s;
 }
 
     button:hover {
@@ -137,39 +189,45 @@ button {
     }
 
 /* Form Styles */
-input[type="text"], input[type="email"], input[type="password"], textarea, select {
-    @apply transition-all duration-200;
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    transition: all 0.2s;
 }
 
-    input:focus, textarea:focus, select:focus {
-        @apply ring-2 ring-blue-500 border-transparent transform scale-105;
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-
-/* Card Hover Effects */
-.hover\:shadow-md:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Gradient Backgrounds */
-.bg-gradient-admin {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
 
 /* Status Badges */
 .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .status-active {
-    @apply bg-green-100 text-green-800;
+    background-color: #d1fae5;
+    color: #065f46;
 }
 
 .status-inactive {
-    @apply bg-red-100 text-red-800;
+    background-color: #fee2e2;
+    color: #991b1b;
 }
 
 .status-pending {
-    @apply bg-yellow-100 text-yellow-800;
+    background-color: #fef3c7;
+    color: #92400e;
 }
 
 /* Mobile Optimizations */
