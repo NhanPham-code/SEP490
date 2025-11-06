@@ -1,160 +1,116 @@
 ﻿@model DTOs.BookingDTO.ViewModel.BookingManagementViewModel
-@using System.Text.Json;
+@using System.Text.Json
 @using DTOs.StadiumDTO
 
 @{
     ViewData["Title"] = "Quản Lý Lịch Đặt Sân";
     var stadiums = ViewBag.Stadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
-
-    var sortedDailyBookings = Model.DailyBookings
-        .OrderBy(b => b.Booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-        .ThenByDescending(b => b.Booking.CreatedAt)
-        .ToList();
-
-    var sortedMonthlyBookings = Model.MonthlyBookings
-        .OrderBy(b => b.MonthlyBooking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-        .ThenByDescending(b => b.MonthlyBooking.CreatedAt)
-        .ToList();
-
-    var pendingBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase)) + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase));
-
-    // *** SỬA LỖI TÍNH TỔNG DOANH THU ***
-    var acceptedBookings = sortedDailyBookings.Count(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
-                         + sortedMonthlyBookings.Count(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase));
-
-    var totalRevenue = sortedDailyBookings
-                         .Where(b => b.Booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Booking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
-                         .Sum(b => b.Booking.TotalPrice ?? 0)
-                     + sortedMonthlyBookings
-                         .Where(mb => mb.MonthlyBooking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || mb.MonthlyBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase))
-                         .Sum(mb => mb.MonthlyBooking.TotalPrice ?? 0);
-
-    string GetStatusClass(string status) => status.ToLower() switch
-    {
-        "pending" => "bm-status-pending",
-        "accepted" => "bm-status-accepted",
-        "completed" => "bm-status-completed",
-        "denied" or "cancelled" or "payfail" => "bm-status-cancelled",
-        "waiting" => "bm-status-waiting",
-        _ => "bm-status-default"
-    };
-
-    string TranslateStatus(string status) => status.ToLower() switch
-    {
-        "pending" => "Chờ xử lý",
-        "accepted" => "Đã nhận",
-        "completed" => "Đã hoàn thành",
-        "cancelled" => "Đã hủy",
-        "denied" => "Đã từ chối",
-        "waiting" => "Chờ thanh toán",
-        "payfail" => "Lỗi thanh toán",
-        _ => status
-    };
-
-    string GetInitials(string fullName) { if (string.IsNullOrWhiteSpace(fullName)) return "U"; var parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); return parts.Length > 1 ? $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper() : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U"); }
-
-    (string Text, string Class) GetCreatorInfo(int creatorId)
-    {
-        if (creatorId == 0)
-        {
-            return ("Khách tự đặt", "creator-customer");
-        }
-        return ("Chủ sân tạo", "creator-owner");
-    }
+    int currentYear = DateTime.UtcNow.Year;
 }
 
 @section Style {
     <link rel="stylesheet" href="~/css/Booking/BookingManager.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .bm-status-waiting {
-            background-color: #e5e7eb;
-            color: #4b5563;
-            border: 1px solid #d1d5db;
-        }
-
-        .bm-child-table th:first-child, .bm-child-table td:first-child {
-            width: 40px;
+        /* CSS cho phân trang */
+        .bm-pagination-container {
             text-align: center;
+            margin-top: 1.5rem;
         }
 
-        .bm-child-booking-checkbox, .bm-select-all-children {
-            transform: scale(1.2);
+        .bm-pagination {
+            display: inline-block;
+            padding-left: 0;
+            margin: 20px 0;
+            border-radius: 4px;
         }
 
-        .bm-child-cancellation-actions {
-            padding: 1rem 1.5rem;
-            text-align: right;
-            border-top: 1px solid #e5e7eb;
-            background-color: #f9fafb;
-        }
-
-        .bm-confirm-child-cancel-btn {
-            background-color: #dc2626;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.375rem;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-            .bm-confirm-child-cancel-btn:hover {
-                background-color: #b91c1c;
+            .bm-pagination > li {
+                display: inline;
             }
 
-            .bm-confirm-child-cancel-btn:disabled {
-                background-color: #fca5a5;
+                .bm-pagination > li > a, .bm-pagination > li > span {
+                    position: relative;
+                    float: left;
+                    padding: 6px 12px;
+                    margin-left: -1px;
+                    line-height: 1.42857143;
+                    color: #1d4ed8;
+                    text-decoration: none;
+                    background-color: #fff;
+                    border: 1px solid #ddd;
+                }
+
+                    .bm-pagination > li > a:hover, .bm-pagination > li > span:hover {
+                        z-index: 2;
+                        color: #1e40af;
+                        background-color: #eee;
+                        border-color: #ddd;
+                    }
+
+            .bm-pagination > .active > a, .bm-pagination > .active > span {
+                z-index: 3;
+                color: #fff;
+                cursor: default;
+                background-color: #1d4ed8;
+                border-color: #1d4ed8;
+            }
+
+            .bm-pagination > .disabled > span, .bm-pagination > .disabled > a {
+                color: #777;
                 cursor: not-allowed;
+                background-color: #fff;
+                border-color: #ddd;
             }
 
-        .cancellation-summary-text {
-            font-size: 0.9em;
-            color: #4b5563;
-            margin-right: 1rem;
+        /* Style cho form lọc mới */
+        .bm-filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
         }
 
-        .bm-pricing-list {
+        .bm-filter-group {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            font-size: 1rem;
         }
 
-        .bm-pricing-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-            .bm-pricing-line .label {
-                color: #4b5563;
-            }
-
-            .bm-pricing-line .value {
+            .bm-filter-group label {
+                margin-bottom: 0.5rem;
                 font-weight: 600;
-                color: #1f2937;
+                color: #374151;
             }
 
-        .bm-pricing-divider {
+            .bm-filter-group select, .bm-filter-group input {
+                min-width: 180px;
+                padding: 0.5rem;
+                border-radius: 0.375rem;
+                border: 1px solid #d1d5db;
+            }
+
+        #bm-apply-filter-btn {
+            background-color: #16a34a;
+            color: white;
+            margin-bottom: 0;
             border: none;
-            border-top: 1px solid #e5e7eb;
-            margin: 0.5rem 0;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-radius: 0.375rem;
         }
 
-        .bm-pricing-line.bm-total .label {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #111827;
-        }
+            #bm-apply-filter-btn:hover {
+                background-color: #15803d;
+            }
 
-        .bm-pricing-line.bm-total .value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1d4ed8;
-        }
 
+        /* Các style khác giữ nguyên từ file gốc của bạn */
         .bm-header-with-action {
             display: flex;
             justify-content: space-between;
@@ -179,31 +135,29 @@
                 background-color: #1e40af;
             }
 
-            .bm-create-booking-btn i {
-                font-size: 1rem;
+        .bm-stat-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-top: 5px solid transparent; /* Viền trong suốt mặc định */
+        }
+
+            .bm-stat-card.bm-red {
+                border-top-color: #ef4444; /* Màu đỏ cho thẻ "Hủy" */
             }
 
-        .bm-creator-badge {
-            font-size: 0.75rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+            .bm-stat-card.bm-blue {
+                border-top-color: #3b82f6; /* Màu xanh dương */
+            }
 
-        .creator-customer {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
+            .bm-stat-card.bm-green {
+                border-top-color: #22c55e; /* Màu xanh lá */
+            }
 
-        .creator-owner {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .bm-modal-detail-item.bm-full-width {
-            grid-column: 1 / -1;
-        }
+            .bm-stat-card.bm-teal {
+                border-top-color: #14b8a6; /* Màu xanh mòng két */
+            }
     </style>
 }
 
@@ -215,206 +169,71 @@
         </a>
     </div>
 
+    <!-- Thống kê: "Lịch chờ xử lý" đã được thay bằng "Lịch đã hủy" -->
     <div class="bm-stats-grid" style="margin-bottom: 2rem;">
-        <div class="bm-stat-card bm-yellow"><div class="bm-stat-header">Lịch chờ xử lý</div><div class="bm-stat-value">@pendingBookings</div></div>
-        <div class="bm-stat-card bm-blue"><div class="bm-stat-header">Lịch đã nhận</div><div class="bm-stat-value">@acceptedBookings</div></div>
-        <div class="bm-stat-card bm-green"><div class="bm-stat-header">Tổng doanh thu</div><div class="bm-stat-value">@totalRevenue.ToString("N0")₫</div></div>
+        <div class="bm-stat-card bm-red"><div class="bm-stat-header">Lịch đã hủy (Tháng này)</div><div class="bm-stat-value">@ViewBag.CancelledBookingsThisMonth</div></div>
+        <div class="bm-stat-card bm-blue"><div class="bm-stat-header">Lịch đã nhận (Tháng này)</div><div class="bm-stat-value">@ViewBag.AcceptedBookingsThisMonth</div></div>
+        <div class="bm-stat-card bm-green"><div class="bm-stat-header">Doanh thu (Tháng này)</div><div class="bm-stat-value">@(((decimal)(ViewBag.TotalRevenueThisMonth ?? 0m)).ToString("N0"))₫</div></div>
         <div class="bm-stat-card bm-teal"><div class="bm-stat-header">Sân vận động</div><div class="bm-stat-value">@stadiums.Count</div></div>
     </div>
 
-    <div class="bm-filter-section">
-        <div class="bm-filter-group">
-            <label for="bm-stadiumFilter">Lọc theo sân:</label>
-            <select id="bm-stadiumFilter">
-                <option value="all">Tất cả các sân</option>
-                @foreach (var stadium in stadiums)
-                {
-                    <option value="@stadium.Id">@stadium.Name</option>
-                }
-            </select>
-        </div>
+    <!-- KHU VỰC LỌC MỚI -->
+    <form class="bm-filter-section" id="bm-main-filter-form" method="get">
         <div class="bm-filter-group">
             <label for="bm-bookingTypeFilter">Loại lịch đặt:</label>
-            <select id="bm-bookingTypeFilter">
-                <option value="all">Tất cả các loại</option>
-                <option value="daily">Lịch Hằng Ngày</option>
+            <select id="bm-bookingTypeFilter" name="type">
+                <option value="daily" selected>Lịch Hằng Ngày</option>
                 <option value="monthly">Lịch Hằng Tháng</option>
             </select>
         </div>
         <div class="bm-filter-group">
-            <label for="bm-statusFilter">Trạng thái:</label>
-            <select id="bm-statusFilter">
-                <option value="all">Tất cả các trạng thái</option>
-                <option value="pending">Chờ xử lý</option>
-                <option value="accepted">Đã nhận</option>
-                <option value="completed">Đã hoàn thành</option>
-                <option value="waiting">Chờ thanh toán</option>
-                <option value="cancelled-group">Đã hủy / Lỗi</option>
+            <label for="bm-stadiumFilter">Sân:</label>
+            <select id="bm-stadiumFilter" name="stadiumId">
+                <option value="">Tất cả các sân</option>
+                @foreach (var stadium in stadiums)
+                {
+                    <option value="@stadium.Id" selected="@(stadium.Id == ViewBag.CurrentStadiumId ? "selected" : null)">@stadium.Name</option>
+                }
             </select>
         </div>
-    </div>
+        <div class="bm-filter-group">
+            <label for="bm-statusFilter">Trạng thái:</label>
+            <select id="bm-statusFilter" name="status">
+                <option value="all" selected="@("all" == ViewBag.CurrentStatus ? "selected" : null)">Tất cả</option>
+                <option value="accepted" selected="@("accepted" == ViewBag.CurrentStatus ? "selected" : null)">Đã nhận</option>
+                <option value="completed" selected="@("completed" == ViewBag.CurrentStatus ? "selected" : null)">Đã hoàn thành</option>
+                <option value="waiting" selected="@("waiting" == ViewBag.CurrentStatus ? "selected" : null)">Chờ thanh toán</option>
+                <option value="cancelled-group" selected="@("cancelled-group" == ViewBag.CurrentStatus ? "selected" : null)">Đã hủy / Lỗi</option>
+            </select>
+        </div>
+        <div class="bm-filter-group">
+            <label for="bm-monthFilter">(Ngày chơi)Tháng:</label>
+            <select id="bm-monthFilter" name="filterMonth">
+                <option value="0">Tất cả</option>
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i" selected="@(i == ViewBag.CurrentFilterMonth ? "selected" : null)">Tháng @i</option>
+                }
+            </select>
+        </div>
+        <div class="bm-filter-group">
+            <label for="bm-yearFilter">(Ngày chơi)Năm:</label>
+            <select id="bm-yearFilter" name="filterYear">
+                <option value="0">Tất cả</option>
+                @for (int i = currentYear - 3; i <= currentYear + 1; i++)
+                {
+                    <option value="@i" selected="@(i == ViewBag.CurrentFilterYear ? "selected" : null)">Năm @i</option>
+                }
+            </select>
+        </div>
+        <div class="bm-filter-group">
+            <button id="bm-apply-filter-btn" type="submit" class="bm-create-booking-btn"><i class="fas fa-filter"></i> Lọc</button>
+        </div>
+    </form>
 
-    <div class="bm-booking-section" id="bm-daily-booking-section">
-        <div class="bm-section-header">
-            <h2 class="bm-section-title">Lịch Đặt Hằng Ngày</h2>
-            <div class="bm-filter-group bm-date-filter-container">
-                <label for="bm-dateFilter"><i class="fas fa-calendar-alt"></i> Ngày chơi:</label>
-                <input type="date" id="bm-dateFilter" placeholder=" " />
-                <button class="bm-clear-date-btn" title="Xóa ngày">&times;</button>
-            </div>
-        </div>
-        <div style="overflow-x: auto;">
-            <table class="bm-booking-table">
-                <thead><tr><th class="bm-align-left">Khách hàng / Sân</th><th>Ngày chơi</th><th>Ngày tạo</th><th>Người tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
-                <tbody>
-                    @if (sortedDailyBookings.Any())
-                    {
-                        @foreach (var dailyVm in sortedDailyBookings)
-                        {
-                            var booking = dailyVm.Booking;
-                            var user = dailyVm.User;
-                            var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                            var creatorInfo = GetCreatorInfo(booking.CreatedById);
-                            <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily" data-play-date="@booking.Date.ToString("yyyy-MM-dd")" data-status="@booking.Status.ToLower()">
-                                <td class="bm-align-left">
-                                    <div class="bm-customer-info">
-                                        <div class="bm-customer-avatar">
-                                            @if (!string.IsNullOrEmpty(user.AvatarUrl))
-                                            {
-                                                <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
-                                            }
-                                            else
-                                            {
-                                                <span>@GetInitials(user.FullName)</span>
-                                            }
-                                        </div>
-                                        <div class="bm-customer-details">
-                                            <span class="bm-customer-name">@user.FullName</span>
-                                            <span class="bm-stadium-name">@stadium?.Name</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>@booking.Date.ToString("dd/MM/yyyy")</td>
-                                <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td><span class="bm-creator-badge @creatorInfo.Class">@creatorInfo.Text</span></td>
-                                <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
-                                <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
-                                <td class="bm-actions">
-                                    <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-eye"></i></button>
-                                    @if (booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <button class="bm-action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-check"></i></button> <button class="bm-action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-times"></i></button>
-                                    }
-                                    @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-ban"></i></button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng ngày nào.</p></div></td></tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="bm-booking-section" id="bm-monthly-booking-section">
-        <div class="bm-section-header"> <h2 class="bm-section-title">Lịch Đặt Hằng Tháng</h2> </div>
-        <div style="overflow-x: auto;">
-            <table class="bm-booking-table">
-                <thead><tr><th style="width: 50px;"></th><th class="bm-align-left">Khách hàng / Sân</th><th>Khung giờ / Thời gian</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
-                <tbody>
-                    @if (sortedMonthlyBookings.Any())
-                    {
-                        @foreach (var monthlyVm in sortedMonthlyBookings)
-                        {
-                            var booking = monthlyVm.MonthlyBooking;
-                            var user = monthlyVm.User;
-                            var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                            <tr class="bm-monthly-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
-                                <td><i class="fas fa-chevron-down bm-expand-toggle"></i></td>
-                                <td class="bm-align-left">
-                                    <div class="bm-customer-info">
-                                        <div class="bm-customer-avatar">
-                                            @if (!string.IsNullOrEmpty(user.AvatarUrl))
-                                            {
-                                                <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
-                                            }
-                                            else
-                                            {
-                                                <span>@GetInitials(user.FullName)</span>
-                                            }
-                                        </div>
-                                        <div class="bm-customer-details">
-                                            <span class="bm-customer-name">@user.FullName</span>
-                                            <span class="bm-stadium-name">@stadium?.Name</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><div style="display: flex; flex-direction: column; align-items: center;"><span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span><span style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span></div></td>
-                                <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                               
-                                <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
-                                <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
-                                <td class="bm-actions">
-                                    <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-eye"></i></button>
-                                    @if (booking.Status.Equals("pending", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        <button class="bm-action-btn accept" title="Chấp nhận" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-check"></i></button> <button class="bm-action-btn deny" title="Từ chối" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-times"></i></button>
-                                    }
-                                </td>
-                            </tr>
-                            <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id" style="display:none;">
-                                <td colspan="8">
-                                    <div class="bm-child-table-container">
-                                        <h4>Các Lịch Đặt Chi Tiết</h4>
-                                        @if (monthlyVm.Bookings.Any())
-                                        {
-                                            <table class="bm-child-table">
-                                                <thead><tr><th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th><th>Ngày Chơi</th><th>Sân Con</th><th>Thời Gian</th><th>Giá tiền</th><th>Trạng Thái</th></tr></thead>
-                                                <tbody>
-                                                    @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
-                                                    {
-                                                        var isCancellable = !childBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) && !childBooking.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase);
-                                                        <tr style="@(isCancellable ? "" : "color: #9ca3af;")">
-                                                            <td><input type="checkbox" class="bm-child-booking-checkbox" value="@childBooking.Id" data-price="@childBooking.TotalPrice" @(isCancellable ? "" : "disabled")></td>
-                                                            <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
-                                                            <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
-                                                            <td> @if (childBooking.BookingDetails.Any())
-                                                                {
-                                                                    <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
-                                                                } </td>
-                                                            <td class="bm-price">@((childBooking.TotalPrice ?? 0).ToString("N0"))₫</td>
-                                                            <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
-                                                        </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                            <div class="bm-child-cancellation-actions">
-                                                <span class="cancellation-summary-text">Đã chọn: <b class="selected-count">0</b> | Phí hủy: <b class="cancellation-fee">0₫</b></span>
-                                                <button class="bm-confirm-child-cancel-btn" disabled>Hủy <span class="selected-count">0</span> mục đã chọn</button>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <p style="text-align:center; padding: 1rem;">Không có lịch đặt chi tiết nào cho tháng này.</p>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="8"><div class="no-data"><p>Không có lịch đặt hằng tháng nào.</p></div></td></tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+    <!-- Container để cập nhật AJAX -->
+    <div id="booking-tables-container">
+        @await Html.PartialAsync("_BookingTablesPartial", Model)
     </div>
 </div>
 
@@ -428,14 +247,4 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/BookingManager.js" asp-append-version="true"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const viewModel = {
-                dailyBookings: @Html.Raw(JsonSerializer.Serialize(sortedDailyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })),
-                monthlyBookings: @Html.Raw(JsonSerializer.Serialize(sortedMonthlyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
-            };
-            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
-            initializeBookingManager(viewModel, stadiums);
-        });
-    </script>
 }

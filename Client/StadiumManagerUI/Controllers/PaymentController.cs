@@ -142,7 +142,7 @@ namespace StadiumManagerUI.Controllers
 
         private async Task HandleDailySuccessfulCancellation(int bookingId, string status, string accessToken)
         {
-            var booking = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=Id eq {bookingId}")).FirstOrDefault();
+            var booking = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=Id eq {bookingId}")).Data.FirstOrDefault();
             if (booking == null) throw new Exception($"Booking với ID {bookingId} không tồn tại.");
 
             var updateDto = new BookingUpdateDto { Status = status, UserId = booking.UserId, StadiumId = booking.StadiumId, Date = booking.Date, TotalPrice = booking.TotalPrice, OriginalPrice = booking.OriginalPrice, Note = booking.Note, DiscountId = booking.DiscountId };
@@ -166,17 +166,17 @@ namespace StadiumManagerUI.Controllers
             var cancelledChildBookings = new List<BookingReadDto>();
             foreach (var childId in childBookingIdsToCancel)
             {
-                var booking = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=Id eq {childId}")).FirstOrDefault();
+                var booking = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=Id eq {childId}")).Data.FirstOrDefault();
                 if (booking == null) continue;
                 cancelledChildBookings.Add(booking);
                 var childUpdateDto = new BookingUpdateDto { Status = "cancelled", UserId = booking.UserId, StadiumId = booking.StadiumId, Date = booking.Date, TotalPrice = booking.TotalPrice, OriginalPrice = booking.OriginalPrice, Note = booking.Note, DiscountId = booking.DiscountId };
                 await _bookingService.UpdateBookingAsync(childId, childUpdateDto, accessToken);
             }
 
-            var monthlyBooking = (await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter=Id eq {monthlyBookingId}")).FirstOrDefault();
+            var monthlyBooking = (await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter=Id eq {monthlyBookingId}")).Data.FirstOrDefault();
             if (monthlyBooking == null) throw new Exception("Không tìm thấy lịch đặt tháng.");
 
-            var allChildBookingsAfterUpdate = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
+            var allChildBookingsAfterUpdate = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}")).Data;
             var newTotalPrice = allChildBookingsAfterUpdate.Where(b => !b.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase)).Sum(b => b.TotalPrice.GetValueOrDefault());
             var remainingActiveBookings = allChildBookingsAfterUpdate.Any(b => !b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) && !b.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase));
             var newMonthlyStatus = remainingActiveBookings ? "accepted" : "cancelled";

@@ -10,8 +10,10 @@ namespace Service.Interfaces
 {
         public interface IBookingService
         {
-                // Lấy lịch sử booking của user hiện tại, cần token để xác thực
-                Task<List<BookingReadDto>> GetBookingAsync(string accessToken, string queryString);
+        // Lấy lịch sử booking của user hiện tại, cần token để xác thực
+        // Thay đổi trong IBookingService
+                Task<(List<BookingReadDto> Data, int TotalCount)> GetBookingAsync(string accessToken, string queryString);
+                Task<(List<MonthlyBookingReadDto> Data, int TotalCount)> GetMonthlyBookingAsync(string accessToken, string queryString);
                 Task<BookingReadDto?> CreateBookingAsync(BookingCreateDto bookingCreateDto, string accessToken);
                 Task<BookingReadDto?> CreateBookingByOwnerAsync(BookingCreateDto bookingDto, string accessToken);
                 Task<BookingReadDto> GetBookingDetailAsync(string accessToken, int bookingId);
@@ -20,7 +22,6 @@ namespace Service.Interfaces
                 Task<List<BookingReadDto>> FilterByDateAndHour(int year, int month, List<int> days, int startTime, int endTime);
                 Task<List<BookingReadDto>> FilterByCourtAndHour(List<int> courtIds, int year, int month, int startTime, int endTime);
                 Task<BookingReadDto?> CreateMonthlyBookingAsync(MonthlyBookingCreateDto bookingDto, string accessToken);
-                Task<List<MonthlyBookingReadDto>> GetMonthlyBookingAsync(string accessToken, string queryString);
                 Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken);
                 Task<BookingReadDto?> UpdateBookingAsync(int id, BookingUpdateDto bookingDto, string accessToken);
                 Task<bool> CheckSlotsAvailabilityAsync(List<BookingSlotRequest> requestedSlots, string accessToken);

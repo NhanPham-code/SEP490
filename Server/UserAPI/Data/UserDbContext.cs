@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UserAPI.Model;
+using UserAPI.Model; // Giả định Model 'User' của bạn ở đây
 using System.Security.Cryptography;
 using System.Text;
 
@@ -21,7 +21,7 @@ namespace UserAPI.Data
             base.OnModelCreating(modelBuilder);
 
             // --- GIÁ TRỊ TĨNH CHO MẬT KHẨU 'nhan123@' ---
-            // Các giá trị này được tạo ra một lần và giữ nguyên để đảm bảo model không thay đổi.
+            // (Lấy từ khai báo DECLARE @PasswordSalt VÀ @PasswordHash của bạn)
             byte[] passwordSalt = new byte[] {
                 0x09, 0xF1, 0x40, 0x7A, 0xC0, 0xA2, 0xAE, 0x67, 0xB3, 0xE5, 0xCC, 0x86, 0x40, 0x7B, 0x37, 0x48,
                 0x28, 0x6F, 0xA5, 0xB6, 0x33, 0x81, 0xDE, 0x1E, 0xAB, 0x75, 0x3B, 0xE8, 0x23, 0xEA, 0xAC, 0x56,
@@ -39,17 +39,128 @@ namespace UserAPI.Data
                 0xFD, 0x91, 0xF4, 0xF0, 0xCF, 0x22, 0x3C, 0x8E, 0x67, 0x49, 0x97, 0xBF, 0x6A, 0xF6, 0xE9, 0x3C
             };
 
+            // Ngày cố định
             var fixedDate = new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc);
 
+            // --- Chèn dữ liệu mẫu (Seed Data) ---
             modelBuilder.Entity<User>().HasData(
-                new User { UserId = 1, FullName = "Chủ Sân Một", Email = "stadium.manager1@example.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "StadiumManager", Address = "123 Đường A, Cần Thơ", PhoneNumber = "0901111111", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate },
-                new User { UserId = 2, FullName = "Chủ Sân Hai", Email = "stadium.manager2@example.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "StadiumManager", Address = "456 Đường B, Cần Thơ", PhoneNumber = "0902222222", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate },
-                new User { UserId = 3, FullName = "Chủ Sân Ba", Email = "stadium.manager3@example.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "StadiumManager", Address = "789 Đường C, Cần Thơ", PhoneNumber = "0903333333", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate },
-                new User { UserId = 4, FullName = "Chủ Sân Bốn", Email = "stadium.manager4@example.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "StadiumManager", Address = "101 Đường D, Cần Thơ", PhoneNumber = "0904444444", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate },
-                new User { UserId = 5, FullName = "Admin User", Email = "admin@example.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "Admin", Address = "1 Admin Street, System", PhoneNumber = "0905555555", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate },
-                new User { UserId = 2006, FullName = "Phạm Hiền Nhân", Email = "phamhiennhan3105@gmail.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt, Role = "Customer", Address = "2006 Đường E, Cần Thơ", PhoneNumber = "09020062006", IsActive = true, CreatedDate = fixedDate, UpdatedDate = fixedDate }
+                // Dữ liệu từ SQL script của bạn (ID 1-6)
+                new User
+                {
+                    UserId = 1,
+                    FullName = "Admin User",
+                    Email = "admin@example.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "Admin",
+                    Address = "1 Admin Street, System",
+                    PhoneNumber = "0905555555",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 2,
+                    FullName = "Chủ Sân Một",
+                    Email = "stadium.manager1@example.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "StadiumManager",
+                    Address = "123 Đường A, Cần Thơ",
+                    PhoneNumber = "0901111111",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 3,
+                    FullName = "Chủ Sân Hai",
+                    Email = "stadium.manager2@example.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "StadiumManager",
+                    Address = "456 Đường B, Cần Thơ",
+                    PhoneNumber = "0902222222",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 4,
+                    FullName = "Chủ Sân Ba",
+                    Email = "stadium.manager3@example.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "StadiumManager",
+                    Address = "789 Đường C, Cần Thơ",
+                    PhoneNumber = "0903333333",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 5,
+                    FullName = "Phạm Hiền Nhân",
+                    Email = "phamhiennhan3105@gmail.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "Customer",
+                    Address = "2006 Đường E, Cần Thơ",
+                    PhoneNumber = "09020062006",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 6,
+                    FullName = "FPT Customer",
+                    Email = "NhanPHCE180604@fpt.edu.vn",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "Customer",
+                    Address = "Đại học FPT Cần Thơ",
+                    PhoneNumber = "0123456789",
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+
+                new User
+                {
+                    UserId = 7,
+                    FullName = "Tiến", // Tên như yêu cầu
+                    Email = "customer7@example.com", // Email như yêu cầu
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "Customer",
+                    Address = "123 Đường Tiến, Cần Thơ", // Địa chỉ tạm
+                    PhoneNumber = "0907777777", // SĐT tạm
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                },
+                new User
+                {
+                    UserId = 8,
+                    FullName = "Abu", // Tên như yêu cầu
+                    Email = "customer8@example.com", // Email như yêu cầu
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Role = "Customer",
+                    Address = "456 Đường Abu, Cần Thơ", // Địa chỉ tạm
+                    PhoneNumber = "0908888888", // SĐT tạm
+                    IsActive = true,
+                    CreatedDate = fixedDate,
+                    UpdatedDate = fixedDate
+                }
             );
 
+            // Cấu hình Quan hệ cho RefreshToken
             modelBuilder.Entity<RefreshToken>()
                 .HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)

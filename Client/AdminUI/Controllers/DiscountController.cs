@@ -69,8 +69,9 @@ namespace AdminUI.Controllers
                 .ToList();
 
             userIdsToFetch.AddRange(discounts
-                .Where(d => !string.IsNullOrEmpty(d.UserId) && int.TryParse(d.UserId, out _))
-                .Select(d => int.Parse(d.UserId)));
+            .Where(d => d.UserId.HasValue)
+            .Select(d => d.UserId.Value));
+
 
             userIdsToFetch = userIdsToFetch.Distinct().ToList();
 

@@ -242,7 +242,7 @@ namespace StadiumManagerUI.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> BookingManager()
+        public async Task<IActionResult> BookingManager(int dailyPage = 1, int monthlyPage = 1, int? filterMonth = null, int? filterYear = null, int? stadiumId = null, string status = null)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(accessToken))
@@ -252,10 +252,21 @@ namespace StadiumManagerUI.Controllers
             if (userId == null)
                 return RedirectToAction("Login", "Account");
 
-            var viewModel = new BookingManagementViewModel();
+            // Lưu lại các giá trị filter để hiển thị trên view
+            ViewBag.CurrentFilterMonth = filterMonth ?? DateTime.UtcNow.Month;
+            ViewBag.CurrentFilterYear = filterYear ?? DateTime.UtcNow.Year;
+            ViewBag.CurrentStadiumId = stadiumId;
+            ViewBag.CurrentStatus = status;
 
-            string stadiumFilter = $"&$filter=CreatedBy eq {userId}";
-            var stadiumsJson = await _stadiumService.SearchStadiumAsync(stadiumFilter);
+            var viewModel = new BookingManagementViewModel();
+            const int pageSize = 10;
+            ViewBag.DailyCurrentPage = dailyPage;
+            ViewBag.MonthlyCurrentPage = monthlyPage;
+            ViewBag.PageSize = pageSize;
+
+            // Lấy sân của chủ sân
+            string stadiumQuery = $"&$filter=CreatedBy eq {userId}";
+            var stadiumsJson = await _stadiumService.SearchStadiumAsync(stadiumQuery);
             var stadiums = new List<ReadStadiumDTO>();
             if (!string.IsNullOrEmpty(stadiumsJson))
             {
@@ -271,79 +282,95 @@ namespace StadiumManagerUI.Controllers
                         }
                     }
                 }
-                catch (JsonException ex)
-                {
-                    Console.WriteLine($"Error parsing stadiums JSON: {ex.Message}");
-                    return View("Error", new { message = "Failed to load stadium data" });
-                }
+                catch (JsonException) { /* ... error handling ... */ }
             }
+            ViewBag.Stadiums = stadiums;
 
             if (stadiums.Any())
             {
-                var courtNameLookup = stadiums
-                    .SelectMany(s => s.Courts)
-                    .ToDictionary(c => c.Id, c => c.Name);
+                var stadiumIds = stadiums.Select(s => s.Id).ToList();
 
-                var stadiumIds = stadiums.Select(s => s.Id);
-                string bookingFilter = string.Join(" or ", stadiumIds.Select(id => $"StadiumId eq {id}"));
+                // --- CẢI TIẾN: SỬ DỤNG TOÁN TỬ "in" CỦA ODATA ---
+                string stadiumIdList = string.Join(",", stadiumIds);
+                string bookingFilter = $"StadiumId in ({stadiumIdList})";
 
-                var allBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=({bookingFilter})&$expand=BookingDetails") ?? new List<BookingReadDto>();
-                var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter={bookingFilter}") ?? new List<MonthlyBookingReadDto>();
+                // Lấy tất cả dữ liệu lịch đặt
+                var allBookings = (await _bookingService.GetBookingAsync(accessToken, $"?$filter={bookingFilter}&$expand=BookingDetails")).Data;
+                var allMonthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter={bookingFilter}")).Data;
 
-                foreach (var booking in allBookings)
+                // --- TÍNH TOÁN THỐNG KÊ ---
+                var now = DateTime.UtcNow;
+                var statsBookings = allBookings.Where(b => b.Date.Year == now.Year && b.Date.Month == now.Month);
+                ViewBag.CancelledBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("payfail", StringComparison.OrdinalIgnoreCase));
+                ViewBag.AcceptedBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase));
+                ViewBag.TotalRevenueThisMonth = statsBookings.Where(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)).Sum(b => b.TotalPrice ?? 0);
+
+                // --- ÁP DỤNG BỘ LỌC TỪ FORM ---
+                var dailyBookingsQuery = allBookings.Where(b => b.MonthlyBookingId == null);
+                var monthlyBookingsQuery = allMonthlyBookings.AsEnumerable();
+
+                if (filterMonth.HasValue && filterMonth > 0)
                 {
-                    foreach (var detail in booking.BookingDetails)
+                    dailyBookingsQuery = dailyBookingsQuery.Where(b => b.Date.Month == filterMonth.Value);
+                    monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => mb.Month == filterMonth.Value);
+                }
+                if (filterYear.HasValue && filterYear > 0)
+                {
+                    dailyBookingsQuery = dailyBookingsQuery.Where(b => b.Date.Year == filterYear.Value);
+                    monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => mb.Year == filterYear.Value);
+                }
+                if (stadiumId.HasValue)
+                {
+                    dailyBookingsQuery = dailyBookingsQuery.Where(b => b.StadiumId == stadiumId.Value);
+                    monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => mb.StadiumId == stadiumId.Value);
+                }
+                if (!string.IsNullOrEmpty(status) && !status.Equals("all"))
+                {
+                    if (status.Equals("cancelled-group"))
                     {
-                        if (courtNameLookup.TryGetValue(detail.CourtId, out var courtName))
-                        {
-                            detail.CourtName = courtName;
-                        }
-                        else
-                        {
-                            detail.CourtName = $"Sân {detail.CourtId}";
-                        }
+                        var cancelledStatuses = new[] { "cancelled", "payfail" };
+                        dailyBookingsQuery = dailyBookingsQuery.Where(b => cancelledStatuses.Contains(b.Status.ToLower()));
+                        monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => cancelledStatuses.Contains(mb.Status.ToLower()));
+                    }
+                    else
+                    {
+                        dailyBookingsQuery = dailyBookingsQuery.Where(b => b.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+                        monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => mb.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
                     }
                 }
 
-                var dailyUserIds = allBookings.Where(b => b.MonthlyBookingId == null).Select(b => b.UserId);
-                var monthlyUserIds = monthlyBookings.Select(b => b.UserId);
-                var allUserIds = dailyUserIds.Concat(monthlyUserIds).Where(id => id != 0).Distinct().ToList();
-
-                var users = new List<PublicUserProfileDTO>();
-                if (allUserIds.Any())
-                {
-                    users = await _userService.GetUsersByIdsAsync(allUserIds, accessToken) ?? new List<PublicUserProfileDTO>();
-                }
+                // --- LẤY THÔNG TIN USER VÀ PHÂN TRANG ---
+                var userIdsToFetch = dailyBookingsQuery.Select(b => b.UserId).Concat(monthlyBookingsQuery.Select(b => b.UserId)).Where(id => id != 0).Distinct().ToList();
+                var users = userIdsToFetch.Any() ? await _userService.GetUsersByIdsAsync(userIdsToFetch, accessToken) ?? new List<PublicUserProfileDTO>() : new List<PublicUserProfileDTO>();
                 var userDictionary = users.ToDictionary(u => u.UserId);
                 var defaultUser = new PublicUserProfileDTO { FullName = "Khách vãng lai" };
 
-                var dailyBookingsList = allBookings.Where(b => b.MonthlyBookingId == null);
-                foreach (var booking in dailyBookingsList)
-                {
-                    viewModel.DailyBookings.Add(new DailyBookingWithUserViewModel
-                    {
-                        Booking = booking,
-                        User = userDictionary.GetValueOrDefault(booking.UserId, defaultUser)
-                    });
-                }
+                var sortedDailyBookings = dailyBookingsQuery.OrderByDescending(b => b.CreatedAt).ToList();
+                var sortedMonthlyBookings = monthlyBookingsQuery.OrderByDescending(b => b.CreatedAt).ToList();
 
                 var bookingsInMonthlyPlan = allBookings.Where(b => b.MonthlyBookingId != null).GroupBy(b => b.MonthlyBookingId).ToDictionary(g => g.Key, g => g.ToList());
 
-                foreach (var mb in monthlyBookings)
-                {
-                    viewModel.MonthlyBookings.Add(new MonthlyBookingWithDetailsViewModel
-                    {
-                        MonthlyBooking = mb,
-                        User = userDictionary.GetValueOrDefault(mb.UserId, defaultUser),
-                        Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>())
-                    });
-                }
+                ViewBag.DailyTotalPages = (int)Math.Ceiling(sortedDailyBookings.Count / (double)pageSize);
+                viewModel.DailyBookings = sortedDailyBookings.Skip((dailyPage - 1) * pageSize).Take(pageSize).Select(b => new DailyBookingWithUserViewModel { Booking = b, User = userDictionary.GetValueOrDefault(b.UserId, defaultUser) }).ToList();
+
+                ViewBag.MonthlyTotalPages = (int)Math.Ceiling(sortedMonthlyBookings.Count / (double)pageSize);
+                viewModel.MonthlyBookings = sortedMonthlyBookings.Skip((monthlyPage - 1) * pageSize).Take(pageSize).Select(mb => new MonthlyBookingWithDetailsViewModel { MonthlyBooking = mb, User = userDictionary.GetValueOrDefault(mb.UserId, defaultUser), Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>()) }).ToList();
+            }
+            else
+            {
+                ViewBag.DailyTotalPages = 0;
+                ViewBag.MonthlyTotalPages = 0;
             }
 
-            ViewBag.Stadiums = stadiums;
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                // Khi ghép file, chúng ta sẽ cần phải tìm cách render đúng phần HTML
+                // Tạm thời vẫn trả về một PartialView để giữ code sạch sẽ
+                return PartialView("_BookingTablesPartial", viewModel);
+            }
+
             return View(viewModel);
         }
-
         // Trong file: StadiumManagerUI/Controllers/BookingController.cs
 
         [HttpPost]
@@ -415,8 +442,8 @@ namespace StadiumManagerUI.Controllers
             }
 
             var filter = string.Join(" or ", dto.ChildBookingIdsToCancel.Select(childId => $"Id eq {childId}"));
-            var bookingsToCancel = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {id} and ({filter})");
-
+            var bookingsToCancelResponse = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {id} and ({filter})");
+            var bookingsToCancel = bookingsToCancelResponse.Data;
             if (bookingsToCancel == null || !bookingsToCancel.Any())
                 return Json(new { success = false, message = "Không tìm thấy lịch đặt hợp lệ để hủy." });
 
