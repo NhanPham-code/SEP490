@@ -32,11 +32,8 @@ namespace BookingAPI.Data
                 .HasForeignKey(b => b.MonthlyBookingId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // ======================================================================
-            // === START: SEED DATA (TẠO DỮ LIỆU MẪU) ===
-            // ======================================================================
 
-            var currentDate = new DateTime(2025, 11, 6, 10, 41, 13); // Sử dụng thời gian bạn cung cấp
+            var currentDate = new DateTime(2025, 11, 6, 10, 41, 13);
             var random = new Random();
             var ownerIds = new List<int> { 2, 3, 4 };
             var customerIds = new List<int> { 5, 6, 7, 8 };
@@ -118,7 +115,7 @@ namespace BookingAPI.Data
                         {
                             Id = bookingIdCounter,
                             UserId = customerId,
-                            CreatedById = customerId, // *** YÊU CẦU ĐÃ ÁP DỤNG ***
+                            CreatedById = customerId,
                             Status = childFinalStatus,
                             Date = bookingDate,
                             TotalPrice = monthlyPrice / 4,
@@ -150,7 +147,7 @@ namespace BookingAPI.Data
                     {
                         Id = bookingIdCounter,
                         UserId = customerId,
-                        CreatedById = customerId, // *** YÊU CẦU ĐÃ ÁP DỤNG ***
+                        CreatedById = customerId,
                         Status = finalStatus,
                         Date = bookingDate,
                         TotalPrice = price,
@@ -173,13 +170,13 @@ namespace BookingAPI.Data
                     var bookingDate = currentDate.AddDays(random.Next(1, 31));
                     int startHour = random.Next(7, 20);
                     decimal price = courtInfo.Price * 2;
-                    string status = random.Next(10) < 8 ? "accepted" : "pending";
+                    string status = random.Next(10) < 8 ? "accepted" : "waiting";
 
                     bookings.Add(new Booking
                     {
                         Id = bookingIdCounter,
                         UserId = customerId,
-                        CreatedById = customerId, // *** YÊU CẦU ĐÃ ÁP DỤNG ***
+                        CreatedById = customerId,
                         Status = status,
                         Date = bookingDate,
                         TotalPrice = price,
