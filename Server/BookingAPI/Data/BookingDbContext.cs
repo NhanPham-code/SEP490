@@ -16,11 +16,11 @@ namespace BookingAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             // Biến "toàn cục" duy nhất để dễ dàng thay đổi UserId khi test
             int globalUserId = 5;
             int userId_alternative = 6;
-            
+
             // Ngày tạo/cập nhật (sử dụng một mốc cố định cho seeding)
             var seedDate = new DateTime(2025, 11, 04, 15, 00, 40);
 
@@ -45,7 +45,7 @@ namespace BookingAPI.Data
                       .HasForeignKey(e => e.BookingId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
-            
+
             // ===== SEED DATA =====
 
             // 1. Seed MonthlyBooking (1 entry)
@@ -141,7 +141,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 30, BookingId = 30, CourtId = 1, StartTime = new DateTime(2025, 12, 30, 6, 0, 0), EndTime = new DateTime(2025, 12, 30, 9, 0, 0) },
                 new BookingDetail { Id = 31, BookingId = 31, CourtId = 1, StartTime = new DateTime(2025, 12, 31, 6, 0, 0), EndTime = new DateTime(2025, 12, 31, 9, 0, 0) }
             );
-            
+
             modelBuilder.Entity<MonthlyBooking>().HasData(
                 new MonthlyBooking
                 {
@@ -198,7 +198,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 43, BookingId = 43, CourtId = 2, StartTime = new DateTime(2025, 11, 28, 7, 0, 0), EndTime = new DateTime(2025, 11, 28, 10, 0, 0) },
                 new BookingDetail { Id = 44, BookingId = 44, CourtId = 2, StartTime = new DateTime(2025, 11, 30, 7, 0, 0), EndTime = new DateTime(2025, 11, 30, 10, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 3 (THÁNG 10/2025, Sân 1 - Sân 7 người) =====
             // - Tất cả các ngày, 6h-10h (4 tiếng), 300k/h
             // - Giá/ngày = 1,200,000 | 31 ngày
@@ -419,7 +419,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 126, BookingId = 126, CourtId = 2, StartTime = new DateTime(2025, 6, 26, 6, 0, 0), EndTime = new DateTime(2025, 6, 26, 8, 0, 0) },
                 new BookingDetail { Id = 127, BookingId = 127, CourtId = 2, StartTime = new DateTime(2025, 6, 28, 6, 0, 0), EndTime = new DateTime(2025, 6, 28, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 8 (THÁNG 5/2025, Sân 1 - Sân 7 người) =====
             // - Tất cả các ngày, 6h-10h (4 tiếng), 300k/h
             // - Giá/ngày = 1,200,000 | 31 ngày
@@ -638,7 +638,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 208, BookingId = 208, CourtId = 2, StartTime = new DateTime(2025, 1, 28, 6, 0, 0), EndTime = new DateTime(2025, 1, 28, 8, 0, 0) },
                 new BookingDetail { Id = 209, BookingId = 209, CourtId = 2, StartTime = new DateTime(2025, 1, 30, 6, 0, 0), EndTime = new DateTime(2025, 1, 30, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 13 (THÁNG 12/2024, Sân 1 - Sân 7 người) =====
             // - T3, T5, T7 | 6h-8h (2 tiếng), 300k/h
             // - Giá/ngày = 600,000 | 13 ngày
@@ -786,7 +786,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 260, BookingId = 260, CourtId = 2, StartTime = new DateTime(2024, 9, 26, 6, 0, 0), EndTime = new DateTime(2024, 9, 26, 8, 0, 0) },
                 new BookingDetail { Id = 261, BookingId = 261, CourtId = 2, StartTime = new DateTime(2024, 9, 28, 6, 0, 0), EndTime = new DateTime(2024, 9, 28, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 17 (THÁNG 8/2024, Sân 1 - Sân 7 người) =====
             // - T3, T5, T7 | 6h-7h (1 tiếng), 300k/h
             // - Giá/ngày = 300,000 | 14 ngày
@@ -936,7 +936,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 313, BookingId = 313, CourtId = 2, StartTime = new DateTime(2024, 5, 28, 6, 0, 0), EndTime = new DateTime(2024, 5, 28, 7, 0, 0) },
                 new BookingDetail { Id = 314, BookingId = 314, CourtId = 2, StartTime = new DateTime(2024, 5, 30, 6, 0, 0), EndTime = new DateTime(2024, 5, 30, 7, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 21 (THÁNG 4/2024, Sân 1 - Sân 7 người) =====
             // - T3, T5, T7 | 6h-7h (1 tiếng), 300k/h
             // - Giá/ngày = 300,000 | 13 ngày
@@ -1084,7 +1084,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 365, BookingId = 365, CourtId = 2, StartTime = new DateTime(2024, 1, 27, 6, 0, 0), EndTime = new DateTime(2024, 1, 27, 7, 0, 0) },
                 new BookingDetail { Id = 366, BookingId = 366, CourtId = 2, StartTime = new DateTime(2024, 1, 30, 6, 0, 0), EndTime = new DateTime(2024, 1, 30, 7, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 25 (THÁNG 12/2025, Sân 4 - Sân A Cầu Lông) =====
             // - T2, T4, T6 | 6h-9h (3 tiếng), 50k/h
             // - Giá/ngày = 150,000 | 14 ngày
@@ -1222,7 +1222,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 412, BookingId = 412, CourtId = 4, StartTime = new DateTime(2025, 9, 26, 6, 0, 0), EndTime = new DateTime(2025, 9, 26, 8, 0, 0) },
                 new BookingDetail { Id = 413, BookingId = 413, CourtId = 4, StartTime = new DateTime(2025, 9, 29, 6, 0, 0), EndTime = new DateTime(2025, 9, 29, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 29 (THÁNG 8/2025, Sân 4 - Sân A Cầu Lông) =====
             // - T2, T4, T6 | 6h-9h (3 tiếng), 50k/h
             // - Giá/ngày = 150,000 | 13 ngày
@@ -1434,7 +1434,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 496, BookingId = 496, CourtId = 4, StartTime = new DateTime(2025, 5, 30, 6, 0, 0), EndTime = new DateTime(2025, 5, 30, 8, 0, 0) },
                 new BookingDetail { Id = 497, BookingId = 497, CourtId = 4, StartTime = new DateTime(2025, 5, 31, 6, 0, 0), EndTime = new DateTime(2025, 5, 31, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 33 (THÁNG 4/2025, Sân 4 - Sân A Cầu Lông) =====
             // - T2, T4, T6 | 6h-9h (3 tiếng), 50k/h
             // - Giá/ngày = 150,000 | 13 ngày (T2, T4, T6 của T4/2025)
@@ -1644,7 +1644,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 579, BookingId = 579, CourtId = 4, StartTime = new DateTime(2025, 1, 30, 6, 0, 0), EndTime = new DateTime(2025, 1, 30, 8, 0, 0) },
                 new BookingDetail { Id = 580, BookingId = 580, CourtId = 4, StartTime = new DateTime(2025, 1, 31, 6, 0, 0), EndTime = new DateTime(2025, 1, 31, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 37 (THÁNG 12/2025, Sân 6 - Sân Tennis 1) =====
             // - T2, 4, 6 | 6h-9h (3 tiếng), 100k/h
             // - Giá/ngày = 300,000 | 14 ngày
@@ -1950,7 +1950,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 699, BookingId = 699, CourtId = 6, StartTime = new DateTime(2025, 9, 29, 6, 0, 0), EndTime = new DateTime(2025, 9, 29, 8, 0, 0) },
                 new BookingDetail { Id = 700, BookingId = 700, CourtId = 6, StartTime = new DateTime(2025, 9, 30, 6, 0, 0), EndTime = new DateTime(2025, 9, 30, 8, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 43 (THÁNG 8/2025, Sân 6 - Sân Tennis 1) =====
             // - T2, 4, 6 | 6h-9h (3 tiếng), 100k/h
             // - Giá/ngày = 300,000 | 13 ngày
@@ -2228,7 +2228,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 805, BookingId = 805, CourtId = 6, StartTime = new DateTime(2025, 5, 30, 6, 0, 0), EndTime = new DateTime(2025, 5, 30, 9, 0, 0) },
                 new BookingDetail { Id = 806, BookingId = 806, CourtId = 6, StartTime = new DateTime(2025, 5, 31, 6, 0, 0), EndTime = new DateTime(2025, 5, 31, 9, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 49 (THÁNG 4/2025, Sân 6 - Sân Tennis 1) =====
             // - T2, 4, 6 | 6h-9h (3 tiếng), 100k/h
             // - Giá/ngày = 300,000 | 13 ngày
@@ -2502,7 +2502,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 909, BookingId = 909, CourtId = 6, StartTime = new DateTime(2025, 1, 30, 6, 0, 0), EndTime = new DateTime(2025, 1, 30, 9, 0, 0) },
                 new BookingDetail { Id = 910, BookingId = 910, CourtId = 6, StartTime = new DateTime(2025, 1, 31, 6, 0, 0), EndTime = new DateTime(2025, 1, 31, 9, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 55 (THÁNG 12/2025, Sân 8 - Sân Bóng Rổ) =====
             // - T2 | 12h-14h (2 tiếng), 150k/h, UserId = 6
             // - Giá/ngày = 300,000 | 5 ngày (T2)
@@ -2590,7 +2590,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 931, BookingId = 931, CourtId = 8, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 932, BookingId = 932, CourtId = 8, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 59 (THÁNG 12/2025, Sân 9 - Sân Cầu Lông) =====
             // - T2 | 12h-14h (2 tiếng), 70k/h, UserId = 6
             // - Giá/ngày = 140,000 | 5 ngày (T2)
@@ -2678,7 +2678,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 953, BookingId = 953, CourtId = 9, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 954, BookingId = 954, CourtId = 9, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 63 (THÁNG 12/2025, Sân 11 - Sân 11 người) =====
             // - T2 | 12h-14h (2 tiếng), 500k/h, UserId = 6
             // - Giá/ngày = 1,000,000 | 5 ngày (T2)
@@ -2766,7 +2766,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 975, BookingId = 975, CourtId = 11, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 976, BookingId = 976, CourtId = 11, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 67 (THÁNG 12/2025, Sân 12 - Sân Tennis 1) =====
             // - T2 | 12h-14h (2 tiếng), 120k/h, UserId = 6
             // - Giá/ngày = 240,000 | 5 ngày (T2: 2, 9, 16, 23, 30)
@@ -2942,7 +2942,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1019, BookingId = 1019, CourtId = 13, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 1020, BookingId = 1020, CourtId = 13, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 75 (THÁNG 12/2025, Sân 14 - Sân Cầu Lông 1) =====
             // - T2 | 12h-14h (2 tiếng), 60k/h, globalUserId
             // - Giá/ngày = 120,000 | 5 ngày (T2)
@@ -3118,7 +3118,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1063, BookingId = 1063, CourtId = 15, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 1064, BookingId = 1064, CourtId = 15, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 83 (THÁNG 9/2025, Sân 16 - Sân Đơn Tennis) =====
             // - T2, 4, 6 | 12h-14h (2 tiếng), 150k/h, globalUserId
             // - Giá/ngày = 300,000 | 13 ngày
@@ -3250,7 +3250,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1107, BookingId = 1107, CourtId = 16, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
                 new BookingDetail { Id = 1108, BookingId = 1108, CourtId = 16, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 87 (THÁNG 9/2025, Sân 17 - Sân Bóng Chuyền) =====
             // - T2, 4, 6 | 12h-14h (2 tiếng), 80k/h, globalUserId
             // - Giá/ngày = 160,000 | 13 ngày
@@ -3382,7 +3382,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1151, BookingId = 1151, CourtId = 17, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
                 new BookingDetail { Id = 1152, BookingId = 1152, CourtId = 17, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 91 (THÁNG 9/2025, Sân 18 - Sân Cầu Lông) =====
             // - T2, 4, 6 | 12h-14h (2 tiếng), 75k/h, globalUserId
             // - Giá/ngày = 150,000 | 13 ngày
@@ -3514,7 +3514,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1195, BookingId = 1195, CourtId = 18, StartTime = new DateTime(2025, 5, 25, 12, 0, 0), EndTime = new DateTime(2025, 5, 25, 15, 0, 0) },
                 new BookingDetail { Id = 1196, BookingId = 1196, CourtId = 18, StartTime = new DateTime(2025, 5, 31, 12, 0, 0), EndTime = new DateTime(2025, 5, 31, 15, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 100 (THÁNG 6/2025, Sân 19 - Sân 7) =====
             // - T7 | 12h-13h (1 tiếng), 280k/h, UserId = 6
             // - Giá/ngày = 280,000 | 4 ngày (T7)
@@ -3707,7 +3707,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1299, BookingId = 1299, CourtId = 19, StartTime = new DateTime(2025, 12, 20, 12, 0, 0), EndTime = new DateTime(2025, 12, 20, 13, 0, 0) },
                 new BookingDetail { Id = 1300, BookingId = 1300, CourtId = 19, StartTime = new DateTime(2025, 12, 27, 12, 0, 0), EndTime = new DateTime(2025, 12, 27, 13, 0, 0) }
             );
-            
+
             // ========== STADIUM 14 (ID 20, 21) - UserId 6 ==========
             // ===== SEED DATA - SET 95 (THÁNG 1/2025, Sân 20 - Sân 5A) =====
             // - T7, CN | 12h-15h (3 tiếng), 180k/h, UserId = 6
@@ -3855,7 +3855,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1241, BookingId = 1241, CourtId = 20, StartTime = new DateTime(2025, 5, 28, 12, 0, 0), EndTime = new DateTime(2025, 5, 28, 14, 0, 0) },
                 new BookingDetail { Id = 1242, BookingId = 1242, CourtId = 20, StartTime = new DateTime(2025, 5, 30, 12, 0, 0), EndTime = new DateTime(2025, 5, 30, 14, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 107 (THÁNG 12/2025, Sân 22 - Sân Công an 1) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 110k/h, globalUserId
             // - Giá/ngày = 220,000 | 14 ngày
@@ -4067,8 +4067,8 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1372, BookingId = 1372, CourtId = 22, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
                 new BookingDetail { Id = 1373, BookingId = 1373, CourtId = 22, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
             );
-            
-            
+
+
             // ===== SEED DATA - SET 113 (THÁNG 1/2025, Sân 23 - Sân Bóng Rổ) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 100k/h, UserId = 6
             // - Giá/ngày = 200,000 | 13 ngày
@@ -4272,7 +4272,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1441, BookingId = 1441, CourtId = 23, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 20, 0, 0) },
                 new BookingDetail { Id = 1442, BookingId = 1442, CourtId = 23, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 119 (THÁNG 12/2025, Sân 24 - Sân Cầu Lông) =====
             // - T2 | 12h-14h (2 tiếng), 50k/h, globalUserId
             // - Giá/ngày = 100,000 | 5 ngày (T2)
@@ -4448,7 +4448,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1485, BookingId = 1485, CourtId = 25, StartTime = new DateTime(2025, 3, 22, 12, 0, 0), EndTime = new DateTime(2025, 3, 22, 13, 0, 0) },
                 new BookingDetail { Id = 1486, BookingId = 1486, CourtId = 25, StartTime = new DateTime(2025, 3, 29, 12, 0, 0), EndTime = new DateTime(2025, 3, 29, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 127 (THÁNG 12/2025, Sân 26 - Sân 7) =====
             // - T2 | 12h-14h (2 tiếng), 250k/h, globalUserId
             // - Giá/ngày = 500,000 | 5 ngày (T2)
@@ -4620,7 +4620,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1527, BookingId = 1527, CourtId = 27, StartTime = new DateTime(2025, 2, 15, 12, 0, 0), EndTime = new DateTime(2025, 2, 15, 13, 0, 0) },
                 new BookingDetail { Id = 1528, BookingId = 1528, CourtId = 27, StartTime = new DateTime(2025, 2, 22, 12, 0, 0), EndTime = new DateTime(2025, 2, 22, 13, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 135 (THÁNG 12/2025, Sân 28 - Sân Tennis) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 90k/h, globalUserId
             // - Giá/ngày = 180,000 | 14 ngày
@@ -4832,7 +4832,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1600, BookingId = 1600, CourtId = 28, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
                 new BookingDetail { Id = 1601, BookingId = 1601, CourtId = 28, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 141 (THÁNG 1/2025, Sân 29 - Sân Bóng Chuyền) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 80k/h, UserId = 6
             // - Giá/ngày = 160,000 | 13 ngày
@@ -5036,7 +5036,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1669, BookingId = 1669, CourtId = 25, StartTime = new DateTime(2025, 6, 21, 17, 0, 0), EndTime = new DateTime(2025, 6, 21, 20, 0, 0) },
                 new BookingDetail { Id = 1670, BookingId = 1670, CourtId = 25, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 147 (THÁNG 12/2025, Sân 30 - Sân Pickleball) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 100k/h, globalUserId
             // - Giá/ngày = 200,000 | 14 ngày
@@ -5248,7 +5248,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1742, BookingId = 1742, CourtId = 30, StartTime = new DateTime(2025, 7, 19, 17, 0, 0), EndTime = new DateTime(2025, 7, 19, 20, 0, 0) },
                 new BookingDetail { Id = 1743, BookingId = 1743, CourtId = 30, StartTime = new DateTime(2025, 7, 26, 17, 0, 0), EndTime = new DateTime(2025, 7, 26, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 153 (THÁNG 12/2025, Sân 31 - Sân Cầu Lông) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 70k/h, globalUserId
             // - Giá/ngày = 140,000 | 14 ngày
@@ -5482,7 +5482,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1815, BookingId = 1815, CourtId = 32, StartTime = new DateTime(2025, 2, 16, 17, 0, 0), EndTime = new DateTime(2025, 2, 16, 20, 0, 0) },
                 new BookingDetail { Id = 1816, BookingId = 1816, CourtId = 32, StartTime = new DateTime(2025, 2, 23, 17, 0, 0), EndTime = new DateTime(2025, 2, 23, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 161 (THÁNG 1/2025, Sân 33 - Sân Bóng Chuyền) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 150k/h, globalUserId
             // - Giá/ngày = 300,000 | 13 ngày
@@ -5594,7 +5594,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1849, BookingId = 1849, CourtId = 33, StartTime = new DateTime(2025, 5, 18, 17, 0, 0), EndTime = new DateTime(2025, 5, 18, 20, 0, 0) },
                 new BookingDetail { Id = 1850, BookingId = 1850, CourtId = 33, StartTime = new DateTime(2025, 5, 25, 17, 0, 0), EndTime = new DateTime(2025, 5, 25, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 165 (THÁNG 8/2025, Sân 34 - Sân 11 người) =====
             // - T7, CN | 16h-18h (2 tiếng), 450k/h, globalUserId
             // - Giá/ngày = 900,000 | 10 ngày
@@ -5735,7 +5735,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1892, BookingId = 1892, CourtId = 34, StartTime = new DateTime(2025, 12, 27, 8, 0, 0), EndTime = new DateTime(2025, 12, 27, 10, 0, 0) },
                 new BookingDetail { Id = 1893, BookingId = 1893, CourtId = 34, StartTime = new DateTime(2025, 12, 28, 8, 0, 0), EndTime = new DateTime(2025, 12, 28, 10, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 170 (THÁNG 1/2025, Sân 35 - Sân 7A) =====
             // - T7, CN | 16h-18h (2 tiếng), 300k/h, globalUserId
             // - Giá/ngày = 600,000 | 8 ngày
@@ -5924,7 +5924,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1948, BookingId = 1948, CourtId = 35, StartTime = new DateTime(2025, 7, 26, 16, 0, 0), EndTime = new DateTime(2025, 7, 26, 18, 0, 0) },
                 new BookingDetail { Id = 1949, BookingId = 1949, CourtId = 35, StartTime = new DateTime(2025, 7, 27, 16, 0, 0), EndTime = new DateTime(2025, 7, 27, 18, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 177 (THÁNG 1/2025, Sân 37 - Pickleball 1) =====
             // - T7, CN | 16h-18h (2 tiếng), 120k/h, globalUserId
             // - Giá/ngày = 240,000 | 8 ngày
@@ -6086,7 +6086,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 1996, BookingId = 1996, CourtId = 38, StartTime = new DateTime(2025, 6, 28, 8, 0, 0), EndTime = new DateTime(2025, 6, 28, 10, 0, 0) },
                 new BookingDetail { Id = 1997, BookingId = 1997, CourtId = 38, StartTime = new DateTime(2025, 6, 29, 8, 0, 0), EndTime = new DateTime(2025, 6, 29, 10, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 183 (THÁNG 7/2025, Sân 39 - Pickleball 3) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 120k/h, globalUserId
             // - Giá/ngày = 240,000 | 13 ngày
@@ -6262,7 +6262,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 2051, BookingId = 2051, CourtId = 40, StartTime = new DateTime(2025, 12, 20, 15, 0, 0), EndTime = new DateTime(2025, 12, 20, 18, 0, 0) },
                 new BookingDetail { Id = 2052, BookingId = 2052, CourtId = 40, StartTime = new DateTime(2025, 12, 27, 15, 0, 0), EndTime = new DateTime(2025, 12, 27, 18, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 189 (THÁNG 1/2025, Sân 41 - Pickleball A) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 95k/h, globalUserId
             // - Giá/ngày = 190,000 | 13 ngày
@@ -6446,7 +6446,7 @@ namespace BookingAPI.Data
                 new BookingDetail { Id = 2110, BookingId = 2110, CourtId = 41, StartTime = new DateTime(2025, 6, 28, 17, 0, 0), EndTime = new DateTime(2025, 6, 28, 20, 0, 0) },
                 new BookingDetail { Id = 2111, BookingId = 2111, CourtId = 41, StartTime = new DateTime(2025, 6, 29, 17, 0, 0), EndTime = new DateTime(2025, 6, 29, 20, 0, 0) }
             );
-            
+
             // ===== SEED DATA - SET 195 (THÁNG 7/2025, Sân 41 - Pickleball A) =====
             // - T2, 4, 6 | 18h-20h (2 tiếng), 95k/h, globalUserId
             // - Giá/ngày = 190,000 | 13 ngày

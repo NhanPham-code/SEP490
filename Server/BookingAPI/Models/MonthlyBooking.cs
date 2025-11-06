@@ -30,7 +30,7 @@ namespace BookingAPI.Models
         public decimal? TotalPrice { get; set; }
 
         [StringLength(20)]
-        public string Status { get; set; } = "pending";
+        public string Status { get; set; }
 
         public string? PaymentMethod { get; set; }
 
