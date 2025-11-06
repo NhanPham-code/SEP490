@@ -26,7 +26,7 @@ namespace DTOs.DiscountDTO
         public string CodeType { get; set; } = null!; // System / Stadium / Unique
 
         [Required]
-        public string UserId { get; set; } = null!;
+        public int? UserId { get; set; }
 
         public string? TargetUserId { get; set; }
 

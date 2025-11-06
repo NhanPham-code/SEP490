@@ -203,13 +203,14 @@ namespace BookingAPI.Repository
             return allStadiumsResult;
         }
         
-        public async Task<bool> HasCompletedBookingsAsync(int userId)
+        public async Task<bool> HasCompletedBookingsAsync(int userId, int stadiumId)
         {
-            // Sử dụng "completed" (viết thường) để nhất quán với logic
-            // trong GetRevenueStatisticsAsync và GetBookingsByDateRangeAndHourAsync
+            // Sử dụng "completed" (viết thường)
             return await _context.Bookings
-                .AsNoTracking() // Tăng hiệu suất vì không cần theo dõi thay đổi
-                .AnyAsync(b => b.UserId == userId && b.Status == "completed");
+                .AsNoTracking() // Tăng hiệu suất
+                .AnyAsync(b => b.UserId == userId &&
+                               b.StadiumId == stadiumId && // <-- ĐIỀU KIỆN MỚI
+                               b.Status == "completed");
         }
 
         public async Task<RichStadiumKpiDto> GetKpiForStadiumsAsync(List<int> stadiumIds)

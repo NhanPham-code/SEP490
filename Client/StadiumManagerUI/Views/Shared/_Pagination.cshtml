@@ -1,0 +1,43 @@
+﻿@model dynamic
+@{
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
+    string pageParamName = Model.PageParamName;
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
+
+    if (totalPages <= 1) { return; }
+}
+
+<div class="bm-pagination-container">
+    <ul class="bm-pagination">
+        @if (currentPage > 1)
+        {
+            <li><a href="#" data-page="1" data-param="@pageParamName">&laquo;</a></li>
+            <li><a href="#" data-page="@(currentPage - 1)" data-param="@pageParamName">&lsaquo;</a></li>
+        }
+        else
+        {
+            <li class="disabled"><span>&laquo;</span></li>
+            <li class="disabled"><span>&lsaquo;</span></li>
+        }
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            <li class="@(i == currentPage ? "active" : "")">
+                <a href="#" data-page="@i" data-param="@pageParamName">@i</a>
+            </li>
+        }
+
+        @if (currentPage < totalPages)
+        {
+            <li><a href="#" data-page="@(currentPage + 1)" data-param="@pageParamName">&rsaquo;</a></li>
+            <li><a href="#" data-page="@totalPages" data-param="@pageParamName">&raquo;</a></li>
+        }
+        else
+        {
+            <li class="disabled"><span>&rsaquo;</span></li>
+            <li class="disabled"><span>&raquo;</span></li>
+        }
+    </ul>
+</div>

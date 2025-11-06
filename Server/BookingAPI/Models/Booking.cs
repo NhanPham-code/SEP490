@@ -14,7 +14,7 @@ namespace BookingAPI.Models
         public int CreatedById { get; set; }
 
         [StringLength(20)]
-        public string Status { get; set; } = "pending";
+        public string Status { get; set; }
 
         [Required]
         [DataType(DataType.Date)]

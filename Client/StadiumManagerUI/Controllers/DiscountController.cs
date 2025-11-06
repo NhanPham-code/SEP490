@@ -163,7 +163,7 @@ namespace StadiumManagerUI.Controllers
 
             var userId = HttpContext.Session.GetInt32("UserId");
 
-            dto.UserId = userId + "";
+            dto.UserId = userId;
 
             var createdDiscount = await _discountService.CreateDiscountAsync(accessToken, dto);
 

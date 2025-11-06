@@ -37,7 +37,7 @@ namespace Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Required]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
 
         public string? TargetUserId { get; set; }
 
