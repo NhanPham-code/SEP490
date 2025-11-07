@@ -169,7 +169,6 @@
         </a>
     </div>
 
-    <!-- Thống kê: "Lịch chờ xử lý" đã được thay bằng "Lịch đã hủy" -->
     <div class="bm-stats-grid" style="margin-bottom: 2rem;">
         <div class="bm-stat-card bm-red"><div class="bm-stat-header">Lịch đã hủy (Tháng này)</div><div class="bm-stat-value">@ViewBag.CancelledBookingsThisMonth</div></div>
         <div class="bm-stat-card bm-blue"><div class="bm-stat-header">Lịch đã nhận (Tháng này)</div><div class="bm-stat-value">@ViewBag.AcceptedBookingsThisMonth</div></div>
@@ -177,13 +176,12 @@
         <div class="bm-stat-card bm-teal"><div class="bm-stat-header">Sân vận động</div><div class="bm-stat-value">@stadiums.Count</div></div>
     </div>
 
-    <!-- KHU VỰC LỌC MỚI -->
     <form class="bm-filter-section" id="bm-main-filter-form" method="get">
         <div class="bm-filter-group">
             <label for="bm-bookingTypeFilter">Loại lịch đặt:</label>
             <select id="bm-bookingTypeFilter" name="type">
-                <option value="daily" selected>Lịch Hằng Ngày</option>
-                <option value="monthly">Lịch Hằng Tháng</option>
+                <option value="daily" selected="@("daily" == (string)ViewBag.CurrentType)">Lịch Hằng Ngày</option>
+                <option value="monthly" selected="@("monthly" == (string)ViewBag.CurrentType)">Lịch Hằng Tháng</option>
             </select>
         </div>
         <div class="bm-filter-group">
@@ -192,18 +190,19 @@
                 <option value="">Tất cả các sân</option>
                 @foreach (var stadium in stadiums)
                 {
-                    <option value="@stadium.Id" selected="@(stadium.Id == ViewBag.CurrentStadiumId ? "selected" : null)">@stadium.Name</option>
+                    <option value="@stadium.Id" selected="@(stadium.Id.ToString() == ViewBag.CurrentStadiumId?.ToString())">@stadium.Name</option>
                 }
             </select>
         </div>
         <div class="bm-filter-group">
             <label for="bm-statusFilter">Trạng thái:</label>
             <select id="bm-statusFilter" name="status">
-                <option value="all" selected="@("all" == ViewBag.CurrentStatus ? "selected" : null)">Tất cả</option>
-                <option value="accepted" selected="@("accepted" == ViewBag.CurrentStatus ? "selected" : null)">Đã nhận</option>
-                <option value="completed" selected="@("completed" == ViewBag.CurrentStatus ? "selected" : null)">Đã hoàn thành</option>
-                <option value="waiting" selected="@("waiting" == ViewBag.CurrentStatus ? "selected" : null)">Chờ thanh toán</option>
-                <option value="cancelled-group" selected="@("cancelled-group" == ViewBag.CurrentStatus ? "selected" : null)">Đã hủy / Lỗi</option>
+                <option value="all" selected="@("all" == (string)ViewBag.CurrentStatus)">Tất cả</option>
+                @* Đã bỏ 'pending' *@
+                <option value="accepted" selected="@("accepted" == (string)ViewBag.CurrentStatus)">Đã nhận</option>
+                <option value="completed" selected="@("completed" == (string)ViewBag.CurrentStatus)">Đã hoàn thành</option>
+                <option value="waiting" selected="@("waiting" == (string)ViewBag.CurrentStatus)">Chờ thanh toán</option>
+                <option value="cancelled-group" selected="@("cancelled-group" == (string)ViewBag.CurrentStatus)">Đã hủy / Lỗi</option>
             </select>
         </div>
         <div class="bm-filter-group">
@@ -212,7 +211,7 @@
                 <option value="0">Tất cả</option>
                 @for (int i = 1; i <= 12; i++)
                 {
-                    <option value="@i" selected="@(i == ViewBag.CurrentFilterMonth ? "selected" : null)">Tháng @i</option>
+                    <option value="@i" selected="@(i == (int)ViewBag.CurrentFilterMonth)">Tháng @i</option>
                 }
             </select>
         </div>
@@ -222,7 +221,7 @@
                 <option value="0">Tất cả</option>
                 @for (int i = currentYear - 3; i <= currentYear + 1; i++)
                 {
-                    <option value="@i" selected="@(i == ViewBag.CurrentFilterYear ? "selected" : null)">Năm @i</option>
+                    <option value="@i" selected="@(i == (int)ViewBag.CurrentFilterYear)">Năm @i</option>
                 }
             </select>
         </div>
@@ -231,7 +230,6 @@
         </div>
     </form>
 
-    <!-- Container để cập nhật AJAX -->
     <div id="booking-tables-container">
         @await Html.PartialAsync("_BookingTablesPartial", Model)
     </div>

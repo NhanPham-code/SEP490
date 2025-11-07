@@ -951,10 +951,10 @@ namespace CustomerUI.Controllers
                 // Đặt endDate đến cuối ngày để bao gồm tất cả booking trong ngày đó
                 var startDateIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
                 var endDateIso = endDate.ToString("yyyy-MM-ddT23:59:59Z");
-
+                var userId = HttpContext.Session.GetInt32("UserId");
                 // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
                 // Build query string với điều kiện lọc Status
-                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$expand=BookingDetails&$orderby=Date asc";
+                var queryString = $"?$filter=UserId eq {userId} and Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$expand=BookingDetails&$orderby=Date asc";
                 var bookings = (await _bookingService.GetBookingAsync(accessToken, queryString)).Data;
 
                 if (bookings == null)

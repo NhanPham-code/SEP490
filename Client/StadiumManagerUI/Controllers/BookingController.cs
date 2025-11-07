@@ -253,10 +253,10 @@ namespace StadiumManagerUI.Controllers
                 return RedirectToAction("Login", "Account");
 
             // Lưu lại các giá trị filter để hiển thị trên view
-            ViewBag.CurrentFilterMonth = filterMonth ?? DateTime.UtcNow.Month;
-            ViewBag.CurrentFilterYear = filterYear ?? DateTime.UtcNow.Year;
+            ViewBag.CurrentFilterMonth = filterMonth ?? 0;
+            ViewBag.CurrentFilterYear = filterYear ?? 0;
             ViewBag.CurrentStadiumId = stadiumId;
-            ViewBag.CurrentStatus = status;
+            ViewBag.CurrentStatus = status ?? "all";
 
             var viewModel = new BookingManagementViewModel();
             const int pageSize = 10;
@@ -289,23 +289,18 @@ namespace StadiumManagerUI.Controllers
             if (stadiums.Any())
             {
                 var stadiumIds = stadiums.Select(s => s.Id).ToList();
-
-                // --- CẢI TIẾN: SỬ DỤNG TOÁN TỬ "in" CỦA ODATA ---
                 string stadiumIdList = string.Join(",", stadiumIds);
                 string bookingFilter = $"StadiumId in ({stadiumIdList})";
 
-                // Lấy tất cả dữ liệu lịch đặt
                 var allBookings = (await _bookingService.GetBookingAsync(accessToken, $"?$filter={bookingFilter}&$expand=BookingDetails")).Data;
                 var allMonthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter={bookingFilter}")).Data;
 
-                // --- TÍNH TOÁN THỐNG KÊ ---
                 var now = DateTime.UtcNow;
                 var statsBookings = allBookings.Where(b => b.Date.Year == now.Year && b.Date.Month == now.Month);
                 ViewBag.CancelledBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("payfail", StringComparison.OrdinalIgnoreCase));
                 ViewBag.AcceptedBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase));
                 ViewBag.TotalRevenueThisMonth = statsBookings.Where(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase)).Sum(b => b.TotalPrice ?? 0);
 
-                // --- ÁP DỤNG BỘ LỌC TỪ FORM ---
                 var dailyBookingsQuery = allBookings.Where(b => b.MonthlyBookingId == null);
                 var monthlyBookingsQuery = allMonthlyBookings.AsEnumerable();
 
@@ -328,7 +323,7 @@ namespace StadiumManagerUI.Controllers
                 {
                     if (status.Equals("cancelled-group"))
                     {
-                        var cancelledStatuses = new[] { "cancelled", "payfail" };
+                        var cancelledStatuses = new[] { "cancelled", "denied", "payfail" };
                         dailyBookingsQuery = dailyBookingsQuery.Where(b => cancelledStatuses.Contains(b.Status.ToLower()));
                         monthlyBookingsQuery = monthlyBookingsQuery.Where(mb => cancelledStatuses.Contains(mb.Status.ToLower()));
                     }
@@ -339,7 +334,6 @@ namespace StadiumManagerUI.Controllers
                     }
                 }
 
-                // --- LẤY THÔNG TIN USER VÀ PHÂN TRANG ---
                 var userIdsToFetch = dailyBookingsQuery.Select(b => b.UserId).Concat(monthlyBookingsQuery.Select(b => b.UserId)).Where(id => id != 0).Distinct().ToList();
                 var users = userIdsToFetch.Any() ? await _userService.GetUsersByIdsAsync(userIdsToFetch, accessToken) ?? new List<PublicUserProfileDTO>() : new List<PublicUserProfileDTO>();
                 var userDictionary = users.ToDictionary(u => u.UserId);
@@ -364,8 +358,6 @@ namespace StadiumManagerUI.Controllers
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                // Khi ghép file, chúng ta sẽ cần phải tìm cách render đúng phần HTML
-                // Tạm thời vẫn trả về một PartialView để giữ code sạch sẽ
                 return PartialView("_BookingTablesPartial", viewModel);
             }
 
@@ -380,7 +372,7 @@ namespace StadiumManagerUI.Controllers
             if (string.IsNullOrEmpty(accessToken))
                 return Unauthorized(new { message = "Token not found" });
 
-            if ("cancelled".Equals(dto.Status, StringComparison.OrdinalIgnoreCase) || "denied".Equals(dto.Status, StringComparison.OrdinalIgnoreCase))
+            if ("cancelled".Equals(dto.Status, StringComparison.OrdinalIgnoreCase))
             {
                 // --- BẮT ĐẦU SỬA LỖI LOGIC ---
                 HttpContext.Session.SetString("AccessToken", accessToken);

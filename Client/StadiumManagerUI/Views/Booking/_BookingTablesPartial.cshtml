@@ -1,11 +1,12 @@
 ﻿@model DTOs.BookingDTO.ViewModel.BookingManagementViewModel
 @using DTOs.StadiumDTO
+@using System.Text.Json;
 
 @{
-    // Phần này được để trống vì file này chỉ chứa HTML render
     var stadiums = ViewBag.Stadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-    // Các hàm trợ giúp (Helper functions) - Đã loại bỏ "pending" và "denied"
+    // --- HELPER FUNCTIONS ĐÃ DỌN DẸP ---
     string GetStatusClass(string status) => status.ToLower() switch
     {
         "accepted" => "bm-status-accepted",
@@ -14,7 +15,6 @@
         "waiting" => "bm-status-waiting",
         _ => "bm-status-default"
     };
-
     string TranslateStatus(string status) => status.ToLower() switch
     {
         "accepted" => "Đã nhận",
@@ -24,17 +24,8 @@
         "payfail" => "Lỗi thanh toán",
         _ => status
     };
-
     string GetInitials(string fullName) { if (string.IsNullOrWhiteSpace(fullName)) return "U"; var parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); return parts.Length > 1 ? $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper() : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U"); }
-
-    (string Text, string Class) GetCreatorInfo(int creatorId)
-    {
-        if (creatorId == 0)
-        {
-            return ("Chủ sân tạo", "creator-owner");
-        }
-        return ("Khách tự đặt", "creator-customer");
-    }
+    (string Text, string Class) GetCreatorInfo(int creatorId) => creatorId == 0 ? ("Chủ sân tạo", "creator-owner") : ("Khách tự đặt", "creator-customer");
 }
 
 <!-- LỊCH ĐẶT HẰNG NGÀY -->
@@ -52,17 +43,19 @@
                         var user = dailyVm.User;
                         var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
                         var creatorInfo = GetCreatorInfo(booking.CreatedById);
-                        <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily">
+                        <tr data-booking-json="@JsonSerializer.Serialize(dailyVm, jsonOptions)">
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
-                                    <div class="bm-customer-avatar">@if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                    <div class="bm-customer-avatar">
+                                        @if (!string.IsNullOrEmpty(user.AvatarUrl))
                                         {
                                             <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
                                         }
                                         else
                                         {
                                             <span>@GetInitials(user.FullName)</span>
-                                        }</div>
+                                        }
+                                    </div>
                                     <div class="bm-customer-details"><span class="bm-customer-name">@user.FullName</span><span class="bm-stadium-name">@stadium?.Name</span></div>
                                 </div>
                             </td>
@@ -73,6 +66,7 @@
                             <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                             <td class="bm-actions">
                                 <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-eye"></i></button>
+                                @* Đã bỏ nút accept/deny *@
                                 @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
                                 {
                                     <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-ban"></i></button>
@@ -96,7 +90,17 @@
     <h2 class="bm-section-title">Lịch Đặt Hằng Tháng</h2>
     <div style="overflow-x: auto;">
         <table class="bm-booking-table">
-            <thead><tr><th style="width: 50px;"></th><th class="bm-align-left">Khách hàng / Sân</th><th>Khung giờ / Thời gian</th><th>Ngày tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+            <thead>
+                <tr>
+                    <th style="width: 50px;"></th>
+                    <th class="bm-align-left">Khách hàng / Sân</th>
+                    <th>Khung giờ / Thời gian</th>
+                    <th>Ngày tạo</th>
+                    <th>Giá tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
             <tbody>
                 @if (Model.MonthlyBookings.Any())
                 {
@@ -105,7 +109,8 @@
                         var booking = monthlyVm.MonthlyBooking;
                         var user = monthlyVm.User;
                         var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                        <tr class="bm-monthly-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
+
+                        <tr class="bm-monthly-parent-row" data-monthly-id="@booking.Id" data-booking-json="@JsonSerializer.Serialize(monthlyVm, jsonOptions)">
                             <td><i class="fas fa-chevron-down bm-expand-toggle"></i></td>
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
@@ -131,7 +136,6 @@
                             <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                             <td class="bm-actions">
                                 <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-eye"></i></button>
-                                <!-- Không có action cho lịch tháng cha -->
                             </td>
                         </tr>
                         <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id" style="display:none;">
@@ -150,12 +154,10 @@
                                                         <td><input type="checkbox" class="bm-child-booking-checkbox" value="@childBooking.Id" data-price="@childBooking.TotalPrice" @(isCancellable ? "" : "disabled")></td>
                                                         <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
                                                         <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
-                                                        <td>
-                                                            @if (childBooking.BookingDetails.Any())
+                                                        <td>@if (childBooking.BookingDetails.Any())
                                                             {
                                                                 <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
-                                                            }
-                                                        </td>
+                                                            }</td>
                                                         <td class="bm-price">@((childBooking.TotalPrice ?? 0).ToString("N0"))₫</td>
                                                         <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
                                                     </tr>
