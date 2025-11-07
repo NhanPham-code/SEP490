@@ -490,10 +490,11 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
-                            <i class="fas fa-cog me-2"></i>
-                            Cài đặt
-                        </a>
+                        <button id="chat-with-admin-btn" type="button" class="dropdown-item">
+                            <i class="fas fa-headset me-2 text-primary"></i>
+                            Chat với Admin
+                        </button>
+                        <input type="hidden" id="senderId" value="@userId" />
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
@@ -703,6 +704,65 @@
             updateNotificationBadge();
 
         });
+    </script>
+
+
+    <script type="module">
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        const db = getDatabase();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatWithAdminBtn = document.getElementById("chat-with-admin-btn");
+            if (chatWithAdminBtn) {
+                chatWithAdminBtn.addEventListener("click", async function() {
+                    const senderId = document.getElementById("senderId")?.value;
+                    const senderName = "@fullName"; // hoặc lấy từ biến JS/session
+                    const receiverId = "1";
+                    const receiverName = "Admin";
+
+                    if (!senderId || !senderName) {
+                        alert("Bạn cần đăng nhập để chat với Admin.");
+                        return;
+                    }
+                    if (senderId === receiverId) {
+                        alert("Bạn không thể chat với chính mình!");
+                        return;
+                    }
+                    await createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+                });
+            }
+        });
+
+        async function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName,
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName,
+                timestamp,
+                lastMessage: ""
+            };
+            try {
+                await Promise.all(
+                    Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+                );
+            } catch (e) {}
+            redirectToChat(senderId, senderName, receiverId, receiverName);
+        }
+
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName,
+                receiverId,
+                receiverName
+            });
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
     </script>
     <!-- === KẾT THÚC PHẦN JAVASCRIPT XỬ LÝ NOTIFICATION === -->
 </body>

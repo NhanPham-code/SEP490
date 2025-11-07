@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTOs.NotificationDTO;
+using FeedbackAPI.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
-using DTOs.NotificationDTO; // Để dùng NotificationDTO
-using FeedbackAPI.DTOs;    // Để dùng FeedbackResponse
+using System.Text.Json;
 
 namespace AdminUI.Controllers
 {
@@ -9,12 +10,12 @@ namespace AdminUI.Controllers
     {
         private readonly IFeedbackService _feedbackService;
         private readonly IUserService _userService;
-        private readonly INotificationService _notificationService; // Inject notification service
+        private readonly INotificationService _notificationService;
 
         public FeedbackController(
             IFeedbackService feedbackService,
             IUserService userService,
-            INotificationService notificationService // Inject ở đây
+            INotificationService notificationService
         )
         {
             _feedbackService = feedbackService;
@@ -25,11 +26,6 @@ namespace AdminUI.Controllers
         private string? GetAccessToken()
         {
             return Request.Cookies["AccessToken"];
-        }
-
-        private string? GetRefreshToken()
-        {
-            return Request.Cookies["RefreshToken"];
         }
 
         [HttpGet]
@@ -153,18 +149,9 @@ namespace AdminUI.Controllers
 
                 var result = await _feedbackService.DeleteAsync(accessToken, id);
 
+                // Gửi thông báo chỉ cho user bị xóa feedback
+                await SendNotificationForFeedback(feedback);
 
-
-                // Gửi notification cho user, KHÔNG cần type/title
-                var notification = new NotificationDTO
-                {
-                    UserId = feedback.UserId,
-                    Type = "Feedback.Deleted",
-                    Message = "Feedback của bạn đã bị xóa do vi phạm tiêu chuẩn cộng đồng.",
-                    CreatedAt = DateTime.Now
-                };
-                await _notificationService.SendNotificationToUserAsync(notification);
-                await _notificationService.SendNotificationToAll(notification);
                 if (result)
                 {
                     return Json(new { success = true, message = "Xóa feedback thành công" });
@@ -180,20 +167,49 @@ namespace AdminUI.Controllers
                 return Json(new { success = false, message = "Có lỗi xảy ra khi xóa feedback" });
             }
         }
+
+        /// <summary>
+        /// Gửi thông báo chỉ cho user sở hữu feedback vừa bị xóa.
+        /// </summary>
+        private async Task SendNotificationForFeedback(FeedbackResponse feedback)
+        {
+            if (feedback != null && feedback.UserId > 0)
+            {
+                var notification = new CreateNotificationDto
+                {
+                    UserId = feedback.UserId,
+                    Type = "Feedback.Deleted",
+                    Title = "Feedback bị xóa",
+                    Message = "Feedback của bạn đã bị xóa do vi phạm tiêu chuẩn cộng đồng.",
+                    Parameters = JsonSerializer.Serialize(new { feedbackId = feedback.Id, stadiumId = feedback.StadiumId })
+                };
+
+                try
+                {
+                    await _notificationService.SendNotificationToUserAsync(notification);
+                    Console.WriteLine($"[FeedbackController] Đã gửi notification cho UserId = {feedback.UserId}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[FeedbackController] Lỗi gửi notification cho user: {ex.Message}");
+                }
+            }
+        }
+
         [HttpGet]
         public IActionResult ByStadium(int stadiumId)
         {
             ViewData["stadiumId"] = stadiumId;
             return View("FeedbackByStadium");
         }
-        // Logic kiểm tra hợp lệ (ví dụ: comment phải khác rỗng)
+
         private bool IsValidFeedback(FeedbackResponse feedback)
         {
             if (feedback == null) return false;
             if (string.IsNullOrWhiteSpace(feedback.Comment)) return false;
-            // Có thể thêm check khác theo nhu cầu
             return true;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetSummary(int stadiumId)
         {
@@ -202,6 +218,7 @@ namespace AdminUI.Controllers
             var avg = count > 0 ? feedbacks.Average(f => f.Rating) : 0;
             return Json(new { count, avgRating = avg });
         }
+
         public IActionResult Feedback()
         {
             return View();

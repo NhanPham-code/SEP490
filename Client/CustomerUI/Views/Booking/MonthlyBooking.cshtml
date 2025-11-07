@@ -336,7 +336,6 @@
             updateNavigationButtons();
         }
 
-
         // Hàm cập nhật trạng thái nút điều hướng
         function updateNavigationButtons() {
             const $prevButton = $('#prevMonth');
@@ -411,7 +410,6 @@
             generateCalendar(currentMonth, currentYear);
             logSelectedDates();
         }
-
 
         function logSelectedDates() {
             const selectedArray = Array.from(selectedDates).map(dateKey => {
@@ -672,7 +670,7 @@
         }
 
         // Render time button
-               function renderTimeButtons() {
+        function renderTimeButtons() {
             $timeButtonsContainer.empty();
             allHours.forEach(hour => {
                 const $button = $(`
@@ -702,7 +700,6 @@
                 $timeButtonsContainer.append($button);
             });
         }
-
 
         // Xử lý khi chọn thời gian
         function handleTimeSelect(hour) {
@@ -798,12 +795,12 @@
                             borderColor = 'border-red-500';
                             statusText = 'Đã đặt';
                             statusTextColor = 'text-red-500';
-                            canClick = false; // Không thể click sân đã đặt
+                            canClick = true; // Không thể click sân đã đặt
                         } else if (timeSelected && isRelatedToBooked) { // Chỉ kiểm tra isRelatedToBooked nếu đã chọn giờ
                             borderColor = 'border-yellow-500';
                             statusText = 'Liên quan';
                             statusTextColor = 'text-yellow-500';
-                            canClick = false; // Không thể click sân liên quan
+                            canClick = true; // Không thể click sân liên quan
                         } else {
                             // Trạng thái mặc định cho một sân có thể chọn
                             borderColor = 'border-green-500';

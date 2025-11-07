@@ -790,6 +790,22 @@
                                         class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
                                     中文
                                 </button>
+                                <button data-lang="fr"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    Français
+                                </button>
+                                <button data-lang="de"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    Deutsch
+                                </button>
+                                <button data-lang="it"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    Italiano
+                                </button>
+                                <button data-lang="es"
+                                        class="block w-full text-left px-4 py-2 text-slate-600 hover:text-blue-600 text-sm">
+                                    Español
+                                </button>
                             </div>
                         </div>
                         <button id="reset-translate-btn"
@@ -921,7 +937,7 @@
                                         <button id="chat-with-admin-btn"
                                                 type="button"
                                                 class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group font-semibold">
-                                            <i class="ri-settings-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                            <i class="ri-chat-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span>Chat với Admin</span>
                                         </button>
                                         <input type="hidden" id="senderId" value="@userId" />
@@ -1077,105 +1093,13 @@
         // Các hàm JavaScript khác giữ nguyên
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
-    <script>
-          function initGoogleTranslate() {
-          new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,vi,ja,ko,zh-CN',
-            autoDisplay: false,
-            multilanguagePage: true
-          }, 'google_translate_element');
-
-          // Ẩn banner Google
-          const handleGoogleUI = () => {
-            document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
-            document.body.style.top = '0px';
-          };
-
-          const observer = new MutationObserver(() => handleGoogleUI());
-          observer.observe(document.body, { childList: true, subtree: true });
-        }
-
-        // Toggle menu custom
-        const toggleBtn = document.getElementById("translate-toggle");
-        const menu = document.getElementById("translate-menu");
-
-        toggleBtn.addEventListener("click", () => {
-          menu.classList.toggle("hidden");
-        });
-
-        document.addEventListener("click", (e) => {
-          if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add("hidden");
-          }
-        });
-
-
-        document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const lang = btn.getAttribute("data-lang");
-            const select = document.querySelector("#google_translate_element select");
-            if (select) {
-              select.value = lang;
-              select.dispatchEvent(new Event("change"));
-            }
-            menu.classList.add("hidden");
-
-
-            setTimeout(() => {
-              document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
-                el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
-              });
-            }, 500);
-          });
-        });
-
-
-        document.getElementById("reset-translate-btn").addEventListener("click", function() {
-        document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
-          if (window.localStorage) {
-            localStorage.removeItem('googtrans');
-          }
-         window.location.reload();
-        });
-         (function () {
-            function deleteCookie(name) {
-                try {
-                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
-                    if (location.hostname.indexOf('.') !== -1) {
-                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
-                    }
-                } catch (e) { console.warn('Cookie delete failed', e); }
-            }
-
-            function stopTranslateAndReload() {
-                // Xóa cookie Google Translate
-                deleteCookie('googtrans');
-
-                // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
-                // Sau đó reload trang để trạng thái dịch bị loại bỏ
-                location.reload();
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                const btn = document.getElementById('reset-translate-btn');
-                if (!btn) return;
-                btn.addEventListener('click', function () {
-                    btn.disabled = true;
-                    btn.textContent = 'Đang đặt...';
-                    setTimeout(() => {
-                        stopTranslateAndReload();
-                    }, 150);
-                });
-            });
-        })();
-    </script>
+    
     @RenderSection("Scripts", required: false)
 
 
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -1197,45 +1121,6 @@
 
                         const badge = $('#notification-badge');
 
-
-            // Lắng nghe sự kiện "ReceiveNotification"
-            connection.on("ReceiveNotification", function (notification) {
-                console.log("Nhận thông báo mới:", notification);
-
-                // Nếu không có parameters, delay 3 giây rồi cập nhật badge
-                setTimeout(function () {
-                    updateNotificationBadge();
-                }, 3000);
-
-                 if (typeof onReceiveStadiumNotification === "function") {
-        onReceiveStadiumNotification(notification);
-    }
-                // Hiển thị thông báo toast nếu muốn
-                // showToast(notification.title, notification.message);
-            });
-
-            // Kết nối tới hub
-            connection.start()
-                .then(function () {
-                    console.log("Đã kết nối tới notification hub!");
-                })
-                .catch(function (err) {
-                    console.error("Kết nối SignalR thất bại:", err);
-                });
-        }
-
-        async function updateNotificationBadge() {
-            try {
-                const resp = await fetch('/Notification/GetUnreadNotificationCount');
-                if (resp.ok) {
-                    const count = await resp.json();
-                    const badge = document.getElementById('notification-badge');
-                    console.log('Unread notifications:', count);
-                    if (badge) {
-                        if (count > 0) {
-                            badge.textContent = count;
-                            badge.style.display = 'flex';
-
                         if (badge.length) {
                             if (count > 0) {
                                 badge.text(count);
@@ -1245,7 +1130,6 @@
                                 badge.hide();
                                 console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                             }
-
                         } else {
                             console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
                         }
@@ -1297,7 +1181,9 @@
 
             // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
+
     </script>
+
     <script>
         window.currentUserId = @userId;
         console.log("🔑 UserId từ Session:", @userId);
@@ -1499,7 +1385,104 @@
             window.location.href = `/Chat/Chat?${params.toString()}`;
         }
     </script>
-</body>
+
+
+    
+    <script>
+      function initGoogleTranslate() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
+        autoDisplay: false,
+        multilanguagePage: true
+      }, 'google_translate_element');
+
+      // Ẩn banner Google
+      const handleGoogleUI = () => {
+        document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+        document.body.style.top = '0px';
+      };
+
+      const observer = new MutationObserver(() => handleGoogleUI());
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // Toggle menu custom
+    const toggleBtn = document.getElementById("translate-toggle");
+    const menu = document.getElementById("translate-menu");
+
+    toggleBtn.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add("hidden");
+      }
+    });
+
+
+    document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lang = btn.getAttribute("data-lang");
+        const select = document.querySelector("#google_translate_element select");
+        if (select) {
+          select.value = lang;
+          select.dispatchEvent(new Event("change"));
+        }
+        menu.classList.add("hidden");
+
+
+        setTimeout(() => {
+          document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+            el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+          });
+        }, 500);
+      });
+    });
+
+
+    document.getElementById("reset-translate-btn").addEventListener("click", function() {
+    document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+      if (window.localStorage) {
+        localStorage.removeItem('googtrans');
+      }
+     window.location.reload();
+    });
+     (function () {
+        function deleteCookie(name) {
+            try {
+                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
+                if (location.hostname.indexOf('.') !== -1) {
+                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
+                }
+            } catch (e) { console.warn('Cookie delete failed', e); }
+        }
+
+        function stopTranslateAndReload() {
+            // Xóa cookie Google Translate
+            deleteCookie('googtrans');
+
+            // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
+            // Sau đó reload trang để trạng thái dịch bị loại bỏ
+            location.reload();
+}
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('reset-translate-btn');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                btn.disabled = true;
+                btn.textContent = 'Đang đặt...';
+                setTimeout(() => {
+                    stopTranslateAndReload();
+                }, 150);
+            });
+        });
+    })();
+</script>
+    </body>
 
 
 </html>

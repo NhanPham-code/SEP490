@@ -600,6 +600,25 @@
       //   "RequireAuthentication": true
       // }
     },
+    {
+      "DownstreamPathTemplate": "/api/Booking/check-completed/{userId}",
+      "UpstreamPathTemplate": "/booking/check-completed",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7015
+        }
+      ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireAuthentication": true
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value"
+      }
+    },
     // === STADIUM API ===
     {
       "DownstreamPathTemplate": "/odata/OdataStadium",
@@ -1626,32 +1645,32 @@
         }
     },
     {
-        "UpstreamPathTemplate": "/notifications/all", 
-        "UpstreamHttpMethod": [ "POST" ], 
-        "DownstreamPathTemplate": "/api/Notifications/all",
-        "DownstreamScheme": "https",
-        "DownstreamHostAndPorts": [
-            {
-                "Host": "localhost",
-                "Port": 7072 
-            }
-        ],
-        "AuthenticationOptions": {
-            "AuthenticationProviderKey": "Bearer" 
-        }
-    },
-    // AggregatorPatternAPI
-    {
-      "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+      "UpstreamPathTemplate": "/notifications/all",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Notifications/all",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7175
+          "Port": 7072
         }
       ],
-      "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
-      "UpstreamHttpMethod": [ "GET" ]
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    // AggregatorPatternAPI
+    {
+        "DownstreamPathTemplate": "/api/aggregator/stadiums-bookings",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+            {
+                "Host": "localhost",
+                "Port": 7175
+            }
+        ],
+        "UpstreamPathTemplate": "/aggregator/stadiums-bookings",
+        "UpstreamHttpMethod": [ "GET" ]
     },
     // FeesAPI
     {

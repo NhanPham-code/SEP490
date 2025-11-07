@@ -54,6 +54,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseWebSockets();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -306,10 +306,25 @@
                         const stadium = stadiumCache[timeSlot.bookingData.stadiumId];
                         const stadiumName = stadium ? stadium.Name : `Sân ${timeSlot.bookingData.stadiumId}`;
 
-                        const courtChips = timeSlot.courtsForDisplay.sort((a, b) => a - b).map(courtId => {
-                            const courtName = getCourtName(stadium, courtId);
-                            return `<span class="court-chip">${courtName}</span>`;
-                        }).join('');
+                        const sortedCourts = timeSlot.courtsForDisplay.sort((a, b) => a - b);
+                        const totalCourts = sortedCourts.length;
+                        let courtChips = '';
+
+                        if (totalCourts <= 2) {
+                            // If 2 or fewer courts, show all of them
+                            courtChips = sortedCourts.map(courtId => {
+                                const courtName = getCourtName(stadium, courtId);
+                                return `<span class="court-chip">${courtName}</span>`;
+                            }).join('');
+                        } else {
+                            // If more than 2 courts, show the first one + a "more" chip
+                            const firstCourtName = getCourtName(stadium, sortedCourts[0]);
+                            const remainingCount = totalCourts - 1;
+                            courtChips = `
+                                <span class="court-chip">${firstCourtName}</span>
+                                <span class="court-chip more-courts-chip">+${remainingCount} sân khác</span>
+                            `;
+                        }
 
                         const startTimeFormatted = formatTime(timeSlot.startTime);
                         const endTimeFormatted = formatTime(timeSlot.endTime);

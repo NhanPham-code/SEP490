@@ -1092,7 +1092,7 @@
                 <button class="chat-btn chat-send-btn" onclick="sendMessage()" disabled id="sendBtn">
                     <span id="sendIcon">🚀</span>
                 </button>
-                <input type="file" id="imageInput" accept="image/*" style="display:none" />
+                <input type="file" id="imageInput" accept="image/*,video/*" style="display:none" />
             </div>
         </div>
         <div id="imageModal" style="display:none; position:fixed; z-index:2000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
@@ -2077,6 +2077,16 @@
                 <small>${time}</small>
             `;
         }
+                else if (msg.message && msg.message.startsWith('[VIDEO]')) {
+            const videoData = msg.message.substring(7);
+            const [videoUrl, name] = videoData.split('|');
+            div.innerHTML = `
+                <div class="msg-video">
+                    <video src="${videoUrl}" controls style="max-width:220px; border-radius:8px;"></video>
+                </div>
+                <small>${time}</small>
+            `;
+        }
                             // Hiển thị text thường
                             else {
                                 div.innerHTML = `
@@ -2287,30 +2297,57 @@
         const CLOUDINARY_UPLOAD_PRESET = 'ChatMoBe';
                 const IMGBB_API_KEY = 'i4WkW4ZQ6UW4Ws9tV-K6jcxovNg'; // Thay YOUR_IMGBB_API_KEY bằng key của bạn
 
-                document.getElementById('imageInput').addEventListener('change', async (event) => {
+                       document.getElementById('imageInput').addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
 
+            const isVideo = file.type.startsWith('video/');
+            const endpoint = isVideo
+                ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`
+                : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
             try {
                 const formData = new FormData();
-                formData.append('file', file); // <--- file gốc, không cần base64
+                formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     body: formData
                 });
                 const data = await res.json();
 
                 if (data && data.secure_url) {
-                    sendImageMessage(data.secure_url, file.name);
+                    sendMediaMessage(data.secure_url, file.name, isVideo ? 'video' : 'image');
                 } else {
-                    alert('❌ Không gửi được ảnh, thử lại sau!');
+                    alert('❌ Không gửi được file, thử lại sau!');
                 }
             } catch (err) {
-                alert('❌ Không gửi được ảnh, thử lại sau!');
+                alert('❌ Không gửi được file, thử lại sau!');
             }
         });
+                function sendMediaMessage(mediaUrl, name, type) {
+            const senderId = document.getElementById('senderId')?.value.trim();
+            const senderName = document.getElementById('senderName')?.value.trim();
+            const timestamp = Date.now();
+            if (!senderId || !senderName || !currentReceiverId || !currentChatId) {
+                alert('⚠️ Vui lòng nhập đủ thông tin và chọn chat');
+                return;
+            }
+            showTypingIndicator();
+            push(ref(db, `chats/${currentChatId}`), {
+                senderId,
+                senderName,
+                message: type === 'image'
+                    ? `[IMAGE]${mediaUrl}|${name}`
+                    : `[VIDEO]${mediaUrl}|${name}`,
+                timestamp,
+                type
+            }).then(() => {
+                hideTypingIndicator();
+                scrollToLatestMessage();
+            });
+        }
         function sendImageMessage(imageUrl, name) {
             const senderId = document.getElementById('senderId')?.value.trim();
             const senderName = document.getElementById('senderName')?.value.trim();

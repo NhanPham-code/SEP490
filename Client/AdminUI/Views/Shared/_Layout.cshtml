@@ -96,10 +96,14 @@
                             {
                                 <div class="nav-indicator"></div>
                             } </a> </li>
-                    <li> <a asp-controller="Chat" asp-action="Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"> <i class="ri-chat-3-line"></i> <span>Chat</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Chat")
-                            {
-                                <div class="nav-indicator"></div>
-                            } </a> </li>
+                    <li>
+                        <a asp-controller="Chat" asp-action="Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"
+                           id="chat-nav-link">
+                            <i class="ri-chat-3-line"></i>
+                            <span>Chat</span>
+                            <span id="chat-unread-badge" class="badge-red" style="display:none;"></span>
+                        </a>
+                    </li>
                     <li> <a href="/Admin/Notification" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")"> <i class="ri-notification-line"></i> <span>Thông Báo</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
                             {
                                 <div class="nav-indicator"></div>
@@ -397,6 +401,51 @@
              connectToSignalRAdmin();      // Kết nối SignalR
              updateNotificationBadgeAdmin(); // Tải số lượng ban đầu
          });
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Mặc định userId=1 (bạn có thể lấy từ server nếu đăng nhập)
+        const currentUserId = 1;
+
+        // Lắng nghe số tin chưa đọc
+        function listenUnreadBadge() {
+            const badge = document.getElementById('chat-unread-badge');
+            const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                if (badge) {
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'inline-block' : 'none';
+                }
+            });
+        }
+
+        // Reset badge về 0 khi click
+        document.getElementById('chat-nav-link')?.addEventListener('click', async () => {
+            const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+            await set(unreadRef, 0);
+            const badge = document.getElementById('chat-unread-badge');
+            if (badge) {
+                badge.textContent = '';
+                badge.style.display = 'none';
+            }
+        });
+
+        // Gọi khi trang load
+        listenUnreadBadge();
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -20,6 +20,135 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        /* Hide Google Translate banner and unwanted elements */
+        .goog-te-banner-frame,
+        iframe.goog-te-banner-frame,
+        .goog-logo-link,
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight,
+        .goog-te-balloon-frame,
+        #goog-gt-tt,
+        .goog-te-banner,
+        .skiptranslate iframe,
+        iframe[src*="translate.googleapis.com"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        body {
+            top: 0px !important;
+            margin: 0 !important;
+            position: static !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .goog-te-gadget {
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+
+            .goog-te-gadget .goog-te-combo {
+                margin: 0 !important;
+            }
+
+        /* Style the translate dropdown to match navbar */
+        .goog-te-combo {
+            appearance: none !important;
+            background: transparent !important;
+            border: none !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            padding: 0 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+        }
+
+            .goog-te-combo:hover {
+                color: #2563eb !important;
+            }
+
+            .goog-te-combo option {
+                background: white !important;
+                color: #475569 !important;
+                font-weight: 600 !important;
+            }
+
+        /* Custom translate container styling */
+        .translate-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translate-icon {
+            color: #475569;
+            font-size: 16px;
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            color: #2563eb !important;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Demo content styling */
+        .demo-content {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px auto;
+            max-width: 800px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            color: white;
+        }
+    </style>
+    <style>
+        #translate-toggle, #reset-translate-btn {
+            padding: 2px 4px !important;
+            font-size: 11px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            height: 36px !important;
+            width: auto !important;
+            line-height: 1;
+        }
+
+        #translate-menu {
+            width: 110px !important;
+            font-size: 12px !important;
+            padding: 2px 0 !important;
+        }
+
+            #translate-menu button {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                line-height: 1.2;
+            }
+        @@media (max-width: 400px) {
+            #translate-toggle span, #reset-translate-btn span
+
+        {
+            display: none;
+        }
+
+        #translate-menu {
+            width: 75px !important;
+        }
+
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -480,6 +609,7 @@
             position: relative;
         }
     </style>
+
 </head>
 
 <body id="body-mobile" class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
@@ -520,20 +650,20 @@
             <div class="flex items-center space-x-2">
                 @if (isLoggedIn)
                 {
-                    <!-- Messages Button -->
-                   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-<a asp-controller="Chat" asp-action="Chat"
-   x-data="chatBadge()"
-   x-init="init()"
-   class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
-   title="Messages"
-   @@click.prevent="openChat">
-    <i class="ri-message-3-line text-lg text-white"></i>
-    <span x-show="unreadCount > 0"
-          class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
-          x-text="unreadCount"></span>
-</a>
+                    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+                    <!-- Đổi từ <a ...> sang <button ...> -->
+                    <button type="button"
+                            x-data="chatBadge()"
+                            x-init="init()"
+                            class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
+                            title="Messages"
+                            x-on:click.prevent="openChat">
+                        <i class="ri-message-3-line text-lg text-white"></i>
+                        <span x-show="unreadCount > 0"
+                              class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
+                              x-text="unreadCount"></span>
+                    </button>
 
                 }
                 else
@@ -691,6 +821,48 @@
                 </div>
                 <span class="text-xs mt-1 font-medium truncate">Alerts</span>
             </a>
+            <!-- Google Translate Element (ẩn select) -->
+            <div id="google_translate_element" class="hidden"></div>
+
+            
+            <div class="flex flex-col items-center flex-1 max-w-none px-1">
+                <div class="relative flex flex-col items-center justify-center" style="min-width:32px;">
+                    <button id="translate-toggle"
+                            type="button"
+                            class="nav-link p-1 text-slate-600 hover:text-blue-600 font-semibold flex flex-col items-center text-[11px] rounded transition-all duration-200"
+                            style="min-width: 32px; min-height: 32px; height:36px;">
+                        <i class="ri-translate-2 text-base leading-none"></i>
+                        <span class="leading-tight text-[10px]">Ngôn ngữ</span>
+                        <i class="ri-arrow-up-s-line text-xs leading-none"></i>
+                    </button>
+                    <!-- Menu xổ lên trên -->
+                    <div id="translate-menu"
+                         class="absolute right-0 bottom-full mb-1 w-28 bg-white rounded shadow border border-gray-200 hidden z-50"
+                         style="transform: translateY(-4px); font-size:12px;">
+                        <button data-lang="en" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">English</button>
+                        <button data-lang="vi" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Tiếng Việt</button>
+                        <button data-lang="ja" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">日本語</button>
+                        <button data-lang="ko" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">한국어</button>
+                        <button data-lang="zh-CN" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">中文</button>
+                        <button data-lang="fr" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Français</button>
+                        <button data-lang="de" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Deutsch</button>
+                        <button data-lang="it" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Italiano</button>
+                        <button data-lang="es" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Español</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Nút Mặc định (reset nhỏ gọn) -->
+            <div class="flex flex-col items-center flex-1 max-w-none px-1">
+                <button id="reset-translate-btn"
+                        type="button"
+                        class="px-1 py-1 text-slate-600 hover:text-blue-600 font-semibold flex flex-col items-center text-[11px] rounded transition-all duration-200"
+                        style="min-width: 32px; min-height: 32px; height:36px;">
+                    <i class="ri-refresh-line text-base leading-none"></i>
+                    <span class="leading-tight text-[10px]">Mặc định</span>
+                </button>
+            </div>
+
+
 
             <!-- User Profile -->
             <div class="relative flex-1 max-w-none">
@@ -760,17 +932,17 @@
                             </a>
 
                             <!-- Settings -->
-                            <a href="#"
-                               x-on:click="userMenuOpen = false"
-                               class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
-                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
-                                    <i class="ri-settings-3-line text-blue-600"></i>
+                            <button id="chat-with-admin-btn" type="button"
+                                    class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group w-full">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
+                                    <i class="ri-message-2-line text-purple-600 text-base"></i>
                                 </div>
                                 <div>
-                                    <span class="font-medium">Settings</span>
-                                    <p class="text-xs text-slate-400">Account preferences</p>
+                                    <span class="font-medium">Admin</span>
+                                    <p class="text-xs text-slate-400">Hỗ trợ trực tuyến</p>
                                 </div>
-                            </a>
+                            </button>
+                            <input type="hidden" id="senderId" value="@userId" />
 
                             <!-- Divider -->
                             <hr class="my-3 border-slate-200">
@@ -1119,8 +1291,9 @@
             };
         }
     </script>
+
     <script>
-        function chatBadge() {
+              function chatBadge() {
             return {
                 unreadCount: 0,
                 async openChat() {
@@ -1128,7 +1301,9 @@
                         await window.resetUnreadMessages();
                     }
                     this.unreadCount = 0;
-                    window.location.href = '@Url.Action("Chat", "Chat")';
+                    setTimeout(() => {
+                        window.location.href = '@Url.Action("Chat", "Chat")';
+                    }, 150);
                 },
                 setBadge(count) {
                     this.unreadCount = count;
@@ -1144,6 +1319,7 @@
                 }
             }
         }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -1230,6 +1406,140 @@
             // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
 
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
+    <script>
+        function initGoogleTranslate() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
+            autoDisplay: false,
+            multilanguagePage: true
+          }, 'google_translate_element');
+          // Ẩn banner Google
+          const handleGoogleUI = () => {
+            document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+            document.body.style.top = '0px';
+          };
+          const observer = new MutationObserver(() => handleGoogleUI());
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const toggleBtn = document.getElementById("translate-toggle");
+          const menu = document.getElementById("translate-menu");
+          let translateLoaded = false;
+
+          // Khi Google Translate đã sẵn sàng (check có select trong #google_translate_element)
+          function waitForTranslateReady(cb) {
+            if (document.querySelector("#google_translate_element select")) {
+              translateLoaded = true;
+              if (cb) cb();
+            } else {
+              setTimeout(() => waitForTranslateReady(cb), 100);
+            }
+          }
+          waitForTranslateReady();
+
+          toggleBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            menu.classList.toggle("hidden");
+          });
+
+          document.addEventListener("click", function (e) {
+            if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+              menu.classList.add("hidden");
+            }
+          });
+
+          // Sự kiện chọn ngôn ngữ
+          document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+            btn.addEventListener("click", function () {
+              function changeLang() {
+                const lang = btn.getAttribute("data-lang");
+                const select = document.querySelector("#google_translate_element select");
+                if (select) {
+                  select.value = lang;
+                  select.dispatchEvent(new Event("change"));
+                }
+                menu.classList.add("hidden");
+                setTimeout(() => {
+                  document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+                    el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+                  });
+                }, 500);
+              }
+              if (translateLoaded) {
+                changeLang();
+              } else {
+                waitForTranslateReady(changeLang);
+              }
+            });
+          });
+
+          document.getElementById("reset-translate-btn").addEventListener("click", function () {
+            document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+            if (window.localStorage) localStorage.removeItem('googtrans');
+            window.location.reload();
+          });
+        });
+    </script>
+    <script type="module">
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        const db = getDatabase();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatWithAdminBtn = document.getElementById("chat-with-admin-btn");
+            if (chatWithAdminBtn) {
+                chatWithAdminBtn.addEventListener("click", async function() {
+                    const senderId = document.getElementById("senderId")?.value;
+                    const senderName = "@fullName"; // hoặc lấy từ biến JS/session
+                    const receiverId = "1";
+                    const receiverName = "Admin";
+
+                    if (!senderId || !senderName) {
+                        alert("Bạn cần đăng nhập để chat với Admin.");
+                        return;
+                    }
+                    if (senderId === receiverId) {
+                        alert("Bạn không thể chat với chính mình!");
+                        return;
+                    }
+                    await createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+                });
+            }
+        });
+
+        async function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName,
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName,
+                timestamp,
+                lastMessage: ""
+            };
+            try {
+                await Promise.all(
+                    Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+                );
+            } catch (e) {}
+            redirectToChat(senderId, senderName, receiverId, receiverName);
+        }
+
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName,
+                receiverId,
+                receiverName
+            });
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
     </script>
 </body>
 </html>
