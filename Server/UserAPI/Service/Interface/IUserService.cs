@@ -43,5 +43,7 @@ namespace UserAPI.Service.Interface
         Task<LoginResponseDTO> LoginWithFaceAsync(AiFaceLoginRequestDTO aiFaceLoginRequestDTO);
 
         Task<bool> AddorUpdateFaceEmbeddings(int userId, FaceImagesDTO faceImagesDTO);
+
+        Task<UserStatisticsDTO> GetUserStatisticsAsync();
     }
 }

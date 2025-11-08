@@ -38,5 +38,17 @@ namespace Service.Services
             // Đọc nội dung response dưới dạng chuỗi JSON
             return await response.Content.ReadAsStringAsync();
         }
+
+        public async Task<string> GetAdminDashboardDataAsync()
+        {
+            // Gọi đến Upstream Path của Gateway
+            var response = await _httpClient.GetAsync("aggregator/admin-dashboard");
+
+            // Kiểm tra nếu request không thành công
+            response.EnsureSuccessStatusCode();
+
+            // Đọc nội dung response dưới dạng chuỗi JSON
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }

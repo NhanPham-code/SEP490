@@ -297,5 +297,20 @@ namespace BookingAPI.Controllers
                 return StatusCode(500, $"Lỗi hệ thống khi lấy dữ liệu KPI: {ex.Message}");
             }
         }
+
+        [HttpGet("summary/statistics")]
+        public async Task<ActionResult<BookingStatisticsDto>> GetStatistics()
+        {
+            try
+            {
+                var statistics = await _bookingService.GetBookingStatisticsAsync();
+                return Ok(statistics);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi tại đây
+                return StatusCode(500, "An internal server error occurred while fetching booking statistics.");
+            }
+        }
     }
 }

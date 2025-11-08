@@ -1670,6 +1670,18 @@
       "UpstreamPathTemplate": "/aggregator/stadiums-kpis",
       "UpstreamHttpMethod": [ "GET" ]
     },
+    {
+      "DownstreamPathTemplate": "/api/aggregator/admin-dashboard",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7175
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/admin-dashboard",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
     // FeesAPI
     {
       "DownstreamPathTemplate": "/odata/ODataFees",
