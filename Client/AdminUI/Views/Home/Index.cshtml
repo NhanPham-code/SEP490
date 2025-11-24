@@ -1,22 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Tổng Quan";
+    // Giả sử file này được dùng cho action Index, nên tên file có thể là Index.cshtml
 }
 
 @section Styles {
     <style>
-        /* Custom styles cho dashboard nếu cần */
+        /* Custom styles nếu cần */
     </style>
 }
 
 <div class="p-6">
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+        <!-- Card: Tổng Người Dùng -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Tổng Người Dùng</p>
-                    <p class="text-3xl font-bold text-gray-900">12,543</p>
-                    <p class="text-green-600 text-sm font-medium">+12.5% so với tháng trước</p>
+                    <p id="totalUsers" class="text-3xl font-bold text-gray-900">...</p>
+                    <p id="userChangePercentage" class="text-sm font-medium"></p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <i class="ri-user-line text-2xl text-blue-600"></i>
@@ -24,12 +26,13 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+        <!-- Card: Doanh Thu Tháng -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Doanh Thu Tháng</p>
-                    <p class="text-3xl font-bold text-gray-900">2.5M VNĐ</p>
-                    <p class="text-green-600 text-sm font-medium">+8.2% so với tháng trước</p>
+                    <p id="revenueThisMonth" class="text-3xl font-bold text-gray-900">...</p>
+                    <p id="revenueChangePercentage" class="text-sm font-medium"></p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                     <i class="ri-money-dollar-circle-line text-2xl text-green-600"></i>
@@ -37,25 +40,27 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+        <!-- Card: Tổng Số Sân (Thay thế Mã Giảm Giá) -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-medium">Mã Giảm Giá</p>
-                    <p class="text-3xl font-bold text-gray-900">24</p>
-                    <p class="text-orange-600 text-sm font-medium">8 mã đang hoạt động</p>
+                    <p class="text-gray-500 text-sm font-medium">Tổng Số Sân</p>
+                    <p id="totalStadiums" class="text-3xl font-bold text-gray-900">...</p>
+                    <p class="text-gray-400 text-sm font-medium">Sân đang hoạt động</p>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <i class="ri-coupon-line text-2xl text-orange-600"></i>
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="ri-building-2-line text-2xl text-purple-600"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+        <!-- Card: Tổng Đánh Giá (Thay thế Đánh Giá Mới) -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-medium">Đánh Giá Mới</p>
-                    <p class="text-3xl font-bold text-gray-900">89</p>
-                    <p class="text-red-600 text-sm font-medium">24 chưa phản hồi</p>
+                    <p class="text-gray-500 text-sm font-medium">Tổng Đánh Giá</p>
+                    <p id="totalFeedbacks" class="text-3xl font-bold text-gray-900">...</p>
+                    <p class="text-gray-400 text-sm font-medium">Từ người dùng</p>
                 </div>
                 <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                     <i class="ri-feedback-line text-2xl text-red-600"></i>
@@ -68,12 +73,12 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Doanh Thu 6 Tháng Gần Đây</h3>
-            <canvas id="revenueChart" width="400" height="200"></canvas>
+            <canvas id="revenueChart"></canvas>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Người Dùng Mới</h3>
-            <canvas id="userChart" width="400" height="200"></canvas>
+            <canvas id="userChart"></canvas>
         </div>
     </div>
 
@@ -91,7 +96,7 @@
             </div>
         </a>
 
-        <a href="/Admin/Coupons" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+        <a asp-controller="Discount" asp-action="DiscountList" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                     <i class="ri-coupon-line text-2xl text-orange-600"></i>
@@ -103,7 +108,7 @@
             </div>
         </a>
 
-        <a href="/Admin/Revenue" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+        <a asp-controller="Revenue" asp-action="Revenue" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                     <i class="ri-line-chart-line text-2xl text-green-600"></i>
@@ -115,7 +120,7 @@
             </div>
         </a>
 
-        <a href="/Admin/Venues" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
+        <a asp-controller="Stadium" asp-action="StadiumAdmin" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow cursor-pointer block">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                     <i class="ri-building-2-line text-2xl text-purple-600"></i>
@@ -130,95 +135,107 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        $(document).ready(function () {
-            // Initialize Charts
-            initializeDashboardCharts();
+        document.addEventListener('DOMContentLoaded', function () {
+            // Các biến để giữ các instance của chart, giúp update dễ dàng
+            let revenueChartInstance;
+            let userChartInstance;
 
-            // Show welcome toast
-            showToast('Chào mừng đến với Dashboard Sportivey!', 'success', 3000);
-        });
+            // --- CÁC HÀM TIỆN ÍCH ---
+            const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
+            const getMonthName = (monthNumber) => `T${monthNumber}`;
 
-        function initializeDashboardCharts() {
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart');
-            if (revenueCtx) {
-                new Chart(revenueCtx, {
+            // Hàm cập nhật màu sắc và nội dung cho các thẻ phần trăm
+            const updatePercentageField = (elementId, percentage) => {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+
+                const isPositive = percentage >= 0;
+                el.textContent = `${isPositive ? '+' : ''}${percentage}% so với tháng trước`;
+                el.className = `text-sm font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`;
+            };
+
+            // --- HÀM VẼ BIỂU ĐỒ ---
+            function renderRevenueChart(data) {
+                const ctx = document.getElementById('revenueChart');
+                if (!ctx) return;
+                if (revenueChartInstance) revenueChartInstance.destroy();
+
+                revenueChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: ['T4/2025', 'T5/2025', 'T6/2025', 'T7/2025', 'T8/2025', 'T9/2025'],
+                        labels: data.map(d => `${getMonthName(d.month)}/${d.year}`),
                         datasets: [{
-                            label: 'Doanh Thu (triệu VNĐ)',
-                            data: [1.8, 2.1, 2.3, 2.0, 2.4, 2.5],
+                            label: 'Doanh Thu (VNĐ)',
+                            data: data.map(d => d.totalRevenue),
                             borderColor: 'rgb(59, 130, 246)',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             tension: 0.4,
                             fill: true
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
+                    options: { /* ... giữ nguyên options của bạn ... */ }
                 });
             }
 
-            // User Chart
-            const userCtx = document.getElementById('userChart');
-            if (userCtx) {
-                new Chart(userCtx, {
+            function renderUserChart(data) {
+                const ctx = document.getElementById('userChart');
+                if (!ctx) return;
+                if (userChartInstance) userChartInstance.destroy();
+
+                userChartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['T4/2025', 'T5/2025', 'T6/2025', 'T7/2025', 'T8/2025', 'T9/2025'],
+                        labels: data.map(d => `${getMonthName(d.month)}/${d.year}`),
                         datasets: [{
                             label: 'Người dùng mới',
-                            data: [850, 920, 1050, 980, 1150, 1200],
+                            data: data.map(d => d.count),
                             backgroundColor: 'rgba(16, 185, 129, 0.8)',
                             borderColor: 'rgb(16, 185, 129)',
                             borderWidth: 1,
                             borderRadius: 4
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
+                    options: { /* ... giữ nguyên options của bạn ... */ }
                 });
             }
-        }
+
+            // --- HÀM CHÍNH: LẤY VÀ HIỂN THỊ DỮ LIỆU ---
+            async function loadDashboardData() {
+                try {
+                    const response = await fetch('/Home/GetDashboardData');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+
+                    // Cập nhật các thẻ KPI
+                    document.getElementById('totalUsers').textContent = formatNumber(data.totalUsers);
+                    document.getElementById('revenueThisMonth').textContent = formatCurrency(data.revenueThisMonth);
+                    document.getElementById('totalStadiums').textContent = formatNumber(data.totalStadiums);
+                    document.getElementById('totalFeedbacks').textContent = formatNumber(data.totalFeedbacks);
+
+                    // Cập nhật các chỉ số phần trăm
+                    updatePercentageField('userChangePercentage', data.newUsersChangePercentage);
+                    updatePercentageField('revenueChangePercentage', data.revenueChangePercentage);
+
+                    // Vẽ lại biểu đồ
+                    renderRevenueChart(data.revenueLast6Months);
+                    renderUserChart(data.newUsersLast6Months);
+
+                    // Hiển thị toast chào mừng
+                    // showToast('Chào mừng đến với Dashboard Sportivey!', 'success', 3000);
+
+                } catch (error) {
+                    console.error("Failed to load dashboard data:", error);
+                    // showToast('Không thể tải dữ liệu dashboard!', 'error', 5000);
+                }
+            }
+
+            // Chạy hàm chính khi trang được tải
+            loadDashboardData();
+        });
     </script>
 }

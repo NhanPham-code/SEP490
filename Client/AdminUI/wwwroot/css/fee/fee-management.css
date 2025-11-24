@@ -325,6 +325,20 @@ body {
     font-size: 0.875rem;
 }
 
+.fee-amount {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #3b82f6; /* Màu chữ xanh */
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50rem; /* Bo tròn cạnh */
+    background-color: #dbeafe; /* Màu nền xanh nhạt */
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 1200px) {
     .filter-form {

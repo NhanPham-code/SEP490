@@ -107,7 +107,7 @@ namespace Service.Services
 
             if (userId.HasValue)
             {
-                filters.Add($"userId eq '{userId.Value}'");
+                filters.Add($"userId eq {userId.Value}");
             }
 
             if (!string.IsNullOrEmpty(searchByCode))

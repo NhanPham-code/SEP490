@@ -1,5 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using StadiumManagerUI.Helpers;
+﻿using DTOs.ConvertTime;
+using Newtonsoft.Json;
+
 
 namespace DTOs.BookingDTO
 {
@@ -12,7 +13,7 @@ namespace DTOs.BookingDTO
         public DateTime CreatedAt { get; set; }
         public decimal? OriginalPrice { get; set; }
         public decimal? TotalPrice { get; set; }
-        public string Status { get; set; } = "pending";
+        public string Status { get; set; }
         public string? PaymentMethod { get; set; }
         public string? Note { get; set; }
         public int TotalHour { get; set; }

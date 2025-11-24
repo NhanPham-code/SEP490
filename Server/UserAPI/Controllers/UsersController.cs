@@ -36,6 +36,25 @@ namespace UserAPI.Controllers
         }
 
         /// <sumary>
+        /// Lấy thống kê user
+        /// api/Users/statistics
+        /// </sumary>
+        [HttpGet("statistics")]
+        public async Task<ActionResult<UserStatisticsDTO>> GetStatistics()
+        {
+            try
+            {
+                var statistics = await _userService.GetUserStatisticsAsync();
+                return Ok(statistics);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi ở đây nếu cần
+                return StatusCode(500, "An internal server error occurred while fetching user statistics.");
+            }
+        }
+
+        /// <sumary>
         /// Thêm hoặc cập nhật khuôn mặt cho Customer
         /// api/Users/face-embeddings
         /// </sumary>

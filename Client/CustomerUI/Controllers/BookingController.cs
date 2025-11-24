@@ -180,11 +180,11 @@ namespace CustomerUI.Controllers
             {
                 // 1. Lấy tất cả booking (cả lẻ và con của tháng) của user
                 string bookingFilter = $"?$filter=UserId eq {userId}&$expand=BookingDetails&$orderby=CreatedAt desc";
-                var allUserBookings = await _bookingService.GetBookingAsync(accessToken, bookingFilter) ?? new List<BookingReadDto>();
+                var allUserBookings = (await _bookingService.GetBookingAsync(accessToken, bookingFilter)).Data ?? new List<BookingReadDto>();
 
                 // 2. Lấy tất cả các gói đặt tháng của user
                 string monthlyBookingFilter = $"?$filter=UserId eq {userId}&$orderby=CreatedAt desc";
-                var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyBookingFilter) ?? new List<MonthlyBookingReadDto>();
+                var monthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyBookingFilter)).Data ?? new List<MonthlyBookingReadDto>();
 
                 // 3. Lấy thông tin các sân vận động liên quan
                 var allStadiumIds = allUserBookings.Select(b => b.StadiumId)
@@ -951,11 +951,11 @@ namespace CustomerUI.Controllers
                 // Đặt endDate đến cuối ngày để bao gồm tất cả booking trong ngày đó
                 var startDateIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
                 var endDateIso = endDate.ToString("yyyy-MM-ddT23:59:59Z");
-
+                var userId = HttpContext.Session.GetInt32("UserId");
                 // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
                 // Build query string với điều kiện lọc Status
-                var queryString = $"?$filter=Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'pending' or Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$expand=BookingDetails&$orderby=Date asc";
-                var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
+                var queryString = $"?$filter=UserId eq {userId} and Date ge {startDateIso} and Date le {endDateIso} and (Status eq 'accepted' or Status eq 'waiting' or Status eq 'completed')&$expand=BookingDetails&$orderby=Date asc";
+                var bookings = (await _bookingService.GetBookingAsync(accessToken, queryString)).Data;
 
                 if (bookings == null)
                 {

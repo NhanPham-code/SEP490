@@ -72,7 +72,7 @@
             <nav class="mt-6 flex-1 overflow-y-auto px-3">
                 <div class="px-3 mb-4"> <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Quản Lý Chính</h3> </div>
                 <ul class="space-y-1">
-                    <li> <a href="/Admin/Dashboard" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"> <i class="ri-dashboard-line"></i> <span>Tổng Quan</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard")
+                    <li> <a href="/Home/Index" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"> <i class="ri-dashboard-line"></i> <span>Tổng Quan</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard")
                             {
                                 <div class="nav-indicator"></div>
                             } </a> </li>
@@ -92,15 +92,11 @@
                             {
                                 <div class="nav-indicator"></div>
                             } </a> </li>
-                    <li> <a asp-controller="Feedback" asp-action="Feedback" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")"> <i class="ri-feedback-line"></i> <span>Feedback</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Feedback")
+                    <li> <a asp-controller="Feedback" asp-action="Feedback" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Feedback" ? "active" : "")"> <i class="ri-feedback-line"></i> <span>Đánh giá</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Feedback")
                             {
                                 <div class="nav-indicator"></div>
                             } </a> </li>
                     <li> <a asp-controller="Chat" asp-action="Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"> <i class="ri-chat-3-line"></i> <span>Chat</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Chat")
-                            {
-                                <div class="nav-indicator"></div>
-                            } </a> </li>
-                    <li> <a href="/Admin/Notification" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")"> <i class="ri-notification-line"></i> <span>Thông Báo</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
                             {
                                 <div class="nav-indicator"></div>
                             } </a> </li>
@@ -109,27 +105,16 @@
                                 <div class="nav-indicator"></div>
                             } </a> </li>
                 </ul>
-                <div class="px-3 mt-8 mb-4"> <h3 class="text-gray-500 text-xs font-semibold uppercase tracking-wider">Hệ Thống</h3> </div>
-                <ul class="space-y-1">
-                    <li> <a href="/Admin/Settings" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")"> <i class="ri-settings-3-line"></i> <span>Cài Đặt</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Settings")
-                            {
-                                <div class="nav-indicator"></div>
-                            } </a> </li>
-                    <li> <a href="/Admin/Logs" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Logs" ? "active" : "")"> <i class="ri-file-list-3-line"></i> <span>Nhật Ký</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Logs")
-                            {
-                                <div class="nav-indicator"></div>
-                            } </a> </li>
-                </ul>
             </nav>
 
             @{
                 var adminName = User.Identity?.Name ?? "Admin";
-                var adminAvatarUrl = Context.Session.GetString("AvatarUrl") ?? "/uploads/avatars/default-avatar.png";
+                var adminAvatarUrl = Context.Session.GetString("AvatarUrl") ?? "/images/default-avatar.png";
                 var loginTimeDisplay = DateTime.Now.ToString("HH:mm");
             }
             <div class="p-4 border-t border-gray-200 bg-white flex-shrink-0">
                 <div class="flex items-center space-x-3">
-                    <img src="@adminAvatarUrl" alt="Admin Avatar" class="w-10 h-10 rounded-full border-2 border-admin-primary" />
+                    <img src="~/images/default-avatar.png" alt="Admin Avatar" class="w-10 h-10 rounded-full border-2 border-admin-primary" />
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-900 truncate">@adminName</p>
                         <p class="text-xs text-gray-500">Quản trị viên</p>

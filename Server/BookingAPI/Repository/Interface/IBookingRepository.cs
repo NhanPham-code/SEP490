@@ -20,6 +20,7 @@ namespace BookingAPI.Repository.Interface
         Task<IEnumerable<Booking>> GetBookingsByStadiumsAndDateAsync( IEnumerable<int> stadiumIds, int? year, int? month, int? day);
         Task<IEnumerable<StadiumRevenueDto>> GetRevenueByStadiumsAsync(List<int> stadiumIds, int year, int month);
         Task<RichStadiumKpiDto> GetKpiForStadiumsAsync(List<int> stadiumIds);
+        Task<BookingStatisticsDto> GetBookingStatisticsAsync();
         Task<bool> HasCompletedBookingsAsync(int userId, int stadiumId);
     }
 }

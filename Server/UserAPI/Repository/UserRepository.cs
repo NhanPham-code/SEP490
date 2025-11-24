@@ -108,5 +108,45 @@ namespace UserAPI.Repository
 
             return usersWithEmbeddingsDTO;
         }
+
+        public async Task<UserStatisticsDTO> GetUserStatisticsAsync()
+        {
+            var utcNow = DateTime.UtcNow;
+            var startOfThisMonth = new DateTime(utcNow.Year, utcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var startOfLastMonth = startOfThisMonth.AddMonths(-1);
+            var startOf6MonthsAgo = startOfThisMonth.AddMonths(-5);
+
+            // ✅ SỬA LỖI: Gom các truy vấn đếm vào một lần gọi để tránh lỗi concurrency
+            var statsSummary = await _context.Users
+                .GroupBy(u => 1) // Trick để gom tất cả user vào một nhóm
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    NewThisMonth = g.Count(u => u.CreatedDate >= startOfThisMonth),
+                    NewLastMonth = g.Count(u => u.CreatedDate >= startOfLastMonth && u.CreatedDate < startOfThisMonth)
+                })
+                .FirstOrDefaultAsync();
+
+            // ✅ SỬA LỖI: Thực thi truy vấn này tuần tự, SAU truy vấn trên
+            var newUsersLast6Months = await _context.Users
+                .Where(u => u.CreatedDate >= startOf6MonthsAgo)
+                .GroupBy(u => new { Year = u.CreatedDate.Value.Year, Month = u.CreatedDate.Value.Month })
+                .Select(g => new MonthlyCountDto
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .OrderBy(r => r.Year).ThenBy(r => r.Month)
+                .ToListAsync();
+
+            return new UserStatisticsDTO
+            {
+                TotalUsers = statsSummary?.Total ?? 0,
+                NewUsersThisMonth = statsSummary?.NewThisMonth ?? 0,
+                NewUsersLastMonth = statsSummary?.NewLastMonth ?? 0,
+                NewUsersLast6Months = newUsersLast6Months
+            };
+        }
     }
 }
