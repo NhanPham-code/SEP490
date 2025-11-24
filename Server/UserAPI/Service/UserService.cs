@@ -849,5 +849,10 @@ namespace UserAPI.Service
                 AvatarUrl = user.AvatarUrl
             };
         }
+
+        public async Task<UserStatisticsDTO> GetUserStatisticsAsync()
+        {
+            return await _userRepository.GetUserStatisticsAsync();
+        }
     }
 }

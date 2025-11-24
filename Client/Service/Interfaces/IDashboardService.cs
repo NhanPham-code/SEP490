@@ -9,5 +9,7 @@ namespace Service.Interfaces
     public interface IDashboardService
     {
         Task<string> GetStadiumManagerDashboardDataAsync(string accessToken);
+
+        Task<string> GetAdminDashboardDataAsync();
     }
 }

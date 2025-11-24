@@ -334,5 +334,130 @@ namespace AggregatorPatternAPI.Services
 
             return dashboardDto;
         }
+
+        // lấy số lượng sân bằng odata
+        private async Task<int> GetTotalStadiumCountAsync()
+        {
+            var response = await _stadiumClient.GetAsync("odata/OdataStadium?$count=true&$top=0");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch total stadium count. Status: {StatusCode}", response.StatusCode);
+                return 0;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            //var odataResponse = JsonSerializer.Deserialize<OdataHaveCountResponse<StadiumIdAndNameDto>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var odataResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<OdataHaveCountResponse<StadiumIdAndNameDto>>(content);
+            return odataResponse?.Count ?? 0;
+        }
+
+        // lấy số lượng feedback bằng odata
+        private async Task<int> GetTotalFeedbackCountAsync()
+        {
+            var response = await _feedbackClient.GetAsync("odata/FeedbackOData?$count=true&$top=0");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch total feedback count. Status: {StatusCode}", response.StatusCode);
+                return 0;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            //var odataResponse = JsonSerializer.Deserialize<OdataHaveCountResponse<ReadFeedbackDTO>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var odataResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadFeedbackDTO>>(content);
+            return odataResponse?.Count ?? 0;
+        }
+
+        // lấy user statistic
+        private async Task<UserStatisticsDto> GetUserStatisticsAsync()
+        {
+            var response = await _userClient.GetAsync("api/Users/statistics");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch user statistics. Status: {StatusCode}", response.StatusCode);
+                return new UserStatisticsDto();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var userStats = JsonSerializer.Deserialize<UserStatisticsDto>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return userStats ?? new UserStatisticsDto();
+        }
+
+        // lấy booking statistic
+        private async Task<DTOs.BookingStatisticsDto> GetBookingStatisticsAsync()
+        {
+            var response = await _bookingClient.GetAsync("api/Booking/summary/statistics");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to fetch booking statistics. Status: {StatusCode}", response.StatusCode);
+                return new DTOs.BookingStatisticsDto();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var bookingStats = JsonSerializer.Deserialize<DTOs.BookingStatisticsDto>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return bookingStats ?? new DTOs.BookingStatisticsDto();
+        }
+
+
+        // tổng hợp dữ liệu cho dashboard admin
+        public async Task<AdminDashboardDto> GetAdminDashboardAsync()
+        {
+            // 1. Gọi tất cả các hàm helper song song để tối ưu hiệu năng
+            var userStatsTask = GetUserStatisticsAsync();
+            var bookingStatsTask = GetBookingStatisticsAsync();
+            var totalStadiumsTask = GetTotalStadiumCountAsync();
+            var totalFeedbacksTask = GetTotalFeedbackCountAsync();
+
+            try
+            {
+                // Chờ tất cả các cuộc gọi API hoàn thành
+                await Task.WhenAll(userStatsTask, bookingStatsTask, totalStadiumsTask, totalFeedbacksTask);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "One or more API calls failed while gathering data for Admin Dashboard.");
+                return null; // Trả về null nếu có lỗi nghiêm trọng
+            }
+
+            // 2. Lấy kết quả từ các task đã hoàn thành
+            var userStats = await userStatsTask;
+            var bookingStats = await bookingStatsTask;
+            var totalStadiums = await totalStadiumsTask;
+            var totalFeedbacks = await totalFeedbacksTask;
+
+            // 3. Tính toán các chỉ số phụ (phần trăm thay đổi)
+            decimal newUserChangePercentage = (userStats.NewUsersLastMonth > 0)
+                ? ((decimal)(userStats.NewUsersThisMonth - userStats.NewUsersLastMonth) / userStats.NewUsersLastMonth) * 100
+                : (userStats.NewUsersThisMonth > 0 ? 100 : 0);
+
+            decimal revenueChangePercentage = (bookingStats.RevenueLastMonth > 0)
+                ? ((bookingStats.RevenueThisMonth - bookingStats.RevenueLastMonth) / bookingStats.RevenueLastMonth) * 100
+                : (bookingStats.RevenueThisMonth > 0 ? 100 : 0);
+
+            // 4. Tạo DTO cuối cùng để trả về cho client
+            var dashboardDto = new AdminDashboardDto
+            {
+                // Dữ liệu cho các thẻ KPI
+                TotalUsers = userStats.TotalUsers,
+                NewUsersChangePercentage = Math.Round(newUserChangePercentage, 1),
+
+                RevenueThisMonth = bookingStats.RevenueThisMonth,
+                RevenueChangePercentage = Math.Round(revenueChangePercentage, 1),
+
+                // Thay thế cho thẻ "Mã giảm giá"
+                TotalStadiums = totalStadiums,
+                // Thay thế cho thẻ "Đánh giá mới"
+                TotalFeedbacks = totalFeedbacks,
+
+                // Dữ liệu cho các biểu đồ
+                RevenueLast6Months = bookingStats.RevenueLast6Months,
+                NewUsersLast6Months = userStats.NewUsersLast6Months
+            };
+
+            return dashboardDto;
+        }
     }
 }

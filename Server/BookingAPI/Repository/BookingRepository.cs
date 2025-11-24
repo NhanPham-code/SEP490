@@ -224,7 +224,7 @@ namespace BookingAPI.Repository
             var tomorrow = today.AddDays(1); // Dùng để so sánh khoảng ngày, an toàn hơn Date.Date
             var fourWeeksAgo = today.AddDays(-28);
 
-            var baseQuery = _context.Bookings.Where(b => stadiumIds.Contains(b.Id));
+            var baseQuery = _context.Bookings.Where(b => stadiumIds.Contains(b.StadiumId));
 
             // TRUY VẤN 1: Lấy các chỉ số KPI chính trong một lần gọi DB
             var kpiSummary = await baseQuery
@@ -260,6 +260,49 @@ namespace BookingAPI.Repository
                 RevenueToday = kpiSummary?.RevenueToday ?? 0,
                 WeeklyRevenueData = weeklyRevenueData,
                 BookingStatusData = bookingStatusData
+            };
+        }
+
+        public async Task<BookingStatisticsDto> GetBookingStatisticsAsync()
+        {
+            var utcNow = DateTime.UtcNow;
+            var startOfThisMonth = new DateTime(utcNow.Year, utcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var startOfLastMonth = startOfThisMonth.AddMonths(-1);
+            var startOf6MonthsAgo = startOfThisMonth.AddMonths(-5);
+
+            // Chỉ tính doanh thu trên các booking đã hoàn thành
+            var baseQuery = _context.Bookings.Where(b => b.Status == "completed");
+
+            // TRUY VẤN 1: Lấy doanh thu tháng này và tháng trước trong 1 lần gọi
+            var revenueSummary = await baseQuery
+                .GroupBy(b => 1) // Gom tất cả vào 1 nhóm để tính tổng
+                .Select(g => new
+                {
+                    ThisMonth = g.Where(b => b.Date >= startOfThisMonth)
+                                 .Sum(b => (decimal?)b.TotalPrice) ?? 0m,
+                    LastMonth = g.Where(b => b.Date >= startOfLastMonth && b.Date < startOfThisMonth)
+                                 .Sum(b => (decimal?)b.TotalPrice) ?? 0m
+                })
+                .FirstOrDefaultAsync();
+
+            // TRUY VẤN 2: Lấy dữ liệu doanh thu 6 tháng gần nhất (thực thi tuần tự)
+            var revenueLast6Months = await baseQuery
+                .Where(b => b.Date >= startOf6MonthsAgo)
+                .GroupBy(b => new { b.Date.Year, b.Date.Month })
+                .Select(g => new MonthlyRevenueDto
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalRevenue = g.Sum(b => b.TotalPrice ?? 0)
+                })
+                .OrderBy(r => r.Year).ThenBy(r => r.Month)
+                .ToListAsync();
+
+            return new BookingStatisticsDto
+            {
+                RevenueThisMonth = revenueSummary?.ThisMonth ?? 0m,
+                RevenueLastMonth = revenueSummary?.LastMonth ?? 0m,
+                RevenueLast6Months = revenueLast6Months
             };
         }
     }
