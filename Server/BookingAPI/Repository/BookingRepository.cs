@@ -203,13 +203,64 @@ namespace BookingAPI.Repository
             return allStadiumsResult;
         }
         
-        public async Task<bool> HasCompletedBookingsAsync(int userId)
+        public async Task<bool> HasCompletedBookingsAsync(int userId, int stadiumId)
         {
-            // Sử dụng "completed" (viết thường) để nhất quán với logic
-            // trong GetRevenueStatisticsAsync và GetBookingsByDateRangeAndHourAsync
+            // Sử dụng "completed" (viết thường)
             return await _context.Bookings
-                .AsNoTracking() // Tăng hiệu suất vì không cần theo dõi thay đổi
-                .AnyAsync(b => b.UserId == userId && b.Status == "completed");
+                .AsNoTracking() // Tăng hiệu suất
+                .AnyAsync(b => b.UserId == userId &&
+                               b.StadiumId == stadiumId && // <-- ĐIỀU KIỆN MỚI
+                               b.Status == "completed");
+        }
+
+        public async Task<RichStadiumKpiDto> GetKpiForStadiumsAsync(List<int> stadiumIds)
+        {
+            if (stadiumIds == null || !stadiumIds.Any())
+            {
+                return new RichStadiumKpiDto();
+            }
+
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1); // Dùng để so sánh khoảng ngày, an toàn hơn Date.Date
+            var fourWeeksAgo = today.AddDays(-28);
+
+            var baseQuery = _context.Bookings.Where(b => stadiumIds.Contains(b.Id));
+
+            // TRUY VẤN 1: Lấy các chỉ số KPI chính trong một lần gọi DB
+            var kpiSummary = await baseQuery
+                .GroupBy(b => 1) // Trick để gom tất cả các dòng vào một nhóm
+                .Select(g => new
+                {
+                    Successful = g.Count(b => b.Status == "accepted" || b.Status == "completed"),
+                    Failed = g.Count(b => b.Status == "cancelled" || b.Status == "payfail"),
+                    BookingsToday = g.Count(b => b.Date >= today && b.Date < tomorrow),
+                    RevenueToday = g.Where(b => b.Date >= today && b.Date < tomorrow && b.Status == "completed")
+                                    .Sum(b => (decimal?)b.TotalPrice) ?? 0m
+                })
+                .FirstOrDefaultAsync();
+
+            // TRUY VẤN 2: Lấy dữ liệu doanh thu hàng tuần (thực thi tuần tự)
+            var weeklyRevenueData = await baseQuery
+                .Where(b => b.Status == "completed" && b.Date >= fourWeeksAgo)
+                .Select(b => new WeeklyRevenuePoint { Date = b.Date, TotalPrice = b.TotalPrice ?? 0 })
+                .ToListAsync();
+
+            // TRUY VẤN 3: Lấy dữ liệu trạng thái booking (thực thi tuần tự)
+            var bookingStatusData = await baseQuery
+                .GroupBy(b => b.Status)
+                .Select(g => new BookingStatusCount { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // --- Tổng hợp kết quả ---
+            return new RichStadiumKpiDto
+            {
+                SuccessfulBookings = kpiSummary?.Successful ?? 0,
+                FailedBookings = kpiSummary?.Failed ?? 0,
+                BookingsToday = kpiSummary?.BookingsToday ?? 0,
+                RevenueToday = kpiSummary?.RevenueToday ?? 0,
+                WeeklyRevenueData = weeklyRevenueData,
+                BookingStatusData = bookingStatusData
+            };
         }
     }
 }

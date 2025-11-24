@@ -1,10 +1,11 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>Chat App - Messenger Style with GIPHY</title>
     <style>
+
+
 
         body {
             margin: 0;
@@ -211,6 +212,7 @@
             position: relative;
         }
 
+            /* Override existing pseudo, drive by attribute data-online */
             .chat-avatar::after {
                 content: '';
                 position: absolute;
@@ -218,10 +220,24 @@
                 right: 2px;
                 width: 12px;
                 height: 12px;
-                background: var(--color-secondary);
-                border: 2px solid white;
                 border-radius: 50%;
-                animation: pulse 2s infinite;
+                border: 2px solid white;
+                background: #c4c4c4; /* offline default */
+                box-shadow: none;
+                transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+                pointer-events: none;
+            }
+
+            /* online style */
+            .chat-avatar[data-online="true"]::after {
+                background: #00d4aa;
+                box-shadow: 0 0 8px rgba(0,212,170,0.45);
+            }
+
+            /* offline style (explicit) */
+            .chat-avatar[data-online="false"]::after {
+                background: #c4c4c4;
+                box-shadow: none;
             }
 
         @@keyframes pulse {
@@ -496,21 +512,7 @@
             .emoji-picker.show {
                 display: flex;
             }
-        /* Giới hạn chiều cao emoji picker, luôn nằm trên input bar */
-        .emoji-picker {
-            max-height: 60vh; /* hoặc dùng: calc(100vh - 120px) */
-            overflow: hidden; /* Ẩn phần tràn */
-            bottom: 60px !important; /* Đẩy lên trên input, nếu cần */
-            box-sizing: border-box;
-        }
 
-        /* Scroll bên trong grid emoji */
-        .emoji-grid {
-            max-height: 42vh; /* hoặc tuỳ chỉnh thấp hơn nếu còn tràn */
-            overflow-y: auto !important;
-            min-height: 120px;
-            box-sizing: border-box;
-        }
         @@keyframes emojiPickerSlideIn {
             from {
                 opacity: 0;
@@ -817,42 +819,19 @@
         /* Responsive */
         @@media (max-width: 768px) {
             .chat-container {
-                height: calc(100vh - 20px);
+                height: 500px;
                 margin: 10px;
                 border-radius: 15px;
-                max-width: 420px;
-                width: calc(100% - 20px);
             }
 
             .chat-sidebar {
-                width: 100%;
-                height: 100%;
-                border-radius: 15px;
+                width: 280px;
             }
 
-            .chat-main {
-                width: 100%;
-                height: 100%;
-                border-radius: 15px;
-            }
-            /* Mobile behavior: show only list OR chat */
-            .chat-main {
-                display: none; /* default show list */
-                flex-direction: column;
-            }
-            /* When .show-chat is set on container, show chat and hide list */
-            .chat-container.show-chat .chat-sidebar {
-                display: none;
-            }
-
-            .chat-container.show-chat .chat-main {
-                display: flex;
-            }
-
-            .chat-sidebar h3 {
-                font-size: 20px;
-                padding: 15px;
-            }
+                .chat-sidebar h3 {
+                    font-size: 20px;
+                    padding: 15px;
+                }
 
             .user-info, .add-chat {
                 padding: 15px;
@@ -870,21 +849,6 @@
 
             .gif-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            /* Show a back button in chat header on mobile */
-            #backBtn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 38px;
-                height: 38px;
-                border-radius: 10px;
-                border: none;
-                background: rgba(255,255,255,0.9);
-                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-                cursor: pointer;
-                margin-right: 6px;
-                font-size: 18px;
             }
         }
 
@@ -906,114 +870,412 @@
                 transform: scale(1);
             }
         }
-        @@media (max-width: 768px) {
-            /* Ẩn chat-main mặc định trên mobile và loại bỏ border/box-shadow "ló" ra */
-            .chat-main
 
-        {
-            display: none !important;
-            border-left: none !important;
-            box-shadow: none !important;
-        }
+        /* ===== IMPROVED WEBRTC POPUP STYLING ===== */
 
-        /* Sidebar full-width, không hiển thị đường viền phải */
-        .chat-sidebar {
-            width: 100% !important;
-            border-right: none !important;
-            border-radius: 15px !important;
-        }
-
-        /* Khi container có class show-chat thì ẩn list (sidebar) và hiện chat */
-        .chat-container.show-chat .chat-sidebar {
-            display: none !important;
-        }
-
-        .chat-container.show-chat .chat-main {
-            display: flex !important;
-        }
-
-        /* Back button styling (ký sẵn) */
-        #backBtn {
-            display: inline-flex !important;
-        }
-
-        }
-
-
-
-        /* Responsive images in chat messages */
-        .msg-image img, .msg-gif img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 8px;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        /* Gọn lại input bar trên mobile */
-        @@media (max-width: 768px) {
-            .chat-input-section
-
-        {
-            padding: 4px 2px 4px 2px !important;
-            gap: 3px;
-            min-height: unset;
-        }
-
-        .chat-input-wrapper {
-            border-radius: 14px;
-            padding: 0 2px;
-        }
-
-        .chat-input {
-            padding: 6px 7px;
-            font-size: 12px;
-            min-height: 16px;
-            max-height: 36px;
-            line-height: 16px;
-        }
-
-        .input-actions button {
-            width: 28px !important;
-            height: 28px !important;
-            font-size: 16px !important;
-            padding: 3px !important;
-        }
-
-        .chat-send-btn {
-            padding: 7px 8px !important;
-            min-width: 34px !important;
-            font-size: 14px !important;
-            border-radius: 15px !important;
-        }
-
-        }
-
-        .emoji-categories {
+        /* Incoming Call Popup - Messenger Style */
+        #incomingCallPopup {
+            position: fixed;
+            z-index: 3000;
+            inset: 0;
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            gap: 5px;
-            justify-content: flex-start;
-            padding: 10px;
-            -webkit-overflow-scrolling: touch; /* cho mượt trên iOS */
-            scrollbar-width: thin; /* cho Firefox */
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            transition: opacity 0.3s ease;
         }
 
-            .emoji-categories::-webkit-scrollbar {
-                height: 4px;
-                background: transparent;
+            #incomingCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
             }
 
-       
+        .webrtc-popup-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 320px;
+            max-width: 380px;
+            animation: popupBounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @@keyframes popupBounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .webrtc-popup-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+            position: relative;
+            animation: avatarPulse 2s infinite;
+        }
+
+        @@keyframes avatarPulse {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 8px 35px rgba(78, 158, 255, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .webrtc-popup-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            z-index: -1;
+            opacity: 0.3;
+            animation: ringPulse 2s infinite;
+        }
+
+        @@keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .webrtc-popup-caller {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .webrtc-popup-type {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .webrtc-popup-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .accept-btn, .decline-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: white;
+        }
+
+            .accept-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+            }
+
+            .accept-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .decline-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+            .decline-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            }
+
+            .decline-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .accept-btn span::before {
+            content: '📞';
+            margin-right: 5px;
+        }
+
+        .decline-btn span::before {
+            content: '✖️';
+            margin-right: 5px;
+        }
+
+        /* Video Call Modal - Improved */
+        #videoCallPopup {
+            position: fixed;
+            z-index: 2050;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            transition: opacity 0.3s ease;
+        }
+
+            #videoCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .video-call-modal {
+            width: 100vw;
+            max-width: 420px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+        }
+
+        @@keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .video-call-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(78, 158, 255, 0.1), rgba(0, 212, 170, 0.1));
+            border-radius: 16px;
+        }
+
+        #videoCallTitle {
+            font-weight: 700;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex: 1;
+        }
+
+        #endCallBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            min-width: 100px;
+        }
+
+            #endCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            }
+
+            #endCallBtn::before {
+                content: '📞';
+                margin-right: 5px;
+            }
+
+        .video-call-video-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        #remoteVideo, #localVideo {
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        #remoteVideo {
+            width: 96%;
+            max-width: 380px;
+            height: 280px;
+            object-fit: cover;
+            border: 3px solid rgba(78, 158, 255, 0.5);
+        }
+
+        #localVideo {
+            width: 110px;
+            height: 80px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: 3px solid #00d4aa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            object-fit: cover;
+        }
+
+        /* Waiting Message Styling */
+        #waitingCallMsg {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-weight: 600;
+            color: #4e9eff;
+            z-index: 4005;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 30px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.3);
+            animation: messageFadeIn 0.3s ease;
+            max-width: 90%;
+        }
+
+        @@keyframes messageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Call buttons styling */
+        #startAudioCallBtn, #startVideoCallBtn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 158, 255, 0.3);
+            margin: 5px;
+        }
+
+            #startAudioCallBtn:hover, #startVideoCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(78, 158, 255, 0.4);
+            }
+
+            #startAudioCallBtn::before {
+                content: '📞 ';
+            }
+
+            #startVideoCallBtn::before {
+                content: '📹 ';
+            }
+
+        /* Responsive */
+        @@media (max-width: 500px) {
+            .webrtc-popup-content {
+                min-width: 280px;
+                padding: 30px 20px;
+            }
+
+            .webrtc-popup-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 38px;
+            }
+
+            .webrtc-popup-caller {
+                font-size: 20px;
+            }
+
+            .accept-btn, .decline-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+            }
+
+            .video-call-modal {
+                max-width: 95vw;
+                padding: 15px;
+            }
+
+            #remoteVideo {
+                height: 220px;
+            }
+
+            #localVideo {
+                width: 80px;
+                height: 60px;
+                top: 10px;
+                right: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="chat-container" id="chatContainer">
+    <div class="chat-container">
         <!-- Sidebar -->
-        <div class="chat-sidebar" id="sidebar">
+        <div class="chat-sidebar">
             <h3>💬 Messenger</h3>
 
             <!-- Hidden user info - set programmatically -->
@@ -1032,13 +1294,16 @@
         </div>
 
         <!-- Chat Box -->
-        <div class="chat-main" id="chatMain">
-            <div class="chat-header">
-                <!-- Back button only visible on mobile (CSS) -->
-                <button id="backBtn" title="Back" aria-label="Back" style="display:none;">←</button>
+        <div class="chat-main">
+            <div class="chat-header" style="display: flex; align-items: center; gap: 10px;">
                 <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 16px;" id="headerAvatar">💬</div>
-                <h4 id="currentChatName">Select a chat to start messaging</h4>
+                <h4 id="currentChatName" style="flex: 1;">Select a chat to start messaging</h4>
+                <!-- Icon buttons: -->
+                <button id="startAudioCallBtn" title="Gọi âm thanh" style="background: none; border: none; font-size: 22px; margin-left:8px; cursor: pointer;"></button>
+                <button id="startVideoCallBtn" title="Gọi video" style="background: none; border: none; font-size: 22px; margin-left:4px; cursor: pointer;"></button>
             </div>
+
+            <!-- WebRTC Call Controls -->
 
             <div class="chat-messages" id="messages"></div>
 
@@ -1092,9 +1357,10 @@
                 <button class="chat-btn chat-send-btn" onclick="sendMessage()" disabled id="sendBtn">
                     <span id="sendIcon">🚀</span>
                 </button>
-                <input type="file" id="imageInput" accept="image/*,video/*" style="display:none" />
             </div>
+            <input type="file" id="imageInput" accept="image/*,video/*" style="display:none" />
         </div>
+        <!-- Image Modal for Zoom -->
         <div id="imageModal" style="display:none; position:fixed; z-index:2000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
             <span id="closeImageModal" style="position:absolute; top:30px; right:40px; font-size:40px; color:white; cursor:pointer; font-weight:bold;">&times;</span>
             <img id="modalImg" src="" alt="Zoom Image" style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow:0 6px 30px #000b; display:block; margin:auto;" />
@@ -1102,21 +1368,220 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, off } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+             // Paste this entire block into your <script type="module">. If you already have
+        // initializeApp/db above, remove duplicate lines to avoid double initialization.
+        // This version fixes the missing onDisconnect import and uses a per-connection
+        // "connections" child (more robust) and includes debug logs.
 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import {
+          getDatabase,
+          ref,
+          push,
+          set,
+          onValue,
+          off,
+          onDisconnect
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+        // ====== Firebase config & init (keep only one copy in your script) ======
         const firebaseConfig = {
-            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
-            authDomain: "chatbox-993b2.firebaseapp.com",
-            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
-            projectId: "chatbox-993b2",
-            storageBucket: "chatbox-993b2.firebasestorage.app",
-            messagingSenderId: "168483987205",
-            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+          apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+          authDomain: "chatbox-993b2.firebaseapp.com",
+          databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+          projectId: "chatbox-993b2",
+          storageBucket: "chatbox-993b2.appspot.com",
+          messagingSenderId: "168483987205",
+          appId: "1:168483987205:web:c9ef776901ec2882bb616c"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
+        // ====== Presence helper code (fixed & robust) ======
+        const SERVER_TIMESTAMP = { '.sv': 'timestamp' };
+
+        // Map of userId -> statusRef (so we can off() later)
+        const statusListeners = {};
+
+        // Remove all currently attached status listeners (call before rebuilding chat list)
+        function removeAllStatusListeners() {
+          try {
+            Object.keys(statusListeners).forEach(userId => {
+              const r = statusListeners[userId];
+              if (r) {
+                // remove all listeners on this ref
+                off(r);
+              }
+              delete statusListeners[userId];
+            });
+          } catch (e) {
+            console.error('[PRESENCE] Error removing status listeners:', e);
+          }
+        }
+
+        // Attach listener for a single user's status node and update the dot element with id `status-{userId}`
+                function addStatusListenerForList(userId) {
+          if (!userId) return;
+          if (statusListeners[userId]) return; // already listening
+
+          const sr = ref(db, `userStatus/${userId}`);
+          statusListeners[userId] = sr;
+
+          onValue(sr, (snap) => {
+            const val = snap.val();
+            // Update avatar pseudo-element using data-online attribute
+            const avatar = document.querySelector(`#chat-${userId} .chat-avatar`);
+            if (avatar) {
+              avatar.setAttribute('data-online', (val && val.online) ? 'true' : 'false');
+            }
+
+            // Optional: if you still have a separate status span, update it too
+            const dot = document.getElementById(`status-${userId}`);
+            if (dot) {
+              if (val && val.online) {
+                dot.classList.remove('offline-dot');
+                dot.classList.add('online-dot');
+                dot.title = 'Online';
+              } else {
+                dot.classList.remove('online-dot');
+                dot.classList.add('offline-dot');
+                if (val && val.lastSeen) {
+                  try {
+                    const t = new Date(val.lastSeen);
+                    dot.title = `Last seen: ${t.toLocaleString()}`;
+                  } catch (e) {
+                    dot.title = 'Offline';
+                  }
+                } else {
+                  dot.title = 'Offline';
+                }
+              }
+            }
+          }, (err) => {
+            console.error('Status listener error for', userId, err);
+          });
+        }
+
+        // Initialize presence for the given userId (call after login / when senderId is known)
+        // Uses a connections child (push) so multiple tabs are handled correctly.
+        function initPresenceFor(userId) {
+          if (!userId) {
+            console.warn('[PRESENCE] initPresenceFor: missing userId');
+            return;
+          }
+
+          try {
+            const connectedRef = ref(db, '.info/connected');
+            const statusRef = ref(db, `userStatus/${userId}`);
+            const connectionsRef = ref(db, `userStatus/${userId}/connections`);
+
+            onValue(connectedRef, async (snap) => {
+              const connected = !!snap.val();
+              console.log('[PRESENCE] .info/connected =', connected);
+
+              if (!connected) {
+                // local offline; nothing to register now
+                return;
+              }
+
+              try {
+                // create a per-tab connection child
+                const newConnRef = push(connectionsRef);
+                const connKey = newConnRef.key;
+                console.log('[PRESENCE] creating connection child', connKey);
+
+                // set the connection child (server-side)
+                await set(newConnRef, true).catch(e => {
+                  console.warn('[PRESENCE] set(newConnRef) failed', e);
+                });
+
+                // ensure this connection child is removed on disconnect (server-side)
+                try {
+                  onDisconnect(newConnRef).remove().catch(e => console.warn('[PRESENCE] onDisconnect(remove child) failed', e));
+                  console.log('[PRESENCE] onDisconnect registered for connection child');
+                } catch (e) {
+                  console.warn('[PRESENCE] onDisconnect(newConnRef) not available or failed', e);
+                }
+
+                // set root status online now (server timestamp)
+                await set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => {
+                  console.warn('[PRESENCE] set(statusRef online) failed', e);
+                });
+
+                // try to register onDisconnect for the root status as well
+                try {
+                  onDisconnect(statusRef).set({ online: false, lastSeen: SERVER_TIMESTAMP }).catch(e => {
+                    console.warn('[PRESENCE] onDisconnect(set root) failed', e);
+                  });
+                  console.log('[PRESENCE] onDisconnect registered for status root');
+                } catch (e) {
+                  console.warn('[PRESENCE] onDisconnect(statusRef) not available or failed', e);
+                }
+
+                // listen connections child to optionally keep root in sync (useful if you want root reflect connections count)
+                onValue(connectionsRef, (cSnap) => {
+                  const conns = cSnap.val();
+                  const count = conns ? Object.keys(conns).length : 0;
+                  // If you want to ensure root always accurate, uncomment the set below
+                  // if (count > 0) set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP });
+                  // else set(statusRef, { online: false, lastSeen: SERVER_TIMESTAMP });
+                  console.log('[PRESENCE] connections count =', count);
+                }, (err) => {
+                  console.warn('[PRESENCE] connectionsRef listener error', err);
+                });
+
+              } catch (err) {
+                console.error('[PRESENCE] initPresenceFor error', err);
+              }
+            }, (err) => {
+              console.error('[PRESENCE] connectedRef onValue error', err);
+            });
+          } catch (e) {
+            console.error('[PRESENCE] initPresenceFor failed', e);
+          }
+        }
+
+        // Helper that creates the status-dot HTML string for a chat-item (id = other user id)
+        function makeStatusDotHtml(userId) {
+          return `<span id="status-${userId}" class="offline-dot" style="margin-left:8px; vertical-align:middle;" title="Loading..."></span>`;
+        }
+
+        // Auto-init presence on DOMContentLoaded if senderId is already set in DOM
+        document.addEventListener('DOMContentLoaded', () => {
+          try {
+            const sid = document.getElementById('senderId')?.value?.trim();
+            if (sid) {
+              console.log('[PRESENCE] initPresenceFor on DOMContentLoaded for', sid);
+              initPresenceFor(sid);
+            } else {
+              console.log('[PRESENCE] senderId not present at DOMContentLoaded');
+            }
+          } catch (e) {
+            console.error('[PRESENCE] DOMContentLoaded init error', e);
+          }
+        });
+
+        // Best-effort: set offline on unload (may not always finish; onDisconnect is more reliable)
+        window.addEventListener('beforeunload', () => {
+          try {
+            const sid = document.getElementById('senderId')?.value?.trim();
+            if (sid) {
+              const sr = ref(db, `userStatus/${sid}`);
+              set(sr, { online: false, lastSeen: Date.now() }).catch(() => {});
+              console.log('[PRESENCE] beforeunload tried to set offline for', sid);
+            }
+          } catch (e) { /* ignore */ }
+        });
+
+        // Expose helpers for manual testing in the console
+        window._presenceHelpers = {
+          initPresenceFor,
+          addStatusListenerForList,
+          removeAllStatusListeners,
+          makeStatusDotHtml,
+          statusListeners
+        };
 
         // 🔑 MULTIPLE GIPHY API KEYS CONFIGURATION
         const GIPHY_KEYS = [
@@ -1410,22 +1875,14 @@
             const now = Date.now();
 
             // Check cache first
-                    // Check cache first
-        if (gifCache.has(cacheKey)) {
-            const cached = gifCache.get(cacheKey);
-            if (now - cached.timestamp < CACHE_DURATION) {
-                // Nếu cached.data.length < GIFS_PER_PAGE, nghĩa là đã hết GIF, không hiển thị "Load More"
-                if (cached.data.length < limit) {
-                    // Xóa cacheKey này để lần sau gọi lại API cho chắc chắn!
-                    gifCache.delete(cacheKey);
-                } else {
-                    console.log(`📦 Using cached data for: ${query}, offset: ${offset}`);
+            if (gifCache.has(cacheKey)) {
+                const cached = gifCache.get(cacheKey);
+                if (now - cached.timestamp < CACHE_DURATION) {
+                    console.log(`📦 Using cached data for: ${query}`);
                     return cached.data;
                 }
-            } else {
                 gifCache.delete(cacheKey);
             }
-        }
 
             try {
                 let url;
@@ -1563,208 +2020,209 @@
             loadEmojiCategory(currentCategory);
         }
 
+               // Sửa lỗi GIF picker tự đóng sau khi load more
         function initGifPicker() {
-             const gifBtn = document.getElementById('gifBtn');
-             const gifPicker = document.getElementById('gifPicker');
-             const gifGrid = document.getElementById('gifGrid');
-             const gifSearchInput = document.getElementById('gifSearchInput');
-             const gifCategoryBtns = document.querySelectorAll('.gif-category-btn');
+            const gifBtn = document.getElementById('gifBtn');
+            const gifPicker = document.getElementById('gifPicker');
+            const gifGrid = document.getElementById('gifGrid');
+            const gifSearchInput = document.getElementById('gifSearchInput');
+            const gifCategoryBtns = document.querySelectorAll('.gif-category-btn');
 
-             if (!gifBtn || !gifPicker || !gifGrid) {
-                 console.error('GIF picker elements not found');
-                 return;
-             }
+            if (!gifBtn || !gifPicker || !gifGrid) {
+                console.error('GIF picker elements not found');
+                return;
+            }
 
-             // FIX 1: Ngăn event bubbling từ gifPicker
-             gifPicker.addEventListener('click', (e) => {
-                 e.stopPropagation(); // Ngăn event bubble lên document
-             });
+            // FIX 1: Ngăn event bubbling từ gifPicker
+            gifPicker.addEventListener('click', (e) => {
+                e.stopPropagation(); // Ngăn event bubble lên document
+            });
 
-             gifBtn.addEventListener('click', (e) => {
-                 e.preventDefault();
-                 e.stopPropagation();
+            gifBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-                 const emojiPicker = document.getElementById('emojiPicker');
-                 if (emojiPicker) {
-                     emojiPicker.classList.remove('show');
-                 }
+                const emojiPicker = document.getElementById('emojiPicker');
+                if (emojiPicker) {
+                    emojiPicker.classList.remove('show');
+                }
 
-                 gifPicker.classList.toggle('show');
-                 if (gifPicker.classList.contains('show')) {
-                     loadGIFs(currentGifQuery);
-                 }
-             });
+                gifPicker.classList.toggle('show');
+                if (gifPicker.classList.contains('show')) {
+                    loadGIFs(currentGifQuery);
+                }
+            });
 
-             // FIX 2: Cải thiện click outside logic
-             document.addEventListener('click', (e) => {
-                 // Chỉ đóng nếu click thực sự ở ngoài và không phải là Load More button
-                 if (!gifPicker.contains(e.target) &&
-                     !gifBtn.contains(e.target) &&
-                     !e.target.classList.contains('load-more-btn') &&
-                     !e.target.closest('.load-more-btn')) {
-                     gifPicker.classList.remove('show');
-                 }
-             });
+            // FIX 2: Cải thiện click outside logic
+            document.addEventListener('click', (e) => {
+                // Chỉ đóng nếu click thực sự ở ngoài và không phải là Load More button
+                if (!gifPicker.contains(e.target) &&
+                    !gifBtn.contains(e.target) &&
+                    !e.target.classList.contains('load-more-btn') &&
+                    !e.target.closest('.load-more-btn')) {
+                    gifPicker.classList.remove('show');
+                }
+            });
 
-             // Enhanced search with debounce
-             if (gifSearchInput) {
-                 let searchTimeout;
-                 gifSearchInput.addEventListener('input', (e) => {
-                     clearTimeout(searchTimeout);
-                     const query = e.target.value.trim();
-                     searchTimeout = setTimeout(() => {
-                         if (query && query.length >= 3) {
-                             currentGifQuery = query;
-                             loadGIFs(query);
-                             gifCategoryBtns.forEach(btn => btn.classList.remove('active'));
-                         }
-                     }, 1200);
-                 });
+            // Enhanced search with debounce
+            if (gifSearchInput) {
+                let searchTimeout;
+                gifSearchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    const query = e.target.value.trim();
+                    searchTimeout = setTimeout(() => {
+                        if (query && query.length >= 3) {
+                            currentGifQuery = query;
+                            loadGIFs(query);
+                            gifCategoryBtns.forEach(btn => btn.classList.remove('active'));
+                        }
+                    }, 1200);
+                });
 
-                 // FIX 3: Ngăn search input đóng picker
-                 gifSearchInput.addEventListener('click', (e) => {
-                     e.stopPropagation();
-                 });
-             }
+                // FIX 3: Ngăn search input đóng picker
+                gifSearchInput.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
 
-             // FIX 4: Ngăn category buttons đóng picker
-             gifCategoryBtns.forEach(btn => {
-                 btn.addEventListener('click', (e) => {
-                     e.preventDefault();
-                     e.stopPropagation(); // Quan trọng!
+            // FIX 4: Ngăn category buttons đóng picker
+            gifCategoryBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Quan trọng!
 
-                     gifCategoryBtns.forEach(b => b.classList.remove('active'));
-                     btn.classList.add('active');
-                     currentGifQuery = btn.dataset.query;
-                     if (gifSearchInput) {
-                         gifSearchInput.value = '';
-                     }
-                     loadGIFs(currentGifQuery);
-                 });
-             });
+                    gifCategoryBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentGifQuery = btn.dataset.query;
+                    if (gifSearchInput) {
+                        gifSearchInput.value = '';
+                    }
+                    loadGIFs(currentGifQuery);
+                });
+            });
 
-             loadGIFs(currentGifQuery);
-         }
+            loadGIFs(currentGifQuery);
+        }
 
-         // FIX 5: Sửa lại hàm loadGIFs để tránh conflict
-         async function loadGIFs(query, append = false) {
-             const gifGrid = document.getElementById('gifGrid');
-             if (!gifGrid) return;
+        // FIX 5: Sửa lại hàm loadGIFs để tránh conflict
+        async function loadGIFs(query, append = false) {
+            const gifGrid = document.getElementById('gifGrid');
+            if (!gifGrid) return;
 
-             if (!append) {
-                 gifGrid.innerHTML = '<div class="gif-loading">🔍 Searching GIFs...</div>';
-                 currentOffset = 0;
-             } else {
-                 const loadMoreBtn = gifGrid.querySelector('.load-more-btn');
-                 if (loadMoreBtn) loadMoreBtn.remove();
+            if (!append) {
+                gifGrid.innerHTML = '<div class="gif-loading">🔍 Searching GIFs...</div>';
+                currentOffset = 0;
+            } else {
+                const loadMoreBtn = gifGrid.querySelector('.load-more-btn');
+                if (loadMoreBtn) loadMoreBtn.remove();
 
-                 const loadingDiv = document.createElement('div');
-                 loadingDiv.className = 'gif-loading';
-                 loadingDiv.innerHTML = '📥 Loading more GIFs...';
-                 gifGrid.appendChild(loadingDiv);
-             }
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'gif-loading';
+                loadingDiv.innerHTML = '📥 Loading more GIFs...';
+                gifGrid.appendChild(loadingDiv);
+            }
 
-             try {
-                 const gifs = await searchGIFs(query, GIFS_PER_PAGE, currentOffset);
+            try {
+                const gifs = await searchGIFs(query, GIFS_PER_PAGE, currentOffset);
 
-                 const loadingElements = gifGrid.querySelectorAll('.gif-loading');
-                 loadingElements.forEach(el => el.remove());
+                const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                loadingElements.forEach(el => el.remove());
 
-                 if (!append && gifs.length === 0) {
-                     gifGrid.innerHTML = '<div class="gif-loading">😅 No GIFs found<br>Try a different search term</div>';
-                     return;
-                 }
+                if (!append && gifs.length === 0) {
+                    gifGrid.innerHTML = '<div class="gif-loading">😅 No GIFs found<br>Try a different search term</div>';
+                    return;
+                }
 
-                 if (gifs.length === 0 && append) {
-                     const noMoreDiv = document.createElement('div');
-                     noMoreDiv.className = 'gif-loading';
-                     noMoreDiv.innerHTML = '✅ All GIFs loaded';
-                     gifGrid.appendChild(noMoreDiv);
-                     return;
-                 }
+                if (gifs.length === 0 && append) {
+                    const noMoreDiv = document.createElement('div');
+                    noMoreDiv.className = 'gif-loading';
+                    noMoreDiv.innerHTML = '✅ All GIFs loaded';
+                    gifGrid.appendChild(noMoreDiv);
+                    return;
+                }
 
-                 if (!append) {
-                     gifGrid.innerHTML = '';
-                 }
+                if (!append) {
+                    gifGrid.innerHTML = '';
+                }
 
-                 // Create GIF grid
-                 for (let i = 0; i < gifs.length; i += 3) {
-                     const row = document.createElement('div');
-                     row.className = 'gif-row';
+                // Create GIF grid
+                for (let i = 0; i < gifs.length; i += 3) {
+                    const row = document.createElement('div');
+                    row.className = 'gif-row';
 
-                     const rowGifs = gifs.slice(i, i + 3);
-                     rowGifs.forEach(gif => {
-                         const gifItem = document.createElement('div');
-                         gifItem.className = 'gif-item';
+                    const rowGifs = gifs.slice(i, i + 3);
+                    rowGifs.forEach(gif => {
+                        const gifItem = document.createElement('div');
+                        gifItem.className = 'gif-item';
 
-                         const img = document.createElement('img');
-                         img.src = gif.images.fixed_height_small.url;
-                         img.alt = gif.title || 'GIF';
-                         img.loading = 'lazy';
+                        const img = document.createElement('img');
+                        img.src = gif.images.fixed_height_small.url;
+                        img.alt = gif.title || 'GIF';
+                        img.loading = 'lazy';
 
-                         img.onerror = function() {
-                             this.src = gif.images.fixed_width_small.url;
-                         };
+                        img.onerror = function() {
+                            this.src = gif.images.fixed_width_small.url;
+                        };
 
-                         // FIX 6: Ngăn GIF item click đóng picker
-                         gifItem.addEventListener('click', (e) => {
-                             e.stopPropagation();
-                             insertGIF(gif.images.fixed_height.url, gif.title || 'GIF');
-                         });
+                        // FIX 6: Ngăn GIF item click đóng picker
+                        gifItem.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            insertGIF(gif.images.fixed_height.url, gif.title || 'GIF');
+                        });
 
-                         gifItem.appendChild(img);
-                         row.appendChild(gifItem);
-                     });
+                        gifItem.appendChild(img);
+                        row.appendChild(gifItem);
+                    });
 
-                     gifGrid.appendChild(row);
-                 }
+                    gifGrid.appendChild(row);
+                }
 
-                 // FIX 7: Load More button với proper event handling
-                 if (gifs.length === GIFS_PER_PAGE) {
-                     const loadMoreContainer = document.createElement('div');
-                     loadMoreContainer.style.textAlign = 'center';
-                     loadMoreContainer.style.padding = '15px';
+                // FIX 7: Load More button với proper event handling
+                if (gifs.length === GIFS_PER_PAGE) {
+                    const loadMoreContainer = document.createElement('div');
+                    loadMoreContainer.style.textAlign = 'center';
+                    loadMoreContainer.style.padding = '15px';
 
-                     const loadMoreBtn = document.createElement('button');
-                     loadMoreBtn.className = 'load-more-btn chat-btn';
-                     loadMoreBtn.innerHTML = '📥 Load More GIFs';
-                     loadMoreBtn.style.width = '80%';
-                     loadMoreBtn.style.margin = '0 auto';
+                    const loadMoreBtn = document.createElement('button');
+                    loadMoreBtn.className = 'load-more-btn chat-btn';
+                    loadMoreBtn.innerHTML = '📥 Load More GIFs';
+                    loadMoreBtn.style.width = '80%';
+                    loadMoreBtn.style.margin = '0 auto';
 
-                     // QUAN TRỌNG: Ngăn event bubbling
-                     loadMoreBtn.addEventListener('click', (e) => {
-                         e.preventDefault();
-                         e.stopPropagation(); // Ngăn đóng picker!
+                    // QUAN TRỌNG: Ngăn event bubbling
+                    loadMoreBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation(); // Ngăn đóng picker!
 
-                         currentOffset += GIFS_PER_PAGE;
-                         loadGIFs(query, true);
-                     });
+                        currentOffset += GIFS_PER_PAGE;
+                        loadGIFs(query, true);
+                    });
 
-                     loadMoreContainer.appendChild(loadMoreBtn);
-                     gifGrid.appendChild(loadMoreContainer);
-                 }
+                    loadMoreContainer.appendChild(loadMoreBtn);
+                    gifGrid.appendChild(loadMoreContainer);
+                }
 
-             } catch (error) {
-                 console.error('Error loading GIFs:', error);
+            } catch (error) {
+                console.error('Error loading GIFs:', error);
 
-                 const loadingElements = gifGrid.querySelectorAll('.gif-loading');
-                 loadingElements.forEach(el => el.remove());
+                const loadingElements = gifGrid.querySelectorAll('.gif-loading');
+                loadingElements.forEach(el => el.remove());
 
-                 if (!append) {
-                     gifGrid.innerHTML = '<div class="gif-loading">❌ Error loading GIFs<br>Try again later</div>';
-                 } else {
-                     const errorDiv = document.createElement('div');
-                     errorDiv.className = 'gif-loading';
-                     errorDiv.innerHTML = '❌ Error loading more GIFs<br>Try again';
-                     gifGrid.appendChild(errorDiv);
-                 }
-             }
-         }
-
-
+                if (!append) {
+                    gifGrid.innerHTML = '<div class="gif-loading">❌ Error loading GIFs<br>Try again later</div>';
+                } else {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'gif-loading';
+                    errorDiv.innerHTML = '❌ Error loading more GIFs<br>Try again';
+                    gifGrid.appendChild(errorDiv);
+                }
+            }
+        }
 
 
-         function loadEmojiCategory(category) {
+
+
+        function loadEmojiCategory(category) {
             const emojiGrid = document.getElementById('emojiGrid');
             if (!emojiGrid) return;
 
@@ -1869,7 +2327,7 @@
                     timestamp,
                     name: senderName
                 };
-                 tangSoTinChuaDoc333(currentReceiverId);
+
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -1883,49 +2341,71 @@
             });
         }
 
-        window.loadChatList = () => {
-            const userId = document.getElementById('senderId').value.trim();
-            if (!userId) {
-                alert('⚠️ Please enter your ID first');
-                return;
+               window.loadChatList = () => {
+          const userId = document.getElementById('senderId').value.trim();
+          if (!userId) {
+            alert('⚠️ Please enter your ID first');
+            return;
+          }
+
+          // ensure presence for current user is active
+          initPresenceFor(userId);
+
+          const chatListRef = ref(db, `userChats/${userId}`);
+
+          // Remove old status listeners before re-render
+          removeAllStatusListeners();
+
+          onValue(chatListRef, (snapshot) => {
+            const data = snapshot.val();
+            const list = document.getElementById('chatList');
+            list.innerHTML = '';
+
+            if (data) {
+              const entries = Object.entries(data).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+              for (let [id, info] of entries) {
+                const item = document.createElement('div');
+                item.className = 'chat-item';
+                item.id = `chat-${id}`;
+                let lastMsg = info.lastMessage || '👋 Say hello!';
+
+                if (lastMsg.startsWith('[GIF]')) {
+                  lastMsg = '🎬 GIF';
+                } else if (lastMsg.length > 25) {
+                  lastMsg = lastMsg.substring(0, 25) + '...';
+                }
+
+                const avatarLetter = (info.name || id).charAt(0).toUpperCase();
+
+                // include status dot in the markup (id = status-{id})
+                item.innerHTML = `
+                  <div class="chat-avatar" style="position:relative;">
+                    ${avatarLetter}
+                  </div>
+                  <div class="chat-info">
+                    <strong>${info.name || id}</strong>
+                    <small>${lastMsg}</small>
+                  </div>
+                  <div class="chat-status">
+                    ${makeStatusDotHtml(id)}
+                  </div>
+                `;
+
+                item.onclick = () => openChat(userId, document.getElementById('senderName').value, id, info.name || id);
+                list.appendChild(item);
+
+                // Attach real-time status listener for this chat partner
+                addStatusListenerForList(id);
+              }
+            } else {
+              list.innerHTML = '<div class="status-message">🌟 No chats yet<br>Start a new conversation!</div>';
             }
 
-            const chatListRef = ref(db, `userChats/${userId}`);
-            onValue(chatListRef, (snapshot) => {
-                const data = snapshot.val();
-                const list = document.getElementById('chatList');
-                list.innerHTML = '';
-
-                if (data) {
-                    const entries = Object.entries(data).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-                    for (let [id, info] of entries) {
-                        const item = document.createElement('div');
-                        item.className = 'chat-item';
-                        item.id = `chat-${id}`;
-                        let lastMsg = info.lastMessage || '👋 Say hello!';
-
-                        if (lastMsg.startsWith('[GIF]')) {
-                            lastMsg = '🎬 GIF';
-                        } else if (lastMsg.length > 25) {
-                            lastMsg = lastMsg.substring(0, 25) + '...';
-                        }
-
-                        const avatarLetter = (info.name || id).charAt(0).toUpperCase();
-
-                        item.innerHTML = `
-                            <div class="chat-avatar">${avatarLetter}</div>
-                            <div class="chat-info">
-                                <strong>${info.name || id}</strong>
-                                <small>${lastMsg}</small>
-                            </div>
-                        `;
-                        item.onclick = () => openChat(userId, document.getElementById('senderName').value, id, info.name || id);
-                        list.appendChild(item);
-                    }
-                } else {
-                    list.innerHTML = '<div class="status-message">🌟 No chats yet<br>Start a new conversation!</div>';
-                }
-            });
+            console.log('🔔 Initializing incoming call listener after loading chat list...');
+            initIncomingCallListener();
+          }, (err) => {
+            console.error('Error loading chat list:', err);
+          });
         };
 
         window.startNewChat = () => {
@@ -1957,27 +2437,6 @@
                 hideTypingIndicator();
             });
         };
-
-        // Helper: detect mobile width (same breakpoint as CSS)
-        function isMobileView() {
-            return window.matchMedia('(max-width: 768px)').matches;
-        }
-
-        function showChatOnMobile() {
-            const container = document.getElementById('chatContainer');
-            if (!container) return;
-            container.classList.add('show-chat');
-            // ensure back button visible (CSS handles display in media query)
-            const backBtn = document.getElementById('backBtn');
-            if (backBtn) backBtn.style.display = ''; // let CSS decide
-        }
-
-        function showListOnMobile() {
-            const container = document.getElementById('chatContainer');
-            if (!container) return;
-            container.classList.remove('show-chat');
-        }
-
         function openChat(senderId, senderName, receiverId, receiverName) {
             // Bỏ active khỏi tất cả chat-item
             document.querySelectorAll('.chat-item').forEach(item => {
@@ -2017,9 +2476,7 @@
             if (msgBox) {
                 msgBox.innerHTML = '<div class="status-message">📖 Loading messages...</div>';
             }
-             if (isMobileView()) {
-                showChatOnMobile();
-            }
+
             // Lắng nghe dữ liệu message mới
             currentMessagesRef = ref(db, `chats/${currentChatId}`);
             onValue(currentMessagesRef, (snapshot) => {
@@ -2066,13 +2523,12 @@
                                 `;
                             }
                             // Hiển thị ảnh upload
-                                                   else if (msg.message && msg.message.startsWith('[IMAGE]')) {
+                                         else if (msg.message && msg.message.startsWith('[IMAGE]')) {
             const imgData = msg.message.substring(7);
             const [imgUrl, name] = imgData.split('|');
             div.innerHTML = `
                 <div class="msg-image">
-                    <img src="${imgUrl}" alt="${name || 'Image'}" style="cursor:pointer;"
-                         onclick="window.openImageModal && window.openImageModal('${imgUrl.replace(/'/g, "\\'")}')" />
+                    <img src="${imgUrl}" alt="${name || 'Image'}" style="max-width:200px; border-radius:8px; cursor:pointer;" onclick="openImageModal('${imgUrl}')" />
                 </div>
                 <small>${time}</small>
             `;
@@ -2110,9 +2566,6 @@
             });
         }
 
-        // Expose openChat globally (used by chat list)
-        window.openChat = openChat;
-
         window.sendMessage = () => {
             const senderId = document.getElementById('senderId')?.value.trim();
             const senderName = document.getElementById('senderName')?.value.trim();
@@ -2149,7 +2602,7 @@
                     timestamp,
                     name: senderName
                 };
-                 tangSoTinChuaDoc333(currentReceiverId);
+
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -2207,44 +2660,15 @@
                     });
                 });
             }
-
-            // Back button on mobile: go back to list
-            const backBtn = document.getElementById('backBtn');
-            if (backBtn) {
-                backBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    showListOnMobile();
-                });
+                 setTimeout(() => {
+            const senderId = document.getElementById('senderId')?.value.trim();
+            if (senderId) {
+                console.log('🔔 Initializing incoming call listener for user:', senderId);
+                initIncomingCallListener();
+            } else {
+                console.warn('⚠️ SenderId not found, call listener not initialized');
             }
-
-            // Make sure initial mobile/desktop state is correct
-                   function applyResponsiveInitialState() {
-          const container = document.getElementById('chatContainer');
-          if (!container) return;
-          const backBtn = document.getElementById('backBtn');
-
-          if (isMobileView()) {
-            // mặc định show list trên mobile
-            container.classList.remove('show-chat');
-            if (backBtn) backBtn.style.display = ''; // để media query quyết định hiển thị
-          } else {
-            // desktop: đảm bảo cả 2 cột hiển thị (không ép inline styles)
-            container.classList.remove('show-chat');
-            if (backBtn) backBtn.style.display = 'none';
-            // không set chatMain.style.display = 'flex' ở đây nữa
-          }
-        }
-
-            window.addEventListener('resize', () => {
-                // If switching to desktop, ensure the list and chat are both visible and container not locked in show-chat
-                if (!isMobileView()) {
-                    const container = document.getElementById('chatContainer');
-                    if (container) {
-                        container.classList.remove('show-chat');
-                    }
-                }
-                applyResponsiveInitialState();
-            });
+        }, 1000);
 
             // Initialize components
             loadChatList();
@@ -2260,9 +2684,6 @@
 
             // Display usage stats every 5 minutes
             setInterval(displayApiUsage, 5 * 60 * 1000);
-
-            // Apply responsive initial state
-            applyResponsiveInitialState();
 
             console.log('🚀 Smart Chat with Optimized GIPHY initialized!');
         });
@@ -2293,11 +2714,9 @@
                 document.getElementById('imageBtn').addEventListener('click', () => {
             document.getElementById('imageInput').click();
         });
-                const CLOUDINARY_CLOUD_NAME = 'dwt7k4avh';
-        const CLOUDINARY_UPLOAD_PRESET = 'ChatMoBe';
                 const IMGBB_API_KEY = 'i4WkW4ZQ6UW4Ws9tV-K6jcxovNg'; // Thay YOUR_IMGBB_API_KEY bằng key của bạn
 
-                       document.getElementById('imageInput').addEventListener('change', async (event) => {
+                      document.getElementById('imageInput').addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -2326,6 +2745,26 @@
                 alert('❌ Không gửi được file, thử lại sau!');
             }
         });
+        function sendImageMessage(imageUrl, name) {
+            const senderId = document.getElementById('senderId')?.value.trim();
+            const senderName = document.getElementById('senderName')?.value.trim();
+            const timestamp = Date.now();
+            if (!senderId || !senderName || !currentReceiverId || !currentChatId) {
+                alert('⚠️ Vui lòng nhập đủ thông tin và chọn chat');
+                return;
+            }
+            showTypingIndicator();
+            push(ref(db, `chats/${currentChatId}`), {
+                senderId,
+                senderName,
+                message: `[IMAGE]${imageUrl}|${name}`,
+                timestamp,
+                type: 'image'
+            }).then(() => {
+                hideTypingIndicator();
+                scrollToLatestMessage();
+            });
+        }
                 function sendMediaMessage(mediaUrl, name, type) {
             const senderId = document.getElementById('senderId')?.value.trim();
             const senderName = document.getElementById('senderName')?.value.trim();
@@ -2348,27 +2787,6 @@
                 scrollToLatestMessage();
             });
         }
-        function sendImageMessage(imageUrl, name) {
-            const senderId = document.getElementById('senderId')?.value.trim();
-            const senderName = document.getElementById('senderName')?.value.trim();
-            const timestamp = Date.now();
-            if (!senderId || !senderName || !currentReceiverId || !currentChatId) {
-                alert('⚠️ Vui lòng nhập đủ thông tin và chọn chat');
-                return;
-            }
-            showTypingIndicator();
-            push(ref(db, `chats/${currentChatId}`), {
-                senderId,
-                senderName,
-                message: `[IMAGE]${imageUrl}|${name}`,
-                timestamp,
-                type: 'image'
-            }).then(() => {
-                hideTypingIndicator();
-                scrollToLatestMessage();
-            });
-        }
-
         // Utility functions
         window.setUserInfo = (userId, userName) => {
             const senderIdInput = document.getElementById('senderId');
@@ -2376,7 +2794,14 @@
             if (senderIdInput) senderIdInput.value = userId;
             if (senderNameInput) senderNameInput.value = userName;
             loadChatList();
+                setTimeout(() => {
+            console.log('🔔 Initializing incoming call listener for new user:', userId);
+            initIncomingCallListener();
+        }, 500);
         };
+
+                const CLOUDINARY_CLOUD_NAME = 'dwt7k4avh';
+        const CLOUDINARY_UPLOAD_PRESET = 'ChatMoBe';
 
         window.addNewChat = (friendId, friendName) => {
             const senderId = document.getElementById('senderId')?.value.trim();
@@ -2402,62 +2827,8 @@
                 console.error('Error adding new chat:', error);
             });
         };
-
-        // Global functions
-        window.scrollToLatestMessage = scrollToLatestMessage;
-        window.displayApiUsage = displayApiUsage;
-                // chat-page-init.js
-        function getQueryParams() {
-          const params = new URLSearchParams(window.location.search);
-          return {
-            senderId: params.get('senderId') || '',
-            senderName: params.get('senderName') || '', // optional
-            receiverId: params.get('receiverId') || '',
-            receiverName: params.get('receiverName') || '' // optional
-          };
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-          const q = getQueryParams();
-
-          if (!q.receiverId) {
-            // Nothing to auto-open
-            return;
-          }
-
-          // Nếu server đã xác thực, bạn có thể bỏ qua senderId từ query và lấy senderId từ server-rendered hidden input
-          const serverSenderId = document.getElementById('senderId')?.value?.trim();
-          const finalSenderId = serverSenderId || q.senderId;
-
-          // Fill hidden inputs if present
-          const senderIdInput = document.getElementById('senderId');
-          const senderNameInput = document.getElementById('senderName');
-          if (senderIdInput && finalSenderId) senderIdInput.value = finalSenderId;
-          if (senderNameInput && q.senderName) senderNameInput.value = q.senderName;
-
-          // Ensure setUserInfo exists
-          if (typeof window.setUserInfo === 'function') {
-            window.setUserInfo(finalSenderId || '', q.senderName || '');
-          }
-
-          // Ensure openChat exists
-          if (typeof window.openChat === 'function') {
-            const senderNameForOpen = q.senderName || (senderNameInput ? senderNameInput.value : '');
-            const receiverNameForOpen = q.receiverName || q.receiverId; // fallback to id if no name
-            window.openChat(finalSenderId || '', senderNameForOpen, q.receiverId, receiverNameForOpen);
-          } else {
-            console.warn('openChat function not found on this page. Make sure your chat UI exposes openChat(senderId, senderName, receiverId, receiverName).');
-          }
-        });
-
-         function tangSoTinChuaDoc333(receiverId) {
-            // Tăng số tin chưa đọc cho user nhận (chỉ 1 cấp)
-            const unreadRef = ref(db, `unreadMessages/${receiverId}`);
-            import("https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js").then(({ runTransaction }) => {
-                runTransaction(unreadRef, (current) => (current || 0) + 1);
-            });
-        }
-          window.openImageModal = function(imgUrl) {
+                // Modal Image Viewer
+        window.openImageModal = function(imgUrl) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImg');
             modalImg.src = imgUrl;
@@ -2471,7 +2842,873 @@
         document.getElementById('imageModal').onclick = function(e) {
             if (e.target === this) this.style.display = 'none';
         };
+        // Global functions
+        window.scrollToLatestMessage = scrollToLatestMessage;
+        window.displayApiUsage = displayApiUsage;
+               // ==== WebRTC section (audio + video call separated) ====
+                                               // ==== WEBRTC SECTION - COMPLETE FIXED VERSION ====
+        let peerConnection = null;
+        let localStream = null;
+        let callTimeoutId = null;
+        let rtcListeners = {};
+        let isCleaningUp = false;
+
+                        const iceConfig = {
+          iceServers: [
+            // Xirsys TURN 1
+            { urls: [ "stun:ss-turn2.xirsys.com" ] },
+            {
+              username: "J4iMiMv9g1r-ZJjiFIVJr1OOztQWCW3p2zYqF-cFtHp0FDFx30CFkDnZegxwX-J5AAAAAGkMTGtEYWlzeQ==",
+              credential: "2e09fc6a-bae1-11f0-a5a8-0242ac140004",
+              urls: [
+                "turn:ss-turn2.xirsys.com:80?transport=udp",
+                "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+              ]
+            },
+
+            // Xirsys TURN 2
+            { urls: [ "stun:ss-turn1.xirsys.com" ] },
+            {
+              username: "Jd20WO7aA9k61Wt0gGMOwXsb5sO9IdWzODI6EtDorfAt9mjiLhOA68rH-poM5lcjAAAAAGkMTvQxMTExMTIyMjIy",
+              credential: "b1432ba0-bae2-11f0-8597-0242ac140004",
+              urls: [
+                "turn:ss-turn1.xirsys.com:80?transport=udp",
+                "turn:ss-turn1.xirsys.com:3478?transport=udp",
+                "turn:ss-turn1.xirsys.com:80?transport=tcp",
+                "turn:ss-turn1.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn1.xirsys.com:443?transport=tcp",
+                "turns:ss-turn1.xirsys.com:5349?transport=tcp"
+              ]
+            },
+
+            // Xirsys TURN 3 (bạn vừa gửi)
+            { urls: [ "stun:ss-turn1.xirsys.com" ] },
+            {
+              username: "7oIHXLS2NRuFyJg5dx2OlnpgEkmxLjcxaodxQZumf6Aie8kUx_DyLZvT1fmrIq-aAAAAAGkMT2ozMzMzMzM=",
+              credential: "f72ca9b6-bae2-11f0-8e52-0242ac140004",
+              urls: [
+                "turn:ss-turn1.xirsys.com:80?transport=udp",
+                "turn:ss-turn1.xirsys.com:3478?transport=udp",
+                "turn:ss-turn1.xirsys.com:80?transport=tcp",
+                "turn:ss-turn1.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn1.xirsys.com:443?transport=tcp",
+                "turns:ss-turn1.xirsys.com:5349?transport=tcp"
+              ]
+            }
+          ]
+        };
+
+                // Helper: Get RTC path
+        function getRTCPath() {
+            return currentChatId ? `webrtc/${currentChatId}` : null;
+        }
+
+        // ===== CLEANUP FUNCTION =====
+        function cleanUpMedia() {
+            if (isCleaningUp) {
+                console.log('⏳ Already cleaning up, skipping...');
+                return;
+            }
+
+            isCleaningUp = true;
+            console.log('🧹 Cleaning up media and listeners...');
+            console.trace('📍 Cleanup called from:');
+
+            // Stop all tracks
+            if (localStream) {
+                localStream.getTracks().forEach(t => {
+                    t.stop();
+                    console.log('Stopped track:', t.kind);
+                });
+                localStream = null;
+            }
+
+            // Close peer connection
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+                console.log('Closed peer connection');
+            }
+
+            // Remove all Firebase listeners
+            Object.values(rtcListeners).forEach(unsubscribe => {
+                if (typeof unsubscribe === 'function') {
+                    try {
+                        unsubscribe();
+                    } catch (e) {
+                        console.error('Error unsubscribing:', e);
+                    }
+                }
+            });
+            rtcListeners = {};
+            console.log('Removed all RTC listeners');
+
+            // Clear Firebase RTC data
+            const rtcPath = getRTCPath();
+            if (rtcPath) {
+                set(ref(db, rtcPath), null).catch(err =>
+                    console.error('Error clearing RTC path:', err)
+                );
+            }
+
+            // Clear UI
+            hideVideoCallModal();
+            setWaitingMsg("");
+            clearTimeout(callTimeoutId);
+
+            // Reset video elements
+            const localVideo = document.getElementById("localVideo");
+            const remoteVideo = document.getElementById("remoteVideo");
+            if (localVideo) localVideo.srcObject = null;
+            if (remoteVideo) remoteVideo.srcObject = null;
+
+            console.log('✅ Cleanup completed');
+
+            setTimeout(() => {
+                isCleaningUp = false;
+            }, 500);
+        }
+
+        // ===== VIDEO POPUP UI =====
+        function showVideoCallModal({otherName, isVideo}) {
+            const title = otherName
+                ? `Đang gọi với ${otherName}`
+                : "Cuộc gọi";
+            const type = isVideo ? "" : " (Âm thanh)";
+
+            document.getElementById("videoCallTitle").textContent = title + type;
+            document.getElementById("videoCallPopup").classList.remove("webrtc-popup-hidden");
+            document.getElementById("localVideo").style.display = isVideo ? "" : "none";
+            document.getElementById("remoteVideo").style.display = "";
+        }
+
+        function hideVideoCallModal() {
+            document.getElementById("videoCallPopup").classList.add("webrtc-popup-hidden");
+        }
+
+        // End call button
+        document.getElementById("endCallBtn").onclick = function() {
+            console.log('📞 User ended call');
+            cleanUpMedia();
+        };
+
+        // ===== INCOMING CALL POPUP (NO BEEP) =====
+        function showIncomingCallPopup({from, isVideo, avatarText, onAccept, onDecline}) {
+            document.getElementById('incomingCallName').textContent = from || "Người lạ";
+            document.getElementById('incomingCallType').textContent = isVideo ? 'Cuộc gọi Video' : 'Cuộc gọi Âm thanh';
+            document.getElementById('incomingCallAvatar').textContent = avatarText || "👤";
+
+            const popup = document.getElementById('incomingCallPopup');
+            popup.classList.remove('webrtc-popup-hidden');
+
+            function handle(accept) {
+                popup.classList.add('webrtc-popup-hidden');
+
+                if (accept) {
+                    console.log('✅ User accepted call');
+                    onAccept && onAccept();
+                } else {
+                    console.log('❌ User declined call');
+                    onDecline && onDecline();
+                }
+
+                document.getElementById('acceptCallBtn').onclick = null;
+                document.getElementById('declineCallBtn').onclick = null;
+                popup.onclick = null;
+            }
+
+            document.getElementById('acceptCallBtn').onclick = () => handle(true);
+            document.getElementById('declineCallBtn').onclick = () => handle(false);
+            popup.onclick = function(e) {
+                if(e.target === popup) handle(false);
+            }
+        }
+
+        // ===== WAITING MESSAGE =====
+        function setWaitingMsg(txt) {
+            let waiting = document.getElementById("waitingCallMsg");
+            if (!waiting) {
+                waiting = document.createElement("div");
+                waiting.id = "waitingCallMsg";
+                waiting.style.display = "none";
+                document.body.appendChild(waiting);
+            }
+            waiting.style.display = txt ? "" : "none";
+            waiting.textContent = txt || "";
+        }
+
+        // ===== CALL BUTTONS =====
+        document.getElementById("startAudioCallBtn").onclick = async function() {
+            await startRTCCall(false);
+        };
+
+        document.getElementById("startVideoCallBtn").onclick = async function() {
+            await startRTCCall(true);
+        };
+
+        // ===== CALLER: START CALL =====
+        async function startRTCCall(isVideo) {
+            if (!currentChatId) {
+                alert("Chọn chat trước khi gọi!");
+                return;
+            }
+
+            const senderId = document.getElementById('senderId')?.value.trim();
+            const senderName = document.getElementById('senderName')?.value.trim();
+
+            if (!senderId || !senderName) {
+                alert("Vui lòng nhập ID và tên của bạn!");
+                return;
+            }
+
+            console.log(`📞 CALLER: Starting ${isVideo ? 'video' : 'audio'} call to:`, currentReceiverName);
+            console.log('📍 Chat ID:', currentChatId);
+            console.log('👤 My ID:', senderId);
+            console.log('👥 Receiver ID:', currentReceiverId);
+
+            // Clean up previous call
+            if (peerConnection || localStream) {
+                console.log('⏳ Waiting for previous call cleanup...');
+                cleanUpMedia();
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+
+            try {
+                const rtcPath = getRTCPath();
+                console.log('📍 RTC Path:', rtcPath);
+
+                // Step 1: Create peer connection
+                console.log('Step 1: Creating peer connection...');
+                peerConnection = new RTCPeerConnection(iceConfig);
+
+                if (!peerConnection) {
+                    throw new Error('Failed to create RTCPeerConnection');
+                }
+
+                console.log('✅ Peer connection created');
+
+                // Step 2: Set up ICE candidate handler
+                peerConnection.onicecandidate = (e) => {
+                    if (e.candidate) {
+                        console.log('📤 CALLER: Sending ICE candidate');
+                        console.log('  Type:', e.candidate.type);
+                        console.log('  Protocol:', e.candidate.protocol);
+
+                        const candidateData = {
+                            candidate: e.candidate.candidate,
+                            sdpMid: e.candidate.sdpMid,
+                            sdpMLineIndex: e.candidate.sdpMLineIndex,
+                            usernameFragment: e.candidate.usernameFragment
+                        };
+
+                        const candidateKey = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                        set(ref(db, rtcPath + '/callerCandidates/' + candidateKey), candidateData)
+                            .then(() => {
+                                console.log('✅ CALLER: ICE candidate sent to Firebase');
+                            })
+                            .catch(err => {
+                                console.error('❌ Error sending ICE candidate:', err);
+                            });
+                    } else {
+                        console.log('🏁 CALLER: All ICE candidates sent');
+                    }
+                };
+
+                // ICE gathering state
+                peerConnection.onicegatheringstatechange = () => {
+                    console.log('🧊 CALLER ICE gathering state:', peerConnection.iceGatheringState);
+                };
+
+                // Connection states
+                peerConnection.onconnectionstatechange = () => {
+                    console.log('📊 CALLER Connection state:', peerConnection?.connectionState);
+
+                    if (peerConnection?.connectionState === 'connected') {
+                        console.log('🎉 CALLER: Successfully connected!');
+                        setWaitingMsg("");
+                    }
+                };
+
+                peerConnection.oniceconnectionstatechange = () => {
+                    console.log('🧊 CALLER ICE connection state:', peerConnection?.iceConnectionState);
+
+                    if (peerConnection?.iceConnectionState === 'failed') {
+                        console.error('❌ CALLER: ICE connection failed');
+                        setWaitingMsg("⚠️ Kết nối thất bại, đang thử lại...");
+                    }
+                };
+
+                // Handle remote track
+                peerConnection.ontrack = e => {
+                    console.log('📺 CALLER: Received remote track!');
+                    console.log('  Stream ID:', e.streams[0].id);
+                    console.log('  Tracks:', e.streams[0].getTracks().map(t => `${t.kind}: ${t.enabled}`));
+
+                    const remoteVideo = document.getElementById("remoteVideo");
+                    if (remoteVideo) {
+                        remoteVideo.srcObject = e.streams[0];
+                        console.log('✅ CALLER: Remote video srcObject set');
+
+                        remoteVideo.play()
+                            .then(() => console.log('✅ CALLER: Remote video playing'))
+                            .catch(err => console.log('⚠️ Autoplay blocked:', err));
+                    } else {
+                        console.error('❌ Remote video element not found!');
+                    }
+                };
+
+                // Step 3: Get user media
+                console.log('Step 2: Requesting user media...');
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: isVideo ? {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    } : false,
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                console.log('✅ Got local stream');
+                console.log('  Stream ID:', localStream.id);
+                console.log('  Tracks:', localStream.getTracks().map(t => `${t.kind}: ${t.label} (enabled: ${t.enabled})`));
+
+                const localVideo = document.getElementById("localVideo");
+                if (localVideo) {
+                    localVideo.srcObject = isVideo ? localStream : null;
+                    localVideo.muted = true; // Prevent echo
+                }
+
+                // Step 4: Add tracks
+                console.log('Step 3: Adding tracks to peer connection...');
+                localStream.getTracks().forEach(track => {
+                    const sender = peerConnection.addTrack(track, localStream);
+                    console.log('✅ Added track:', track.kind, '- Label:', track.label);
+                });
+
+                // Step 5: Create offer
+                console.log('Step 4: Creating offer...');
+                const offer = await peerConnection.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: isVideo
+                });
+
+                await peerConnection.setLocalDescription(offer);
+                console.log('✅ Offer created and set as local description');
+
+                // Step 6: Send offer to Firebase
+                console.log('Step 5: Sending offer to Firebase...');
+                await set(ref(db, rtcPath + '/offer'), {
+                    sdp: offer.sdp,
+                    type: offer.type,
+                    from: senderId,
+                    isVideo: isVideo,
+                    callerName: senderName,
+                    timestamp: Date.now()
+                });
+
+                console.log('✅ Offer sent to Firebase');
+
+                // Step 7: Set up signal listeners AFTER sending offer
+                console.log('Step 6: Setting up signal listeners...');
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay
+                listenForCallerSignals(isVideo);
+
+                // Step 8: Show calling UI
+                showVideoCallModal({otherName: currentReceiverName, isVideo});
+                setWaitingMsg("⏳ Đang chờ " + currentReceiverName + " nhận cuộc gọi...");
+
+                // Step 9: Set timeout
+                callTimeoutId = setTimeout(() => {
+                    console.log('⏰ Call timeout - no response');
+                    setWaitingMsg("⏰ " + currentReceiverName + " không trả lời cuộc gọi");
+                    setTimeout(() => {
+                        cleanUpMedia();
+                    }, 2500);
+                }, 30000); // 30 seconds timeout
+
+            } catch (error) {
+                console.error('❌ Error starting call:', error);
+                alert('Không thể bắt đầu cuộc gọi: ' + error.message);
+                cleanUpMedia();
+            }
+        }
+
+        // ===== CALLER: LISTEN FOR SIGNALS =====
+        function listenForCallerSignals(isVideo) {
+            const rtcPath = getRTCPath();
+            if (!rtcPath) {
+                console.error('❌ Cannot listen: RTC path is null');
+                return;
+            }
+
+            const senderId = document.getElementById('senderId')?.value.trim();
+
+            console.log('👂 CALLER: Setting up signal listeners...');
+            console.log('📍 Listening at:', rtcPath);
+
+            // Listen for answer
+            const answerRef = ref(db, rtcPath + '/answer');
+            rtcListeners.answer = onValue(answerRef, async (snap) => {
+                const answer = snap.val();
+
+                if (!answer) {
+                    console.log('⏭️ No answer yet');
+                    return;
+                }
+
+                if (!peerConnection) {
+                    console.log('⏭️ No peer connection');
+                    return;
+                }
+
+                if (answer.from === senderId) {
+                    console.log('⏭️ Ignoring own answer');
+                    return;
+                }
+
+                console.log('📞 CALLER: Call accepted by:', answer.calleeName || answer.from);
+                console.log('  Answer type:', answer.type);
+                console.log('  Signaling state:', peerConnection.signalingState);
+
+                try {
+                    if (peerConnection.signalingState !== "stable") {
+                        console.log('📥 Setting remote description (answer)...');
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                        console.log('✅ CALLER: Remote description set successfully');
+                    } else {
+                        console.log('⚠️ Already in stable state, skipping setRemoteDescription');
+                    }
+
+                    setWaitingMsg("");
+                    clearTimeout(callTimeoutId);
+
+                    showVideoCallModal({
+                        otherName: answer.calleeName || currentReceiverName,
+                        isVideo
+                    });
+
+                } catch (error) {
+                    console.error('❌ Error handling answer:', error);
+                }
+            });
+
+            // Listen for CALLEE's ICE candidates
+            const calleeCandidatesRef = ref(db, rtcPath + '/calleeCandidates');
+            console.log('👂 CALLER: Listening for callee candidates at:', rtcPath + '/calleeCandidates');
+
+            rtcListeners.calleeCandidates = onValue(calleeCandidatesRef, snap => {
+                const candidates = snap.val();
+
+                if (!candidates) {
+                    console.log('⏭️ CALLER: No candidates from callee yet');
+                    return;
+                }
+
+                if (!peerConnection) {
+                    console.log('⚠️ CALLER: No peer connection to add candidates');
+                    return;
+                }
+
+                const candidateKeys = Object.keys(candidates);
+                console.log('📦 CALLER: Received', candidateKeys.length, 'candidates from callee');
+
+                candidateKeys.forEach(key => {
+                    const candidate = candidates[key];
+
+                    if (!candidate || !candidate.candidate) {
+                        console.warn('⚠️ CALLER: Invalid candidate:', key);
+                        return;
+                    }
+
+                    console.log('🔄 CALLER: Processing ICE candidate from callee');
+                    console.log('  Key:', key);
+                    console.log('  Candidate:', candidate.candidate.substring(0, 50) + '...');
+
+                    peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                        .then(() => {
+                            console.log('✅ CALLER: Added ICE candidate successfully');
+                        })
+                        .catch(err => {
+                            console.error('❌ CALLER: Error adding ICE candidate:', err);
+                        });
+                });
+            });
+
+            // Listen for declined
+            const declinedRef = ref(db, rtcPath + '/declined');
+            rtcListeners.declined = onValue(declinedRef, snap => {
+                const decl = snap.val();
+                if (decl && decl.ts > Date.now() - 5000) {
+                    console.log('❌ CALLER: Call was declined');
+                    setWaitingMsg("❌ " + currentReceiverName + " đã từ chối cuộc gọi");
+                    setTimeout(() => {
+                        cleanUpMedia();
+                    }, 2000);
+                }
+            });
+
+            console.log('✅ CALLER: All signal listeners set up');
+        }
+
+        // ===== CALLEE: INCOMING CALL LISTENER =====
+        function initIncomingCallListener() {
+            const senderId = document.getElementById('senderId')?.value.trim();
+            if (!senderId) {
+                console.warn('⚠️ Cannot init call listener: No senderId');
+                return;
+            }
+
+            console.log('👂 CALLEE: Listening for incoming calls for user:', senderId);
+
+            const userChatsRef = ref(db, `userChats/${senderId}`);
+            onValue(userChatsRef, (snapshot) => {
+                const chats = snapshot.val();
+                if (!chats) return;
+
+                Object.keys(chats).forEach(otherUserId => {
+                    const chatId = generateChatId(senderId, otherUserId);
+                    const offerPath = `webrtc/${chatId}/offer`;
+
+                    onValue(ref(db, offerPath), async (offerSnap) => {
+                        const offer = offerSnap.val();
+
+                        if (!offer) return;
+                        if (offer.from === senderId) return;
+                        if (peerConnection) {
+                            console.log('⚠️ Already in call, ignoring new offer');
+                            return;
+                        }
+
+                        // Check if offer is recent (within last 30 seconds)
+                        if (offer.timestamp && Date.now() - offer.timestamp > 30000) {
+                            console.log('⏰ Ignoring old offer from:', offer.from);
+                            return;
+                        }
+
+                        console.log('📞 CALLEE: Incoming call detected!');
+                        console.log('  From:', offer.from);
+                        console.log('  Caller name:', offer.callerName);
+                        console.log('  Chat ID:', chatId);
+                        console.log('  Is video:', offer.isVideo);
+
+                        const callContext = {
+                            chatId: chatId,
+                            callerId: offer.from,
+                            callerName: offer.callerName || offer.from,
+                            isVideo: typeof offer.isVideo === "boolean" ? offer.isVideo : true
+                        };
+
+                        showIncomingCallPopup({
+                            from: callContext.callerName,
+                            isVideo: callContext.isVideo,
+                            avatarText: callContext.callerName.charAt(0).toUpperCase(),
+                            onAccept: async () => {
+                                await acceptIncomingCall(offer, callContext);
+                            },
+                            onDecline: () => {
+                                declineIncomingCall(callContext.chatId);
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        // ===== CALLEE: ACCEPT CALL =====
+        async function acceptIncomingCall(offer, callContext) {
+            console.log('✅ CALLEE: Accepting call from:', callContext.callerName);
+            console.log('📍 Chat ID:', callContext.chatId);
+            console.log('📍 Is video:', callContext.isVideo);
+
+            const senderId = document.getElementById('senderId')?.value.trim();
+            const senderName = document.getElementById('senderName')?.value.trim();
+            const rtcPath = `webrtc/${callContext.chatId}`;
+
+            console.log('👤 My ID:', senderId);
+            console.log('👥 Caller ID:', callContext.callerId);
+            console.log('📍 RTC Path:', rtcPath);
+
+            // Clean up first
+            if (peerConnection || localStream) {
+                cleanUpMedia();
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+
+            try {
+                // Step 1: Create peer connection
+                console.log('Step 1: Creating peer connection...');
+                peerConnection = new RTCPeerConnection(iceConfig);
+
+                if (!peerConnection) {
+                    throw new Error('Failed to create RTCPeerConnection');
+                }
+
+                console.log('✅ Peer connection created');
+
+                // Step 2: Set up ICE candidate handler
+                peerConnection.onicecandidate = (e) => {
+                    if (e.candidate) {
+                        console.log('📤 CALLEE: Sending ICE candidate');
+                        console.log('  Type:', e.candidate.type);
+                        console.log('  Protocol:', e.candidate.protocol);
+
+                        const candidateData = {
+                            candidate: e.candidate.candidate,
+                            sdpMid: e.candidate.sdpMid,
+                            sdpMLineIndex: e.candidate.sdpMLineIndex,
+                            usernameFragment: e.candidate.usernameFragment
+                        };
+
+                        const candidateKey = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                        set(ref(db, rtcPath + '/calleeCandidates/' + candidateKey), candidateData)
+                            .then(() => {
+                                console.log('✅ CALLEE: ICE candidate sent to Firebase');
+                            })
+                            .catch(err => {
+                                console.error('❌ Error sending ICE candidate:', err);
+                            });
+                    } else {
+                        console.log('🏁 CALLEE: All ICE candidates sent');
+                    }
+                };
+
+                // ICE gathering state
+                peerConnection.onicegatheringstatechange = () => {
+                    console.log('🧊 CALLEE ICE gathering state:', peerConnection.iceGatheringState);
+                };
+
+                // Connection states
+                peerConnection.onconnectionstatechange = () => {
+                    console.log('📊 CALLEE Connection state:', peerConnection.connectionState);
+
+                    if (peerConnection.connectionState === 'connected') {
+                        console.log('🎉 CALLEE: Successfully connected!');
+                    }
+                };
+
+                peerConnection.oniceconnectionstatechange = () => {
+                    console.log('🧊 CALLEE ICE connection state:', peerConnection.iceConnectionState);
+
+                    if (peerConnection.iceConnectionState === 'failed') {
+                        console.error('❌ CALLEE: ICE connection failed');
+                    }
+                };
+
+                // Handle remote track
+                peerConnection.ontrack = (e) => {
+                    console.log('📺 CALLEE: Received remote stream!');
+                    console.log('  Stream ID:', e.streams[0].id);
+                    console.log('  Tracks:', e.streams[0].getTracks().map(t => `${t.kind}: ${t.enabled}`));
+
+                    const remoteVideo = document.getElementById("remoteVideo");
+                    if (remoteVideo) {
+                        remoteVideo.srcObject = e.streams[0];
+                        console.log('✅ CALLEE: Remote video srcObject set');
+
+                        remoteVideo.play()
+                            .then(() => console.log('✅ CALLEE: Remote video playing'))
+                            .catch(err => console.log('⚠️ Autoplay blocked:', err));
+                    } else {
+                        console.error('❌ Remote video element not found!');
+                    }
+                };
+
+                // Step 3: Get user media
+                console.log('Step 2: Requesting user media...');
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: callContext.isVideo ? {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    } : false,
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                console.log('✅ Got local stream');
+                console.log('  Stream ID:', localStream.id);
+                console.log('  Tracks:', localStream.getTracks().map(t => `${t.kind}: ${t.label} (enabled: ${t.enabled})`));
+
+                const localVideo = document.getElementById("localVideo");
+                if (localVideo) {
+                    localVideo.srcObject = callContext.isVideo ? localStream : null;
+                    localVideo.muted = true; // Prevent echo
+                    console.log('✅ Local video srcObject set');
+                }
+
+                // Step 4: Add tracks
+                console.log('Step 3: Adding tracks to peer connection...');
+                localStream.getTracks().forEach(track => {
+                    const sender = peerConnection.addTrack(track, localStream);
+                    console.log('✅ Added track:', track.kind, '- Label:', track.label);
+                });
+
+                // Step 5: Listen for CALLER's ICE candidates
+                console.log('Step 4: Setting up ICE candidate listener for caller...');
+                const callerCandidatesRef = ref(db, rtcPath + '/callerCandidates');
+                console.log('👂 CALLEE: Listening at:', rtcPath + '/callerCandidates');
+
+                rtcListeners.callerCandidates = onValue(callerCandidatesRef, (snap) => {
+                    const candidates = snap.val();
+
+                    if (!candidates) {
+                        console.log('⏭️ CALLEE: No candidates from caller yet');
+                        return;
+                    }
+
+                    if (!peerConnection) {
+                        console.log('⚠️ CALLEE: No peer connection');
+                        return;
+                    }
+
+                    const candidateKeys = Object.keys(candidates);
+                    console.log('📦 CALLEE: Received', candidateKeys.length, 'candidates from caller');
+
+                    candidateKeys.forEach(key => {
+                        const candidate = candidates[key];
+
+                        if (!candidate || !candidate.candidate) {
+                            console.warn('⚠️ CALLEE: Invalid candidate:', key);
+                            return;
+                        }
+
+                        console.log('🔄 CALLEE: Processing ICE candidate from caller');
+                        console.log('  Key:', key);
+                        console.log('  Candidate:', candidate.candidate.substring(0, 50) + '...');
+
+                        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                            .then(() => {
+                                console.log('✅ CALLEE: Added ICE candidate successfully');
+                            })
+                            .catch(err => {
+                                console.error('❌ CALLEE: Error adding ICE candidate:', err);
+                            });
+                    });
+                });
+
+                // Step 6: Set remote description (offer)
+                if (!peerConnection) {
+                    throw new Error('Peer connection is null before setRemoteDescription');
+                }
+
+                console.log('Step 5: Setting remote description (offer)...');
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                console.log('✅ Remote description set');
+                console.log('  Signaling state:', peerConnection.signalingState);
+
+                // Step 7: Create answer
+                if (!peerConnection) {
+                    throw new Error('Peer connection is null before createAnswer');
+                }
+
+                console.log('Step 6: Creating answer...');
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                console.log('✅ Answer created and set as local description');
+                console.log('  Signaling state:', peerConnection.signalingState);
+
+                // Step 8: Send answer
+                console.log('Step 7: Sending answer to Firebase...');
+                await set(ref(db, rtcPath + '/answer'), {
+                    sdp: answer.sdp,
+                    type: answer.type,
+                    from: senderId,
+                    calleeName: senderName,
+                    timestamp: Date.now()
+                });
+                console.log('✅ Answer sent to:', rtcPath + '/answer');
+
+                // Step 9: Show video call modal
+                showVideoCallModal({
+                    otherName: callContext.callerName,
+                    isVideo: callContext.isVideo
+                });
+
+                console.log('🎉 CALLEE: Call setup complete!');
+
+            } catch (error) {
+                console.error('❌ Error accepting call:', error);
+                alert('Không thể nhận cuộc gọi: ' + error.message);
+                cleanUpMedia();
+            }
+        }
+
+        // ===== DECLINE CALL =====
+        function declineIncomingCall(chatId) {
+            console.log('❌ CALLEE: Declining call in chat:', chatId);
+
+            const rtcPath = `webrtc/${chatId}`;
+
+            set(ref(db, rtcPath + '/declined'), {
+                val: true,
+                ts: Date.now()
+            }).then(() => {
+                console.log('✅ Decline signal sent');
+                setTimeout(() => {
+                    set(ref(db, rtcPath), null);
+                }, 1000);
+            }).catch(err => {
+                console.error('Error declining call:', err);
+            });
+
+            cleanUpMedia();
+        }
+
+        // ===== AUTO CLEANUP ON CHAT SWITCH =====
+        if (typeof window.openChat !== 'undefined') {
+            const _oldOpenChat = window.openChat;
+            window.openChat = function(...args) {
+                console.log('💬 Switching chat, cleaning up call...');
+                cleanUpMedia();
+                return _oldOpenChat.apply(this, args);
+            }
+        }
+
+        // ===== CLEANUP ON PAGE UNLOAD =====
+        window.addEventListener("beforeunload", cleanUpMedia);
+
+        // ===== INIT LISTENER (Will be called from loadChatList) =====
+        console.log('✅ WebRTC module loaded');
+
     </script>
+
+    <div id="incomingCallPopup" class="webrtc-popup-hidden">
+        <div class="webrtc-popup-content">
+            <div class="webrtc-popup-avatar" id="incomingCallAvatar">👤</div>
+            <div class="webrtc-popup-caller" id="incomingCallName">Someone</div>
+            <div class="webrtc-popup-type" id="incomingCallType">Cuộc gọi Video</div>
+            <div class="webrtc-popup-btns">
+                <button id="acceptCallBtn" class="accept-btn"><span>Nghe</span></button>
+                <button id="declineCallBtn" class="decline-btn"><span>Từ chối</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Call Modal - Improved -->
+    <div id="videoCallPopup" class="webrtc-popup-hidden">
+        <div class="video-call-modal">
+            <div class="video-call-header">
+                <span id="videoCallTitle"></span>
+                <button id="endCallBtn">Kết thúc</button>
+            </div>
+            <div class="video-call-video-area">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <video id="localVideo" autoplay muted playsinline></video>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
-```

@@ -30,6 +30,10 @@
                                 <i class="ri-add-line me-1"></i>
                                 Thêm thiết bị
                             </button>
+                            <button type="button" class="btn btn-secondary" onclick="exportToExcel()">
+                                <i class="ri-download-2-line me-1"></i>
+                                Xuất Excel
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -131,6 +135,7 @@
                 <h5 class="modal-title" id="modalTitle">Thêm thiết bị mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <form id="equipmentForm">
                     <input type="hidden" id="equipmentId" name="id">
@@ -1132,13 +1137,64 @@
                 reader.readAsDataURL(file);
             }
         };
+               // Hàm xuất dữ liệu bảng thiết bị ra file CSV
+    window.exportToExcel = function() {
+        // Lấy dữ liệu bảng
+        const equipments = [];
+        $('#equipmentTableBody tr').each(function() {
+            // Loại bỏ dòng "Không có thiết bị nào" hoặc đang loading
+            if ($(this).find('td').length < 8) return;
 
-        window.changePage = function(page) {
-            if (page >= 1) {
-                currentPage = page;
-                loadEquipmentData();
-            }
-        };
+            const tds = $(this).find('td');
+            equipments.push({
+                image: $(tds[0]).find('img').attr('src') || '',
+                name: $(tds[1]).text().trim(),
+                description: $(tds[2]).text().trim(),
+                quantityTotal: $(tds[3]).text().trim(),
+                quantityAvailable: $(tds[4]).text().trim(),
+                status: $(tds[5]).text().trim(),
+                createdAt: $(tds[6]).text().trim(),
+            });
+        });
+
+        if (equipments.length === 0) {
+            showNotification('Không có dữ liệu để xuất.', 'info');
+            return;
+        }
+
+        // Build CSV
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += "Tên thiết bị,Mô tả,Tổng số lượng,Số lượng có sẵn,Trạng thái,Ngày tạo\n";
+    equipments.forEach(e => {
+        let row = [
+            e.name,
+            e.description,
+            e.quantityTotal,
+            e.quantityAvailable,
+            e.status,
+            e.createdAt
+        ].map(cell => `"${cell.replace(/"/g, '""')}"`).join(",");
+        csvContent += row + "\n";
+    });
+
+        // Download file
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        let fileName = `ThietBiSan_${new Date().toISOString().slice(0,10)}.csv`;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Hàm chuyển trang dữ liệu thiết bị (nếu có phân trang)
+    window.changePage = function(page) {
+        if (page >= 1) {
+            currentPage = page;
+            loadEquipmentData();
+        }
+    };
 
         window.goBackToInventory = function() {
             window.location.href = '/Management/Inventory';

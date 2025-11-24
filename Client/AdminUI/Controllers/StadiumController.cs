@@ -1,4 +1,5 @@
-﻿using DTOs.StadiumDTO;
+﻿using DTOs.NotificationDTO;
+using DTOs.StadiumDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -12,15 +13,16 @@ namespace AdminUI.Controllers
         private readonly IStadiumVideoSetvice _videoService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly INotificationService _notificationService;
 
-
-        public StadiumController(IStadiumService stadiumService, IStadiumImageService stadiumImageService, IStadiumVideoSetvice stadiumVideoSetvice, ITokenService tokenService, IUserService userService)
+        public StadiumController(IStadiumService stadiumService, IStadiumImageService stadiumImageService, IStadiumVideoSetvice stadiumVideoSetvice, ITokenService tokenService, IUserService userService, INotificationService notificationService)
         {
             _service = stadiumService;
             _imageService = stadiumImageService;
             _videoService = stadiumVideoSetvice;
             _tokenService = tokenService;
             _userService = userService;
+            _notificationService = notificationService;
         }
         public IActionResult StadiumAdmin()
         {
@@ -58,15 +60,31 @@ namespace AdminUI.Controllers
             List<int> ids = new List<int>();
             ids.Add(id);
             var stadium = await _service.GetAllStadiumByListId(ids);
+            // id của chủ sân
+            int createdBy = stadium.Value.FirstOrDefault().CreatedBy;
             if (locked)
             {
                 var islock = stadium.Value.FirstOrDefault();
                 if ( islock.IsLocked == true)
                 {
+                    // thông báo cho chủ sân khi bị khóa sân
+                    _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
+                    {
+                        Title = "<h3 class=\"text-red\">Sân của bạn đã bị khóa</h3>",
+                        Message = $"Sân '{islock.Name}' của bạn đã bị khóa do vi phạm các quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.",
+                        UserId = createdBy
+                    });
                     return Json(new { success = 200, value = "Sân được khóa thành công!" });
                 }
                 else
                 {
+                    // thông báo cho chủ sân khi được mở khóa sân
+                    _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
+                    {
+                        Title = "<h3 class=\"text-green-700\">Sân của bạn đã được mở khóa</h3>",
+                        Message = $"Sân '{islock.Name}' của bạn đã được mở khóa. Cảm ơn bạn đã tuân thủ các quy định của hệ thống.",
+                        UserId = createdBy
+                    });
                     return Json(new { success = 200, value = "Sân được mở khóa thành công!" });
                 }
             }
@@ -97,16 +115,17 @@ namespace AdminUI.Controllers
             var updatedStadium = await _service.UpdateStadiumAsync(id, updateStadiumDTO);
             
             
-            if (updatedStadium != null)
+            if (updatedStadium != null && updatedStadium.IsApproved == true)
             {
-                if (updatedStadium.IsLocked == true)
+
+                // thông báo cho chủ sân khi được duyệt sân
+                _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
                 {
-                    return Json(new { success = 200, value = "Sân được khóa thành công!" });
-                }
-                else
-                {
-                    return Json(new { success = 200, value = "Sân được mở khóa thành công!" });
-                }
+                    Title = "<h3 class=\"text-green-700\">Sân của bạn đã được duyệt</h3>",
+                    Message = $"Sân '{updatedStadium.Name}' của bạn đã được duyệt và hiển thị trên hệ thống. Cảm ơn bạn đã đăng ký sân với chúng tôi.",
+                    UserId = updatedStadium.CreatedBy
+                });
+                return Json(new { success = 200, value = "Sân được duyệt thành công!" });
 
             }
             else

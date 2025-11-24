@@ -196,7 +196,7 @@ namespace CustomerUI.Controllers
                
                 // xóa thành viên khỏi đội
              
-                int daletedMemberId = 0;
+                int daletedMemberCount = 0;
                 string mesage = string.Empty;
                 string messageTitle = string.Empty;
                 string notifiMessage = string.Empty;
@@ -213,7 +213,7 @@ namespace CustomerUI.Controllers
                     // nếu là xóa hoặc rời đội thì trừ số thành viên
                     else if (status == "Delete")
                     {
-                        daletedMemberId = 1;
+                    daletedMemberCount = 1;
                     notifiMessage = $"Bạn đã bị xóa khỏi nhóm <span class=\"group-name\">{post.Value.Select(p => p.Title).FirstOrDefault()}</span>";
                         mesage = "Đã xóa thành viên thành công!";
                         messageTitle = "<div class=\"text-red-500\">Bạn đã bị xóa khỏi nhóm</div>";
@@ -223,7 +223,7 @@ namespace CustomerUI.Controllers
                     {
                         if (role == "Member")
                         {
-                            daletedMemberId = 1;
+                            daletedMemberCount = 1;
                         notifiMessage = $"Một thành viên đã rời khỏi nhóm <span class=\"group-name\">{post.Value.Select(p => p.Title).FirstOrDefault()}</span> của bạn";
                         messageTitle = "<div class=\"text-red-500\">Thành viên đã rời nhóm của bạn</div>";
                             userId = post.Value.Select(p => p.CreatedBy).FirstOrDefault();
@@ -248,7 +248,7 @@ namespace CustomerUI.Controllers
                 {
                     Id = postId,
                     Title = post.Value.FirstOrDefault().Title,
-                    JoinedPlayers = post.Value.FirstOrDefault().JoinedPlayers - daletedMemberId,
+                    JoinedPlayers = post.Value.FirstOrDefault().JoinedPlayers - daletedMemberCount,
                     NeededPlayers = post.Value.FirstOrDefault().NeededPlayers,
                     PricePerPerson = post.Value.FirstOrDefault().PricePerPerson,
                     Description = post.Value.FirstOrDefault().Description,

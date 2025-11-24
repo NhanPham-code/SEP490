@@ -46,19 +46,15 @@
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content">
             <div class="hero-text">
-                <h1 class="hero-title">Khám Phá Các Sân Thể Thao Cao Cấp</h1>
+                <h1 class="hero-title">Hãy Cùng Nhau Chơi Thật Vui</h1>
                 <p class="hero-subtitle">Kết nối với các vận động viên, đặt sân thể thao đẳng cấp thế giới và nâng tầm trò chơi của bạn với nền tảng thể thao toàn diện.</p>
                 <div class="hero-actions">
                     <a class="btn btn-primary btn-large" href="#main-list" aria-label="Khám phá danh sách sân thể thao">
                         Khám Phá Sân
                     </a>
-                    <button class="btn btn-secondary btn-large" onclick="startGuide()" type="button" aria-label="Xem video hướng dẫn cách hoạt động">
-                        <i class="ri-play-circle-line" aria-hidden="true"></i>
-                        Cách Hoạt Động
-                    </button>
                 </div>
             </div>
-            <div class="hero-stats" aria-label="Thống kê nền tảng">
+            @* <div class="hero-stats" aria-label="Thống kê nền tảng">
                 <div class="stat-item">
                     <div class="stat-number" aria-label="500 sân cao cấp">500+</div>
                     <div class="stat-label">Sân Cao Cấp</div>
@@ -67,11 +63,7 @@
                     <div class="stat-number" aria-label="10000 người chơi hoạt động">10K+</div>
                     <div class="stat-label">Người Chơi Hoạt Động</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" aria-label="50 môn thể thao">50+</div>
-                    <div class="stat-label">Môn Thể Thao</div>
-                </div>
-            </div>
+            </div> *@
         </div>
     </section>
 
@@ -175,14 +167,14 @@
                                         <span class="label-text">Cầu Lông</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Chuyền">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng chuyền">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Đa Môn">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="pikleball">
                                         <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Đa Môn</span>
+                                        <span class="label-text">Pikleball</span>
                                     </label>
                                 </div>
                             </div>
@@ -207,18 +199,12 @@
                                            id="play-date-filter"
                                            aria-label="Chọn ngày chơi">
                                 </div>
-                                <div class="quick-date-options">
-                                    <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
-                                    <button type="button" class="quick-date-btn" data-days="1">Mai</button>
-                                    <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
-                                    <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Thời Gian -->
+                        <!-- Thời Gian -->
                         <div class="filter-section" data-intro="Chọn thời gian bạn muốn chơi" data-step="8">
-                          
                             <button class="filter-header"
                                     data-target="time-filter"
                                     type="button"
@@ -228,8 +214,59 @@
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
                             <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
-                                <div class="time-grid">
-                                    <input type="time" class="time-slot" name="play_time" value="" />
+                                <div class="time-select-wrapper">
+                                    <i class="ri-time-line" aria-hidden="true"></i>
+                                    <select name="play_time" id="play-time-select" class="time-select" aria-label="Chọn giờ chơi">
+                                        <option value="">Chọn thời gian</option>
+                                        <option value="00:00">00:00</option>
+                                        <option value="00:30">00:30</option>
+                                        <option value="01:00">01:00</option>
+                                        <option value="01:30">01:30</option>
+                                        <option value="02:00">02:00</option>
+                                        <option value="02:30">02:30</option>
+                                        <option value="03:00">03:00</option>
+                                        <option value="03:30">03:30</option>
+                                        <option value="04:00">04:00</option>
+                                        <option value="04:30">04:30</option>
+                                        <option value="05:00">05:00</option>
+                                        <option value="05:30">05:30</option>
+                                        <option value="06:00">06:00</option>
+                                        <option value="06:30">06:30</option>
+                                        <option value="07:00">07:00</option>
+                                        <option value="07:30">07:30</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="08:30">08:30</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="09:30">09:30</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="10:30">10:30</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="11:30">11:30</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="12:30">12:30</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="13:30">13:30</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="14:30">14:30</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="15:30">15:30</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="16:30">16:30</option>
+                                        <option value="17:00">17:00</option>
+                                        <option value="17:30">17:30</option>
+                                        <option value="18:00">18:00</option>
+                                        <option value="18:30">18:30</option>
+                                        <option value="19:00">19:00</option>
+                                        <option value="19:30">19:30</option>
+                                        <option value="20:00">20:00</option>
+                                        <option value="20:30">20:30</option>
+                                        <option value="21:00">21:00</option>
+                                        <option value="21:30">21:30</option>
+                                        <option value="22:00">22:00</option>
+                                        <option value="22:30">22:30</option>
+                                        <option value="23:00">23:00</option>
+                                        <option value="23:30">23:30</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -310,15 +347,6 @@
                                         <i class="ri-close-line" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="popular-locations">
-                                    <h5 class="popular-title">Địa điểm phổ biến:</h5>
-                                    <div class="location-tags">
-                                        <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
-                                        <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
-                                        <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
-                                        <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -383,10 +411,7 @@
                             <i class="ri-search-line" aria-hidden="true"></i>
                             <h3>Không tìm thấy kết quả</h3>
                             <p>Thử điều chỉnh bộ lọc hoặc tạo bài viết mới để tìm đồng đội</p>
-                            <button class="btn btn-primary" type="button" onclick="findTeamManager.showCreatePostModal()">
-                                <i class="ri-add-line" aria-hidden="true"></i>
-                                Tạo Bài Viết Đầu Tiên
-                            </button>
+        
                         </div>
                     </div>
                 </section>
@@ -517,16 +542,13 @@
         }
 
         // filter and search
-                function setupSearchListener() {
+                         function setupSearchListener() {
             const filterForm = document.getElementById('filter-form');
 
             if (filterForm) {
                 filterForm.addEventListener('submit', function (event) {
                     // Ngăn chặn hành vi gửi form mặc định
                     event.preventDefault();
-
-                    // Hiển thị trạng thái tải (nếu có)
-                    // showLoading();
 
                     // Thu thập dữ liệu từ các trường của form
                     const formData = new FormData(filterForm);
@@ -543,19 +565,23 @@
                         }
                     });
 
-                    // tạo seach cho odata
-                    let url = ''; // Mặc định lấy 6 bản ghi đầu tiên
+                    // Tạo chuỗi truy vấn OData
+                    let url = '';
 
                     if (searchParams.sports && searchParams.sports.length > 0) {
                         const sportsFilter = searchParams.sports.map(sport => `SportType eq '${sport}'`).join(' or ');
-                        url += `and ${sportsFilter} `
+                        url += `and (${sportsFilter}) `;
                     }
                     if (searchParams.play_date) {
                         url += `and PlayDate eq ${searchParams.play_date} `;
                     }
+
+                    // Xử lý thời gian chơi từ thẻ <select>
                     if (searchParams.play_time) {
-                        url += `and TimePlay eq ${searchParams.play_time} `;
+                        // Sử dụng 'eq' để tìm chính xác mốc thời gian
+                        url += `and TimePlay eq duration'${toISODuration(searchParams.play_time)}' `;
                     }
+
                     if (searchParams.price_max) {
                         url += `and PricePerPerson le ${searchParams.price_max} `;
                     }
@@ -566,15 +592,16 @@
                         url += `and NeededPlayers le ${searchParams.max_players} `;
                     }
                     if (searchParams.location) {
-                        url += `and contains(Location, '${searchParams.location} ')`;
+                        url += `and contains(Location, '${searchParams.location}')`;
                     }
 
                     url += '&top=6&skip=0';
 
                     console.log('Đang gửi dữ liệu tìm kiếm đến server:', searchParams);
+                    console.log('OData URL part:', url);
 
-                    // Gửi yêu cầu AJAX với dữ liệu đã được sửa
-                    $.ajax({
+                    // Gửi yêu cầu AJAX
+                       $.ajax({
                         url: '/FindTeam/GetAllAndSearch',
                         type: 'GET',
                         data: { url: url },
@@ -625,13 +652,52 @@
             const resetButton = filterForm.querySelector('button[type="reset"]');
             if (resetButton) {
                 resetButton.addEventListener('click', function() {
+                    // Đặt lại giá trị của select về mặc định
+                    const timeSelect = document.getElementById('play-time-select');
+                    if (timeSelect) {
+                        timeSelect.value = "";
+                    }
                     console.log('Biểu mẫu đã được đặt lại.');
-                    // Tùy chọn: có thể kích hoạt lại một tìm kiếm trống để hiển thị tất cả kết quả
-                    // filterForm.submit();
                 });
             }
         }
+                // helper: chuyển input thành ISO 8601 duration (PTnHnM)
+        function toISODuration(input) {
+            if (!input) return null;
+            input = String(input).trim();
 
+            // Nếu đã là ISO duration (bắt đầu bằng 'PT' hoặc 'pt')
+            if (/^pt/i.test(input)) {
+                return input.toUpperCase();
+            }
+
+            // Nếu là số nguyên -> coi là phút
+            if (/^\d+$/.test(input)) {
+                const minutes = parseInt(input, 10);
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                let res = 'PT';
+                if (hours) res += `${hours}H`;
+                if (mins) res += `${mins}M`;
+                if (!hours && !mins) res += '0M';
+                return res;
+            }
+
+            // Nếu dạng HH:MM hoặc H:MM
+            const hhmm = input.match(/^(\d{1,2}):(\d{1,2})$/);
+            if (hhmm) {
+                const h = parseInt(hhmm[1], 10);
+                const m = parseInt(hhmm[2], 10);
+                let res = 'PT';
+                if (h) res += `${h}H`;
+                if (m) res += `${m}M`;
+                if (!h && !m) res += '0M';
+                return res;
+            }
+
+            // Không parse được -> trả null
+            return null;
+        }
         // xem thanh cuộn đang ở post nào 
         function getCurrentScrollPosition() {
                     const sections = document.querySelectorAll("div[id]");

@@ -1,4 +1,4 @@
-﻿using DTOs;
+﻿using FeeAPI.DTOs;
 
 namespace FeeAPI.Service.Interface
 {

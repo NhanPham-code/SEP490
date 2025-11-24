@@ -39,6 +39,8 @@ namespace CustomerUI.Controllers
             ViewBag.UserId = profile?.UserId;
             ViewBag.UserName = profile?.FullName ?? "User";
             ViewBag.Profile = profile;
+            ViewBag.CloudinaryCloudName = "dwt7k4avh";  
+            ViewBag.CloudinaryPreset = "ChatMoBe";
 
             return View();
         }

@@ -259,21 +259,42 @@ namespace BookingAPI.Controllers
             }
         }
         
-        [HttpGet("check-completed/{userId}")]
-        [Authorize] // Đảm bảo endpoint này được bảo vệ và có thể nhận userId từ Ocelot
-        public async Task<ActionResult<bool>> CheckUserHasCompletedBookings(int userId)
+        [HttpGet("check-completed/{userId}/{stadiumId}")]
+        [Authorize]
+        public async Task<ActionResult<bool>> CheckUserHasCompletedBookings(int userId, int stadiumId)
         {
             try
             {
-                // userId này đã được Ocelot trích xuất từ token và truyền vào
-                var hasCompleted = await _bookingService.CheckUserHasCompletedBookingsAsync(userId);
+                // userId được Ocelot gán từ token
+                // stadiumId được lấy từ URL
+                var hasCompleted = await _bookingService.CheckUserHasCompletedBookingsAsync(userId, stadiumId);
         
-                // Trả về kết quả boolean (true hoặc false)
                 return Ok(hasCompleted);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("summary/kpi")]
+        public async Task<ActionResult<RichStadiumKpiDto>> GetKpiForStadiums([FromQuery] List<int> stadiumIds)
+        {
+            if (stadiumIds == null || !stadiumIds.Any())
+            {
+                return BadRequest("Cần cung cấp danh sách ID của sân vận động.");
+            }
+
+            try
+            {
+                // Giả sử service của bạn có phương thức này
+                var kpiData = await _bookingService.GetKpiForStadiumsAsync(stadiumIds);
+                return Ok(kpiData);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi ở đây
+                return StatusCode(500, $"Lỗi hệ thống khi lấy dữ liệu KPI: {ex.Message}");
             }
         }
     }

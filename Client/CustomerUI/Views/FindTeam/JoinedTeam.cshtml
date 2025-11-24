@@ -45,42 +45,9 @@
                     <p class="results-count" id="results-count">Hiển thị <span class="current-count" id="post-count"></span> kết quả</p>
                 </div>
 
-                <!-- Quick Search Bar -->
-                <div class="quick-search">
-                    <div class="search-input-wrapper">
-                        <i class="ri-search-line" aria-hidden="true"></i>
-                        <input type="search"
-                               id="quick-search"
-                               class="search-input"
-                               placeholder="Tìm kiếm theo môn thể thao, địa điểm..."
-                               aria-label="Tìm kiếm nhanh">
-                        <button type="button" class="search-clear" id="clear-search" aria-label="Xóa tìm kiếm">
-                            <i class="ri-close-line" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </div>
+  
             </div>
 
-            <!-- Mobile Filter Toggle -->
-            <div class="mobile-filter-toggle">
-                <button class="btn btn-secondary" id="mobile-filter-btn" type="button" aria-label="Mở bộ lọc">
-                    <i class="ri-filter-3-line" aria-hidden="true"></i>
-                    Bộ Lọc
-                    <span class="filter-count" id="active-filters-count" aria-label="Số bộ lọc đang áp dụng">0</span>
-                </button>
-
-                <!-- Sort Options -->
-                <div class="sort-options">
-                    <label for="sort-select" class="sort-label">Sắp xếp:</label>
-                    <select id="sort-select" class="sort-select" aria-label="Sắp xếp kết quả">
-                        <option value="newest">Mới nhất</option>
-                        <option value="oldest">Cũ nhất</option>
-                        <option value="most-needed">Cần nhiều người nhất</option>
-                        <option value="least-needed">Cần ít người nhất</option>
-                        <option value="nearest-date">Gần nhất</option>
-                    </select>
-                </div>
-            </div>
 
             <div class="content-grid">
                 <!-- Filter Sidebar -->
@@ -115,40 +82,52 @@
                             <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
                                 <div class="filter-options">
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Đá" checked>
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 11" checked>
                                         <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Bóng Đá</span>
-                                        <span class="count" aria-label="45 bài viết">(45)</span>
+                                        <span class="label-text">Bóng đá sân 11</span>
+                         
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Rổ">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 7" checked>
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 7</span>
+                                 
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng đá sân 5" checked>
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Bóng đá sân 5</span>
+                        
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng rổ">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Rổ</span>
-                                        <span class="count" aria-label="32 bài viết">(32)</span>
+                             
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Tennis">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Tennis</span>
-                                        <span class="count" aria-label="28 bài viết">(28)</span>
+                          
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu Lông">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Cầu lông">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Cầu Lông</span>
-                                        <span class="count" aria-label="19 bài viết">(19)</span>
+                          
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng Chuyền">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Bóng chuyền">
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
-                                        <span class="count" aria-label="15 bài viết">(15)</span>
+                            
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Đa Môn">
+                                        <input type="checkbox" name="sports" class="custom-checkbox sport-filter" value="Piklerball">
                                         <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Đa Môn</span>
-                                        <span class="count" aria-label="22 bài viết">(22)</span>
+                                        <span class="label-text">Piklerball</span>
+                             
                                     </label>
                                 </div>
                             </div>
@@ -174,12 +153,7 @@
                                            aria-label="Chọn ngày chơi"
                                            min="2025-09-11">
                                 </div>
-                                <div class="quick-date-options">
-                                    <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
-                                    <button type="button" class="quick-date-btn" data-days="1">Mai</button>
-                                    <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
-                                    <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
-                                </div>
+
                             </div>
                         </div>
 
@@ -276,15 +250,7 @@
                                         <i class="ri-close-line" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="popular-locations">
-                                    <h5 class="popular-title">Địa điểm phổ biến:</h5>
-                                    <div class="location-tags">
-                                        <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
-                                        <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
-                                        <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
-                                        <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
-                                    </div>
-                                </div>
+        
                             </div>
                         </div>
 

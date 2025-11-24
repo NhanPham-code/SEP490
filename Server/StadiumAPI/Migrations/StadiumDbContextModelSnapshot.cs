@@ -524,6 +524,72 @@ namespace StadiumAPI.Migrations
                             SportType = "Bóng đá sân 7",
                             StadiumId = 25,
                             UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = true,
+                            Name = "Sân 1",
+                            PricePerHour = 120000m,
+                            SportType = "Pickleball",
+                            StadiumId = 26,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = true,
+                            Name = "Sân 2",
+                            PricePerHour = 120000m,
+                            SportType = "Pickleball",
+                            StadiumId = 26,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 39,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = false,
+                            Name = "Sân 3",
+                            PricePerHour = 120000m,
+                            SportType = "Pickleball",
+                            StadiumId = 26,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 40,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = true,
+                            Name = "Sân 4",
+                            PricePerHour = 120000m,
+                            SportType = "Pickleball",
+                            StadiumId = 26,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 41,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = true,
+                            Name = "Sân A",
+                            PricePerHour = 95000m,
+                            SportType = "Pickleball",
+                            StadiumId = 27,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 42,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsAvailable = true,
+                            Name = "Sân B",
+                            PricePerHour = 95000m,
+                            SportType = "Pickleball",
+                            StadiumId = 27,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -654,8 +720,8 @@ namespace StadiumAPI.Migrations
                         new
                         {
                             Id = 15,
-                            ImageUrl = "img/9fc70741-ab78-4396-8165-067736a70416.jpg",
-                            StadiumId = 6,
+                            ImageUrl = "img/3266cfc8b6706e52b34b42d198fa89bb98633df0-680x510.jpg",
+                            StadiumId = 15,
                             UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -766,30 +832,58 @@ namespace StadiumAPI.Migrations
                         new
                         {
                             Id = 31,
-                            ImageUrl = "img/41b18406-815d-4f10-9140-5e3a3c9e6d08.jpg",
+                            ImageUrl = "img/san-pickleball-65-can-tho-4-1719439252.png",
                             StadiumId = 22,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 32,
-                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            ImageUrl = "img/486546596_1899487307524059_1687421610940034640_n.jpg",
                             StadiumId = 23,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 33,
-                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
-                            StadiumId = 24,
+                            ImageUrl = "img/499999699_1944698556336267_4351189224537576330_n.jpg",
+                            StadiumId = 23,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 34,
-                            ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg",
+                            ImageUrl = "img/baibiencantho.jpg",
+                            StadiumId = 24,
+                            UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 35,
+                            ImageUrl = "img/san-bong-da-can-tho-4.jpg",
                             StadiumId = 25,
                             UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 36,
+                            ImageUrl = "img/san-pickleball-c-club-academy-5-1733860845.jpg",
+                            StadiumId = 26,
+                            UploadedAt = new DateTime(2025, 8, 18, 9, 30, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 37,
+                            ImageUrl = "img/san-pickleball-c-club-academy-2-1733860844.jpg",
+                            StadiumId = 26,
+                            UploadedAt = new DateTime(2025, 8, 18, 9, 30, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 38,
+                            ImageUrl = "img/san-pickleball-dat-cao-2-1730166260.jpg",
+                            StadiumId = 27,
+                            UploadedAt = new DateTime(2025, 8, 18, 9, 35, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -989,7 +1083,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "duong le loi, cai khe, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 8,
+                            CreatedBy = 2,
                             Description = "Sân vận động đa năng lớn nhất khu vực, phù hợp cho nhiều sự kiện thể thao lớn.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1007,7 +1101,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "phu thu, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 21, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 8,
+                            CreatedBy = 3,
                             Description = "Cụm sân tennis với mặt sân chất lượng cao, phục vụ luyện tập và thi đấu.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1061,7 +1155,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "96 chu van an, an khanh, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 1,
+                            CreatedBy = 2,
                             Description = "Sân bóng chuyền ngoài trời, là nơi giao lưu của các đội bóng mạnh trong khu vực.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1079,7 +1173,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "hem lien to 4-5, hung loi, ninh kieu, can tho",
                             CloseTime = new TimeSpan(0, 22, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 1,
+                            CreatedBy = 2,
                             Description = "Sân cầu lông tư nhân, có nhiều sân con, không gian thoáng đãng.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1151,7 +1245,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "quoc lo 61, vi tan, vi thanh, hau giang",
                             CloseTime = new TimeSpan(0, 21, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 1,
+                            CreatedBy = 2,
                             Description = "Nhà thi đấu đa năng, tổ chức các môn thể thao trong nhà như bóng chuyền, cầu lông, bóng rổ.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1205,7 +1299,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "duong 1/5, phuong 1, vinh long",
                             CloseTime = new TimeSpan(0, 21, 30, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 1,
+                            CreatedBy = 3,
                             Description = "Nhà thi đấu trung tâm tỉnh Vĩnh Long, thường tổ chức các sự kiện thể thao lớn.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1259,7 +1353,7 @@ namespace StadiumAPI.Migrations
                             AddressUnsigned = "khu du lich sinh thai con au, hung phu, cai rang, can tho",
                             CloseTime = new TimeSpan(0, 18, 0, 0, 0),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = 1,
+                            CreatedBy = 3,
                             Description = "Sân bóng chuyền bãi biển tiêu chuẩn, không gian thoáng đãng.",
                             IsApproved = true,
                             IsLocked = false,
@@ -1286,6 +1380,42 @@ namespace StadiumAPI.Migrations
                             Name = "Sân bóng đá Đại học Cần Thơ",
                             NameUnsigned = "san bong da dai hoc can tho",
                             OpenTime = new TimeSpan(0, 6, 0, 0, 0),
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Address = "Đường Nguyễn Văn Linh, An Khánh, Ninh Kiều, Cần Thơ",
+                            AddressUnsigned = "duong nguyen van linh, an khanh, ninh kieu, can tho",
+                            CloseTime = new TimeSpan(0, 22, 0, 0, 0),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = 2,
+                            Description = "Cụm sân pickleball mới với 4 sân đạt chuẩn, có mái che.",
+                            IsApproved = true,
+                            IsLocked = false,
+                            Latitude = 10.0278m,
+                            Longitude = 105.7531m,
+                            Name = "Sân Pickleball Ninh Kiều",
+                            NameUnsigned = "san pickleball ninh kieu",
+                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Address = "Khu dân cư 586, Phú Thứ, Cái Răng, Cần Thơ",
+                            AddressUnsigned = "khu dan cu 586, phu thu, cai rang, can tho",
+                            CloseTime = new TimeSpan(0, 21, 30, 0, 0),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = 4,
+                            Description = "Sân pickleball ngoài trời, không gian thoáng đãng, gần bờ sông.",
+                            IsApproved = true,
+                            IsLocked = false,
+                            Latitude = 10.0085m,
+                            Longitude = 105.7891m,
+                            Name = "Sân Pickleball Cái Răng",
+                            NameUnsigned = "san pickleball cai rang",
+                            OpenTime = new TimeSpan(0, 5, 30, 0, 0),
                             UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });

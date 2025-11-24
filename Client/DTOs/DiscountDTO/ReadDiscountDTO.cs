@@ -13,7 +13,7 @@
         public string CodeType { get; set; } = null!;
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string UserId { get; set; } = null!;
+        public int? UserId { get; set; }
         public string? TargetUserId { get; set; }
         // Trả về danh sách stadium áp dụng
         public List<int> StadiumIds { get; set; } = new();

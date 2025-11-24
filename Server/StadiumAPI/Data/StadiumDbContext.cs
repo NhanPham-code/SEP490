@@ -215,7 +215,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0396m,
                     Longitude = 105.7725m,
                     IsApproved = true,
-                    CreatedBy = 8,
+                    CreatedBy = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -233,7 +233,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0094m,
                     Longitude = 105.7877m,
                     IsApproved = true,
-                    CreatedBy = 8,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -287,7 +287,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0240m,
                     Longitude = 105.7725m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -305,7 +305,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0152m,
                     Longitude = 105.7629m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 2,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -360,7 +360,7 @@ namespace StadiumAPI.Data
                     Longitude = 105.7876m,
                     IsApproved = true,
                     CreatedBy = 4,
-      
+
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -378,8 +378,8 @@ namespace StadiumAPI.Data
                     Latitude = 9.7761m,
                     Longitude = 105.4746m,
                     IsApproved = true,
-                    CreatedBy = 1,
-            
+                    CreatedBy = 2,
+
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -433,7 +433,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.2458m,
                     Longitude = 105.9723m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -487,7 +487,7 @@ namespace StadiumAPI.Data
                     Latitude = 10.0289m,
                     Longitude = 105.7997m,
                     IsApproved = true,
-                    CreatedBy = 1,
+                    CreatedBy = 3,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -506,6 +506,42 @@ namespace StadiumAPI.Data
                     Longitude = 105.7702m,
                     IsApproved = true,
                     CreatedBy = 2,
+                    CreatedAt = fixedDate,
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
+                },
+                new Stadiums
+                {
+                    Id = 26,
+                    Name = "Sân Pickleball Ninh Kiều",
+                    NameUnsigned = "san pickleball ninh kieu",
+                    Address = "Đường Nguyễn Văn Linh, An Khánh, Ninh Kiều, Cần Thơ",
+                    AddressUnsigned = "duong nguyen van linh, an khanh, ninh kieu, can tho",
+                    Description = "Cụm sân pickleball mới với 4 sân đạt chuẩn, có mái che.",
+                    OpenTime = new TimeSpan(6, 0, 0),
+                    CloseTime = new TimeSpan(22, 0, 0),
+                    Latitude = 10.0278m,
+                    Longitude = 105.7531m,
+                    IsApproved = true,
+                    CreatedBy = 2,
+                    CreatedAt = fixedDate,
+                    UpdatedAt = fixedDate,
+                    IsLocked = false
+                },
+                new Stadiums
+                {
+                    Id = 27,
+                    Name = "Sân Pickleball Cái Răng",
+                    NameUnsigned = "san pickleball cai rang",
+                    Address = "Khu dân cư 586, Phú Thứ, Cái Răng, Cần Thơ",
+                    AddressUnsigned = "khu dan cu 586, phu thu, cai rang, can tho",
+                    Description = "Sân pickleball ngoài trời, không gian thoáng đãng, gần bờ sông.",
+                    OpenTime = new TimeSpan(5, 30, 0),
+                    CloseTime = new TimeSpan(21, 30, 0),
+                    Latitude = 10.0085m,
+                    Longitude = 105.7891m,
+                    IsApproved = true,
+                    CreatedBy = 4,
                     CreatedAt = fixedDate,
                     UpdatedAt = fixedDate,
                     IsLocked = false
@@ -549,7 +585,13 @@ namespace StadiumAPI.Data
                 new Courts { Id = 33, StadiumId = 24, Name = "Sân chính", SportType = "Bóng chuyền", PricePerHour = 150000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
                 new Courts { Id = 34, StadiumId = 25, Name = "Sân 11 người", SportType = "Bóng đá sân 11", PricePerHour = 450000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
                 new Courts { Id = 35, StadiumId = 25, Name = "Sân 7 người A", SportType = "Bóng đá sân 7", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
-                new Courts { Id = 36, StadiumId = 25, Name = "Sân 7 người B", SportType = "Bóng đá sân 7", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
+                new Courts { Id = 36, StadiumId = 25, Name = "Sân 7 người B", SportType = "Bóng đá sân 7", PricePerHour = 300000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 37, StadiumId = 26, Name = "Sân 1", SportType = "Pickleball", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 38, StadiumId = 26, Name = "Sân 2", SportType = "Pickleball", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 39, StadiumId = 26, Name = "Sân 3", SportType = "Pickleball", PricePerHour = 120000m, IsAvailable = false, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 40, StadiumId = 26, Name = "Sân 4", SportType = "Pickleball", PricePerHour = 120000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 41, StadiumId = 27, Name = "Sân A", SportType = "Pickleball", PricePerHour = 95000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate },
+                new Courts { Id = 42, StadiumId = 27, Name = "Sân B", SportType = "Pickleball", PricePerHour = 95000m, IsAvailable = true, CreatedAt = fixedDate, UpdatedAt = fixedDate }
             );
 
             // ===== COURT RELATIONS =====
@@ -581,7 +623,7 @@ namespace StadiumAPI.Data
                 new StadiumImages { Id = 12, StadiumId = 5, ImageUrl = "img/e36d13a7-23b3-4bfd-a421-0d370a2313ad.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
                 new StadiumImages { Id = 13, StadiumId = 6, ImageUrl = "img/12bad99d-2b1b-48bc-a3a2-5b91cf0a9cff.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
                 new StadiumImages { Id = 14, StadiumId = 6, ImageUrl = "img/adc0fc5e-6260-4a29-9e18-ac508157db11.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
-                new StadiumImages { Id = 15, StadiumId = 6, ImageUrl = "img/9fc70741-ab78-4396-8165-067736a70416.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
+                new StadiumImages { Id = 15, StadiumId = 15, ImageUrl = "img/3266cfc8b6706e52b34b42d198fa89bb98633df0-680x510.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
                 new StadiumImages { Id = 16, StadiumId = 8, ImageUrl = "img/b2f0a4aa-c4e1-45c6-90f2-e14faa85c406.png", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
                 new StadiumImages { Id = 17, StadiumId = 9, ImageUrl = "img/37d7b03f-34cd-441d-ba51-2ae85c88188a.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
                 new StadiumImages { Id = 18, StadiumId = 9, ImageUrl = "img/52e1d9bf-2f4f-48fc-a543-7f23e61e1395.jpg", UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0) },
@@ -597,11 +639,16 @@ namespace StadiumAPI.Data
                 new StadiumImages { Id = 28, StadiumId = 18, ImageUrl = "img/21a9b32a-bede-4c9b-984f-db32070b4a22.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
                 new StadiumImages { Id = 29, StadiumId = 19, ImageUrl = "img/364ddf95-6df0-426f-86a1-7923eedc03de.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
                 new StadiumImages { Id = 30, StadiumId = 20, ImageUrl = "img/93d0cd83-6917-4d56-870c-871c4d63e036.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
-                new StadiumImages { Id = 31, StadiumId = 22, ImageUrl = "img/41b18406-815d-4f10-9140-5e3a3c9e6d08.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
-                new StadiumImages { Id = 32, StadiumId = 23, ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
-                new StadiumImages { Id = 33, StadiumId = 24, ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
-                new StadiumImages { Id = 34, StadiumId = 25, ImageUrl = "img/25e1be93-6df3-4507-a7f7-201e602afa7f.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) }
+                new StadiumImages { Id = 31, StadiumId = 22, ImageUrl = "img/san-pickleball-65-can-tho-4-1719439252.png", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
+                new StadiumImages { Id = 32, StadiumId = 23, ImageUrl = "img/486546596_1899487307524059_1687421610940034640_n.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
+                new StadiumImages { Id = 33, StadiumId = 23, ImageUrl = "img/499999699_1944698556336267_4351189224537576330_n.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
+                new StadiumImages { Id = 34, StadiumId = 24, ImageUrl = "img/baibiencantho.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
+                new StadiumImages { Id = 35, StadiumId = 25, ImageUrl = "img/san-bong-da-can-tho-4.jpg", UploadedAt = new DateTime(2025, 8, 17, 13, 38, 21, 454) },
+                new StadiumImages { Id = 36, StadiumId = 26, ImageUrl = "img/san-pickleball-c-club-academy-5-1733860845.jpg", UploadedAt = new DateTime(2025, 8, 18, 9, 30, 0) },
+                new StadiumImages { Id = 37, StadiumId = 26, ImageUrl = "img/san-pickleball-c-club-academy-2-1733860844.jpg", UploadedAt = new DateTime(2025, 8, 18, 9, 30, 0) },
+                new StadiumImages { Id = 38, StadiumId = 27, ImageUrl = "img/san-pickleball-dat-cao-2-1730166260.jpg", UploadedAt = new DateTime(2025, 8, 18, 9, 35, 0) }
             );
+            
         }
     }
 }

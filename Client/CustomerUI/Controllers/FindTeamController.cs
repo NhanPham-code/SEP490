@@ -56,10 +56,11 @@ namespace CustomerUI.Controllers
             return connection;
         }
 
-        private async Task SendNotificationToUserAsync(NotificationDTO notification)
+        private async Task SendNotificationToUserAsync(CreateNotificationDto notification)
         {
             HubConnection connection = await ConnectToSignalRAsync();
-            await connection.InvokeAsync("SendNotificationToUser", notification);
+            _notificationService.SendNotificationToUserAsync(notification).GetAwaiter().GetResult();
+           
         }
 
         private async Task SendNotificationToGroupUserAsync( string groupName, List<NotificationDTO> notificationDTOs)
@@ -193,8 +194,8 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //get booking by user id
-            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and BookingDetails/any(m: m/StartTime ge {formatted})";
-            var booking = await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url);
+            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and Status eq 'accepted' and BookingDetails/any(m: m/StartTime ge {formatted}) ";
+            var booking = (await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url)).Data;
      
             if (booking == null || !booking.Any())
             {
@@ -385,15 +386,15 @@ namespace CustomerUI.Controllers
                 return Json(new { Message = 500, value = "Join team post failed" });
             }
             var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {postId}");
+            int createdBy = post.Value.Select(p => p.CreatedBy).FirstOrDefault();
+            Console.WriteLine("CreatedBy: " + createdBy);
             // gửi notification cho người tạo bài đăng biết có người tham gia
-            SendNotificationToUserAsync( new NotificationDTO
+            SendNotificationToUserAsync( new CreateNotificationDto
             {
-                UserId = post.Value.Select(p => p.CreatedBy).FirstOrDefault(),
+                UserId = createdBy,
                 Type = "Recruitment.JoinRequest",
                 Title = "<h3 class=\"text-green-500\">Yêu cầu tham gia nhóm</h3>",
-                Message = "<div><span>Đã có một thành viên tham gia vào nhóm của bạn: </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId=" + postId + "\">Xem chi tiết</a></div>",
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
+                Message = "<div><span>Đã có một thành viên tham gia vào nhóm của bạn: </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId=" + postId + "\">Xem chi tiết</a></div>"
             }).GetAwaiter().GetResult();
             _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             {
@@ -444,25 +445,23 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> DeleteTeamPost(int postId)
         {
             var members = await _teamMember.GetAllTeamMemberByPostId(postId);
-            List<NotificationDTO> notificationDTOs = new List<NotificationDTO>();
+            List<CreateNotificationDto> notificationDTOs = new List<CreateNotificationDto>();
             // gửi notification cho tất cả thành viên trong bài đăng biết bài đăng đã bị xóa
             foreach (var member in members)
             {
                 if (member.UserId != null && member.UserId != 0)
                 {
 
-                    notificationDTOs.Add(new NotificationDTO
+                    notificationDTOs.Add(new CreateNotificationDto
                     {
                         UserId = (Int32)member.UserId,
                         Type = "Recruitment.Accepted",
                         Title = "<h3 class=\"text-red-600\">Bài đăng đã bị xóa</h3>",
-                        Message = "<div><span>Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm bài đăng khác</a></div>",
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow
+                        Message = "<div><span>Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm bài đăng khác</a></div>"
                     });
                 }
             }
-            await SendNotificationToGroupUserAsync(postId.ToString(), notificationDTOs);
+            await _notificationService.SendNotificationToGroupUserAsync(postId.ToString(), notificationDTOs);
             if (postId <= 0)
             {
                 return Json(new { Message = 500, value = "Delete team post failed" });
@@ -472,7 +471,7 @@ namespace CustomerUI.Controllers
             var result = await _teamPost.DeleteTeamPost(postId);
             if (result == false)
             {
-                return Json(new { Message = false, value = "Delete team post failed" });
+                return Json(new { Message = 400, value = "Delete team post failed" });
             }
             // xóa thành viên
             if (members != null && members.Any())
@@ -482,7 +481,7 @@ namespace CustomerUI.Controllers
                     await _teamMember.DeleteTeamMember(member.Id, postId);
                 }
             }
-            return Json(new { Message = true, value = "Delete team post successfully" });
+            return Json(new { Message = 200, value = "Delete team post successfully" });
         }
 
         // chuyển đổi từ datetime sang timespan

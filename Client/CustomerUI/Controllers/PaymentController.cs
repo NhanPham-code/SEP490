@@ -57,7 +57,7 @@ namespace CustomerUI.Controllers
             }
 
             string queryString = $"?$filter=Id eq {bookingId}";
-            var bookings = await _bookingService.GetBookingAsync(accessToken, queryString);
+            var bookings = (await _bookingService.GetBookingAsync(accessToken, queryString)).Data;
             var booking = bookings.FirstOrDefault();
 
             if (booking == null)
@@ -174,7 +174,7 @@ namespace CustomerUI.Controllers
             }
 
             string queryString = $"?$filter=Id eq {monthlyBookingId}";
-            var monthlyBookings = await _bookingService.GetMonthlyBookingAsync(accessToken, queryString);
+            var monthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, queryString)).Data;
             var monthlyBooking = monthlyBookings.FirstOrDefault();
 
             if (monthlyBooking == null)
@@ -231,7 +231,7 @@ namespace CustomerUI.Controllers
                     }
 
                     // Cập nhật trạng thái cho tất cả booking con
-                    var childBookings = await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}");
+                    var childBookings = (await _bookingService.GetBookingAsync(accessToken, $"?$filter=MonthlyBookingId eq {monthlyBookingId}")).Data;
                     foreach (var child in childBookings)
                     {
                         var childUpdateDto = new BookingUpdateDto

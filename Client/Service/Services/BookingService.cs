@@ -30,9 +30,8 @@ namespace Service.Services
         }
 
         // Lấy lịch sử booking của user hiện tại qua route gateway đã giấu userId
-        public async Task<List<BookingReadDto>> GetBookingAsync(string accessToken, string queryString)
+        public async Task<(List<BookingReadDto> Data, int TotalCount)> GetBookingAsync(string accessToken, string queryString)
         {
-            // Sử dụng HttpRequestMessage để set token thủ công
             var request = new HttpRequestMessage(HttpMethod.Get, "/bookings/history" + queryString);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
@@ -40,23 +39,19 @@ namespace Service.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<BookingReadDto>();
+                return (new List<BookingReadDto>(), 0);
             }
 
             var jsonString = await response.Content.ReadAsStringAsync();
 
-            // Deserialize theo kiểu DTO bao ngoài chứa 'value'
-            var result = System.Text.Json.JsonSerializer.Deserialize<BookingHistoryResponseDto>(jsonString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            // Sử dụng DTO mới của bạn để deserialize
+            var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<BookingReadDto>>(jsonString);
 
-            return result?.Value ?? new List<BookingReadDto>();
+            return (result?.Value ?? new List<BookingReadDto>(), result?.Count ?? 0);
         }
 
-        public async Task<List<MonthlyBookingReadDto>> GetMonthlyBookingAsync(string accessToken, string queryString)
+        public async Task<(List<MonthlyBookingReadDto> Data, int TotalCount)> GetMonthlyBookingAsync(string accessToken, string queryString)
         {
-            // Sử dụng HttpRequestMessage để set token thủ công
             var request = new HttpRequestMessage(HttpMethod.Get, "/monthlyBooking" + queryString);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
@@ -64,18 +59,15 @@ namespace Service.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<MonthlyBookingReadDto>();
+                return (new List<MonthlyBookingReadDto>(), 0);
             }
 
             var jsonString = await response.Content.ReadAsStringAsync();
 
-            // Deserialize theo kiểu DTO bao ngoài chứa 'value'
-            var result = System.Text.Json.JsonSerializer.Deserialize<OdataHaveCountResponse<MonthlyBookingReadDto>>(jsonString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            // Sử dụng DTO mới của bạn để deserialize
+            var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<MonthlyBookingReadDto>>(jsonString);
 
-            return result?.Value ?? new List<MonthlyBookingReadDto>();
+            return (result?.Value ?? new List<MonthlyBookingReadDto>(), result?.Count ?? 0);
         }
 
         public async Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken)

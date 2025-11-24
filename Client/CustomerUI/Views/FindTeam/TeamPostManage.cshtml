@@ -51,9 +51,6 @@
                         </p>
                         <div class="flex gap-4 mt-4">
                             <div class="stat-badge px-4 py-2 rounded-xl">
-                                <span class="text-sm font-medium text-gray-700">2 Bài Đăng Hoạt Động</span>
-                            </div>
-                            <div class="stat-badge px-4 py-2 rounded-xl">
                                 <span class="text-sm font-medium text-gray-700"><span id="count"></span> Lượt Xem Tổng</span>
                             </div>
                         </div>
@@ -792,7 +789,7 @@
                 url: `/FindTeam/DeleteTeamPost?postId=${postId}`,
                 type: 'DELETE',
                 success: function(response) {
-                    if (response.success) {
+                    if (response.message == 200) {
                         // Remove the post card from the UI with animation
                         const postCard = document.getElementById(`post-${postId}`);
                         if (postCard) {
@@ -845,12 +842,12 @@
                         <div class="modal-icon">
                             <i class="ri-add-circle-line"></i>
                         </div>
-                        <div class="modal-title-text">Tạo Bài Đăng Tìm Đội</div>
+                        <div class="modal-title-text">Sửa Bài Đăng Tìm Đội</div>
                     </div>
                 `,
                 html: generateEditTeamPostModalHTML(response),
                 showCancelButton: true,
-                confirmButtonText: '<i class="ri-save-line mr-1"></i>Tạo Bài Đăng',
+                confirmButtonText: '<i class="ri-save-line mr-1"></i>Sửa Bài Đăng',
                 cancelButtonText: '<i class="ri-close-line mr-1"></i>Hủy Bỏ',
                 confirmButtonColor: '#3b82f6',
                 cancelButtonColor: '#6b7280',

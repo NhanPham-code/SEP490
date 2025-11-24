@@ -1,4 +1,4 @@
-﻿using DTOs;
+﻿using FeeAPI.DTOs;
 using FeeAPI.Service.Interface;
 using Newtonsoft.Json;
 

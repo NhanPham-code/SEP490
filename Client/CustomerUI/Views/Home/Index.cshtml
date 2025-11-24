@@ -156,8 +156,8 @@
         }
 
             .time-slot.selected {
-                background-color: #2563eb;
-                color: white;
+                background-color: #dce7ff;
+                color: #000;
                 border-color: #2563eb;
             }
 
@@ -380,8 +380,8 @@
         <div class="absolute inset-0 bg-black bg-opacity-40"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
             <div class="w-full text-center text-white">
-                <h1 class="text-4xl font-bold mb-4">Discover Premium Stadiums</h1>
-                <p class="text-lg mb-6 max-w-2xl mx-auto">Browse our extensive collection of world-class sports facilities. Find the perfect venue for your next game, training session, or event.</p>  
+                <h1 class="text-4xl font-bold mb-4">Khám phá Sân vận động Đẳng cấp</h1>
+                <p class="text-lg mb-6 max-w-2xl mx-auto">Duyệt qua bộ sưu tập phong phú của chúng tôi về các cơ sở vật chất thể thao đẳng cấp thế giới. Tìm địa điểm hoàn hảo cho trận đấu, buổi tập luyện hoặc sự kiện tiếp theo của bạn.</p>
             </div>
         </div>
     </section>
@@ -412,7 +412,7 @@
                            class="w-full pl-8 pr-24 py-3 text-base text-gray-700 bg-transparent rounded-lg focus:outline-none"
                            placeholder="Tìm kiếm bằng tên" />
                     <button type="submit" id="search-btn" class="absolute right-1 top-1 bottom-1 px-6 bg-[#5044e4] text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5044e4]">
-                        Search
+                        Tìm kiếm
                     </button>
                 </div>
 
@@ -482,42 +482,10 @@
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
                                     </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Đa Môn">
-                                        <span class="checkmark" aria-hidden="true"></span>
-                                        <span class="label-text">Đa Môn</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Chọn Ngày -->
-                        <div class="filter-section" data-intro="Bạn có thể chọn ngày bạn muốn chơi" data-step="7">
-                            <button class="filter-header"
-                                    data-target="date-filter"
-                                    type="button"
-                                    aria-expanded="true"
-                                    aria-controls="date-filter">
-                                <h4 class="filter-title">Chọn Ngày</h4>
-                                <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
-                            </button>
-                            <div class="filter-content active" id="date-filter">
-                                <div class="date-input-wrapper">
-                                    <i class="ri-calendar-line" aria-hidden="true"></i>
-                                    <input type="date"
-                                           name="date"
-                                           class="date-input"
-                                           id="play-date-filter"
-                                           aria-label="Chọn ngày chơi">
-                                </div>
-                                <div class="quick-date-options">
-                                    <button type="button" class="quick-date-btn" data-days="0">Hôm nay</button>
-                                    <button type="button" class="quick-date-btn" data-days="1">Mai</button>
-                                    <button type="button" class="quick-date-btn" data-days="7">Tuần sau</button>
-                                    <button type="button" class="quick-date-btn" data-days="30">Tháng sau</button>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Thời Gian -->
                         <div class="filter-section" data-intro="Chọn thời gian bạn muốn chơi" data-step="8">
@@ -530,11 +498,13 @@
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
                             <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
+                                <p class="text-red-500" id="time-error-message"></p>
                                 <div class="time-grid">
                                     <label for="startTime" class="range-label">Từ:</label>
-                                    <input type="time" class="time-slot" name="startTime" id="startTime" value="" />
+                                    <select class="time-slot" name="startTime" id="startTime"></select>
+
                                     <label for="endTime" class="range-label">Đến:</label>
-                                    <input type="time" class="time-slot" name="endTime" id="endTime" value="" />
+                                    <select class="time-slot" name="endTime" id="endTime"></select>
                                 </div>
                             </div>
                         </div>
@@ -555,7 +525,7 @@
                                            name="price"
                                            min="0"
                                            max="500000"
-                                           value="250000"
+                                           value="500000"
                                            step="10000"
                                            class="range-slider"
                                            id="price-range-slider"
@@ -593,15 +563,7 @@
                                         <i class="ri-close-line" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="popular-locations">
-                                    <h5 class="popular-title">Địa điểm phổ biến:</h5>
-                                    <div class="location-tags">
-                                        <button type="button" class="location-tag" data-location="Quận 1">Quận 1</button>
-                                        <button type="button" class="location-tag" data-location="Quận 3">Quận 3</button>
-                                        <button type="button" class="location-tag" data-location="Quận 7">Quận 7</button>
-                                        <button type="button" class="location-tag" data-location="Thủ Đức">Thủ Đức</button>
-                                    </div>
-                                </div>
+                    
                             </div>
                         </div>
 
@@ -610,10 +572,6 @@
                             <button class="btn btn-primary btn-full" type="submit">
                                 <i class="ri-check-line" aria-hidden="true"></i>
                                 Áp Dụng Bộ Lọc
-                            </button>
-                            <button class="btn btn-secondary btn-outline btn-full" type="reset">
-                                <i class="ri-refresh-line" aria-hidden="true"></i>
-                                Đặt Lại
                             </button>
                         </div>
                     </aside>
@@ -695,7 +653,7 @@
                                                function showLoading(){
                             $('#loading-state').show();
                             $('#stadium-grid').hide();
-                            // $('#empty-state').hide();
+                            $('#empty-state').hide();
                             $('#loadMoreBtn').hide();
 
                         }
@@ -752,27 +710,32 @@
                             .replace(/đ/g, 'd').replace(/Đ/g, 'D');
                         }
                                                 // Get the form element
-                                                                      $(document).ready(function() {
-                            //load stadium gird 
+                                                $(document).ready(function() {
+                            //load stadium gird
                             showLoading();
 
                             //search
                             performSearch();
 
-                                                 $('#mobile-filter-btn').on('click', function() {
+                                                   // Đóng mở sidebar
+                        $('#mobile-filter-btn').on('click', function() {
                             $('#filter-sidebar').addClass('active');
+                            $('body').addClass('filter-open'); // Thêm class vào body
+                            // Các dòng ẩn header/footer của bạn vẫn giữ nguyên
                             $('#footer').addClass('hidden');
                             $('#header-mobile').addClass('hidden');
-                                                $('#main-body').addClass('aria-hidden', 'false');
+                            $('#main-body').attr('aria-hidden', 'true'); // Sửa lại: dùng attr() và giá trị 'true'
                             $('#nav-mobile').addClass('hidden');
                         });
 
                         // Đóng sidebar với nút close
                         $('#close-filter').on('click', function() {
                             $('#filter-sidebar').removeClass('active');
+                            $('body').removeClass('filter-open'); // Xóa class khỏi body
+                            // Hiện lại header/footer
                             $('#footer').removeClass('hidden');
                             $('#header-mobile').removeClass('hidden');
-                                                $('#main-body').removeClass('aria-hidden', 'false');
+                            $('#main-body').attr('aria-hidden', 'false');
                             $('#nav-mobile').removeClass('hidden');
                         });
                             sessionStorage.setItem('searchTerm', "");
@@ -784,6 +747,7 @@
                             const form = $('#filter-form');
                             form.on('submit', function(e) {
                                 e.preventDefault();
+                                $('#time-erro-message').text(''); // Xóa thông báo lỗi cũ
 
                                 let filters = [];
 
@@ -808,65 +772,102 @@
                                     priceFilter = `c/PricePerHour le ${price}`;
                                 }
 
-                                // Date (Court.AvailableDates)
-                                let date = this.querySelector('input[name="date"]').value;
-                                let dateFilter = "";
-                                if (date) {
-                                    dateFilter = `c/AvailableDates/any(d: d eq '${date}')`;
-                                }
 
                                 // Gom tất cả điều kiện Courts vào 1 any (KHÔNG filter OpenTime/CloseTime ở đây!)
-                                let courtsConditions = [sportTypeFilter, priceFilter, dateFilter].filter(Boolean);
+                                let courtsConditions = [sportTypeFilter, priceFilter].filter(Boolean); // Bỏ dateFilter nếu không có
                                 if (courtsConditions.length > 0) {
                                     filters.push(`Courts/any(c: ${courtsConditions.join(" and ")})`);
                                 }
 
-                                // Thời gian filter theo Stadium.OpenTime/CloseTime
-                                let startTime = this.querySelector('input[name="startTime"]').value;
-                                let endTime = this.querySelector('input[name="endTime"]').value;
-                                if (startTime && endTime) {
-                                    let [sh, sm] = startTime.split(":").map(Number);
-                                    let [eh, em] = endTime.split(":").map(Number);
-                                    let startDuration = `duration'PT${sh}H${sm || 0}M'`;
-                                    let endDuration = `duration'PT${eh}H${em || 0}M'`;
-                                    filters.push(`OpenTime le ${startDuration} and CloseTime ge ${endDuration}`);
-                                }
+
+
+
+                                             // Lấy giá trị từ các phần tử <select> trong bộ lọc
+                        let startTime = document.getElementById('startTime').value; // Ví dụ: "10:30"
+                        let endTime = document.getElementById('endTime').value;   // Ví dụ: "18:00"
+
+                        // Lấy phần tử hiển thị lỗi
+                        const timeErrorElement = document.getElementById('time-error-message');
+
+                        if (startTime && endTime) {
+                            // ---- LOGIC SO SÁNH THỜI GIAN ----
+                            // So sánh trực tiếp chuỗi 'HH:mm'. Cách này đơn giản và chính xác
+                            // miễn là khoảng thời gian không đi qua nửa đêm (ví dụ: 22:00 đến 02:00).
+                            // Trường hợp đặc biệt: endTime là "00:00" được coi là cuối ngày (giờ 24), nên hợp lệ.
+                            if (startTime >= endTime && endTime !== "00:00") {
+                                timeErrorElement.textContent = 'Giờ kết thúc phải sau giờ bắt đầu.';
+                                return; // Dừng thực thi nếu có lỗi
+                            }
+
+                            // Xóa thông báo lỗi nếu thời gian hợp lệ
+                            timeErrorElement.textContent = '';
+
+                            // Tách giờ và phút
+                            let [sh, sm] = startTime.split(":").map(Number);
+                            let [eh, em] = endTime.split(":").map(Number);
+
+                            // Logic đặc biệt: Nếu endTime là "00:00", coi nó là giờ thứ 24 (kết thúc ngày).
+                            if (endTime === "00:00") {
+                                eh = 24;
+                                em = 0;
+                            }
+
+                            console.log(`Thời gian bắt đầu: ${sh}h${sm}m - Thời gian kết thúc (diễn giải): ${eh}h${em}m`);
+
+                            // Tạo chuỗi duration theo chuẩn ISO 8601 để filter
+                            // Ví dụ: PT10H30M
+                            let startDuration = `duration'PT${sh}H${sm || 0}M'`;
+                            let endDuration = `duration'PT${eh}H${em || 0}M'`;
+
+                            // Logic filter của bạn:
+                            // Tìm các địa điểm có giờ mở cửa (OpenTime) trước hoặc bằng `startTime`
+                            // VÀ giờ đóng cửa (CloseTime) sau hoặc bằng `endTime`.
+                            filters.push(`OpenTime le ${startDuration} and CloseTime ge ${endDuration}`);
+
+                        } else if (startTime || endTime) {
+                            // Xử lý trường hợp chỉ nhập 1 trong 2
+                            timeErrorElement.textContent = 'Vui lòng nhập cả giờ bắt đầu và kết thúc.';
+                            return; // Dừng thực thi
+                        } else {
+                            // Xóa thông báo lỗi nếu không có giờ nào được nhập
+                            timeErrorElement.textContent = '';
+                        }
 
                                 // Nối filter
                                 let filterString = filters.join(" and ");
                                 let finalUrl = filterString ? "&$filter=" + encodeURIComponent(filterString) : "";
                                 skip = 0;
                                 console.log(finalUrl);
-                                                    let searchName = sessionStorage.getItem('searchName') || "";
-                                if(searchName.length > 0){
-                                                        sessionStorage.setItem('searchTerm', finalUrl += ` and contains(Name,'${searchName}')`); // Lưu search term vào sessionStorage
-                                }else{
-                                  sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
+                                let searchName = sessionStorage.getItem('searchName') || "";
+                                if (searchName.length > 0) {
+                                    sessionStorage.setItem('searchTerm', finalUrl += ` and contains(Name,'${searchName}')`); // Lưu search term vào sessionStorage
+                                } else {
+                                    sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
 
                                 }
-                                                    showLoading();
+                                showLoading();
                                 displayList(finalUrl, top, skip);
 
                             });
 
-                            $('#loadMoreBtn').on("click", function () {
+                            $('#loadMoreBtn').on("click", function() {
                                 showLoadMore();
                                 var count = sessionStorage.getItem('stadiumCount') || 0;
                                 var url = sessionStorage.getItem('searchTerm') || "";
                                 var minTop = 0;
                                 skip += 10;
 
-                                if (skip + 10 > count ){
+                                if (skip + 10 > count) {
                                     minTop = skip - count; // Giảm top nếu vượt quá số lượng
                                     $('#loadMoreBtn').hide();
-                                }else if(skip === count){
+                                } else if (skip === count) {
                                     $('#loadMoreBtn').hide();
                                 }
 
                                 displayList(url, top - minTop, skip);
                             });
                         });
-
+                             
                             // You can now use formData object to process or send the data
 
 
@@ -876,10 +877,10 @@
                         function displayList(searchTerm, top, skip){
                             let url;
                             if(searchTerm <= 0 || searchTerm === null){
-                               url = searchTerm += "&$filter=IsApproved eq true and IsLocked eq false ";
+                               url = searchTerm;
                             }
                             else{
-                               url = searchTerm += " and IsApproved eq true and IsLocked eq false ";
+                               url = searchTerm += " and Courts/any()";
                             }
                             var searchUrl = url + `&$top=${top}&$skip=${skip}`;
                             console.log(searchUrl);
@@ -890,14 +891,16 @@
                             data: {searchTerm: searchUrl},
                             success: function (data) {
                                 let count = data["@@odata.count"];
-                                if(count <= 0){
+                                if(data.value.length <= 0) {
                                     hideLoading();
+                                                        $('#stadium-grid').empty().hide();
                                      $('#stadium-grid').html(`
-        <div class="no-stadium-found">
+                            <div class="no-stadium-found " style="width:100%;height:100%;">
             <img src="https://cdn-icons-png.flaticon.com/512/2748/2748558.png" alt="Not found" style="width:64px;height:64px;opacity:0.7;">
             <div>Không tìm thấy sân nào phù hợp.</div>
         </div>
     `).show();
+    return;
                                 }
                                 
                                 sessionStorage.setItem('stadiumCount', count); // Lưu số lượng sân vào sessionStorage
@@ -927,11 +930,26 @@
                                             }).format(price);
                                             let address = item.Address ?? '';
 
+                                                                let bg = '';
+                                                                let btn = '';
+                                                                if(item.IsApproved == true && item.IsLocked == false){
+                                                                                        bg = 'bg-white';
+                                                                                                            btn = `<button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                                                                onclick="redirectToBooking('${item.Id}')">
+                                                            Đặt ngay
+                                                        </button>`;
+                                                                                    }else if(item.IsApproved == false && item.IsLocked == false){
+                                                                                                            bg = 'bg-orange-50 disable';
+                                                                                                            btn = `<h3 class="p-3">Sân chưa thể đặt</h3>`
+                                                                }else if(item.IsApproved == true && item.IsLocked == true){
+                                                                                                            bg = 'bg-red-50 disable';
+                                                                                                            btn = `<h3 class="p-3">Sân đã bị khoá</h3>`
+                                                                }
                                             // HTML card
                                             html += `
-                        <div id="stadium-${item.Id}" class="card-content bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div id="stadium-${item.Id}" class="card-content ${bg} rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="relative h-48">
-                                <img src="https://localhost:7280/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
+                                <img src="https://localhost:7136/img/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
                                 <!-- Favorite Button -->
                                 <div class="absolute top-3 left-3 ">
@@ -983,10 +1001,7 @@
                                     <div class="text-2xl font-bold text-blue-600 notranslate">
                                         ${formattedPrice}<span class="text-sm font-normal text-gray-500">/giờ</span>
                                     </div>
-                                    <button class="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
-                                            onclick="redirectToBooking('${item.Id}')">
-                                        Đặt ngay
-                                    </button>
+                                    ${btn}
                                 </div>
                             </div>
                         </div>`;
@@ -1076,6 +1091,14 @@
                         <button class="btn btn-secondary" onclick="getCurrentLocation()" title="Quay lại vị trí hiện tại">📍 Vị trí hiện tại</button>
                     </div>
                 </div>
+                @* thông báo khi search mà không có kết quả *@
+                <div id="empty-state">
+                    <div  class="hidden flex flex-col items-center justify-center py-10" aria-live="polite">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2748/2748558.png" alt="Not found" style="width:64px;height:64px;opacity:0.7;">
+                        <div class="mt-4 text-gray-600">Không tìm thấy sân nào phù hợp.</div>
+                    </div>
+                </div>
+
                 <div id="favorite-container" class="hidden bg-white rounded-lg shadow-sm overflow-hidden relative map-container">
                     <div id="favorite-list"  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
                 </div>
@@ -1088,8 +1111,8 @@
                 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
                 <div class="text-center mt-8">
-                    <button id="loadMoreBtn" class="bg-white text-primary border-2 border-primary px-8 py-3 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
-                        Load More Stadiums
+                    <button id="loadMoreBtn" class="rounded-2xl bg-white text-primary border-2 border-primary px-8 py-3 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
+                        Tải thêm
                     </button>
                 </div>
             </div>
