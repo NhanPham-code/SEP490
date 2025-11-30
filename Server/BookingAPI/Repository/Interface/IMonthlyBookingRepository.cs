@@ -7,5 +7,7 @@ namespace BookingAPI.Repository.Interface
         Task<MonthlyBooking> CreateMonthlyBookingAsync(MonthlyBooking monthlyBooking);
         IQueryable<MonthlyBooking> GetAllMonthlyBookingsAsQueryable();
         Task<MonthlyBooking> UpdateMonthlyBookingAsync(MonthlyBooking monthlyBooking);
+
+        Task<MonthlyBooking?> GetMonthlyBookingWithChildrenAsync(int id);
     }
 }

@@ -72,13 +72,45 @@
                 color: #374151;
             }
 
-            .form-group select, .form-group input {
+            .form-group select, .form-group input[type="text"], .form-group input[type="date"], .form-group textarea {
                 width: 100%;
                 padding: 0.75rem 1rem;
                 border: 1px solid #d1d5db;
                 border-radius: 0.375rem;
                 font-size: 1rem;
             }
+
+        /* Customer Toggle Styles */
+        .customer-toggle-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+            .toggle-option input {
+                width: 1.25rem;
+                height: 1.25rem;
+                margin-right: 0.5rem;
+                cursor: pointer;
+            }
+
+            .toggle-option span {
+                font-weight: 500;
+                color: #374151;
+            }
+
+        /* Walk-in customer inputs */
+        .walkin-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
         #booking-visual-section {
             display: none;
@@ -121,6 +153,7 @@
             color: #6b7280;
         }
 
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -287,13 +320,37 @@
                     }
                 </select>
             </div>
+
             <div class="form-group">
-                <label for="customer-search">2. Thông tin khách hàng (để trống cho khách vãng lai)</label>
-                <div class="customer-info-group">
-                    <input type="text" id="customer-search" placeholder="Tìm kiếm theo SĐT hoặc Email..." autocomplete="off">
-                    <div id="user-search-results" style="display: none;"></div>
+                <label>2. Loại khách hàng</label>
+                <div class="customer-toggle-group">
+                    <label class="toggle-option">
+                        <input type="radio" name="customerType" value="system" checked>
+                        <span>Khách thành viên</span>
+                    </label>
+                    <label class="toggle-option">
+                        <input type="radio" name="customerType" value="walkin">
+                        <span>Khách vãng lai</span>
+                    </label>
                 </div>
-                <input type="text" id="customer-name-display" placeholder="Khách vãng lai" class="mt-2" disabled style="font-weight: bold; background: #e9ecef;">
+
+                <!-- KHUNG TÌM KIẾM KHÁCH HỆ THỐNG -->
+                <div id="system-customer-section">
+                    <div class="customer-info-group">
+                        <input type="text" id="customer-search" placeholder="Tìm kiếm theo SĐT hoặc Email..." autocomplete="off">
+                        <div id="user-search-results" style="display: none;"></div>
+                    </div>
+                    <input type="text" id="customer-name-display" placeholder="Chưa chọn khách hàng" class="mt-2" disabled style="font-weight: bold; background: #e9ecef;">
+                </div>
+
+                <!-- KHUNG GHI CHÚ KHÁCH VÃNG LAI -->
+                <div id="walkin-customer-section" style="display: none;" class="walkin-inputs">
+                    <div>
+                        <label for="walkin-note" style="font-size: 0.9rem; color: #6b7280; margin-bottom: 0.25rem;">Ghi chú thông tin khách (Tên, SĐT...)</label>
+                        <textarea id="walkin-note" rows="3" placeholder="VD: Anh Hùng - 0912345678 - Đặt cọc 50k"></textarea>
+                    </div>
+                    <p class="text-xs text-gray-500 italic">*Thông tin này sẽ được lưu vào Ghi chú của đơn đặt sân.</p>
+                </div>
             </div>
         </div>
 
@@ -337,7 +394,10 @@
                 <input type="hidden" name="OriginalPrice" id="form-original-price" />
                 <input type="hidden" name="UserId" id="form-user-id" />
                 <input type="hidden" name="Status" value="accepted" />
+
+                <!-- Trường Note duy nhất để lưu thông tin -->
                 <input type="hidden" name="Note" id="form-note" />
+
                 <div id="booking-details-container"></div>
                 <div class="text-center mb-12 mt-8">
                     <button type="button" id="continue-button" disabled class="continue-btn w-full md:w-auto px-16 py-4 rounded-2xl font-bold text-white text-lg transition-all duration-300 shadow-xl cursor-not-allowed relative overflow-hidden">
@@ -364,6 +424,10 @@
         </div>
         <div class="modal-body">
             <div class="summary-line"><span class="summary-label">Khách hàng:</span><span class="summary-value" id="modal-customer-name"></span></div>
+            <div class="summary-line" id="modal-note-row" style="display:none;">
+                <span class="summary-label">Ghi chú:</span>
+                <span class="summary-value" id="modal-note-display" style="font-weight: 400; font-style: italic; max-width: 200px; text-align: right;"></span>
+            </div>
             <div class="summary-line"><span class="summary-label">Sân vận động:</span><span class="summary-value" id="modal-stadium-name"></span></div>
             <hr style="margin: 0.5rem 0;" />
             <div class="summary-line"><span class="summary-label">Ngày đặt:</span><span class="summary-value" id="modal-date"></span></div>

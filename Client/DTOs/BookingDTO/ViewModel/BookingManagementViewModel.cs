@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DTOs.DiscountDTO;
 using DTOs.UserDTO;
 
 namespace DTOs.BookingDTO.ViewModel
@@ -12,6 +13,7 @@ namespace DTOs.BookingDTO.ViewModel
     {
         public BookingReadDto Booking { get; set; } = new BookingReadDto();
         public PublicUserProfileDTO User { get; set; } = new PublicUserProfileDTO();
+        public ReadDiscountDTO? Discount { get; set; } 
     }
 
     // ViewModel mới cho MonthlyBooking, chứa cả thông tin User và các booking con cũng có User
@@ -20,6 +22,7 @@ namespace DTOs.BookingDTO.ViewModel
         public MonthlyBookingReadDto MonthlyBooking { get; set; } = new MonthlyBookingReadDto();
         public List<BookingReadDto> Bookings { get; set; } = new List<BookingReadDto>();
         public PublicUserProfileDTO User { get; set; } = new PublicUserProfileDTO();
+        public ReadDiscountDTO? Discount { get; set; } 
     }
 
     // ViewModel chính cho trang
@@ -33,7 +36,7 @@ namespace DTOs.BookingDTO.ViewModel
         public int Id { get; set; }
         public int BookingId { get; set; }
         public int CourtId { get; set; }
-        public string CourtName { get; set; } // <-- DỮ LIỆU MỚI QUAN TRỌNG
+        public string CourtName { get; set; } 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }

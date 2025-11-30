@@ -1,6 +1,6 @@
 ﻿// --- KHỞI TẠO BIẾN TOÀN CỤC ---
 let stadiumId = null;
-let selectedUserId = null; // Sẽ là null cho khách vãng lai, hoặc một số cho user đã chọn
+let selectedUserId = null;
 let openTime;
 let closeTime;
 let date = null;
@@ -14,7 +14,7 @@ const selectedCourts = new Map();
 // --- ĐIỂM KHỞI ĐẦU LOGIC CỦA TRANG (DOCUMENT READY) ---
 $(document).ready(function () {
 
-    // 1. LOGIC CHO PHẦN SETUP BAN ĐẦU
+    // 1. SETUP BAN ĐẦU
     $('#stadium-select').on('change', function () {
         stadiumId = $(this).val();
         if (stadiumId) {
@@ -27,7 +27,39 @@ $(document).ready(function () {
         }
     });
 
-    // 2. LOGIC TÌM KIẾM KHÁCH HÀNG
+    // 2. LOGIC CHUYỂN ĐỔI CHẾ ĐỘ KHÁCH HÀNG
+    $('input[name="customerType"]').on('change', function () {
+        const mode = $(this).val();
+
+        if (mode === 'system') {
+            $('#system-customer-section').show();
+            $('#walkin-customer-section').hide();
+
+            // Reset data khách vãng lai
+            $('#walkin-note').val('');
+
+            // Khôi phục ID nếu đã chọn trước đó
+            if (selectedUserId) {
+                $('#form-user-id').val(selectedUserId);
+            } else {
+                $('#form-user-id').val('');
+            }
+        } else {
+            $('#system-customer-section').hide();
+            $('#walkin-customer-section').show();
+
+            // Reset search box
+            $('#customer-search').val('');
+            $('#user-search-results').hide();
+
+            // Set ID về 0 cho khách vãng lai
+            selectedUserId = null;
+            $('#customer-name-display').val('');
+            $('#form-user-id').val('0');
+        }
+    });
+
+    // 3. LOGIC TÌM KIẾM KHÁCH HÀNG (HỆ THỐNG)
     $('#customer-search').on('keyup', function () {
         const query = $(this).val();
         clearTimeout(searchTimeout);
@@ -36,8 +68,8 @@ $(document).ready(function () {
             $('#user-search-results').hide().empty();
             if (query.length === 0) {
                 selectedUserId = null;
-                $('#customer-name-display').val('Khách vãng lai');
-                $('#form-user-id').val('0'); // Gửi 0 cho khách vãng lai
+                $('#customer-name-display').val('Chưa chọn khách hàng');
+                $('#form-user-id').val('');
             }
             return;
         }
@@ -81,7 +113,7 @@ $(document).ready(function () {
         }
     });
 
-    // 3. LOGIC CHO LỊCH ĐẶT TRỰC QUAN
+    // 4. LOGIC CHO LỊCH ĐẶT TRỰC QUAN
     $(document).on("change", "#date-picker", function () {
         date = $(this).val();
         selectedCourts.clear();
@@ -102,7 +134,6 @@ $(document).ready(function () {
             const courtId = $this.data('court');
             const isSelected = $this.hasClass('selected');
 
-            // Cập nhật danh sách các sân được chọn
             if (isSelected) {
                 if (!selectedCourts.has(timeId)) selectedCourts.set(timeId, []);
                 selectedCourts.get(timeId).push(courtId);
@@ -115,7 +146,6 @@ $(document).ready(function () {
                 }
             }
 
-            // Xử lý logic cho các sân liên quan
             const relatedCourtIds = courtRelations.get(courtId) || [];
             relatedCourtIds.forEach(relatedId => {
                 const $relatedCell = $(`.grid-cell[data-court="${relatedId}"][data-time="${timeId}"]`);
@@ -138,9 +168,25 @@ $(document).ready(function () {
         }
     });
 
-    // 4. LOGIC CHO MODAL XÁC NHẬN VÀ SUBMIT FORM
+    // 5. MODAL VÀ SUBMIT
     $('#continue-button').on('click', function (e) {
         e.preventDefault();
+
+        // Validate
+        const mode = $('input[name="customerType"]:checked').val();
+        if (mode === 'walkin') {
+            const wNote = $('#walkin-note').val().trim();
+            if (!wNote) {
+                alert("Vui lòng nhập thông tin khách hàng (Tên, SĐT...) vào ô ghi chú.");
+                return;
+            }
+        } else {
+            if (!selectedUserId) {
+                alert("Vui lòng chọn một khách hàng thành viên từ hệ thống.");
+                return;
+            }
+        }
+
         populateAndShowConfirmationModal();
     });
 
@@ -158,12 +204,12 @@ $(document).ready(function () {
         }
     });
 
-    // Khởi tạo ngày về hôm nay
     forceResetToToday();
 });
 
-// --- CÁC HÀM XỬ LÝ GIAO DIỆN (UI) ---
-
+// --- CÁC HÀM HELPER --- (Giữ nguyên các hàm fetch, render, updateStats như cũ)
+// ... (Phần này giống hệt phiên bản trước, tôi sẽ không lặp lại để tiết kiệm không gian,
+// nhưng bạn hãy đảm bảo giữ lại các hàm fetchStadiumData, fetchBookedCourts, renderSchedule..., updateStats)
 async function updateUI() {
     if (!stadiumId) return;
     await fetchBookedCourts(stadiumId, date);
@@ -504,7 +550,8 @@ function updateBordersForCell($cell) {
     // Hiện tại không có logic, để trống
 }
 
-// --- CÁC HÀM SUBMIT VÀ HIỂN THỊ MODAL ---
+
+// --- MODAL VÀ SUBMIT FORM ---
 
 function populateAndShowConfirmationModal() {
     const courtsForCheckout = getSelectedCourtsGrouped();
@@ -512,7 +559,22 @@ function populateAndShowConfirmationModal() {
     const totalHours = getSelectedCourtsWithTimes().length;
     const courtNames = [...new Set(courtsForCheckout.map(c => getCourtNameById(c.courtId)))].join(', ');
 
-    $('#modal-customer-name').text($('#customer-name-display').val());
+    const mode = $('input[name="customerType"]:checked').val();
+    let customerDisplay = "";
+    let noteDisplay = "";
+
+    if (mode === 'walkin') {
+        customerDisplay = "Khách vãng lai";
+        noteDisplay = $('#walkin-note').val();
+        $('#modal-note-row').show();
+        $('#modal-note-display').text(noteDisplay);
+    } else {
+        customerDisplay = $('#customer-name-display').val();
+        $('#modal-note-row').hide();
+        $('#modal-note-display').text('');
+    }
+
+    $('#modal-customer-name').text(customerDisplay);
     $('#modal-stadium-name').text(stadiumData.Name);
     $('#modal-date').text(new Date($('#date-picker').val()).toLocaleDateString('vi-VN'));
     $('#modal-courts').text(courtNames);
@@ -526,12 +588,23 @@ function submitOwnerBookingForm() {
     const dateValue = $("#date-picker").val();
     const courtsForCheckout = getSelectedCourtsGrouped();
     const totalPrice = calculateTotalPrice(courtsForCheckout);
+    const mode = $('input[name="customerType"]:checked').val();
 
     $("#form-stadium-id").val(stadiumId);
     $("#form-date").val(dateValue);
     $("#form-total-price").val(totalPrice);
     $("#form-original-price").val(totalPrice);
-    $("#form-user-id").val(selectedUserId || '0');
+
+    // XỬ LÝ NOTE VÀ USER ID
+    if (mode === 'walkin') {
+        $("#form-user-id").val('0'); // Khách vãng lai
+        // Lấy nội dung từ textarea và gán vào input hidden "Note"
+        const walkinInfo = $('#walkin-note').val();
+        $("#form-note").val("[Vãng Lai] " + walkinInfo);
+    } else {
+        $("#form-user-id").val(selectedUserId);
+        $("#form-note").val("Đặt bởi chủ sân cho thành viên");
+    }
 
     const detailsContainer = $('#booking-details-container');
     detailsContainer.empty();

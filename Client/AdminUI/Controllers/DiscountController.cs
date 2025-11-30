@@ -11,7 +11,6 @@ using DTOs.UserDTO;
 using StadiumManagerUI.Helpers;
 using System;
 
-
 namespace AdminUI.Controllers
 {
     public class DiscountController : Controller
@@ -39,7 +38,12 @@ namespace AdminUI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDiscountPageData(int page = 1, int pageSize = 5, string? searchByCode = null, int? stadiumId = null, bool? isActive = null)
+        public async Task<IActionResult> GetDiscountPageData(
+            int page = 1,
+            int pageSize = 5,
+            string? searchByCode = null,
+            int? stadiumId = null,
+            bool? isActive = null)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(accessToken))
@@ -47,16 +51,16 @@ namespace AdminUI.Controllers
                 return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
             }
 
-            // Lấy tất cả discount (không lọc theo user)
-            // Giả sử service có phương thức GetAllDiscountsAsync hỗ trợ OData
-            var discountsResponse = await _discountService.GetDiscountsByUserAsync(
+            // ✅ Dùng hàm mới GetDiscountsAsync
+            // Admin: không filter theo userId (lấy tất cả discounts)
+            var discountsResponse = await _discountService.GetDiscountsAsync(
                 accessToken,
-                null,
-                page,
-                pageSize,
-                searchByCode,
-                stadiumId,
-                isActive
+                userId: null,  // Admin xem tất cả
+                page: page,
+                pageSize: pageSize,
+                searchByCode: searchByCode,
+                stadiumIds: stadiumId.HasValue ? new List<int> { stadiumId.Value } : null,
+                isActive: isActive
             );
 
             var discounts = discountsResponse?.Value ?? new List<ReadDiscountDTO>();
@@ -69,9 +73,8 @@ namespace AdminUI.Controllers
                 .ToList();
 
             userIdsToFetch.AddRange(discounts
-            .Where(d => d.UserId.HasValue)
-            .Select(d => d.UserId.Value));
-
+                .Where(d => d.UserId.HasValue)
+                .Select(d => d.UserId.Value));
 
             userIdsToFetch = userIdsToFetch.Distinct().ToList();
 
@@ -82,7 +85,7 @@ namespace AdminUI.Controllers
             }
 
             // Lấy tất cả sân vận động để lọc
-            var stadiumsJson  = await _stadiumService.SearchStadiumAsync(""); ; // Lấy tất cả
+            var stadiumsJson = await _stadiumService.SearchStadiumAsync("");
             var stadiums = new List<ReadStadiumDTO>();
             if (!string.IsNullOrEmpty(stadiumsJson))
             {
@@ -94,7 +97,8 @@ namespace AdminUI.Controllers
                     {
                         if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement))
                         {
-                            stadiums = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(valueElement.GetRawText(), options) ?? new List<ReadStadiumDTO>();
+                            stadiums = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(valueElement.GetRawText(), options)
+                                ?? new List<ReadStadiumDTO>();
                         }
                     }
                 }
@@ -104,7 +108,6 @@ namespace AdminUI.Controllers
                 }
             }
 
-            // Trả về dữ liệu cho view
             return Json(new { discounts, stadiums, users, count = totalCount });
         }
     }
