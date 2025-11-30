@@ -79,6 +79,28 @@ namespace AggregatorPatternAPI.Controllers
                 _logger.LogError(ex, "An error occurred while getting stadium KPI overview.");
                 return StatusCode(500, "An internal server error occurred.");
             }
-        }   
+        }
+
+        [HttpGet("admin-dashboard")]
+        public async Task<IActionResult> GetAdminDashboardOverview()
+        {
+            try
+            {
+                var result = await _aggregatorService.GetAdminDashboardAsync();
+
+                if (result == null) // Có thể trả về null nếu có lỗi
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting admin dashboard overview.");
+                return StatusCode(500, "An internal server error occurred.");
+            }   
+        }
+        
     }
 }

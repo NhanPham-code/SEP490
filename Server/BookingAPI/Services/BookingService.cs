@@ -404,5 +404,10 @@ namespace BookingAPI.Services
         {
             return await _bookingRepository.GetKpiForStadiumsAsync(stadiumIds);
         }
+
+        public async Task<BookingStatisticsDto> GetBookingStatisticsAsync()
+        {
+            return await _bookingRepository.GetBookingStatisticsAsync();
+        }
     }
 }
