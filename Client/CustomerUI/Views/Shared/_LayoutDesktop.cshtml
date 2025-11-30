@@ -1238,7 +1238,46 @@
         });
     })();
 </script>
-    </body>
 
+    <script>
+        // Hàm này sẽ được gọi từ các trang con (như Profile) sau khi update thành công
+        window.refreshHeaderFromSession = function () {
+            console.log('🔄 Đang cập nhật lại Header từ Session...');
 
+            $.ajax({
+                url: '/Common/GetUserHeaderInfo', // Gọi về Controller để lấy session mới nhất
+                type: 'GET',
+                success: function (data) {
+                    // 1. Cập nhật tất cả các thẻ img hiển thị Avatar người dùng
+                    const avatarElements = document.querySelectorAll('[data-user-avatar]');
+                    const timestamp = new Date().getTime(); // Thêm timestamp để tránh cache trình duyệt
+
+                    avatarElements.forEach(img => {
+                        img.src = data.avatarUrl + '?t=' + timestamp;
+                    });
+
+                    // 2. Cập nhật tên người dùng (Fullname)
+                    const fullnameElements = document.querySelectorAll('[data-user-fullname]');
+                    fullnameElements.forEach(el => {
+                        el.textContent = data.fullName;
+                    });
+
+                    // 3. Cập nhật tên người dùng (Firstname - hiển thị trên thanh header nhỏ)
+                    const firstnameElements = document.querySelectorAll('[data-user-firstname]');
+                    if (data.fullName) {
+                        const firstName = data.fullName.split(' ')[0] || "Người dùng";
+                        firstnameElements.forEach(el => {
+                            el.textContent = firstName;
+                        });
+                    }
+
+                    console.log('✅ Đã cập nhật Header thành công:', data);
+                },
+                error: function (err) {
+                    console.error('❌ Lỗi khi cập nhật Header:', err);
+                }
+            });
+        };
+    </script>
+</body>
 </html>
