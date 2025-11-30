@@ -66,21 +66,22 @@ namespace BookingAPI.Services
             var existingBooking = await _bookingRepository.GetBookingByIdAsync(id);
             if (existingBooking == null) return null;
 
+            // Lưu trạng thái cũ để so sánh
+            var oldStatus = existingBooking.Status;
+
             _mapper.Map(bookingUpdateDto, existingBooking);
 
-            // Update booking details
-            /*            existingBooking.BookingDetails.Clear();
-                        foreach (var detailDto in bookingUpdateDto.BookingDetails)
-                        {
-                            var bookingDetail = _mapper.Map<BookingDetail>(detailDto);
-                            bookingDetail.BookingId = id;
-                            existingBooking.BookingDetails.Add(bookingDetail);
-                        }*/
-
             var updatedBooking = await _bookingRepository.UpdateBookingAsync(existingBooking);
+
+            // Nếu trạng thái mới là completed và trạng thái cũ không phải completed
+            // thì kiểm tra MonthlyBooking
+            if (updatedBooking.Status == "completed" && oldStatus != "completed" && updatedBooking.MonthlyBookingId.HasValue)
+            {
+                await CheckAndCompleteMonthlyBookingAsync(updatedBooking.MonthlyBookingId.Value);
+            }
+
             return _mapper.Map<BookingUpdateDto>(updatedBooking);
         }
-
         public async Task<bool> DeleteBookingAsync(int id)
         {
             return await _bookingRepository.DeleteBookingAsync(id);
@@ -223,9 +224,7 @@ namespace BookingAPI.Services
         public async Task AutoCompleteBookingsAsync()
         {
             Console.WriteLine("Bắt đầu chuyển cập nhật trạng thái completed");
-
             var now = DateTime.UtcNow;
-
 
             var bookingsToComplete = await _bookingRepository.GetAllBookingsAsQueryable()
                 .Where(b => b.Status == "accepted" && b.BookingDetails.Any(bd => bd.EndTime < now))
@@ -249,6 +248,12 @@ namespace BookingAPI.Services
                 {
                     await _bookingRepository.UpdateBookingAsync(booking);
                     completedCount++;
+
+                    // --- LOGIC MỚI: Kiểm tra Monthly Booking ---
+                    if (booking.MonthlyBookingId.HasValue)
+                    {
+                        await CheckAndCompleteMonthlyBookingAsync(booking.MonthlyBookingId.Value);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -261,6 +266,48 @@ namespace BookingAPI.Services
                 Console.WriteLine($" Cập nhật thành công {completedCount} booking");
             }
         }
+
+        // --- HÀM HELPER MỚI ĐỂ KIỂM TRA VÀ COMPLETE MONTHLY BOOKING ---
+        private async Task CheckAndCompleteMonthlyBookingAsync(int monthlyBookingId)
+        {
+            try
+            {
+                // 1. Lấy MonthlyBooking cùng với tất cả Booking con
+                var monthlyBooking = await _monthlyBookingRepository.GetMonthlyBookingWithChildrenAsync(monthlyBookingId);
+
+                if (monthlyBooking == null) return;
+
+                // Nếu trạng thái đã là completed hoặc cancelled thì không cần làm gì
+                if (monthlyBooking.Status == "completed" || monthlyBooking.Status == "cancelled") return;
+
+                // 2. Kiểm tra xem tất cả Booking con đã completed chưa
+                // (Status == "completed" hoặc "cancelled" - tùy thuộc vào logic nghiệp vụ của bạn. 
+                // Ở đây giả sử phải completed hết mới tính là completed tháng, hoặc nếu có cái cancel thì tháng vẫn tính là completed khi các cái còn lại xong?)
+                // Logic ở đây: Nếu KHÔNG CÒN booking nào ở trạng thái pending/accepted/waiting -> Tức là đã xong hết (completed hoặc bị hủy).
+
+                bool allChildrenFinished = !monthlyBooking.Bookings.Any(b =>
+                    b.Status == "pending" ||
+                    b.Status == "accepted" ||
+                    b.Status == "waiting"
+                );
+
+                // Hoặc logic chặt chẽ hơn: TẤT CẢ phải là completed
+                // bool allChildrenCompleted = monthlyBooking.Bookings.All(b => b.Status == "completed");
+
+                if (allChildrenFinished)
+                {
+                    // 3. Cập nhật trạng thái MonthlyBooking
+                    monthlyBooking.Status = "completed";
+                    await _monthlyBookingRepository.UpdateMonthlyBookingAsync(monthlyBooking);
+                    Console.WriteLine($"[System] MonthlyBooking {monthlyBookingId} has been marked as COMPLETED.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking monthly booking completion: {ex.Message}");
+            }
+        }
+
 
         public async Task<RevenueStatisticDto> GetRevenueStatisticsAsync(int year, int? month, int? day, IEnumerable<int>? stadiumIds = null)
         {

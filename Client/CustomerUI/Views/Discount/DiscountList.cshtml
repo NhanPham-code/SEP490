@@ -1,0 +1,414 @@
+﻿@{
+    ViewData["Title"] = "Khuyến mãi của bạn";
+}
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .my-discounts-page {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            padding: 2rem 1rem;
+            min-height: 80vh;
+        }
+
+        .container-md {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #4f46e5;
+        }
+
+        .tabs-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+            .tab-btn:hover {
+                color: #4f46e5;
+                background-color: #eef2ff;
+            }
+
+            .tab-btn.active {
+                color: #4f46e5;
+                border-bottom-color: #4f46e5;
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        /* ===== CSS CHO GRID (ĐÃ SỬA ĐỂ CĂN GIỮA) ===== */
+        .discount-grid {
+            display: flex; /* Chuyển sang flexbox */
+            flex-wrap: wrap; /* Cho phép các thẻ tự xuống hàng */
+            justify-content: center; /* Căn giữa các thẻ */
+            gap: 1.5rem;
+        }
+
+        .discount-card {
+            /* Đặt chiều rộng cho thẻ để flexbox hoạt động đúng */
+            width: 100%; /* Mặc định cho mobile */
+            max-width: 250px; /* Đặt chiều rộng tối đa cho thẻ */
+        }
+
+        /* Màn hình nhỏ hơn, thẻ sẽ to hơn một chút */
+        @@media (min-width: 640px) {
+            .discount-card {
+                /* Tính toán chiều rộng để có 2-3 thẻ/hàng */
+                width: calc(50% - 1.5rem);
+            }
+        }
+
+        @@media (min-width: 992px) {
+            .discount-card {
+                /* Tính toán chiều rộng để có 3-4 thẻ/hàng */
+                width: calc(33.33% - 1.5rem);
+            }
+        }
+
+        /* Trên màn hình lớn, mỗi thẻ sẽ có chiều rộng cố định */
+        @@media (min-width: 1400px) {
+            .discount-card {
+                width: calc(20% - 1.5rem); /* 5 thẻ 1 hàng */
+            }
+        }
+
+        .discount-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.07);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all .2s ease;
+        }
+
+            .discount-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.08);
+            }
+
+            .discount-card.expired {
+                filter: grayscale(90%);
+                opacity: .7;
+            }
+
+                .discount-card.expired:hover {
+                    transform: none;
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.07);
+                }
+
+                .discount-card.expired .value {
+                    text-decoration: line-through;
+                }
+
+            .discount-card .card-main {
+                padding: 1rem;
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .discount-card .icon-wrapper {
+                font-size: 1.8rem;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .discount-card.type-unique .icon-wrapper {
+                background-color: #fffbeb;
+                color: #f59e0b;
+            }
+
+            .discount-card.type-stadium .icon-wrapper {
+                background-color: #ecfdf5;
+                color: #10b981;
+            }
+
+            .discount-card .card-details {
+                flex-grow: 1;
+            }
+
+            .discount-card .value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #4f46e5;
+            }
+
+            .discount-card .code {
+                font-size: 1rem;
+                padding: .2rem .5rem;
+                border-radius: 6px;
+                margin-top: .25rem;
+                margin-bottom: .25rem;
+                font-family: 'Courier New', monospace;
+                font-weight: 700;
+                background-color: #f3f4f6;
+                color: #374151;
+                display: inline-block;
+            }
+
+            .discount-card .card-footer {
+                background-color: #f9fafb;
+                padding: .75rem 1rem;
+                border-top: 1px solid #e5e7eb;
+                margin-top: auto;
+            }
+
+        .footer-item {
+            font-size: .8rem;
+            gap: .5rem;
+            display: flex;
+            align-items: center;
+            color: #4b5563;
+        }
+
+            .footer-item + .footer-item {
+                margin-top: .5rem;
+            }
+
+            .footer-item i {
+                color: #9ca3af;
+                width: 14px;
+                text-align: center;
+            }
+
+        .placeholder-message {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1rem;
+            color: #6b7280;
+            background-color: #fff;
+            border-radius: 8px;
+            border: 2px dashed #e5e7eb;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            padding: .5rem 1rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-weight: 500;
+            font-size: .9rem;
+        }
+
+            .pagination-btn:hover:not(:disabled) {
+                background: #eef2ff;
+                color: #4f46e5;
+                border-color: #a5b4fc;
+            }
+
+            .pagination-btn:disabled {
+                opacity: .5;
+                cursor: not-allowed;
+            }
+
+        .page-info {
+            margin: 0 1rem;
+            font-weight: 600;
+            color: #4b5563;
+            font-size: .9rem;
+        }
+    </style>
+</head>
+<!-- HTML và Script giữ nguyên như cũ, không cần thay đổi -->
+
+<div class="my-discounts-page">
+    <div class="container-md">
+        <header class="page-header">
+            <h1 class="page-title">Khuyến mãi của bạn</h1>
+        </header>
+
+        <!-- THANH CHUYỂN TAB -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('personal')">
+                <i class="fas fa-star"></i> Dành riêng cho bạn
+            </button>
+            <button class="tab-btn" onclick="switchTab('stadium')">
+                <i class="fas fa-futbol"></i> Từ sân yêu thích
+            </button>
+        </nav>
+
+        <!-- NỘI DUNG TAB 1: MÃ CÁ NHÂN -->
+        <div id="personal-tab" class="tab-content active">
+            <div class="discount-grid" id="personalDiscountGrid"></div>
+            <div id="personalEmpty" class="placeholder-message" style="display:none;">Bạn không có mã giảm giá cá nhân nào.</div>
+            <div class="pagination-controls" id="personalPagination"></div>
+        </div>
+
+        <!-- NỘI DUNG TAB 2: MÃ SÂN YÊU THÍCH -->
+        <div id="stadium-tab" class="tab-content">
+            <div class="discount-grid" id="stadiumDiscountGrid"></div>
+            <div id="stadiumEmpty" class="placeholder-message" style="display:none;">Không tìm thấy mã giảm giá nào từ các sân bạn yêu thích.</div>
+            <div class="pagination-controls" id="stadiumPagination"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toàn bộ phần script của bạn giữ nguyên, không cần thay đổi
+        let isPersonalLoaded = false;
+        let isStadiumLoaded = false;
+
+        function createDiscountCard(d, stadiumsMap) {
+            const card = document.createElement('div');
+            const isExpired = new Date(d.endDate) < new Date();
+            card.className = `discount-card type-${d.codeType.toLowerCase()} ${isExpired ? 'expired' : ''}`;
+            const isPersonal = d.codeType.toLowerCase() === 'unique';
+            const iconClass = isPersonal ? 'fa-solid fa-star' : 'fa-solid fa-futbol';
+            let applicableStadiums = 'Áp dụng cho mọi sân';
+            if (d.stadiumIds && d.stadiumIds.length > 0) {
+                 applicableStadiums = d.stadiumIds.map(id => stadiumsMap.get(id) || `Sân #${id}`).join(', ');
+            }
+            const expiryDateHtml = isExpired
+                ? `Đã hết hạn: <strong>${new Date(d.endDate).toLocaleDateString('vi-VN')}</strong>`
+                : `Hạn sử dụng: <strong>${new Date(d.endDate).toLocaleDateString('vi-VN')}</strong>`;
+
+            card.innerHTML = `
+                <div class="card-main">
+                    <div class="icon-wrapper"><i class="${iconClass}"></i></div>
+                    <div class="card-details">
+                        <div class="value">Giảm ${d.percentValue}%</div>
+                        <div class="code">${d.code}</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                     <div class="footer-item"><i class="fas fa-futbol fa-fw"></i><span>${applicableStadiums}</span></div>
+                     <div class="footer-item"><i class="fas fa-calendar-alt fa-fw"></i><span>${expiryDateHtml}</span></div>
+                     <div class="footer-item"><i class="fas fa-tag fa-fw"></i><span>Đơn tối thiểu: <strong>${d.minOrderAmount.toLocaleString('vi-VN')}đ</strong></span></div>
+                     <div class="footer-item"><i class="fas fa-shield-halved fa-fw"></i><span>Giảm tối đa: <strong>${d.maxDiscountAmount.toLocaleString('vi-VN')}đ</strong></span></div>
+                </div>`;
+            return card;
+        }
+
+        function renderPagination(containerId, page, count, pageSize, callbackFnName) {
+            const pagination = document.getElementById(containerId);
+            pagination.innerHTML = '';
+            if (count > 0 && pageSize > 0) {
+                const totalPages = Math.ceil(count / pageSize);
+                if (totalPages > 1) {
+                    pagination.innerHTML = `
+                        <button class="pagination-btn" onclick="${callbackFnName}(${page - 1})" ${page === 1 ? 'disabled' : ''}>&laquo; Trước</button>
+                        <span class="page-info">Trang ${page} / ${totalPages}</span>
+                        <button class="pagination-btn" onclick="${callbackFnName}(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Sau &raquo;</button>
+                    `;
+                }
+            }
+        }
+
+        function renderData(gridId, emptyMsgId, paginationId, data, cardCreationFn, paginationCallbackName) {
+            const grid = document.getElementById(gridId);
+            const emptyMsg = document.getElementById(emptyMsgId);
+            grid.innerHTML = '';
+
+            const { discounts, stadiums, count, page, pageSize } = data;
+
+            if (!discounts || discounts.length === 0) {
+                emptyMsg.style.display = 'block';
+                document.getElementById(paginationId).innerHTML = '';
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            const stadiumsMap = new Map(stadiums.map(s => [s.id, s.name]));
+            discounts.forEach(d => grid.appendChild(cardCreationFn(d, stadiumsMap)));
+            renderPagination(paginationId, page, count, pageSize, paginationCallbackName);
+        }
+
+        function fetchPersonalDiscounts(page = 1) {
+            const grid = document.getElementById('personalDiscountGrid');
+            const emptyMsg = document.getElementById('personalEmpty');
+            grid.innerHTML = '<div class="placeholder-message"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>';
+            emptyMsg.style.display = 'none';
+
+            fetch(`/Discount/GetPersonalDiscounts?page=${page}`)
+                .then(res => res.json())
+                .then(data => {
+                    isPersonalLoaded = true;
+                    renderData('personalDiscountGrid', 'personalEmpty', 'personalPagination', data, createDiscountCard, 'fetchPersonalDiscounts');
+                }).catch(err => {
+                    console.error("Lỗi tải mã cá nhân:", err);
+                    grid.innerHTML = '<div class="placeholder-message">Lỗi khi tải dữ liệu. Vui lòng thử lại.</div>';
+                });
+        }
+
+        function fetchStadiumDiscounts(page = 1) {
+            const grid = document.getElementById('stadiumDiscountGrid');
+            const emptyMsg = document.getElementById('stadiumEmpty');
+            grid.innerHTML = '<div class="placeholder-message"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>';
+            emptyMsg.style.display = 'none';
+
+            fetch(`/Discount/GetFavoriteStadiumDiscounts?page=${page}`)
+                .then(res => res.json())
+                .then(data => {
+                    isStadiumLoaded = true;
+                    renderData('stadiumDiscountGrid', 'stadiumEmpty', 'stadiumPagination', data, createDiscountCard, 'fetchStadiumDiscounts');
+                }).catch(err => {
+                    console.error("Lỗi tải mã sân yêu thích:", err);
+                    grid.innerHTML = '<div class="placeholder-message">Lỗi khi tải dữ liệu. Vui lòng thử lại.</div>';
+                });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            if (tabName === 'personal' && !isPersonalLoaded) {
+                fetchPersonalDiscounts(1);
+            } else if (tabName === 'stadium' && !isStadiumLoaded) {
+                fetchStadiumDiscounts(1);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('personal');
+        });
+    </script>
+}
