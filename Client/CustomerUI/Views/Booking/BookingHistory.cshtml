@@ -1,6 +1,7 @@
 ﻿@model DTOs.BookingDTO.ViewModel.BookingManagementViewModel
 @using System.Text.Json
 @using DTOs.StadiumDTO
+@using System.Text.Json.Serialization
 
 @{
     ViewData["Title"] = "Lịch Sử Đặt Sân";
@@ -39,508 +40,530 @@
 }
 
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 
-    <style>
+<style>
 
-        :root {
-            --bh-primary-50: #eff6ff;
-            --bh-primary-100: #dbeafe;
-            --bh-primary-500: #3b82f6;
-            --bh-primary-600: #2563eb;
-            --bh-primary-700: #1d4ed8;
-            --bh-text-dark: #111827;
-            --bh-text-med: #374151;
-            --bh-text-light: #6b7280;
-            --bh-bg-main: #f9fafb;
-            --bh-bg-card: #ffffff;
-            --bh-border-color: #e5e7eb;
-            --bh-success: #10b981;
-            --bh-warning: #f59e0b;
-            --bh-danger: #ef4444;
-            --bh-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --bh-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    :root {
+        --bh-primary-50: #eff6ff;
+        --bh-primary-100: #dbeafe;
+        --bh-primary-500: #3b82f6;
+        --bh-primary-600: #2563eb;
+        --bh-primary-700: #1d4ed8;
+        --bh-text-dark: #111827;
+        --bh-text-med: #374151;
+        --bh-text-light: #6b7280;
+        --bh-bg-main: #f9fafb;
+        --bh-bg-card: #ffffff;
+        --bh-border-color: #e5e7eb;
+        --bh-success: #10b981;
+        --bh-warning: #f59e0b;
+        --bh-danger: #ef4444;
+        --bh-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --bh-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    .bh-body {
+        font-family: 'Be Vietnam Pro', sans-serif;
+        background-color: var(--bh-bg-main);
+        color: var(--bh-text-med);
+    }
+
+    .bh-container {
+        max-width: 1280px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+
+    .bh-header {
+        text-align: center;
+    }
+
+        .bh-header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--bh-text-dark);
+            margin-bottom: 0.25rem;
         }
 
-        .bh-body {
-            font-family: 'Be Vietnam Pro', sans-serif;
-            background-color: var(--bh-bg-main);
-            color: var(--bh-text-med);
+        .bh-header p {
+            font-size: 1.125rem;
+            color: var(--bh-text-light);
         }
 
-        .bh-container {
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
+    .bh-empty-state {
+        background: var(--bh-bg-card);
+        border-radius: 0.75rem;
+        box-shadow: var(--bh-shadow);
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+        .bh-empty-state .icon {
+            font-size: 3rem;
+            color: var(--bh-primary-500);
+            margin-bottom: 1.5rem;
         }
 
-        .bh-header {
-            text-align: center;
-        }
-
-            .bh-header h1 {
-                font-size: 2.25rem;
-                font-weight: 700;
-                color: var(--bh-text-dark);
-                margin-bottom: 0.25rem;
-            }
-
-            .bh-header p {
-                font-size: 1.125rem;
-                color: var(--bh-text-light);
-            }
-
-        .bh-empty-state {
-            background: var(--bh-bg-card);
-            border-radius: 0.75rem;
-            box-shadow: var(--bh-shadow);
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-            .bh-empty-state .icon {
-                font-size: 3rem;
-                color: var(--bh-primary-500);
-                margin-bottom: 1.5rem;
-            }
-
-            .bh-empty-state h3 {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: var(--bh-text-dark);
-            }
-
-            .bh-empty-state .bh-btn {
-                margin-top: 1.5rem;
-            }
-
-        .bh-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-decoration: none;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-
-            .bh-btn.bh-btn-primary {
-                background-color: var(--bh-primary-600);
-                color: white;
-                border-color: var(--bh-primary-600);
-            }
-
-                .bh-btn.bh-btn-primary:hover {
-                    background-color: var(--bh-primary-700);
-                }
-
-        .bh-filters {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1rem;
-            background: var(--bh-bg-card);
-            padding: 1rem;
-            border-radius: 0.75rem;
-            box-shadow: var(--bh-shadow);
-        }
-
-            .bh-filters .bh-filter-group {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .bh-filters label {
-                font-weight: 500;
-                font-size: 0.875rem;
-                color: var(--bh-text-light);
-            }
-
-            .bh-filters select {
-                background-color: var(--bh-bg-card);
-                border: 1px solid var(--bh-border-color);
-                border-radius: 0.5rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.875rem;
-                min-width: 180px;
-            }
-
-        .bh-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .bh-section-title {
-            font-size: 1.5rem;
+        .bh-empty-state h3 {
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--bh-text-dark);
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--bh-border-color);
         }
 
-        .bh-table-wrapper {
-            background: var(--bh-bg-card);
-            border-radius: 0.75rem;
-            box-shadow: var(--bh-shadow);
-            overflow: hidden;
-        }
-
-        .bh-table-scroll {
-            overflow-x: auto;
-        }
-
-        .bh-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
-            .bh-table thead {
-                background-color: #f9fafb;
-            }
-
-            .bh-table th {
-                padding: 0.75rem 1.5rem;
-                text-align: left;
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: var(--bh-text-light);
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-
-            .bh-table td {
-                padding: 1rem 1.5rem;
-                vertical-align: middle;
-                border-top: 1px solid var(--bh-border-color);
-            }
-
-            .bh-table tbody tr:first-child td {
-                border-top: none;
-            }
-
-        .bh-table-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-            .bh-table-info .icon {
-                font-size: 1.25rem;
-                color: var(--bh-primary-500);
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background-color: var(--bh-primary-50);
-                border-radius: 8px;
-            }
-
-            .bh-table-info .details {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .bh-table-info .name {
-                font-weight: 600;
-                color: var(--bh-text-dark);
-            }
-
-            .bh-table-info .sub {
-                font-size: 0.875rem;
-                color: var(--bh-text-light);
-            }
-
-        .bh-table .price {
-            font-weight: 600;
-            color: var(--bh-primary-700);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .status--pending {
-            background-color: #fffbeb;
-            color: #b45309;
-        }
-
-        .status--accepted {
-            background-color: var(--bh-primary-50);
-            color: var(--bh-primary-700);
-        }
-
-        .status--completed {
-            background-color: #ecfdf5;
-            color: #065f46;
-        }
-
-        .status--cancelled {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status--waiting {
-            background-color: #f3f4f6;
-            color: #4b5563;
-        }
-
-        .bh-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-            .bh-actions .bh-btn-icon {
-                width: 2.25rem;
-                height: 2.25rem;
-                padding: 0;
-                background: transparent;
-                color: var(--bh-text-light);
-                border: 1px solid transparent;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 6px;
-                transition: all 0.2s ease;
-            }
-
-                .bh-actions .bh-btn-icon:hover {
-                    background-color: var(--bh-primary-50);
-                    color: var(--bh-primary-600);
-                }
-
-                .bh-actions .bh-btn-icon.pay {
-                    color: var(--bh-success);
-                }
-
-                    .bh-actions .bh-btn-icon.pay:hover {
-                        background-color: #ecfdf5;
-                    }
-
-                .bh-actions .bh-btn-icon.cancel {
-                    color: var(--bh-danger);
-                }
-
-                    .bh-actions .bh-btn-icon.cancel:hover {
-                        background-color: #fee2e2;
-                    }
-
-        .bh-table .expand-toggle {
-            cursor: pointer;
-            color: var(--bh-text-light);
-            transition: transform 0.3s;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f3f4f6;
-            border-radius: 50%;
-        }
-
-        .bh-parent-row.expanded .expand-toggle {
-            transform: rotate(180deg);
-            background-color: var(--bh-primary-50);
-        }
-
-        .bh-child-row {
-            display: none;
-        }
-
-            .bh-child-row > td {
-                padding: 0;
-                background-color: #f9fafb;
-            }
-
-        .bh-child-container {
-            padding: 1.5rem;
-        }
-
-            .bh-child-container h4 {
-                font-weight: 600;
-                margin-bottom: 1rem;
-                color: var(--bh-text-dark);
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-                .bh-child-container h4 i {
-                    color: var(--bh-primary-500);
-                }
-
-        .bh-child-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-            .bh-child-table thead {
-                background-color: #f3f4f6;
-            }
-
-            .bh-child-table th, .bh-child-table td {
-                padding: 0.75rem 1rem;
-                text-align: left;
-                font-size: 0.875rem;
-                border-bottom: 1px solid var(--bh-border-color);
-            }
-
-            .bh-child-table th {
-                font-weight: 600;
-                color: var(--bh-text-med);
-            }
-
-            .bh-child-table tr:last-child td {
-                border-bottom: none;
-            }
-
-        /* Modal Styles */
-        .bh-modal-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            background-color: rgb(17 24 39 / 0.8);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .bh-modal {
-            background: var(--bh-bg-card);
-            border-radius: 0.75rem;
-            box-shadow: var(--bh-shadow-md);
-            width: 100%;
-            max-width: 800px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .bh-modal-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--bh-border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-            .bh-modal-header h3 {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: var(--bh-text-dark);
-                margin: 0;
-            }
-
-        .bh-modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--bh-text-light);
-            cursor: pointer;
-        }
-
-        .bh-modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .bh-modal-section h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--bh-text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .bh-modal-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-
-        .bh-modal-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-            .bh-modal-item .label {
-                font-size: 0.875rem;
-                color: var(--bh-text-light);
-            }
-
-            .bh-modal-item .value {
-                font-weight: 600;
-            }
-
-        .bh-modal-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .bh-modal-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bh-bg-main);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-        }
-
-        .bh-modal-pricing {
-            border-top: 1px solid var(--bh-border-color);
-            padding-top: 1.5rem;
+        .bh-empty-state .bh-btn {
             margin-top: 1.5rem;
         }
 
-            .bh-modal-pricing .total {
-                display: flex;
-                justify-content: space-between;
-                align-items: baseline;
+    .bh-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .bh-btn.bh-btn-primary {
+            background-color: var(--bh-primary-600);
+            color: white;
+            border-color: var(--bh-primary-600);
+        }
+
+            .bh-btn.bh-btn-primary:hover {
+                background-color: var(--bh-primary-700);
             }
 
-                .bh-modal-pricing .total .label {
-                    font-size: 1.25rem;
-                    font-weight: 600;
+    .bh-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        background: var(--bh-bg-card);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        box-shadow: var(--bh-shadow);
+    }
+
+        .bh-filters .bh-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bh-filters label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--bh-text-light);
+        }
+
+        .bh-filters select {
+            background-color: var(--bh-bg-card);
+            border: 1px solid var(--bh-border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            min-width: 180px;
+        }
+
+    .bh-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .bh-section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--bh-text-dark);
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--bh-border-color);
+    }
+
+    .bh-table-wrapper {
+        background: var(--bh-bg-card);
+        border-radius: 0.75rem;
+        box-shadow: var(--bh-shadow);
+        overflow: hidden;
+    }
+
+    .bh-table-scroll {
+        overflow-x: auto;
+    }
+
+    .bh-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+
+        .bh-table thead {
+            background-color: #f9fafb;
+        }
+
+        .bh-table th {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--bh-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .bh-table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            border-top: 1px solid var(--bh-border-color);
+        }
+
+        .bh-table tbody tr:first-child td {
+            border-top: none;
+        }
+
+    .bh-table-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+        .bh-table-info .icon {
+            font-size: 1.25rem;
+            color: var(--bh-primary-500);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bh-primary-50);
+            border-radius: 8px;
+        }
+
+        .bh-table-info .details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bh-table-info .name {
+            font-weight: 600;
+            color: var(--bh-text-dark);
+        }
+
+        .bh-table-info .sub {
+            font-size: 0.875rem;
+            color: var(--bh-text-light);
+        }
+
+    .bh-table .price {
+        font-weight: 600;
+        color: var(--bh-primary-700);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .status--pending {
+        background-color: #fffbeb;
+        color: #b45309;
+    }
+
+    .status--accepted {
+        background-color: var(--bh-primary-50);
+        color: var(--bh-primary-700);
+    }
+
+    .status--completed {
+        background-color: #ecfdf5;
+        color: #065f46;
+    }
+
+    .status--cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status--waiting {
+        background-color: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .bh-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .bh-actions .bh-btn-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            padding: 0;
+            background: transparent;
+            color: var(--bh-text-light);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+            .bh-actions .bh-btn-icon:hover {
+                background-color: var(--bh-primary-50);
+                color: var(--bh-primary-600);
+            }
+
+            .bh-actions .bh-btn-icon.pay {
+                color: var(--bh-success);
+            }
+
+                .bh-actions .bh-btn-icon.pay:hover {
+                    background-color: #ecfdf5;
                 }
 
-                .bh-modal-pricing .total .value {
-                    font-size: 1.75rem;
-                    font-weight: 700;
-                    color: var(--bh-primary-600);
+            .bh-actions .bh-btn-icon.cancel {
+                color: var(--bh-danger);
+            }
+
+                .bh-actions .bh-btn-icon.cancel:hover {
+                    background-color: #fee2e2;
                 }
 
-        @@media (max-width: 768px) {
-            .bh-header h1
+    .bh-table .expand-toggle {
+        cursor: pointer;
+        color: var(--bh-text-light);
+        transition: transform 0.3s;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f3f4f6;
+        border-radius: 50%;
+    }
 
-        {
+    .bh-parent-row.expanded .expand-toggle {
+        transform: rotate(180deg);
+        background-color: var(--bh-primary-50);
+    }
+
+    .bh-child-row {
+        display: none;
+    }
+
+        .bh-child-row > td {
+            padding: 0;
+            background-color: #f9fafb;
+        }
+
+    .bh-child-container {
+        padding: 1.5rem;
+    }
+
+        .bh-child-container h4 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--bh-text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .bh-child-container h4 i {
+                color: var(--bh-primary-500);
+            }
+
+    .bh-child-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .bh-child-table thead {
+            background-color: #f3f4f6;
+        }
+
+        .bh-child-table th, .bh-child-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--bh-border-color);
+        }
+
+        .bh-child-table th {
+            font-weight: 600;
+            color: var(--bh-text-med);
+        }
+
+        .bh-child-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* Modal Styles */
+    .bh-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background-color: rgb(17 24 39 / 0.8);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .bh-modal {
+        background: var(--bh-bg-card);
+        border-radius: 0.75rem;
+        box-shadow: var(--bh-shadow-md);
+        width: 100%;
+        max-width: 800px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .bh-modal-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--bh-border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .bh-modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--bh-text-dark);
+            margin: 0;
+        }
+
+    .bh-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--bh-text-light);
+        cursor: pointer;
+    }
+
+    .bh-modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .bh-modal-section h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--bh-text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .bh-modal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .bh-modal-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+        .bh-modal-item .label {
+            font-size: 0.875rem;
+            color: var(--bh-text-light);
+        }
+
+        .bh-modal-item .value {
+            font-weight: 600;
+        }
+
+    .bh-modal-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+        /* Pricing List */
+        .bh-modal-list.pricing-list .bh-modal-list-item {
+            background: transparent;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--bh-border-color);
+        }
+
+            .bh-modal-list.pricing-list .bh-modal-list-item:last-child {
+                border-bottom: none;
+            }
+
+        .bh-modal-list.pricing-list .item-label {
+            color: var(--bh-text-light);
+        }
+
+        .bh-modal-list.pricing-list .item-value {
+            font-weight: 600;
+        }
+
+        .bh-modal-list.pricing-list .discount-item .item-value {
+            color: var(--bh-danger);
+        }
+
+
+    .bh-modal-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bh-bg-main);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+
+    .bh-modal-pricing {
+        border-top: 1px solid var(--bh-border-color);
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+        .bh-modal-pricing .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+            .bh-modal-pricing .total .label {
+                font-size: 1.25rem;
+                font-weight: 600;
+            }
+
+            .bh-modal-pricing .total .value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--bh-primary-600);
+            }
+
+    @@media (max-width: 768px) {
+        .bh-header h1 {
             font-size: 1.75rem;
         }
 
@@ -600,8 +623,8 @@
                 display: none;
             }
         /* Hide icon on mobile */
-        }
-    </style>
+    }
+</style>
 
 
 <body class="bh-body">
@@ -657,7 +680,7 @@
             </div>
 
             <div class="bh-section" id="bh-daily-booking-section">
-                <h2 class="bh-section-title">Lịch Đặt Trong Ngày</h2>
+                <h2 class="bh-section-title">Lịch Đặt Theo Ngày</h2>
                 <div class="bh-table-wrapper">
                     <div class="bh-table-scroll">
                         <table class="bh-table">
@@ -810,7 +833,7 @@
                 if (s === 'pending') { className = 'status--pending'; text = 'Chờ xử lý'; }
                 else if (s === 'accepted') { className = 'status--accepted'; text = 'Đã nhận'; }
                 else if (s === 'completed') { className = 'status--completed'; text = 'Hoàn thành'; }
-                else if (['cancelled', 'denied', 'payfail'].includes(s)) { className = 'status--cancelled'; text = s === 'denied' ? 'Bị từ chối' : 'Đã hủy'; }
+                else if (['cancelled', 'denied', 'payfail'].includes(s)) { className = 'status--cancelled'; text = s === 'denied' ? 'Bị từ chối' : (s === 'payfail' ? 'Lỗi thanh toán' : 'Đã hủy'); }
                 else if (s === 'waiting') { className = 'status--waiting'; text = 'Chờ thanh toán'; }
                 return `<span class="status-badge ${className}">${text}</span>`;
             };
@@ -850,6 +873,7 @@
             function populateModal(bookingVm, type) {
                 const isMonthly = type === 'monthly';
                 const booking = isMonthly ? bookingVm.monthlyBooking : bookingVm.booking;
+                const discount = bookingVm.discount;
                 const stadium = stadiums.find(s => s.id === booking.stadiumId);
                 const modalBody = document.getElementById('bh-modal-body');
 
@@ -892,9 +916,27 @@
                         </div>`;
                 }
 
+                // --- Pricing Section (NEW) ---
+                let pricingHtml = '';
+                if(discount && booking.originalPrice > booking.totalPrice) {
+                    const discountAmount = (booking.originalPrice ?? 0) - (booking.totalPrice ?? 0);
+                    pricingHtml = `
+                    <div class="bh-modal-list pricing-list">
+                        <div class="bh-modal-list-item">
+                            <span class="item-label">Tạm tính</span>
+                            <span class="item-value">${formatCurrency(booking.originalPrice ?? 0)}</span>
+                        </div>
+                        <div class="bh-modal-list-item discount-item">
+                            <span class="item-label">Khuyến mãi (${discount.code})</span>
+                            <span class="item-value">- ${formatCurrency(discountAmount)}</span>
+                        </div>
+                    </div>`;
+                }
+
                 detailsHtml += `
                     <div class="bh-modal-pricing">
-                        <div class="total">
+                        ${pricingHtml}
+                        <div class="total" style="${pricingHtml ? 'margin-top: 1rem;' : ''}">
                             <span class="label">Tổng cộng</span>
                             <span class="value">${formatCurrency(booking.totalPrice ?? 0)}</span>
                         </div>

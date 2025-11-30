@@ -84,8 +84,7 @@
      * Hàm chính: Gửi yêu cầu lọc đến server và cập nhật lại nội dung bảng bằng AJAX.
      */
     function loadFilteredBookings(page = 1, pageParam = null) {
-        const formData = new FormData(filterForm);
-        const url = new URL(filterForm.action || window.location.href);
+        const url = new URL(window.location.origin + '/Booking/BookingManager');
 
         const currentParams = new URLSearchParams(window.location.search);
         let dailyPage = parseInt(currentParams.get('dailyPage') || '1');
@@ -93,13 +92,41 @@
 
         if (pageParam === 'dailyPage') { dailyPage = page; }
         else if (pageParam === 'monthlyPage') { monthlyPage = page; }
-        else if (pageParam === null) { // Là một hành động lọc mới, reset về trang 1
+        else if (pageParam === null) {
+            // Là một hành động lọc mới, reset về trang 1
             dailyPage = 1;
             monthlyPage = 1;
         }
 
-        url.pathname = '/Booking/BookingManager'; // Đảm bảo URL luôn đúng
-        formData.forEach((value, key) => { if (value) { url.searchParams.set(key, value); } });
+        // Lấy giá trị từ form và chỉ thêm vào URL nếu có giá trị thực
+        const type = filterForm.querySelector('#bm-bookingTypeFilter')?.value;
+        const stadiumId = filterForm.querySelector('#bm-stadiumFilter')?.value;
+        const status = filterForm.querySelector('#bm-statusFilter')?.value;
+        const filterMonth = filterForm.querySelector('#bm-monthFilter')?.value;
+        const filterYear = filterForm.querySelector('#bm-yearFilter')?.value;
+
+        // Luôn thêm type
+        if (type) url.searchParams.set('type', type);
+
+        // Chỉ thêm stadiumId nếu có giá trị (không rỗng)
+        if (stadiumId && stadiumId !== '') {
+            url.searchParams.set('stadiumId', stadiumId);
+        }
+
+        // Chỉ thêm status nếu không phải "all"
+        if (status && status !== 'all') {
+            url.searchParams.set('status', status);
+        }
+
+        // Chỉ thêm filterMonth nếu không phải 0
+        if (filterMonth && filterMonth !== '0') {
+            url.searchParams.set('filterMonth', filterMonth);
+        }
+
+        // Chỉ thêm filterYear nếu không phải 0
+        if (filterYear && filterYear !== '0') {
+            url.searchParams.set('filterYear', filterYear);
+        }
 
         url.searchParams.set('dailyPage', dailyPage);
         url.searchParams.set('monthlyPage', monthlyPage);
@@ -111,9 +138,9 @@
             .then(response => response.text())
             .then(html => {
                 tablesContainer.innerHTML = html;
-                toggleTableVisibility(); // Sửa lỗi lọc loại
+                toggleTableVisibility();
                 rebindAllEventListeners();
-                window.history.pushState({}, '', url.toString()); // Cập nhật URL trình duyệt
+                window.history.pushState({}, '', url.toString());
             })
             .catch(error => console.error('Lỗi khi lọc lịch đặt:', error))
             .finally(() => {
@@ -253,7 +280,131 @@
             });
         });
 
-        // ... (Sao chép logic xử lý hủy lịch con từ file JS gốc của bạn vào đây nếu cần) ...
+        rebindChildCancellationLogic();
+    }
+
+    function rebindChildCancellationLogic() {
+        const CANCELLATION_FEE_PERCENTAGE = 100; // Phí hủy 100% giá tiền
+
+        function handleCheckboxChange(childContainer) {
+            const checkBoxes = childContainer.querySelectorAll('.bm-child-booking-checkbox:checked');
+            const confirmButton = childContainer.querySelector('.bm-confirm-child-cancel-btn');
+            const countSpans = childContainer.querySelectorAll('.selected-count');
+            const feeSpan = childContainer.querySelector('.cancellation-fee');
+
+            let totalSelectedPrice = 0;
+            checkBoxes.forEach(cb => totalSelectedPrice += parseFloat(cb.dataset.price || 0));
+            const fee = totalSelectedPrice * (CANCELLATION_FEE_PERCENTAGE / 100);
+
+            countSpans.forEach(s => s.textContent = checkBoxes.length);
+            if (feeSpan) feeSpan.textContent = formatCurrency(fee);
+            if (confirmButton) {
+                confirmButton.disabled = checkBoxes.length === 0;
+                confirmButton.innerHTML = `Hủy ${checkBoxes.length} mục đã chọn`;
+            }
+        }
+
+        // Gắn event cho từng container lịch con
+        tablesContainer.querySelectorAll('.bm-child-table-container').forEach(childContainer => {
+            const selectAll = childContainer.querySelector('.bm-select-all-children');
+            const checkBoxes = childContainer.querySelectorAll('.bm-child-booking-checkbox');
+
+            // Event cho checkbox "Chọn tất cả"
+            if (selectAll) {
+                selectAll.addEventListener('change', () => {
+                    checkBoxes.forEach(cb => {
+                        if (!cb.disabled) cb.checked = selectAll.checked;
+                    });
+                    handleCheckboxChange(childContainer);
+                });
+            }
+
+            // Event cho từng checkbox lịch con
+            checkBoxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    handleCheckboxChange(childContainer);
+
+                    // Cập nhật trạng thái checkbox "Chọn tất cả"
+                    if (selectAll) {
+                        const allEnabled = childContainer.querySelectorAll('.bm-child-booking-checkbox:not(:disabled)');
+                        const allChecked = childContainer.querySelectorAll('.bm-child-booking-checkbox:not(:disabled):checked');
+                        selectAll.checked = allEnabled.length > 0 && allEnabled.length === allChecked.length;
+                        selectAll.indeterminate = allChecked.length > 0 && allChecked.length < allEnabled.length;
+                    }
+                });
+            });
+        });
+
+        // Gắn event cho nút hủy
+        tablesContainer.querySelectorAll('.bm-confirm-child-cancel-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const childRow = this.closest('.bm-child-bookings-row');
+                const monthlyId = childRow.dataset.parentMonthlyId;
+
+                const childContainer = this.closest('.bm-child-table-container');
+                const selectedIds = Array.from(childContainer.querySelectorAll('.bm-child-booking-checkbox:checked')).map(cb => parseInt(cb.value));
+                const feeText = childContainer.querySelector('.cancellation-fee')?.textContent || '0₫';
+
+                if (selectedIds.length === 0) {
+                    Swal.fire('Thông báo', 'Vui lòng chọn ít nhất một lịch đặt để hủy. ', 'info');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận Hủy',
+                    html: `Bạn sẽ hủy <b>${selectedIds.length}</b> lịch đặt. <br>Phí hủy dự kiến: <b>${feeText}</b>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Đồng ý & Hủy',
+                    cancelButtonText: 'Xem lại'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Đang xử lý...',
+                            text: 'Vui lòng đợi trong giây lát',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => { Swal.showLoading(); }
+                        });
+
+                        const dto = { status: 'cancelled', childBookingIdsToCancel: selectedIds };
+
+                        fetch(`/Booking/UpdateMonthlyBooking/${monthlyId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(dto)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.paymentRequired && data.paymentUrl) {
+                                    window.location.href = data.paymentUrl;
+                                    return;
+                                }
+                                if (data.success || data.redirectUrl) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: data.message || 'Đã hủy các lịch đặt được chọn.',
+                                        confirmButtonColor: '#22c55e'
+                                    }).then(() => location.reload());
+                                } else {
+                                    throw new Error(data.message || 'Lỗi không xác định từ server');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi!',
+                                    text: error.message,
+                                    confirmButtonColor: '#d33'
+                                });
+                            });
+                    }
+                });
+            });
+        });
     }
 
 
