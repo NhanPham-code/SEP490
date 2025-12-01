@@ -57,7 +57,7 @@
                 <!-- Avatar Section -->
                 <div class="avatar-section">
                     <div class="avatar-container group" id="avatarClick" title="Nhấn để thay đổi ảnh đại diện">
-                        <img id="avatarImg" src="@(Model.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" />
+                        <img id="avatarImg" src="@(Model.AvatarUrl)" alt="Avatar" />
                         <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
                             <i class="ri-camera-line text-lg"></i>
                         </div>
@@ -382,28 +382,46 @@
             function validateForm() {
                 const fullnameInput = document.getElementById("fullnameInput");
                 const phoneInput = document.getElementById("phoneInput");
+                const addressInput = document.getElementById("addressInput");
 
                 if (!fullnameInput) {
-                    console.error('Fullname input not found');
+                    console.error('Required inputs not found');
                     return false;
                 }
 
                 const fullname = fullnameInput.value.trim();
                 const phone = phoneInput ? phoneInput.value.trim() : '';
+                const address = addressInput ? addressInput.value.trim() : '';
 
+                // 1. Kiểm tra Họ tên
                 if (!fullname) {
                     showToast("Vui lòng nhập họ và tên", "error");
                     fullnameInput.focus();
                     return false;
                 }
 
-                if (phone) {
-                    const phoneRegex = /^[0-9]{10,11}$/;
-                    if (!phoneRegex.test(phone)) {
-                        showToast("Số điện thoại không hợp lệ (10-11 số)", "error");
-                        phoneInput.focus();
-                        return false;
-                    }
+                // 2. Kiểm tra Địa chỉ (Mới thêm: Bắt buộc nhập)
+                if (!address) {
+                    showToast("Vui lòng nhập địa chỉ", "error");
+                    if (addressInput) addressInput.focus();
+                    return false;
+                }
+
+                // 3. Kiểm tra Số điện thoại (Mới thêm: Bắt buộc nhập & Đúng định dạng VN)
+                if (!phone) {
+                    showToast("Vui lòng nhập số điện thoại", "error");
+                    if (phoneInput) phoneInput.focus();
+                    return false;
+                }
+
+                // Regex số điện thoại Việt Nam:
+                // Bắt đầu bằng 03, 05, 07, 08, 09 và theo sau là 8 chữ số nữa (Tổng 10 số)
+                const vnPhoneRegex = /^(03|05|07|08|09)\d{8}$/;
+
+                if (!vnPhoneRegex.test(phone)) {
+                    showToast("SĐT không hợp lệ (Phải là 10 số, đầu 03, 05, 07, 08, 09)", "error");
+                    if (phoneInput) phoneInput.focus();
+                    return false;
                 }
 
                 return true;
@@ -574,16 +592,36 @@
                             success: function (updatedUser) {
                                 removeLoadingToast(loadingToast);
 
-                                document.getElementById("displayFullname").textContent = updatedUser.fullName;
-                                document.getElementById("displayPhone").textContent = updatedUser.phoneNumber || "Chưa cập nhật";
-                                document.getElementById("displayAddress").textContent = updatedUser.address || "Chưa cập nhật";
+                                console.log('Update profile success');
 
-                                // Update original data
+                                // 1. Cập nhật hiển thị (Chế độ xem)
+                                document.getElementById("displayFullname").textContent = updatedUser.fullName;
+                                document.getElementById("displayPhone").textContent = updatedUser.phoneNumber;
+                                document.getElementById("displayAddress").textContent = updatedUser.address;
+
+                                // 2. QUAN TRỌNG: Cập nhật lại biến lưu trữ dữ liệu gốc
+                                // Để lần sau bấm "Hủy" hoặc mở lại form, nó sẽ lấy dữ liệu mới nhất này
                                 originalData.fullname = updatedUser.fullName;
                                 originalData.phone = updatedUser.phoneNumber;
                                 originalData.address = updatedUser.address;
 
+                                // 3. Cập nhật lại giá trị trong ô Input ngay lập tức (để đồng bộ)
+                                const fullnameInput = document.getElementById("fullnameInput");
+                                const phoneInput = document.getElementById("phoneInput");
+                                const addressInput = document.getElementById("addressInput");
+
+                                if (fullnameInput) fullnameInput.value = updatedUser.fullName;
+                                if (phoneInput) phoneInput.value = updatedUser.phoneNumber;
+                                if (addressInput) addressInput.value = updatedUser.address;
+
+                                // Refresh header
+                                if (typeof window.refreshHeaderFromSession === 'function') {
+                                    window.refreshHeaderFromSession();
+                                }
+
                                 showToast("Cập nhật thông tin thành công!", "success");
+
+                                // Đóng chế độ sửa
                                 toggleEditMode(false);
                             },
                             error: function (xhr) {

@@ -152,7 +152,6 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetInt32("BookingId", createdBooking.Id);
             return Redirect(paymentUrl);
         }
-        [HttpGet]
         public async Task<IActionResult> BookingHistory()
         {
             var accessToken = GetAccessToken(); // Giả sử phương thức này tồn tại để lấy token
@@ -185,6 +184,23 @@ namespace CustomerUI.Controllers
                 // 2. Lấy tất cả các gói đặt tháng của user
                 string monthlyBookingFilter = $"?$filter=UserId eq {userId}&$orderby=CreatedAt desc";
                 var monthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyBookingFilter)).Data ?? new List<MonthlyBookingReadDto>();
+
+                // **MỚI: Lấy thông tin tất cả các mã giảm giá liên quan**
+                var allDiscountIds = allUserBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value)
+                                    .Concat(monthlyBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value))
+                                    .Distinct().ToList();
+
+                var discountLookup = new Dictionary<int, ReadDiscountDTO>();
+                if (allDiscountIds.Any())
+                {
+                    // Giả sử có _discountService được inject
+                    var discountTasks = allDiscountIds.Select(id => _discountService.GetDiscountByIdAsync(id));
+                    var discounts = await Task.WhenAll(discountTasks);
+                    foreach (var discount in discounts.Where(d => d != null))
+                    {
+                        discountLookup[discount.Id] = discount;
+                    }
+                }
 
                 // 3. Lấy thông tin các sân vận động liên quan
                 var allStadiumIds = allUserBookings.Select(b => b.StadiumId)
@@ -224,7 +240,8 @@ namespace CustomerUI.Controllers
                     viewModel.DailyBookings.Add(new DailyBookingWithUserViewModel
                     {
                         Booking = booking,
-                        User = userProfile // User ở đây là chính họ
+                        User = userProfile, // User ở đây là chính họ
+                        Discount = booking.DiscountId.HasValue ? discountLookup.GetValueOrDefault(booking.DiscountId.Value) : null
                     });
                 }
 
@@ -240,7 +257,8 @@ namespace CustomerUI.Controllers
                     {
                         MonthlyBooking = mb,
                         User = userProfile, // User ở đây là chính họ
-                        Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>())
+                        Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>()),
+                        Discount = mb.DiscountId.HasValue ? discountLookup.GetValueOrDefault(mb.DiscountId.Value) : null
                     });
                 }
             }

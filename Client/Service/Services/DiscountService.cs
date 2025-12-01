@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DTOs.DiscountDTO;
 using DTOs.OData;
+using Newtonsoft.Json;
 using Service.BaseService;
 using Service.Interfaces;
 
@@ -88,67 +89,117 @@ namespace Service.Services
             return response.IsSuccessStatusCode;
         }
 
-        /// <summary>
-        /// Lấy danh sách discount qua OData với lọc, phân trang, count
-        /// </summary>
-        public async Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsByUserAsync(
-        string accessToken,
-        int? userId = null,
-        int page = 1,
-        int pageSize = 5,
-        string? searchByCode = null,
-        int? stadiumId = null,
-        bool? isActive = null,
-        string? targetUserId = null) // 👈 thêm tham số mới
+
+
+/// <summary>
+/// Hàm tổng hợp để query discounts với nhiều filter options
+/// </summary>
+public async Task<OdataHaveCountResponse<ReadDiscountDTO>?> GetDiscountsAsync(
+    string accessToken,
+    int? userId = null,
+    int page = 1,
+    int pageSize = 5,
+    string? searchByCode = null,
+    List<int>? stadiumIds = null,
+    bool? isActive = null,
+    string? targetUserId = null,
+    bool? isPersonalDiscount = null,
+    bool filterExpired = false,
+    string? orderBy = null)
+    {
+        AddBearerAccessToken(accessToken);
+
+        var filters = new List<string>();
+
+        // Filter theo UserId (người tạo discount)
+        if (userId.HasValue)
         {
-            AddBearerAccessToken(accessToken);
-
-            var filters = new List<string>();
-
-            if (userId.HasValue)
-            {
-                filters.Add($"userId eq {userId.Value}");
-            }
-
-            if (!string.IsNullOrEmpty(searchByCode))
-            {
-                filters.Add($"contains(tolower(Code), tolower('{searchByCode}'))");
-            }
-
-            if (isActive.HasValue)
-            {
-                filters.Add($"IsActive eq {isActive.Value.ToString().ToLower()}");
-            }
-
-            if (stadiumId.HasValue)
-            {
-                filters.Add($"StadiumIds/any(s: s eq {stadiumId.Value})");
-            }
-
-            if (!string.IsNullOrEmpty(targetUserId)) // 👈 thêm điều kiện filter mới
-            {
-                filters.Add($"TargetUserId eq '{targetUserId}'");
-            }
-
-            var query = new List<string>();
-            if (filters.Any())
-            {
-                query.Add($"$filter={string.Join(" and ", filters)}");
-            }
-
-            var skip = (page - 1) * pageSize;
-            query.Add($"$skip={skip}");
-            query.Add($"$top={pageSize}");
-            query.Add("$count=true");
-
-            var requestUrl = $"/odata/discounts?{string.Join("&", query)}";
-
-            var response = await _httpClient.GetAsync(requestUrl);
-            if (!response.IsSuccessStatusCode) return null;
-
-            return await response.Content.ReadFromJsonAsync<OdataHaveCountResponse<ReadDiscountDTO>>();
+            filters.Add($"UserId eq {userId.Value}");
         }
 
+        // Filter theo mã code (search)
+        if (!string.IsNullOrEmpty(searchByCode))
+        {
+            filters.Add($"contains(tolower(Code), tolower('{searchByCode}'))");
+        }
 
+        // Filter theo trạng thái active
+        if (isActive.HasValue)
+        {
+            filters.Add($"IsActive eq {isActive.Value.ToString().ToLower()}");
+        }
+
+        // Filter theo stadium IDs
+        if (stadiumIds != null && stadiumIds.Any())
+        {
+            if (stadiumIds.Count == 1)
+            {
+                // 1 stadium: query đơn giản hơn
+                filters.Add($"StadiumIds/any(s: s eq {stadiumIds[0]})");
+            }
+            else
+            {
+                // Nhiều stadiums
+                var stadiumConditions = string.Join(" or ", stadiumIds.Select(id => $"s eq {id}"));
+                filters.Add($"StadiumIds/any(s: {stadiumConditions})");
+            }
+        }
+
+        // Filter theo TargetUserId cụ thể
+        if (!string.IsNullOrEmpty(targetUserId))
+        {
+            filters.Add($"TargetUserId eq '{targetUserId}'");
+        }
+        // Filter theo loại discount (personal vs stadium)
+        else if (isPersonalDiscount.HasValue)
+        {
+            filters.Add(isPersonalDiscount.Value
+                ? "TargetUserId ne null"   // Mã cá nhân
+                : "TargetUserId eq null"); // Mã sân
+        }
+
+        // Filter chưa hết hạn
+        if (filterExpired)
+        {
+            filters.Add($"EndDate ge {DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}");
+        }
+
+        // Build query
+        var query = new List<string>();
+
+        if (filters.Any())
+        {
+            query.Add($"$filter={string.Join(" and ", filters)}");
+        }
+
+        if (!string.IsNullOrEmpty(orderBy))
+        {
+            query.Add($"$orderby={orderBy}");
+        }
+
+        query.Add($"$skip={(page - 1) * pageSize}");
+        query.Add($"$top={pageSize}");
+        query.Add("$count=true");
+
+        var requestUrl = $"/odata/discounts?{string.Join("&", query)}";
+
+        Console.WriteLine($"[GetDiscountsAsync] URL: {requestUrl}");
+
+        var response = await _httpClient.GetAsync(requestUrl);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"[GetDiscountsAsync] Error: {await response.Content.ReadAsStringAsync()}");
+            return null;
+        }
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<OdataHaveCountResponse<ReadDiscountDTO>>(jsonString);
     }
+
+
+}
+
+
+
 }

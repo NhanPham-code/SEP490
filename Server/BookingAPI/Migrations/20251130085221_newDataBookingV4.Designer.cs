@@ -4,6 +4,7 @@ using BookingAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingAPI.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130085221_newDataBookingV4")]
+    partial class newDataBookingV4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -666,7 +669,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 26,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -682,7 +685,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 26,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -698,7 +701,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 26,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -714,7 +717,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 26,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -1075,7 +1078,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 14,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 360000m,
                             UpdatedAt = new DateTime(2025, 12, 20, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1135,7 +1138,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 18,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 300000m,
                             UpdatedAt = new DateTime(2025, 9, 3, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1180,7 +1183,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 14,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 360000m,
                             UpdatedAt = new DateTime(2025, 9, 1, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1225,7 +1228,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 14,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 560000m,
                             UpdatedAt = new DateTime(2025, 12, 27, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1255,7 +1258,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 25,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 900000m,
                             UpdatedAt = new DateTime(2025, 11, 6, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -1330,7 +1333,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 14,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 360000m,
                             UpdatedAt = new DateTime(2025, 12, 30, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -1360,7 +1363,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 11,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 160000m,
                             UpdatedAt = new DateTime(2026, 1, 10, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -1390,7 +1393,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 14,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 560000m,
                             UpdatedAt = new DateTime(2025, 12, 15, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -1510,7 +1513,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 6,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 1000000m,
                             UpdatedAt = new DateTime(2025, 12, 11, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1645,7 +1648,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 26,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2025, 10, 17, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -1660,7 +1663,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 25,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 12, 22, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -1720,7 +1723,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 17,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 140000m,
                             UpdatedAt = new DateTime(2025, 11, 14, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1780,7 +1783,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 25,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2026, 1, 16, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -1840,7 +1843,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 17,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 100000m,
                             UpdatedAt = new DateTime(2026, 1, 5, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -1870,7 +1873,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 25,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 12, 31, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -2294,7 +2297,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 9,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 120000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -2310,7 +2313,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 9,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 120000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -2326,7 +2329,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 9,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 120000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -2342,7 +2345,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 9,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 120000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -2550,7 +2553,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 19,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 180000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -2566,7 +2569,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 19,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 180000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -2582,7 +2585,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 19,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 180000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -2598,7 +2601,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 19,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 180000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -2998,7 +3001,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 1,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -3014,7 +3017,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 1,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -3030,7 +3033,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 1,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -3046,7 +3049,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 1,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 600000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -3260,7 +3263,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 8,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 240000m,
                             UpdatedAt = new DateTime(2026, 1, 14, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -3530,7 +3533,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 24,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 300000m,
                             UpdatedAt = new DateTime(2025, 12, 10, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -3995,7 +3998,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 19,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 180000m,
                             UpdatedAt = new DateTime(2025, 11, 13, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -4010,7 +4013,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 9,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 120000m,
                             UpdatedAt = new DateTime(2025, 11, 26, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5073,7 +5076,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -5089,7 +5092,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -5105,7 +5108,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -5121,7 +5124,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -5137,7 +5140,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5153,7 +5156,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5169,7 +5172,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5185,7 +5188,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5201,7 +5204,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -5217,7 +5220,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -5233,7 +5236,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -5249,7 +5252,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -5279,7 +5282,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 5,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 140000m,
                             UpdatedAt = new DateTime(2025, 12, 11, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -5339,7 +5342,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 27,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 190000m,
                             UpdatedAt = new DateTime(2025, 11, 3, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -5384,7 +5387,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 10, 27, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5489,7 +5492,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 5,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 140000m,
                             UpdatedAt = new DateTime(2025, 9, 21, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -5684,7 +5687,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 23,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 140000m,
                             UpdatedAt = new DateTime(2025, 12, 11, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5759,7 +5762,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 22,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 10, 6, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -5924,7 +5927,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 4,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 300000m,
                             UpdatedAt = new DateTime(2025, 10, 3, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5
                         },
@@ -5954,7 +5957,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 3,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2026, 1, 7, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -5984,7 +5987,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 4,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 300000m,
                             UpdatedAt = new DateTime(2025, 12, 8, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -6029,7 +6032,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 27,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 190000m,
                             UpdatedAt = new DateTime(2025, 11, 2, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7
                         },
@@ -6074,7 +6077,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 16,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 12, 4, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6
                         },
@@ -6089,7 +6092,7 @@ namespace BookingAPI.Migrations
                             PaymentMethod = "vnpay_100",
                             StadiumId = 16,
                             Status = "cancelled",
-                            TotalPrice = 0m,
+                            TotalPrice = 200000m,
                             UpdatedAt = new DateTime(2025, 10, 3, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8
                         },
@@ -10266,7 +10269,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 14, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 960000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5,
                             Year = 2025
@@ -10374,7 +10377,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 18, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 480000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5,
                             Year = 2025
@@ -10446,7 +10449,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 10, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 720000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 8,
                             Year = 2025
@@ -10572,7 +10575,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 14, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 2400000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6,
                             Year = 2026
@@ -10806,7 +10809,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 9, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 800000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 7,
                             Year = 2025
@@ -10824,7 +10827,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 14, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 800000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 5,
                             Year = 2026
@@ -10842,7 +10845,7 @@ namespace BookingAPI.Migrations
                             StartTime = new TimeSpan(0, 21, 0, 0, 0),
                             Status = "cancelled",
                             TotalHour = 8,
-                            TotalPrice = 0m,
+                            TotalPrice = 800000m,
                             UpdatedAt = new DateTime(2025, 11, 29, 10, 41, 13, 0, DateTimeKind.Unspecified),
                             UserId = 6,
                             Year = 2026

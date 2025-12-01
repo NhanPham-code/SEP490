@@ -242,7 +242,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName, 
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 
@@ -310,7 +310,7 @@ namespace UserAPI.Service
                 RefreshToken = newRefreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png",
             };
         }
 
@@ -715,7 +715,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 
@@ -846,7 +846,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 

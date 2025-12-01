@@ -2,13 +2,13 @@
     ViewData["Title"] = "Quản lý Mã giảm giá";
 }
 
-<!DOCTYPE html>
+<! DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs. cloudflare.com/ajax/libs/font-awesome/6. 0.0/css/all. min.css" rel="stylesheet">
 
     <link href="~/css/Discount/discount.css" rel="stylesheet" />
 </head>
@@ -26,7 +26,7 @@
                 <div class="filter-row">
                     <div class="form-group">
                         <label class="form-label">Tìm kiếm mã giảm giá</label>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mã...">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo mã... ">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Sân vận động</label>
@@ -118,7 +118,7 @@
                         <div class="user-search-container">
                             <div class="user-search-bar">
                                 <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="userSearchInput" class="form-control" placeholder="Nhập SĐT hoặc Email để tìm...">
+                                <input type="text" id="userSearchInput" class="form-control" placeholder="Nhập SĐT hoặc Email để tìm... ">
                                 <button type="button" class="search-btn" onclick="searchUsers()">
                                     <i class="fas fa-search"></i> Tìm kiếm
                                 </button>
@@ -159,7 +159,7 @@
         <script>
             // === STATE MANAGEMENT ===
             let allStadiums = [];
-            let allUsers = []; // Cache user data
+            let allUsers = [];
             let currentEditingId = null;
             let currentPage = 1;
             let pageSize = 5;
@@ -170,7 +170,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 fetchAndRenderDiscounts();
                 document.getElementById('discountForm').addEventListener('submit', handleFormSubmit);
-                document.getElementById('startDate').addEventListener('change', validateDates);
+                document. getElementById('startDate').addEventListener('change', handleStartDateChange);
                 document.getElementById('endDate').addEventListener('change', validateDates);
                 document.getElementById('userSearchInput').addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
@@ -180,41 +180,92 @@
                 });
             });
 
+            // === HELPER FUNCTION: Lấy ngày hôm nay theo format YYYY-MM-DD ===
+            function getTodayDate() {
+                return new Date().toISOString(). slice(0, 10);
+            }
+
+            // === HELPER FUNCTION: Set min date cho các input ===
+            function setMinDates() {
+                const today = getTodayDate();
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+
+                startDateInput.setAttribute('min', today);
+                endDateInput.setAttribute('min', today);
+            }
+
+            // === HELPER FUNCTION: Xử lý khi thay đổi ngày bắt đầu ===
+            function handleStartDateChange() {
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+                const today = getTodayDate();
+
+                // Cập nhật min của endDate = max(today, startDate)
+                const startDateValue = startDateInput.value;
+                if (startDateValue && startDateValue > today) {
+                    endDateInput.setAttribute('min', startDateValue);
+                } else {
+                    endDateInput.setAttribute('min', today);
+                }
+
+                // Nếu endDate < startDate thì reset endDate
+                if (endDateInput.value && endDateInput.value < startDateValue) {
+                    endDateInput.value = startDateValue;
+                }
+
+                validateDates();
+            }
+
             // === DATA FETCHING & RENDERING ===
-            function fetchAndRenderDiscounts(page = 1) {
+                        function fetchAndRenderDiscounts(page = 1) {
                 currentPage = page;
-                const searchCode = document.getElementById('searchInput').value;
+
+                // Lấy giá trị và trim khoảng trắng để an toàn
+                const searchCode = document.getElementById('searchInput').value.trim();
                 const stadiumId = document.getElementById('stadiumFilter').value;
                 const status = document.getElementById('statusFilter').value;
+
                 let query = `?page=${currentPage}&pageSize=${pageSize}`;
+
                 if (searchCode) query += `&searchByCode=${encodeURIComponent(searchCode)}`;
                 if (stadiumId) query += `&stadiumId=${stadiumId}`;
-                if (status !== "") query += `&isActive=${status}`;
+
+                // LOGIC FILTER TRẠNG THÁI
+                // ASP.NET Core sẽ tự map chuỗi "true"/"false" sang bool
+                if (status === "true" || status === "false") {
+                    query += `&isActive=${status}`;
+                }
+
                 setLoadingState(true);
+
                 fetch(`/Discount/GetDiscountPageData${query}`)
-                    .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
+                    .then(response => {
+                        if (!response.ok) throw new Error(response.statusText);
+                        return response.json();
+                    })
                     .then(data => {
                         currentDiscounts = data.discounts;
 
-                        // *** LOGIC UPDATE START ***
-                        // Cache stadiums if not already cached
+                        // Load danh sách sân nếu chưa có (cho dropdown filter)
                         if (allStadiums.length === 0 && data.stadiums) {
                             allStadiums = data.stadiums;
                             renderFilterOptions(allStadiums);
                             renderStadiumSelectionModal(allStadiums);
                         }
-                        // Cache target users from the response
+
+                        // Cache user data nếu có
                         if (data.targetUsers && data.targetUsers.length > 0) {
                             cacheUserData(data.targetUsers);
                         }
-                        // *** LOGIC UPDATE END ***
 
                         renderTable(currentDiscounts);
-                        renderPagination(currentDiscounts.length);
+                        renderPagination(currentDiscounts.length); // Hoặc dùng data.count nếu API trả về tổng số bản ghi
                     })
                     .catch(error => {
                         console.error('Lỗi tải dữ liệu:', error);
-                        document.getElementById('discountTableBody').innerHTML = `<tr><td colspan="7" class="text-center">Lỗi tải dữ liệu. Vui lòng thử lại.</td></tr>`;
+                        document.getElementById('discountTableBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Lỗi tải dữ liệu. Vui lòng thử lại.</td></tr>`;
+                        document.getElementById('resultsCount').textContent = 'Lỗi';
                     })
                     .finally(() => setLoadingState(false));
             }
@@ -232,7 +283,7 @@
                 const tableBody = document.getElementById('discountTableBody');
                 const resultsCount = document.getElementById('resultsCount');
                 tableBody.innerHTML = '';
-                if (!discounts || discounts.length === 0) {
+                if (! discounts || discounts.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Không tìm thấy discount nào phù hợp.</td></tr>`;
                     resultsCount.textContent = 'Tìm thấy 0 kết quả';
                 } else {
@@ -246,13 +297,13 @@
                 container.innerHTML = '';
                 const hasPrevious = currentPage > 1;
                 const hasNext = currentItemCount === pageSize;
-                if (!hasPrevious && !hasNext) return;
+                if (! hasPrevious && !hasNext) return;
                 container.innerHTML = `
-                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage - 1})" ${!hasPrevious ? 'disabled' : ''}>
+                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage - 1})" ${! hasPrevious ? 'disabled' : ''}>
                         <i class="fas fa-chevron-left"></i> Trước
                     </button>
                     <span class="pagination-info">Trang ${currentPage}</span>
-                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage + 1})" ${!hasNext ? 'disabled' : ''}>
+                    <button class="pagination-btn" onclick="fetchAndRenderDiscounts(${currentPage + 1})" ${! hasNext ? 'disabled' : ''}>
                         Sau <i class="fas fa-chevron-right"></i>
                     </button>
                 `;
@@ -277,7 +328,6 @@
                 const codeTypeLabels = { 'Stadium': 'Mã theo sân', 'Unique': 'Mã cá nhân' };
                 const codeTypeDisplay = codeTypeLabels[discount.codeType] || discount.codeType;
 
-                // *** LOGIC UPDATE START: Restore target user display ***
                 let targetDisplay = '';
                 const hasStadiums = discount.stadiumIds && discount.stadiumIds.length > 0;
                 const stadiumTag = hasStadiums
@@ -291,7 +341,6 @@
                 } else {
                     targetDisplay = '<span class="stadium-tag">Tất cả</span>';
                 }
-                // *** LOGIC UPDATE END ***
 
                 tr.innerHTML = `
                     <td><span class="discount-code">${discount.code}</span></td>
@@ -304,7 +353,7 @@
                             </div>
                         </div>
                     </td>
-                    <td><span class="code-type-badge type-${discount.codeType.toLowerCase()}">${codeTypeDisplay}</span></td>
+                    <td><span class="code-type-badge type-${discount.codeType. toLowerCase()}">${codeTypeDisplay}</span></td>
                     <td>${targetDisplay}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                     <td>
@@ -322,7 +371,7 @@
             function openDiscountModal(discountId = null) {
                 document.getElementById('discountForm').reset();
                 document.getElementById('userSelectionResults').innerHTML = '';
-                document.getElementById('userSearchInput').value = '';
+                document. getElementById('userSearchInput').value = '';
                 document.getElementById('endDate').setCustomValidity('');
                 const modalTitle = document.getElementById('modalTitle');
                 const saveBtnText = document.getElementById('saveButtonText');
@@ -330,20 +379,44 @@
                 currentEditingId = discountId;
                 let selectedStadiumIds = [], isActiveValue = true, targetUserId = null;
 
+                const today = getTodayDate();
+
+                // Set min date cho cả tạo mới và chỉnh sửa
+                setMinDates();
+
                 if (discountId) {
-                    modalTitle.textContent = 'Chỉnh sửa Discount';
-                    saveBtnText.textContent = 'Cập nhật';
+                    modalTitle.textContent = 'Chỉnh sửa Mã giảm giá';
+                    saveBtnText. textContent = 'Cập nhật';
                     const data = currentDiscounts.find(d => d.id === discountId);
                     if (data) {
                         document.getElementById('discountId').value = data.id;
-                        document.getElementById('discountCode').value = data.code;
+                        document. getElementById('discountCode').value = data.code;
                         document.getElementById('discountCode').readOnly = true;
                         document.getElementById('description').value = data.description || '';
                         document.getElementById('percentValue').value = data.percentValue;
                         document.getElementById('maxDiscountAmount').value = data.maxDiscountAmount;
                         document.getElementById('minOrderAmount').value = data.minOrderAmount;
-                        document.getElementById('startDate').value = data.startDate.slice(0, 10);
-                        document.getElementById('endDate').value = data.endDate.slice(0, 10);
+
+                        // Xử lý ngày bắt đầu: nếu ngày cũ < today thì set = today
+                        const existingStartDate = data.startDate. slice(0, 10);
+                        const existingEndDate = data.endDate.slice(0, 10);
+
+                        if (existingStartDate < today) {
+                            document.getElementById('startDate').value = today;
+                        } else {
+                            document.getElementById('startDate').value = existingStartDate;
+                        }
+
+                        // Xử lý ngày kết thúc: nếu ngày cũ < today thì set = today
+                        if (existingEndDate < today) {
+                            document.getElementById('endDate').value = today;
+                        } else {
+                            document.getElementById('endDate').value = existingEndDate;
+                        }
+
+                        // Cập nhật min của endDate dựa trên startDate
+                        handleStartDateChange();
+
                         document.getElementById('codeType').value = data.codeType;
                         selectedStadiumIds = data.stadiumIds || [];
                         isActiveValue = data.isActive;
@@ -356,20 +429,42 @@
                 } else {
                     modalTitle.textContent = 'Tạo Mã Mới';
                     saveBtnText.textContent = 'Lưu';
-                    document.getElementById('startDate').value = new Date().toISOString().slice(0, 10);
+                    document.getElementById('startDate').value = today;
+
+                    // Cập nhật min của endDate
+                    handleStartDateChange();
                 }
                 renderStadiumSelectionModal(allStadiums, selectedStadiumIds);
                 toggleSections();
-                document.getElementById('discountForm').dataset.isActive = isActiveValue;
+                document.getElementById('discountForm'). dataset.isActive = isActiveValue;
                 document.getElementById('discountModal').classList.add('active');
             }
 
             async function handleFormSubmit(event) {
                 event.preventDefault();
-                if (!validateDates()) {
+
+                // Validate ngày không được trong quá khứ
+                const today = getTodayDate();
+                const startDateValue = document.getElementById('startDate'). value;
+                const endDateValue = document.getElementById('endDate'). value;
+
+                if (startDateValue < today) {
+                    alert('Ngày bắt đầu không được là ngày trong quá khứ.');
+                    document.getElementById('startDate').focus();
+                    return;
+                }
+
+                if (endDateValue < today) {
+                    alert('Ngày kết thúc không được là ngày trong quá khứ.');
+                    document. getElementById('endDate').focus();
+                    return;
+                }
+
+                if (! validateDates()) {
                     alert('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
                     return;
                 }
+
                 const saveButton = event.target.querySelector('.btn-save');
                 saveButton.disabled = true;
 
@@ -406,7 +501,7 @@
                         alert(currentEditingId ? 'Cập nhật thành công!' : 'Tạo mới thành công!');
                         fetchAndRenderDiscounts(currentEditingId ? currentPage : 1);
                     } else {
-                        alert('Lỗi: ' + (result.message || 'Thao tác thất bại.'));
+                        alert('Lỗi: ' + (result.message || 'Thao tác thất bại. '));
                     }
                 } catch (err) {
                     console.error("Submit Error:", err);
@@ -418,12 +513,12 @@
 
             function getFormData() {
                 return {
-                    id: currentEditingId ? parseInt(document.getElementById('discountId').value) : 0,
-                    code: document.getElementById('discountCode').value.trim(),
+                    id: currentEditingId ?  parseInt(document.getElementById('discountId').value) : 0,
+                    code: document.getElementById('discountCode').value. trim(),
                     description: document.getElementById('description').value,
-                    percentValue: parseFloat(document.getElementById('percentValue').value),
+                    percentValue: parseFloat(document.getElementById('percentValue'). value),
                     maxDiscountAmount: parseFloat(document.getElementById('maxDiscountAmount').value) || 0,
-                    minOrderAmount: parseFloat(document.getElementById('minOrderAmount').value) || 0,
+                    minOrderAmount: parseFloat(document. getElementById('minOrderAmount').value) || 0,
                     startDate: new Date(document.getElementById('startDate').value + 'T00:00:00Z'),
                     endDate: new Date(document.getElementById('endDate').value + 'T23:59:59Z'),
                     codeType: document.getElementById('codeType').value,
@@ -434,13 +529,13 @@
 
             async function openToggleStatusConfirm(discountId) {
                 const discount = currentDiscounts.find(d => d.id === discountId);
-                if (!discount) return;
+                if (! discount) return;
                 try {
-                    const payload = { ...discount, isActive: !discount.isActive };
+                    const payload = { ... discount, isActive: !discount. isActive };
                     const response = await fetch('/Discount/UpdateDiscount', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    const result = await response.json();
+                    const result = await response. json();
                     if (result.success) {
-                        alert('Thay đổi trạng thái thành công!');
+                        alert('Thay đổi trạng thái thành công! ');
                         fetchAndRenderDiscounts(currentPage);
                     } else {
                         alert('Lỗi: ' + (result.message || 'Thao tác thất bại.'));
@@ -462,7 +557,7 @@
                 const container = document.getElementById('stadiumSelectionGroup');
                 container.innerHTML = '';
                 stadiums.forEach(s => {
-                    const checked = selectedIds.includes(s.id) ? 'checked' : '';
+                    const checked = selectedIds.includes(s. id) ?  'checked' : '';
                     container.innerHTML += `
                         <div class="stadium-card">
                             <div class="stadium-card-header">
@@ -490,19 +585,19 @@
                 updateStadiumCount();
             }
 
-            function closeDiscountModal() { document.getElementById('discountModal').classList.remove('active'); }
+            function closeDiscountModal() { document.getElementById('discountModal'). classList.remove('active'); }
 
             function toggleSections() {
                 const codeType = document.getElementById('codeType').value;
                 document.getElementById('stadiumSelectionSection').style.display = (codeType === 'Stadium' || codeType === 'Unique') ? 'block' : 'none';
-                document.getElementById('userSelectionSection').style.display = codeType === 'Unique' ? 'block' : 'none';
+                document. getElementById('userSelectionSection').style.display = codeType === 'Unique' ? 'block' : 'none';
             }
 
             function validateDates() {
                 const startDate = document.getElementById('startDate').value;
                 const endDateInput = document.getElementById('endDate');
-                if (startDate && endDateInput.value && startDate > endDateInput.value) {
-                    endDateInput.setCustomValidity('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
+                if (startDate && endDateInput. value && startDate > endDateInput.value) {
+                    endDateInput. setCustomValidity('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
                     endDateInput.reportValidity();
                     return false;
                 }
@@ -513,8 +608,8 @@
             async function searchUsers() {
                 const searchTerm = document.getElementById('userSearchInput').value;
                 const resultsContainer = document.getElementById('userSelectionResults');
-                if (!searchTerm.trim()) {
-                    resultsContainer.innerHTML = '<p class="user-search-message">Nhập SĐT hoặc Email để tìm người dùng.</p>';
+                if (! searchTerm. trim()) {
+                    resultsContainer.innerHTML = '<p class="user-search-message">Nhập SĐT hoặc Email để tìm người dùng. </p>';
                     return;
                 }
                 resultsContainer.innerHTML = '<p class="user-search-message"><i class="fas fa-spinner fa-spin"></i> Đang tìm...</p>';
@@ -525,7 +620,7 @@
                         cacheUserData(result.users);
                         renderUserSelectionResults(result.users, document.querySelector('#userSelectionResults input[name="targetUser"]:checked')?.value);
                     } else {
-                        resultsContainer.innerHTML = `<p class="user-search-message">${result.message || 'Không tìm thấy người dùng.'}</p>`;
+                        resultsContainer. innerHTML = `<p class="user-search-message">${result.message || 'Không tìm thấy người dùng.'}</p>`;
                     }
                 } catch (error) {
                     console.error('Lỗi tìm kiếm người dùng:', error);
@@ -535,7 +630,7 @@
 
             function renderUserSelectionResults(users, selectedUserId = null) {
                 const container = document.getElementById('userSelectionResults');
-                if (users.length === 0 && !selectedUserId) {
+                if (users.length === 0 && ! selectedUserId) {
                     container.innerHTML = '<p class="user-search-message">Không tìm thấy người dùng nào.</p>';
                     return;
                 }
@@ -543,7 +638,7 @@
                     const checked = user.userId == selectedUserId ? 'checked' : '';
                     const avatarSrc = user.avatarUrl ? `https://localhost:7136/${user.avatarUrl}` : '/images/default-avatar.png';
                     return `
-                        <div class="user-card ${checked ? 'user-card-selected' : ''}">
+                        <div class="user-card ${checked ?  'user-card-selected' : ''}">
                            <label class="user-card-content">
                                 <img src="${avatarSrc}" alt="Avatar" class="user-avatar" onerror="this.src='/images/default-avatar.png'; this.onerror=null;">
                                 <div class="user-info">
@@ -559,12 +654,9 @@
             }
 
             function highlightSelectedUser(radioBtn) {
-                // Remove selected class from all cards
                 document.querySelectorAll('.user-card').forEach(card => {
                     card.classList.remove('user-card-selected');
                 });
-
-                // Add selected class to the parent card
                 if (radioBtn.checked) {
                     radioBtn.closest('.user-card').classList.add('user-card-selected');
                 }
@@ -572,7 +664,7 @@
 
             function cacheUserData(users) {
                 users.forEach(user => {
-                    if (!allUsers.some(u => u.userId === user.userId)) {
+                    if (!allUsers.some(u => u. userId === user.userId)) {
                         allUsers.push(user);
                     }
                 });

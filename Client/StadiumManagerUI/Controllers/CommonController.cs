@@ -43,7 +43,7 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
                 ? $"{BASE_URL}{response.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
 
             HttpContext.Session.SetInt32("UserId", response.UserId);
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
@@ -56,7 +56,7 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(userProfileDTO.AvatarUrl)
                 ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
 
             HttpContext.Session.SetInt32("UserId", userProfileDTO.UserId);
             HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
@@ -391,7 +391,7 @@ namespace StadiumManagerUI.Controllers
 
             userProfile.AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
                 ? $"{BASE_URL}{userProfile.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
 
             return View(userProfile);
         }

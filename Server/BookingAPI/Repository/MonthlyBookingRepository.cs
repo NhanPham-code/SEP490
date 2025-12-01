@@ -38,5 +38,12 @@ namespace BookingAPI.Repository
             return monthlyBooking;
         }
 
+        public async Task<MonthlyBooking?> GetMonthlyBookingWithChildrenAsync(int id)
+        {
+            return await _context.MonthlyBookings
+                .Include(mb => mb.Bookings) // Load danh sách con
+                .FirstOrDefaultAsync(mb => mb.Id == id);
+        }
+
     }
 }
