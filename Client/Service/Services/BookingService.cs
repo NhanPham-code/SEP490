@@ -416,5 +416,40 @@ namespace Service.Services
             var result = await response.Content.ReadFromJsonAsync<List<StadiumBookingOverviewDto>>();
             return result ?? new List<StadiumBookingOverviewDto>();
         }
+        
+        public async Task<bool> HasCompletedBookingAtStadiumAsync(string accessToken, int stadiumId)
+        {
+            // Thêm token vào header cho request này
+            AddBearerAccessToken(accessToken);
+
+            // Tạo request URL dựa trên UpstreamPathTemplate của Ocelot
+            var requestUrl = $"/booking/check-completed/{stadiumId}";
+
+            try
+            {
+                // Thực hiện cuộc gọi GET
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                // API có thể được thiết kế để trả về 200 OK nếu có, và 404 Not Found nếu không có.
+                // Chúng ta sẽ coi 200 OK là 'true'.
+                if (response.IsSuccessStatusCode)
+                {
+                    // Nếu muốn chắc chắn hơn, bạn có thể đọc nội dung và kiểm tra giá trị boolean
+                    // var result = await response.Content.ReadFromJsonAsync<bool>();
+                    // return result;
+                    return true;
+                }
+
+                // Nếu không thành công (ví dụ: 404 Not Found, 401 Unauthorized), coi như là 'false'.
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // Ghi lại log lỗi nếu cần thiết
+                Console.WriteLine($"Error calling HasCompletedBookingAtStadiumAsync: {ex.Message}");
+                // Nếu có lỗi xảy ra trong quá trình gọi API, an toàn nhất là trả về false.
+                return false;
+            }
+        }
     }
 }

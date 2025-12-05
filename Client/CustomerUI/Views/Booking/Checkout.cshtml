@@ -407,7 +407,21 @@
             $('#modal-close-btn').click(hideModal);
             $('#close-discount-modal').click(hideDiscountModal);
             if (bookingData.type !== 'day') {
-                $('#back-button').click(() => window.history.back());
+                $('#back-button').on('click', function(e) {
+                    e.preventDefault();
+
+                    // Lấy dữ liệu cần thiết
+                    const stadiumId = bookingData.stadiumId;
+                    const dateToRestore = bookingData.date;
+                    // Mã hóa courts JSON để an toàn khi đặt trong URL
+                    const courtsJson = encodeURIComponent(JSON.stringify(bookingData.courts));
+
+                    // Tạo URL để quay lại trang VisuallyBooking với dữ liệu
+                    const backUrl = `/Booking/VisuallyBooking?stadiumId=${stadiumId}&date=${dateToRestore}&courts=${courtsJson}`;
+
+                    // Chuyển hướng người dùng
+                    window.location.href = backUrl;
+                });
             }
 
             // Gắn sự kiện cho nút "Áp dụng" trong modal

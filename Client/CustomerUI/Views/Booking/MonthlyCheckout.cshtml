@@ -339,7 +339,30 @@
             // Modal and navigation buttons
             $('#modal-close-btn').click(hideModal);
             $('#close-discount-modal').click(hideDiscountModal);
-            $('#back-button').click(() => window.history.back());
+            $('#back-button').off('click').on('click', function(e) {
+                e.preventDefault();
+
+                // Lấy dữ liệu từ bookingData object
+                const stadiumId = bookingData.stadiumId;
+                const year = bookingData.year;
+                const month = bookingData.month; // Đây là tháng 1-based
+                const days = bookingData.selectedDays.join(',');
+                const courtIds = bookingData.selectedCourtIds.join(',');
+                const sTime = bookingData.startTime;
+                const eTime = bookingData.endTime;
+
+                // Xây dựng URL để quay lại
+                const backUrl = `/Booking/MonthlyBooking?stadiumId=${stadiumId}` +
+                    `&year=${year}` +
+                    `&month=${month}` +
+                    `&selectedDays=${days}` +
+                    `&selectedCourtIds=${courtIds}` +
+                    `&startTime=${sTime}` +
+                    `&endTime=${eTime}`;
+
+                // Chuyển hướng người dùng
+                window.location.href = backUrl;
+            });
             $('#select-discount-button').click(() => { fetchDiscounts(); showDiscountModal(); });
 
             // Apply discount logic

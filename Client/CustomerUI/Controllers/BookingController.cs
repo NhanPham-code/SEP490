@@ -529,7 +529,11 @@ namespace CustomerUI.Controllers
             return View();
         }*/
 
-        public IActionResult Booking(string stadiumId)
+        public IActionResult Booking(string stadiumId,
+            string? date,
+            int? startTime,
+            int? endTime,
+            string? courtIds)
         {
 
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -549,12 +553,22 @@ namespace CustomerUI.Controllers
 
             // Truyền stadiumId vào ViewBag để View có thể sử dụng.
             ViewBag.StadiumId = stadiumId;
+            ViewBag.RestoreDate = date;
+            ViewBag.RestoreStartTime = startTime;
+            ViewBag.RestoreEndTime = endTime;
+            ViewBag.RestoreCourtIds = courtIds;
 
             // Trả về cùng một View "Booking.cshtml".
             return View();
         }
 
-        public IActionResult MonthlyBooking(string stadiumId)
+        public IActionResult MonthlyBooking(string stadiumId,
+            int? year,
+            int? month,
+            string? selectedDays,
+            string? selectedCourtIds,
+            int? startTime,
+            int? endTime)
         {
 
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -574,6 +588,12 @@ namespace CustomerUI.Controllers
 
             // Truyền stadiumId vào ViewBag để View có thể sử dụng.
             ViewBag.StadiumId = stadiumId;
+            ViewBag.RestoreYear = year;
+            ViewBag.RestoreMonth = month; 
+            ViewBag.RestoreSelectedDays = selectedDays;
+            ViewBag.RestoreSelectedCourtIds = selectedCourtIds;
+            ViewBag.RestoreStartTime = startTime;
+            ViewBag.RestoreEndTime = endTime;
 
             // Trả về cùng một View "Booking.cshtml".
             return View();
@@ -642,7 +662,7 @@ namespace CustomerUI.Controllers
             return View();
         }
 
-        public IActionResult VisuallyBooking(string stadiumId)
+        public IActionResult VisuallyBooking(string stadiumId, string? date, string? courts)
         {
 
             var accessToken = _tokenService.GetAccessTokenFromCookie();
@@ -661,6 +681,9 @@ namespace CustomerUI.Controllers
 
             // Truyền stadiumId vào ViewBag để View có thể sử dụng.
             ViewBag.StadiumId = stadiumId;
+            
+            ViewBag.RestoreDate = date;
+            ViewBag.RestoreCourts = courts;
 
             // Trả về cùng một View "Booking.cshtml".
             return View();
