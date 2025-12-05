@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
+using System.Threading.Tasks;
 using UserAPI.DTOs;
 using UserAPI.Model;
 
@@ -45,5 +46,9 @@ namespace UserAPI.Service.Interface
         Task<bool> AddorUpdateFaceEmbeddings(int userId, FaceImagesDTO faceImagesDTO);
 
         Task<UserStatisticsDTO> GetUserStatisticsAsync();
+
+        Task<PrivateUserProfileDTO> UpdateNationalIdCardAsync(UpdateNationalIdRequestDTO updateDto);
+
+        Task<bool> VerifyPassword(int userId, string password);
     }
 }
