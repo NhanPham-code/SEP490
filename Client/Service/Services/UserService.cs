@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Service.Services
@@ -84,7 +85,7 @@ namespace Service.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO dto)
+        public async Task<ApiResult<bool>> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO dto)
         {
             using var form = new MultipartFormDataContent();
 
@@ -119,7 +120,36 @@ namespace Service.Services
             }
 
             var response = await _httpClient.PostAsync("/users/ManagerRegister", form);
-            return response.IsSuccessStatusCode;
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ApiResult<bool> { IsSuccess = true };
+            }
+            else
+            {
+                // Server trả về BadRequest với body: { "message": "Lỗi gì đó..." }
+                // Chúng ta cần parse JSON này để lấy message
+                try
+                {
+                    // Dùng thư viện System.Text.Json hoặc Newtonsoft.Json
+                    var errorObj = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(responseString);
+
+                    // Lấy property "message" (khớp với server trả về)
+                    string errorMessage = "Đăng ký thất bại.";
+                    if (errorObj.TryGetProperty("message", out var msg))
+                    {
+                        errorMessage = msg.GetString() ?? errorMessage;
+                    }
+
+                    return new ApiResult<bool> { IsSuccess = false, Message = errorMessage };
+                }
+                catch
+                {
+                    // Trường hợp không parse được JSON lỗi
+                    return new ApiResult<bool> { IsSuccess = false, Message = "Lỗi kết nối đến máy chủ: " + response.StatusCode };
+                }
+            }
         }
 
         public async Task<LogoutResponseDTO> LogoutAsync(LogoutRequestDTO logoutRequestDTO)
@@ -467,6 +497,104 @@ namespace Service.Services
 
             var response = await _httpClient.PutAsync("/users/face-embeddings", form);
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<ApiResult<PrivateUserProfileDTO>> UpdateNationalIdCardAsync(IFormFile frontImage, string accessToken)
+        {
+            try
+            {
+                AddBearerAccessToken(accessToken);
+
+                using var form = new MultipartFormDataContent();
+
+                if (frontImage != null)
+                {
+                    var frontContent = new StreamContent(frontImage.OpenReadStream());
+                    frontContent.Headers.ContentType = new MediaTypeHeaderValue(frontImage.ContentType);
+                    // Key "frontImage" phải khớp với parameter [FromForm] IFormFile frontImage bên Controller Server
+                    form.Add(frontContent, "frontImage", frontImage.FileName);
+                }
+                else
+                {
+                    return new ApiResult<PrivateUserProfileDTO> { IsSuccess = false, Message = "Vui lòng chọn ảnh CCCD mặt trước." };
+                }
+
+                // Gọi API Server
+                var response = await _httpClient.PutAsync("/users/update-national-id", form);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse JSON trả về
+                    var jsonDoc = System.Text.Json.JsonDocument.Parse(responseString);
+
+                    // Lấy object "user" từ JSON response
+                    if (jsonDoc.RootElement.TryGetProperty("user", out var userElement))
+                    {
+                        var userData = System.Text.Json.JsonSerializer.Deserialize<PrivateUserProfileDTO>(
+                            userElement.GetRawText(),
+                            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+
+                        return new ApiResult<PrivateUserProfileDTO>
+                        {
+                            IsSuccess = true,
+                            Data = userData,
+                            Message = "Cập nhật CCCD thành công."
+                        };
+                    }
+
+                    return new ApiResult<PrivateUserProfileDTO> { IsSuccess = true, Message = "Cập nhật thành công (Không có dữ liệu user trả về)." };
+                }
+                else
+                {
+                    // Xử lý lỗi từ server trả về (BadRequest 400, Error 500...)
+                    string errorMessage = "Lỗi cập nhật CCCD.";
+                    try
+                    {
+                        var errorObj = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(responseString);
+                        if (errorObj.TryGetProperty("message", out var msg))
+                        {
+                            errorMessage = msg.GetString() ?? errorMessage;
+                        }
+                    }
+                    catch
+                    {
+                        errorMessage += $" (Status: {response.StatusCode})";
+                    }
+
+                    return new ApiResult<PrivateUserProfileDTO> { IsSuccess = false, Message = errorMessage };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<PrivateUserProfileDTO> { IsSuccess = false, Message = "Lỗi kết nối hệ thống: " + ex.Message };
+            }
+
+        }
+
+        public async Task<ApiResult<string>> VerifyPassword(VerifyPasswordRequestDTO dto, string accessToken)
+        {
+            try
+            {
+                AddBearerAccessToken(accessToken);
+
+                var response = await _httpClient.PostAsJsonAsync("/users/VerifyPassword", dto);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResult<string> { IsSuccess = true, Message = "Xác thực thành công." };
+                }
+                else
+                {
+                    return new ApiResult<string> { IsSuccess = false, Message = "Mật khẩu không chính xác." };
+                }
+            }
+            catch
+            {
+                return new ApiResult<string> { IsSuccess = false, Message = "Lỗi kết nối server." };
+            }
         }
     }
 }

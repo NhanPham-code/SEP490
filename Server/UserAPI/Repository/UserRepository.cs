@@ -148,5 +148,10 @@ namespace UserAPI.Repository
                 NewUsersLast6Months = newUsersLast6Months
             };
         }
+
+        public async Task<bool> IsIdentityNumberExistsAsync(string identityNumber)
+        {
+            return await _context.Users.AnyAsync(u => u.IdentityNumber == identityNumber);
+        }
     }
 }

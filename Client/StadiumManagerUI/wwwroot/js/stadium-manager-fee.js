@@ -60,6 +60,27 @@
     async function handleUploadSubmit(event) {
         event.preventDefault();
         const form = event.target;
+
+        const fileInput = document.getElementById('billImageInput');
+        const file = fileInput.files[0];
+
+        // Kiểm tra nếu có file
+        if (file) {
+            // Kiểm tra loại file (MIME type)
+            const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                elements.uploadModal.errorDiv.textContent = 'Vui lòng chỉ chọn file ảnh (jpg, png, jpeg).';
+                return;
+            }
+
+            // Kiểm tra kích thước file nếu muốn
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSizeInBytes) {
+                elements.uploadModal.errorDiv.textContent = 'File ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.';
+                return;
+            }
+        }
+
         const formData = new FormData(form);
         const originalBtnText = elements.uploadModal.submitBtn.innerHTML;
 

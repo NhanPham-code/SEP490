@@ -50,7 +50,6 @@ namespace UserAPI.Service
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("AI service trả về lỗi. Status Code: {StatusCode}. Response Body: {ResponseBody}", response.StatusCode, responseBody);
-                    // Ném ra ngoại lệ sau khi đã ghi log
                     response.EnsureSuccessStatusCode();
                 }
 
@@ -73,7 +72,7 @@ namespace UserAPI.Service
                     return null; // Trả về null
                 }
 
-                // (Tùy chọn) Ghi log khi deserialize thành công ở cấp độ Debug để không làm spam log production
+                // Ghi log khi deserialize thành công ở cấp độ Debug để không làm spam log production
                 _logger.LogInformation("Trích xuất dữ liệu từ CCCD thành công. Số CCCD: {CccdId}", aiResponse.Id.First());
 
                 return aiResponse;

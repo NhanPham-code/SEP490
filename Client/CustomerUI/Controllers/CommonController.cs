@@ -502,17 +502,28 @@ namespace CustomerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            // 1. Get tokens from cookie
+            // Kiểm tra cờ xác thực
+            if (TempData["ProfileVerified"] == null || (bool)TempData["ProfileVerified"] == false)
+            {
+                // Nếu chưa xác thực mà cố vào -> Đá về trang chủ và báo lỗi
+                TempData["ErrorMessage"] = "Vui lòng xác thực mật khẩu trước khi truy cập thông tin cá nhân.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Xóa cờ xác thực sau khi đã sử dụng
+            TempData.Remove("ProfileVerified");
+
+            // Get tokens from cookie
             var accessToken = _tokenService.GetAccessTokenFromCookie();
 
-            // 2. Handle missing access token
+            // Handle missing access token
             if (string.IsNullOrEmpty(accessToken))
             {
                 TempData["ErrorMessage"] = "Access Token is missing.";
                 return RedirectToAction("Login");
             }
 
-            // 3. Initial service call
+            // Initial service call
             var userProfile = await _userService.GetMyProfileAsync(accessToken);
 
             if (userProfile == null)
@@ -700,6 +711,34 @@ namespace CustomerUI.Controllers
             HttpContext.Session.Clear();
 
             return Json(new { success = true, message = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập với mật khẩu mới." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyPassword(string password)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            var dto = new VerifyPasswordRequestDTO
+            {
+                Password = password
+            };
+
+            var result = await _userService.VerifyPassword(dto, accessToken);
+
+            if (result.IsSuccess)
+            {
+                // Đánh dấu Session/TempData là đã xác thực cho Profile
+                // Tránh truy cập trái phép vào trang chỉnh sửa profile
+                TempData["ProfileVerified"] = true;
+                TempData.Keep("ProfileVerified");
+                return Ok(new { success = true, message = result.Message ?? "Xác thực thành công." });
+            }
+
+            return Ok(new { success = false, message = result.Message ?? "Mật khẩu không chính xác." });
         }
 
         //public IActionResult GetSignalRToken()
