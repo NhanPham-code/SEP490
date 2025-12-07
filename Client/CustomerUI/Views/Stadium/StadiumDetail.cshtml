@@ -1,4 +1,5 @@
-﻿@model DTOs.StadiumDTO.ReadStadiumDTO
+﻿@using DTOs.StadiumDTO
+@model ReadStadiumDTO
 
 @{
     ViewData["Title"] = Model.Name;
@@ -8,6 +9,7 @@
     var maxPrice = Model.Courts?.Any() == true ? Model.Courts.Max(c => c.PricePerHour) : 0;
     var priceRange = minPrice == maxPrice ? $"{minPrice:N0} VNĐ/giờ" : $"{minPrice:N0} - {maxPrice:N0} VNĐ/giờ";
     var operatingHours = $"{Model.OpenTime:hh\\:mm} - {Model.CloseTime:hh\\:mm}";
+    var videos = ViewBag.StadiumVideos as List<ReadStadiumVideoDTO>;
     var mapEmbedUrl = (Model.Latitude.HasValue && Model.Longitude.HasValue)
         ? $"https://maps.google.com/maps?q={Model.Latitude},{Model.Longitude}&hl=vi&z=16&amp;output=embed"
         : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.553950669145!2d106.66442651474932!3d10.769931892323048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f1e29e9447d%3A0x7d0e405e3a89e103!2zS2h1IEdp4bqjaSB0csOtIFRo4buRbmcgTmjhuqV0LCBQaOG7sOG7nW5nIDIsIFF14bqtbiAxMCwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1678893922639!5m2!1svi!2s";
@@ -802,6 +804,13 @@
                 cursor: pointer;
                 margin-left: auto;
             }
+
+            .slider-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Keeps video aspect ratio within the container */
+            background: black; /* Background for letterboxing */
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center">
@@ -907,25 +916,52 @@
                 <p id="stadium-address" class="text-gray-600">@Model.Address</p>
             </div>
 
+            <!-- SLIDER CONTAINER (UPDATED) -->
             <div class="slider-container mb-10">
-                <div class="relative w-full h-80 overflow-hidden rounded-2xl">
+                <div class="relative w-full h-80 overflow-hidden rounded-2xl bg-gray-100">
+
+                    @{
+                        bool hasMedia = false;
+                    }
+
+                    @* 1. Render Images *@
                     @if (Model.StadiumImages != null && Model.StadiumImages.Any())
                     {
+                        hasMedia = true;
                         foreach (var image in Model.StadiumImages)
                         {
-                            <div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+                            <div class="slider-item absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0">
                                 <img src="https://localhost:7280/@image.ImageUrl" class="slider-image object-cover w-full h-full" alt="Hình ảnh sân @Model.Name">
                                 <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-                                    <p class="text-sm">Hình ảnh sân vận động.</p>
+                                    <p class="text-sm">Hình ảnh sân vận động</p>
                                 </div>
                             </div>
                         }
                     }
-                    else
+
+                    @* 2. Render Videos (NEW) *@
+                    @if (videos != null && videos.Any())
                     {
-                        <!-- Ảnh mặc định nếu không có ảnh nào -->
-                        <div class="slider-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100">
-                            <img src="https://images.unsplash.com/photo-1541252260770-cefd4f3d2a7c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" class="slider-image object-cover w-full h-full" alt="Sân banh cỏ tự nhiên">
+                        hasMedia = true;
+                        foreach (var video in videos)
+                        {
+                            <div class="slider-item absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0">
+                                <video class="slider-video" controls playsinline>
+                                    <source src="@video.VideoUrl" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 pointer-events-none">
+                                    <p class="text-sm">Video giới thiệu sân</p>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @* 3. Fallback Image if no images and no videos *@
+                    @if (!hasMedia)
+                    {
+                        <div class="slider-item absolute inset-0 transition-opacity duration-500 ease-in-out opacity-100">
+                            <img src="https://images.unsplash.com/photo-1541252260770-cefd4f3d2a7c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" class="slider-image object-cover w-full h-full" alt="Sân banh cỏ tự nhiên">
                             <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
                                 <p class="text-sm">Sân cỏ chất lượng cao.</p>
                             </div>
@@ -933,8 +969,8 @@
                     }
                 </div>
 
-                <a class="slider-prev absolute top-1/2 left-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-r-lg" onclick="plusSlides(-1)">❮</a>
-                <a class="slider-next absolute top-1/2 right-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-l-lg" onclick="plusSlides(1)">❯</a>
+                <a class="slider-prev absolute top-1/2 left-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-r-lg z-10" onclick="plusSlides(-1)">❮</a>
+                <a class="slider-next absolute top-1/2 right-0 transform -translate-y-1/2 px-4 py-2 text-white text-3xl font-bold transition-all duration-300 rounded-l-lg z-10" onclick="plusSlides(1)">❯</a>
             </div>
             </br>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -1102,6 +1138,7 @@
             </div>
         </div>
     </div>
+
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -1907,50 +1944,8 @@
                 document.getElementById('booking-btn').onclick = showBookingModal;
 
 
-                // Click outside modal to close
-                window.onclick = function(event) {
-                    if (event.target === modalEl) {
-                        hideModal();
-                    }
-                    if (event.target === bookingModalEl) {
-                        hideBookingModal();
-                    }
-                }
-                            function showSlides() {
-                                let slides = document.getElementsByClassName("slider-item");
-                                if (slides.length === 0) return;
-
-                                for (let i = 0; i < slides.length; i++) {
-                                    slides[i].style.opacity = "0";
-                                }
-                                slideIndex++;
-                                if (slideIndex > slides.length) { slideIndex = 1 }
-                                slides[slideIndex - 1].style.opacity = "1";
-                                slideTimer = setTimeout(showSlides, 4000);
-                            }
-
-                            function plusSlides(n) {
-                                let slides = document.getElementsByClassName("slider-item");
-                                if (slides.length === 0) return;
-                                clearTimeout(slideTimer);
-                                slideIndex += n;
-                                if (slideIndex > slides.length) {slideIndex = 1}
-                                if (slideIndex < 1) {slideIndex = slides.length}
-
-                                for (let i = 0; i < slides.length; i++) {
-                                    slides[i].style.opacity = "0";
-                                }
-                                slides[slideIndex - 1].style.opacity = "1";
-                                slideTimer = setTimeout(showSlides, 4000); // Restart timer
-                            }
-                        window.onload = function() {
-                                showSlides();
-
-                            };
-
-
-
-                                    // Notification + modal helpers (paste near bottom, after jQuery ready or inside ready)
+                            
+                                    
                 (function(){
                   'use strict';
 
@@ -2048,6 +2043,9 @@
                   window.hideBookingModal = hideBookingModal;
                 })();
     </script>
+
+    
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
@@ -2190,6 +2188,99 @@
             }
         })();
     </script>
+    <script>
+        /* =============================================================
+           SCRIPT SỬA LỖI TOÀN DIỆN (SLIDER + MODAL + GLOBAL SCOPE)
+           ============================================================= */
 
+        // 1. Đảm bảo biến toàn cục cho Slider
+        window.slideIndex = 1;
+        window.slideTimer = null;
+        window.isVideoPlaying = false;
+
+        // 2. Định nghĩa hàm plusSlides GẮN TRỰC TIẾP vào WINDOW để HTML gọi được
+        window.plusSlides = function(n) {
+            window.showSlides(window.slideIndex += n);
+            resetAutoSlide();
+        };
+
+        window.currentSlide = function(n) {
+            window.showSlides(window.slideIndex = n);
+            resetAutoSlide();
+        };
+
+        window.showSlides = function(n) {
+            let slides = document.getElementsByClassName("slider-item");
+
+            // Nếu chưa có slide nào thì dừng, không báo lỗi
+            if (!slides || slides.length === 0) return;
+
+            // Logic vòng lặp
+            if (n > slides.length) { window.slideIndex = 1 }
+            if (n < 1) { window.slideIndex = slides.length }
+
+            // Tạm dừng mọi video đang phát
+            document.querySelectorAll('video').forEach(v => v.pause());
+            window.isVideoPlaying = false;
+
+            // Ẩn tất cả slide
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.opacity = "0";
+                slides[i].style.zIndex = "0";
+                slides[i].style.pointerEvents = "none";
+            }
+
+            // Hiện slide hiện tại
+            let current = slides[window.slideIndex - 1];
+            if (current) {
+                current.style.opacity = "1";
+                current.style.zIndex = "10";
+                current.style.pointerEvents = "auto";
+
+                // Nếu là video: Xử lý logic dừng tự động chuyển
+                let vid = current.querySelector('video');
+                if (vid) {
+                    vid.onplay = () => { window.isVideoPlaying = true; stopAutoSlide(); };
+                    vid.onpause = () => { window.isVideoPlaying = false; startAutoSlide(); };
+                    vid.onended = () => { window.isVideoPlaying = false; window.plusSlides(1); };
+                }
+            }
+        };
+
+        // 3. Logic tự động chạy (Auto Slide)
+        function startAutoSlide() {
+            stopAutoSlide();
+            if (!window.isVideoPlaying) {
+                window.slideTimer = setTimeout(() => window.plusSlides(1), 5000);
+            }
+        }
+
+        function stopAutoSlide() {
+            if (window.slideTimer) {
+                clearTimeout(window.slideTimer);
+                window.slideTimer = null;
+            }
+        }
+
+        function resetAutoSlide() {
+            stopAutoSlide();
+            if (!window.isVideoPlaying) startAutoSlide();
+        }
+
+        // 4. Sửa lỗi Modal (Dùng getElementById trực tiếp để không bị lỗi undefined)
+        window.onclick = function(event) {
+            let modal = document.getElementById('custom-modal');
+            let bookingModal = document.getElementById('booking-modal');
+
+            if (modal && event.target == modal) modal.style.display = "none";
+            if (bookingModal && event.target == bookingModal) bookingModal.style.display = "none";
+        };
+
+        // 5. Khởi chạy khi trang tải xong
+        document.addEventListener("DOMContentLoaded", function() {
+            window.showSlides(window.slideIndex);
+            startAutoSlide();
+        });
+    </script>
 </body>
 </html>

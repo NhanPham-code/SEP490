@@ -201,7 +201,7 @@
 
                     <div class="field-group">
                         <div class="floating-label">
-                            <input type="tel" id="register-phone" placeholder="Số điện thoại" required pattern="[0-9]{10,15}" />
+                            <input type="number" id="register-phone" placeholder="Số điện thoại" />
                             <i class="ri-phone-line icon text-xl"></i>
                         </div>
                         <div id="register-phone-error" class="field-error">
@@ -492,8 +492,15 @@
             const errorDiv = document.getElementById(fieldId + '-error');
 
             if (input && errorDiv) {
+                // QUAN TRỌNG: Hủy bỏ lệnh xóa text đang chờ (nếu có)
+                if (errorDiv.clearTextTimeout) {
+                    clearTimeout(errorDiv.clearTextTimeout);
+                    errorDiv.clearTextTimeout = null;
+                }
+
                 input.classList.add('error');
-                errorDiv.querySelector('span').textContent = message;
+                const span = errorDiv.querySelector('span');
+                if (span) span.textContent = message;
                 errorDiv.classList.add('show');
             }
         }
@@ -505,22 +512,45 @@
             if (input && errorDiv) {
                 input.classList.remove('error');
                 errorDiv.classList.remove('show');
-                setTimeout(() => {
-                    errorDiv.querySelector('span').textContent = '';
+
+                // Hủy timeout cũ
+                if (errorDiv.clearTextTimeout) {
+                    clearTimeout(errorDiv.clearTextTimeout);
+                }
+
+                // Đặt timeout mới để xóa text sau khi hiệu ứng ẩn kết thúc
+                errorDiv.clearTextTimeout = setTimeout(() => {
+                    const span = errorDiv.querySelector('span');
+                    if (span) span.textContent = '';
+                    errorDiv.clearTextTimeout = null;
                 }, 200);
             }
         }
 
         function clearAllFieldErrors(formId) {
             const form = document.getElementById(formId);
-            const errorDivs = form.querySelectorAll('.field-error.show');
-            const errorInputs = form.querySelectorAll('input.error, select.error, .custom-select-trigger.error');
 
-            errorInputs.forEach(input => input.classList.remove('error'));
+            // Xử lý input bị đánh dấu lỗi
+            const errorInputs = form.querySelectorAll('.error');
+            errorInputs.forEach(input => {
+                input.classList.remove('error');
+            });
+
+            // Xử lý các div thông báo lỗi đang hiện
+            const errorDivs = form.querySelectorAll('.field-error.show');
             errorDivs.forEach(div => {
                 div.classList.remove('show');
-                setTimeout(() => {
-                    div.querySelector('span').textContent = '';
+
+                // Hủy timeout cũ
+                if (div.clearTextTimeout) {
+                    clearTimeout(div.clearTextTimeout);
+                }
+
+                // Đặt timeout mới
+                div.clearTextTimeout = setTimeout(() => {
+                    const span = div.querySelector('span');
+                    if (span) span.textContent = '';
+                    div.clearTextTimeout = null;
                 }, 200);
             });
         }
@@ -550,6 +580,15 @@
 
         function validateFullName(name) {
             return /^[a-zA-ZÀ-ỹ\s]{2,}$/.test(name);
+        }
+
+        // Hàm kiểm tra số điện thoại Việt Nam
+        function validateVietnamesePhone(phone) {
+            // Regex giải thích:
+            // ^(03|05|07|08|09) : Bắt đầu bằng 03, 05, 07, 08 hoặc 09 (các đầu số di động VN hiện nay)
+            // \d{8}$            : Theo sau là đúng 8 chữ số nữa (Tổng cộng 10 số)
+            const regex = /^(03|05|07|08|09)\d{8}$/;
+            return regex.test(phone);
         }
 
         function getPasswordStrength(password) {
@@ -886,9 +925,20 @@
                 if (!formData.phoneNumber) {
                     showFieldError('register-phone', 'Số điện thoại không được để trống');
                     hasError = true;
-                } else if (!validatePhone(formData.phoneNumber)) {
-                    showFieldError('register-phone', 'Số điện thoại phải có từ 10-15 chữ số');
-                    hasError = true;
+                } else {
+                    // Loại bỏ khoảng trắng thừa nếu người dùng nhập kiểu "0912 345 678"
+                    const cleanPhone = formData.phoneNumber.replace(/\s/g, '');
+
+                    // Kiểm tra xem có phải toàn số không
+                    if (!/^\d+$/.test(cleanPhone)) {
+                        showFieldError('register-phone', 'Số điện thoại chỉ được chứa chữ số');
+                        hasError = true;
+                    }
+                    // Kiểm tra định dạng VN
+                    else if (!validateVietnamesePhone(cleanPhone)) {
+                        showFieldError('register-phone', 'SĐT không hợp lệ (Phải là 10 số, đầu 03, 05, 07, 08, 09)');
+                        hasError = true;
+                    }
                 }
 
                 if (!formData.gender) {
@@ -904,9 +954,23 @@
                 if (!formData.password) {
                     showFieldError('register-password', 'Mật khẩu không được để trống');
                     hasError = true;
-                } else if (getPasswordStrength(formData.password) < 3) {
-                    showFieldError('register-password', 'Mật khẩu phải đạt độ mạnh "Tốt" trở lên');
-                    hasError = true;
+                } else {
+                    // --- LOGIC KIỂM TRA CHI TIẾT ---
+                    const missingRules = [];
+                    if (formData.password.length < 8) missingRules.push("8 ký tự");
+                    if (!/[A-Z]/.test(formData.password)) missingRules.push("chữ in hoa");
+                    if (!/\d/.test(formData.password)) missingRules.push("số");
+                    if (!/[^a-zA-Z\d\s]/.test(formData.password)) missingRules.push("ký tự đặc biệt");
+
+                    // Nếu điểm < 3 (tức là chưa đạt mức "Tốt")
+                    if (getPasswordStrength(formData.password) < 3) {
+                        let msg = 'Mật khẩu chưa đủ mạnh.';
+                        if (missingRules.length > 0) {
+                            msg += ' Cần thêm: ' + missingRules.join(', ') + '.';
+                        }
+                        showFieldError('register-password', msg);
+                        hasError = true;
+                    }
                 }
 
                 if (!confirmPassword) {

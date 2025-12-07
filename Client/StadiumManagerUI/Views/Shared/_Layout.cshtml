@@ -507,6 +507,45 @@
             </div>
         </header>
 
+        <!-- Modal Xác thực Mật khẩu -->
+        <div class="modal fade" id="securityCheckModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <!-- Thêm modal-sm nếu muốn modal nhỏ gọn hơn -->
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header border-0 pb-0 justify-content-center">
+                        <!-- Canh giữa tiêu đề -->
+                        <h5 class="modal-title fw-bold text-primary">
+                            <i class="fas fa-shield-alt me-2"></i>Xác thực
+                        </h5>
+                        <!-- Nút đóng nhỏ gọn absolute ở góc -->
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-2 px-4 pb-4">
+                        <p class="text-muted small text-center mb-4">Nhập mật khẩu để tiếp tục.</p>
+                        <form id="verifyPassForm">
+                            <div class="mb-4 position-relative">
+                                <input type="password" class="form-control bg-light border-0 rounded-3 py-2"
+                                       id="securityPassword" placeholder="Mật khẩu..." required>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted border-0"
+                                        onclick="togglePassVisibility()">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5 py-2 shadow-sm" id="btnConfirmPass">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="verifySpinner"></span>
+                                    Xác nhận
+                                </button>
+                            </div>
+
+                            <div id="verifyErrorMsg" class="text-danger text-center mt-3 small d-none"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main class="content">
             @RenderBody()
         </main>
@@ -1006,5 +1045,79 @@
         }
     </script>
   
+
+    <!-- Xử lí xác thực mật khẩu khi xem thông tin tài khoảng-->
+    <script>
+        // Toggle hiện mật khẩu
+        function togglePassVisibility() {
+            const input = document.getElementById('securityPassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Xử lý logic
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileLink = document.querySelector('a[href*="/Common/Profile"]'); // Tìm link Profile
+            const modal = new bootstrap.Modal(document.getElementById('securityCheckModal'));
+            const form = document.getElementById('verifyPassForm');
+            const errMsg = document.getElementById('verifyErrorMsg');
+            const spinner = document.getElementById('verifySpinner');
+            const btn = document.getElementById('btnConfirmPass');
+
+            if (profileLink) {
+                // 1. Chặn hành động click mặc định
+                profileLink.addEventListener('click', function (e) {
+                    e.preventDefault(); // Không chuyển trang ngay
+                    document.getElementById('securityPassword').value = ''; // Reset input
+                    errMsg.classList.add('d-none');
+                    modal.show(); // Hiện modal
+                });
+            }
+
+            // 2. Xử lý submit form xác thực
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const password = document.getElementById('securityPassword').value;
+
+                // UI loading
+                btn.disabled = true;
+                spinner.classList.remove('d-none');
+                errMsg.classList.add('d-none');
+
+                // 3. Gọi Ajax Verify
+                $.ajax({
+                    url: '/Common/VerifyPassword', // Controller đã có
+                    type: 'POST',
+                    data: { password: password },
+                    success: function (res) {
+                        if (res.success) {
+                            // Mật khẩu đúng -> Chuyển trang
+                            window.location.href = '/Common/Profile';
+                        } else {
+                            // Mật khẩu sai
+                            errMsg.textContent = res.message || "Mật khẩu không đúng.";
+                            errMsg.classList.remove('d-none');
+                            btn.disabled = false;
+                            spinner.classList.add('d-none');
+                        }
+                    },
+                    error: function () {
+                        errMsg.textContent = "Lỗi kết nối máy chủ.";
+                        errMsg.classList.remove('d-none');
+                        btn.disabled = false;
+                        spinner.classList.add('d-none');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

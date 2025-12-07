@@ -228,6 +228,19 @@
         <div class="bm-filter-group">
             <button id="bm-apply-filter-btn" type="submit" class="bm-create-booking-btn"><i class="fas fa-filter"></i> Lọc</button>
         </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-container alert-danger" role="alert">
+                <strong>Lỗi!</strong> @TempData["ErrorMessage"]
+            </div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-container alert-success" role="alert">
+                <strong>Thành công!</strong> @TempData["SuccessMessage"]
+            </div>
+        }
     </form>
 
     <div id="booking-tables-container">

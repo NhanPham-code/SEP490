@@ -22,5 +22,7 @@ namespace UserAPI.Repository.Interface
         Task<List<UserEmbeddingDTO>> GetAllUserEmbeddingsAsync();
 
         Task<UserStatisticsDTO> GetUserStatisticsAsync();
+
+        Task<bool> IsIdentityNumberExistsAsync(string identityNumber);
     }
 }

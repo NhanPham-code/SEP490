@@ -165,6 +165,11 @@ namespace UserAPI.Data
                 .HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(rt => rt.UserId);
+
+            // Cấu hình  Index duy nhất cho IdentityNumber
+            modelBuilder.Entity<User>()
+            .HasIndex(u => u.IdentityNumber)
+            .IsUnique();
         }
     }
 }

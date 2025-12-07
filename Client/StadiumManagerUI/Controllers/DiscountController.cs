@@ -48,7 +48,12 @@ namespace StadiumManagerUI.Controllers
 
         // Action này được JavaScript gọi để LẤY TẤT CẢ DỮ LIỆU discount VỚI PHÂN TRANG
         [HttpGet]
-        public async Task<IActionResult> GetDiscountPageData(int page = 1, int pageSize = 5, string? searchByCode = null, int? stadiumId = null, bool? isActive = null)
+        public async Task<IActionResult> GetDiscountPageData(
+        int page = 1,
+        int pageSize = 5,
+        string? searchByCode = null,
+        int? stadiumId = null,
+        bool? isActive = null)
         {
             var accessToken = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(accessToken))
@@ -62,23 +67,21 @@ namespace StadiumManagerUI.Controllers
                 return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
             }
 
-            // --- LOGIC UPDATE START ---
-
-            // 1. Lấy danh sách discount trước
-            var discountsResponse = await _discountService.GetDiscountsByUserAsync(
+            // ✅ Dùng hàm mới GetDiscountsAsync
+            var discountsResponse = await _discountService.GetDiscountsAsync(
                 accessToken,
-                userId,
-                page,
-                pageSize,
-                searchByCode,
-                stadiumId,
-                isActive
+                userId: userId,
+                page: page,
+                pageSize: pageSize,
+                searchByCode: searchByCode,
+                stadiumIds: stadiumId.HasValue ? new List<int> { stadiumId.Value } : null,
+                isActive: isActive
             );
 
             var discounts = discountsResponse?.Value ?? new List<ReadDiscountDTO>();
             var totalCount = discountsResponse?.Count ?? 0;
 
-            // 2. Thu thập TargetUserIds từ danh sách discount
+            // Thu thập TargetUserIds từ danh sách discount
             var targetUserIds = discounts
                 .Where(d => !string.IsNullOrEmpty(d.TargetUserId) && int.TryParse(d.TargetUserId, out _))
                 .Select(d => int.Parse(d.TargetUserId!))
@@ -86,17 +89,15 @@ namespace StadiumManagerUI.Controllers
                 .ToList();
 
             var targetUsers = new List<PublicUserProfileDTO>();
-            // 3. Gọi service để lấy thông tin user nếu có ID
             if (targetUserIds.Any())
             {
                 targetUsers = await _userService.GetUsersByIdsAsync(targetUserIds, accessToken);
             }
 
-            // 4. Lấy danh sách stadium (có thể chạy song song với việc lấy user)
+            // Lấy danh sách stadium
             string filter = $"&$filter=CreatedBy eq {userId}";
             var stadiumsJson = await _stadiumService.SearchStadiumAsync(filter);
 
-            // Xử lý stadium
             var stadiums = new List<ReadStadiumDTO>();
             if (!string.IsNullOrEmpty(stadiumsJson))
             {
@@ -108,7 +109,8 @@ namespace StadiumManagerUI.Controllers
                     {
                         if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement))
                         {
-                            stadiums = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(valueElement.GetRawText(), options) ?? new List<ReadStadiumDTO>();
+                            stadiums = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(valueElement.GetRawText(), options)
+                                ?? new List<ReadStadiumDTO>();
                         }
                     }
                 }
@@ -118,10 +120,7 @@ namespace StadiumManagerUI.Controllers
                 }
             }
 
-            // 5. Trả về cho client: discounts, stadiums, targetUsers, và count
             return Json(new { discounts, stadiums, targetUsers, count = totalCount });
-
-            // --- LOGIC UPDATE END ---
         }
 
         // NEW ACTION to search for users

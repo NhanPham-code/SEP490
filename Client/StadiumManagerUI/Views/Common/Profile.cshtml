@@ -57,7 +57,7 @@
                 <!-- Avatar Section -->
                 <div class="avatar-section">
                     <div class="avatar-container group" id="avatarClick" title="Nhấn để thay đổi ảnh đại diện">
-                        <img id="avatarImg" src="@(Model.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" />
+                        <img id="avatarImg" src="@(Model.AvatarUrl)" alt="Avatar" />
                         <div class="avatar-edit-btn" title="Đổi ảnh đại diện">
                             <i class="ri-camera-line text-lg"></i>
                         </div>
@@ -152,6 +152,10 @@
                             <i class="ri-edit-line text-lg"></i>
                             <span>Chỉnh sửa</span>
                         </button>
+                        <button type="button" id="btnOpenCCCD" class="px-6 py-2.5 rounded-xl font-medium text-white shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:shadow-purple-500/40 transform hover:-translate-y-0.5">
+                            <i class="ri-id-card-line text-lg"></i>
+                            <span>Cập nhật CCCD</span>
+                        </button>
                         <button type="submit" id="saveBtn" class="btn-gradient hidden">
                             <i class="ri-save-3-line text-lg"></i>
                             <span>Lưu thay đổi</span>
@@ -222,6 +226,82 @@
                     <span>Lưu ảnh mới</span>
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- CCCD Modal-->
+    <div id="cccdModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden bg-black bg-opacity-50 backdrop-blur-sm transition-opacity">
+        <div class="modal-content w-full max-w-5xl bg-white rounded-2xl shadow-2xl relative flex flex-col md:flex-row overflow-hidden max-h-[90vh]">
+
+            <button type="button" onclick="closeModal('cccdModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+
+            <!-- CỘT TRÁI: ẢNH HIỆN TẠI -->
+            <div class="w-full md:w-1/2 bg-gray-50 p-8 border-r border-gray-100 flex flex-col items-center justify-center">
+                <h3 class="text-lg font-bold text-gray-700 mb-4"><i class="ri-image-2-line mr-2"></i>Ảnh CCCD hiện tại</h3>
+                <div class="relative w-full h-64 md:h-80 rounded-xl border-2 border-gray-200 shadow-sm bg-white overflow-hidden group">
+                    @if (!string.IsNullOrEmpty(Model.FrontCCCDUrl))
+                    {
+                        <img src="@(Model.FrontCCCDUrl)"
+                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                             alt="CCCD Hiện tại" />
+                        <div class="absolute top-2 right-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md font-bold border border-green-200 shadow-sm">
+                            Đang sử dụng
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                            <i class="ri-image-line text-5xl mb-2"></i>
+                            <span>Chưa có dữ liệu ảnh</span>
+                        </div>
+                    }
+                </div>
+                <p class="text-xs text-gray-400 mt-3 text-center">Hình ảnh được lưu trữ bảo mật trên hệ thống.</p>
+            </div>
+
+            <!-- CỘT PHẢI: FORM UPLOAD -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Cập nhật Mới
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1">Vui lòng tải lên ảnh mặt trước CCCD rõ nét.</p>
+                </div>
+
+                <form id="cccdForm" enctype="multipart/form-data" class="space-y-5">
+                    <div class="relative group cursor-pointer border-2 border-dashed border-indigo-200 hover:border-indigo-500 rounded-2xl p-2 h-64 flex flex-col justify-center items-center bg-indigo-50/30 transition-all duration-300" onclick="document.getElementById('frontCccdUpload').click()">
+
+                        <input type="file" id="frontCccdUpload" name="frontImage" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" />
+
+                        <div id="frontPlaceholder" class="flex flex-col items-center transform transition-transform group-hover:scale-105">
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-3">
+                                <i class="ri-upload-cloud-2-fill text-3xl text-indigo-500"></i>
+                            </div>
+                            <span class="text-indigo-900 font-medium">Nhấn để chọn ảnh mới</span>
+                            <span class="text-xs text-indigo-400 mt-1">Hỗ trợ JPG, PNG (Max 5MB)</span>
+                        </div>
+
+                        <img id="frontPreview" class="hidden w-full h-full object-contain rounded-lg shadow-sm" />
+
+                        <div id="changeOverlay" class="hidden absolute inset-0 bg-black bg-opacity-40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-white font-medium bg-black bg-opacity-50 px-3 py-1 rounded-full backdrop-blur-sm">
+                                <i class="ri-camera-switch-line mr-1"></i> Đổi ảnh khác
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="cccdLoading" class="hidden flex flex-col items-center justify-center py-2">
+                        <div class="loading-spinner w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                        <span class="text-sm text-indigo-600 font-medium animate-pulse">Hệ thống AI đang xác thực...</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-white shadow-lg shadow-indigo-500/30 bg-gradient-to-r from-indigo-500 to-purple-600 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed" id="submitCccdBtn">
+                        <i class="ri-shield-check-line mr-2"></i> Xác nhận Cập nhật
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -382,28 +462,46 @@
             function validateForm() {
                 const fullnameInput = document.getElementById("fullnameInput");
                 const phoneInput = document.getElementById("phoneInput");
+                const addressInput = document.getElementById("addressInput");
 
                 if (!fullnameInput) {
-                    console.error('Fullname input not found');
+                    console.error('Required inputs not found');
                     return false;
                 }
 
                 const fullname = fullnameInput.value.trim();
                 const phone = phoneInput ? phoneInput.value.trim() : '';
+                const address = addressInput ? addressInput.value.trim() : '';
 
+                // 1. Kiểm tra Họ tên
                 if (!fullname) {
                     showToast("Vui lòng nhập họ và tên", "error");
                     fullnameInput.focus();
                     return false;
                 }
 
-                if (phone) {
-                    const phoneRegex = /^[0-9]{10,11}$/;
-                    if (!phoneRegex.test(phone)) {
-                        showToast("Số điện thoại không hợp lệ (10-11 số)", "error");
-                        phoneInput.focus();
-                        return false;
-                    }
+                // 2. Kiểm tra Địa chỉ (Mới thêm: Bắt buộc nhập)
+                if (!address) {
+                    showToast("Vui lòng nhập địa chỉ", "error");
+                    if (addressInput) addressInput.focus();
+                    return false;
+                }
+
+                // 3. Kiểm tra Số điện thoại (Mới thêm: Bắt buộc nhập & Đúng định dạng VN)
+                if (!phone) {
+                    showToast("Vui lòng nhập số điện thoại", "error");
+                    if (phoneInput) phoneInput.focus();
+                    return false;
+                }
+
+                // Regex số điện thoại Việt Nam:
+                // Bắt đầu bằng 03, 05, 07, 08, 09 và theo sau là 8 chữ số nữa (Tổng 10 số)
+                const vnPhoneRegex = /^(03|05|07|08|09)\d{8}$/;
+
+                if (!vnPhoneRegex.test(phone)) {
+                    showToast("SĐT không hợp lệ (Phải là 10 số, đầu 03, 05, 07, 08, 09)", "error");
+                    if (phoneInput) phoneInput.focus();
+                    return false;
                 }
 
                 return true;
@@ -486,6 +584,31 @@
                 };
 
                 reader.readAsDataURL(file);
+            }
+
+            // Hàm xử lý preview ảnh CCCD
+            function handleCccdPreview(file) {
+                const preview = document.getElementById('frontPreview');
+                const placeholder = document.getElementById('frontPlaceholder');
+                const overlay = document.getElementById('changeOverlay');
+
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        showToast("Vui lòng chỉ chọn file ảnh!", "error");
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (preview) {
+                            preview.src = e.target.result;
+                            preview.classList.remove('hidden');
+                        }
+                        if (placeholder) placeholder.classList.add('hidden');
+                        if (overlay) overlay.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                }
             }
 
             function initializeEventListeners() {
@@ -574,16 +697,36 @@
                             success: function (updatedUser) {
                                 removeLoadingToast(loadingToast);
 
-                                document.getElementById("displayFullname").textContent = updatedUser.fullName;
-                                document.getElementById("displayPhone").textContent = updatedUser.phoneNumber || "Chưa cập nhật";
-                                document.getElementById("displayAddress").textContent = updatedUser.address || "Chưa cập nhật";
+                                console.log('Update profile success');
 
-                                // Update original data
+                                // 1. Cập nhật hiển thị (Chế độ xem)
+                                document.getElementById("displayFullname").textContent = updatedUser.fullName;
+                                document.getElementById("displayPhone").textContent = updatedUser.phoneNumber;
+                                document.getElementById("displayAddress").textContent = updatedUser.address;
+
+                                // 2. QUAN TRỌNG: Cập nhật lại biến lưu trữ dữ liệu gốc
+                                // Để lần sau bấm "Hủy" hoặc mở lại form, nó sẽ lấy dữ liệu mới nhất này
                                 originalData.fullname = updatedUser.fullName;
                                 originalData.phone = updatedUser.phoneNumber;
                                 originalData.address = updatedUser.address;
 
+                                // 3. Cập nhật lại giá trị trong ô Input ngay lập tức (để đồng bộ)
+                                const fullnameInput = document.getElementById("fullnameInput");
+                                const phoneInput = document.getElementById("phoneInput");
+                                const addressInput = document.getElementById("addressInput");
+
+                                if (fullnameInput) fullnameInput.value = updatedUser.fullName;
+                                if (phoneInput) phoneInput.value = updatedUser.phoneNumber;
+                                if (addressInput) addressInput.value = updatedUser.address;
+
+                                // Refresh header
+                                if (typeof window.refreshHeaderFromSession === 'function') {
+                                    window.refreshHeaderFromSession();
+                                }
+
                                 showToast("Cập nhật thông tin thành công!", "success");
+
+                                // Đóng chế độ sửa
                                 toggleEditMode(false);
                             },
                             error: function (xhr) {
@@ -653,6 +796,81 @@
                             },
                             complete: function () {
                                 if (uploadBtn) uploadBtn.disabled = false;
+                            }
+                        });
+                    });
+                }
+
+                // 1. Mở Modal CCCD
+                const btnOpenCCCD = document.getElementById('btnOpenCCCD');
+                if (btnOpenCCCD) {
+                    btnOpenCCCD.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        openModal('cccdModal');
+                    });
+                }
+
+                // 2. Preview ảnh khi chọn file
+                const cccdUpload = document.getElementById('frontCccdUpload');
+                if (cccdUpload) {
+                    cccdUpload.addEventListener('change', function (e) {
+                        const file = e.target.files[0];
+                        if (file) handleCccdPreview(file);
+                    });
+                }
+
+                // 3. Submit Form CCCD
+                const cccdForm = document.getElementById('cccdForm');
+                if (cccdForm) {
+                    cccdForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const fileInput = document.getElementById('frontCccdUpload');
+                        const file = fileInput ? fileInput.files[0] : null;
+
+                        if (!file) {
+                            showToast("Vui lòng chọn ảnh CCCD mới trước khi cập nhật.", "warning");
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append('frontImage', file);
+
+                        const btn = document.getElementById('submitCccdBtn');
+                        const loading = document.getElementById('cccdLoading');
+
+                        if (btn) btn.classList.add('hidden');
+                        if (loading) loading.classList.remove('hidden');
+
+                        $.ajax({
+                            url: '/Common/UpdateCCCD',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            timeout: 60000,
+                            success: function (response) {
+                                showToast("Cập nhật CCCD thành công!", "success");
+
+                                // Update UI nếu cần thiết
+                                if (response) {
+                                    const nameEl = document.getElementById('displayFullname');
+                                    const addrEl = document.getElementById('displayAddress');
+                                    if (nameEl && response.fullName) nameEl.textContent = response.fullName;
+                                    if (addrEl && response.address) addrEl.textContent = response.address;
+                                }
+
+                                closeModal('cccdModal');
+                                setTimeout(() => { window.location.reload(); }, 1500);
+                            },
+                            error: function (xhr) {
+                                const res = xhr.responseJSON;
+                                const msg = res && res.message ? res.message : "Có lỗi xảy ra.";
+                                showToast(msg, "error");
+                            },
+                            complete: function () {
+                                if (btn) btn.classList.remove('hidden');
+                                if (loading) loading.classList.add('hidden');
                             }
                         });
                     });

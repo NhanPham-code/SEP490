@@ -135,7 +135,7 @@ namespace UserAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdentityNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -167,6 +167,10 @@ namespace UserAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("IdentityNumber")
+                        .IsUnique()
+                        .HasFilter("[IdentityNumber] IS NOT NULL");
 
                     b.ToTable("Users");
 

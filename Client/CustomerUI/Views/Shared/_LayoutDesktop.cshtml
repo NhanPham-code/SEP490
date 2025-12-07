@@ -1311,7 +1311,7 @@
                                         <a asp-controller="Common" asp-action="Profile"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-user-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
-                                            <span class="font-semibold">Hồ sơ của tôi</span>
+                                            <span class="font-semibold">Thông tin tài khoản</span>
                                         </a>
                                         <a asp-controller="Booking" asp-action="BookingHistory"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all duration-200 group">
@@ -1330,6 +1330,11 @@
                                             <span>Chat với Admin</span>
                                         </button>
                                         <input type="hidden" id="senderId" value="@userId" />
+                                        <a asp-controller="Discount" asp-action="DiscountList"
+                                           class="flex items-center px-4 py-3 text-slate-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all duration-200 group">
+                                            <i class="ri-coupon-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                            <span class="font-semibold">Mã Giảm Giá</span>
+                                        </a>
                                         <hr class="my-3 border-slate-200">
                                         <a asp-controller="Common" asp-action="Logout"
                                            class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
@@ -1385,11 +1390,6 @@
                         <i class="ri-team-line mr-3"></i>Tìm đội
                     </a>
 
-                    <a href="#"
-                       class="block px-4 py-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                        <i class="ri-information-line mr-3"></i>Về chúng tôi
-                    </a>
-
                     <!-- Mobile Search -->
                     <div class="pt-4 border-t border-slate-200">
                         <div class="relative">
@@ -1420,50 +1420,6 @@
                         <h3 class="font-poppins font-bold text-2xl logo-gradient">Sportivey</h3>
                     </div>
                     <p class="text-slate-300 mb-6 leading-relaxed">Điểm đến hàng đầu của bạn để đặt sân thể thao và kết nối với các đội.</p>
-                    <div class="flex space-x-3">
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-facebook-fill text-lg"></i>
-                        </button>
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-twitter-fill text-lg"></i>
-                        </button>
-                        <button class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-instagram-fill text-lg"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Quick links -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Liên kết nhanh</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Bảng giá</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Về chúng tôi</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Hỗ trợ</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Trung tâm trợ giúp</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-2JSON">Liên hệ</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Điều khoản dịch vụ</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200">Chính sách bảo mật</a></li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-white">Cập nhật tin tức</h4>
-                    <p class="text-slate-300 mb-4">Đăng ký để nhận cập nhật và ưu đãi.</p>
-                    <div class="space-y-3">
-                        <input type="email" placeholder="Email của bạn"
-                               class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button class="w-full btn-gradient text-white px-4 py-2 rounded-lg font-semibold">
-                            Đăng ký
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -1472,6 +1428,59 @@
             </div>
         </div>
     </footer>
+
+    <!-- === MODAL XÁC THỰC BẢO MẬT (Tailwind Style) === -->
+    <div id="securityModal" class="fixed inset-0 z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0" id="securityBackdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <!-- Modal Panel -->
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-sm opacity-0 scale-95" id="securityPanel">
+
+                    <!-- Header -->
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10 mb-4 sm:mb-0 sm:mx-auto">
+                            <i class="ri-shield-keyhole-line text-2xl text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-center">
+                            <h3 class="text-lg font-semibold leading-6 text-slate-900" id="modal-title">Xác thực bảo mật</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">Vui lòng nhập mật khẩu để truy cập thông tin cá nhân nhạy cảm.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="verifyPassForm" class="px-6 pb-6">
+                        <div class="relative mb-4">
+                            <input type="password" id="securityPassword"
+                                   class="w-full rounded-xl border-0 bg-slate-50 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all"
+                                   placeholder="Nhập mật khẩu của bạn..." required>
+                            <button type="button" onclick="togglePassVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i class="ri-eye-line text-lg" id="eyeIcon"></i>
+                            </button>
+                        </div>
+
+                        <div id="verifyErrorMsg" class="mb-3 text-sm text-red-500 text-center hidden font-medium"></div>
+
+                        <div class="mt-5 sm:mt-6 flex gap-3">
+                            <button type="button" onclick="closeSecurityModal()"
+                                    class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto flex-1 transition-all">
+                                Hủy bỏ
+                            </button>
+                            <button type="submit" id="btnConfirmPass"
+                                    class="inline-flex w-full justify-center rounded-xl bg-blue-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto flex-1 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+                                <span id="verifySpinner" class="hidden mr-2 animate-spin"><i class="ri-loader-4-line"></i></span>
+                                Xác nhận
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -1485,10 +1494,121 @@
     
     @RenderSection("Scripts", required: false)
 
+    <script>
+        // --- LOGIC MODAL BẢO MẬT ---
+
+        // Hàm toggle ẩn hiện mật khẩu
+        function togglePassVisibility() {
+            const input = document.getElementById('securityPassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+            }
+        }
+
+        // Hàm đóng modal (có animation)
+        function closeSecurityModal() {
+            const modal = document.getElementById('securityModal');
+            const backdrop = document.getElementById('securityBackdrop');
+            const panel = document.getElementById('securityPanel');
+
+            // Animation out
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('opacity-100', 'scale-100');
+            panel.classList.add('opacity-0', 'scale-95');
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Hàm mở modal (có animation)
+        function openSecurityModal() {
+            const modal = document.getElementById('securityModal');
+            const backdrop = document.getElementById('securityBackdrop');
+            const panel = document.getElementById('securityPanel');
+            const input = document.getElementById('securityPassword');
+            const errMsg = document.getElementById('verifyErrorMsg');
+
+            // Reset form
+            input.value = '';
+            errMsg.classList.add('hidden');
+
+            modal.classList.remove('hidden');
+
+            // Animation in (cần delay nhỏ để CSS transition hoạt động)
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+                panel.classList.remove('opacity-0', 'scale-95');
+                panel.classList.add('opacity-100', 'scale-100');
+                input.focus();
+            }, 10);
+        }
+
+        $(document).ready(function () {
+            // 1. Tìm link Profile và chặn click
+            // Selector này tìm thẻ a có href chứa Common/Profile
+            const profileLink = $('a[href*="/Common/Profile"]');
+
+            if (profileLink.length > 0) {
+                profileLink.on('click', function (e) {
+                    e.preventDefault(); // Ngăn chuyển trang
+                    openSecurityModal(); // Mở modal
+                });
+            }
+
+            // 2. Xử lý Submit Form
+            $('#verifyPassForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const password = $('#securityPassword').val();
+                const btn = $('#btnConfirmPass');
+                const spinner = $('#verifySpinner');
+                const errMsg = $('#verifyErrorMsg');
+
+                // UI Loading
+                btn.prop('disabled', true);
+                spinner.removeClass('hidden');
+                errMsg.addClass('hidden');
+
+                // Gọi Ajax
+                $.ajax({
+                    url: '/Common/VerifyPassword',
+                    type: 'POST',
+                    data: { password: password },
+                    success: function (res) {
+                        if (res.success) {
+                            // Thành công -> Chuyển trang
+                            window.location.href = '/Common/Profile';
+                        } else {
+                            // Thất bại -> Hiện lỗi
+                            errMsg.text(res.message || "Mật khẩu không đúng").removeClass('hidden');
+                            btn.prop('disabled', false);
+                            spinner.addClass('hidden');
+                            // Animation lắc nhẹ báo lỗi
+                            $('#securityPanel').addClass('animate-shake');
+                            setTimeout(() => $('#securityPanel').removeClass('animate-shake'), 500);
+                        }
+                    },
+                    error: function () {
+                        errMsg.text("Lỗi kết nối máy chủ").removeClass('hidden');
+                        btn.prop('disabled', false);
+                        spinner.addClass('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+
     <script>
         $(document).ready(function () {
 
@@ -2292,5 +2412,45 @@
     </div>
     </body>
 
+    <script>
+        // Hàm này sẽ được gọi từ các trang con (như Profile) sau khi update thành công
+        window.refreshHeaderFromSession = function () {
+            console.log('🔄 Đang cập nhật lại Header từ Session...');
 
+            $.ajax({
+                url: '/Common/GetUserHeaderInfo', // Gọi về Controller để lấy session mới nhất
+                type: 'GET',
+                success: function (data) {
+                    // 1. Cập nhật tất cả các thẻ img hiển thị Avatar người dùng
+                    const avatarElements = document.querySelectorAll('[data-user-avatar]');
+                    const timestamp = new Date().getTime(); // Thêm timestamp để tránh cache trình duyệt
+
+                    avatarElements.forEach(img => {
+                        img.src = data.avatarUrl + '?t=' + timestamp;
+                    });
+
+                    // 2. Cập nhật tên người dùng (Fullname)
+                    const fullnameElements = document.querySelectorAll('[data-user-fullname]');
+                    fullnameElements.forEach(el => {
+                        el.textContent = data.fullName;
+                    });
+
+                    // 3. Cập nhật tên người dùng (Firstname - hiển thị trên thanh header nhỏ)
+                    const firstnameElements = document.querySelectorAll('[data-user-firstname]');
+                    if (data.fullName) {
+                        const firstName = data.fullName.split(' ')[0] || "Người dùng";
+                        firstnameElements.forEach(el => {
+                            el.textContent = firstName;
+                        });
+                    }
+
+                    console.log('✅ Đã cập nhật Header thành công:', data);
+                },
+                error: function (err) {
+                    console.error('❌ Lỗi khi cập nhật Header:', err);
+                }
+            });
+        };
+    </script>
+</body>
 </html>

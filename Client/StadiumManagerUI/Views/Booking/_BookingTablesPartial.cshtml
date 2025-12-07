@@ -4,10 +4,10 @@
 
 @{
     var stadiums = ViewBag.Stadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
-    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy. CamelCase };
 
-    // --- HELPER FUNCTIONS ĐÃ DỌN DẸP ---
-    string GetStatusClass(string status) => status.ToLower() switch
+    // --- HELPER FUNCTIONS ---
+    string GetStatusClass(string status) => status?. ToLower() switch
     {
         "accepted" => "bm-status-accepted",
         "completed" => "bm-status-completed",
@@ -15,17 +15,54 @@
         "waiting" => "bm-status-waiting",
         _ => "bm-status-default"
     };
-    string TranslateStatus(string status) => status.ToLower() switch
+
+    string TranslateStatus(string status) => status?.ToLower() switch
     {
         "accepted" => "Đã nhận",
         "completed" => "Đã hoàn thành",
         "cancelled" => "Đã hủy",
         "waiting" => "Chờ thanh toán",
         "payfail" => "Lỗi thanh toán",
-        _ => status
+        _ => status ??  "N/A"
     };
-    string GetInitials(string fullName) { if (string.IsNullOrWhiteSpace(fullName)) return "U"; var parts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries); return parts.Length > 1 ? $"{parts[0][0]}{parts[parts.Length - 1][0]}".ToUpper() : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U"); }
-    (string Text, string Class) GetCreatorInfo(int creatorId) => creatorId == 0 ? ("Chủ sân tạo", "creator-owner") : ("Khách tự đặt", "creator-customer");
+
+    string GetInitials(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "U";
+        var parts = fullName. Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 1
+            ? $"{parts[0][0]}{parts[parts.Length - 1][0]}". ToUpper()
+            : (fullName.Length > 0 ? $"{fullName[0]}".ToUpper() : "U");
+    }
+
+    // CreatedById == 0: Khách tự đặt, != 0: Chủ sân tạo
+    (string Text, string Class) GetCreatorInfo(int creatorId) => creatorId == 0
+        ? ("Khách tự đặt", "creator-customer")
+        : ("Chủ sân tạo", "creator-owner");
+
+    // Lấy tên sân con từ BookingDetails
+    string GetCourtNames(DTOs.BookingDTO.BookingReadDto booking)
+    {
+        if (booking. BookingDetails == null || ! booking.BookingDetails.Any())
+        {
+            return "N/A";
+        }
+        var names = booking.BookingDetails
+            .Select(d => ! string.IsNullOrEmpty(d.CourtName) ? d. CourtName : $"Sân {d.CourtId}")
+            .ToList();
+        return string.Join(", ", names);
+    }
+
+    // Lấy thời gian từ BookingDetails
+    string GetTimeRange(DTOs.BookingDTO.BookingReadDto booking)
+    {
+        if (booking.BookingDetails == null || ! booking.BookingDetails.Any())
+        {
+            return "N/A";
+        }
+        var first = booking.BookingDetails.First();
+        return $"{first.StartTime:HH:mm} - {first.EndTime:HH:mm}";
+    }
 }
 
 <!-- LỊCH ĐẶT HẰNG NGÀY -->
@@ -33,43 +70,61 @@
     <h2 class="bm-section-title">Lịch Đặt Hằng Ngày</h2>
     <div style="overflow-x: auto;">
         <table class="bm-booking-table">
-            <thead><tr><th class="bm-align-left">Khách hàng / Sân</th><th>Ngày chơi</th><th>Ngày tạo</th><th>Người tạo</th><th>Giá tiền</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+            <thead>
+                <tr>
+                    <th class="bm-align-left">Khách hàng / Sân</th>
+                    <th>Ngày chơi</th>
+                    <th>Ngày tạo</th>
+                    <th>Người tạo</th>
+                    <th>Giá gốc</th>
+                    <th>Doanh thu</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
             <tbody>
-                @if (Model.DailyBookings.Any())
+                @if (Model. DailyBookings != null && Model.DailyBookings. Any())
                 {
                     foreach (var dailyVm in Model.DailyBookings)
                     {
-                        var booking = dailyVm.Booking;
+                        var booking = dailyVm. Booking;
                         var user = dailyVm.User;
-                        var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                        var creatorInfo = GetCreatorInfo(booking.CreatedById);
+                        var stadium = stadiums.FirstOrDefault(s => s. Id == booking.StadiumId);
+                        var creatorInfo = GetCreatorInfo(booking. CreatedById);
                         <tr data-booking-json="@JsonSerializer.Serialize(dailyVm, jsonOptions)">
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
                                     <div class="bm-customer-avatar">
-                                        @if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                        @if (! string.IsNullOrEmpty(user?. AvatarUrl))
                                         {
-                                            <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
+                                            <img src="https://localhost:7136/@user. AvatarUrl" alt="@user. FullName" />
                                         }
                                         else
                                         {
-                                            <span>@GetInitials(user.FullName)</span>
+                                            <span>@GetInitials(user?. FullName)</span>
                                         }
                                     </div>
-                                    <div class="bm-customer-details"><span class="bm-customer-name">@user.FullName</span><span class="bm-stadium-name">@stadium?.Name</span></div>
+                                    <div class="bm-customer-details">
+                                        <span class="bm-customer-name">@(user?.FullName ?? "Khách vãng lai")</span>
+                                        <span class="bm-stadium-name">@(stadium?.Name ?? "N/A")</span>
+                                    </div>
                                 </div>
                             </td>
                             <td>@booking.Date.ToString("dd/MM/yyyy")</td>
                             <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                             <td><span class="bm-creator-badge @creatorInfo.Class">@creatorInfo.Text</span></td>
-                            <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                            <td><span class="bm-price">@((booking.OriginalPrice ?? 0).ToString("N0"))₫</span></td>
+                            <td><span class="bm-price">@((booking.TotalPrice ??  0).ToString("N0"))₫</span></td>
                             <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                             <td class="bm-actions">
-                                <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-eye"></i></button>
-                                @* Đã bỏ nút accept/deny *@
-                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
+                                <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                @if (booking.Status. Equals("accepted", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fas fa-ban"></i></button>
+                                    <button class="bm-action-btn cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
                                 }
                             </td>
                         </tr>
@@ -77,7 +132,13 @@
                 }
                 else
                 {
-                    <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng ngày nào phù hợp.</p></div></td></tr>
+                    <tr>
+                        <td colspan="7">
+                            <div class="no-data">
+                                <p>Không có lịch đặt hằng ngày nào phù hợp. </p>
+                            </div>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -96,77 +157,107 @@
                     <th class="bm-align-left">Khách hàng / Sân</th>
                     <th>Khung giờ / Thời gian</th>
                     <th>Ngày tạo</th>
-                    <th>Giá tiền</th>
+                    <th>Giá gốc</th>
+                    <th>Doanh thu</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model.MonthlyBookings.Any())
+                @if (Model.MonthlyBookings != null && Model.MonthlyBookings.Any())
                 {
-                    foreach (var monthlyVm in Model.MonthlyBookings)
+                    foreach (var monthlyVm in Model. MonthlyBookings)
                     {
                         var booking = monthlyVm.MonthlyBooking;
                         var user = monthlyVm.User;
-                        var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+                        var stadium = stadiums.FirstOrDefault(s => s. Id == booking.StadiumId);
 
                         <tr class="bm-monthly-parent-row" data-monthly-id="@booking.Id" data-booking-json="@JsonSerializer.Serialize(monthlyVm, jsonOptions)">
                             <td><i class="fas fa-chevron-down bm-expand-toggle"></i></td>
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
                                     <div class="bm-customer-avatar">
-                                        @if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                        @if (!string.IsNullOrEmpty(user?.AvatarUrl))
                                         {
                                             <img src="https://localhost:7136/@user.AvatarUrl" alt="@user.FullName" />
                                         }
                                         else
                                         {
-                                            <span>@GetInitials(user.FullName)</span>
+                                            <span>@GetInitials(user?.FullName)</span>
                                         }
                                     </div>
                                     <div class="bm-customer-details">
-                                        <span class="bm-customer-name">@user.FullName</span>
-                                        <span class="bm-stadium-name">@stadium?.Name</span>
+                                        <span class="bm-customer-name">@(user?.FullName ?? "Khách vãng lai")</span>
+                                        <span class="bm-stadium-name">@(stadium?.Name ?? "N/A")</span>
                                     </div>
                                 </div>
                             </td>
-                            <td><div style="display: flex; flex-direction: column; align-items: center;"><span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span><span style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span></div></td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span style="font-weight: 600;">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</span>
+                                    <span style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Tháng @booking.Month / @booking.Year</span>
+                                </div>
+                            </td>
                             <td>@booking.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="bm-price">@((booking.OriginalPrice ?? 0).ToString("N0"))₫</span></td>
                             <td><span class="bm-price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
                             <td><span class="bm-status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                             <td class="bm-actions">
-                                <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fas fa-eye"></i></button>
+                                <button class="bm-action-btn details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </td>
                         </tr>
                         <tr class="bm-child-bookings-row" data-parent-monthly-id="@booking.Id" style="display:none;">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="bm-child-table-container">
                                     <h4>Các Lịch Đặt Chi Tiết</h4>
-                                    @if (monthlyVm.Bookings.Any())
+                                    @if (monthlyVm. Bookings != null && monthlyVm. Bookings.Any())
                                     {
                                         <table class="bm-child-table">
-                                            <thead><tr><th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th><th>Ngày Chơi</th><th>Sân Con</th><th>Thời Gian</th><th>Giá tiền</th><th>Trạng Thái</th></tr></thead>
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" class="bm-select-all-children" title="Chọn tất cả" /></th>
+                                                    <th>Ngày Chơi</th>
+                                                    <th>Sân Con</th>
+                                                    <th>Thời Gian</th>
+                                                    <th>Giá tiền</th>
+                                                    <th>Trạng Thái</th>
+                                                </tr>
+                                            </thead>
                                             <tbody>
-                                                @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
+                                                @foreach (var childBooking in monthlyVm.Bookings. OrderBy(b => b.Date))
                                                 {
-                                                    var isCancellable = !childBooking.Status.Equals("completed", StringComparison.OrdinalIgnoreCase) && !childBooking.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase);
+                                                    var isCancellable = ! childBooking.Status. Equals("completed", StringComparison. OrdinalIgnoreCase) 
+                                                                     && !childBooking.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase);
                                                     <tr style="@(isCancellable ? "" : "color: #9ca3af;")">
-                                                        <td><input type="checkbox" class="bm-child-booking-checkbox" value="@childBooking.Id" data-price="@childBooking.TotalPrice" @(isCancellable ? "" : "disabled")></td>
+                                                        <td>
+                                                            <input type="checkbox" 
+                                                                   class="bm-child-booking-checkbox" 
+                                                                   value="@childBooking.Id" 
+                                                                   data-price="@(childBooking.TotalPrice ??  0)" 
+                                                                   @(isCancellable ? "" : "disabled") />
+                                                        </td>
                                                         <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
-                                                        <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
-                                                        <td>@if (childBooking.BookingDetails.Any())
-                                                            {
-                                                                <span>@childBooking.BookingDetails.First().StartTime.ToString("HH:mm") - @childBooking.BookingDetails.First().EndTime.ToString("HH:mm")</span>
-                                                            }</td>
+                                                        <td>@GetCourtNames(childBooking)</td>
+                                                        <td>@GetTimeRange(childBooking)</td>
                                                         <td class="bm-price">@((childBooking.TotalPrice ?? 0).ToString("N0"))₫</td>
-                                                        <td><span class="bm-status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
+                                                        <td>
+                                                            <span class="bm-status-badge @GetStatusClass(childBooking.Status)">
+                                                                @TranslateStatus(childBooking.Status)
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                 }
                                             </tbody>
                                         </table>
                                         <div class="bm-child-cancellation-actions">
-                                            <span class="cancellation-summary-text">Đã chọn: <b class="selected-count">0</b> | Phí hủy: <b class="cancellation-fee">0₫</b></span>
-                                            <button class="bm-confirm-child-cancel-btn" disabled>Hủy <span class="selected-count">0</span> mục đã chọn</button>
+                                            <span class="cancellation-summary-text">
+                                                Đã chọn: <b class="selected-count">0</b> | Phí hủy: <b class="cancellation-fee">0₫</b>
+                                            </span>
+                                            <button class="bm-confirm-child-cancel-btn" disabled>
+                                                Hủy <span class="selected-count">0</span> mục đã chọn
+                                            </button>
                                         </div>
                                     }
                                     else
@@ -180,7 +271,13 @@
                 }
                 else
                 {
-                    <tr><td colspan="7"><div class="no-data"><p>Không có lịch đặt hằng tháng nào phù hợp.</p></div></td></tr>
+                    <tr>
+                        <td colspan="8">
+                            <div class="no-data">
+                                <p>Không có lịch đặt hằng tháng nào phù hợp. </p>
+                            </div>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
