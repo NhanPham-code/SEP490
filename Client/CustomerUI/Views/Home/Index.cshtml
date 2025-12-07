@@ -366,6 +366,163 @@
                 opacity: 0.5;
                 cursor: not-allowed;
             }
+        @@media (max-width: 600px) {
+            /* WEATHER CARD MOBILE STYLE */
+            .weather-card
+
+        {
+            flex-direction: column;
+            padding: 12px;
+            border-radius: 14px;
+            width: 98%;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        /* MAP MOBILE STYLE */
+        #map {
+            width: 98vw;
+            min-height: 280px;
+            height: 50vh; /* Có thể tăng/giảm tuỳ ý */
+            border-radius: 12px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: block;
+            max-width: 100vw;
+        }
+
+        /* FILTER SECTION MOBILE STYLE */
+        .filter-section {
+            width: 98vw;
+            max-width: 98vw;
+            margin: 10px auto 0 auto;
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+        .filter-header {
+            padding: 6px 14px;
+            min-height: 38px;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .filter-title {
+            font-size: 16px;
+        }
+
+        .location-input-wrapper {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            gap: 4px;
+            width: 100%;
+            align-items: center;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        .location-input {
+            font-size: 14px;
+            padding: 5px 6px;
+            border-radius: 6px;
+            width: 85vw;
+            max-width: 180px; /* Giới hạn chiều ngang cho input */
+            border: 1px solid #ccc;
+        }
+
+        .location-clear {
+            font-size: 18px;
+            padding: 2px 5px;
+        }
+
+        .filter-content {
+            padding: 8px 0 0 0;
+        }
+
+        }
+
+        /* Nên thêm cho phần chứa card/map nếu có */
+        @@media (max-width: 600px) {
+            .yourparentclass
+
+        {
+            width: 100vw;
+            max-width: 100vw;
+            padding: 0;
+            margin: 0 auto;
+        }
+
+        }
+        @@media (max-width: 600px) {
+            #search-box
+
+        {
+            gap: 4px;
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        #search-box .btn {
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 7px;
+            min-width: 30px;
+            height: 32px;
+            line-height: 1.1;
+        }
+
+        #search-box input {
+            font-size: 14px;
+            padding: 5px 6px;
+            border-radius: 7px;
+            min-width: 0;
+            width: 90px; /* hoặc để width:100% nếu muốn chiếm ngang */
+        }
+
+        }
+        @@media (max-width:600px) {
+            .radius-control
+
+        {
+            width: 92vw;
+            max-width: 340px;
+            min-width: 150px;
+            margin: 8px auto 0 auto;
+            padding: 7px 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+            background: #fff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* khoảng cách giữa label và select */
+            border: 1px solid #eee;
+        }
+
+        .radius-control label {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radius-control select {
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #dedede;
+            box-sizing: border-box;
+            width: 80px;
+            min-width: 60px;
+            height: 34px;
+            margin: 0;
+        }
+
+        }
+
     </style>
 
 
@@ -1251,7 +1408,23 @@
             map.invalidateSize();
           }, 300);
         });
-
+                function moveRadiusControlBelowSearchBox() {
+            if(window.innerWidth <= 600) {
+                setTimeout(() => {
+                    const radiusControl = document.querySelector('.radius-control');
+                    const searchBox = document.getElementById('search-box');
+                    if (radiusControl && searchBox && !radiusControl.classList.contains('moved-mobile')) {
+                        searchBox.parentNode.insertBefore(radiusControl, searchBox.nextSibling);
+                        radiusControl.classList.add('moved-mobile');
+                    }
+                }, 300); // Đợi render control
+            } else {
+                // Nếu cần di chuyển lại vào vị trí gốc khi không phải mobile
+                // Bỏ qua nếu không muốn chuyển lại
+            }
+        }
+        window.addEventListener('resize', moveRadiusControlBelowSearchBox);
+        window.addEventListener('DOMContentLoaded', moveRadiusControlBelowSearchBox);
     </script>
 
     <script id="comparison-functionality">

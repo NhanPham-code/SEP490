@@ -262,5 +262,12 @@ namespace Service.Services
             var odataResponse = await response.Content.ReadFromJsonAsync<ODataResponse<FeedbackResponse>>();
             return (odataResponse?.Value ?? new List<FeedbackResponse>(), odataResponse?.Count ?? 0);
         }
+
+        public async Task<bool> CheckCompletedAsync(string accessToken, int userId, int stadiumId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var resp = await _httpClient.GetAsync($"booking/check-completed/{userId}/{stadiumId}");
+            return resp.IsSuccessStatusCode;
+        }
     }
 }

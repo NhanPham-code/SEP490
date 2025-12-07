@@ -149,6 +149,402 @@
             display: none !important;
         }
 
+        #incomingCallPopup {
+            position: fixed;
+            z-index: 3000;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            transition: opacity 0.3s ease;
+        }
+
+            #incomingCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .webrtc-popup-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 320px;
+            max-width: 380px;
+            animation: popupBounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @@keyframes popupBounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .webrtc-popup-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+            position: relative;
+            animation: avatarPulse 2s infinite;
+        }
+
+        @@keyframes avatarPulse {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 8px 35px rgba(78, 158, 255, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .webrtc-popup-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            z-index: -1;
+            opacity: 0.3;
+            animation: ringPulse 2s infinite;
+        }
+
+        @@keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .webrtc-popup-caller {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .webrtc-popup-type {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .webrtc-popup-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .accept-btn, .decline-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: white;
+        }
+
+            .accept-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+            }
+
+            .accept-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .decline-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+            .decline-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            }
+
+            .decline-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .accept-btn span::before {
+            content: '📞';
+            margin-right: 5px;
+        }
+
+        .decline-btn span::before {
+            content: '✖️';
+            margin-right: 5px;
+        }
+
+        /* Video Call Modal - Improved */
+        #videoCallPopup {
+            position: fixed;
+            z-index: 2050;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            transition: opacity 0.3s ease;
+        }
+
+            #videoCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .video-call-modal {
+            width: 100vw;
+            max-width: 420px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+        }
+
+        @@keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .video-call-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(78, 158, 255, 0.1), rgba(0, 212, 170, 0.1));
+            border-radius: 16px;
+        }
+
+        #videoCallTitle {
+            font-weight: 700;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex: 1;
+        }
+
+        #endCallBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            min-width: 100px;
+        }
+
+            #endCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            }
+
+            #endCallBtn::before {
+                content: '📞';
+                margin-right: 5px;
+            }
+
+        .video-call-video-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        #remoteVideo, #localVideo {
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        #remoteVideo {
+            width: 96%;
+            max-width: 380px;
+            height: 280px;
+            object-fit: cover;
+            border: 3px solid rgba(78, 158, 255, 0.5);
+        }
+
+        #localVideo {
+            width: 110px;
+            height: 80px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: 3px solid #00d4aa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            object-fit: cover;
+        }
+
+        /* Waiting Message Styling */
+        #waitingCallMsg {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-weight: 600;
+            color: #4e9eff;
+            z-index: 4005;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 30px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.3);
+            animation: messageFadeIn 0.3s ease;
+            max-width: 90%;
+        }
+
+        @@keyframes messageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Call buttons styling */
+        #startAudioCallBtn, #startVideoCallBtn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 158, 255, 0.3);
+            margin: 5px;
+        }
+
+            #startAudioCallBtn:hover, #startVideoCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(78, 158, 255, 0.4);
+            }
+
+            #startAudioCallBtn::before {
+                content: '📞 ';
+            }
+
+            #startVideoCallBtn::before {
+                content: '📹 ';
+            }
+
+        /* Responsive */
+        @@media (max-width: 500px) {
+            .webrtc-popup-content {
+                min-width: 280px;
+                padding: 30px 20px;
+            }
+
+            .webrtc-popup-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 38px;
+            }
+
+            .webrtc-popup-caller {
+                font-size: 20px;
+            }
+
+            .accept-btn, .decline-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+            }
+
+            .video-call-modal {
+                max-width: 95vw;
+                padding: 15px;
+            }
+
+            #remoteVideo {
+                height: 220px;
+            }
+
+            #localVideo {
+                width: 80px;
+                height: 60px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+
     </style>
     <script>
         tailwind.config = {
@@ -1624,6 +2020,167 @@
             });
             window.location.href = `/Chat/Chat?${params.toString()}`;
         }
+                // Lightweight handler that shows the incoming call popup (markup must exist in layout).
+        // Put this non-module script in layout (after the popup HTML and after the listener script).
+        (function () {
+          if (window.__webrtcLayoutPopupHandlerInstalled) return;
+          window.__webrtcLayoutPopupHandlerInstalled = true;
+
+          const popupId = 'incomingCallPopup';
+          const avatarId = 'incomingCallAvatar';
+          const nameId = 'incomingCallName';
+          const typeId = 'incomingCallType';
+          const acceptBtnId = 'acceptCallBtn';
+          const declineBtnId = 'declineCallBtn';
+
+          let currentOffer = null;
+          let currentChatId = null;
+          let autoHideTimer = null;
+
+          function showPopup(offer, chatId) {
+            currentOffer = offer;
+            currentChatId = chatId;
+
+            const popup = document.getElementById(popupId);
+            if (!popup) return console.warn('Incoming popup element not found');
+
+            // Fill UI
+            const avatar = document.getElementById(avatarId);
+            const nameEl = document.getElementById(nameId);
+            const typeEl = document.getElementById(typeId);
+
+            if (nameEl) nameEl.textContent = (offer && (offer.callerName || offer.from)) ? (offer.callerName || offer.from) : 'Người lạ';
+            if (avatar) avatar.textContent = (offer && (offer.callerName || offer.from)) ? ( (offer.callerName || offer.from).charAt(0).toUpperCase() ) : '👤';
+            if (typeEl) typeEl.textContent = (offer && offer.isVideo) ? 'Cuộc gọi Video' : 'Cuộc gọi Âm thanh';
+
+            popup.classList.remove('webrtc-popup-hidden');
+
+            // Auto-hide after 30s if no action
+            if (autoHideTimer) clearTimeout(autoHideTimer);
+            autoHideTimer = setTimeout(() => {
+              hidePopup();
+              // notify decline automatically
+              dispatchDecline();
+            }, 30_000);
+          }
+
+          function hidePopup() {
+            const popup = document.getElementById(popupId);
+            if (!popup) return;
+            popup.classList.add('webrtc-popup-hidden');
+            currentOffer = null;
+            currentChatId = null;
+            if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = null; }
+          }
+
+          // When user accepts: try to call page-level accept handler, else dispatch event
+          function dispatchAccept() {
+            try {
+              // Prefer explicit global handler if present
+              if (typeof window.onAcceptIncomingCall === 'function') {
+                window.onAcceptIncomingCall(currentOffer, currentChatId);
+                return;
+              }
+              // Backwards-compatible name from Chat page
+              if (typeof window.acceptIncomingCall === 'function') {
+                try { window.acceptIncomingCall(currentOffer, { chatId: currentChatId, callerId: currentOffer.from, callerName: currentOffer.callerName, isVideo: currentOffer.isVideo }); return; } catch (e) {}
+              }
+              // Otherwise dispatch event so page-level code can react
+              const evt = new CustomEvent('acceptIncomingCall', { detail: { offer: currentOffer, chatId: currentChatId } });
+              window.dispatchEvent(evt);
+            } catch (e) {
+              console.error('dispatchAccept error', e);
+            }
+          }
+
+          // When user declines: try to call page-level decline handler, else dispatch event
+          function dispatchDecline() {
+            try {
+              if (typeof window.onDeclineIncomingCall === 'function') {
+                window.onDeclineIncomingCall(currentOffer, currentChatId);
+                return;
+              }
+              if (typeof window.declineIncomingCall === 'function') {
+                try { window.declineIncomingCall(currentChatId); return; } catch (e) {}
+              }
+              const evt = new CustomEvent('declineIncomingCall', { detail: { offer: currentOffer, chatId: currentChatId } });
+              window.dispatchEvent(evt);
+            } catch (e) {
+              console.error('dispatchDecline error', e);
+            }
+          }
+
+          // Wire buttons (avoid duplicate handlers)
+          function wireButtons() {
+            const acceptBtn = document.getElementById(acceptBtnId);
+            const declineBtn = document.getElementById(declineBtnId);
+            if (acceptBtn) {
+              acceptBtn.removeEventListener('click', onAcceptClick);
+              acceptBtn.addEventListener('click', onAcceptClick);
+            }
+            if (declineBtn) {
+              declineBtn.removeEventListener('click', onDeclineClick);
+              declineBtn.addEventListener('click', onDeclineClick);
+            }
+
+            // Click outside popup to decline
+            const popup = document.getElementById(popupId);
+            if (popup) {
+              popup.addEventListener('click', function (e) {
+                if (e.target === popup) {
+                  hidePopup();
+                  dispatchDecline();
+                }
+              });
+            }
+          }
+
+          function onAcceptClick(e) {
+            e.preventDefault();
+            hidePopup();
+            dispatchAccept();
+          }
+          function onDeclineClick(e) {
+            e.preventDefault();
+            hidePopup();
+            dispatchDecline();
+          }
+
+          // Listen for incomingCall event produced by the layout listener (or other code)
+          function onIncomingEvent(e) {
+            const detail = e && e.detail;
+            if (!detail) return;
+            const { offer, chatId } = detail;
+            // optionally ignore if you're already in a call
+            if (window.peerConnection) {
+              console.log('Already in call — ignoring incoming popup');
+              return;
+            }
+            showPopup(offer, chatId);
+          }
+
+          // Expose utility to show/hide programmatically
+          window.__webrtcShowIncomingPopup = showPopup;
+          window.__webrtcHideIncomingPopup = hidePopup;
+
+          // Start
+          wireButtons();
+          window.addEventListener('incomingCall', onIncomingEvent); // from webrtc-layout-listener-no-ui
+          // Also accept direct calls to window.onIncomingCall if the other script calls it
+          window.onIncomingCall = function (offer, chatId) {
+            try { onIncomingEvent({ detail: { offer, chatId } }); } catch (e) {}
+          };
+
+          // Clean up on unload
+          window.addEventListener('beforeunload', () => {
+            try {
+              window.removeEventListener('incomingCall', onIncomingEvent);
+              hidePopup();
+            } catch (e) {}
+          });
+
+          console.log('webrtc layout popup handler installed');
+        })();
     </script>
 
 
@@ -1722,6 +2279,17 @@
         });
     })();
 </script>
+    <div id="incomingCallPopup" class="webrtc-popup-hidden">
+        <div class="webrtc-popup-content">
+            <div class="webrtc-popup-avatar" id="incomingCallAvatar">👤</div>
+            <div class="webrtc-popup-caller" id="incomingCallName">Someone</div>
+            <div class="webrtc-popup-type" id="incomingCallType">Cuộc gọi Video</div>
+            <div class="webrtc-popup-btns">
+                <button id="acceptCallBtn" class="accept-btn"><span>Nghe</span></button>
+                <button id="declineCallBtn" class="decline-btn"><span>Từ chối</span></button>
+            </div>
+        </div>
+    </div>
     </body>
 
 

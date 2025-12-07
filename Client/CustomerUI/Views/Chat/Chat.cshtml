@@ -1269,13 +1269,107 @@
                 right: 10px;
             }
         }
+
+        @@media (max-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 20px);
+                margin: 10px;
+                border-radius: 15px;
+                max-width: 420px;
+                width: calc(100% - 20px);
+            }
+
+            .chat-sidebar {
+                width: 100%;
+                height: 100%;
+                border-radius: 15px;
+            }
+
+            .chat-main {
+                width: 100%;
+                height: 100%;
+                border-radius: 15px;
+                display: none; /* mobile: mặc định chỉ show chat list */
+                flex-direction: column;
+            }
+            /* Khi có class .show-chat thì chỉ hiện chat, ẩn list */
+            .chat-container.show-chat .chat-sidebar {
+                display: none;
+            }
+
+            .chat-container.show-chat .chat-main {
+                display: flex;
+            }
+            /* Back button hiện trên mobile */
+            #backBtn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                border: none;
+                background: rgba(255,255,255,0.9);
+                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                cursor: pointer;
+                margin-right: 6px;
+                font-size: 18px;
+            }
+            /* Emoji/Gif Picker nhỏ lại trên mobile */
+            .emoji-picker, .gif-picker {
+                width: 300px;
+                height: 350px;
+                right: 10px;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            /* v.v... */
+        }
+
+        /* Input bar trên mobile */
+        @@media (max-width: 768px) {
+            .chat-input-section {
+                padding: 4px 2px 4px 2px !important;
+                gap: 3px;
+                min-height: unset;
+            }
+
+            .chat-input-wrapper {
+                border-radius: 14px;
+                padding: 0 2px;
+            }
+
+            .chat-input {
+                padding: 6px 7px;
+                font-size: 12px;
+                min-height: 16px;
+                max-height: 36px;
+                line-height: 16px;
+            }
+
+            .input-actions button {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 16px !important;
+                padding: 3px !important;
+            }
+
+            .chat-send-btn {
+                padding: 7px 8px !important;
+                min-width: 34px !important;
+                font-size: 14px !important;
+                border-radius: 15px !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
         <!-- Sidebar -->
-        <div class="chat-sidebar">
+        <div class="chat-sidebar" id="sidebar">
             <h3>💬 Messenger</h3>
 
             <!-- Hidden user info - set programmatically -->
@@ -1296,6 +1390,7 @@
         <!-- Chat Box -->
         <div class="chat-main">
             <div class="chat-header" style="display: flex; align-items: center; gap: 10px;">
+                <button id="backBtn" title="Back" aria-label="Back" style="display:none;">←</button>
                 <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 16px;" id="headerAvatar">💬</div>
                 <h4 id="currentChatName" style="flex: 1;">Select a chat to start messaging</h4>
                 <!-- Icon buttons: -->
@@ -1381,7 +1476,8 @@
           set,
           onValue,
           off,
-          onDisconnect
+          onDisconnect,
+          get
         } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
         // ====== Firebase config & init (keep only one copy in your script) ======
@@ -1404,14 +1500,19 @@
         // Map of userId -> statusRef (so we can off() later)
         const statusListeners = {};
 
-        // Remove all currently attached status listeners (call before rebuilding chat list)
+                // Thay hàm removeAllStatusListeners cũ bằng đoạn này
         function removeAllStatusListeners() {
           try {
             Object.keys(statusListeners).forEach(userId => {
-              const r = statusListeners[userId];
-              if (r) {
-                // remove all listeners on this ref
-                off(r);
+              const entry = statusListeners[userId];
+              if (entry) {
+                // Nếu có hàm unsubscribe đã lưu thì gọi nó
+                if (typeof entry.unsub === 'function') {
+                  try { entry.unsub(); } catch (e) { console.warn('[PRESENCE] error unsub:', userId, e); }
+                }
+                // Dọn thêm off() phòng trường hợp vẫn còn refs
+                try { if (entry.connsRef) off(entry.connsRef); } catch (e) {}
+                try { if (entry.rootRef) off(entry.rootRef); } catch (e) {}
               }
               delete statusListeners[userId];
             });
@@ -1420,47 +1521,92 @@
           }
         }
 
-        // Attach listener for a single user's status node and update the dot element with id `status-{userId}`
-                function addStatusListenerForList(userId) {
+                // REPLACE: function addStatusListenerForList(userId) { ... }
+        function addStatusListenerForList(userId) {
           if (!userId) return;
           if (statusListeners[userId]) return; // already listening
 
-          const sr = ref(db, `userStatus/${userId}`);
-          statusListeners[userId] = sr;
+          // We'll listen both root and connections path for robust updates
+          const rootRef = ref(db, `userStatus/${userId}`);
+          const connsRef = ref(db, `userStatus/${userId}/connections`);
+          statusListeners[userId] = { rootRef, connsRef };
 
-          onValue(sr, (snap) => {
-            const val = snap.val();
-            // Update avatar pseudo-element using data-online attribute
+          const TTL_MS = 30 * 1000; // consider user online if lastSeen within 30s
+
+          // Helper to apply UI state
+          function applyOnlineState(isOnline, lastSeen) {
             const avatar = document.querySelector(`#chat-${userId} .chat-avatar`);
-            if (avatar) {
-              avatar.setAttribute('data-online', (val && val.online) ? 'true' : 'false');
-            }
+            if (avatar) avatar.setAttribute('data-online', isOnline ? 'true' : 'false');
 
-            // Optional: if you still have a separate status span, update it too
             const dot = document.getElementById(`status-${userId}`);
             if (dot) {
-              if (val && val.online) {
-                dot.classList.remove('offline-dot');
-                dot.classList.add('online-dot');
-                dot.title = 'Online';
+              if (isOnline) {
+                dot.classList.remove('offline-dot'); dot.classList.add('online-dot'); dot.title = 'Online';
               } else {
-                dot.classList.remove('online-dot');
-                dot.classList.add('offline-dot');
-                if (val && val.lastSeen) {
-                  try {
-                    const t = new Date(val.lastSeen);
-                    dot.title = `Last seen: ${t.toLocaleString()}`;
-                  } catch (e) {
-                    dot.title = 'Offline';
-                  }
+                dot.classList.remove('online-dot'); dot.classList.add('offline-dot');
+                if (lastSeen) {
+                  try { dot.title = `Last seen: ${new Date(lastSeen).toLocaleString()}`; }
+                  catch (e) { dot.title = 'Offline'; }
+                } else {
+                  dot.title = 'Offline';
+                }
+              }
+            }
+          }
+
+          // Listen to connections child - most reliable indicator
+          const onConns = onValue(connsRef, (snap) => {
+            const conns = snap.val();
+            const count = conns ? Object.keys(conns).length : 0;
+            if (count > 0) {
+              applyOnlineState(true, Date.now());
+            } else {
+              // no connections -> fallback to root.lastSeen check (TTL)
+              get(rootRef).then(rootSnap => {
+                const val = rootSnap.exists() ? (rootSnap.val() || {}) : {};
+                const lastSeen = Number(val.lastSeen) || 0;
+                const now = Date.now();
+                const isOnline = (val && val.online === true) || (lastSeen && (now - lastSeen) < TTL_MS);
+                applyOnlineState(isOnline, lastSeen);
+              }).catch(err => {
+                console.warn('[PRESENCE] fallback root get failed', userId, err);
+                applyOnlineState(false, null);
+              });
+            }
+          }, (err) => {
+            console.error('Status connections listener error for', userId, err);
+          });
+
+          // Also listen to root for lastSeen changes (keeps tooltip accurate)
+          const onRoot = onValue(rootRef, (snap) => {
+            const val = snap.val() || {};
+            const lastSeen = Number(val.lastSeen) || 0;
+            // If root.online explicitly true, ensure UI shows online
+            if (val && val.online === true) {
+              applyOnlineState(true, lastSeen);
+            } else {
+              // don't override connections-based online quickly; connections listener handles main state
+              // but update tooltip if offline
+              const avatar = document.querySelector(`#chat-${userId} .chat-avatar`);
+              const dot = document.getElementById(`status-${userId}`);
+              if (dot && (!(avatar && avatar.getAttribute('data-online') === 'true'))) {
+                if (lastSeen) {
+                  try { dot.title = `Last seen: ${new Date(lastSeen).toLocaleString()}`; }
+                  catch (e) { dot.title = 'Offline'; }
                 } else {
                   dot.title = 'Offline';
                 }
               }
             }
           }, (err) => {
-            console.error('Status listener error for', userId, err);
+            console.error('Status root listener error for', userId, err);
           });
+
+          // store unsubscribe handles so removeAllStatusListeners can off() correctly
+          statusListeners[userId].unsub = () => {
+            try { off(connsRef, 'value', onConns); } catch(e) {}
+            try { off(rootRef, 'value', onRoot); } catch(e) {}
+          };
         }
 
         // Initialize presence for the given userId (call after login / when senderId is known)
@@ -2364,38 +2510,78 @@
             if (data) {
               const entries = Object.entries(data).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
               for (let [id, info] of entries) {
-                const item = document.createElement('div');
-                item.className = 'chat-item';
-                item.id = `chat-${id}`;
-                let lastMsg = info.lastMessage || '👋 Say hello!';
+                   const item = document.createElement('div');
+        item.className = 'chat-item';
+        item.id = `chat-${id}`;
+        let lastMsg = info.lastMessage || '👋 Say hello!';
 
-                if (lastMsg.startsWith('[GIF]')) {
-                  lastMsg = '🎬 GIF';
-                } else if (lastMsg.length > 25) {
-                  lastMsg = lastMsg.substring(0, 25) + '...';
+        if (lastMsg.startsWith('[GIF]')) {
+          lastMsg = '🎬 GIF';
+        } else if (lastMsg.length > 25) {
+          lastMsg = lastMsg.substring(0, 25) + '...';
+        }
+
+        const avatarLetter = (info.name || id).charAt(0).toUpperCase();
+
+        // include status dot in the markup (id = status-{id})
+        item.innerHTML = `
+          <div class="chat-avatar" style="position:relative;">
+            ${avatarLetter}
+          </div>
+          <div class="chat-info">
+            <strong>${info.name || id}</strong>
+            <small>${lastMsg}</small>
+          </div>
+          <div class="chat-status">
+            ${makeStatusDotHtml(id)}
+          </div>
+        `;
+
+        item.onclick = () => openChat(userId, document.getElementById('senderName').value, id, info.name || id);
+        list.appendChild(item);
+
+        // --- Fetch initial presence using connections first, fallback to lastSeen ---
+        (async () => {
+          try {
+            const connsSnap = await get(ref(db, `userStatus/${id}/connections`));
+            const conns = connsSnap.exists() ? connsSnap.val() : null;
+            const connCount = conns ? Object.keys(conns).length : 0;
+
+            if (connCount > 0) {
+              // online
+              const avatarEl = document.querySelector(`#chat-${id} .chat-avatar`);
+              if (avatarEl) avatarEl.setAttribute('data-online', 'true');
+              const dot = document.getElementById(`status-${id}`);
+              if (dot) { dot.classList.remove('offline-dot'); dot.classList.add('online-dot'); dot.title = 'Online'; }
+            } else {
+              // fallback to root lastSeen
+              const rootSnap = await get(ref(db, `userStatus/${id}`));
+              const val = rootSnap.exists() ? (rootSnap.val() || {}) : {};
+              const lastSeen = Number(val.lastSeen) || 0;
+              const now = Date.now();
+              const TTL_MS = 30 * 1000;
+              const isOnline = (val && val.online === true) || (lastSeen && (now - lastSeen) < TTL_MS);
+
+              const avatarEl = document.querySelector(`#chat-${id} .chat-avatar`);
+              if (avatarEl) avatarEl.setAttribute('data-online', isOnline ? 'true' : 'false');
+
+              const dot = document.getElementById(`status-${id}`);
+              if (dot) {
+                if (isOnline) {
+                  dot.classList.remove('offline-dot'); dot.classList.add('online-dot'); dot.title = 'Online';
+                } else {
+                  dot.classList.remove('online-dot'); dot.classList.add('offline-dot');
+                  if (lastSeen) dot.title = `Last seen: ${new Date(lastSeen).toLocaleString()}`; else dot.title = 'Offline';
                 }
-
-                const avatarLetter = (info.name || id).charAt(0).toUpperCase();
-
-                // include status dot in the markup (id = status-{id})
-                item.innerHTML = `
-                  <div class="chat-avatar" style="position:relative;">
-                    ${avatarLetter}
-                  </div>
-                  <div class="chat-info">
-                    <strong>${info.name || id}</strong>
-                    <small>${lastMsg}</small>
-                  </div>
-                  <div class="chat-status">
-                    ${makeStatusDotHtml(id)}
-                  </div>
-                `;
-
-                item.onclick = () => openChat(userId, document.getElementById('senderName').value, id, info.name || id);
-                list.appendChild(item);
-
-                // Attach real-time status listener for this chat partner
-                addStatusListenerForList(id);
+              }
+            }
+          } catch (e) {
+            console.warn('Error getting initial status for', id, e);
+          } finally {
+            // attach realtime listener after initial state is applied
+            addStatusListenerForList(id);
+          }
+        })();
               }
             } else {
               list.innerHTML = '<div class="status-message">🌟 No chats yet<br>Start a new conversation!</div>';
@@ -2442,7 +2628,9 @@
             document.querySelectorAll('.chat-item').forEach(item => {
                 item.classList.remove('active');
             });
-
+                if (isMobileView()) {
+            showChatOnMobile(); // Thêm class .show-chat để chuyển qua khung chat
+        }
             // Đánh dấu chat hiện tại là active
             const currentChatItem = document.getElementById(`chat-${receiverId}`);
             if (currentChatItem) {
@@ -2623,7 +2811,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Load saved key stats
             loadKeyStats();
-
+             applyResponsiveInitialState();
             // Message input event listeners
             const messageInput = document.getElementById('messageInput');
             if (messageInput) {
@@ -2800,8 +2988,8 @@
         }, 500);
         };
 
-                const CLOUDINARY_CLOUD_NAME = 'dwt7k4avh';
-        const CLOUDINARY_UPLOAD_PRESET = 'ChatMoBe';
+                     const CLOUDINARY_CLOUD_NAME = '@ViewBag.CloudinaryCloudName';
+        const CLOUDINARY_UPLOAD_PRESET = '@ViewBag.CloudinaryPreset';
 
         window.addNewChat = (friendId, friendName) => {
             const senderId = document.getElementById('senderId')?.value.trim();
@@ -3682,7 +3870,62 @@
 
         // ===== INIT LISTENER (Will be called from loadChatList) =====
         console.log('✅ WebRTC module loaded');
+                // Helper: detect mobile width (same breakpoint as CSS)
+        function isMobileView() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
 
+        function showChatOnMobile() {
+            const container = document.getElementById('chatContainer');
+            if (!container) return;
+            container.classList.add('show-chat');
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) backBtn.style.display = '';
+        }
+
+        function showListOnMobile() {
+            const container = document.getElementById('chatContainer');
+            if (!container) return;
+            container.classList.remove('show-chat');
+        }
+
+        // Khi chọn chat thì chạy (Xem đoạn openChat trong mã)
+        if (isMobileView()) {
+            showChatOnMobile();
+        }
+
+        // Khi bấm nút Back (chỉ hiện mobile)
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showListOnMobile();
+            });
+        }
+
+        // Khởi tạo giao diện ban đầu theo mobile/desktop
+        function applyResponsiveInitialState() {
+            const container = document.getElementById('chatContainer');
+            if (!container) return;
+            const backBtn = document.getElementById('backBtn');
+            if (isMobileView()) {
+                container.classList.remove('show-chat');
+                if (backBtn) backBtn.style.display = '';
+            } else {
+                container.classList.remove('show-chat');
+                if (backBtn) backBtn.style.display = 'none';
+            }
+        }
+        // Khi resize cửa sổ, tự động chuyển trạng thái
+        window.addEventListener('resize', () => {
+            if (!isMobileView()) {
+                const container = document.getElementById('chatContainer');
+                if (container) {
+                    container.classList.remove('show-chat');
+                }
+            }
+            applyResponsiveInitialState();
+        });
     </script>
 
     <div id="incomingCallPopup" class="webrtc-popup-hidden">
