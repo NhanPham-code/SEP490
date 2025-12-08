@@ -258,6 +258,27 @@
         .search-result-item:first-child {
             border-top: none;
         }
+
+    .card-footer {
+        margin-top: 16px;
+    }
+
+    .center-link {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .details-btn, .edit-btn {
+        /* Để nút nằm sát 2 bên, bạn có thể kiểm soát kích thước nếu cần */
+        min-width: 120px;
+    }
         </style>
 @section Scripts {
 
@@ -424,16 +445,19 @@
                                 <div class="info-value">${getSportTypes(stadium.Courts)}</div>
                             </div>
                         </div>
-                        <div class="card-actions">
-                                                    <button onclick="goToDetail(${stadium.Id})" class="details-btn loading">
-           <i class="ri-information-line"></i> Chi tiết các sân
-        </button>
 
-                                    <div class="action-buttons">
-            <button onclick="openEditModal(${stadium.Id})" class="action-btn edit-btn" title="Chỉnh sửa">
-                <i class="ri-edit-line"></i>
+                                     <div class="card-footer">
+          <div class="center-link">
+                                           <a href="/Feedback/ByStadium?stadiumId=${stadium.Id}" class="link">Xem chi tiết đánh giá</a>
+          </div>
+          <div class="button-row">
+            <button class="details-btn" onclick="goToDetail(${stadium.Id})">
+              <i class="ri-information-line"></i> Chi tiết các sân
             </button>
-  
+            <button class="action-btn edit-btn" onclick="openEditModal(${stadium.Id})" title="Chỉnh sửa">
+              <i class="ri-edit-line"></i>
+            </button>
+          </div>
         </div>
                         </div>
                     </div>
