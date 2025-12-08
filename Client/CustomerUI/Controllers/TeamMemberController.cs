@@ -148,8 +148,8 @@ namespace CustomerUI.Controllers
                             {
                                 UserId = update.UserId,
                                 Type = "Recruitment.Accepted",
-                                Title = "<div class=\"text-green-500\">Yêu cầu tham gia nhóm của bạn đã được chấp nhận</div>",
-                                Message = $"<div><span>Bạn đã được chấp nhận vào nhóm <span class=\"group-name\">{updateTeamPostDTO.Title}</span></span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId={postId}\">Xem chi tiết</a></div>",
+                                Title = "Yêu cầu tham gia nhóm của bạn đã được chấp nhận,",
+                                Message = $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}"
                             });
                     _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
                     {
@@ -177,7 +177,7 @@ namespace CustomerUI.Controllers
                                     UserId = member.UserId,
                                     Type = "Recruitment.Full",
                                     Title = "Nhóm đã đủ thành viên",
-                                    Message = $"<div><span>Nhóm <span class=\"group-name\">{updateTeamPostDTO.Title}</span> đã đủ thành viên</span><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/FindTeam/FindTeam\">Tìm nhóm khác</a></div>",
+                                    Message = $"<div><span>Nhóm đã đủ thành viên. hãy tìm nhóm khác!",
                                 });
                             var deleteMember = await _teamMember.DeleteTeamMember(member.Id, postId);
                         }
@@ -205,18 +205,18 @@ namespace CustomerUI.Controllers
                 // nếu là từ chối thì không trừ số thành viên
                     if (status == "Cancel")
                     {
-                    notifiMessage = $"Bạn đã không được chủ nhóm <span class=\"group-name\">{post.Value.Select(p => p.Title).FirstOrDefault()}</span> chấp nhận";
+                    notifiMessage = $"Bạn đã không được chủ nhóm {post.Value.Select(p => p.Title).FirstOrDefault()} chấp nhận";
                         mesage = "Từ chối thành viên thành công!";
-                        messageTitle = "<div class=\"text-red-500\">Yêu cầu tham gia nhóm của bạn đã bị từ chối</div>";
+                        messageTitle = "Yêu cầu tham gia nhóm của bạn đã bị từ chối";
                         userId = post.Value.SelectMany(p => p.TeamMembers).FirstOrDefault(tm => tm.Id == memberId).UserId;
                     }
                     // nếu là xóa hoặc rời đội thì trừ số thành viên
                     else if (status == "Delete")
                     {
                     daletedMemberCount = 1;
-                    notifiMessage = $"Bạn đã bị xóa khỏi nhóm <span class=\"group-name\">{post.Value.Select(p => p.Title).FirstOrDefault()}</span>";
+                    notifiMessage = $"Bạn đã bị xóa khỏi nhóm {post.Value.Select(p => p.Title).FirstOrDefault()}";
                         mesage = "Đã xóa thành viên thành công!";
-                        messageTitle = "<div class=\"text-red-500\">Bạn đã bị xóa khỏi nhóm</div>";
+                        messageTitle = ">Bạn đã bị xóa khỏi nhóm<";
                         userId = post.Value.SelectMany(p => p.TeamMembers).FirstOrDefault(tm => tm.Id == memberId).UserId;
                     }
                     else if (status == "Leave")
@@ -224,8 +224,8 @@ namespace CustomerUI.Controllers
                         if (role == "Member")
                         {
                             daletedMemberCount = 1;
-                        notifiMessage = $"Một thành viên đã rời khỏi nhóm <span class=\"group-name\">{post.Value.Select(p => p.Title).FirstOrDefault()}</span> của bạn";
-                        messageTitle = "<div class=\"text-red-500\">Thành viên đã rời nhóm của bạn</div>";
+                        notifiMessage = $"Một thành viên đã rời khỏi nhóm {post.Value.Select(p => p.Title).FirstOrDefault()} của bạn";
+                        messageTitle = "Thành viên đã rời nhóm của bạn";
                             userId = post.Value.Select(p => p.CreatedBy).FirstOrDefault();
                         }
                         mesage = "Rời đội thành công!";
@@ -239,7 +239,7 @@ namespace CustomerUI.Controllers
                             UserId = userId,
                             Type = "Recruitment.Removed",
                             Title = messageTitle,
-                            Message = $"<div><span>{notifiMessage}</span><a class=\"text-blue-500\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm nhóm khác</a></div>",
+                            Message = $"{notifiMessage}"
                         });
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
 

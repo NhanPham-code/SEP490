@@ -393,8 +393,8 @@ namespace CustomerUI.Controllers
             {
                 UserId = createdBy,
                 Type = "Recruitment.JoinRequest",
-                Title = "<h3 class=\"text-green-500\">Yêu cầu tham gia nhóm</h3>",
-                Message = "<div><span>Đã có một thành viên tham gia vào nhóm của bạn: </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId=" + postId + "\">Xem chi tiết</a></div>"
+                Title = "Yêu cầu tham gia nhóm",
+                Message = "Đã có một thành viên tham gia vào nhóm của bạn."
             }).GetAwaiter().GetResult();
             _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             {
@@ -456,8 +456,8 @@ namespace CustomerUI.Controllers
                     {
                         UserId = (Int32)member.UserId,
                         Type = "Recruitment.Accepted",
-                        Title = "<h3 class=\"text-red-600\">Bài đăng đã bị xóa</h3>",
-                        Message = "<div><span>Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm bài đăng khác</a></div>"
+                        Title = "Bài đăng đã bị xóa",
+                        Message = "Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác"
                     });
                 }
             }

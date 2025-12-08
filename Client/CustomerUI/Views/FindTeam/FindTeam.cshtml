@@ -1205,7 +1205,8 @@
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
                             { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
-                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' }
+                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' },
+                            { condition: !pricePerPerson || pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
 
@@ -1343,7 +1344,7 @@
                                         <option value="table-tennis">Bóng bàn</option>
                                         <option value="other">Khác</option>
                                     </select>
-                                    <div class="input-helper">Chọn môn thể thao sẽ chơi</div>
+                                    <div class="input-helper">Môn thể thao sẽ chơi</div>
                                 </div>
 
                                 <div class="form-group">

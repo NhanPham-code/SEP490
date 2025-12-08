@@ -10,7 +10,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<!-- Dùng thư viện này mới in đậm được -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
 <!-- Bootstrap 4 JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -944,55 +947,7 @@
                     $('#pagination-container').html(paginationHtml);
                 }
 
-                // Export functionality (optional)
-                function exportReport() {
-                    Swal.fire({
-                        title: 'Đang xuất báo cáo...',
-                        html: `
-                            <div class="loading-content">
-                                <div class="loading-spinner-custom"></div>
-                                <p style="margin-top: 16px; color: #6b7280;">Đang tạo file báo cáo...</p>
-                            </div>
-                        `,
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-
-                    $.ajax({
-                        url: CONFIG.API_ENDPOINTS.EXPORT,
-                        type: 'GET',
-                        xhrFields: {
-                            responseType: 'blob'
-                        },
-                        success: function(data) {
-                            const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `Stadium_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Xuất báo cáo thành công!',
-                                text: 'File đã được tải xuống thiết bị của bạn',
-                                confirmButtonColor: '#10b981'
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error exporting report:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi xuất báo cáo',
-                                text: 'Không thể xuất báo cáo. Vui lòng thử lại!',
-                                confirmButtonColor: '#dc2626'
-                            });
-                        }
-                    });
-                }
+              
 
                 // Add custom styles for enhanced SweetAlert2 buttons
                 const customStyles = `
@@ -3312,30 +3267,77 @@
         }
 
         // xuất file excel
-                function exportFromJSON() {
-
-           $.ajax({
+                    function exportFromJSON() {
+            $.ajax({
                 url: "/Stadium/GetStadiumsForExcel",
                 method: 'GET',
                 success: function(data) {
-                            // 1. Chuyển JSON thành sheet
-                            console.log('Data for export:', data.value);
-        const ws = XLSX.utils.json_to_sheet(data.value);
+                    // Kiểm tra dữ liệu
+                    if (!data.value || data.value.length === 0) {
+                        Swal.fire('Thông báo', 'Không có dữ liệu để xuất file', 'info');
+                        return;
+                    }
 
-        // 2. Tạo workbook
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Danh-sach-nha-thi-dau");
+                    // 1. Chuyển JSON thành sheet
+                    const ws = XLSX.utils.json_to_sheet(data.value);
 
-        // 3. Xuất file
-        XLSX.writeFile(wb, "Export.xlsx");
+                    // --- QUAN TRỌNG: TỰ ĐỘNG CHỈNH ĐỘ RỘNG CỘT ---
+                    const colWidths = Object.keys(data.value[0]).map(key => {
+                        // Tính độ dài tối đa của cột (so sánh Header vs Data)
+                        const maxLength = Math.max(
+                            key.length,
+                            ...data.value.map(row => (row[key] ? row[key].toString().length : 0))
+                        );
+                        return { wch: maxLength + 5 }; // +5 để rộng rãi hơn chút
+                    });
+                    ws['!cols'] = colWidths;
+
+                    // --- QUAN TRỌNG: IN ĐẬM HEADER (ROW 0) ---
+                    // Lấy vùng dữ liệu của sheet (ví dụ A1:Z100)
+                    const range = XLSX.utils.decode_range(ws['!ref']);
+
+                    // Chỉ chạy vòng lặp cho dòng đầu tiên (Header - Row 0)
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        // Lấy địa chỉ ô (A1, B1, C1...)
+                        const address = XLSX.utils.encode_cell({ r: 0, c: C });
+
+                        // Nếu ô không tồn tại thì bỏ qua
+                        if (!ws[address]) continue;
+
+                        // Gán style in đậm
+                        ws[address].s = {
+                            font: {
+                                name: "Arial",
+                                sz: 11,
+                                bold: true, // <--- ĐÂY LÀ PHẦN IN ĐẬM
+                                color: { rgb: "FFFFFF" } // Chữ trắng
+                            },
+                            fill: {
+                                fgColor: { rgb: "808080" } // Nền đen (hoặc đổi màu khác tùy ý)
+                            },
+                            alignment: {
+                                horizontal: "center",
+                                vertical: "center"
+                            },
+                            border: {
+                                bottom: { style: "thin", color: { rgb: "000000" } }
+                            }
+                        };
+                    }
+
+                    // 2. Tạo workbook
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "DanhSach");
+
+                    // 3. Xuất file
+                    XLSX.writeFile(wb, "Export_Stadiums.xlsx");
                 },
                 error: function(err) {
-                    console.error('Error exporting to Excel:', err);
+                    console.error('Error:', err);
                     Swal.fire({
                         icon: 'error',
                         title: 'Lỗi',
-                        text: 'Có lỗi xảy ra khi xuất file Excel. Vui lòng thử lại sau.',
-                        confirmButtonColor: '#10b981'
+                        text: 'Có lỗi xảy ra khi xuất file Excel.'
                     });
                 }
             });

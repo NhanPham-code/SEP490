@@ -15,10 +15,18 @@ public class CourtsRepositories : ICourtsRepositories
     {
         if (court == null)
             throw new ArgumentNullException(nameof(court));
-
+        bool courtExists = await CourtExists(court.Name, court.StadiumId);
+        if (courtExists)
+            throw new InvalidOperationException($"Court with name '{court.Name}' already exists in Stadium ID {court.StadiumId}.");
+        _context.ChangeTracker.Clear();
         _context.Courts.Add(court);
         await _context.SaveChangesAsync();
         return court;
+    }
+
+    private async Task<bool> CourtExists(string name, int id)
+    {
+        return await _context.Courts.Include(s => s.Stadium).AnyAsync(e => e.Name.Equals(name) && e.Stadium.Id.Equals(id));
     }
 
     public async Task<bool> DeleteCourtAsync(int id)

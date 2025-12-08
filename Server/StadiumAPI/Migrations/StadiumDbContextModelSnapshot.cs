@@ -911,6 +911,22 @@ namespace StadiumAPI.Migrations
                         .HasDatabaseName("IX_StadiumVideos_StadiumId");
 
                     b.ToTable("StadiumVideos", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            StadiumId = 1,
+                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            VideoUrl = "dabanh.mp4"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            StadiumId = 2,
+                            UploadedAt = new DateTime(2025, 8, 14, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            VideoUrl = "sancau.mp4"
+                        });
                 });
 
             modelBuilder.Entity("StadiumAPI.Models.Stadiums", b =>

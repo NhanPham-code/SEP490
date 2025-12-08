@@ -33,6 +33,10 @@
       {
         "Path": "FavoriteAPI\\FavoriteAPI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "DiscountAPI\\DiscountAPI.csproj",
+        "Action": "Start"
       }
     ]
   }
