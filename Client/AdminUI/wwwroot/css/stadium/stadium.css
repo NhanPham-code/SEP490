@@ -179,8 +179,8 @@
     }
 .excel-btn {
 
-    background-color:#9fd59f;
-    color: #000;
+    background: linear-gradient(130deg, #387deb, #0854d2);
+    color: #fff;
     backdrop-filter: blur(10px);
 }
 .court-btn {
