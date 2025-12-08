@@ -11,6 +11,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DTOs.BookingDTO.RevenueViewModel;
+using System.Linq;
 
 namespace Service.Services
 {
@@ -68,6 +69,25 @@ namespace Service.Services
             var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<MonthlyBookingReadDto>>(jsonString);
 
             return (result?.Value ?? new List<MonthlyBookingReadDto>(), result?.Count ?? 0);
+        }
+
+        public async Task<MonthlyBookingWithBookingsDto?> GetMonthlyBookingDetailAsync(string accessToken, int monthlyBookingId)
+        {
+            AddBearerAccessToken(accessToken);
+            var queryString = $"?$filter=Id eq {monthlyBookingId}&$expand=Bookings";
+            var request = new HttpRequestMessage(HttpMethod.Get, "/monthlyBooking" + queryString);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<MonthlyBookingWithBookingsDto>>(jsonString);
+
+            return result?.Value?.FirstOrDefault();
         }
 
         public async Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken)
