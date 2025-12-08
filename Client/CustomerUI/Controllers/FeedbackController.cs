@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Interfaces;
+using Service.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +18,13 @@ namespace CustomerUI.Controllers
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
         private static readonly string BASE_URL = "https://localhost:7136"; // URL của Gateway của bạn
-
-        public FeedbackController(IFeedbackService feedbackService, ITokenService tokenService, IUserService userService)
+        private readonly IBookingService _bookingService;
+        public FeedbackController(IFeedbackService feedbackService, ITokenService tokenService, IUserService userService, IBookingService bookingService)
         {
             _feedbackService = feedbackService;
             _tokenService = tokenService;
             _userService = userService;
+            _bookingService = bookingService;
         }
 
         private string? GetAccessToken()
@@ -61,7 +63,7 @@ namespace CustomerUI.Controllers
         }
 
         // GET: Feedback/Create
-        public IActionResult Create(string stadiumId)
+        public async Task<IActionResult> Create(string stadiumId)
         {
             var accessToken = GetAccessToken();
             if (string.IsNullOrEmpty(accessToken))
@@ -70,12 +72,21 @@ namespace CustomerUI.Controllers
                 return RedirectToAction("Login", "Common");
             }
 
-            if (string.IsNullOrEmpty(stadiumId))
+            if (string.IsNullOrEmpty(stadiumId) || !int.TryParse(stadiumId, out var stadiumIdInt) || stadiumIdInt <= 0)
             {
                 TempData["ErrorMessage"] = "Stadium ID không hợp lệ.";
                 return RedirectToAction("Index", "Home");
             }
 
+            // Kiểm tra đã hoàn tất đặt sân chưa (dùng stadiumIdInt cho service)
+            var hasCompletedBooking = await _bookingService.HasCompletedBookingAtStadiumAsync(accessToken, stadiumIdInt);
+            if (!hasCompletedBooking)
+            {
+                TempData["ErrorMessage"] = "Bạn chỉ có thể gửi phản hồi khi đã hoàn tất đặt sân tại sân này.";
+                return RedirectToAction("Details", "Stadiums", new { id = stadiumId }); // vẫn dùng string nếu route cần
+            }
+
+            // Giữ nguyên ViewBag là string như bạn muốn
             ViewBag.StadiumId = stadiumId;
             return View();
         }
@@ -85,8 +96,8 @@ namespace CustomerUI.Controllers
         {
             try
             {
-                // Add debug logging
-                Console.WriteLine($"[Feedback] Received request - StadiumId: {stadiumId}, Rating: {rating}, Comment: {comment}");
+                Console.WriteLine($"[Feedback] ========== START CREATE ==========");
+                Console.WriteLine($"[Feedback] Received request - StadiumId: {stadiumId}, Rating: {rating}");
 
                 var accessToken = GetAccessToken();
                 if (string.IsNullOrEmpty(accessToken))
@@ -104,7 +115,35 @@ namespace CustomerUI.Controllers
 
                 Console.WriteLine($"[Feedback] User profile retrieved - UserId: {userProfile.UserId}");
 
-                // ✅ Validate input parameters first
+                // ✅ CHECK #1: Kiểm tra đã có feedback chưa (di chuyển lên đầu)
+                var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
+                var existingFeedback = stadiumFeedbacks?.FirstOrDefault(f => f.UserId == userProfile.UserId);
+
+                if (existingFeedback != null)
+                {
+                    Console.WriteLine($"[Feedback] ❌ BLOCKED - User {userProfile.UserId} already has feedback (ID: {existingFeedback.Id}) for stadium {stadiumId}");
+                    return BadRequest(new
+                    {
+                        message = "Bạn đã gửi feedback cho sân này.  Vui lòng chỉnh sửa thay vì gửi mới.",
+                        existingFeedbackId = existingFeedback.Id
+                    });
+                }
+
+                // ✅ CHECK #2: Kiểm tra đã hoàn tất booking chưa
+                Console.WriteLine($"[Feedback] Checking completed booking for stadiumId: {stadiumId}");
+                var hasCompletedBooking = await _bookingService.HasCompletedBookingAtStadiumAsync(accessToken, stadiumId);
+
+                Console.WriteLine($"[Feedback] HasCompletedBooking result: {hasCompletedBooking}");
+
+                if (!hasCompletedBooking)
+                {
+                    Console.WriteLine($"[Feedback] ❌ BLOCKED - User {userProfile.UserId} has not completed booking at stadium {stadiumId}");
+                    return BadRequest(new { message = "Bạn chỉ có thể gửi phản hồi khi đã hoàn tất đặt sân tại sân này." });
+                }
+
+                Console.WriteLine($"[Feedback] ✅ All checks passed, proceeding with create");
+
+                // Validate input
                 if (stadiumId <= 0)
                 {
                     Console.WriteLine($"[Feedback] Invalid stadiumId: {stadiumId}");
@@ -123,20 +162,10 @@ namespace CustomerUI.Controllers
                     return BadRequest(new { message = "Bình luận không được vượt quá 1000 ký tự." });
                 }
 
-                // ✅ Check if user already gave feedback for this stadium
-                var stadiumFeedbacks = await _feedbackService.GetByStadiumIdAsync(stadiumId);
-                var existingFeedback = stadiumFeedbacks?.FirstOrDefault(f => f.UserId == userProfile.UserId);
-
-                if (existingFeedback != null)
-                {
-                    Console.WriteLine($"[Feedback] User {userProfile.UserId} already has feedback for stadium {stadiumId}");
-                    return BadRequest(new { message = "Bạn đã gửi feedback cho sân này. Vui lòng chỉnh sửa thay vì gửi mới." });
-                }
-
-                // ✅ Validate image file if provided
+                // Validate image
                 if (image != null)
                 {
-                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var allowedExtensions = new[] { ". jpg", ".jpeg", ".png", ".gif" };
                     var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
 
                     if (!allowedExtensions.Contains(fileExtension))
@@ -152,7 +181,7 @@ namespace CustomerUI.Controllers
                     }
                 }
 
-                // ✅ Create feedback DTO
+                // Tạo DTO
                 var feedbackDto = new CreateFeedback
                 {
                     UserId = userProfile.UserId,
@@ -172,12 +201,12 @@ namespace CustomerUI.Controllers
                     return StatusCode(500, new { message = "Không thể tạo phản hồi." });
                 }
 
-                Console.WriteLine("[Feedback] Feedback created successfully");
+                Console.WriteLine("[Feedback] ✅ Feedback created successfully");
                 return Ok(new { success = true, message = "Gửi phản hồi thành công!" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Feedback] Exception occurred: {ex.Message}");
+                Console.WriteLine($"[Feedback] ❌ Exception occurred: {ex.Message}");
                 Console.WriteLine($"[Feedback] Stack trace: {ex.StackTrace}");
                 return StatusCode(500, new { message = "Có lỗi xảy ra khi tạo feedback." });
             }
