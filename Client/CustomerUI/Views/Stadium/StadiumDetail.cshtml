@@ -811,6 +811,67 @@
             object-fit: contain; /* Keeps video aspect ratio within the container */
             background: black; /* Background for letterboxing */
         }
+        /* Mặc định, desktop hiện, mobile ẩn */
+        .desktop-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        /* Từ 768px trở xuống (mobi/tablet), desktop ẩn, mobile hiện */
+        @@media (max-width: 767px) {
+            .desktop-only
+
+        {
+            display: none !important;
+        }
+
+        .mobile-only {
+            display: block !important;
+        }
+
+        }
+        /* Chỉ sửa cho mobile-only feedback box */
+        @@media (max-width: 767px) {
+            .mobile-only .feedback-item
+
+        {
+            overflow: hidden; /* Chắn phần tử con vượt ra ngoài */
+            border-radius: 1.5rem; /* Đảm bảo đúng bo góc như khối lớn */
+            position: relative; /* Để có thể xếp lớp phần tử con */
+        }
+
+        .mobile-only .feedback-item img,
+        .mobile-only .feedback-item svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px; /* Bớt cứng, hạn chế góc vuông */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        /* Nếu có phần .feedback-icon lớn dùng absolute, nên bóc lại static hoặc thu nhỏ lại */
+        .mobile-only .feedback-item .feedback-icon,
+        .mobile-only .feedback-item [class*='icon'] {
+            max-width: 90%;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            position: static !important;
+            left: unset !important;
+            right: unset !important;
+            top: unset !important;
+            bottom: unset !important;
+            transform: none !important;
+            box-shadow: none !important;
+            z-index: 1;
+            background: none;
+        }
+
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center">
@@ -1123,23 +1184,29 @@
             </div>
 
             <!-- Feedback List Section -->
-            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
-                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
-
-                <div id="feedback-count" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
-
-                <div id="feedbackList">
+            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg desktop-only">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng </h2>
+                <div id="feedback-count-desktop" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
+                <div id="feedbackList-desktop">
                     <!-- Feedback items will be loaded here -->
                 </div>
-
-                <div id="pagination-container">
+                <div id="pagination-container-desktop">
                     <!-- Pagination will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
 
-
+    <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg mobile-only">
+        <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng </h2>
+        <div id="feedback-count-mobile" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
+        <div id="feedbackList-mobile">
+            <!-- Feedback items will be loaded here -->
+        </div>
+        <div id="pagination-container-mobile">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
@@ -1420,7 +1487,24 @@
                 }
             });
         }
-
+                function isMobileScreen() {
+            return window.innerWidth <= 767; // breakpoint phù hợp tailwind md
+        }
+                function getFeedbackElements() {
+            if (isMobileScreen()) {
+                return {
+                    count: '#feedback-count-mobile',
+                    list: '#feedbackList-mobile',
+                    pagination: '#pagination-container-mobile'
+                };
+            } else {
+                return {
+                    count: '#feedback-count-desktop',
+                    list: '#feedbackList-desktop',
+                    pagination: '#pagination-container-desktop'
+                };
+            }
+        }
         function deleteFeedback() {
             if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.')) {
                 return;
@@ -1531,6 +1615,7 @@
 
         function renderFeedbacks(feedbacks) {
             console.log("Rendering feedbacks:", feedbacks);
+             let els = getFeedbackElements();
             let html = "";
 
             if (!feedbacks || feedbacks.length === 0) {
@@ -1545,7 +1630,7 @@
                 });
             }
 
-            $("#feedbackList").html(html);
+            $(els.list).html(html);
         }
 
         // ✅ Render pagination controls
@@ -1554,7 +1639,7 @@
                 $("#pagination-container").html('');
                 return;
             }
-
+             let els = getFeedbackElements();
             let paginationHtml = `
                 <div class="flex flex-col sm:flex-row items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg">
                     <div class="text-sm text-gray-600 mb-3 sm:mb-0">
@@ -1636,7 +1721,7 @@
                     </div>
                 </div>`;
 
-            $("#pagination-container").html(paginationHtml);
+             $(els.pagination).html(paginationHtml);
         }
 
                 // CREATE FEEDBACK
