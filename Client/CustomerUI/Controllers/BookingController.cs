@@ -941,5 +941,33 @@ namespace CustomerUI.Controllers
                 return StatusCode(500, new { message = "Lỗi server khi lấy dữ liệu booking." });
             }
         }
+        
+        // Trong BookingController.cs
+        [HttpGet]
+        public async Task<IActionResult> CheckCompletedBooking(int stadiumId)
+        {
+            try
+            {
+                // 1. Lấy AccessToken từ Cookie
+                var accessToken = GetAccessToken();
+        
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    // Nếu chưa đăng nhập, mặc định là chưa có booking hoàn thành
+                    return Json(new { success = false, hasCompleted = false, message = "User not logged in" });
+                }
+
+                // 2. Gọi Service để kiểm tra
+                // Đảm bảo bạn đã Inject IBookingService vào Controller này
+                bool result = await _bookingService.HasCompletedBookingAtStadiumAsync(accessToken, stadiumId);
+
+                // 3. Trả kết quả về View
+                return Json(new { success = true, hasCompleted = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, hasCompleted = false, message = ex.Message });
+            }
+        }
     }
 }
