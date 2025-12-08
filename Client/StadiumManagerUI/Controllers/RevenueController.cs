@@ -64,8 +64,18 @@ namespace StadiumManagerUI.Controllers
             try
             {
                 var today = DateTime.UtcNow;
-                var initialStats =
-                    await _bookingService.GetRevenueStatisticsAsync(accessToken, today.Year, today.Month, today.Day, stadiums.Select(s => s.Id).ToArray());
+
+                var stadiumIds = stadiums.Any() 
+                    ? stadiums.Select(s => s.Id).ToArray() 
+                    : new int[] { -1 };
+
+                var initialStats = await _bookingService.GetRevenueStatisticsAsync(
+                    accessToken, 
+                    today.Year, 
+                    today.Month, 
+                    today.Day, 
+                    stadiumIds 
+                );
 
                 return View(initialStats);
             }
@@ -85,6 +95,13 @@ namespace StadiumManagerUI.Controllers
             {
                 return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn." });
             }
+            
+            if (stadiumIds == null || stadiumIds.Length == 0)
+            {
+                // Gán mảng mới chứa phần tử -1 (hoặc 0 tùy bạn chọn)
+                stadiumIds = new int[] { -1 }; 
+            }
+            
             try
             {
                 var statistics = await _bookingService.GetRevenueStatisticsAsync(accessToken, year, month, day, stadiumIds);
