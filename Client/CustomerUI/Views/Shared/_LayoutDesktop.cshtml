@@ -1,6 +1,9 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
-
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -725,15 +728,13 @@
                     <div id="nav"
                          class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
                         <a asp-controller="Home" asp-action="Index"
-                           class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-home-4-line text-base"></i>
-                            <span>Trang chủ</span>
+                           class="block px-4 py-3 @(currentController == "Home" ?  "text-blue-600 bg-blue-50" : "text-slate-600") hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                            <i class="ri-home-4-line mr-3"></i>Trang chủ
                         </a>
 
                         <a asp-controller="FindTeam" asp-action="FindTeam"
-                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-team-line text-base"></i>
-                            <span>Đội nhóm</span>
+                           class="block px-4 py-3 @(currentController == "FindTeam" ? "text-blue-600 bg-blue-50" : "text-slate-600") hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                            <i class="ri-team-line mr-3"></i>Tìm đội
                         </a>
 
 

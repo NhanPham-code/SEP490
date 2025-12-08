@@ -110,9 +110,42 @@
             <!-- Discount Section -->
             <div id="discount-section" class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Mã giảm giá</h2>
-                <div class="flex gap-2 items-center">
-                    <span id="selected-discount-code" class="flex-grow p-3 rounded-lg bg-white border border-gray-300 text-gray-600">Chưa có mã giảm giá nào được chọn</span>
-                    <button type="button" id="select-discount-button" class="px-6 py-3 rounded-lg font-bold text-white bg-indigo-500">Chọn mã</button>
+
+                <!-- Khi chưa chọn mã -->
+                <div id="no-discount-selected" class="flex items-center justify-between">
+                    <span class="text-gray-500 italic">Chưa có mã giảm giá nào được chọn</span>
+                    <button type="button" id="select-discount-button"
+                            class="px-5 py-3.5 rounded-lg font-semibold text-white bg-indigo-500 hover:bg-indigo-600 transition">
+                        Chọn mã
+                    </button>
+                </div>
+
+                <!-- Khi đã chọn mã (ẩn mặc định) -->
+                <div id="discount-selected" class="hidden">
+                    <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p id="selected-code-name" class="font-bold text-green-700"></p>
+                                <p id="selected-code-amount" class="text-sm text-green-600"></p>
+                            </div>
+                        </div>
+                        <button type="button" id="remove-discount-button"
+                                class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition"
+                                title="Bỏ chọn mã">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="button" id="change-discount-button"
+                            class="mt-3 text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                        Đổi mã khác
+                    </button>
                 </div>
             </div>
 
@@ -308,6 +341,44 @@
             });
         }
 
+                // Apply & Remove Discount Functions
+        function applyDiscount(id, percent, minAmount, maxAmount, code) {
+            if (originalPrice < minAmount) {
+                showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
+                return;
+            }
+
+            const calculatedDiscount = originalPrice * (percent / 100);
+            discountAmount = Math. min(calculatedDiscount, maxAmount);
+            finalPrice = originalPrice - discountAmount;
+            selectedDiscountId = id;
+
+            // Cập nhật UI
+            $('#selected-code-name').text(code);
+            $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
+            $('#no-discount-selected'). addClass('hidden');
+            $('#discount-selected'). removeClass('hidden');
+
+            updateInvoiceDetails();
+            updateHiddenFields();
+            hideDiscountModal();
+            showModal('Thành công', `Mã giảm giá "${code}" đã được áp dụng! `);
+        }
+
+        function removeDiscount() {
+            // Reset các giá trị
+            discountAmount = 0;
+            finalPrice = originalPrice;
+            selectedDiscountId = null;
+
+            // Cập nhật UI
+            $('#no-discount-selected').removeClass('hidden');
+            $('#discount-selected').addClass('hidden');
+
+            updateInvoiceDetails();
+            updateHiddenFields();
+        }
+
         // Event Listeners
         $(document).ready(function() {
             // Initial setup
@@ -316,9 +387,12 @@
             updateHiddenFields(); // Call on load to set initial values
             
             // Check if we have a pre-selected discount
-            if (selectedDiscountId) {
-                fetchAndDisplayAppliedDiscount(selectedDiscountId);
-            }
+                    if (selectedDiscountId) {
+            fetchAndDisplayAppliedDiscount(selectedDiscountId);
+            // Hiển thị UI đã chọn mã
+            $('#no-discount-selected'). addClass('hidden');
+            $('#discount-selected'). removeClass('hidden');
+        }
             
             // Handle different view modes
             if (bookingData.type === 'month') {
@@ -336,31 +410,26 @@
                 $('#back-button').click(() => window.history.back());
             }
 
-            // Modal and navigation buttons
-            $('#modal-close-btn').click(hideModal);
-            $('#close-discount-modal').click(hideDiscountModal);
-            $('#back-button').click(() => window.history.back());
-            $('#select-discount-button').click(() => { fetchDiscounts(); showDiscountModal(); });
+        $('#modal-close-btn').click(hideModal);
+        $('#close-discount-modal').click(hideDiscountModal);
+        $('#back-button').click(() => window.history.back());
 
-            // Apply discount logic
-            $('#discount-list').on('click', '.apply-discount-btn', function() {
-                const card = $(this).closest('[data-id]');
-                if (originalPrice < card.data('min')) {
-                    showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(card.data('min'))} để áp dụng mã này.`);
-                    return;
-                }
+        // Discount buttons
+        $('#select-discount-button').click(() => { fetchDiscounts(); showDiscountModal(); });
+        $('#change-discount-button'). click(() => { fetchDiscounts(); showDiscountModal(); });
+        $('#remove-discount-button').click(removeDiscount);
 
-                const calculatedDiscount = originalPrice * (card.data('percent') / 100);
-                discountAmount = Math.min(calculatedDiscount, card.data('max'));
-                finalPrice = originalPrice - discountAmount;
-                selectedDiscountId = card.data('id');
-
-                $('#selected-discount-code').text(`Đã chọn mã: ${card.data('code')}`);
-                updateInvoiceDetails();
-                updateHiddenFields();
-                hideDiscountModal();
-                showModal('Thành công', `Mã giảm giá "${card.data('code')}" đã được áp dụng. Bạn được giảm ${formatCurrency(discountAmount)}.`);
-            });
+        // Apply discount từ modal
+        $('#discount-list').on('click', '.apply-discount-btn', function() {
+            const card = $(this).closest('[data-id]');
+            applyDiscount(
+                card.data('id'),
+                card.data('percent'),
+                card.data('min'),
+                card.data('max'),
+                card. data('code')
+            );
+        });
 
             // Update on payment method change
             $('input[name="payment-method"]').change(updateHiddenFields);
