@@ -855,7 +855,11 @@
                              
                          </div>
                          <div class="player-info">
-                             <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
+                         <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
+                            <div class="title flex">
+                                <i class="ri-price-tag-3-line"></i>
+                                <h3 class="stadium-name">${p.title}</h3>
+                            </div>
                                 <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
                          </div>
                          <a href="javascript:void(0)"
@@ -988,7 +992,7 @@
                         if (response.message === 200) {
                              Swal.fire({
             icon: 'success',
-            title: 'Tham gia thành công!',
+            title: 'Đã gửi yêu cầu!',
             text: 'Đang chờ chủ bài đăng chấp nhận',
             showCancelButton: true,
             confirmButtonText: 'Xem chi tiết',

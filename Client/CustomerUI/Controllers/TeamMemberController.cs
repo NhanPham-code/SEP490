@@ -86,13 +86,15 @@ namespace CustomerUI.Controllers
             token = _tokenService.GetAccessTokenFromCookie();
             int myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
             TeamPostDetailViewModel teamPostDetailViewModel = new TeamPostDetailViewModel();
+            
             var teamPost = await _teamPost.GetOdataTeamPostAsync($"&$filter=Id eq {postId}");
             teamPostDetailViewModel.TeamPost = teamPost.Value.FirstOrDefault();
             // get user profile by userId
             teamPostDetailViewModel.User = await _userService.GetOtherUserByIdAsync(teamPostDetailViewModel.TeamPost.CreatedBy);
             // tìm xem bạn có phải viên mới không
-            var btn = teamPostDetailViewModel.TeamPost.TeamMembers.FirstOrDefault(n => n.UserId.Equals(myUserId));
-            if (btn == null)
+
+            teamPostDetailViewModel.memberDTO = teamPostDetailViewModel.TeamPost.TeamMembers.FirstOrDefault(n => n.UserId.Equals(myUserId));
+            if (teamPostDetailViewModel.memberDTO == null)
             {
                 teamPostDetailViewModel.newMember = 1;
             }
@@ -142,14 +144,19 @@ namespace CustomerUI.Controllers
                 if (update != null)
                 {
                     // gửi thông báo cho thành viên được chấp nhận
-       
-                        _ = await _notificationService.SendNotificationToUserAsync(
+                    var json = JsonSerializer.Serialize(new
+                    {
+                        title = "TeamDetail",
+                        content = $"/TeamMember/TeamManage?postId={postId}"
+                    });
+                    _ = await _notificationService.SendNotificationToUserAsync(
                             new CreateNotificationDto
                             {
                                 UserId = update.UserId,
                                 Type = "Recruitment.Accepted",
                                 Title = "Yêu cầu tham gia nhóm của bạn đã được chấp nhận,",
-                                Message = $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}"
+                                Message = $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}",
+                                Parameters = json
                             });
                     _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
                     {
@@ -171,6 +178,11 @@ namespace CustomerUI.Controllers
                     {
                         if (member.role == "Waiting")
                         {
+                            var json = JsonSerializer.Serialize(new
+                            {
+                                title = "FindTeam",
+                                content = "/FindTeam/FindTeam"
+                            });
                             _ = await _notificationService.SendNotificationToUserAsync(
                                 new CreateNotificationDto
                                 {
@@ -178,6 +190,7 @@ namespace CustomerUI.Controllers
                                     Type = "Recruitment.Full",
                                     Title = "Nhóm đã đủ thành viên",
                                     Message = $"<div><span>Nhóm đã đủ thành viên. hãy tìm nhóm khác!",
+                                    Parameters = json
                                 });
                             var deleteMember = await _teamMember.DeleteTeamMember(member.Id, postId);
                         }
@@ -201,6 +214,11 @@ namespace CustomerUI.Controllers
                 string messageTitle = string.Empty;
                 string notifiMessage = string.Empty;
                 int userId = 0;
+                var json = JsonSerializer.Serialize(new
+                {
+                    title = "TeamDetail",
+                    content = $"/TeamMember/TeamManage?postId={postId}"
+                });
                 var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=TeamMembers/any(tm: tm/Id eq {memberId})");
                 // nếu là từ chối thì không trừ số thành viên
                     if (status == "Cancel")
@@ -216,7 +234,7 @@ namespace CustomerUI.Controllers
                     daletedMemberCount = 1;
                     notifiMessage = $"Bạn đã bị xóa khỏi nhóm {post.Value.Select(p => p.Title).FirstOrDefault()}";
                         mesage = "Đã xóa thành viên thành công!";
-                        messageTitle = ">Bạn đã bị xóa khỏi nhóm<";
+                        messageTitle = "Bạn đã bị xóa khỏi nhóm";
                         userId = post.Value.SelectMany(p => p.TeamMembers).FirstOrDefault(tm => tm.Id == memberId).UserId;
                     }
                     else if (status == "Leave")
@@ -239,8 +257,11 @@ namespace CustomerUI.Controllers
                             UserId = userId,
                             Type = "Recruitment.Removed",
                             Title = messageTitle,
-                            Message = $"{notifiMessage}"
+                            Message = $"{notifiMessage}",
+                            Parameters = json
                         });
+                _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
+                {});
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
 
      

@@ -12,8 +12,8 @@ namespace DTOs.FindTeamDTO
     {
         public ReadTeamPostDTO? TeamPost { get; set; } = new ReadTeamPostDTO();
         public PublicUserProfileDTO? User { get; set; } = new PublicUserProfileDTO();
-
         public int newMember { get; set; }
         public int isLeader { get; set; }
+        public ReadTeamMemberDTO? memberDTO { get; set; } = new ReadTeamMemberDTO();
     }
 }

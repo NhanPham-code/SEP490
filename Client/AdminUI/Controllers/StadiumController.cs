@@ -174,11 +174,13 @@ namespace AdminUI.Controllers
             var basketball = await _service.GetSportType("Bóng rổ");
             var volleyball = await _service.GetSportType("Bóng chuyền");
             var football = await _service.GetSportType("Bóng đá");
+            var pickleball = await _service.GetSportType("Pickleball");
             model.volleyballCount = (int)volleyball.Count;
             model.basketballCount = (int)basketball.Count;
             model.tennisCount = (int)tennis.Count;
             model.badmintonCount = (int)badminton.Count;
             model.footballCount = (int)football.Count;
+            model.pickleballCount = (int)pickleball.Count;
             return Json(model);
         }
 

@@ -52,6 +52,7 @@ async function loadStadiums() {
             filteredStadiums = data.value || [];
             
             $("#total-count_unapprove").html(data["@odata.count"] || 0);
+            $('#pending-count').text(data["@odata.count"] || 0);
             console.log("Cout Stadium Unapprove: ", data["@odata.count"] || 0);
             totalItems = data["@odata.count"] || 0;
             updatePaginationUnapprove();
@@ -298,3 +299,37 @@ function formatDate(dateString) {
         minute: '2-digit'
     });
 }
+
+function updateSportChart() {
+    const sports = [
+        { countId: 'football-count', barClass: 'football-bar' },
+        { countId: 'basketball-count', barClass: 'basketball-bar' },
+        { countId: 'volleyball-count', barClass: 'volleyball-bar' },
+        { countId: 'badminton-count', barClass: 'badminton-bar' },
+        { countId: 'tennis-count', barClass: 'tennis-bar' },
+        { countId: 'pickleballCount', barClass: 'pickleball-bar' }
+    ];
+
+    // Lấy giá trị
+    const values = sports.map(sport => {
+        const countEl = document.getElementById(sport.countId);
+        return parseInt(countEl?.textContent) || 0;
+    });
+
+    const maxValue = Math.max(...values, 1);
+
+    // Cập nhật thanh bar
+    sports.forEach((sport, index) => {
+        const bar = document.querySelector('.' + sport.barClass);
+        if (bar) {
+            const percentage = (values[index] / maxValue) * 100;
+            bar.style.width = percentage + '%';
+        }
+    });
+}
+
+// TỰ ĐỘNG CHẠY khi DOM load xong
+document.addEventListener('DOMContentLoaded', function () {
+    // Đợi một chút để data load vào các element
+    setTimeout(updateSportChart, 500);
+});

@@ -375,7 +375,7 @@ body {
 }
 
 /* Focus States */
-button:focus,
+
 a:focus {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
@@ -2018,11 +2018,11 @@ body {
         padding: var(--space-lg);
     }
 
-/*    .card-footer {
+    .card-footer {
         flex-direction: column;
         align-items: stretch;
         gap: var(--space-md);
-    }*/
+    }
 
     .sidebar {
         width: 100%;
@@ -2506,8 +2506,8 @@ body {
 .back {
     position: sticky;
     top: 10%;
-    margin-bottom: 5%;
-    z-index: 1000;
+    z-index: 30;
+    height: auto;
     background-color: white;
 }
 .post-status {

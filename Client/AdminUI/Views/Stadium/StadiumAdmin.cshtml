@@ -312,9 +312,10 @@
                     loadNewStadiumsToday();
                     loadCourtTypes();
                     loadTotalStadiums();
+                    updateSportChart();
                     // setInterval(updateDateTime, 10000);
                 });
-
+             
                 // Core Functions
                 function initializeApp() {
                     bindEventListeners();
@@ -3356,6 +3357,7 @@
                     $('#volleyball-count').text(data.volleyballCount || 0);
                     $('#badminton-count').text(data.badmintonCount || 0);
                     $('#tennis-count').text(data.tennisCount || 0);
+                    $('#pickleballCount').text(data.pickleballCount || 0);
                 },
                 error: function(err) {
                     console.error('Error fetching court types:', err);
@@ -3407,104 +3409,108 @@
             <button class="btn excel-btn" onclick="exportFromJSON()">📑 Xuất Excel</button>
         </div>
         @* hiển thị số lượng nhà thi đấu vừa đăng ký hôm này  *@
-        <div class="header-stats">
-            <div class="stat-card-waiting">
-                <div class="stat-icon bg-blue">
-                    <i class="ri-building-2-fill"></i>
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Nhà Thi Đấu Mới Hôm Nay</p>
-                    <h2 class="stat-value" id="stadium-now">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    <i class="ri-building-2-fill"></i>
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Nhà Thi Đấu Chưa Duyệt</p>
-                    <h2 class="stat-value" id="pending-count">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    <i class="ri-building-2-fill"></i>
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Nhà Thi Đấu Đã Đăng Kí</p>
-                    <h2 class="stat-value" id="count">
-                        0
-                    </h2>
-                </div>
-            </div>
-        </div>
-        @* loại sân  *@
-        <div class="header-stats mt-4">
-            <div class="stat-card-waiting">
-                <div class="stat-icon bg-blue">
-                    ⚽
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Bóng đá</p>
-                    <h2 class="stat-value" id="football-count">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    🏀
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Bóng rổ</p>
-                    <h2 class="stat-value" id="basketball-count">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    🏐
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Bóng chuyền</p>
-                    <h2 class="stat-value" id="volleyball-count">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    🏸
-                </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Cầu long</p>
-                    <h2 class="stat-value" id="badminton-count">
-                        0
-                    </h2>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-blue">
-                    🎾
+        <div class="stats-container">
+            <!-- Thống kê Nhà Thi Đấu -->
+            <h3 class="section-title">Thống kê Nhà Thi Đấu</h3>
+            <div class="header-stats">
+                <div class="stat-card-waiting">
+                    <div class="stat-icon bg-yellow">
+                        <i class="ri-building-2-fill"></i>
                     </div>
-                <div class="stat-info">
-                    <p class="stat-label
-                        ">Tennis</p>
-                    <h2 class="stat-value" id="tennis-count">
-                        0
-                    </h2>
+                    <div class="stat-info">
+                        <p class="stat-label">Mới Hôm Nay</p>
+                        <h2 class="stat-value" id="stadium-now">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card-pending">
+                    <div class="stat-icon bg-blue">
+                        <i class="ri-time-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Chưa Duyệt</p>
+                        <h2 class="stat-value" id="pending-count">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card-done">
+                    <div class="stat-icon bg-green">
+                        <i class="ri-check-double-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Đã Đăng Ký</p>
+                        <h2 class="stat-value" id="count">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ phân loại theo môn thể thao -->
+            <div class="sport-chart-section">
+                <h3 class="section-title">Phân loại theo môn thể thao</h3>
+                <div class="sport-chart-container">
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">⚽</span>
+                            <span class="sport-name">Bóng đá</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar football-bar"></div>
+                        </div>
+                        <span class="chart-count" id="football-count">0</span>
+                    </div>
+
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">🏀</span>
+                            <span class="sport-name">Bóng rổ</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar basketball-bar"></div>
+                        </div>
+                        <span class="chart-count" id="basketball-count">0</span>
+                    </div>
+
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">🏐</span>
+                            <span class="sport-name">Bóng chuyền</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar volleyball-bar"></div>
+                        </div>
+                        <span class="chart-count" id="volleyball-count">0</span>
+                    </div>
+
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">🏸</span>
+                            <span class="sport-name">Cầu lông</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar badminton-bar"></div>
+                        </div>
+                        <span class="chart-count" id="badminton-count">0</span>
+                    </div>
+
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">🎾</span>
+                            <span class="sport-name">Tennis</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar tennis-bar"></div>
+                        </div>
+                        <span class="chart-count" id="tennis-count">0</span>
+                    </div>
+
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <span class="sport-emoji">🏓</span>
+                            <span class="sport-name">Pickleball</span>
+                        </div>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar pickleball-bar"></div>
+                        </div>
+                        <span class="chart-count" id="pickleballCount">0</span>
+                    </div>
                 </div>
             </div>
         </div>

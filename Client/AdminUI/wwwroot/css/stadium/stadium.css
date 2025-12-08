@@ -2139,6 +2139,15 @@
     transition: transform 0.2s, box-shadow 0.2s;
     width: 100%;
 }
+.stat-card-pending {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #c60b0b;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
 .stat-icon {
     font-size: 40px;
 }
@@ -2153,4 +2162,349 @@ grammarly-extension,
 grammarly-extension-root {
     display: none !important;
     visibility: hidden !important;
+}
+
+
+
+.stats-container {
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 2px;
+    }
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.25);
+    }
+
+.stat-card-waiting {
+    background: linear-gradient(135deg, #fff 0%, #fff8dc 100%);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #fcd34d;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .stat-card-waiting::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .stat-card-waiting:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(245, 158, 11, 0.25);
+    }
+.stat-card-pending {
+    background: linear-gradient(135deg, #fff 0%, #ffe9e6 100%);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #fc4d4d;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .stat-card-pending::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #f5100b, #d90d06);
+    }
+
+    .stat-card-pending:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(245, 22, 11, 0.25);
+    }
+.stat-card-done {
+    background: linear-gradient(135deg, #fff 0%, #e3ffdc 100%);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #76fc4d;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .stat-card-done::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #62f50b, #68d906);
+    }
+
+    .stat-card-done:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(11, 245, 41, 0.25);
+    }
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+    .stat-icon. bg-blue {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .stat-icon.bg-yellow {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .stat-icon.bg-green {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0. 4);
+    }
+
+    .stat-icon.sport-icon {
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        font-size: 28px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+. stat-info {
+    flex: 1;
+}
+
+. stat-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+}
+
+.stat-card-waiting .stat-label {
+    color: #92400e;
+}
+.stat-card-pending .stat-label {
+    color: #920f0e;
+}
+
+.stat-value {
+    font-size: 1. 75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1;
+}
+
+. stat-card-waiting .stat-value {
+    color: #78350f;
+}
+. stat-card-pending .stat-value {
+    color: #78170f;
+}
+
+/* Sport cards specific styling */
+.sport-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.sport-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0. 05);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+    .sport-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
+    }
+
+.sport-emoji {
+    font-size: 36px;
+    line-height: 1;
+}
+
+.sport-card . stat-label {
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.sport-card .stat-value {
+    font-size: 1.5rem;
+}
+/* ===== Sport Chart Section ===== */
+.sport-chart-section {
+    margin-top: 24px;
+}
+
+.sport-chart-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+    .chart-item:last-child {
+        border-bottom: none;
+    }
+
+.chart-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 100px;
+}
+
+.sport-emoji {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+}
+
+. sport-name {
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    height: 18px;
+    background: #f0f0f0;
+    border-radius: 9px;
+    overflow: hidden;
+    min-width: 80px;
+}
+
+.chart-bar {
+    height: 100%;
+    border-radius: 9px;
+    transition: width 0.6s ease;
+    width: 0%;
+}
+
+/* Màu gradient cho từng môn - ĐÃ FIX */
+.football-bar {
+    background: linear-gradient(90deg, #22c55e, #4ade80) !important;
+}
+
+.basketball-bar {
+    background: linear-gradient(90deg, #f97316, #fb923c) !important;
+}
+
+.volleyball-bar {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa) !important;
+}
+
+.badminton-bar {
+    background: linear-gradient(90deg, #a855f7, #c084fc) !important;
+}
+
+.tennis-bar {
+    background: linear-gradient(90deg, #eab308, #facc15) !important;
+}
+
+.pickleball-bar {
+    background: linear-gradient(90deg, #06b6d4, #22d3ee) !important;
+}
+
+.chart-count {
+    min-width: 32px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
 }
