@@ -104,8 +104,7 @@ namespace CustomerUI.Controllers
 
             return Content(stadium, "application/json");
         }
-
-
+        
         public IActionResult Privacy()
         {
             return View();
