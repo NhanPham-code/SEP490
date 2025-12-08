@@ -59,6 +59,7 @@ namespace UserAPI.Controllers
         /// api/Users/face-embeddings
         /// </sumary>
         [HttpPut("face-embeddings")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> AddOrUpdateFaceEmbeddings([FromForm] FaceImagesDTO request)
         {
             if (request.FaceImages == null || request.FaceImages.Count == 0)
@@ -604,6 +605,7 @@ namespace UserAPI.Controllers
         }
 
         [HttpPut("ban/{userId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> BanUser(int userId)
         {
             if (userId <= 0)
@@ -627,6 +629,7 @@ namespace UserAPI.Controllers
         }
 
         [HttpPut("unban/{userId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UnbanUser(int userId)
         {
             if (userId <= 0)
@@ -646,6 +649,78 @@ namespace UserAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while unbanning the user.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("update-national-id")]
+        [Authorize(Roles = "StadiumManager")]
+        public async Task<IActionResult> UpdateCCCD([FromForm] IFormFile frontImage)
+        {
+            // Lấy UserId từ Token (an toàn hơn là gửi từ Client)
+            var userIdClaim = User.FindFirst("UserId")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            var userId = int.Parse(userIdClaim);
+
+            var updateDto = new UpdateNationalIdRequestDTO
+            {
+                UserId = userId,
+                FrontCCCDImage = frontImage
+            };
+
+            try
+            {
+                var updatedUser = await _userService.UpdateNationalIdCardAsync(updateDto);
+                return Ok(new { message = "Cập nhật CCCD thành công.", user = updatedUser });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Người dùng không tồn tại." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Trả về lỗi logic (ví dụ: ID không khớp, ảnh mờ...)
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi cập nhật CCCD.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("VerifyPassword")]
+        [Authorize]
+        public async Task<IActionResult> VerifyPasswordAndGetInfo([FromBody] VerifyPasswordRequestDTO request)
+        {
+            // Lấy UserId từ Token
+            var userIdClaim = User.FindFirst("UserId")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+            var userId = int.Parse(userIdClaim);
+
+            try
+            {
+                // Gọi Service
+                var result = await _userService.VerifyPassword(userId, request.Password);
+
+                return Ok(new { message = "Xác thực thành công"});
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Người dùng không tồn tại." });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return BadRequest(new { message = "Mật khẩu không chính xác." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống", error = ex.Message });
             }
         }
     }

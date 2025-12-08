@@ -197,6 +197,14 @@
         const bookingSummaryEl = document.getElementById('booking-summary');
         let hasEnabledTime = false;
 
+        const restoreData = {
+            date: "@ViewBag.RestoreDate",
+            startTime: @(ViewBag.RestoreStartTime ?? "null"),
+            endTime: @(ViewBag.RestoreEndTime ?? "null"),
+            courtIds: "@ViewBag.RestoreCourtIds".split(',').filter(id => id).map(Number)
+        };
+        const hasRestoreData = restoreData.date !== "";
+
         // Hàm hiển thị modal thông báo tùy chỉnh
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
@@ -476,6 +484,8 @@
         // Hàm render các nút giờ (compact)
         function renderTimeButtons() {
             timeButtonsContainerEl.innerHTML = '';
+            const isCurrentlyToday = selectedDate && (new Date()).toDateString() === (new Date(selectedDate)).toDateString();
+            const now = new Date();
 
             allHours.forEach(hour => {
                 const button = document.createElement('button');
@@ -483,17 +493,15 @@
                 button.className = `time-button px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300`;
                 button.onclick = () => handleTimeSelect(hour);
 
-                if (isToday) {
+                if (isCurrentlyToday) {
                     if (
                         hour < now.getHours() ||
-                        (hour === now.getHours() && now.getMinutes() > 0) ||
-                        hour > closeTime
+                        (hour === now.getHours() && now.getMinutes() > 0)
+                        // Bỏ điều kiện `hour > closeTime` vì nó không cần thiết, vòng lặp đã giới hạn rồi
                     ) {
                         button.disabled = true;
                         button.classList.add('opacity-50', 'cursor-not-allowed');
                         button.classList.remove('hover:bg-gray-300');
-                    } else {
-                        hasEnabledTime = true;
                     }
                 }
 
@@ -644,7 +652,7 @@
             });
         }
 
-        function fetchBookedCourts(stadiumId, date, startHour, endHour) {
+        function fetchBookedCourts(stadiumId, date, startHour, endHour, onComplete) {
             function safeParseInt(value, defaultValue = null) {
                 const parsed = parseInt(value, 10);
                 return isNaN(parsed) ? defaultValue : parsed;
@@ -708,8 +716,10 @@
 
                         Promise.all(relationPromises).then(() => {
                             updateUI();
+                            if (onComplete) onComplete();
                         }).catch(() => {
                             updateUI();
+                            if (onComplete) onComplete();
                         });
                     } else {
                         updateUI();
@@ -717,20 +727,25 @@
                 },
                 error: function () {
                     showModal('Lỗi', 'Không thể lấy thông tin sân đã đặt.');
+                    if (onComplete) onComplete();
                 }
             });
         }
 
         function maybeFetchBookedCourts() {
-            if (
-                stadiumData?.Id &&
-                selectedDate &&
-                startTime !== null &&
-                endTime !== null &&
-                endTime > startTime
-            ) {
-                fetchBookedCourts(stadiumData.Id, selectedDate, startTime, endTime);
-            }
+            return new Promise((resolve) => {
+                if (
+                    stadiumData?.Id &&
+                    selectedDate &&
+                    startTime !== null &&
+                    endTime !== null &&
+                    endTime > startTime
+                ) {
+                    fetchBookedCourts(stadiumData.Id, selectedDate, startTime, endTime, resolve); 
+                } else {
+                    resolve(); 
+                }
+            });
         }
 
         function clearBookingStatusCache() {
@@ -782,19 +797,22 @@
                 url: `/Home/Stadiums`,
                 type: 'GET',
                 data: { searchTerm: searchTerm },
-                success: function (data) {
+                success: async function (data) {
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0];
                         openTime = parseHour(stadiumData.OpenTime);
                         closeTime = parseHour(stadiumData.CloseTime);
                         allHours = Array.from(
-                            { length: closeTime - openTime + 1 },
+                            {length: closeTime - openTime + 1},
                             (_, i) => i + openTime
                         );
                         renderStadiumInfo();
                         setupCourtTypeSelection();
                         setupDatePicker();
-                        updateUI();
+                        await restoreState();
+                        if (!hasRestoreData) {
+                            updateUI();
+                        }
                     } else {
                         console.error('Không tìm thấy dữ liệu sân vận động.');
                     }
@@ -803,6 +821,37 @@
                     console.error('Lỗi khi tải dữ liệu sân vận động:', textStatus, errorThrown);
                 }
             });
+        }
+
+        async function restoreState() {
+            if (!hasRestoreData) return;
+
+            console.log("Bắt đầu khôi phục trạng thái:", restoreData);
+
+            // 1. Khôi phục ngày
+            datePickerEl.value = restoreData.date;
+            selectedDate = restoreData.date;
+
+            // 2. Khôi phục giờ
+            startTime = restoreData.startTime;
+            endTime = restoreData.endTime;
+
+            // 3. Khôi phục sân
+            if (stadiumData && stadiumData.Courts) {
+                selectedCourts = stadiumData.Courts.filter(c => restoreData.courtIds.includes(c.Id));
+            }
+
+            console.log("Đã khôi phục:", {
+                date: selectedDate,
+                time: `${startTime}-${endTime}`,
+                courts: selectedCourts.map(c => c.Name)
+            });
+
+            // 4. Fetch lại dữ liệu sân đã đặt cho khung giờ đã khôi phục
+            await maybeFetchBookedCourts();
+
+            // 5. Cập nhật toàn bộ UI sau khi đã có dữ liệu
+            updateUI();
         }
 
         // Khởi tạo ứng dụng

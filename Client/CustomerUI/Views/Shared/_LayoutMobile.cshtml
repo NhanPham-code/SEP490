@@ -242,11 +242,11 @@
             transition: all 0.3s ease;
         }
 
-            .search-enhanced:focus-within {
-                background: rgba(255, 255, 255, 1);
-                border-color: rgba(59, 130, 246, 0.5);
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-            }
+        .search-enhanced:focus-within {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
 
         /* Enhanced Buttons */
         .btn-enhanced {
@@ -255,28 +255,28 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-            .btn-enhanced:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-            }
+        .btn-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
 
-            .btn-enhanced::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%;
-                transition: all 0.4s ease;
-                transform: translate(-50%, -50%);
-            }
+        .btn-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+        }
 
-            .btn-enhanced:active::before {
-                width: 300px;
-                height: 300px;
-            }
+        .btn-enhanced:active::before {
+            width: 300px;
+            height: 300px;
+        }
 
         /* Enhanced Bottom Navigation - Responsive */
         .bottom-nav-item {
@@ -285,22 +285,22 @@
             min-height: 44px;
         }
 
-            .bottom-nav-item.active {
-                color: #3b82f6;
-                transform: translateY(-2px);
-            }
+        .bottom-nav-item.active {
+            color: #3b82f6;
+            transform: translateY(-2px);
+        }
 
-                .bottom-nav-item.active::before {
-                    content: '';
-                    position: absolute;
-                    bottom: -2px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 4px;
-                    height: 4px;
-                    background: #3b82f6;
-                    border-radius: 50%;
-                }
+        .bottom-nav-item.active::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
 
         /* Profile Avatar in Bottom Nav - Responsive sizes */
         .profile-avatar-nav {
@@ -323,18 +323,18 @@
                 padding: 0.5rem 0.25rem !important;
             }
 
-                .bottom-nav-item span {
-                    font-size: 0.6rem !important;
-                }
+            .bottom-nav-item span {
+                font-size: 0.6rem !important;
+            }
 
-                .bottom-nav-item .w-8 {
-                    width: 1.5rem !important;
-                    height: 1.5rem !important;
-                }
+            .bottom-nav-item .w-8 {
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+            }
 
-                .bottom-nav-item .text-xl {
-                    font-size: 1rem !important;
-                }
+            .bottom-nav-item .text-xl {
+                font-size: 1rem !important;
+            }
         }
 
         /* Very small screens (320px) */
@@ -343,9 +343,9 @@
                 padding: 0.5rem 0.125rem !important;
             }
 
-                .bottom-nav-item span {
-                    display: none; /* Hide text labels on very small screens */
-                }
+            .bottom-nav-item span {
+                display: none; /* Hide text labels on very small screens */
+            }
 
             .profile-avatar-nav {
                 width: 18px;
@@ -399,10 +399,10 @@
             transition: all 0.3s ease;
         }
 
-            .quick-action:hover {
-                transform: scale(1.1);
-                box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6);
-            }
+        .quick-action:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6);
+        }
 
         /* Small screen quick action positioning */
         @@media (max-width: 375px) {
@@ -481,623 +481,732 @@
 
 <body id="body-mobile" class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
 
-    @{
-        var accessToken = Context.Request.Cookies["AccessToken"];
-        var fullName = Context.Session.GetString("FullName");
-        var avatarUrl = Context.Session.GetString("AvatarUrl");
-        var userEmail = Context.Session.GetString("Email");
-        var isLoggedIn = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(fullName);
-    }
+@{
+var accessToken = Context.Request.Cookies["AccessToken"];
+var fullName = Context.Session.GetString("FullName");
+var avatarUrl = Context.Session.GetString("AvatarUrl");
+var userEmail = Context.Session.GetString("Email");
+var isLoggedIn = !string.IsNullOrEmpty(accessToken) && !string.IsNullOrEmpty(fullName);
+}
 
-    <!-- Enhanced Mobile Header - Simplified -->
-    <header x-data="{
+<!-- Enhanced Mobile Header - Simplified -->
+<header x-data="{
         mobileMenuOpen: false,
         searchOpen: false,
         notificationCount: 3
     }"
-    id="header-mobile"
-            class="mobile-nav glass-effect  top-0 z-50 shadow-soft">
-        <div class="flex justify-between items-center h-16 px-4">
+        id="header-mobile"
+        class="mobile-nav glass-effect  top-0 z-50 shadow-soft">
+    <div class="flex justify-between items-center h-16 px-4">
 
-            <!-- Left: Menu Button -->
-            <button x-on:click="mobileMenuOpen = true"
-                    class="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/40 transition-all duration-200 active:scale-95">
-                <i class="ri-menu-3-line text-xl text-slate-700"></i>
-            </button>
+        <!-- Left: Menu Button -->
+        <button x-on:click="mobileMenuOpen = true"
+                class="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/40 transition-all duration-200 active:scale-95">
+            <i class="ri-menu-3-line text-xl text-slate-700"></i>
+        </button>
 
-            <!-- Center: Logo -->
-            <a asp-controller="Home" asp-action="Index" class="flex items-center space-x-2">
-                <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-soft">
-                    <i class="ri-football-line text-white text-lg animate-float"></i>
-                </div>
-                <h1 class="font-poppins font-bold text-xl logo-gradient">SportVenue</h1>
+        <!-- Center: Logo -->
+        <a asp-controller="Home" asp-action="Index" class="flex items-center space-x-2">
+            <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-soft">
+                <i class="ri-football-line text-white text-lg animate-float"></i>
+            </div>
+            <h1 class="font-poppins font-bold text-xl logo-gradient">Sportivey</h1>
+        </a>
+
+        <!-- Right: Actions (Simplified for better UX) -->
+        <div class="flex items-center space-x-2">
+            @if (isLoggedIn)
+            {
+            <!-- Messages Button -->
+            <a asp-controller="Chat" asp-action="Chat"
+               class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
+               title="Messages">
+                <i class="ri-message-3-line text-lg text-white"></i>
+                <span x-show="notificationCount > 0"
+                      class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
+                      x-text="notificationCount"></span>
             </a>
+            }
+            else
+            {
+            <!-- Sign In Button -->
+            <a asp-controller="Common" asp-action="Login">
+                <button class="w-12 h-12 flex items-center justify-center rounded-xl gradient-primary shadow-soft hover:shadow-hover transition-all duration-200 active:scale-95">
+                    <i class="ri-user-line text-xl text-white"></i>
+                </button>
+            </a>
+            }
+        </div>
+    </div>
 
-            <!-- Right: Actions (Simplified for better UX) -->
-            <div class="flex items-center space-x-2">
+    <!-- Enhanced Mobile Menu Overlay -->
+    <div x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-1"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-1"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/50 z-40"
+         x-on:click="mobileMenuOpen = false">
+        <div x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="-translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="-translate-x-full"
+             x-on:click.stop
+             class="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-50 mobile-menu-container">
+
+            <div class="p-6 bg-white mobile-menu-content">
+                <!-- Menu Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-soft">
+                            <i class="ri-football-line text-white text-lg"></i>
+                        </div>
+                        <h2 class="font-poppins font-bold text-xl logo-gradient">Sportivey</h2>
+                    </div>
+                    <button x-on:click="mobileMenuOpen = false"
+                            class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all duration-200">
+                        <i class="ri-close-line text-xl text-slate-700"></i>
+                    </button>
+                </div>
+
+                <!-- Enhanced Navigation -->
+                <nav class="space-y-2">
+                    <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all duration-200 group">
+                        <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
+                            <i class="ri-phone-line text-primary"></i>
+                        </div>
+                        <span class="font-medium text-lg">Contact Support</span>
+                    </a>
+
+                    <a asp-controller="Common" asp-action="Settings" class="flex items-center px-4 py-4 text-slate-700 hover:bg-secondary/10 hover:text-secondary rounded-2xl transition-all duration-200 group">
+                        <div class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-secondary/20 transition-colors">
+                            <i class="ri-settings-3-line text-secondary"></i>
+                        </div>
+                        <span class="font-medium text-lg">Settings</span>
+                    </a>
+
+                    <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-accent/10 hover:text-accent rounded-2xl transition-all duration-200 group">
+                        <div class="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-accent/20 transition-colors">
+                            <i class="ri-information-line text-accent"></i>
+                        </div>
+                        <span class="font-medium text-lg">About</span>
+                    </a>
+
+                    <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all duration-200 group">
+                        <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
+                            <i class="ri-star-line text-primary"></i>
+                        </div>
+                        <span class="font-medium text-lg">Rate App</span>
+                    </a>
+                </nav>
+
+                <!-- User Info in Drawer (if logged in) -->
                 @if (isLoggedIn)
                 {
-                    <!-- Messages Button -->
-                    <a asp-controller="Chat" asp-action="Chat"
-                       class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
-                       title="Messages">
-                        <i class="ri-message-3-line text-lg text-white"></i>
-                        <span x-show="notificationCount > 0"
-                              class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
-                              x-text="notificationCount"></span>
-                    </a>
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <img src="@avatarUrl" alt="Avatar" class="w-12 h-12 rounded-xl border-2 border-white shadow-sm" />
+                            <div>
+                                <p class="font-semibold text-slate-800">@fullName</p>
+                                <p class="text-sm text-slate-500">Premium Member</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 }
                 else
                 {
-                    <!-- Sign In Button -->
+                <div class="mt-8 pt-6 border-t border-slate-200">
                     <a asp-controller="Common" asp-action="Login">
-                        <button class="w-12 h-12 flex items-center justify-center rounded-xl gradient-primary shadow-soft hover:shadow-hover transition-all duration-200 active:scale-95">
-                            <i class="ri-user-line text-xl text-white"></i>
+                        <button class="w-full btn-enhanced gradient-primary text-white py-4 rounded-2xl font-semibold shadow-soft hover:shadow-hover transition-all duration-300 flex items-center justify-center space-x-2">
+                            <i class="ri-login-circle-line text-lg"></i>
+                            <span>Đăng nhập</span>
                         </button>
                     </a>
+                </div>
                 }
             </div>
         </div>
+    </div>
+</header>
 
-        <!-- Enhanced Mobile Menu Overlay -->
-        <div x-show="mobileMenuOpen"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-1"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-1"
-             x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-black/50 z-40"
-             x-on:click="mobileMenuOpen = false">
-            <div x-show="mobileMenuOpen"
-                 x-transition:enter="transition ease-out duration-300 transform"
-                 x-transition:enter-start="-translate-x-full"
-                 x-transition:enter-end="translate-x-0"
-                 x-transition:leave="transition ease-in duration-200 transform"
-                 x-transition:leave-start="translate-x-0"
-                 x-transition:leave-end="-translate-x-full"
-                 x-on:click.stop
-                 class="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-50 mobile-menu-container">
+<!-- Quick Action Button (Floating Action Button) -->
+<button class="quick-action">
+    <i class="ri-add-line text-2xl text-white"></i>
+</button>
 
-                <div class="p-6 bg-white mobile-menu-content">
-                    <!-- Menu Header -->
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-soft">
-                                <i class="ri-football-line text-white text-lg"></i>
-                            </div>
-                            <h2 class="font-poppins font-bold text-xl logo-gradient">SportVenue</h2>
-                        </div>
-                        <button x-on:click="mobileMenuOpen = false"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all duration-200">
-                            <i class="ri-close-line text-xl text-slate-700"></i>
-                        </button>
-                    </div>
-
-                    <!-- Enhanced Navigation -->
-                    <nav class="space-y-2">
-                        <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all duration-200 group">
-                            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
-                                <i class="ri-phone-line text-primary"></i>
-                            </div>
-                            <span class="font-medium text-lg">Contact Support</span>
-                        </a>
-
-                        <a asp-controller="Common" asp-action="Settings" class="flex items-center px-4 py-4 text-slate-700 hover:bg-secondary/10 hover:text-secondary rounded-2xl transition-all duration-200 group">
-                            <div class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-secondary/20 transition-colors">
-                                <i class="ri-settings-3-line text-secondary"></i>
-                            </div>
-                            <span class="font-medium text-lg">Settings</span>
-                        </a>
-
-                        <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-accent/10 hover:text-accent rounded-2xl transition-all duration-200 group">
-                            <div class="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-accent/20 transition-colors">
-                                <i class="ri-information-line text-accent"></i>
-                            </div>
-                            <span class="font-medium text-lg">About</span>
-                        </a>
-
-                        <a href="#" class="flex items-center px-4 py-4 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all duration-200 group">
-                            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
-                                <i class="ri-star-line text-primary"></i>
-                            </div>
-                            <span class="font-medium text-lg">Rate App</span>
-                        </a>
-                    </nav>
-
-                    <!-- User Info in Drawer (if logged in) -->
-                    @if (isLoggedIn)
-                    {
-                        <div class="mt-8 pt-6 border-t border-slate-200">
-                            <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 rounded-2xl">
-                                <div class="flex items-center space-x-3">
-                                    <img src="@avatarUrl" alt="Avatar" class="w-12 h-12 rounded-xl border-2 border-white shadow-sm" />
-                                    <div>
-                                        <p class="font-semibold text-slate-800">@fullName</p>
-                                        <p class="text-sm text-slate-500">Premium Member</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="mt-8 pt-6 border-t border-slate-200">
-                            <a asp-controller="Common" asp-action="Login">
-                                <button class="w-full btn-enhanced gradient-primary text-white py-4 rounded-2xl font-semibold shadow-soft hover:shadow-hover transition-all duration-300 flex items-center justify-center space-x-2">
-                                    <i class="ri-login-circle-line text-lg"></i>
-                                    <span>Sign In to SportVenue</span>
-                                </button>
-                            </a>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Quick Action Button (Floating Action Button) -->
-    <button class="quick-action">
-        <i class="ri-add-line text-2xl text-white"></i>
-    </button>
-
-    <!-- Enhanced Bottom Navigation with Profile - Responsive -->
-    <nav id="nav-mobile" x-data="{
+<!-- Enhanced Bottom Navigation with Profile - Responsive -->
+<nav id="nav-mobile" x-data="{
         activeTab: 'home',
         userMenuOpen: false
     }" class="mobile-nav fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-200 z-40 shadow-soft bottom-nav-safe" >
-        <div class="bottom-nav-container">
-            <!-- Home -->
-            <a asp-controller="Home" asp-action="Index"
-               x-on:click="activeTab = 'home'"
-               :class="activeTab === 'home' ? 'bottom-nav-item active' : 'bottom-nav-item'"
-               class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
+    <div class="bottom-nav-container">
+        <!-- Home -->
+        <a asp-controller="Home" asp-action="Index"
+           x-on:click="activeTab = 'home'"
+           :class="activeTab === 'home' ? 'bottom-nav-item active' : 'bottom-nav-item'"
+           class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
+            <div class="w-6 h-6 flex items-center justify-center">
+                <i class="ri-home-4-line text-lg"></i>
+            </div>
+            <span class="text-xs mt-1 font-medium truncate">Trang chủ</span>
+        </a>
+
+        <!-- Groups/Teams -->
+        <a asp-controller="Findteam" asp-action="Findteam"
+           x-on:click="activeTab = 'groups'"
+           :class="activeTab === 'groups' ? 'bottom-nav-item active' : 'bottom-nav-item'"
+           class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-accent transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
+            <div class="w-6 h-6 flex items-center justify-center">
+                <i class="ri-team-line text-lg"></i>
+            </div>
+            <span class="text-xs mt-1 font-medium truncate">Tìm nhóm</span>
+        </a>
+
+        <!-- Notifications -->
+        <a asp-controller="Notification" asp-action="Index"
+           x-on:click="activeTab = 'notifications'"
+           :class="activeTab === 'notifications' ? 'bottom-nav-item active' : 'bottom-nav-item'"
+           class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-orange-500 transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
+            <div class="w-6 h-6 flex items-center justify-center relative">
+                <i class="ri-notification-3-line text-lg"></i>
+                <span id="notification-badge-bottom"
+                      class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold"
+                      style="font-size: 8px; display:none"></span>
+            </div>
+            <span class="text-xs mt-1 font-medium truncate">Thông báo</span>
+        </a>
+
+        <!-- User Profile -->
+        <div class="relative flex-1 max-w-none">
+            @if (isLoggedIn)
+            {
+            <button x-on:click="userMenuOpen = !userMenuOpen; activeTab = 'profile'"
+                    :class="activeTab === 'profile' ? 'bottom-nav-item active' : 'bottom-nav-item'"
+                    class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative w-full">
                 <div class="w-6 h-6 flex items-center justify-center">
-                    <i class="ri-home-4-line text-lg"></i>
+                    <img src="@avatarUrl" alt="Avatar" class="profile-avatar-nav" />
                 </div>
-                <span class="text-xs mt-1 font-medium truncate">Home</span>
-            </a>
+                <span class="text-xs mt-1 font-medium truncate">Hồ sơ</span>
+            </button>
 
-            <!-- Groups/Teams -->
-            <a asp-controller="Findteam" asp-action="Findteam"
-               x-on:click="activeTab = 'groups'"
-               :class="activeTab === 'groups' ? 'bottom-nav-item active' : 'bottom-nav-item'"
-               class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-accent transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
-                <div class="w-6 h-6 flex items-center justify-center">
-                    <i class="ri-team-line text-lg"></i>
-                </div>
-                <span class="text-xs mt-1 font-medium truncate">Groups</span>
-            </a>
+            <!-- Profile Menu Popup - Responsive positioning -->
+            <div x-show="userMenuOpen"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-1 scale-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                 x-on:click.away="userMenuOpen = false"
+                 class="profile-dropdown dropdown-solid rounded-2xl shadow-card z-50">
 
-            <!-- Notifications -->
-            <a asp-controller="Notification" asp-action="Index"
-               x-on:click="activeTab = 'notifications'"
-               :class="activeTab === 'notifications' ? 'bottom-nav-item active' : 'bottom-nav-item'"
-               class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-orange-500 transition-all duration-200 hover:scale-105 relative flex-1 max-w-none">
-                <div class="w-6 h-6 flex items-center justify-center relative">
-                    <i class="ri-notification-3-line text-lg"></i>
-                    <span id="notification-badge-bottom"
-                          class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold"
-                          style="font-size: 8px; display:none"></span>
-                </div>
-                <span class="text-xs mt-1 font-medium truncate">Alerts</span>
-            </a>
-
-            <!-- User Profile -->
-            <div class="relative flex-1 max-w-none">
-                @if (isLoggedIn)
-                {
-                    <button x-on:click="userMenuOpen = !userMenuOpen; activeTab = 'profile'"
-                            :class="activeTab === 'profile' ? 'bottom-nav-item active' : 'bottom-nav-item'"
-                            class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative w-full">
-                        <div class="w-6 h-6 flex items-center justify-center">
-                            <img src="@avatarUrl" alt="Avatar" class="profile-avatar-nav" />
-                        </div>
-                        <span class="text-xs mt-1 font-medium truncate">Profile</span>
-                    </button>
-
-                    <!-- Profile Menu Popup - Responsive positioning -->
-                    <div x-show="userMenuOpen"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-                         x-transition:enter-end="opacity-1 scale-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-1 scale-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                         x-on:click.away="userMenuOpen = false"
-                         class="profile-dropdown dropdown-solid rounded-2xl shadow-card z-50">
-
-                        <!-- User Info Header -->
-                        <div class="p-4 border-b border-slate-200">
-                            <div class="flex items-center space-x-3">
-                                <img src="@avatarUrl" alt="Avatar"
-                                     class="w-12 h-12 rounded-xl border-2 border-primary/30 shadow-sm" />
-                                <div class="flex-1">
-                                    <p class="font-semibold text-slate-800 leading-tight">@fullName</p>
-                                    <p class="text-sm text-slate-500 truncate">@userEmail</p>
-                                    <span class="inline-flex items-center px-2 py-1 bg-gradient-to-r from-primary to-accent text-white text-xs rounded-full font-medium mt-1">
+                <!-- User Info Header -->
+                <div class="p-4 border-b border-slate-200">
+                    <div class="flex items-center space-x-3">
+                        <img src="@avatarUrl" alt="Avatar"
+                             class="w-12 h-12 rounded-xl border-2 border-primary/30 shadow-sm" />
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-800 leading-tight">@fullName</p>
+                            <p class="text-sm text-slate-500 truncate">@userEmail</p>
+                            <span class="inline-flex items-center px-2 py-1 bg-gradient-to-r from-primary to-accent text-white text-xs rounded-full font-medium mt-1">
                                         <i class="ri-vip-crown-line mr-1"></i>Premium
                                     </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Menu Items -->
-                        <div class="p-2">
-                            <!-- Profile Link -->
-                            <a asp-controller="Common" asp-action="Profile"
-                               x-on:click="userMenuOpen = false"
-                               class="flex items-center px-4 py-3 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group">
-                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary/20 transition-colors">
-                                    <i class="ri-user-3-line text-primary"></i>
-                                </div>
-                                <div>
-                                    <span class="font-medium">View Profile</span>
-                                    <p class="text-xs text-slate-400">Personal information</p>
-                                </div>
-                            </a>
-
-                            <!-- Booking History - Fixed as proper menu item -->
-                            <a href="#"
-                               x-on:click="userMenuOpen = false"
-                               class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
-                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
-                                    <i class="ri-calendar-check-line text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <span class="font-medium">My Bookings</span>
-                                    <p class="text-xs text-slate-400">View booking history</p>
-                                </div>
-                            </a>
-
-                            <!-- Settings -->
-                            <a href="#"
-                               x-on:click="userMenuOpen = false"
-                               class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
-                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
-                                    <i class="ri-settings-3-line text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <span class="font-medium">Settings</span>
-                                    <p class="text-xs text-slate-400">Account preferences</p>
-                                </div>
-                            </a>
-
-                            <!-- Divider -->
-                            <hr class="my-3 border-slate-200">
-
-                            <!-- Sign Out -->
-                            <a asp-controller="Common" asp-action="Logout"
-                               x-on:click="userMenuOpen = false"
-                               class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
-                                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200 transition-colors">
-                                    <i class="ri-logout-circle-line text-red-600"></i>
-                                </div>
-                                <div>
-                                    <span class="font-medium">Sign Out</span>
-                                    <p class="text-xs text-red-400">See you next time!</p>
-                                </div>
-                            </a>
                         </div>
                     </div>
-                }
-                else
-                {
-                    <a asp-controller="Common" asp-action="Login"
-                       x-on:click="activeTab = 'profile'"
-                       :class="activeTab === 'profile' ? 'bottom-nav-item active' : 'bottom-nav-item'"
-                       class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative w-full">
-                        <div class="w-6 h-6 flex items-center justify-center">
-                            <i class="ri-user-3-line text-lg"></i>
+                </div>
+
+                <!-- Menu Items -->
+                <div class="p-2">
+                    <!-- Profile Link -->
+                    <a asp-controller="Common" asp-action="Profile"
+                       x-on:click="userMenuOpen = false"
+                       class="flex items-center px-4 py-3 text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary/20 transition-colors">
+                            <i class="ri-user-3-line text-primary"></i>
                         </div>
-                        <span class="text-xs mt-1 font-medium truncate">Sign In</span>
+                        <div>
+                            <span class="font-medium">Thông tin tài khoản</span>
+                            <p class="text-xs text-slate-400">Hồ sơ cá nhân</p>
+                        </div>
                     </a>
-                }
+
+                    <!-- Booking History - Fixed as proper menu item -->
+                    <a href="#"
+                       x-on:click="userMenuOpen = false"
+                       class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
+                            <i class="ri-calendar-check-line text-purple-600"></i>
+                        </div>
+                        <div>
+
+                            <span class="font-medium">Lịch sử đặt sân</span>
+                            <p class="text-xs text-slate-400">Lịch đã đặt</p>
+                        </div>
+                    </a>
+
+                    <!-- Booking Schedule -->
+                    <a asp-controller="Booking" asp-action="BookingSchedule"
+                       x-on:click="userMenuOpen = false"
+                       class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
+                            <i class="ri-calendar-todo-line text-blue-600"></i>
+                        </div>
+                        <div>
+                            <span class="font-medium">Lịch chơi</span>
+                            <p class="text-xs text-slate-400">Lịch chơi sắp đến</p>
+                        </div>
+                    </a>
+
+                    <!-- Divider -->
+                    <hr class="my-3 border-slate-200">
+
+                    <!-- Sign Out -->
+                    <a asp-controller="Common" asp-action="Logout"
+                       x-on:click="userMenuOpen = false"
+                       class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group">
+                        <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200 transition-colors">
+                            <i class="ri-logout-circle-line text-red-600"></i>
+                        </div>
+                        <div>
+                            <span class="font-medium">Đăng xuất</span>
+                            <p class="text-xs text-red-400">Hẹn gặp lại!</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            }
+            else
+            {
+            <a asp-controller="Common" asp-action="Login"
+               x-on:click="activeTab = 'profile'"
+               :class="activeTab === 'profile' ? 'bottom-nav-item active' : 'bottom-nav-item'"
+               class="flex flex-col items-center py-2 px-1 text-slate-400 hover:text-primary transition-all duration-200 hover:scale-105 relative w-full">
+                <div class="w-6 h-6 flex items-center justify-center">
+                    <i class="ri-user-3-line text-lg"></i>
+                </div>
+                <span class="text-xs mt-1 font-medium truncate">Đăng nhập</span>
+            </a>
+            }
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div id="main-body" role="main" class="pb-24 max-w-7xl mx-auto px-4 animate-fade-in">
+    @RenderBody()
+</div>
+
+<!-- Enhanced Footer -->
+<footer id="footer" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16 mt-12 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Logo & social -->
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
+                        <i class="ri-football-line text-white text-lg"></i>
+                    </div>
+                    <h3 class="font-poppins font-bold text-2xl logo-gradient">Sportivey</h3>
+                </div>
+                <p class="text-slate-300 mb-6 leading-relaxed">Điểm đến hàng đầu của bạn để đặt sân thể thao và kết nối với các đội.</p>
             </div>
         </div>
-    </nav>
 
-    <!-- Main Content -->
-    <div id="main-body" role="main" class="pb-24 max-w-7xl mx-auto px-4 animate-fade-in">
-        @RenderBody()
+        <div class="border-t border-slate-700 mt-12 pt-8 text-center">
+            <p class="text-slate-300">&copy; 2025 Nền tảng Sportivey. Đã đăng ký bản quyền.</p>
+        </div>
     </div>
 
-    <!-- Enhanced Footer -->
-    <footer id="footer" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16 mt-12 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Logo & social -->
-                <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
-                            <i class="ri-football-line text-white text-lg"></i>
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-r from-secondary/10 to-transparent rounded-full blur-3xl"></div>
+</footer>
+
+<!-- === MODAL XÁC THỰC BẢO MẬT (Tailwind Style) === -->
+<div id="mobileSecurityModal" class="fixed inset-0 z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Backdrop (làm mờ nền) -->
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0" id="mobileSecurityBackdrop"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <!-- Modal Panel -->
+            <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full max-w-xs opacity-0 scale-95" id="mobileSecurityPanel">
+
+                <!-- Header -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 px-4 py-6 text-center">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/20 mb-3 backdrop-blur-sm">
+                        <i class="ri-shield-keyhole-fill text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Bảo mật tài khoản</h3>
+                    <p class="text-blue-100 text-sm mt-1">Xác thực danh tính của bạn</p>
+                </div>
+
+                <!-- Form -->
+                <div class="px-6 py-6">
+                    <form id="mobileVerifyPassForm">
+                        <div class="relative mb-4">
+                            <input type="password" id="mobileSecurityPassword"
+                                   class="w-full rounded-xl border-2 border-slate-100 bg-slate-50 py-3.5 px-4 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 text-base transition-all"
+                                   placeholder="Nhập mật khẩu..." required>
+                            <button type="button" onclick="toggleMobilePassVisibility()" class="absolute right-0 top-0 h-full px-4 text-slate-400 active:text-blue-600">
+                                <i class="ri-eye-line text-xl" id="mobileEyeIcon"></i>
+                            </button>
                         </div>
-                        <h3 class="font-poppins font-bold text-2xl logo-gradient">SportVenue</h3>
-                    </div>
-                    <p class="text-slate-300 mb-6 leading-relaxed">Your premier destination for booking sports stadiums and facilities across the city.</p>
-                    <div class="flex space-x-3">
-                        <button class="w-12 h-12 bg-slate-800 hover:bg-primary rounded-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-facebook-fill text-lg"></i>
-                        </button>
-                        <button class="w-12 h-12 bg-slate-800 hover:bg-primary rounded-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-twitter-fill text-lg"></i>
-                        </button>
-                        <button class="w-12 h-12 bg-slate-800 hover:bg-primary rounded-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                            <i class="ri-instagram-fill text-lg"></i>
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Quick links -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-6 text-white">Quick Links</h4>
-                    <ul class="space-y-3">
-                        <li><a asp-controller="Stadiums" asp-action="Index" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Find Stadiums</a></li>
-                        <li><a asp-controller="Sports" asp-action="Index" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Sports Categories</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Pricing</a></li>
-                        <li><a asp-controller="Home" asp-action="About" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>About Us</a></li>
-                    </ul>
-                </div>
+                        <div id="mobileVerifyErrorMsg" class="mb-4 text-sm text-red-500 text-center hidden bg-red-50 py-2 rounded-lg font-medium"></div>
 
-                <!-- Support -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-6 text-white">Support</h4>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Help Center</a></li>
-                        <li><a asp-controller="Home" asp-action="Contact" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Contact Us</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Booking Policy</a></li>
-                        <li><a href="#" class="text-slate-300 hover:text-white transition-colors duration-200 flex items-center"><i class="ri-arrow-right-s-line mr-2"></i>Terms of Service</a></li>
-                    </ul>
-                </div>
+                        <div class="flex flex-col gap-3">
+                            <button type="submit" id="btnMobileConfirm"
+                                    class="w-full justify-center rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all flex items-center">
+                                <span id="mobileVerifySpinner" class="hidden mr-2 animate-spin"><i class="ri-loader-4-line"></i></span>
+                                Xác nhận truy cập
+                            </button>
 
-                <!-- Enhanced Newsletter -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-6 text-white">Stay Updated</h4>
-                    <p class="text-slate-300 mb-4">Subscribe for updates and exclusive offers.</p>
-                    <div class="space-y-3">
-                        <input type="email" placeholder="Your email"
-                               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300">
-                        <button class="w-full btn-enhanced gradient-primary text-white px-6 py-3 rounded-xl font-semibold shadow-soft">
-                            <i class="ri-send-plane-line mr-2"></i>
-                            Subscribe
-                        </button>
-                    </div>
+                            <button type="button" onclick="closeMobileSecurityModal()"
+                                    class="w-full justify-center rounded-xl bg-slate-100 py-3.5 text-base font-semibold text-slate-600 hover:bg-slate-200 active:scale-95 transition-all">
+                                Hủy bỏ
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-
-            <div class="border-t border-slate-700 mt-12 pt-8 text-center">
-                <p class="text-slate-300">&copy; 2025 SportVenue Platform. All rights reserved. Made with ❤️ for sports enthusiasts.</p>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Decorative Elements -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-r from-secondary/10 to-transparent rounded-full blur-3xl"></div>
-    </footer>
+<!-- Scripts -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Scripts -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    // --- MOBILE SECURITY LOGIC ---
 
-    <!-- Enhanced JavaScript -->
-    <script>
-        // Enhanced performance monitoring
-        window.addEventListener('load', function () {
-            console.log('🚀 SportVenue Mobile loaded successfully!');
-            document.body.classList.add('loaded');
-        });
+    function toggleMobilePassVisibility() {
+        const input = document.getElementById('mobileSecurityPassword');
+        const icon = document.getElementById('mobileEyeIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+        }
+    }
 
-        // Enhanced touch interactions
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add touch feedback to all buttons
-            const buttons = document.querySelectorAll('button, .btn-enhanced');
-            buttons.forEach(button => {
-                button.addEventListener('touchstart', function () {
-                    this.style.transform = 'scale(0.95)';
-                }, { passive: true });
+    function closeMobileSecurityModal() {
+        const modal = document.getElementById('mobileSecurityModal');
+        const backdrop = document.getElementById('mobileSecurityBackdrop');
+        const panel = document.getElementById('mobileSecurityPanel');
 
-                button.addEventListener('touchend', function () {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
+        backdrop.classList.remove('opacity-100');
+        panel.classList.remove('opacity-100', 'scale-100');
 
-            // Enhanced scroll behavior for bottom nav
-            let lastScrollTop = 0;
-            const bottomNav = document.querySelector('.mobile-nav:last-of-type');
-            const quickAction = document.querySelector('.quick-action');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
 
-            window.addEventListener('scroll', function () {
-                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    function openMobileSecurityModal() {
+        const modal = document.getElementById('mobileSecurityModal');
+        const backdrop = document.getElementById('mobileSecurityBackdrop');
+        const panel = document.getElementById('mobileSecurityPanel');
+        const input = document.getElementById('mobileSecurityPassword');
+        const errMsg = document.getElementById('mobileVerifyErrorMsg');
 
-                if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scrolling down - hide navigation
-                    bottomNav.style.transform = 'translateY(100%)';
-                    if (quickAction) quickAction.style.transform = 'scale(0)';
-                } else {
-                    // Scrolling up - show navigation
-                    bottomNav.style.transform = 'translateY(0)';
-                    if (quickAction) quickAction.style.transform = 'scale(1)';
+        input.value = '';
+        errMsg.classList.add('hidden');
+        modal.classList.remove('hidden');
+
+        // Animation
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            panel.classList.add('opacity-100', 'scale-100');
+            input.focus();
+        }, 10);
+    }
+
+    $(document).ready(function () {
+        // 1. Bắt sự kiện click vào link Profile
+        // Selector này tìm các thẻ a có href chứa "Profile" trong Layout Mobile
+        const profileLinks = $('a[href*="/Common/Profile"]');
+
+        if (profileLinks.length > 0) {
+            profileLinks.on('click', function (e) {
+                e.preventDefault();
+                // Đóng menu người dùng nếu đang mở (để trải nghiệm mượt hơn)
+                if (window.Alpine) {
+                    // Tìm component Alpine đang mở userMenu và đóng nó (optional)
+                    // document.dispatchEvent(new CustomEvent('close-user-menu'));
                 }
-                lastScrollTop = scrollTop;
+                openMobileSecurityModal();
+            });
+        }
+
+        // 2. Submit Form
+        $('#mobileVerifyPassForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const password = $('#mobileSecurityPassword').val();
+            const btn = $('#btnMobileConfirm');
+            const spinner = $('#mobileVerifySpinner');
+            const errMsg = $('#mobileVerifyErrorMsg');
+
+            btn.prop('disabled', true).addClass('opacity-75');
+            spinner.removeClass('hidden');
+            errMsg.addClass('hidden');
+
+            $.ajax({
+                url: '/Common/VerifyPassword',
+                type: 'POST',
+                data: { password: password },
+                success: function (res) {
+                    if (res.success) {
+                        window.location.href = '/Common/Profile';
+                    } else {
+                        errMsg.text(res.message || "Mật khẩu không đúng").removeClass('hidden');
+                        btn.prop('disabled', false).removeClass('opacity-75');
+                        spinner.addClass('hidden');
+                        // Rung nhẹ báo lỗi
+                        $('#mobileSecurityPanel').addClass('animate-bounce');
+                        setTimeout(() => $('#mobileSecurityPanel').removeClass('animate-bounce'), 500);
+                    }
+                },
+                error: function () {
+                    errMsg.text("Lỗi kết nối").removeClass('hidden');
+                    btn.prop('disabled', false).removeClass('opacity-75');
+                    spinner.addClass('hidden');
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Enhanced JavaScript -->
+<script>
+    // Enhanced performance monitoring
+    window.addEventListener('load', function () {
+        console.log('🚀 SportVenue Mobile loaded successfully!');
+        document.body.classList.add('loaded');
+    });
+
+    // Enhanced touch interactions
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add touch feedback to all buttons
+        const buttons = document.querySelectorAll('button, .btn-enhanced');
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', function () {
+                this.style.transform = 'scale(0.95)';
+            }, { passive: true });
+
+            button.addEventListener('touchend', function () {
+                this.style.transform = '';
             }, { passive: true });
         });
-    </script>
 
-    @RenderSection("Scripts", required: false)
+        // Enhanced scroll behavior for bottom nav
+        let lastScrollTop = 0;
+        const bottomNav = document.querySelector('.mobile-nav:last-of-type');
+        const quickAction = document.querySelector('.quick-action');
 
-    // Function to update user info in header dynamically
-    <script>
-        // Enhanced global function for header update from session
-        window.refreshHeaderFromSession = function () {
-            console.log('🔄 Refreshing header with session data...');
+        window.addEventListener('scroll', function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-            fetch('/Common/GetUserHeaderInfo')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('📊 Session data received:', data);
-
-                    // Update avatar images
-                    const avatarImages = document.querySelectorAll('img[alt="Avatar"]');
-                    avatarImages.forEach(img => {
-                        if (img) {
-                            const updatedAvatarUrl = data.avatarUrl + '?t=' + Date.now();
-                            console.log(`Updating avatar: ${img.src} → ${updatedAvatarUrl}`);
-                            img.src = updatedAvatarUrl;
-                            img.onerror = function () {
-                                this.src = '/images/default-avatar.png';
-                            };
-                        }
-                    });
-
-                    // Update full name
-                    const fullNameElements = document.querySelectorAll('.p-4 .font-semibold'); // Selector của FullName
-                    fullNameElements.forEach(element => {
-                        if (element && data.fullName) {
-                            console.log(`Updating full name: ${element.textContent} → ${data.fullName}`);
-                            element.textContent = data.fullName;
-                        }
-                    });
-
-                    // Update email
-                    const emailElements = document.querySelectorAll('.p-4 .text-sm');
-                    emailElements.forEach(element => {
-                        if (element && data.email) {
-                            console.log(`Updating email: ${element.textContent} → ${data.email}`);
-                            element.textContent = data.email;
-                        }
-                    });
-
-                    console.log('✅ Header refreshed successfully!');
-                })
-                .catch(error => {
-                    console.error('❌ Error refreshing header from session:', error);
-                });
-        };
-
-        // Auto-initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('🚀 Mobile layout header refresh initialized');
-            console.log('💡 Available functions: refreshHeaderFromSession()');
-
-            // Test function for development
-            if (window.location.hostname === 'localhost') {
-                window.testSessionRefresh = function () {
-                    console.log('🧪 Testing session refresh...');
-                    return window.refreshHeaderFromSession();
-                };
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down - hide navigation
+                bottomNav.style.transform = 'translateY(100%)';
+                if (quickAction) quickAction.style.transform = 'scale(0)';
+            } else {
+                // Scrolling up - show navigation
+                bottomNav.style.transform = 'translateY(0)';
+                if (quickAction) quickAction.style.transform = 'scale(1)';
             }
-        });
-    </script>
+            lastScrollTop = scrollTop;
+        }, { passive: true });
+    });
+</script>
 
-    <script>
-        async function updateMobileNotificationBadges() {
-            try {
-                const resp = await fetch('/Notification/GetUnreadNotificationCount');
-                if (resp.ok) {
-                    const count = await resp.json();
-                    // Bottom nav badge
-                    const badgeBottom = document.getElementById('notification-badge-bottom');
-                    if (badgeBottom) {
-                        if (count > 0) {
-                            badgeBottom.textContent = count;
-                            badgeBottom.style.display = 'flex';
-                        } else {
-                            badgeBottom.style.display = 'none';
-                        }
+@RenderSection("Scripts", required: false)
+
+// Function to update user info in header dynamically
+<script>
+    // Enhanced global function for header update from session
+    window.refreshHeaderFromSession = function () {
+        console.log('🔄 Refreshing header with session data...');
+
+        fetch('/Common/GetUserHeaderInfo')
+            .then(response => response.json())
+            .then(data => {
+                console.log('📊 Session data received:', data);
+
+                // Update avatar images
+                const avatarImages = document.querySelectorAll('img[alt="Avatar"]');
+                avatarImages.forEach(img => {
+                    if (img) {
+                        const updatedAvatarUrl = data.avatarUrl + '?t=' + Date.now();
+                        console.log(`Updating avatar: ${img.src} → ${updatedAvatarUrl}`);
+                        img.src = updatedAvatarUrl;
+                        img.onerror = function () {
+                            this.src = '/images/default-avatar.png';
+                        };
                     }
-                }
-            } catch (err) {
-                // Nếu cần xử lý lỗi
-                console.error('Error fetching notification count:', err);
-            }
+                });
+
+                // Update full name
+                const fullNameElements = document.querySelectorAll('.p-4 .font-semibold'); // Selector của FullName
+                fullNameElements.forEach(element => {
+                    if (element && data.fullName) {
+                        console.log(`Updating full name: ${element.textContent} → ${data.fullName}`);
+                        element.textContent = data.fullName;
+                    }
+                });
+
+                // Update email
+                const emailElements = document.querySelectorAll('.p-4 .text-sm');
+                emailElements.forEach(element => {
+                    if (element && data.email) {
+                        console.log(`Updating email: ${element.textContent} → ${data.email}`);
+                        element.textContent = data.email;
+                    }
+                });
+
+                console.log('✅ Header refreshed successfully!');
+            })
+            .catch(error => {
+                console.error('❌ Error refreshing header from session:', error);
+            });
+    };
+
+    // Auto-initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('🚀 Mobile layout header refresh initialized');
+        console.log('💡 Available functions: refreshHeaderFromSession()');
+
+        // Test function for development
+        if (window.location.hostname === 'localhost') {
+            window.testSessionRefresh = function () {
+                console.log('🧪 Testing session refresh...');
+                return window.refreshHeaderFromSession();
+            };
         }
-        document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
-    <script>
-        $(document).ready(function () {
+    });
+</script>
 
-            // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
-
-            function updateNotificationBadge() {
-                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
-
-                $.ajax({
-                    // === SỬA LỖI CORS ===
-                    // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
-                    // ngay trên project UI này. Đây là đường dẫn tương đối.
-                    url: '/Notification/GetUnreadNotificationCount',
-                    type: 'GET',
-                    // KHÔNG cần "beforeSend" (Authorization) nữa,
-                    // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
-                    success: function (count) {
-                        console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
-
-                        const badge = $('#notification-badge');
-
-                        if (badge.length) {
-                            if (count > 0) {
-                                badge.text(count);
-                                badge.show();
-                                console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
-                            } else {
-                                badge.hide();
-                                console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
-                            }
-                        } else {
-                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
-                        // chứ không còn là lỗi CORS (status 0) nữa.
-                        console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
-                        console.error(`  - Status: ${jqXHR.status}`);
-                        console.error(`  - URL: ${this.url}`);
+<script>
+    async function updateMobileNotificationBadges() {
+        try {
+            const resp = await fetch('/Notification/GetUnreadNotificationCount');
+            if (resp.ok) {
+                const count = await resp.json();
+                // Bottom nav badge
+                const badgeBottom = document.getElementById('notification-badge-bottom');
+                if (badgeBottom) {
+                    if (count > 0) {
+                        badgeBottom.textContent = count;
+                        badgeBottom.style.display = 'flex';
+                    } else {
+                        badgeBottom.style.display = 'none';
                     }
-                });
-            }
-
-            function connectToSignalR() {
-                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-                if (!userId) {
-                    console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
-                    return;
                 }
+            }
+        } catch (err) {
+            // Nếu cần xử lý lỗi
+            console.error('Error fetching notification count:', err);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+<script>
+    $(document).ready(function () {
 
-                // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
-                const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
-                const connection = new signalR.HubConnectionBuilder()
-                    .withUrl(hubUrl, {
-                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
-                         accessTokenFactory: () => {
-                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
-                         }
-                    })
-                    .withAutomaticReconnect()
-                    .build();
+        // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
 
-                // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
-                connection.on("ReceiveNotification", function (notification) {
-                    console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
-                    updateNotificationBadge(); // <-- Chính xác!
-                });
+        function updateNotificationBadge() {
+            console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
 
-                connection.start()
-                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
-                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
+            $.ajax({
+                // === SỬA LỖI CORS ===
+                // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
+                // ngay trên project UI này. Đây là đường dẫn tương đối.
+                url: '/Notification/GetUnreadNotificationCount',
+                type: 'GET',
+                // KHÔNG cần "beforeSend" (Authorization) nữa,
+                // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
+                success: function (count) {
+                    console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
+
+                    const badge = $('#notification-badge');
+
+                    if (badge.length) {
+                        if (count > 0) {
+                            badge.text(count);
+                            badge.show();
+                            console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
+                        } else {
+                            badge.hide();
+                            console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
+                        }
+                    } else {
+                        console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
+                    // chứ không còn là lỗi CORS (status 0) nữa.
+                    console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
+                    console.error(`  - Status: ${jqXHR.status}`);
+                    console.error(`  - URL: ${this.url}`);
+                }
+            });
+        }
+
+        function connectToSignalR() {
+            const userId = @(Context.Session.GetInt32("UserId") ?? 0);
+            if (!userId) {
+                console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
+                return;
             }
 
-            console.log("Bắt đầu thực thi script layout...");
-            connectToSignalR();
-            console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
-            updateNotificationBadge();
+            // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
+            const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(hubUrl, {
+                    // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                    accessTokenFactory: () => {
+                        return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                    }
+                })
+                .withAutomaticReconnect()
+                .build();
 
-            // --- KẾT THÚC PHẦN CẬP NHẬT ---
-        });
-    </script>
+            // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
+            connection.on("ReceiveNotification", function (notification) {
+                console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
+                updateNotificationBadge(); // <-- Chính xác!
+            });
+
+            connection.start()
+                .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
+        }
+
+        console.log("Bắt đầu thực thi script layout...");
+        connectToSignalR();
+        console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
+        updateNotificationBadge();
+
+        // --- KẾT THÚC PHẦN CẬP NHẬT ---
+    });
+</script>
 </body>
 </html>

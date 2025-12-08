@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -242,7 +243,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName, 
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 
@@ -310,7 +311,7 @@ namespace UserAPI.Service
                 RefreshToken = newRefreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png",
             };
         }
 
@@ -485,9 +486,20 @@ namespace UserAPI.Service
             var genderFromAI = aiData.Gender?.FirstOrDefault();
             var originPlaceFromAI = aiData.OriginPlace?.FirstOrDefault();
             var currentPlaceFromAI = aiData.CurrentPlace?.FirstOrDefault();
-
             var fullAddress = string.Join(", ", aiData.CurrentPlace ?? new List<string>());
 
+            // Kiểm tra ID có trống không
+            if (string.IsNullOrWhiteSpace(idFromAI))
+            {
+                throw new InvalidOperationException("Không đọc được số CCCD từ ảnh. Vui lòng thử lại với ảnh rõ nét hơn.");
+            }
+
+            // Kiểm tra ID đã tồn tại trong hệ thống chưa
+            if (await _userRepository.IsIdentityNumberExistsAsync(idFromAI))
+            {
+                _logger.LogWarning("Đăng ký thất bại. Số CCCD {IdentityNumber} đã tồn tại trong hệ thống.", idFromAI);
+                throw new InvalidOperationException($"Số CCCD {idFromAI} đã được đăng ký bởi một tài khoản khác.");
+            }
 
             // Kiểm tra các trường thông tin quan trọng
             if (string.IsNullOrWhiteSpace(fullNameFromAI) || string.IsNullOrWhiteSpace(dobFromAI))
@@ -520,10 +532,14 @@ namespace UserAPI.Service
             Directory.CreateDirectory(cccdFolder);
             Directory.CreateDirectory(avatarFolder);
 
+            string frontPath = null;
+            string rearPath = null;
+            string avatarPath = null;
+
             if (registerDto.FrontCCCDImage != null && registerDto.FrontCCCDImage.Length > 0)
             {
                 string frontFileName = $"front_{Guid.NewGuid()}{Path.GetExtension(registerDto.FrontCCCDImage.FileName)}";
-                string frontPath = Path.Combine(cccdFolder, frontFileName);
+                frontPath = Path.Combine(cccdFolder, frontFileName);
 
                 using (var stream = new FileStream(frontPath, FileMode.Create))
                 {
@@ -535,7 +551,7 @@ namespace UserAPI.Service
             if (registerDto.RearCCCDImage != null && registerDto.RearCCCDImage.Length > 0)
             {
                 string rearFileName = $"rear_{Guid.NewGuid()}{Path.GetExtension(registerDto.RearCCCDImage.FileName)}";
-                string rearPath = Path.Combine(cccdFolder, rearFileName);
+                rearPath = Path.Combine(cccdFolder, rearFileName);
 
                 using (var stream = new FileStream(rearPath, FileMode.Create))
                 {
@@ -547,7 +563,7 @@ namespace UserAPI.Service
             if (registerDto.Avatar != null && registerDto.Avatar.Length > 0)
             {
                 string avatarFileName = $"{Guid.NewGuid()}{Path.GetExtension(registerDto.Avatar.FileName)}";
-                string avatarPath = Path.Combine(avatarFolder, avatarFileName);
+                avatarPath = Path.Combine(avatarFolder, avatarFileName);
 
                 using (var stream = new FileStream(avatarPath, FileMode.Create))
                 {
@@ -582,10 +598,46 @@ namespace UserAPI.Service
             };
 
             // 5. Lưu vào DB
-            await _userRepository.CreateUserAsync(user);
+            try
+            {
+                await _userRepository.CreateUserAsync(user);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log lỗi để debug
+                _logger.LogError(ex, "Lỗi DbUpdateException khi tạo user {Email} - CCCD {CCCD}", registerDto.Email, idFromAI);
+
+                // Kiểm tra xem lỗi có phải do trùng lặp IdentityNumber hay không
+                if (ex.InnerException != null &&
+                   (ex.InnerException.Message.Contains("IdentityNumber") || ex.InnerException.Message.Contains("IX_Users_IdentityNumber")))
+                {
+                    // Xóa các file ảnh vừa upload để tránh rác server vì đăng ký thất bại
+                    CleanupFailedUpload(frontPath, rearPath, avatarPath);
+
+                    throw new InvalidOperationException($"Đăng ký thất bại. Số CCCD {idFromAI} đã tồn tại trong hệ thống.");
+                }
+
+                // Nếu là lỗi DB khác (mất kết nối, sai kiểu dữ liệu...)
+                throw;
+            }
 
             // 6. Map sang ReadUserDTO
             return _mapper.Map<PrivateUserProfileDTO>(user);
+        }
+
+        // Hàm phụ trợ để xóa file rác nếu lưu DB lỗi
+        private void CleanupFailedUpload(string? frontPath, string? rearPath, string? avatarPath)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(frontPath) && File.Exists(frontPath)) File.Delete(frontPath);
+                if (!string.IsNullOrEmpty(rearPath) && File.Exists(rearPath)) File.Delete(rearPath);
+                if (!string.IsNullOrEmpty(avatarPath) && File.Exists(avatarPath) && !avatarPath.Contains("default-avatar")) File.Delete(avatarPath);
+            }
+            catch
+            {
+                // Ignore lỗi xóa file
+            }
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -715,7 +767,7 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 
@@ -846,13 +898,139 @@ namespace UserAPI.Service
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpiresMinutes"]!)),
                 UserId = user.UserId,
                 FullName = user.FullName,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl ?? "/uploads/avatars/default-avatar.png"
             };
         }
 
         public async Task<UserStatisticsDTO> GetUserStatisticsAsync()
         {
             return await _userRepository.GetUserStatisticsAsync();
+        }
+
+        public async Task<PrivateUserProfileDTO> UpdateNationalIdCardAsync(UpdateNationalIdRequestDTO updateDto)
+        {
+            // 1. Lấy thông tin User hiện tại từ DB
+            var user = await _userRepository.GetUserByIdAsync(updateDto.UserId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Không tìm thấy người dùng.");
+            }
+
+            // 2. Gọi AI Service để đọc ảnh CCCD mới
+            if (updateDto.FrontCCCDImage == null || updateDto.FrontCCCDImage.Length == 0)
+            {
+                throw new InvalidOperationException("Vui lòng cung cấp ảnh mặt trước CCCD.");
+            }
+
+            AiCccdResponseModel? aiData;
+            try
+            {
+                _logger.LogInformation("Đang gửi ảnh CCCD update của user {UserId} đến AI Service.", user.UserId);
+                aiData = await _aiService.ExtractInfoFromFrontCCCDImage(updateDto.FrontCCCDImage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi AI Service khi update CCCD cho user {UserId}", user.UserId);
+                throw new Exception("Hệ thống xác thực đang gặp sự cố.");
+            }
+
+            if (aiData == null || string.IsNullOrWhiteSpace(aiData.Id?.FirstOrDefault()))
+            {
+                throw new InvalidOperationException("Không thể đọc thông tin từ ảnh CCCD mới. Ảnh không rõ nét hoặc không hợp lệ.");
+            }
+
+            // 3. Kiểm tra ID mới có KHỚP với ID cũ không
+            string newIdFromAI = aiData.Id.First();
+
+            // Chỉ so sánh nếu user cũ đã có số CCCD (để tránh lỗi null reference, dù logic đăng ký đã bắt buộc có)
+            if (!string.IsNullOrEmpty(user.IdentityNumber))
+            {
+                // So sánh chuỗi, bỏ qua khoảng trắng nếu cần
+                if (!string.Equals(user.IdentityNumber.Trim(), newIdFromAI.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning("User {UserId} cố gắng update CCCD với số ID khác. Cũ: {OldId}, Mới: {NewId}", user.UserId, user.IdentityNumber, newIdFromAI);
+                    throw new InvalidOperationException("Ảnh CCCD mới không trùng khớp với số định danh (ID) đã đăng ký. Bạn chỉ được phép cập nhật ảnh mới cho cùng một người.");
+                }
+            }
+            else
+            {
+                // User cũ chưa có ID (lỗi dữ liệu cũ), thì kiểm tra xem ID mới này có trùng với ai khác trong hệ thống không?
+                if (await _userRepository.IsIdentityNumberExistsAsync(newIdFromAI))
+                {
+                    throw new InvalidOperationException($"Số CCCD {newIdFromAI} đã thuộc về một tài khoản khác.");
+                }
+            }
+
+            // 4. Cập nhật thông tin mới từ AI
+            user.FullName = aiData.Name?.FirstOrDefault() ?? user.FullName;
+            user.Gender = aiData.Gender?.FirstOrDefault() ?? user.Gender;
+            user.Address = string.Join(", ", aiData.CurrentPlace ?? new List<string>());
+
+            var dobFromAI = aiData.DateOfBirth?.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(dobFromAI))
+            {
+                var parsedDob = DateHelper.Parse(dobFromAI, "dd/MM/yyyy");
+                if (parsedDob == null || (DateTime.UtcNow.Year - parsedDob.Year) < 18)
+                {
+                    throw new InvalidOperationException("Người dùng phải từ 18 tuổi trở lên.");
+                } else
+                {
+                    user.DateOfBirth = parsedDob;
+                }
+            }
+
+            // Lưu lại ID 
+            user.IdentityNumber = newIdFromAI;
+
+            // 5. Xử lý file ảnh (Xóa ảnh cũ, Lưu ảnh mới)
+            string safeEmail = user.Email.Replace("@", "_at_").Replace(".", "_dot_");
+            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            string cccdFolder = Path.Combine(uploadFolder, "cccd", safeEmail);
+
+            // Tạo folder nếu chưa có
+            if (!Directory.Exists(cccdFolder)) Directory.CreateDirectory(cccdFolder);
+
+            // -- Xử lý Mặt Trước --
+            // Xóa file cũ
+            if (!string.IsNullOrEmpty(user.FrontCCCDUrl))
+            {
+                string oldFrontPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.FrontCCCDUrl.TrimStart('/'));
+                if (File.Exists(oldFrontPath)) File.Delete(oldFrontPath);
+            }
+            // Lưu file mới
+            string frontFileName = $"front_upd_{Guid.NewGuid()}{Path.GetExtension(updateDto.FrontCCCDImage.FileName)}";
+            string frontPath = Path.Combine(cccdFolder, frontFileName);
+            using (var stream = new FileStream(frontPath, FileMode.Create))
+            {
+                await updateDto.FrontCCCDImage.CopyToAsync(stream);
+            }
+            user.FrontCCCDUrl = $"/uploads/cccd/{safeEmail}/{frontFileName}";
+
+            user.UpdatedDate = DateTime.UtcNow;
+
+            // 6. Lưu vào DB
+            await _userRepository.UpdateUserAsync(user);
+
+            return _mapper.Map<PrivateUserProfileDTO>(user);
+        }
+
+        public async Task<bool> VerifyPassword(int userId, string password)
+        {
+            // 1. Lấy user từ DB
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Người dùng không tồn tại.");
+            }
+
+            // 2. Xác thực mật khẩu
+            if (!VerifyPassword(password, user.PasswordHash, user.PasswordSalt))
+            {
+                throw new UnauthorizedAccessException("Mật khẩu không chính xác.");
+            }
+
+            // 3. Mật khẩu đúng
+            return true;
         }
     }
 }

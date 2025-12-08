@@ -43,7 +43,7 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(response.AvatarUrl)
                 ? $"{BASE_URL}{response.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
 
             HttpContext.Session.SetInt32("UserId", response.UserId);
             HttpContext.Session.SetString("FullName", response.FullName ?? "User");
@@ -56,7 +56,7 @@ namespace StadiumManagerUI.Controllers
             // Lưu thông tin user vào Session (đường dẫn ảnh đầy đủ)
             var avatarFullUrl = !string.IsNullOrEmpty(userProfileDTO.AvatarUrl)
                 ? $"{BASE_URL}{userProfileDTO.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
 
             HttpContext.Session.SetInt32("UserId", userProfileDTO.UserId);
             HttpContext.Session.SetString("FullName", userProfileDTO.FullName ?? "User");
@@ -330,15 +330,15 @@ namespace StadiumManagerUI.Controllers
                 Password = tempRegisterData.RegisterData.Password,
                 PhoneNumber = tempRegisterData.RegisterData.PhoneNumber,
                 Avatar = avatar,
-                FrontCCCDImage = frontCccdImage // nhận dạng IFormFile chuẩn
+                FrontCCCDImage = frontCccdImage
             };
 
             // Gọi service để đăng ký người dùng (API sẽ xử lý lưu file video từ base64)
-            var isRegistered = await _userService.StadiumManagerRegisterAsync(registerRequestDTO);
+            var result = await _userService.StadiumManagerRegisterAsync(registerRequestDTO);
 
-            if (!isRegistered)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { success = false, message = "Hình CCCD bạn cung cấp không chính xác. Vui lòng thử lại." });
+                return BadRequest(new { success = false, message = result.Message });
             }
 
             // Xóa dữ liệu tạm sau khi đăng ký thành công
@@ -370,17 +370,28 @@ namespace StadiumManagerUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            // 1. Get tokens from cookie
+            // Kiểm tra cờ xác thực
+            if (TempData["ProfileVerified"] == null || (bool)TempData["ProfileVerified"] == false)
+            {
+                // Nếu chưa xác thực mà cố vào -> Đá về trang chủ và báo lỗi
+                TempData["ErrorMessage"] = "Vui lòng xác thực mật khẩu trước khi truy cập thông tin cá nhân.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Xóa cờ xác thực sau khi đã sử dụng
+            TempData.Remove("ProfileVerified");
+
+            // Get tokens from cookie
             var accessToken = _tokenService.GetAccessTokenFromCookie();
 
-            // 2. Handle missing access token
+            // Handle missing access token
             if (string.IsNullOrEmpty(accessToken))
             {
                 TempData["ErrorMessage"] = "Access Token is missing.";
                 return RedirectToAction("Login");
             }
 
-            // 3. Initial service call
+            // Initial service call
             var userProfile = await _userService.GetMyProfileAsync(accessToken);
 
             if (userProfile == null)
@@ -391,7 +402,11 @@ namespace StadiumManagerUI.Controllers
 
             userProfile.AvatarUrl = !string.IsNullOrEmpty(userProfile.AvatarUrl)
                 ? $"{BASE_URL}{userProfile.AvatarUrl}"
-                : $"{BASE_URL}/avatars/default-avatar.png";
+                : $"{BASE_URL}/uploads/avatars/default-avatar.png";
+
+            userProfile.FrontCCCDUrl = !string.IsNullOrEmpty(userProfile.FrontCCCDUrl)
+                ? $"{BASE_URL}{userProfile.FrontCCCDUrl}"
+                : "";
 
             return View(userProfile);
         }
@@ -555,6 +570,60 @@ namespace StadiumManagerUI.Controllers
             HttpContext.Session.Clear();
 
             return Json(new { success = true, message = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập với mật khẩu mới." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCCCD(IFormFile frontImage)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            if (frontImage == null || frontImage.Length == 0)
+            {
+                return BadRequest(new { message = "Vui lòng tải lên ảnh mặt trước CCCD." });
+            }
+
+            var result = await _userService.UpdateNationalIdCardAsync(frontImage, accessToken);
+
+            if (result.IsSuccess)
+            {
+                // Cập nhật lại Session user mới (nếu cần hiển thị thông tin mới ngay lập tức)
+                // UpdateUserSession(result.Data); 
+                return Ok(result.Data);
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyPassword(string password)
+        {
+            var accessToken = _tokenService.GetAccessTokenFromCookie();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập hết hạn." });
+            }
+
+            var dto = new VerifyPasswordRequestDTO
+            {
+                Password = password
+            };
+
+            var result = await _userService.VerifyPassword(dto, accessToken);
+
+            if (result.IsSuccess)
+            {
+                // Đánh dấu Session/TempData là đã xác thực cho Profile
+                // Tránh truy cập trái phép vào trang chỉnh sửa profile
+                TempData["ProfileVerified"] = true;
+                TempData.Keep("ProfileVerified");
+                return Ok(new { success = true, message = result.Message ?? "Xác thực thành công."});
+            }
+
+            return Ok(new { success = false, message = result.Message ?? "Mật khẩu không chính xác."});
         }
     }
 }

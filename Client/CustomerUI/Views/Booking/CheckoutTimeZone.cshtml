@@ -202,7 +202,7 @@
             endTime: parseInt("@ViewBag.EndTime"),
             totalPrice: parseFloat("@ViewBag.TotalPrice")
         };
-
+        
         let stadiumData = null;
         let subtotalPrice = bookingData.totalPrice;
         let discountAmount = 0;
@@ -451,9 +451,29 @@
             fetchStadiumData(bookingData.stadiumId);
             updateHiddenFields();
             loadUserProfile();
-        $('#modal-close-btn').click(hideModal);
-            $('#close-discount-modal'). click(hideDiscountModal);
-            $('#back-button').click(() => window.history.back());
+
+            $('#modal-close-btn').click(hideModal);
+            $('#close-discount-modal').click(hideDiscountModal);
+            $('#back-button').off('click').on('click', function(e) {
+                e.preventDefault();
+
+                // Dữ liệu cần gửi lại
+                const stadiumId = bookingData.stadiumId;
+                const date = bookingData.date;
+                const sTime = bookingData.startTime;
+                const eTime = bookingData.endTime;
+                const courtIds = bookingData.courtIdsString;
+
+                // Tạo URL để quay lại
+                const backUrl = `/Booking/Booking?stadiumId=${stadiumId}` +
+                    `&date=${date}` +
+                    `&startTime=${sTime}` +
+                    `&endTime=${eTime}` +
+                    `&courtIds=${courtIds}`;
+
+                // Chuyển hướng
+                window.location.href = backUrl;
+            });
 
             // Mở modal chọn mã
             $('#select-discount-button'). click(() => {

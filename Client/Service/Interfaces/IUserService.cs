@@ -1,5 +1,6 @@
 ﻿using DTOs.OData;
 using DTOs.UserDTO;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Service.Interfaces
 
         Task<bool> CustomerRegisterAsync(CustomerRegisterRequestDTO registerRequestDTO);
 
-        Task<bool> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerRequestDTO);
+        Task<ApiResult<bool>> StadiumManagerRegisterAsync(StadiumManagerRegisterRequestDTO registerRequestDTO);
 
         Task<PrivateUserProfileDTO?> GetMyProfileAsync(string accessToken);
 
@@ -37,7 +38,9 @@ namespace Service.Interfaces
         Task<List<PublicUserProfileDTO>> GetUsersByIdsAsync(List<int> userIds, string accessToken);
 
         Task<List<PublicUserProfileDTO>> SearchUsersByPhoneAsync(string phoneNumber, string accessToken);
+
         Task<List<PublicUserProfileDTO>> SearchUsersByEmailAsync(string email, string accessToken);
+
         Task<OdataHaveCountResponse<AdminUserProfileDTO>> GetUsersForAdmin(string accessToken, UserSearchRequestDTO request);
 
         Task<AdminUserStatsDTO> GetUserStats(string accessToken); 
@@ -50,5 +53,8 @@ namespace Service.Interfaces
 
         Task<bool> AddorUpdateFaceEmbeddings(FaceImagesDTO faceImagesDTO, string accessToken);
 
+        Task<ApiResult<PrivateUserProfileDTO>> UpdateNationalIdCardAsync(IFormFile frontImage, string accessToken);
+
+        Task<ApiResult<string>> VerifyPassword(VerifyPasswordRequestDTO dto, string accessToken);
     }
 }

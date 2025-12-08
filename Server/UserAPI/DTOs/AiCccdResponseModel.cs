@@ -16,7 +16,6 @@ namespace UserAPI.DTOs
         [JsonPropertyName("originPlace")]
         public List<string> OriginPlace { get; set; } = new List<string>();
 
-        // SỬA "current_place" thành "currentPlace"
         [JsonPropertyName("currentPlace")]
         public List<string> CurrentPlace { get; set; } = new List<string>();
 
