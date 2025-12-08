@@ -331,5 +331,5 @@ function updateSportChart() {
 // TỰ ĐỘNG CHẠY khi DOM load xong
 document.addEventListener('DOMContentLoaded', function () {
     // Đợi một chút để data load vào các element
-    setTimeout(updateSportChart, 500);
+    setTimeout(updateSportChart, 1500);
 });
