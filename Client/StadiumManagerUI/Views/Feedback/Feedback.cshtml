@@ -65,7 +65,7 @@
                     <th>User</th>
                     <th>Rating</th>
                     <th>Comment</th>
-                    <th>Image</th>
+                    <th>Image</th> 
                     <th>Created At</th>
                     <th>Actions</th>
                 </tr>
@@ -437,9 +437,12 @@
     }
 
     @@keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
     }
 
     .user-cell {
@@ -531,15 +534,18 @@
     }
 
     @@keyframes modalSlideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-50px) scale(0.9);
-        }
+        from
 
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
     }
 
     .modal-header {
@@ -628,36 +634,39 @@
 
     /* responsive */
     @@media (max-width: 768px) {
-        .feedback-container {
-            margin: 10px;
+        .feedback-container
+
+    {
+        margin: 10px;
+    }
+
+    .filter-item {
+        min-width: 140px;
+    }
+
+    .table {
+        min-width: 640px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+        .card-header h2 {
+            font-size: 1.5rem;
         }
 
-        .filter-item {
-            min-width: 140px;
-        }
+    .filters {
+        padding: 20px;
+    }
 
-        .table {
-            min-width: 640px;
-        }
+    .table-responsive, .pager, .info {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 
-        .card-header {
-            flex-direction: column;
-            gap: 15px;
-            align-items: flex-start;
-        }
-
-            .card-header h2 {
-                font-size: 1.5rem;
-            }
-
-        .filters {
-            padding: 20px;
-        }
-
-        .table-responsive, .pager, .info {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
     }
 </style>
 

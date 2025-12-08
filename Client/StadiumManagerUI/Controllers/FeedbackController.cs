@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System.Text.Json;
 
-namespace AdminUI.Controllers
+namespace StadiumManagerUI.Controllers
 {
     public class FeedbackController : Controller
     {

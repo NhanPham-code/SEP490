@@ -805,11 +805,66 @@
                 margin-left: auto;
             }
 
-            .slider-video {
+        .slider-video {
             width: 100%;
             height: 100%;
             object-fit: contain; /* Keeps video aspect ratio within the container */
             background: black; /* Background for letterboxing */
+        }
+        /* Mặc định, desktop hiện, mobile ẩn */
+        .desktop-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        /* Từ 768px trở xuống (mobi/tablet), desktop ẩn, mobile hiện */
+        @@media (max-width: 767px) {
+            .desktop-only {
+                display: none !important;
+            }
+
+            .mobile-only {
+                display: block !important;
+            }
+        }
+        /* Chỉ sửa cho mobile-only feedback box */
+        @@media (max-width: 767px) {
+            .mobile-only .feedback-item {
+                overflow: hidden; /* Chắn phần tử con vượt ra ngoài */
+                border-radius: 1.5rem; /* Đảm bảo đúng bo góc như khối lớn */
+                position: relative; /* Để có thể xếp lớp phần tử con */
+            }
+
+                .mobile-only .feedback-item img,
+                .mobile-only .feedback-item svg {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 12px; /* Bớt cứng, hạn chế góc vuông */
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    box-sizing: border-box;
+                }
+                /* Nếu có phần .feedback-icon lớn dùng absolute, nên bóc lại static hoặc thu nhỏ lại */
+                .mobile-only .feedback-item .feedback-icon,
+                .mobile-only .feedback-item [class*='icon'] {
+                    max-width: 90%;
+                    width: 100%;
+                    height: auto;
+                    margin: 0 auto;
+                    position: static !important;
+                    left: unset !important;
+                    right: unset !important;
+                    top: unset !important;
+                    bottom: unset !important;
+                    transform: none !important;
+                    box-shadow: none !important;
+                    z-index: 1;
+                    background: none;
+                }
         }
     </style>
 </head>
@@ -1123,23 +1178,29 @@
             </div>
 
             <!-- Feedback List Section -->
-            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg">
-                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng</h2>
-
-                <div id="feedback-count" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
-
-                <div id="feedbackList">
+            <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg desktop-only">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng </h2>
+                <div id="feedback-count-desktop" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
+                <div id="feedbackList-desktop">
                     <!-- Feedback items will be loaded here -->
                 </div>
-
-                <div id="pagination-container">
+                <div id="pagination-container-desktop">
                     <!-- Pagination will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
 
-
+    <div class="mb-12 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl shadow-lg mobile-only">
+        <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center gradient-text">⭐ Đánh giá từ khách hàng </h2>
+        <div id="feedback-count-mobile" class="text-center text-gray-600 mb-4 text-sm sm:text-base"></div>
+        <div id="feedbackList-mobile">
+            <!-- Feedback items will be loaded here -->
+        </div>
+        <div id="pagination-container-mobile">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
@@ -1359,7 +1420,7 @@
             // ============================================================
             // 2. THÊM ĐOẠN KIỂM TRA BOOKING TẠI ĐÂY
             // ============================================================
-            // Chỉ cần kiểm tra khi tạo mới (Create). 
+            // Chỉ cần kiểm tra khi tạo mới (Create).
             // Nếu là Edit (Sửa) thì nghĩa là họ đã từng được phép tạo rồi.
             if (!isEditMode) {
                 // Hiển thị loading nhẹ hoặc disable nút để user biết đang kiểm tra
@@ -1425,25 +1486,22 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (response) {
-                    console.log('Success response:', response);
+                        success: function(response) {
+            if (response.success) {
+                showModal('Thành công!', response.message);
 
-                    if (response.success) {
-                        showModal('Thành công!', response.message);
+                // Cập nhật lại danh sách feedback
+                loadFeedbacks(stadiumId, currentPage);
 
-                        // Load danh sách feedback (vẫn cần cập nhật list public)
-                        const pageToLoad = isEditMode ? currentPage : 1;
-                        loadFeedbacks(stadiumId, pageToLoad);
-
-                        // Không reset form — gọi lại AJAX kiểm tra feedback của user
-                        // để load lại dữ liệu của form (chuyển sang edit mode, hiển thị ảnh, ...)
-                        checkUserFeedback(stadiumId);
-                    } else {
-                        showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('AJAX Error:', { status, error, response: xhr.responseText });
+                // Clear preview ảnh mới và load lại feedback của user
+                clearImagePreview();
+                checkUserFeedback(stadiumId); // Form hiển thị lại đúng trạng thái (chỉ ảnh hiện tại)
+            } else {
+                showModal('Lỗi', response.message || 'Có lỗi xảy ra.');
+            }
+        },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {status, error, response: xhr.responseText});
 
                     let errorMessage = 'Có lỗi xảy ra.';
                     if (xhr.responseJSON?.message) {
@@ -1459,7 +1517,24 @@
                 }
             });
         }
-
+                function isMobileScreen() {
+            return window.innerWidth <= 767; // breakpoint phù hợp tailwind md
+        }
+                function getFeedbackElements() {
+            if (isMobileScreen()) {
+                return {
+                    count: '#feedback-count-mobile',
+                    list: '#feedbackList-mobile',
+                    pagination: '#pagination-container-mobile'
+                };
+            } else {
+                return {
+                    count: '#feedback-count-desktop',
+                    list: '#feedbackList-desktop',
+                    pagination: '#pagination-container-desktop'
+                };
+            }
+        }
         function deleteFeedback() {
             if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.')) {
                 return;
@@ -1570,6 +1645,7 @@
 
         function renderFeedbacks(feedbacks) {
             console.log("Rendering feedbacks:", feedbacks);
+             let els = getFeedbackElements();
             let html = "";
 
             if (!feedbacks || feedbacks.length === 0) {
@@ -1584,7 +1660,7 @@
                 });
             }
 
-            $("#feedbackList").html(html);
+            $(els.list).html(html);
         }
 
         // ✅ Render pagination controls
@@ -1593,7 +1669,7 @@
                 $("#pagination-container").html('');
                 return;
             }
-
+             let els = getFeedbackElements();
             let paginationHtml = `
                 <div class="flex flex-col sm:flex-row items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg">
                     <div class="text-sm text-gray-600 mb-3 sm:mb-0">
@@ -1675,7 +1751,7 @@
                     </div>
                 </div>`;
 
-            $("#pagination-container").html(paginationHtml);
+             $(els.pagination).html(paginationHtml);
         }
 
                 // CREATE FEEDBACK
@@ -1982,9 +2058,9 @@
                 document.getElementById('booking-modal-close-btn').onclick = hideBookingModal;
                 document.getElementById('booking-btn').onclick = showBookingModal;
 
-    
-                            
-                                    
+
+
+
                 (function(){
                   'use strict';
 
@@ -2110,7 +2186,7 @@
         }
     </script>
 
-    
+
 
 
     <script type="module">
@@ -2153,12 +2229,15 @@
         }
 
         // Tạo phòng chat
-        function createChatRoomAndRedirect(senderId, senderName, receiverId) {
+               function createChatRoomAndRedirect(senderId, senderName, receiverId) {
             const timestamp = Date.now();
+
+            // Lấy tên từ Razor Model
+            const modelName = "@Html.Raw(Model.Name)";
 
             const updates = {};
             updates[`userChats/${senderId}/${receiverId}`] = {
-                name: "@Html.Raw(Model.Name)",
+                name: modelName,
                 timestamp,
                 lastMessage: ""
             };
@@ -2172,10 +2251,10 @@
                 Object.keys(updates).map(path => set(ref(db, path), updates[path]))
             ).then(() => {
                 console.log("✅ Chat room created successfully");
-                redirectToChat(senderId, senderName, receiverId, "Chủ sân");
+                redirectToChat(senderId, senderName, receiverId, modelName);
             }).catch((error) => {
                 console.error("❌ Error creating chat room:", error);
-                redirectToChat(senderId, senderName, receiverId, "Chủ sân");
+                redirectToChat(senderId, senderName, receiverId, modelName);
             });
         }
 
@@ -2202,11 +2281,55 @@
 
         // Cho phép gọi trực tiếp onclick từ HTML
         window.toggleChat = toggleChat;
+
+
+
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        (function() {
+            // Nếu đã có connection rồi thì không tạo lại
+            if (!window._stadiumSignalRConnection) {
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("https://localhost:7072/notificationHub")
+                    .build();
 
+                // Lắng nghe sự kiện "ReceiveNotification" từ server
+                connection.on("ReceiveNotification", function (notification) {
+                    console.log("[StadiumDetail] Nhận thông báo mới:", notification);
+                    // Cập nhật badge notification nếu có
+                    if (typeof updateNotificationBadge === "function") {
+                        setTimeout(updateNotificationBadge, 1000);
+                        setTimeout(updateNotificationBadge, 2000);
+                    }
+                    // Reload feedback list
+                    if (typeof loadFeedbacks === "function") loadFeedbacks(stadiumId, 1);
+                    // Reload form feedback user
+                    if (typeof checkUserFeedback === "function") checkUserFeedback(stadiumId);
+                    // Nếu muốn reset về tạo mới
+                    if (typeof setCreateMode === "function") setTimeout(setCreateMode, 500);
 
+                    if (typeof resetFeedbackForm === "function") resetFeedbackForm();
+                    // Hiển thị thông báo toast nếu muốn
+                    if (typeof showNotification === "function" && notification?.Message) {
+                        showNotification(notification.Message, "info");
+                    }
+                });
 
+                connection.start()
+                    .then(function () {
+                        console.log("[StadiumDetail] Đã kết nối tới notification hub!");
+                    })
+                    .catch(function (err) {
+                        console.error("[StadiumDetail] Kết nối SignalR thất bại:", err);
+                    });
+
+                // Đánh dấu đã tạo connection để tránh trùng lặp nếu trang reload AJAX
+                window._stadiumSignalRConnection = connection;
+            }
+        })();
+    </script>
     <script>
         /* =============================================================
            SCRIPT SỬA LỖI TOÀN DIỆN (SLIDER + MODAL + GLOBAL SCOPE)
