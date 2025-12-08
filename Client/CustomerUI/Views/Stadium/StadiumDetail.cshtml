@@ -1400,7 +1400,8 @@
             }
         }
 
-        function handleFeedbackSubmit(e) {
+        // 1. Thêm từ khóa 'async' ở đây để xử lý đồng bộ việc kiểm tra
+        async function handleFeedbackSubmit(e) {
             e.preventDefault();
             console.log("Form submitted, edit mode:", isEditMode);
 
@@ -1421,6 +1422,41 @@
                 showModal('Lỗi', 'Bình luận không được vượt quá 500 ký tự!');
                 return;
             }
+
+            // ============================================================
+            // 2. THÊM ĐOẠN KIỂM TRA BOOKING TẠI ĐÂY
+            // ============================================================
+            // Chỉ cần kiểm tra khi tạo mới (Create). 
+            // Nếu là Edit (Sửa) thì nghĩa là họ đã từng được phép tạo rồi.
+            if (!isEditMode) {
+                // Hiển thị loading nhẹ hoặc disable nút để user biết đang kiểm tra
+                const submitBtn = $('#submit-btn');
+                const originalText = submitBtn.html();
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang kiểm tra điều kiện...');
+
+                try {
+                    // Gọi hàm checkBookingStatus (đã tạo ở bước trước)
+                    const hasCompletedBooking = await checkBookingStatus(stadiumId);
+                    console.log("hasCompletedBooking: ", hasCompletedBooking);
+
+                    // Trả lại nút bấm bình thường
+                    submitBtn.prop('disabled', false).html(originalText);
+
+                    if (!hasCompletedBooking) {
+                        showModal('Rất tiếc', 'Bạn cần hoàn thành ít nhất một trận đấu tại sân này để có thể gửi đánh giá!');
+                        return; // ⛔ DỪNG LẠI NGAY, không chạy code gửi form phía dưới
+                    }
+                } catch (err) {
+                    console.error("Lỗi khi kiểm tra booking:", err);
+                    submitBtn.prop('disabled', false).html(originalText);
+                    // Tùy chọn: Có thể return hoặc cho qua nếu API lỗi (ở đây mình chọn return an toàn)
+                    showModal('Lỗi', 'Không thể xác minh lịch sử đặt sân. Vui lòng thử lại sau.');
+                    return;
+                }
+            }
+            // ============================================================
+            // KẾT THÚC ĐOẠN KIỂM TRA
+            // ============================================================
 
             // Create FormData
             const formData = new FormData();
@@ -2028,7 +2064,7 @@
                 document.getElementById('booking-modal-close-btn').onclick = hideBookingModal;
                 document.getElementById('booking-btn').onclick = showBookingModal;
 
-
+    
                             
                                     
                 (function(){
@@ -2127,6 +2163,33 @@
                   window.showBookingModal = showBookingModal;
                   window.hideBookingModal = hideBookingModal;
                 })();
+
+        // Hàm kiểm tra trạng thái booking (Client -> Controller -> Service)
+        async function checkBookingStatus(stadiumId) {
+            console.log("🔍 Đang kiểm tra lịch sử booking cho Stadium ID:", stadiumId);
+
+            try {
+                const response = await $.ajax({
+                    url: '/Booking/CheckCompletedBooking', // Gọi Action vừa tạo ở Bước 1
+                    type: 'GET',
+                    data: { stadiumId: stadiumId }
+                });
+
+                console.log("📩 Kết quả trả về từ Controller:", response);
+
+                if (response.success && response.hasCompleted) {
+                    console.log("✅ User ĐÃ hoàn thành booking tại sân này -> Return TRUE");
+                    return true;
+                } else {
+                    console.log("❌ User CHƯA hoàn thành booking nào tại sân này -> Return FALSE");
+                    return false;
+                }
+
+            } catch (error) {
+                console.error("⚠️ Lỗi khi gọi API CheckCompletedBooking:", error);
+                return false; // Mặc định trả về false nếu lỗi
+            }
+        }
     </script>
 
     
