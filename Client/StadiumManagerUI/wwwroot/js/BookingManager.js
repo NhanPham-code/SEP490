@@ -164,6 +164,8 @@
         const row = button.closest('tr');
         if (!row) return;
 
+        const stadiumNameFromRow = row.dataset.stadiumName;
+
         const bookingJson = row.dataset.bookingJson;
         if (!bookingJson) {
             console.error('Lỗi: không tìm thấy thuộc tính data-booking-json trên hàng này.');
@@ -173,7 +175,7 @@
         const bookingData = bookingType === 'daily' ? bookingVm.booking : bookingVm.monthlyBooking;
 
         if (button.classList.contains('details')) {
-            populateModal(bookingVm, bookingType);
+            populateModal(bookingVm, bookingType, stadiumNameFromRow);
         } else if (button.classList.contains('cancel')) {
             updateBookingStatus(bookingId, bookingType, 'cancelled', 'Bạn có chắc muốn hủy lịch đặt này?', bookingData);
         }
@@ -183,13 +185,13 @@
      * [ĐÃ SỬA LỖI] Hiển thị popup chi tiết, đầy đủ như phiên bản gốc.
      * Hàm này đọc dữ liệu từ `bookingVm` (được parse từ `data-booking-json`) để xây dựng modal.
      */
-    function populateModal(bookingVm, type) {
+    function populateModal(bookingVm, type, stadiumNameOverride) {
         const modalHeader = document.getElementById('bm-modalHeader');
         const modalBody = document.getElementById('bm-modalBodyContent');
         const isMonthly = type === 'monthly';
         const bookingData = isMonthly ? bookingVm.monthlyBooking : bookingVm.booking;
         const userData = bookingVm.user;
-        const stadiumName = bookingData.stadiumName || 'N/A';
+        const stadiumName = stadiumNameOverride || bookingData.stadiumName || 'N/A';
 
         modalHeader.innerHTML = `<h3><i class="fas fa-receipt"></i> Chi tiết Lịch đặt ${isMonthly ? 'Tháng' : 'Ngày'} #${bookingData.id}</h3><button class="bm-modal-close-btn">&times;</button>`;
 

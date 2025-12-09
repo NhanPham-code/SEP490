@@ -39,8 +39,8 @@
                         <label class="form-label">Trạng thái</label>
                         <select class="form-control" id="statusFilter">
                             <option value="">Tất cả</option>
-                            <option value="true">Đang hoạt động</option>
-                            <option value="false">Không hoạt động</option>
+                            <option value="true">Mở</option> <!-- Đã sửa nhãn -->
+                            <option value="false">Khóa</option> <!-- Đã sửa nhãn -->
                         </select>
                     </div>
                     <div class="filter-buttons">
@@ -218,7 +218,7 @@
             }
 
             // === DATA FETCHING & RENDERING ===
-                        function fetchAndRenderDiscounts(page = 1) {
+            function fetchAndRenderDiscounts(page = 1) {
                 currentPage = page;
 
                 // Lấy giá trị và trim khoảng trắng để an toàn
@@ -233,7 +233,7 @@
 
                 // LOGIC FILTER TRẠNG THÁI
                 // ASP.NET Core sẽ tự map chuỗi "true"/"false" sang bool
-                if (status === "true" || status === "false") {
+                if (status && status !== "") {
                     query += `&isActive=${status}`;
                 }
 
@@ -245,7 +245,21 @@
                         return response.json();
                     })
                     .then(data => {
-                        currentDiscounts = data.discounts;
+                         let processedDiscounts = data.discounts;
+
+                        // 2. THÊM LOGIC: Nếu đang lọc "Mở" (true), dùng JS loại bỏ các mã đã hết hạn
+                        // (Vì server chỉ trả về isActive=true nhưng có thể bao gồm cả mã hết hạn)
+                        if (status === 'true') {
+                            processedDiscounts = processedDiscounts.filter(d => {
+                                const isExpired = new Date() > new Date(d.endDate);
+                                // Giữ lại nếu: isActive là true VÀ chưa hết hạn
+                                return d.isActive && !isExpired;
+                            });
+                        }
+
+
+                         currentDiscounts = processedDiscounts;
+
 
                         // Load danh sách sân nếu chưa có (cho dropdown filter)
                         if (allStadiums.length === 0 && data.stadiums) {
@@ -323,7 +337,7 @@
                 const isExpired = new Date() > new Date(discount.endDate);
                 const isActive = discount.isActive && !isExpired;
                 const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? 'ON' : 'OFF';
+                const statusText = isActive ? 'Mở' : 'Khóa';
                 const remainingDays = Math.ceil((new Date(discount.endDate) - new Date()) / (1000 * 60 * 60 * 24));
                 const codeTypeLabels = { 'Stadium': 'Mã theo sân', 'Unique': 'Mã cá nhân' };
                 const codeTypeDisplay = codeTypeLabels[discount.codeType] || discount.codeType;
