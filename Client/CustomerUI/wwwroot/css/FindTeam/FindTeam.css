@@ -670,7 +670,6 @@ body {
     .date-input-wrapper i,
     .location-input-wrapper i {
         position: absolute;
-        left: var(--space-md);
         top: 50%;
         transform: translateY(-50%);
         color: var(--gray-400);
