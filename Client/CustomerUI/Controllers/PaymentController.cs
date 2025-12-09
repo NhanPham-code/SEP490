@@ -185,7 +185,7 @@ namespace CustomerUI.Controllers
 
             var updateDto = new MonthlyBookingUpdateDto
             {
-                Status = isPaymentSuccess ? "accepted" : "canceled",
+                Status = isPaymentSuccess ? "accepted" : "cancelled",
                 TotalPrice = monthlyBooking.TotalPrice,
                 PaymentMethod = monthlyBooking.PaymentMethod,
                 OriginalPrice = monthlyBooking.OriginalPrice,
