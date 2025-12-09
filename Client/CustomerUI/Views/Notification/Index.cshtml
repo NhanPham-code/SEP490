@@ -73,8 +73,6 @@
                 case "Booking.Problem": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 case "Discount.New": return ["ri-price-tag-3-line", "bg-purple-100 text-purple-600"];
                 case "Stadium.FavoriteNews": return ["ri-star-smile-line", "bg-orange-100 text-orange-600"];
-                case "Booking.Reminder": return ["ri-alarm-warning-line", "bg-yellow-100 text-yellow-600"];
-                case "Recruitment.Delete": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 default: return ["ri-notification-3-line", "bg-gray-100 text-gray-600"];
             }
         }
@@ -100,13 +98,15 @@
         }
 
         function generateUrlFromParams(notification) {
+
             if (notification.type === 'Discount.New') {
-                    return '/Discount/DiscountList';
-                }
+                return '/Discount/DiscountList';
+            }
+
+
             try {
                 const params = JSON.parse(notification.parameters);
-                
-                    
+
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
                     return `/Booking/BookingHistory`;
                 }
@@ -142,7 +142,7 @@
                 container.innerHTML = `<div class="notify-empty">
                                             <i class="ri-inbox-2-line"></i>
                                             <div>Bạn chưa có thông báo nào</div>
-                                        </div>`;
+                                       </div>`;
                 if (loadMoreBtn) loadMoreBtn.style.display = 'none';
                 return;
             }
@@ -159,27 +159,27 @@
                 // Kiểm tra các trường có thể chứa createdAt
                 const createdAtValue = n.createdAt || n.CreatedAt || n.created_at || n.CreatedDate || n.createDate || new Date().toISOString();
 
-                // Nếu là Discount.New, tạo một div không thể click thay vì thẻ a
+                // --- THAY ĐỔI 2: Xóa bỏ khối if(n.type === "Discount.New") cũ ---
+                // Chỉ sử dụng logic tạo thẻ <a> chung cho tất cả các loại
 
-                    const url = generateUrlFromParams(n);
-                    container.insertAdjacentHTML('beforeend', `
-                        <a href="${url}" class="notify-item ${readClass}">
-                            <div class="notify-content">
-                                <div class="notify-icon ${color}">
-                                    <i class="${icon}"></i>
-                                </div>
-                                <div class="notify-text">
-                                    <div class="notify-text-header">
-                                        <div class="notify-text-title">${n.title ?? "Thông báo"}</div>
-                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
-                                    </div>
-                                    <div class="notify-text-message">${n.message ?? ""}</div>
-                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
-                                </div>
+                const url = generateUrlFromParams(n);
+                container.insertAdjacentHTML('beforeend', `
+                    <a href="${url}" class="notify-item ${readClass}">
+                        <div class="notify-content">
+                            <div class="notify-icon ${color}">
+                                <i class="${icon}"></i>
                             </div>
-                        </a>
-                    `);
-                }
+                            <div class="notify-text">
+                                <div class="notify-text-header">
+                                    <div class="notify-text-title">${n.title ?? "Thông báo"}</div>
+                                    ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
+                                </div>
+                                <div class="notify-text-message">${n.message ?? ""}</div>
+                                <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
+                            </div>
+                        </div>
+                    </a>
+                `);
             }
         }
 
@@ -196,7 +196,6 @@
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const items = await resp.json();
 
-                // Log dữ liệu để debug
                 console.log("API Response:", items);
 
                 if (!Array.isArray(items)) throw new Error("Dữ liệu trả về không phải là một mảng.");

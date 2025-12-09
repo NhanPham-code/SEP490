@@ -28,11 +28,9 @@
 
     string TranslateStatus(string status) => status.ToLower() switch
     {
-        "pending" => "Chờ xử lý",
         "accepted" => "Đã nhận",
         "completed" => "Đã hoàn thành",
         "cancelled" => "Đã hủy",
-        "denied" => "Bị từ chối",
         "waiting" => "Chờ thanh toán",
         "payfail" => "Lỗi thanh toán",
         _ => status
@@ -668,7 +666,6 @@
                     <label for="bh-statusFilter"><i class="fa-solid fa-flag"></i></label>
                     <select id="bh-statusFilter">
                         <option value="all">Tất cả trạng thái</option>
-                        <option value="pending">Chờ xử lý</option>
                         <option value="waiting">Chờ thanh toán</option>
                         <option value="accepted">Đã nhận / Sắp tới</option>
                         <option value="completed">Đã hoàn thành</option>
@@ -857,7 +854,7 @@
                 const stadiumId = stadiumFilter.value;
                 const type = typeFilter.value;
                 const status = statusFilter.value;
-                const cancelled = ['cancelled', 'denied', 'payfail'];
+                const cancelled = ['cancelled', 'payfail'];
 
                 document.getElementById('bh-daily-booking-section').style.display = (type === 'all' || type === 'daily') ? 'block' : 'none';
                 document.getElementById('bh-monthly-booking-section').style.display = (type === 'all' || type === 'monthly') ? 'block' : 'none';
