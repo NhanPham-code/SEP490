@@ -1169,6 +1169,7 @@
                     timePlayInput.addEventListener('change', () => updateSchedulePreview(timePlayInput, playDateInput, schedulePreview));
                     playDateInput.addEventListener('change', () => updateSchedulePreview(timePlayInput, playDateInput, schedulePreview));
 
+                    console.log("time:", timePlayInput.value);
                     // Gọi một lần để hiển thị giá trị ban đầu
                     updateSchedulePreview(timePlayInput, playDateInput, schedulePreview);
 
@@ -1336,18 +1337,8 @@
                                         <i class="ri-football-line"></i>
                                         Môn thể thao
                                     </label>
-                                    <select id="newSport" class="form-input">
-                                        <option value="">Chọn môn thể thao</option>
-                                        <option value="Bóng đá sân 11">Bóng đá sân 11</option>
-                                        <option value="Bóng đá sân 7">Bóng đá sân 7</option>
-                                        <option value="Bóng đá sân 5">Bóng đá sân 5</option>
-                                        <option value="Bóng rổ">Bóng rổ</option>
-                                        <option value="Bóng chuyền">Bóng chuyền</option>
-                                        <option value="Cầu lông">Cầu lông</option>
-                                        <option value="Tennis">Tennis</option>
-                                        <option value="table-tennis">Bóng bàn</option>
-                                        <option value="other">Khác</option>
-                                    </select>
+                                    <input id="newSport" type="text" class="form-input" readonly>
+                                    </input>
                                     <div class="input-helper">Môn thể thao sẽ chơi</div>
                                 </div>
 
@@ -1412,14 +1403,14 @@
                                     <div class="input-helper">Ngày sẽ được tự động điền từ booking đã chọn</div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label required">
-                                        <i class="ri-time-line"></i>
-                                        Thời gian chơi
-                                    </label>
-                                        <select id="newTimePlay" class="form-select"></select>                                     
-                                        <div class="input-helper">Giờ bắt đầu hoạt động</div>
-                                </div>
+                                       <div class="form-group">
+            <label class="form-label required">
+                <i class="ri-time-line"></i>
+                Thời gian chơi
+            </label>
+            <select id="newTimePlay" class="form-select"></select>
+            <div class="input-helper">Giờ bắt đầu hoạt động</div>
+        </div>
                             </div>
 
                             <div class="schedule-preview">
@@ -1439,7 +1430,45 @@
             return courts?.find(court => court.stadiumId === staidumId)?.sportType || 'Thể thao';
         }
 
+                document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('newTimePlay');
 
+            // Thêm option mặc định
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '-- Chọn giờ --';
+            select.appendChild(defaultOption);
+
+            // Tạo các khung giờ từ 00: 00 đến 23:30, mỗi 30 phút
+            for (let hour = 0; hour <= 23; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    const option = document.createElement('option');
+                    option.value = timeValue;
+
+                    // Thêm label mô tả cho một số khung giờ
+                    let label = timeValue;
+                    if (hour >= 0 && hour < 5) {
+                        label += ' 🌙 Đêm khuya';
+                    } else if (hour >= 5 && hour < 7) {
+                        label += ' 🌅 Sáng sớm';
+                    } else if (hour >= 7 && hour < 12) {
+                        label += ' ☀️ Buổi sáng';
+                    } else if (hour >= 12 && hour < 14) {
+                        label += ' 🌞 Buổi trưa';
+                    } else if (hour >= 14 && hour < 18) {
+                        label += ' 🌤️ Buổi chiều';
+                    } else if (hour >= 18 && hour < 21) {
+                        label += ' 🌆 Buổi tối';
+                    } else {
+                        label += ' 🌃 Đêm';
+                    }
+
+                    option.textContent = label;
+                    select.appendChild(option);
+                }
+            }
+        });
         // New function to generate booking cards
         function generateBookingCards(bookings) {
             if (!bookings || bookings.length === 0) {
@@ -1518,7 +1547,7 @@
         // Helper functions
         function getStatusClass(status) {
             switch (status?.toLowerCase()) {
-                case 'confirmed': return 'status-confirmed';
+                case 'accepted': return 'status-confirmed';
                 case 'pending': return 'status-pending';
                 case 'cancelled': return 'status-cancelled';
                 case 'completed': return 'status-completed';
