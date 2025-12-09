@@ -13,5 +13,6 @@ namespace DTOs.StadiumDTO
         public int volleyballCount { get; set; }
         public int tennisCount { get; set; }
         public int basketballCount { get; set; }
+        public int pickleballCount { get; set; }
     }
 }

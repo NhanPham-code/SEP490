@@ -280,7 +280,10 @@
                                 <i class="ri-file-list-3-line" aria-hidden="true"></i>
                                 Bài Viết Của Tôi
                             </a>
-
+                            <a href="/FindTeam/FindTeam" class="btn btn-secondary" aria-label="Tìm Nhóm">
+                                <i class="ri-file-list-3-line" aria-hidden="true"></i>
+                                Tìm Nhóm
+                            </a>
                             <button id="create-post" onclick="openCreate()" class="btn btn-create-post" type="button" aria-label="Tạo bài viết tìm đồng đội mới">
                                 <i class="ri-add-line" aria-hidden="true"></i>
                                 Tạo Bài Viết
@@ -668,6 +671,10 @@
                          </div>
                          <div class="player-info">
                              <h3 class="player-name">${profile[p.createdBy].fullName}</h3>
+                             <div class="title flex">
+                                <i class="ri-price-tag-3-line"></i>
+                                <h3 class="stadium-name">${p.title}</h3>
+                            </div>
                                 <span class="created-at">${formatDateTimeWithDay(p.createdAt)}</span>
                          </div>
                          <a href="#"title="Chat với người đăng" class="chat-icon"><i class="ri-message-2-line"></i></a>
@@ -923,7 +930,8 @@
                             { condition: !timePlay, message: 'Vui lòng chọn thời gian chơi' },
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
-                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' }
+                            { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
+                            { condition: !pricePerPerson || pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
 

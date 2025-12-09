@@ -73,6 +73,8 @@
                 case "Booking.Problem": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 case "Discount.New": return ["ri-price-tag-3-line", "bg-purple-100 text-purple-600"];
                 case "Stadium.FavoriteNews": return ["ri-star-smile-line", "bg-orange-100 text-orange-600"];
+                case "Booking.Reminder": return ["ri-alarm-warning-line", "bg-yellow-100 text-yellow-600"];
+                case "Recruitment.Delete": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 default: return ["ri-notification-3-line", "bg-gray-100 text-gray-600"];
             }
         }
@@ -113,6 +115,12 @@
                 }
                 if (params.bookingId) {
                     return `/Booking/BookingHistory`;
+                }
+                if(params.title == "FindTeam"){
+                    return params.content;
+                }
+                if(params.title == "TeamDetail"){
+                    return params.content;
                 }
             } catch (e) {
                 // Bỏ qua lỗi nếu không có tham số

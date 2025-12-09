@@ -71,7 +71,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFavoriteStadiumService, FavoriteStadiumService>();
 builder.Services.AddScoped<IFeesService, FeesService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
