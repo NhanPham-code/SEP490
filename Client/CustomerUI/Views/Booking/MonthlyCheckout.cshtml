@@ -2,17 +2,17 @@
     ViewBag.Title = "Thanh Toán Đặt Sân Hàng Tháng";
 }
 
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min. js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis. com/css2? family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -22,12 +22,12 @@
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.5);
             display: none;
-            transition: opacity 0. 3s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .modal-content {
             transform: translateY(-20px);
-            transition: transform 0. 3s ease-in-out;
+            transition: transform 0.3s ease-in-out;
         }
 
         .modal-overlay.open {
@@ -62,7 +62,7 @@
 
     <!-- Main Form -->
     <form id="booking-form" action="/Booking/CreateMonthlyBooking" method="post">
-        <!-- Hidden fields -->
+        <!-- Hidden fields for submission matching MonthlyBookingCreateDto -->
         <input type="hidden" name="StadiumId" id="StadiumId" />
         <input type="hidden" name="DiscountId" id="DiscountId" />
         <input type="hidden" name="OriginalPrice" id="OriginalPrice" />
@@ -72,6 +72,7 @@
         <input type="hidden" name="EndTime" id="EndTime" />
         <input type="hidden" name="Month" id="Month" />
         <input type="hidden" name="Year" id="Year" />
+        <!-- Hidden inputs for lists (Dates and CourtIds) -->
         <div id="dates-container"></div>
         <div id="courtids-container"></div>
 
@@ -106,7 +107,7 @@
                 </div>
             </div>
 
-            <!-- Discount Section - UI mới từ File 2 -->
+            <!-- Discount Section -->
             <div id="discount-section" class="p-6 bg-gray-50 rounded-xl shadow-inner mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Mã giảm giá</h2>
 
@@ -114,7 +115,7 @@
                 <div id="no-discount-selected" class="flex items-center justify-between">
                     <span class="text-gray-500 italic">Chưa có mã giảm giá nào được chọn</span>
                     <button type="button" id="select-discount-button"
-                            class="px-5 py-3. 5 rounded-lg font-semibold text-white bg-indigo-500 hover:bg-indigo-600 transition">
+                            class="px-5 py-3.5 rounded-lg font-semibold text-white bg-indigo-500 hover:bg-indigo-600 transition">
                         Chọn mã
                     </button>
                 </div>
@@ -168,21 +169,20 @@
     </form>
 
     <script>
-        // Helper function từ File 1
         function parseStringList(input) {
-            if (! input) return [];
-            if (Array.isArray(input)) return input. map(Number);
+            if (!input) return [];
+            if (Array.isArray(input)) return input.map(Number);
+
             const stringInput = String(input);
             return stringInput.split(',').map(s => Number(s.trim()));
         }
 
-        // Data from ViewBag - kết hợp cả 2 file
         const bookingData = {
-            stadiumId: parseInt("@ViewBag. StadiumId"),
+            stadiumId: parseInt("@ViewBag.StadiumId"),
             year: parseInt("@ViewBag.Year"),
             month: parseInt("@ViewBag.Month"),
-            selectedDays: parseStringList("@ViewBag. SelectedDays"),
-            selectedCourtIds: parseStringList("@ViewBag. SelectedCourtIds"),
+            selectedDays: parseStringList("@ViewBag.SelectedDays"),
+            selectedCourtIds: parseStringList("@ViewBag.SelectedCourtIds"),
             startTime: parseInt("@ViewBag.StartTime"),
             endTime: parseInt("@ViewBag.EndTime"),
             totalPrice: parseFloat("@ViewBag.TotalPrice"),
@@ -190,12 +190,12 @@
             discountId: @(ViewBag.DiscountId ?? "null"),
             type: "@ViewBag.Type",
             monthlyBookingId: @(ViewBag.MonthlyBookingId ?? "null"),
-            courtNames: "@Html.Raw(ViewBag.CourtNames ?? "")",
+            courtNames: "@Html.Raw(ViewBag.CourtNames)",
         };
 
-        // State variables
+
         let stadiumData = null;
-        if (bookingData. afterPrice === 0 && bookingData. discountId === null) {
+        if (bookingData.afterPrice === 0 && bookingData.discountId === null) {
             bookingData.afterPrice = bookingData.totalPrice;
         }
 
@@ -204,24 +204,22 @@
         let finalPrice = bookingData.afterPrice;
         let selectedDiscountId = bookingData.discountId;
 
-        // Utility Functions
-        const showModal = (title, message) => {
-            $('#modal-title').text(title);
-            $('#modal-message').text(message);
-            $('#custom-modal').removeClass('opacity-0'). addClass('open'). fadeIn();
-        };
-        const hideModal = () => $('#custom-modal').removeClass('open').addClass('opacity-0'). fadeOut();
-        const showDiscountModal = () => $('#discount-modal').removeClass('opacity-0'). addClass('open').fadeIn();
-        const hideDiscountModal = () => $('#discount-modal').removeClass('open'). addClass('opacity-0').fadeOut();
+        const showModal = (title, message) => { $('#modal-title').text(title); $('#modal-message').text(message); $('#custom-modal').removeClass('opacity-0').addClass('open').fadeIn(); };
+        const hideModal = () => $('#custom-modal').removeClass('open').addClass('opacity-0').fadeOut();
+        const showDiscountModal = () => $('#discount-modal').removeClass('opacity-0').addClass('open').fadeIn();
+        const hideDiscountModal = () => $('#discount-modal').removeClass('open').addClass('opacity-0').fadeOut();
         const formatCurrency = (amount) => `${amount.toLocaleString('vi-VN')} VNĐ`;
         const pad = (num) => String(num).padStart(2, '0');
 
-        // Data Fetching - từ File 1 với $expand=Courts
         function fetchStadiumData(id) {
-            $. ajax({
-                url: `/Home/Stadiums? searchTerm=&$filter=Id eq ${id}&$expand=Courts`,
+            $.ajax({
+                url: `/Home/Stadiums?searchTerm=&$filter=Id eq ${id}&$expand=Courts`,
                 type: 'GET',
                 success: (data) => {
+                    // --- SỬA ĐỔI 1 ---
+                    // GIẢI THÍCH: Dữ liệu API trả về có dạng { "value": [ ... ] }.
+                    // Đối tượng sân vận động thực sự nằm ở phần tử đầu tiên của mảng "value".
+                    // Mã cũ gán `stadiumData = data` là sai. Mã mới truy cập đúng vào `data.value[0]`.
                     if (data.value && data.value.length > 0) {
                         stadiumData = data.value[0];
                         console.log("stadiumData:", stadiumData);
@@ -237,9 +235,9 @@
                 url: `/Booking/GetUserProfile`,
                 type: 'GET',
                 success: (response) => {
-                    if (response. success) {
+                    if (response.success) {
                         $('#customerName').val(response.data.fullName || '');
-                        $('#customerPhone').val(response.data. phoneNumber || '');
+                        $('#customerPhone').val(response.data.phoneNumber || '');
                         $('#customerEmail').val(response.data.email || '');
                     }
                 },
@@ -248,71 +246,80 @@
         }
 
         function fetchDiscounts() {
-            $. ajax({
-                url: `/Booking/GetDiscounts?stadiumId=${@ViewBag.StadiumId}`,
+            $.ajax({
+                url: `/Booking/GetDiscounts?stadiumId=${bookingData.stadiumId}`,
                 type: 'GET',
                 success: (discounts) => {
-                    renderDiscounts(discounts. length > 0 ? discounts : []);
+                    renderDiscounts(discounts.length > 0 ? discounts : []);
                 },
                 error: (xhr) => {
-                    const msg = xhr.responseJSON?.message || 'Lỗi khi lấy danh sách mã giảm giá. ';
+                    const msg = xhr.responseJSON?.message || 'Lỗi khi lấy danh sách mã giảm giá.';
                     $('#discount-list').html(`<p class="text-red-500 italic">${msg}</p>`);
                 }
             });
         }
 
-        // Cập nhật cho UI mới
         function fetchAndDisplayAppliedDiscount(discountId) {
-            $.ajax({
+            $. ajax({
                 url: `/Booking/GetDiscountById? id=${discountId}`,
                 type: 'GET',
                 success: function (discount) {
                     if (discount) {
-                        $('#selected-code-name').text(discount.code);
+                        $('#selected-code-name').text(discount. code);
                         $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
+                        $('#no-discount-selected').addClass('hidden');
+                        $('#discount-selected'). removeClass('hidden');
                     }
                 },
                 error: function () {
-                    $('#selected-code-name'). text('Mã giảm giá');
-                    $('#selected-code-amount'). text(`Giảm ${formatCurrency(discountAmount)}`);
+                    $('#selected-code-name').text('Mã giảm giá');
+                    $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
+                    $('#no-discount-selected').addClass('hidden');
+                    $('#discount-selected'). removeClass('hidden');
                 }
             });
         }
 
-        // UI Rendering - logic từ File 1 (xử lý courtNames từ ViewBag)
         function updateInvoiceDetails() {
-            // Xử lý tên sân - ưu tiên từ ViewBag
             if (bookingData.courtNames) {
                 $('#checkout-court-names').text(bookingData.courtNames);
             } else {
-                if (! stadiumData || !stadiumData. Courts) {
-                    console.log("Đang chờ dữ liệu stadiumData hoặc danh sách Courts.. .");
+                if (!stadiumData || !stadiumData.Courts) {
+                    console.log("Đang chờ dữ liệu stadiumData hoặc danh sách Courts...");
                     return;
-                }
+                };
 
-                const courtNames = bookingData.selectedCourtIds. map(selectedId => {
-                    const court = stadiumData.Courts.find(c => c. Id === Number(selectedId));
-                    return court ?  court.Name : `Sân #${selectedId}`;
-                }).join(', ');
+                // 2. Lọc và lấy tên sân
+                const courtNames = bookingData.selectedCourtIds.map(selectedId => {
+                    // Tìm sân trong mảng stadiumData.Courts
+                    // Lưu ý: Dùng c.Id (I viết hoa) và ép kiểu Number để so sánh cho chắc chắn
+                    const court = stadiumData.Courts.find(c => c.Id === Number(selectedId));
 
+                    // Nếu tìm thấy sân thì lấy c.Name (N viết hoa), ngược lại hiển thị tạm ID
+                    return court ? court.Name : `Sân #${selectedId}`;
+                }).join(', '); // Nối các tên bằng dấu phẩy
+
+                // 3. Cập nhật lên giao diện
+                $('#checkout-stadium-name').text(stadiumData.Name); // Dùng .Name (N viết hoa)
+
+                // Nếu map ra chuỗi rỗng thì báo chưa chọn, ngược lại hiển thị tên các sân
                 $('#checkout-court-names').text(courtNames || 'Chưa chọn sân');
             }
 
-            // Hiển thị tên sân vận động
             if (stadiumData) {
-                $('#checkout-stadium-name'). text(stadiumData.Name);
+                $('#checkout-stadium-name').text(stadiumData.Name);
             }
 
-            // Các thông tin khác
+            // --- Các phần hiển thị thời gian, giá tiền giữ nguyên ---
             $('#checkout-time').text(`${bookingData.startTime}:00 - ${bookingData.endTime}:00`);
-            $('#checkout-month-year').text(`Tháng ${bookingData.month} / ${bookingData. year}`);
+            $('#checkout-month-year').text(`Tháng ${bookingData.month} / ${bookingData.year}`);
             $('#checkout-selected-days').text(bookingData.selectedDays.join(', '));
             $('#checkout-original-price').text(formatCurrency(originalPrice));
             $('#checkout-total-price').text(formatCurrency(finalPrice));
 
             if (discountAmount > 0) {
-                $('#discount-amount-row'). removeClass('hidden');
-                $('#checkout-discount-amount'). text(`- ${formatCurrency(discountAmount)}`);
+                $('#discount-amount-row').removeClass('hidden');
+                $('#checkout-discount-amount').text(`- ${formatCurrency(discountAmount)}`);
             } else {
                 $('#discount-amount-row').addClass('hidden');
             }
@@ -322,7 +329,7 @@
             const listContainer = $('#discount-list');
             listContainer.empty();
             if (discounts.length === 0) {
-                listContainer. html('<p class="text-gray-500 italic">Không có mã giảm giá nào cho sân này. </p>');
+                listContainer.html('<p class="text-gray-500 italic">Không có mã giảm giá nào cho sân này.</p>');
                 return;
             }
             discounts.forEach(d => {
@@ -334,7 +341,7 @@
                             <span class="text-sm font-semibold text-green-600">${d.percentValue}% giảm</span>
                         </div>
                         <p class="text-sm text-gray-500 mt-1">${d.description || 'Không có mô tả'}</p>
-                        <p class="text-xs text-gray-500 mt-1">Áp dụng cho đơn từ ${formatCurrency(d. minOrderAmount)} | Tối đa ${formatCurrency(d.maxDiscountAmount)}</p>
+                        <p class="text-xs text-gray-500 mt-1">Áp dụng cho đơn từ ${formatCurrency(d.minOrderAmount)} | Tối đa ${formatCurrency(d.maxDiscountAmount)}</p>
                         <button type="button" class="apply-discount-btn mt-2 px-4 py-2 bg-green-500 text-white rounded-lg text-sm self-end">Áp dụng</button>
                     </div>
                 `);
@@ -343,14 +350,14 @@
 
         function updateHiddenFields() {
             $('#StadiumId').val(bookingData.stadiumId);
-            $('#DiscountId'). val(selectedDiscountId || '');
+            $('#DiscountId').val(selectedDiscountId || '');
             $('#OriginalPrice').val(originalPrice);
             $('#TotalPrice').val(finalPrice);
             $('#PaymentMethod').val($('input[name="payment-method"]:checked').val());
-            $('#StartTime').val(`${pad(bookingData. startTime)}:00`);
-            $('#EndTime'). val(`${pad(bookingData.endTime)}:00`);
+            $('#StartTime').val(`${pad(bookingData.startTime)}:00`);
+            $('#EndTime').val(`${pad(bookingData.endTime)}:00`);
             $('#Month').val(bookingData.month);
-            $('#Year').val(bookingData. year);
+            $('#Year').val(bookingData.year);
 
             const datesContainer = $('#dates-container');
             datesContainer.empty();
@@ -365,7 +372,7 @@
             });
         }
 
-        // Apply & Remove Discount Functions - từ File 2
+                // Apply & Remove Discount Functions
         function applyDiscount(id, percent, minAmount, maxAmount, code) {
             if (originalPrice < minAmount) {
                 showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
@@ -381,7 +388,7 @@
             $('#selected-code-name').text(code);
             $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
             $('#no-discount-selected'). addClass('hidden');
-            $('#discount-selected').removeClass('hidden');
+            $('#discount-selected'). removeClass('hidden');
 
             updateInvoiceDetails();
             updateHiddenFields();
@@ -390,32 +397,28 @@
         }
 
         function removeDiscount() {
+            // Reset các giá trị
             discountAmount = 0;
             finalPrice = originalPrice;
             selectedDiscountId = null;
 
-            $('#no-discount-selected'). removeClass('hidden');
+            // Cập nhật UI
+            $('#no-discount-selected').removeClass('hidden');
             $('#discount-selected').addClass('hidden');
 
             updateInvoiceDetails();
             updateHiddenFields();
         }
 
-        // Event Listeners
         $(document).ready(function() {
-            // Initial setup
             fetchStadiumData(bookingData.stadiumId);
             loadUserProfile();
             updateHiddenFields();
 
-            // Check if we have a pre-selected discount
             if (selectedDiscountId) {
                 fetchAndDisplayAppliedDiscount(selectedDiscountId);
-                $('#no-discount-selected').addClass('hidden');
-                $('#discount-selected'). removeClass('hidden');
             }
 
-            // Handle different view modes
             if (bookingData.type === 'month') {
                 console.log("Hiding discount and payment sections for monthly booking view.");
                 $('#discount-section').hide();
@@ -423,54 +426,49 @@
 
                 const actionContainer = $('#action-buttons-container');
                 actionContainer.empty();
-                actionContainer. append(`<button type="button" id="back-button" class="w-full px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">Quay lại Lịch chơi</button>`);
+                actionContainer.append(`<button type="button" id="back-button" class="w-full px-8 py-3 rounded-xl font-bold text-indigo-600 border border-indigo-600">Quay lại Lịch chơi</button>`);
 
                 $('#back-button').click(() => window.location.href = '@Url.Action("BookingSchedule", "Booking")');
             }
 
-            // Modal buttons
-            $('#modal-close-btn').click(hideModal);
-            $('#close-discount-modal'). click(hideDiscountModal);
-
-            // Back button cho chế độ checkout (không phải view)
-            if (bookingData. type !== 'month') {
-                $('#back-button').off('click'). on('click', function(e) {
+            if (bookingData.type !== 'month') {
+                $('#back-button').off('click').on('click', function(e) {
                     e.preventDefault();
                     const { stadiumId, year, month, selectedDays, selectedCourtIds, startTime, endTime } = bookingData;
-                    const backUrl = `/Booking/MonthlyBooking? stadiumId=${stadiumId}&year=${year}&month=${month}&selectedDays=${selectedDays.join(',')}&selectedCourtIds=${selectedCourtIds.join(',')}&startTime=${startTime}&endTime=${endTime}`;
+                    const backUrl = `/Booking/MonthlyBooking?stadiumId=${stadiumId}&year=${year}&month=${month}&selectedDays=${selectedDays.join(',')}&selectedCourtIds=${selectedCourtIds.join(',')}&startTime=${startTime}&endTime=${endTime}`;
                     window.location.href = backUrl;
                 });
             }
+                // Modal buttons
+        $('#modal-close-btn').click(hideModal);
+        $('#close-discount-modal').click(hideDiscountModal);
+        $('#back-button').click(() => window.history.back());
 
-            // Discount buttons
-            $('#select-discount-button'). click(() => { fetchDiscounts(); showDiscountModal(); });
-            $('#change-discount-button'). click(() => { fetchDiscounts(); showDiscountModal(); });
-            $('#remove-discount-button'). click(removeDiscount);
+        // Discount buttons
+        $('#select-discount-button').click(() => { fetchDiscounts(); showDiscountModal(); });
+        $('#change-discount-button'). click(() => { fetchDiscounts(); showDiscountModal(); });
+        $('#remove-discount-button').click(removeDiscount);
 
-            // Apply discount từ modal
-            $('#discount-list').on('click', '.apply-discount-btn', function() {
-                const card = $(this).closest('[data-id]');
-                applyDiscount(
-                    card.data('id'),
-                    card.data('percent'),
-                    card.data('min'),
-                    card.data('max'),
-                    card. data('code')
-                );
-            });
+        // Apply discount từ modal
+        $('#discount-list').on('click', '.apply-discount-btn', function() {
+            const card = $(this).closest('[data-id]');
+            applyDiscount(
+                card.data('id'),
+                card.data('percent'),
+                card.data('min'),
+                card.data('max'),
+                card. data('code')
+            );
+        });
 
-            // Update on payment method change
-            $('input[name="payment-method"]'). change(updateHiddenFields);
+            $('input[name="payment-method"]').change(updateHiddenFields);
 
-            // Form submission
             $('#booking-form').submit(function(e) {
                 if (bookingData.type === 'month') {
-                    e. preventDefault();
+                    e.preventDefault();
                     return;
                 }
                 updateHiddenFields();
-                console.log('Dữ liệu form chuẩn bị được gửi đi:');
-                new FormData(this). forEach((value, key) => console.log(`${key}: ${value}`));
             });
         });
     </script>
