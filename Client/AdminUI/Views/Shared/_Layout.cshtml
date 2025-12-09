@@ -129,7 +129,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Admin/Notification" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")">
+                        <a asp-controller="Notification" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")">
                             <i class="ri-notification-line"></i> <span>Thông Báo</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
                             {
                                 <div class="nav-indicator"></div>
