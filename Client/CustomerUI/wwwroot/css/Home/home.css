@@ -186,3 +186,8 @@
     flex-direction: column;
     justify-content: space-between;
 }
+
+
+.btn-select{
+    height: 50px;
+}

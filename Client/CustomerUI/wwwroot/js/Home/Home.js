@@ -652,3 +652,20 @@ document.addEventListener('DOMContentLoaded', function () {
         filterContent.classList.toggle('active');
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const sportHeader = document.querySelector('[data-target="sport-filter"]');
+    const sportContent = document.getElementById('sport-filter');
+
+    if (sportHeader && sportContent) {
+        sportHeader.addEventListener('click', function () {
+            // Toggle class active
+            this.classList.toggle('active');
+            sportContent.classList.toggle('active');
+
+            // Cập nhật aria attribute
+            const isExpanded = this.classList.contains('active');
+            this.setAttribute('aria-expanded', isExpanded);
+        });
+    }
+});
