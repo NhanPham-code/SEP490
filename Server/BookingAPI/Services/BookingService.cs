@@ -124,6 +124,7 @@ namespace BookingAPI.Services
             monthlyBooking.UserId = userId; // gán từ tham số
             monthlyBooking.StartTime = startTime;
             monthlyBooking.EndTime = endTime;
+            monthlyBooking.Status = "waiting";
             var hoursPerDay = (endTime - startTime).TotalHours;
             monthlyBooking.TotalHour = (int)(hoursPerDay * monthlyBookingCreateDto.Dates.Count);
 
@@ -141,7 +142,7 @@ namespace BookingAPI.Services
                     TotalPrice = monthlyBooking.TotalPrice / monthlyBookingCreateDto.Dates.Count,
                     PaymentMethod = monthlyBooking.PaymentMethod,
                     Note = monthlyBooking.Note,
-                    Status = "pending",
+                    Status = "waiting",
                 };
 
                 foreach (var courtId in monthlyBookingCreateDto.CourtIds)

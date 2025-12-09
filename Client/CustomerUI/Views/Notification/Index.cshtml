@@ -98,9 +98,12 @@
         }
 
         function generateUrlFromParams(notification) {
+            if (notification.type === 'Discount.New') {
+                    return '/Discount/DiscountList';
+                }
             try {
                 const params = JSON.parse(notification.parameters);
-
+                
                     
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
                     return `/Booking/BookingHistory`;
@@ -149,26 +152,7 @@
                 const createdAtValue = n.createdAt || n.CreatedAt || n.created_at || n.CreatedDate || n.createDate || new Date().toISOString();
 
                 // Nếu là Discount.New, tạo một div không thể click thay vì thẻ a
-                if (n.type === "Discount.New") {
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="notify-item-no-link ${readClass}">
-                            <div class="notify-content">
-                                <div class="notify-icon ${color}">
-                                    <i class="${icon}"></i>
-                                </div>
-                                <div class="notify-text">
-                                    <div class="notify-text-header">
-                                        <div class="notify-text-title">${n.title ?? "Thông báo khuyến mãi"}</div>
-                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
-                                    </div>
-                                    <div class="notify-text-message">${n.message ?? ""}</div>
-                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                } else {
-                    // Các thông báo khác vẫn có thể click như bình thường
+
                     const url = generateUrlFromParams(n);
                     container.insertAdjacentHTML('beforeend', `
                         <a href="${url}" class="notify-item ${readClass}">

@@ -132,6 +132,20 @@ namespace CustomerUI.Controllers
             vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(5).ToString("yyyyMMddHHmmss"));
 
             string paymentUrl = vnpay.CreateRequestUrl(_configuration["VNPAY:Url"], _configuration["VNPAY:HashSecret"]);
+            var sessionData = new PendingPaymentSessionDto
+            {
+                BookingId = createdBooking.Id,
+                Type = "Single",
+                PaymentUrl = paymentUrl,
+                ExpireTime = DateTime.Now.AddMinutes(5) // Lưu thời gian hết hạn để check sau này
+            };
+
+            // Serialize object thành JSON string
+            string jsonSessionData = System.Text.Json.JsonSerializer.Serialize(sessionData);
+
+            // Lưu vào Session với Key duy nhất theo ID booking để tránh bị đè nếu đặt nhiều cái
+            // Key ví dụ: "Payment_Single_102"
+            HttpContext.Session.SetString($"Payment_Single_{createdBooking.Id}", jsonSessionData);
             HttpContext.Session.SetInt32("BookingId", createdBooking.Id);
             return Redirect(paymentUrl);
         }
@@ -895,6 +909,21 @@ namespace CustomerUI.Controllers
                     vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(5).ToString("yyyyMMddHHmmss"));
 
                     string paymentUrl = vnpay.CreateRequestUrl(_configuration["VNPAY:Url"], _configuration["VNPAY:HashSecret"]);
+
+                    // --- BẮT ĐẦU ĐOẠN CODE MỚI: LƯU SESSION ---
+                    var sessionData = new PendingPaymentSessionDto
+                    {
+                        BookingId = createdMonthlyBooking.Id,
+                        Type = "Monthly",
+                        PaymentUrl = paymentUrl,
+                        ExpireTime = DateTime.Now.AddMinutes(5)
+                    };
+
+                    string jsonSessionData = System.Text.Json.JsonSerializer.Serialize(sessionData);
+
+                    // Key ví dụ: "Payment_Monthly_55"
+                    HttpContext.Session.SetString($"Payment_Monthly_{createdMonthlyBooking.Id}", jsonSessionData);
+
                     HttpContext.Session.SetInt32("MonthlyBookingId", createdMonthlyBooking.Id);
                     return Redirect(paymentUrl);
                 }
@@ -968,6 +997,52 @@ namespace CustomerUI.Controllers
             {
                 return Json(new { success = false, hasCompleted = false, message = ex.Message });
             }
+        }
+        [HttpGet]
+        public IActionResult RetryPayment(int id, string type)
+        {
+            string sessionKey = type == "Single" ? $"Payment_Single_{id}" : $"Payment_Monthly_{id}";
+            string jsonSessionData = HttpContext.Session.GetString(sessionKey);
+
+            if (string.IsNullOrEmpty(jsonSessionData))
+            {
+                TempData["ErrorMessage"] = "Link thanh toán không tìm thấy hoặc đã quá hạn.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var paymentData = System.Text.Json.JsonSerializer.Deserialize<PendingPaymentSessionDto>(jsonSessionData);
+
+            if (DateTime.Now > paymentData.ExpireTime)
+            {
+                HttpContext.Session.Remove(sessionKey);
+                TempData["ErrorMessage"] = "Link thanh toán đã hết hạn (quá 5 phút). Vui lòng đặt lại.";
+                // Redirect về trang lịch sử để refresh lại giao diện
+                return RedirectToAction("HistoryBooking");
+            }
+
+
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+                return RedirectToAction("Login", "Common");
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                HttpContext.Session.SetString("AccessToken", accessToken);
+            }
+
+            // 2. Restore ID theo đúng loại và xóa ID của loại kia để tránh nhầm lẫn
+            if (paymentData.Type == "Single")
+            {
+                HttpContext.Session.SetInt32("BookingId", paymentData.BookingId);
+                HttpContext.Session.Remove("MonthlyBookingId"); // Xóa Monthly nếu có
+            }
+            else // Monthly
+            {
+                HttpContext.Session.SetInt32("MonthlyBookingId", paymentData.BookingId);
+                HttpContext.Session.Remove("BookingId"); // Xóa Single nếu có
+            }
+            // ---------------------------------------------------------------------------
+
+            return Redirect(paymentData.PaymentUrl);
         }
     }
 }

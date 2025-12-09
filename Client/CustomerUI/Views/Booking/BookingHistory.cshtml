@@ -44,7 +44,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-
 <style>
 
     :root {
@@ -626,7 +625,6 @@
     }
 </style>
 
-
 <body class="bh-body">
     <div class="bh-container">
         <div class="bh-header">
@@ -703,14 +701,22 @@
                                         <td data-label="Hành động">
                                             <div class="bh-actions" style="justify-content: flex-end;">
                                                 <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-eye"></i></button>
-                                                @* @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow) *@
-                                                @* { *@
-                                                @*     <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-ban"></i></button> *@
-                                                @* } *@
-                                                @* @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase)) *@
-                                                @* { *@
-                                                @*     <a href="/Payment/CreatePayment?bookingId=@booking.Id" class="bh-btn-icon pay" title="Thanh toán ngay"><i class="fa-solid fa-credit-card"></i></a> *@
-                                                @* } *@
+
+                                                @* Nút thanh toán lại cho Daily Booking *@
+                                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Single" })"
+                                                       class="bh-btn-icon pay"
+                                                       title="Thanh toán ngay">
+                                                        <i class="fa-solid fa-credit-card"></i>
+                                                    </a>
+                                                }
+
+                                                @* Logic hủy lịch cũ (giữ nguyên nếu cần) *@
+                                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow)
+                                                {
+                                                    <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-ban"></i></button>
+                                                }
                                             </div>
                                         </td>
                                     </tr>
@@ -746,9 +752,15 @@
                                         <td data-label="Hành động">
                                             <div class="bh-actions" style="justify-content: flex-end;">
                                                 <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fa-solid fa-eye"></i></button>
+
+                                                @* Nút thanh toán lại cho Monthly Booking *@
                                                 @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
                                                 {
-                                                    <a href="/Payment/CreatePaymentForMonthlyBooking?monthlyBookingId=@booking.Id" class="bh-btn-icon pay" title="Thanh toán ngay"><i class="fa-solid fa-credit-card"></i></a>
+                                                    <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Monthly" })"
+                                                       class="bh-btn-icon pay"
+                                                       title="Thanh toán ngay">
+                                                        <i class="fa-solid fa-credit-card"></i>
+                                                    </a>
                                                 }
                                             </div>
                                         </td>
