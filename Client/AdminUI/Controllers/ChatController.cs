@@ -17,6 +17,8 @@ namespace AdminUI.Controllers
 
             ViewBag.UserId = userId;
             ViewBag.UserName = string.IsNullOrEmpty(fullName) ? "Admin" : fullName;
+            ViewBag.CloudinaryCloudName = "dwt7k4avh";
+            ViewBag.CloudinaryPreset = "ChatMoBe";
 
             return View();
         }
