@@ -78,17 +78,25 @@ namespace StadiumManagerUI.Controllers
         {
             try
             {
+                bool noCourt7 = true;
                 // 1. Tạo quan hệ chính (sân cha -> sân con)
-                var createdCourtRelation = await _courtRelationService.CreateCourtRelation(courtChildId, courtParentId);
+                
 
-                // Kiểm tra lỗi cho quan hệ chính
-                foreach (var item in createdCourtRelation)
+                if (courtChildId.Length > 0)
                 {
-                    if (item.ChildCourtId == courtParentId)
+                    var createdCourtRelation = await _courtRelationService.CreateCourtRelation(courtChildId, courtParentId);
+                    noCourt7 = false;
+                    foreach (var item in createdCourtRelation)
                     {
-                        return Json(new { success = 400, value = $"Sân này đã được đặt làm con của {item.ChildCourt.Name}" });
+
+                        if (item.ChildCourtId == courtParentId && noCourt7 == false)
+                        {
+                            return Json(new { success = 400, value = $"Sân này đã được đặt làm con của {item.ChildCourt.Name}" });
+                        }
                     }
                 }
+                // Kiểm tra lỗi cho quan hệ chính
+                
 
                 // 2. Tạo quan hệ phụ (sân 7 -> sân 5) nếu có
                 if (court7Relations.Any() && court7Relations.Length > 0)
@@ -96,9 +104,16 @@ namespace StadiumManagerUI.Controllers
                     for (int i = 0; i < court7Relations.Length; i++)
                     {
                         var court7Relation = court7Relations[i];
+                        if (noCourt7 == true)
+                        {
+                            var relation11 = await _courtRelationService.CreateCourtRelation(
+                                court7Relation.childCourtIds,
+                                courtParentId
+                            );
+                        }
 
                         // Kiểm tra xem parentCourtId có tồn tại trong courtChildId không
-                        if (courtChildId.Contains(court7Relation.parentCourtId))
+                        if (courtChildId.Contains(court7Relation.parentCourtId) && noCourt7 == false)
                         {
                             // Tạo quan hệ sân 7 -> sân 5
                             var relation7 = await _courtRelationService.CreateCourtRelation(
@@ -122,7 +137,7 @@ namespace StadiumManagerUI.Controllers
                     }
                 }
 
-                return Json(new { success = 200, value = createdCourtRelation });
+                return Json(new { success = 200, value = "" });
             }
             catch (Exception ex)
             {
@@ -134,42 +149,61 @@ namespace StadiumManagerUI.Controllers
         {
             try
             {
+                bool oneCourt = true;
                 // 1. Xóa các quan hệ cũ
                 var delete = await _courtRelationService.DeleteCourtRelation(courtParentId);
-
+         
                 // 2. Tạo lại quan hệ chính
-                if (courtChildId.Length > 0 && courtChildId != null)
+                if (courtChildId.Any())
                 {
                     var updatedCourtRelation = await _courtRelationService.CreateCourtRelation(courtChildId, courtParentId);
-                }
-                
-
-                // 3. Tạo lại quan hệ phụ (sân 7 -> sân 5) nếu có
-                if (court7Relations.Any() && court7Relations.Length > 0)
-                {
-                    for (int i = 0; i < court7Relations.Length; i++)
+                    for (int i = 0; i < courtChildId.Length; i++)
                     {
-                        var court7Relation = court7Relations[i];
-
-                        if (courtChildId.Contains(court7Relation.parentCourtId))
-                        {
-                            // Xóa quan hệ cũ của sân 7
-                            await _courtRelationService.DeleteCourtRelation(court7Relation.parentCourtId);
-
-                            // Tạo quan hệ mới sân 7 -> sân 5
-                            await _courtRelationService.CreateCourtRelation(
-                                court7Relation.childCourtIds,
-                                court7Relation.parentCourtId
-                            );
-                            await _courtRelationService.CreateCourtRelation(
-                                court7Relation.childCourtIds,
-                                courtParentId
-                            );
-                        }
+                        var deleteCourt5 = await _courtRelationService.DeleteCourtRelation(courtChildId[i]);
                     }
                 }
 
-                return Json(new { success = 200, value = delete });
+                // 3. Tạo lại quan hệ phụ (sân 7 -> sân 5) nếu có
+                if (court7Relations.Any())
+                {
+
+                    for (int i = 0; i < court7Relations.Length; i++)
+                    {
+
+                        var court7Relation = court7Relations[i];
+
+                        //if (court7Relation.childCourtIds.Any() == false)
+                        //{
+                        //    var delete7 = await _courtRelationService.DeleteCourtRelation(court7Relation.parentCourtId);
+                        //}
+                        await _courtRelationService.DeleteCourtRelation(court7Relation.parentCourtId);
+                        oneCourt = false;
+                        if (courtChildId.Contains(court7Relation.parentCourtId))
+                        {
+                            // Xóa quan hệ cũ của sân 7
+                        
+
+                            if (court7Relation.childCourtIds.Any())
+                            {
+                                // Tạo quan hệ mới sân 7 -> sân 5
+                                await _courtRelationService.CreateCourtRelation(
+                                    court7Relation.childCourtIds,
+                                    court7Relation.parentCourtId
+                                );
+                                await _courtRelationService.CreateCourtRelation(
+                                    court7Relation.childCourtIds,
+                                    courtParentId
+                                );
+                            }
+                        }
+                    }
+                } 
+                if (oneCourt && courtChildId.Any())
+                {
+                    var delete7 = await _courtRelationService.DeleteCourtRelation(courtChildId[0]);
+                }
+
+                    return Json(new { success = 200, value = delete });
             }
             catch (Exception ex)
             {

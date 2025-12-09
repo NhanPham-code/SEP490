@@ -98,10 +98,15 @@
         }
 
         function generateUrlFromParams(notification) {
+
+            if (notification.type === 'Discount.New') {
+                return '/Discount/DiscountList';
+            }
+
+
             try {
                 const params = JSON.parse(notification.parameters);
 
-                    
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
                     return `/Booking/BookingHistory`;
                 }
@@ -110,6 +115,12 @@
                 }
                 if (params.bookingId) {
                     return `/Booking/BookingHistory`;
+                }
+                if(params.title == "FindTeam"){
+                    return params.content;
+                }
+                if(params.title == "TeamDetail"){
+                    return params.content;
                 }
             } catch (e) {
                 // Bỏ qua lỗi nếu không có tham số
@@ -131,7 +142,7 @@
                 container.innerHTML = `<div class="notify-empty">
                                             <i class="ri-inbox-2-line"></i>
                                             <div>Bạn chưa có thông báo nào</div>
-                                        </div>`;
+                                       </div>`;
                 if (loadMoreBtn) loadMoreBtn.style.display = 'none';
                 return;
             }
@@ -148,46 +159,27 @@
                 // Kiểm tra các trường có thể chứa createdAt
                 const createdAtValue = n.createdAt || n.CreatedAt || n.created_at || n.CreatedDate || n.createDate || new Date().toISOString();
 
-                // Nếu là Discount.New, tạo một div không thể click thay vì thẻ a
-                if (n.type === "Discount.New") {
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="notify-item-no-link ${readClass}">
-                            <div class="notify-content">
-                                <div class="notify-icon ${color}">
-                                    <i class="${icon}"></i>
+                // --- THAY ĐỔI 2: Xóa bỏ khối if(n.type === "Discount.New") cũ ---
+                // Chỉ sử dụng logic tạo thẻ <a> chung cho tất cả các loại
+
+                const url = generateUrlFromParams(n);
+                container.insertAdjacentHTML('beforeend', `
+                    <a href="${url}" class="notify-item ${readClass}">
+                        <div class="notify-content">
+                            <div class="notify-icon ${color}">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="notify-text">
+                                <div class="notify-text-header">
+                                    <div class="notify-text-title">${n.title ?? "Thông báo"}</div>
+                                    ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
                                 </div>
-                                <div class="notify-text">
-                                    <div class="notify-text-header">
-                                        <div class="notify-text-title">${n.title ?? "Thông báo khuyến mãi"}</div>
-                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
-                                    </div>
-                                    <div class="notify-text-message">${n.message ?? ""}</div>
-                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
-                                </div>
+                                <div class="notify-text-message">${n.message ?? ""}</div>
+                                <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
                             </div>
                         </div>
-                    `);
-                } else {
-                    // Các thông báo khác vẫn có thể click như bình thường
-                    const url = generateUrlFromParams(n);
-                    container.insertAdjacentHTML('beforeend', `
-                        <a href="${url}" class="notify-item ${readClass}">
-                            <div class="notify-content">
-                                <div class="notify-icon ${color}">
-                                    <i class="${icon}"></i>
-                                </div>
-                                <div class="notify-text">
-                                    <div class="notify-text-header">
-                                        <div class="notify-text-title">${n.title ?? "Thông báo"}</div>
-                                        ${!n.isRead ? `<span class="notify-unread-indicator"></span>` : ""}
-                                    </div>
-                                    <div class="notify-text-message">${n.message ?? ""}</div>
-                                    <div class="notify-text-time">${timeAgo(createdAtValue)}</div>
-                                </div>
-                            </div>
-                        </a>
-                    `);
-                }
+                    </a>
+                `);
             }
         }
 
@@ -204,7 +196,6 @@
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const items = await resp.json();
 
-                // Log dữ liệu để debug
                 console.log("API Response:", items);
 
                 if (!Array.isArray(items)) throw new Error("Dữ liệu trả về không phải là một mảng.");

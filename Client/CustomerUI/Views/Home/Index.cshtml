@@ -629,7 +629,7 @@
                 <!-- From Uiverse.io by mahiatlinux -->
                 <div class="search mt-3 relative w-[350px] bg-gray-100 rounded-2xl shadow-md p-1.5 transition-all duration-150 ease-in-out hover:scale-105 hover:shadow-lg">
                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400"
+                        <svg class="h-5 w-5 text-gray-400 "
                              xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 20 20"
                              fill="currentColor">
@@ -667,15 +667,18 @@
 
                         <!-- Loại Thể Thao -->
                         <div class="filter-section" data-intro="Bạn có thể chọn loại thể thao bạn muốn chơi" data-step="6">
+                            <!-- Nút header: aria-expanded="false" (đang đóng) -->
                             <button class="filter-header"
                                     data-target="sport-filter"
                                     type="button"
-                                    aria-expanded="true"
+                                    aria-expanded="false"
                                     aria-controls="sport-filter">
                                 <h4 class="filter-title">Loại Thể Thao</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
-                            <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
+
+                            <!-- Nội dung: KHÔNG có class 'active' -->
+                            <div class="filter-content" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
                                 <div class="filter-options">
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Bóng đá sân 5">
@@ -712,6 +715,12 @@
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
                                     </label>
+                                    <!-- Thêm mục Pickleball vào đây -->
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Pickleball">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Pickleball</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -722,12 +731,12 @@
                             <button class="filter-header"
                                     data-target="time-filter"
                                     type="button"
-                                    aria-expanded="true"
+                                    aria-expanded="false"
                                     aria-controls="time-filter">
                                 <h4 class="filter-title">Thời Gian Chơi</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
-                            <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
+                            <div class="filter-content" id="time-filter" role="group" aria-label="Chọn giờ chơi">
                                 <p class="text-red-500" id="time-error-message"></p>
                                 <div class="time-grid">
                                     <label for="startTime" class="range-label">Từ:</label>
@@ -744,12 +753,12 @@
                             <button class="filter-header"
                                     data-target="price-filter"
                                     type="button"
-                                    aria-expanded="true"
+                                    aria-expanded="false"
                                     aria-controls="price-filter">
                                 <h4 class="filter-title">Khoảng Giá</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
-                            <div class="filter-content active" id="price-filter">
+                            <div class="filter-content" id="price-filter">
                                 <div class="price-range">
                                     <input type="range"
                                            name="price"
@@ -781,7 +790,7 @@
                             </button>
                             <div class="filter-content" id="location-filter">
                                 <div class="location-input-wrapper">
-                                    <i class="ri-map-pin-line" aria-hidden="true"></i>
+                                    <i class="ri-map-pin-line map-pin" aria-hidden="true"></i>
                                     <input type="text"
                                            name="location"
                                            placeholder="Nhập địa điểm"
@@ -789,7 +798,7 @@
                                            id="location-search"
                                            aria-label="Tìm kiếm địa điểm"
                                            autocomplete="off">
-                                    <button type="button" class="location-clear" aria-label="Xóa địa điểm">
+                                    <button type="button" class="location-clear pl-2" aria-label="Xóa địa điểm">
                                         <i class="ri-close-line" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -813,14 +822,15 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
 
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <span class="text-gray-600 whitespace-nowrap" id="count"></span>
 
+                        <span class="text-gray-600 whitespace-nowrap" id="count" hidden></span>
+                    
                     </div>
                     <div class="flex items-center gap-4 mb-6">
                         <!-- From Uiverse.io by 0x3ther -->
                         <div class="flex items-center gap-2 mt-5 model-btn">
 
-                            <button id="grid-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
+                            <button id="grid-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
                                 <svg class="lucide lucide-newspaper text-blue-400 dark:text-blue-600"
                                      stroke-linejoin="round"
                                      stroke-linecap="round"
@@ -835,7 +845,7 @@
                                 </svg>
                                 DANH SÁCH
                             </button>
-                            <button id="map-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FACC14] h-9 rounded-md px-3">
+                            <button id="map-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FACC14] h-9 rounded-md px-3">
                                 <svg stroke-linejoin="round"
                                      stroke-linecap="round"
                                      stroke-width="2"
@@ -850,7 +860,7 @@
                                 BẢN ĐỒ
                             </button>
 
-                            <button id="compare-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FB923C] h-9 rounded-md px-3">
+                            <button id="compare-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FB923C] h-9 rounded-md px-3">
                                 <svg class="lucide lucide-heart text-orange-400 dark:text-orange-600"
                                      stroke-linejoin="round"
                                      stroke-linecap="round"
@@ -1192,7 +1202,11 @@
 
                                                     <!-- Sport type badge -->
                                                     <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-800 notranslate">
-                                                        ${item.Courts[0].SportType}
+                                                                         ${item.Courts[0]?.SportType
+                        ? ['Bóng đá sân 11', 'Bóng đá sân 7', 'Bóng đá sân 5']. includes(item.Courts[0]. SportType)
+                            ? 'Bóng đá'
+                            : item.Courts[0].SportType
+                        : ''}
                                                     </div>
                                                 </div>
 

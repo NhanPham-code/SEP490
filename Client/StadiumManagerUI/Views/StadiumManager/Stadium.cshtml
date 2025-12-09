@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Quản Lý Sân Thể Thao";
+    ViewData["Title"] = "Quản Lý Nhà Thi Đấu";
 }
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1185,39 +1185,36 @@
                         allowOutsideClick: false
                     });
 
-                    $.ajax({
-                        url: CONFIG.API_ENDPOINTS.EDIT,
-                        type: 'POST',
-                        processData: false,
-                        contentType: false,
-                                data: formData,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Cập nhật thành công!',
-                                html: `
-                                    <div style="text-align: center; padding: 20px 0;">
-                                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669);
-                                                    border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="ri-check-line" style="font-size: 40px; color: white;"></i>
-                                        </div>
-                                        <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                                            Thông tin sân đã được cập nhật
-                                        </h3>
-                                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
-                                            Tất cả thay đổi đã được lưu thành công
-                                        </p>
-                                    </div>
-                                `,
-                                confirmButtonText: 'Tuyệt vời!',
-                                confirmButtonColor: '#10b981'
-                            }).then(() => {
-                                loadData();
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error updating stadium:', error);
-                            let errorMessage = 'Không thể cập nhật thông tin sân. Vui lòng thử lại!';
+            $.ajax({
+                url: CONFIG.API_ENDPOINTS.EDIT,
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                        data: formData,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Cập nhật thành công!',
+                        html: `
+                            <div style="text-align: center; padding: 20px 0;">
+               
+                                <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
+                                    Thông tin sân đã được cập nhật
+                                </h3>
+                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
+                                    Tất cả thay đổi đã được lưu thành công
+                                </p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Tuyệt vời!',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        loadData();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating stadium:', error);
+                    let errorMessage = 'Không thể cập nhật thông tin sân. Vui lòng thử lại!';
 
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
@@ -2507,39 +2504,35 @@
                         allowOutsideClick: false
                     });
 
-                    $.ajax({
-                        url: CONFIG.API_ENDPOINTS.CREATE,
-                        type: 'POST',
-                        processData: false,
-                        contentType: false,
-                        data: formData,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Thành công!',
-                                html: `
-                                    <div style="text-align: center; padding: 20px 0;">
-                                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669);
-                                                    border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="ri-check-line" style="font-size: 40px; color: white;"></i>
-                                        </div>
-                                        <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
-                                            Sân đã được thêm thành công
-                                        </h3>
-                                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
-                                            Sân ${response.value.name} đã được tạo và đang chờ phê duyệt
-                                        </p>
-                                    </div>
-                                `,
-                                confirmButtonText: 'Tuyệt vời!',
-                                confirmButtonColor: '#10b981'
-                            }).then(() => {
-                                loadData();
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error creating stadium:', error);
-                            let errorMessage = 'Không thể thêm sân mới. Vui lòng thử lại!';
+            $.ajax({
+                url: CONFIG.API_ENDPOINTS.CREATE,
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        html: `
+                            <div style="text-align: center; padding: 20px 0;">
+                                <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">
+                                    Sân đã được thêm thành công
+                                </h3>
+                                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
+                                    Sân ${response.value.name} đã được tạo và đang chờ phê duyệt
+                                </p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Tuyệt vời!',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        loadData();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error creating stadium:', error);
+                    let errorMessage = 'Không thể thêm sân mới. Vui lòng thử lại!';
 
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
