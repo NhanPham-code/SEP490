@@ -2,6 +2,7 @@
 using DTOs.StadiumDTO;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using System.Text.Json;
 
 namespace AdminUI.Controllers
 {
@@ -64,26 +65,41 @@ namespace AdminUI.Controllers
             int createdBy = stadium.Value.FirstOrDefault().CreatedBy;
             if (locked)
             {
+                
                 var islock = stadium.Value.FirstOrDefault();
                 if ( islock.IsLocked == true)
                 {
+                    var json = JsonSerializer.Serialize(new
+                    {
+                        title = "StadiumLock",
+                        content = $"/StadiumManager/Stadium"
+                    });
                     // thông báo cho chủ sân khi bị khóa sân
                     _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
                     {
-                        Title = "<h3 class=\"text-red\">Sân của bạn đã bị khóa</h3>",
+                        Type = "Stadium.Locked",
+                        Title = "Sân của bạn đã bị khóa",
                         Message = $"Sân '{islock.Name}' của bạn đã bị khóa do vi phạm các quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.",
-                        UserId = createdBy
+                        UserId = createdBy,
+                        Parameters = json
                     });
                     return Json(new { success = 200, value = "Sân được khóa thành công!" });
                 }
                 else
                 {
+                    var json = JsonSerializer.Serialize(new
+                    {
+                        title = "StadiumUnlock",
+                        content = $"/StadiumManager/Stadium"
+                    });
                     // thông báo cho chủ sân khi được mở khóa sân
                     _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
                     {
-                        Title = "<h3 class=\"text-green-700\">Sân của bạn đã được mở khóa</h3>",
+                        Type = "Stadium.Unlocked",
+                        Title = "Sân của bạn đã được mở khóa",
                         Message = $"Sân '{islock.Name}' của bạn đã được mở khóa. Cảm ơn bạn đã tuân thủ các quy định của hệ thống.",
-                        UserId = createdBy
+                        UserId = createdBy,
+                        Parameters = json
                     });
                     return Json(new { success = 200, value = "Sân được mở khóa thành công!" });
                 }
@@ -117,13 +133,19 @@ namespace AdminUI.Controllers
             
             if (updatedStadium != null && updatedStadium.IsApproved == true)
             {
-
+                var json = JsonSerializer.Serialize(new
+                {
+                    title = "StadiumApproved",
+                    content = $"/StadiumManager/Stadium"
+                });
                 // thông báo cho chủ sân khi được duyệt sân
                 _ = await _notificationService.SendNotificationToUserAsync(new CreateNotificationDto
                 {
-                    Title = "<h3 class=\"text-green-700\">Sân của bạn đã được duyệt</h3>",
+                    Type = "Stadium.Approved",
+                    Title = "Sân của bạn đã được duyệt",
                     Message = $"Sân '{updatedStadium.Name}' của bạn đã được duyệt và hiển thị trên hệ thống. Cảm ơn bạn đã đăng ký sân với chúng tôi.",
-                    UserId = updatedStadium.CreatedBy
+                    UserId = updatedStadium.CreatedBy,
+                    Parameters = json
                 });
                 return Json(new { success = 200, value = "Sân được duyệt thành công!" });
 
