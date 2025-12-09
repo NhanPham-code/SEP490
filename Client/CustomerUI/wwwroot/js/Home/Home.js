@@ -573,17 +573,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, duration);
     }
 
-    // Initialize filter states
-    function initializeFilters() {
-        const sportFilter = document.getElementById('sport-filter');
-        const sportHeader = document.querySelector('[data-target="sport-filter"]');
-        if (sportFilter && sportHeader) {
-            sportFilter.classList.add('active');
-            sportHeader.classList.add('active');
-        }
-    }
-
-    initializeFilters();
 
     // Handle window resize
     let resizeTimer;
@@ -653,19 +642,50 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+function initializeFilters() {
+    const sportFilter = document.getElementById('sport-filter');
     const sportHeader = document.querySelector('[data-target="sport-filter"]');
-    const sportContent = document.getElementById('sport-filter');
 
-    if (sportHeader && sportContent) {
-        sportHeader.addEventListener('click', function () {
-            // Toggle class active
-            this.classList.toggle('active');
-            sportContent.classList.toggle('active');
+    if (sportFilter && sportHeader) {
+        // Đảm bảo trạng thái ban đầu khớp với HTML (không tự động thêm active)
+        
+        sportHeader.addEventListener('click', function() {
+            // Khi click, nó sẽ thêm 'active' nếu chưa có, hoặc xóa nếu đang có
+            sportFilter.classList.toggle('active');
+            sportHeader.classList.toggle('active');
 
-            // Cập nhật aria attribute
-            const isExpanded = this.classList.contains('active');
-            this.setAttribute('aria-expanded', isExpanded);
+            // Cập nhật trạng thái cho thiết bị hỗ trợ đọc màn hình
+            const isExpanded = sportFilter.classList.contains('active');
+            sportHeader.setAttribute('aria-expanded', isExpanded);
         });
     }
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const locationInput = document.getElementById('location-search');
+    const clearButton = document.querySelector('.location-clear');
+
+    if (locationInput && clearButton) {
+        // Xử lý click nút X
+        clearButton.addEventListener('click', function () {
+            locationInput.value = ''; // Xóa nội dung
+            locationInput.focus(); // Focus lại vào input
+        });
+
+        // Tùy chọn: Ẩn/hiện nút X dựa trên nội dung input
+        function toggleClearButton() {
+            if (locationInput.value.length > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
+        }
+
+        // Kiểm tra khi gõ
+        locationInput.addEventListener('input', toggleClearButton);
+
+        // Kiểm tra lúc đầu
+        toggleClearButton();
+    }
 });
+// Chạy hàm khi trang web đã tải xong
+document.addEventListener('DOMContentLoaded', initializeFilters);
