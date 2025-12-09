@@ -408,10 +408,16 @@
                                      alt="${stadium.Name}"
                                      loading="lazy">
                                 <div class="image-overlay"></div>
-                                <div class="status-badge status-${stadium.IsApproved}">
-                                    <i class="ri-${stadium.IsApproved ? 'checkbox-circle' : 'error-warning'}-line"></i>
-                                    ${getStatusText(stadium.IsApproved)}
-                                </div>
+                                       ${stadium.IsLocked
+            ? `<div class="status-badge status-locked">
+                 <i class="ri-lock-line "></i>
+                 Đã khóa
+               </div>`
+            : `<div class="status-badge status-${stadium.IsApproved}">
+                 <i class="ri-${stadium.IsApproved ? 'checkbox-circle' : 'error-warning'}-line"></i>
+                 ${getStatusText(stadium.IsApproved)}
+               </div>`
+        }
                                 <h3 class="stadium-title">${stadium.Name}</h3>
                             </div>
                             <div class="card-content">
@@ -1291,13 +1297,13 @@
 
                 function getUrlImage(stadiumImages) {
                     if (!stadiumImages || stadiumImages.length === 0) {
-                        return '/api/placeholder/400/220';
+                        return 'https://localhost:7136/img/img/default.jpg';
                     }
 
                     const firstImage = stadiumImages[0];
                     let imageUrl = firstImage?.ImageUrl;
 
-                    if (!imageUrl) return '/api/placeholder/400/220';
+                    if (!imageUrl) return 'https://localhost:7136/img/img/default.jpg';
 
                     // Handle relative URLs
                     if (imageUrl.startsWith('/') || imageUrl.startsWith('uploads/')) {
@@ -1971,8 +1977,7 @@
                                 ${images.map((image, index) => `
                                     <div class="image-item" data-image-id="${image.Id || index}">
                                         <img src="${getUrlImage([image])}" alt="Stadium image" />
-                                        ${index === 0 ? '<div class="primary-badge">Chính</div>' : ''}
-                                        ${index !== 0 ? `
+                                        ${index >= 0 ? `
                                             <button type="button" class="delete-image-btn" onclick="deleteCurrentImage(this)" title="Xóa ảnh">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
@@ -3115,7 +3120,7 @@
                                 ${videos.map((video, index) => `
                                     <div class="video-item" data-video-id="${video.Id || index}">
                                         <video controls class="preview-video">
-                                                    <source src="https://localhost:7136/img/${video.VideoUrl}" type="video/mp4">
+                                                    <source src="https://localhost:7136/img/${video.VideoUrl} type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                         <div class="video-info">

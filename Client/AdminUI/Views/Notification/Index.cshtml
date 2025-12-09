@@ -301,6 +301,7 @@
                 case "Booking.Problem": return ["ri-error-warning-line", "bg-red-100 text-red-600"];
                 case "Discount.New": return ["ri-price-tag-3-line", "bg-purple-100 text-purple-600"];
                 case "Stadium.FavoriteNews": return ["ri-star-smile-line", "bg-orange-100 text-orange-600"];
+                case "StadiumApproved": return ["ri-check-line", "bg-teal-100 text-teal-600"];
                 default: return ["ri-notification-3-line", "bg-gray-100 text-gray-600"];
             }
         }
@@ -333,6 +334,9 @@
                 }
                 if (params.bookingType === 'daily' && params.bookingId) {
                     return `/Booking/BookingHistory`;
+                }
+                if(params.title == "Stadium"){
+                    return params.content;
                 }
             } catch (e) {
                 // Bỏ qua lỗi nếu không có tham số

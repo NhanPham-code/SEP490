@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using System.Security.Policy;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace StadiumManagerUI.Controllers
@@ -86,13 +87,18 @@ namespace StadiumManagerUI.Controllers
                     var video = await _videoService.AddStadiumVideoAsync(CreateStadiumRequest.StadiumVideo);
                 }
             }
-
+            var json = JsonSerializer.Serialize(new
+            {
+                title = "Stadium",
+                content = $"/StadiumController/StadiumAdmin"
+            });
             await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.CreateNotificationDto
             {
-                
-                Title = "<div class=\"text-green-500\">Một nhà thi đấu mới được tạo</div>",
-                Message = $"<div><a class=\"text-blue-500\" style=\"text-decoration: underline;\" herf=\"/StadiumController/StadiumAdmin\">Nhà thi đấu '{stadium.Name}' vừa được tạo hãy tới xem</a></div>",
-                UserId = 1
+                Type = "Stadium.Create",
+                Title = "Một nhà thi đấu mới được tạo",
+                Message = $"Nhà thi đấu '{stadium.Name}' vừa được tạo hãy tới xem",
+                UserId = 1,
+                Parameters = json
             });
 
             return Json(new { success = 200, value = stadium });
