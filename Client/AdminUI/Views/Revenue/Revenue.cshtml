@@ -12,6 +12,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Thêm vào <head> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <link rel="stylesheet" href="~/css/Revenue/Revenue.css">
     <style>
         /* Ghi đè background của layout chính */
@@ -386,11 +388,11 @@
             trendChart.update();
         }
 
-        function exportStatsToExcel() {
-            // Helper functions
+                                            async function exportStatsToExcel() {
+            // Helper functions (giữ nguyên như cũ)
             const cleanValue = (text) => {
-                if (!text) return "";
-                return text. replace(/[\n\r]/g, '').trim();
+                if (! text) return "";
+                return text.replace(/[\n\r]/g, '').trim();
             };
 
             const cleanPercent = (text) => {
@@ -401,10 +403,10 @@
             const extractNumber = (text) => {
                 if (!text) return "";
                 const match = text.match(/([\d.,]+)/);
-                return match ? match[1].replace(/\./g, '') : "";
+                return match ? match[1]. replace(/\./g, '') : "";
             };
 
-            // Lấy dữ liệu
+            // Lấy dữ liệu (giữ nguyên như cũ)
             const totalRevenue = extractNumber(document.getElementById('totalRevenue').textContent);
             const systemRevenueText = extractNumber(document.getElementById('systemRevenue').textContent);
             const totalCompletedBookings = cleanValue(document.getElementById('totalCompletedBookings').textContent);
@@ -414,58 +416,127 @@
             const cancelledCount = cleanValue(document.getElementById('cancelledCount').textContent);
             const cancelledPercentage = cleanPercent(document.getElementById('cancelledPercentage').textContent);
 
-            // Lấy thông tin filter
+            // Lấy thông tin filter (giữ nguyên)
             const filterType = document.getElementById('filterType').value;
             let filterValue = '';
+            let titlePeriod = '';
+
             if (filterType === 'day') {
                 const dateVal = document.getElementById('dateInput').value;
                 filterValue = dateVal || 'N/A';
+                const date = new Date(dateVal);
+                titlePeriod = `NGÀY ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
             } else if (filterType === 'month') {
-                const month = document. getElementById('monthInput').value;
+                const month = document.getElementById('monthInput').value;
                 const year = document.getElementById('yearForMonthInput').value;
                 filterValue = `Tháng ${month}/${year}`;
+                titlePeriod = `THÁNG ${month}/${year}`;
             } else {
                 const year = document.getElementById('yearInput').value;
                 filterValue = `Năm ${year}`;
+                titlePeriod = `NĂM ${year}`;
             }
 
-            // Tạo data cho Excel
-            const data = [
-                ["BÁO CÁO THỐNG KÊ DOANH THU"],
-                [],
-                ["Thời gian lọc:", filterValue],
-                ["Xuất lúc:", new Date(). toLocaleString('vi-VN')],
-                [],
-                ["CHỈ TIÊU", "GIÁ TRỊ"],
-                ["Tổng Doanh thu (VNĐ)", totalRevenue],
-                ["Doanh thu Hệ thống 2% (VNĐ)", systemRevenueText],
-                [],
-                ["Booking Hoàn thành", totalCompletedBookings],
-                ["Tỷ lệ Hoàn thành (%)", completedPercentage],
-                [],
-                ["Booking Đang chờ", waitingCount],
-                ["Tỷ lệ Đang chờ (%)", waitingPercentage],
-                [],
-                ["Booking Đã hủy", cancelledCount],
-                ["Tỷ lệ Đã hủy (%)", cancelledPercentage]
+            // Tạo workbook với ExcelJS
+            const workbook = new ExcelJS. Workbook();
+            const worksheet = workbook.addWorksheet('BaoCaoDoanhThu');
+
+            // Thêm dữ liệu (BỎ CÁC EMPTY ROWS)
+            worksheet.addRow([`BÁO CÁO THỐNG KÊ DOANH THU ${titlePeriod}`, '']);
+            worksheet.addRow(['Thời gian lọc:', filterValue]);
+            worksheet.addRow(['Xuất lúc:', new Date().toLocaleString('vi-VN')]);
+            worksheet.addRow(['CHỈ TIÊU', 'GIÁ TRỊ']);
+            worksheet.addRow(['Tổng Doanh thu (VNĐ)', parseInt(totalRevenue || 0).toLocaleString('vi-VN')]);
+            worksheet.addRow(['Doanh thu Hệ thống 2% (VNĐ)', parseInt(systemRevenueText || 0).toLocaleString('vi-VN')]);
+            worksheet.addRow(['Booking Hoàn thành', totalCompletedBookings]);
+            worksheet.addRow(['Tỷ lệ Hoàn thành (%)', `${completedPercentage}%`]);
+            worksheet.addRow(['Booking Đang chờ', waitingCount]);
+            worksheet.addRow(['Tỷ lệ Đang chờ (%)', `${waitingPercentage}%`]);
+            worksheet.addRow(['Booking Đã hủy', cancelledCount]);
+            worksheet.addRow(['Tỷ lệ Đã hủy (%)', `${cancelledPercentage}%`]);
+
+            // Merge title
+            worksheet.mergeCells('A1:B1');
+
+            // Styling với alternating colors liền mạch
+            worksheet.eachRow((row, rowNumber) => {
+                row.eachCell((cell, cellNumber) => {
+                    // Add borders to all cells
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left:  { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right:  { style: 'thin' }
+                    };
+
+                    // Title styling (row 1)
+                    if (rowNumber === 1) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+                        cell. font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 16 };
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    }
+                    // Header styling (row 4 - CHỈ TIÊU, GIÁ TRỊ)
+                    else if (rowNumber === 4) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF70AD47' } };
+                        cell.font = { bold: true, color:  { argb: 'FFFFFFFF' } };
+                        cell.alignment = { horizontal: 'center', vertical:  'middle' };
+                    }
+                    // Data rows (rows 2, 3, 5-12) với alternating colors
+                    else if (rowNumber >= 2) {
+                        // Tính alternating colors cho tất cả data rows
+                        const dataRowIndex = rowNumber - 2; // Bắt đầu từ 0 cho row 2
+                        const isEven = dataRowIndex % 2 === 0;
+
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: isEven ? 'FFFFFFFF' : 'FFF2F2F2' }
+                        };
+
+                        // Font styling
+                        if (cellNumber === 1) {
+                            cell.font = { bold: rowNumber <= 3 ? true : false }; // Info rows bold
+                        } else if (cellNumber === 2) {
+                            cell.font = { bold: true }; // GIÁ TRỊ column luôn bold
+                        }
+
+                        // Alignment
+                        cell.alignment = {
+                            horizontal: cellNumber === 2 ? 'right' : 'left',
+                            vertical:  'middle'
+                        };
+                    }
+                });
+            });
+
+            // Override styling cho header row 4
+            ['A4', 'B4']. forEach(cell => {
+                worksheet.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF70AD47' } };
+                worksheet.getCell(cell).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                worksheet.getCell(cell).alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+
+            // Column widths
+            worksheet.columns = [
+                { width: 35 },
+                { width: 20 }
             ];
 
-            // Tạo workbook và worksheet
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX. utils.aoa_to_sheet(data);
+            // Row heights
+            worksheet.getRow(1).height = 25; // Title row
+            worksheet.getRow(4).height = 22; // Header row
 
-            // Set column widths
-            ws['!cols'] = [
-                { wch: 35 },  // Column A
-                { wch: 20 }   // Column B
-            ];
+            // Export
+            const fileName = `BaoCaoDoanhThu_${titlePeriod. replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            const buffer = await workbook.xlsx.writeBuffer();
 
-            // Thêm worksheet vào workbook
-            XLSX. utils.book_append_sheet(wb, ws, "Thống kê");
-
-            // Xuất file
-            const fileName = `ThongKe_DoanhThu_${filterType}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-            XLSX. writeFile(wb, fileName);
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document. createElement('a');
+            a.href = url;
+            a. download = fileName;
+            a. click();
+            window.URL.revokeObjectURL(url);
         }
 
         document.addEventListener('DOMContentLoaded', function () {

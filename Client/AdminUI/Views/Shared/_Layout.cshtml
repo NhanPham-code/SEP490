@@ -31,6 +31,33 @@
                 }
             }
         }
+                /* Add this to your existing CSS file or create it if it doesn't exist */
+
+        /* Chat unread badge styling */
+               /* Thêm vào file CSS của bạn */
+        .badge-red {
+            color: red;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Optional: Add a pulse animation to make it more noticeable */
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Ensure the parent element has relative positioning for the badge */
+        #chat-nav-link {
+            position: relative;
+        }
     </script>
 
     @await RenderSectionAsync("Styles", required: false)
@@ -120,12 +147,13 @@
                             }
                         </a>
                     </li>
+                    <!-- Thay thế dòng chat nav link hiện tại bằng cái này -->
                     <li>
                         <a asp-controller="Chat" asp-action="Chat" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Chat" ? "active" : "")"
                            id="chat-nav-link">
                             <i class="ri-chat-3-line"></i>
                             <span>Chat</span>
-                            <span id="chat-unread-badge" class="badge-red" style="display:none;"></span>
+                            <span id="chat-unread-badge" class="badge-red" style="display: none; color: red;"></span>
                         </a>
                     </li>
                     <li>
