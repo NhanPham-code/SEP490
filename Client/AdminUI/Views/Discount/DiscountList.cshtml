@@ -559,7 +559,7 @@
                         if (data.users) cacheUserData(data.users);
                         if (data.stadiums) {
                             allStadiums = data.stadiums;
-                            renderFilterOptions(allStadiums);
+                            renderFilterOptions(allStadiums, stadiumId);
                         }
                         renderTable(currentDiscounts);
                         renderPagination(currentDiscounts.length);
@@ -598,7 +598,7 @@
                 const isExpired = new Date() > new Date(d.endDate);
                 const isActive = d.isActive && !isExpired;
                 const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? 'ON' : 'OFF';
+                const statusText = isActive ? 'Mở' : 'Khóa';
 
                 const codeTypeLabels = { 'Stadium': 'Mã theo sân', 'Unique': 'Mã cá nhân' };
                 const codeTypeDisplay = codeTypeLabels[d.codeType] || d.codeType;
@@ -695,7 +695,7 @@
                 `;
             }
 
-            function renderFilterOptions(stadiums) {
+            function renderFilterOptions(stadiums, selectedId) {
                 const stadiumFilter = document.getElementById('stadiumFilter');
                 stadiumFilter.innerHTML = '<option value="">Tất cả sân</option>';
                 stadiums.forEach(s => {
@@ -704,6 +704,9 @@
                     option.textContent = s.name;
                     stadiumFilter.appendChild(option);
                 });
+                        if (selectedId) {
+                stadiumFilter.value = selectedId;
+            }
             }
 
             function applyFilters() { fetchAndRenderDiscounts(1); }

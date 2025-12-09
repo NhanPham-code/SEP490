@@ -332,10 +332,10 @@
             try {
                 const params = JSON.parse(notification.parameters);
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
-                    return `/Booking/BookingHistory`;
+                    return `/Booking/BookingManager`;
                 }
                 if (params.bookingType === 'daily' && params.bookingId) {
-                    return `/Booking/BookingHistory`;
+                    return `/Booking/BookingManager`;
                 }
                 if (params.title === 'StadiumApproved') {
                     return params.content;
