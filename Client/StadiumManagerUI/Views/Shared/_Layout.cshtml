@@ -357,6 +357,12 @@
                 margin-right: 0.5rem;
             }
         }
+
+        .badge-red {
+            color: red;
+            font-weight: bold;
+            margin-left: 5px;
+        }
     </style>
 
 </head>
@@ -419,7 +425,7 @@
                     <!-- 🔴 Badge tin chưa đọc -->
                     <template x-if="unreadCount > 0">
                         <span x-text="unreadCount"
-                              class="absolute top-0 right-0 -translate-y-2 translate-x-2 bg-red-600 text-white text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg z-20">
+                              class="badge-red">
                         </span>
                     </template>
                 </a>

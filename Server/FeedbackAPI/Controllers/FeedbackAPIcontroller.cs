@@ -73,7 +73,7 @@ namespace FeedbackAPI.Controllers
         /// Xóa feedback
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteAsync(id);
