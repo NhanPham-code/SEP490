@@ -29,10 +29,6 @@
       {
         "Path": "FeedbackAPI\\FeedbackAPI.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "FavoriteAPI\\FavoriteAPI.csproj",
-        "Action": "Start"
       }
     ]
   }

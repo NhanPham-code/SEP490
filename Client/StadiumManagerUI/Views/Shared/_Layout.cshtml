@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context.Session.GetInt32("UserId");
+}
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     @await RenderSectionAsync("Styles", required: false)
@@ -7,6 +10,8 @@
     <title>@ViewData["Title"] - Sportivey</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     @await RenderSectionAsync("style", required: false)
     <style>
         :root {
@@ -402,13 +407,24 @@
                     Mã giảm giá
                 </a>
             </div>
-            <div class="nav-item">
+            <!-- ✅ Giao diện Chat & Hỗ trợ có badge -->
+            <div class="nav-item" x-data="chatBadge()" x-init="init()">
                 <a href="@Url.Action("Chat", "Chat")"
-                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Chat" && ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")">
+                   class="nav-link relative @(ViewContext.RouteData.Values["controller"].ToString() == "Chat" && ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")"
+                   @@click="window.resetUnreadMessages && window.resetUnreadMessages()">
+
                     <i class="nav-icon fas fa-headset"></i>
                     Chat & Hỗ trợ
+
+                    <!-- 🔴 Badge tin chưa đọc -->
+                    <template x-if="unreadCount > 0">
+                        <span x-text="unreadCount"
+                              class="absolute top-0 right-0 -translate-y-2 translate-x-2 bg-red-600 text-white text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg z-20">
+                        </span>
+                    </template>
                 </a>
             </div>
+
             <div class="nav-item">
                 <a href="@Url.Action("FeeManagement", "Fee")"
                    class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Fee" && ViewContext.RouteData.Values["action"].ToString() == "FeeManagement" ? "active" : "")">
@@ -419,6 +435,10 @@
         </div>
     </nav>
 
+    <script>
+        window.currentUserId = @userId;
+        console.log("🔑 UserId từ Session:", @userId);
+    </script>
     @{
         var accessToken = Context.Request.Cookies["AccessToken"];
         var fullName = Context.Session.GetString("FullName");
@@ -470,10 +490,11 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="@Url.Action("Settings", "Account")">
-                            <i class="fas fa-cog me-2"></i>
-                            Cài đặt
-                        </a>
+                        <button id="chat-with-admin-btn" type="button" class="dropdown-item">
+                            <i class="fas fa-headset me-2 text-primary"></i>
+                            Chat với Admin
+                        </button>
+                        <input type="hidden" id="senderId" value="@userId" />
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
@@ -529,6 +550,117 @@
             @RenderBody()
         </main>
     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        // 🔹 Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 🔸 Xin quyền hiển thị thông báo
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // 🔹 Lấy danh sách phòng có chứa userId
+        async function getUserRooms(userId) {
+            const snapshot = await get(ref(db, "chats"));
+            const rooms = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(roomSnap => {
+                    const roomId = roomSnap.key;
+                    if (roomId.split("_").includes(String(userId))) {
+                        rooms.push(roomId);
+                    }
+                });
+            }
+            return rooms;
+        }
+
+        // 🔹 Hiển thị thông báo desktop
+        function showNotification(msg) {
+            if (Notification.permission === "granted") {
+                new Notification(`${msg.senderName}`, { body: msg.message });
+            }
+        }
+
+        // 🔹 Tăng số tin chưa đọc cho user
+        async function incrementUnread(userId) {
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        // 🔹 Lắng nghe tin mới và cập nhật badge
+        async function listenForUserMessages(userId, badgeHandler) {
+            const rooms = await getUserRooms(userId);
+            const startTime = Date.now();
+
+            // Cập nhật badge theo số tin chưa đọc
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                badgeHandler(count);
+            });
+
+            // Hiển thị thông báo khi có tin mới
+            rooms.forEach(roomId => {
+                const roomRef = ref(db, `chats/${roomId}`);
+                onChildAdded(roomRef, (snapshot) => {
+                    const msg = snapshot.val();
+                    if (msg.timestamp > startTime && msg.senderId != userId) {
+                        showNotification(msg);
+                    }
+                });
+            });
+        }
+
+        // 🔹 Khởi tạo lắng nghe cho user hiện tại
+        const currentUserId = window.currentUserId;
+
+        if (currentUserId && currentUserId > 0) {
+            window.listenForUserMessages = (badgeHandler) => {
+                return listenForUserMessages(currentUserId, badgeHandler);
+            };
+
+            window.resetUnreadMessages = async () => {
+                const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+                await set(unreadRef, 0);
+            };
+        } else {
+            console.warn("⚠️ Không tìm thấy currentUserId, badge sẽ không hoạt động.");
+        }
+    </script>
+    <script>
+        function chatBadge() {
+            return {
+                unreadCount: 0,
+                setBadge(count) {
+                    this.unreadCount = count;
+                },
+                init() {
+                    setTimeout(() => {
+                        if (typeof window.listenForUserMessages === "function") {
+                            window.listenForUserMessages((count) => {
+                                this.setBadge(count);
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -612,7 +744,307 @@
 
         });
     </script>
+
+
+    <script type="module">
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        const db = getDatabase();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatWithAdminBtn = document.getElementById("chat-with-admin-btn");
+            if (chatWithAdminBtn) {
+                chatWithAdminBtn.addEventListener("click", async function() {
+                    const senderId = document.getElementById("senderId")?.value;
+                    const senderName = "@fullName"; // hoặc lấy từ biến JS/session
+                    const receiverId = "1";
+                    const receiverName = "Admin";
+
+                    if (!senderId || !senderName) {
+                        alert("Bạn cần đăng nhập để chat với Admin.");
+                        return;
+                    }
+                    if (senderId === receiverId) {
+                        alert("Bạn không thể chat với chính mình!");
+                        return;
+                    }
+                    await createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+                });
+            }
+        });
+
+        async function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName,
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName,
+                timestamp,
+                lastMessage: ""
+            };
+            try {
+                await Promise.all(
+                    Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+                );
+            } catch (e) {}
+            redirectToChat(senderId, senderName, receiverId, receiverName);
+        }
+
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName,
+                receiverId,
+                receiverName
+            });
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+    </script>
+
     <!-- === KẾT THÚC PHẦN JAVASCRIPT XỬ LÝ NOTIFICATION === -->
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import {
+          getDatabase,
+          ref,
+          get,
+          set,
+          update,
+          onValue,
+          onChildAdded,
+          off,
+          push,
+          onDisconnect,
+          runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+          authDomain: "chatbox-993b2.firebaseapp.com",
+          databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+          projectId: "chatbox-993b2",
+          storageBucket: "chatbox-993b2.appspot.com",
+          messagingSenderId: "168483987205",
+          appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Request Notification permission
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission().catch(() => {});
+        }
+
+        // ---------------- PRESENCE ----------------
+        // SERVER timestamp helper
+        const SERVER_TIMESTAMP = { '.sv': 'timestamp' };
+
+        // Heartbeat and threshold (tùy chỉnh nếu cần)
+        const HEARTBEAT_INTERVAL_MS = 25_000; // gửi heartbeat mỗi 25s
+        const OFFLINE_THRESHOLD_MS = 60_000;  // nếu lastSeen > 60s trước -> coi là offline
+
+        // Mark this client online for the given userId (per-tab).
+        // Registers onDisconnect handlers so server sets connection child removed when connection lost.
+        // Returns a cleanup function to call on page unload if desired.
+        export function initPresenceFor(userId) {
+          if (!userId) return;
+          try {
+            const connectedRef = ref(db, '.info/connected');
+            const statusRef = ref(db, `userStatus/${userId}`);
+            const connectionsRef = ref(db, `userStatus/${userId}/connections`);
+
+            let heartbeatTimer = null;
+            let currentConnRef = null;
+
+            // Listen connected
+            const connectedListener = onValue(connectedRef, async (snap) => {
+              const connected = !!snap.val();
+              if (!connected) return;
+
+              try {
+                // create a connection child for this tab
+                const newConnRef = push(connectionsRef);
+                currentConnRef = newConnRef;
+
+                // Register onDisconnect for the connection child: remove only this child
+                try {
+                         // đăng ký onDisconnect để remove connection child và đặt trạng thái offline
+        onDisconnect(newConnRef).remove().catch(e => console.warn('onDisconnect remove child failed', e));
+        onDisconnect(statusRef).set({ online: false, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('onDisconnect set root failed', e));
+                } catch (e) {
+                  console.warn('onDisconnect registration failed', e);
+                }
+
+                // Write child and set root online + lastSeen
+                await set(newConnRef, true).catch(e => console.warn('set connection child failed', e));
+                // Use update to avoid accidentally deleting other fields if extant
+                await set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('set status root failed', e));
+
+                // Start heartbeat to keep lastSeen fresh (so quick reloads/navigation keeps user treated as online)
+                try {
+                  if (heartbeatTimer) clearInterval(heartbeatTimer);
+                  heartbeatTimer = setInterval(() => {
+                    // Update lastSeen and online flag
+                    set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('heartbeat failed', e));
+                  }, HEARTBEAT_INTERVAL_MS);
+                } catch (e) {
+                  console.warn('heartbeat setup failed', e);
+                }
+
+              } catch (err) {
+                console.error('initPresenceFor error', err);
+              }
+            }, (err) => {
+              console.error('.info/connected listener error', err);
+            });
+
+            // return cleanup function if needed
+            return () => {
+              try {
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                if (currentConnRef) {
+                  // best-effort: remove our connection child and update lastSeen before unload
+                  try { set(currentConnRef, null).catch(() => {}); } catch (e) {}
+                  try { set(statusRef, { online: true, lastSeen: Date.now() }).catch(() => {}); } catch (e) {}
+                }
+              } catch (e) {}
+              try { off(connectedRef); } catch (e) {}
+            };
+          } catch (ex) {
+            console.error('initPresenceFor exception', ex);
+          }
+        }
+
+        // One-time check whether a userId is online
+        // Uses lastSeen TTL rather than trusting `online` boolean alone.
+        export async function checkUserOnline(userId) {
+          try {
+            if (!userId) return false;
+            const snap = await get(ref(db, `userStatus/${userId}`));
+            if (!snap || !snap.exists()) return false;
+            const val = snap.val();
+            const lastSeen = val && val.lastSeen ? Number(val.lastSeen) : 0;
+            const now = Date.now();
+            return (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+          } catch (err) {
+            console.error('checkUserOnline error', err);
+            return false;
+          }
+        }
+
+        // Subscribe to realtime status changes for a userId
+        // onChange(isOnline:boolean, rawVal:object)
+        export function subscribeUserStatus(userId, onChange) {
+          if (!userId || typeof onChange !== 'function') return () => {};
+          const statusRef = ref(db, `userStatus/${userId}`);
+
+          const listener = (snap) => {
+            const v = snap.val();
+            try {
+              const lastSeen = v && v.lastSeen ? Number(v.lastSeen) : 0;
+              const now = Date.now();
+              const isOnline = (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+              onChange(isOnline, v);
+            } catch (e) {
+              console.error('subscribeUserStatus onChange handler error', e);
+            }
+          };
+
+          onValue(statusRef, listener, (err) => {
+            console.error('subscribeUserStatus error', err);
+          });
+
+          return () => {
+            try { off(statusRef); } catch (e) {}
+          };
+        }
+
+        // ---------------- MESSAGES / NOTIFICATIONS ----------------
+
+        async function getUserRooms(userId) {
+          const snapshot = await get(ref(db, "chats"));
+          const rooms = [];
+          if (snapshot && snapshot.exists()) {
+            snapshot.forEach(roomSnap => {
+              const roomId = roomSnap.key;
+              if (roomId && roomId.split("_").includes(String(userId))) {
+                rooms.push(roomId);
+              }
+            });
+          }
+          return rooms;
+        }
+
+        function showNotification(msg) {
+          if (Notification.permission === "granted") {
+            try {
+              new Notification(`${msg.senderName}`, { body: msg.message });
+            } catch (e) {
+              console.warn('Notification creation failed', e);
+            }
+          }
+        }
+
+        export async function incrementUnread(userId) {
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        export async function listenForUserMessages(userId, badgeHandler) {
+          if (!userId) return;
+          const rooms = await getUserRooms(userId);
+
+          // unread count listener
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          onValue(unreadRef, (snapshot) => {
+            const count = snapshot.exists() ? snapshot.val() : 0;
+            try { badgeHandler(count); } catch (e) { console.error('badgeHandler error', e); }
+          });
+
+          // Listen for new messages
+          const startTime = Date.now();
+          rooms.forEach(roomId => {
+            const roomRef = ref(db, `chats/${roomId}`);
+            onChildAdded(roomRef, (snapshot) => {
+              const msg = snapshot.val();
+              if (msg && msg.timestamp > startTime && String(msg.senderId) !== String(userId)) {
+                showNotification(msg);
+              }
+            });
+          });
+        }
+
+        // ---------------- EXPOSE GLOBAL HELPERS ----------------
+        window._chatPresence = {
+          initPresenceFor,
+          checkUserOnline,
+          subscribeUserStatus,
+          listenForUserMessages,
+          incrementUnread
+        };
+
+        // ---------------- AUTO-INIT PRESENCE FOR LAYOUT USER ----------------
+        try {
+          const layoutUserId = (typeof window.currentUserId !== 'undefined' && window.currentUserId != null)
+            ? String(window.currentUserId)
+            : null;
+
+          if (layoutUserId) {
+            console.log('[PRESENCE] auto init for user:', layoutUserId);
+            initPresenceFor(layoutUserId);
+          } else {
+            console.log('[PRESENCE] no currentUserId, presence not initialized');
+          }
+        } catch (e) {
+          console.warn('[PRESENCE] auto init error', e);
+        }
+    </script>
+
 
     <!-- Xử lí xác thực mật khẩu khi xem thông tin tài khoảng-->
     <script>

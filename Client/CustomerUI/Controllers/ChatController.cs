@@ -9,7 +9,7 @@ namespace CustomerUI.Controllers
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
 
-        
+
         public ChatController(ITokenService tokenService, IUserService userService)
         {
             _tokenService = tokenService;
@@ -39,6 +39,8 @@ namespace CustomerUI.Controllers
             ViewBag.UserId = profile?.UserId;
             ViewBag.UserName = profile?.FullName ?? "User";
             ViewBag.Profile = profile;
+            ViewBag.CloudinaryCloudName = "dwt7k4avh";
+            ViewBag.CloudinaryPreset = "ChatMoBe";
 
             return View();
         }

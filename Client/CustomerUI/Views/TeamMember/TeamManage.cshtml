@@ -65,7 +65,6 @@
 
 
     <!-- From Uiverse.io by xopc333 -->
-    
 
     <div class="back max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-8">
         <!-- From Uiverse.io by cssbuttons-io -->
@@ -298,14 +297,8 @@
                             <i class="ri-delete-bin-line mr-1"></i>
                             Xóa thành viên
                         </button>`;
-            } else{
-                return`<button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
-                id="btn-leave"
-                data-member-id="${member.id}"
-                data-member-role="${member.role}">
-            <i class="ri-logout-box-line"></i>
-            Thoát nhóm
-        </button>`;
+            }else {
+                return``;
             }
         }
 
@@ -560,11 +553,11 @@
                     </div>
                     <div class="flex-1">
                         <h3 class="font-semibold text-gray-900 text-lg">${escapeHtml(response.user.fullName)}</h3>
+                        <div class="title flex">
+                                <i class="ri-price-tag-3-line"></i>
+                                <h3 class="stadium-name">${response.teamPost.title}</h3>
+                            </div>
                         <span>Tạo ngày: ${formatDateTimeWithDay(response.teamPost.createdAt)}</span>
-                        <div class="flex items-center gap-2 mt-1">
-                            <!-- Dữ liệu này nên lấy từ response -->
-                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">${response.interestedCount || 0} Quan Tâm</span>
-                        </div>
                     </div>
                 </div>
 
@@ -598,7 +591,7 @@
                 <div id="preview" class="text-gray-600 leading-relaxed truncate-html">${response.teamPost.description}</div>
                 <div class="line"></div>
                 <div class="">
-                    ${renderJoinButton(response.newMember, response.isLeader, response.teamPost)}
+                    ${renderJoinButton(response.newMember, response.isLeader, response.teamPost, response.memberDTO)}
                 </div>
             </div>`;
         }
@@ -614,7 +607,7 @@
                     data: { postId: postId },
                     success: function(response) {
                         if (response.message === 200) {
-                            showNotification('Đăng ký tham gia thành công! và đang chờ chủ bài đăng chấp nhận', 'success');
+                            showNotification('Đã gửi yêu cầu! và đang chờ chủ bài đăng chấp nhận', 'success');
                             
                             // Cập nhật lại danh sách bài đăng sau khi tham gia
                                                      displayPostDetail();
@@ -640,13 +633,21 @@
         }
 
         // render nút tham gia
-        function renderJoinButton(newMember, isLeader, post) {
+        function renderJoinButton(newMember, isLeader, post, memberDTO) {
             if (newMember === 1) {
                 return `
                 <button onClick="joindTeam(${post.id})" 
                 class="smky-btn3 relative hover:text-[#e6e6e6] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#4b46b6] after:rounded-t-full after:w-full after:bottom-0 after:left-0 text-gray-900">Tham Gia</button>
         
             `;
+            }if(newMember != 1 && memberDTO.role != "Leader"){
+                return `<button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
+                id="btn-leave"
+                data-member-id="${memberDTO.id}"
+                data-member-role="${memberDTO.role}">
+            <i class="ri-logout-box-line"></i>
+            Thoát nhóm
+        </button>`;
             }else{
                 return ``;
             }

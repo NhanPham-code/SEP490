@@ -2387,4 +2387,8 @@ body {
     body.filter-open {
         overflow: hidden; /* Ngăn cuộn trang chính khi sidebar đang mở */
     }
+
+    #newSport {
+        pointer-events: none;
+    }
 }
