@@ -23,6 +23,7 @@ namespace StadiumManagerUI.Controllers
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly ICourtRelationService _courtRelationService;
+        private readonly ICourtService _courtService;
         private readonly IConfiguration _configuration;
 
 
@@ -35,6 +36,7 @@ namespace StadiumManagerUI.Controllers
             IUserService userService,
             INotificationService notificationService,
             ICourtRelationService courtRelationService,
+            ICourtService courtService,
             IConfiguration configuration)
         {
             _tokenService = tokenService;
@@ -43,6 +45,7 @@ namespace StadiumManagerUI.Controllers
             _discountService = discountService;
             _userService = userService;
             _notificationService = notificationService;
+            _courtService = courtService;
             _courtRelationService   = courtRelationService;
             _configuration = configuration;
         }
@@ -293,13 +296,39 @@ namespace StadiumManagerUI.Controllers
             if (stadiums.Any())
             {
                 var stadiumIds = stadiums.Select(s => s.Id).ToList();
+
+                var courtTasks = stadiumIds.Select(id => _courtService.GetAllCourtsAsync(id));
+                var courtResults = await Task.WhenAll(courtTasks);
+
+                var courtMap = courtResults.SelectMany(c => c)
+                                   .ToDictionary(c => c.Id, c => c.Name);
+
                 string stadiumIdList = string.Join(",", stadiumIds);
                 string bookingFilter = $"StadiumId in ({stadiumIdList})";
 
                 var allBookings = (await _bookingService.GetBookingAsync(accessToken, $"?$filter={bookingFilter}&$expand=BookingDetails")).Data;
                 var allMonthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, $"?$filter={bookingFilter}")).Data;
 
-                var now = DateTime.UtcNow;
+                foreach (var booking in allBookings)
+                {
+                    if (booking.BookingDetails != null)
+                    {
+                        foreach (var detail in booking.BookingDetails)
+                        {
+                            // Giả sử detail có thuộc tính CourtName (nếu DTO chưa có thì bạn phải thêm vào DTO)
+                            if (courtMap.TryGetValue(detail.CourtId, out string name))
+                            {
+                                detail.CourtName = name;
+                            }
+                            else
+                            {
+                                detail.CourtName = $"Sân {detail.CourtId}"; // Fallback nếu không tìm thấy
+                            }
+                        }
+                    }
+                }
+
+                    var now = DateTime.UtcNow;
                 var statsBookings = allBookings.Where(b => b.Date.Year == now.Year && b.Date.Month == now.Month);
                 ViewBag.CancelledBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("cancelled", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("payfail", StringComparison.OrdinalIgnoreCase));
                 ViewBag.AcceptedBookingsThisMonth = statsBookings.Count(b => b.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) || b.Status.Equals("completed", StringComparison.OrdinalIgnoreCase));
