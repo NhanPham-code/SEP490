@@ -2513,3 +2513,14 @@ grammarly-extension-root {
 .line {
     align-items: center;
 }
+.status-locked {
+    background-color: #fee2e2; /* Nền đỏ nhạt */
+    color: #dc2626; /* Chữ đỏ */
+    border: 1px solid #fecaca;
+}
+
+/* Hoặc nếu muốn đỏ đậm hơn */
+.status-locked {
+    background-color: #dc2626; /* Nền đỏ */
+    color: #ffffff; /* Chữ trắng */
+}
