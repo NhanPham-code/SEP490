@@ -667,6 +667,7 @@
 
                         <!-- Loại Thể Thao -->
                         <div class="filter-section" data-intro="Bạn có thể chọn loại thể thao bạn muốn chơi" data-step="6">
+                            <!-- Nút header: aria-expanded="false" (đang đóng) -->
                             <button class="filter-header"
                                     data-target="sport-filter"
                                     type="button"
@@ -675,6 +676,8 @@
                                 <h4 class="filter-title">Loại Thể Thao</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
+
+                            <!-- Nội dung: KHÔNG có class 'active' -->
                             <div class="filter-content active" id="sport-filter" role="group" aria-labelledby="sport-filter-title">
                                 <div class="filter-options">
                                     <label class="checkbox-label">
@@ -712,6 +715,12 @@
                                         <span class="checkmark" aria-hidden="true"></span>
                                         <span class="label-text">Bóng Chuyền</span>
                                     </label>
+                                    <!-- Thêm mục Pickleball vào đây -->
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sport_type[]" class="custom-checkbox sport-filter" value="Pickleball">
+                                        <span class="checkmark" aria-hidden="true"></span>
+                                        <span class="label-text">Pickleball</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -722,12 +731,12 @@
                             <button class="filter-header"
                                     data-target="time-filter"
                                     type="button"
-                                    aria-expanded="true"
+                                    aria-expanded="false"
                                     aria-controls="time-filter">
                                 <h4 class="filter-title">Thời Gian Chơi</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
-                            <div class="filter-content active" id="time-filter" role="group" aria-label="Chọn giờ chơi">
+                            <div class="filter-content" id="time-filter" role="group" aria-label="Chọn giờ chơi">
                                 <p class="text-red-500" id="time-error-message"></p>
                                 <div class="time-grid">
                                     <label for="startTime" class="range-label">Từ:</label>
@@ -744,12 +753,12 @@
                             <button class="filter-header"
                                     data-target="price-filter"
                                     type="button"
-                                    aria-expanded="true"
+                                    aria-expanded="false"
                                     aria-controls="price-filter">
                                 <h4 class="filter-title">Khoảng Giá</h4>
                                 <i class="ri-arrow-down-s-line toggle-icon" aria-hidden="true"></i>
                             </button>
-                            <div class="filter-content active" id="price-filter">
+                            <div class="filter-content" id="price-filter">
                                 <div class="price-range">
                                     <input type="range"
                                            name="price"
@@ -821,7 +830,7 @@
                         <!-- From Uiverse.io by 0x3ther -->
                         <div class="flex items-center gap-2 mt-5 model-btn">
 
-                            <button id="grid-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
+                            <button id="grid-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#60A5FA] h-9 rounded-md px-3">
                                 <svg class="lucide lucide-newspaper text-blue-400 dark:text-blue-600"
                                      stroke-linejoin="round"
                                      stroke-linecap="round"
@@ -836,7 +845,7 @@
                                 </svg>
                                 DANH SÁCH
                             </button>
-                            <button id="map-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FACC14] h-9 rounded-md px-3">
+                            <button id="map-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FACC14] h-9 rounded-md px-3">
                                 <svg stroke-linejoin="round"
                                      stroke-linecap="round"
                                      stroke-width="2"
@@ -851,7 +860,7 @@
                                 BẢN ĐỒ
                             </button>
 
-                            <button id="compare-view" class="cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FB923C] h-9 rounded-md px-3">
+                            <button id="compare-view" class="btn-select cursor-pointer bg-white relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] hover:text-[#FB923C] h-9 rounded-md px-3">
                                 <svg class="lucide lucide-heart text-orange-400 dark:text-orange-600"
                                      stroke-linejoin="round"
                                      stroke-linecap="round"
