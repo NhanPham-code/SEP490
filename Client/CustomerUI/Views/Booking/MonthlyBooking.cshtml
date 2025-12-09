@@ -150,6 +150,15 @@
 
     <script>
         const stadiumId = '@ViewBag.StadiumId';
+        const restoreData = {
+            year: @(ViewBag.RestoreYear ?? "null"),
+            month: @(ViewBag.RestoreMonth ?? "null"), // 1-based
+            selectedDays: "@ViewBag.RestoreSelectedDays".split(',').filter(d => d).map(Number),
+            selectedCourtIds: "@ViewBag.RestoreSelectedCourtIds".split(',').filter(id => id).map(Number),
+            startTime: @(ViewBag.RestoreStartTime ?? "null"),
+            endTime: @(ViewBag.RestoreEndTime ?? "null")
+        };
+        const hasRestoreData = restoreData.year !== null;
         let stadiumData = null; //stadium data
         let openTime; // openTime
         let closeTime; // closeTime
@@ -211,8 +220,16 @@
 
         // function when load page
         async function initializePage() {
-            // calculateMinAllowedMonth();
+            if (hasRestoreData) {
+                // Nếu có dữ liệu khôi phục, sử dụng nó
+                currentYear = restoreData.year;
+                currentMonth = restoreData.month - 1; // Chuyển về 0-based cho JS
+            } else {
+                // Nếu không, chạy logic mặc định
+                calculateMinAllowedMonth();
+            }
             await fetchStadiumData(stadiumId);
+            await restoreStateFromData();
             generateCalendar(currentMonth, currentYear);
             updateSelectionUI();
             renderTimeButtons();
@@ -341,12 +358,12 @@
             const $prevButton = $('#prevMonth');
             const $nextButton = $('#nextMonth');
 
-            // // Disable nút Previous nếu không thể điều hướng về tháng trước
-            // if (!canNavigateToPrevMonth()) {
-            //     $prevButton.prop('disabled', true).addClass('disabled-nav');
-            // } else {
-            //     $prevButton.prop('disabled', false).removeClass('disabled-nav');
-            // }
+            // Disable nút Previous nếu không thể điều hướng về tháng trước
+            if (!canNavigateToPrevMonth()) {
+                $prevButton.prop('disabled', true).addClass('disabled-nav');
+            } else {
+                $prevButton.prop('disabled', false).removeClass('disabled-nav');
+            }
 
             // Next button luôn enabled (có thể điều hướng đến tương lai)
             $prevButton.prop('disabled', false).removeClass('disabled-nav');
@@ -362,7 +379,6 @@
                 return;
             }
 
-            // *** UPDATED: Don't clear selections, just fetch new month data ***
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
@@ -495,12 +511,12 @@
 
         // Hàm kiểm tra xem có thể điều hướng đến tháng trước không
         function canNavigateToPrevMonth() {
-            // if (currentYear < minAllowedYear) {
-            //     return false;
-            // }
-            // if (currentYear === minAllowedYear && currentMonth <= minAllowedMonth) {
-            //     return false;
-            // }
+            if (currentYear < minAllowedYear) {
+                return false;
+            }
+            if (currentYear === minAllowedYear && currentMonth <= minAllowedMonth) {
+                return false;
+            }
             return true;
         }
 
@@ -514,46 +530,43 @@
             // }
             return true;
         }
-
-        // New logic for month calculation 
+        
         function calculateMinAllowedMonth() {
-            // FOR TESTING: Hardcode the date to match the user's scenario.
-            // In production, change this back to: const today = new Date();
-            const today = new Date('2025-09-17T10:00:00');
+            if (hasRestoreData) return;
+            
+            const today = new Date();
+            // Để kiểm thử, bạn có thể bỏ comment dòng dưới và thay đổi ngày
+            // const today = new Date('2025-12-26T10:00:00'); 
 
             const currentDay = today.getDate();
-            const currentMonthValue = today.getMonth();
-            const currentYearValue = today.getFullYear();
+            let targetMonth = today.getMonth();
+            let targetYear = today.getFullYear();
 
             if (currentDay > 25) {
-                let targetMonth = currentMonthValue + 2;
-                let targetYear = currentYearValue;
-
-                if (targetMonth > 11) {
-                    targetMonth = targetMonth - 12;
-                    targetYear += 1;
-                }
-                minAllowedMonth = targetMonth;
-                minAllowedYear = targetYear;
+                // Nếu sau ngày 25, cho phép đặt tháng (hiện tại + 2)
+                targetMonth += 2;
             } else {
-                let targetMonth = currentMonthValue + 1;
-                let targetYear = currentYearValue;
-
-                if (targetMonth > 11) {
-                    targetMonth = 0;
-                    targetYear += 1;
-                }
-                minAllowedMonth = targetMonth;
-                minAllowedYear = targetYear;
+                // Nếu từ ngày 25 trở về trước, cho phép đặt tháng (hiện tại + 1)
+                targetMonth += 1;
             }
 
-            // *** FIX: Update the global currentMonth and currentYear variables ***
+            // Xử lý trường hợp chuyển năm
+            if (targetMonth > 11) {
+                targetMonth -= 12; // Ví dụ: tháng 12 (11+1=12) -> tháng 1 (0); tháng 13 (11+2=13) -> tháng 2 (1)
+                targetYear += 1;
+            }
+
+            // Gán giá trị vào biến global để các hàm khác sử dụng
+            minAllowedMonth = targetMonth;
+            minAllowedYear = targetYear;
+
+            // **QUAN TRỌNG**: Cập nhật tháng/năm hiện tại của lịch để nó bắt đầu từ tháng hợp lệ đầu tiên
             currentMonth = minAllowedMonth;
             currentYear = minAllowedYear;
 
-            console.log(`Test Date: ${today.toLocaleDateString()}`);
-            console.log(`Min allowed month/year: ${minAllowedMonth + 1}/${minAllowedYear}`);
-            console.log(`Current calendar set to: ${currentMonth + 1}/${currentYear}`);
+            console.log(`Ngày hiện tại: ${today.toLocaleDateString()}`);
+            console.log(`Tháng/năm tối thiểu được phép đặt: ${minAllowedMonth + 1}/${minAllowedYear}`);
+            console.log(`Lịch được khởi tạo tại tháng/năm: ${currentMonth + 1}/${currentYear}`);
         }
 
         // New logic for checking weekday selection 
@@ -565,7 +578,6 @@
                 const dateObj = new Date(currentYear, currentMonth, day);
                 const dayOfWeek = (dateObj.getDay() + 6) % 7; // Convert to Monday = 0
                 if (dayOfWeek === weekdayIndex) {
-                    // *** UPDATED: Only consider available dates (not booked/disabled) ***
                     const isBooked = bookedDaysInMonth.has(day);
                     const isValidMonth = isMonthYearValid(currentMonth, currentYear);
                     if (!isBooked && isValidMonth) {
@@ -1022,7 +1034,7 @@
             });
         }
 
-        function fetchBookedSlotsForSelection() {
+        function fetchBookedSlotsForSelection(isRestoring = false) {
             // Chỉ thực hiện khi đã chọn đủ sân và khung giờ
             if (startTime === null || endTime === null) {
                 console.log("Chưa đủ thông tin sân và giờ để fetch.");
@@ -1203,6 +1215,40 @@
 
             // 3. Submit form
             $form.submit();
+        }
+
+        async function restoreStateFromData() {
+            if (!hasRestoreData) return;
+
+            console.log("Bắt đầu khôi phục trạng thái từ dữ liệu:", restoreData);
+
+            // 1. Khôi phục khung giờ
+            startTime = restoreData.startTime;
+            endTime = restoreData.endTime;
+            console.log(`Khung giờ được khôi phục: ${startTime}:00 - ${endTime}:00`);
+
+            // 2. Khôi phục các sân đã chọn
+            selectedCourts = stadiumData.Courts.filter(c => restoreData.selectedCourtIds.includes(c.Id));
+            const selectedCourtIdsSet = new Set(selectedCourts.map(c => c.Id));
+            await fetchCourtRelations(selectedCourtIdsSet, selectedCourtRelationIds);
+            console.log("Các sân được khôi phục:", selectedCourts.map(c => c.Name));
+
+
+            // 3. Fetch các ngày đã bị đặt DỰA TRÊN giờ và sân đã khôi phục
+            // isRestoring = true để ngăn nó xóa các lựa chọn ngày của chúng ta
+            await fetchBookedSlotsForSelection(true);
+
+            // 4. Khôi phục các ngày đã chọn (sau khi đã biết ngày nào bị khóa)
+            restoreData.selectedDays.forEach(day => {
+                // Chỉ thêm lại các ngày không nằm trong danh sách đã bị đặt
+                if (!bookedDaysInMonth.has(day)) {
+                    const dateKey = `${restoreData.year}-${restoreData.month - 1}-${day}`;
+                    selectedDates.add(dateKey);
+                }
+            });
+            console.log("Các ngày được khôi phục sau khi lọc:", Array.from(selectedDates));
+
+            // Hàm này không cần gọi các hàm render nữa, vì initializePage sẽ làm điều đó.
         }
     </script>
 </body>

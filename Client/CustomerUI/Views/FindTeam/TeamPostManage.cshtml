@@ -282,6 +282,10 @@
 
                 <!-- Sport Info -->
                 <div class=" bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 mb-6">
+                <div class="title flex">
+                                <i class="ri-price-tag-3-line"></i>
+                                <h3 class="stadium-name">${post.title}</h3>
+                            </div>
                     <div class="flex items-center gap-3 mb-3">
                         <div class="sport-icon">
                             <i class="ri-home-6-line"></i>
@@ -705,7 +709,8 @@
                             { condition: !playDate, message: 'Vui lòng chọn ngày chơi' },
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
                             { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
-                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' }
+                            { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' },
+                            { condition: !pricePerPerson || pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
 
@@ -733,6 +738,7 @@
 
                         console.log("formData: ", formData);
 
+                        
                         return formData;
 
                     } catch (error) {
@@ -790,6 +796,7 @@
                 type: 'DELETE',
                 success: function(response) {
                     if (response.message == 200) {
+                        loadMyPost();
                         // Remove the post card from the UI with animation
                         const postCard = document.getElementById(`post-${postId}`);
                         if (postCard) {
@@ -1078,18 +1085,8 @@
                                         <i class="ri-football-line"></i>
                                         Môn thể thao
                                     </label>
-                                    <select id="newSport" class="form-input">
-                                        <option value="">Chọn môn thể thao</option>
-                                        <option value="Bóng đá sân 11">Bóng đá sân 11</option>
-                                        <option value="Bóng đá sân 7">Bóng đá sân 7</option>
-                                        <option value="Bóng đá sân 5">Bóng đá sân 5</option>
-                                        <option value="Bóng rổ">Bóng rổ</option>
-                                        <option value="Bóng chuyền">Bóng chuyền</option>
-                                        <option value="Cầu lông">Cầu lông</option>
-                                        <option value="Tennis">Tennis</option>
-                                        <option value="table-tennis">Bóng bàn</option>
-                                        <option value="other">Khác</option>
-                                    </select>
+                                    <input id="newSport" type="text" class="form-input" readonly>
+                                    </input>
                                     <div class="input-helper">Chọn môn thể thao sẽ chơi</div>
                                 </div>
 
@@ -1648,6 +1645,7 @@
                     // Refresh page hoặc cập nhật danh sách
                     // location.reload();
                     // hoặc viết hàm refresh list
+                    loadMyPost();
                 });
             },
             error: function (xhr, status, error) {
@@ -1692,6 +1690,7 @@
                     // Refresh page hoặc cập nhật danh sách
                     // location.reload();
                     // hoặc viết hàm refresh list
+                    loadMyPost();
                 });
             },
             error: function (xhr, status, error) {

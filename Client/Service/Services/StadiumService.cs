@@ -73,7 +73,7 @@ namespace Service.Services
 
         public async Task<string> ExportExcel()
         {
-            var response = await _httpClient.GetAsync("/odata/Stadium?$expand=Courts($select=Id,StadiumId,Name,SportType,PricePerHour,IsAvailable)");
+            var response = await _httpClient.GetAsync("/odata/Stadium");
             response.EnsureSuccessStatusCode(); // Nếu không 2xx → throw HttpRequestException
             return await response.Content.ReadAsStringAsync();
         }

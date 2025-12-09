@@ -11,6 +11,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DTOs.BookingDTO.RevenueViewModel;
+using System.Linq;
 
 namespace Service.Services
 {
@@ -68,6 +69,25 @@ namespace Service.Services
             var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<MonthlyBookingReadDto>>(jsonString);
 
             return (result?.Value ?? new List<MonthlyBookingReadDto>(), result?.Count ?? 0);
+        }
+
+        public async Task<MonthlyBookingWithBookingsDto?> GetMonthlyBookingDetailAsync(string accessToken, int monthlyBookingId)
+        {
+            AddBearerAccessToken(accessToken);
+            var queryString = $"?$filter=Id eq {monthlyBookingId}&$expand=Bookings";
+            var request = new HttpRequestMessage(HttpMethod.Get, "/monthlyBooking" + queryString);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<OdataHaveCountResponse<MonthlyBookingWithBookingsDto>>(jsonString);
+
+            return result?.Value?.FirstOrDefault();
         }
 
         public async Task<MonthlyBookingReadDto?> UpdateMonthlyBookingAsync(int id, MonthlyBookingUpdateDto bookingDto, string accessToken)
@@ -415,6 +435,36 @@ namespace Service.Services
 
             var result = await response.Content.ReadFromJsonAsync<List<StadiumBookingOverviewDto>>();
             return result ?? new List<StadiumBookingOverviewDto>();
+        }
+        
+        public async Task<bool> HasCompletedBookingAtStadiumAsync(string accessToken, int stadiumId)
+        {
+            AddBearerAccessToken(accessToken);
+
+            // URL gọi đến API Gateway
+            var requestUrl = $"/booking/check-completed/{stadiumId}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // ✅ SỬA LỖI QUAN TRỌNG:
+                    // Phải đọc nội dung body để xem nó là true hay false.
+                    // Không được chỉ return true dựa trên status code 200.
+                    var result = await response.Content.ReadFromJsonAsync<bool>();
+                    return result;
+                }
+
+                // Trường hợp lỗi 404, 401, 500... coi như chưa booking
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error calling HasCompletedBookingAtStadiumAsync: {ex.Message}");
+                return false;
+            }
         }
     }
 }

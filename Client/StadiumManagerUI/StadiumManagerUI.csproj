@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Views\Revenue\Revenue.cshtml" />
-    <AdditionalFiles Include="Views\Revenue\StadiumRevenue.cshtml" />
   </ItemGroup>
 
 </Project>

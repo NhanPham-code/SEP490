@@ -121,9 +121,15 @@
         <!-- Lưu JSON sang Courts -->
         <input type="hidden" name="Courts" />
     </form>
+    
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
 
     <script>
         const stadiumId = '@ViewBag.StadiumId';
+        const restoreDate = "@ViewBag.RestoreDate";
+        const restoreCourtsJson = @Html.Raw(Json.Serialize(ViewBag.RestoreCourts ?? ""));
         let openTime;
         let closeTime;
         let date = null;
@@ -176,7 +182,9 @@
             // adjustMobileLayout();
             // $(window).resize(adjustMobileLayout);
 
-            forceResetToToday();
+            if (!restoreDate) {
+                forceResetToToday();
+            }
 
             $('#continue-button').on('click', function (e) {
                 e.preventDefault();
@@ -186,28 +194,46 @@
             firstLoadUI();
         });
 
-
         // Hàm cập nhật giao diện người dùng
         async function updateUI() {
-            await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
-            await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
-            renderBookings(bookings); // Rồi mới render bookings
+            try {
+                showLoading();
+                await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
+                await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
+                renderBookings(bookings); // Rồi mới render bookings
+            } catch (error) {
+                console.error('Error updating UI:', error);
+            } finally {
+                hideLoading();
+            }
         }
 
         async function firstLoadUI() {
-            await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
-            await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
-            // Sau khi có stadiumData, lấy danh sách các courtId
-            const courtIds = stadiumData.Courts.map(court => court.Id);
+            try {
+                const initialDate = restoreDate || new Date().toISOString().split('T')[0];
+                $("#date-picker").val(initialDate);
+                date = initialDate;
+                
+                await fetchBookedCourts(stadiumId, date); // Rồi mới lấy dữ liệu đặt sân
+                await fetchStadiumData(stadiumId); // Chờ lấy dữ liệu sân xong
+                // Sau khi có stadiumData, lấy danh sách các courtId
+                const courtIds = stadiumData.Courts.map(court => court.Id);
 
-            // Lặp qua từng courtId để lấy dữ liệu quan hệ
-            for (const courtId of courtIds) {
-                await fetchCourtRelationData(courtId);
+                // Lặp qua từng courtId để lấy dữ liệu quan hệ
+                for (const courtId of courtIds) {
+                    await fetchCourtRelationData(courtId);
+                }
+
+                console.log("📘 Dữ liệu courtRelations:", Object.fromEntries(courtRelations));
+
+                renderBookings(bookings); // Rồi mới render bookings
+
+                restoreSelections();
+            } catch (error) {
+                console.error('Error updating UI:', error);
+            } finally {
+                hideLoading();
             }
-
-            console.log("📘 Dữ liệu courtRelations:", Object.fromEntries(courtRelations));
-
-            renderBookings(bookings); // Rồi mới render bookings
         }
 
         // Thêm hàm clear dữ liệu
@@ -259,6 +285,11 @@
         }
 
         function forceResetToToday() {
+            if (restoreDate) {
+                console.log("Skipping date reset because restore data is present.");
+                return;
+            }
+            
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -1163,6 +1194,85 @@
         // Function để format giờ thành string (6 -> "6:00", 14 -> "14:00")
         function formatHour(hour) {
             return hour.toString().padStart(2, '0') + ':00';
+        }
+
+        function showLoading() {
+            $('#loading-overlay').show();
+        }
+        
+        function hideLoading() {
+            $('#loading-overlay').hide();
+        }
+
+        function restoreSelections() {
+            if (!restoreCourtsJson) return;
+
+            try {
+                const courtsToRestore = JSON.parse(decodeURIComponent(restoreCourtsJson));
+                if (!Array.isArray(courtsToRestore)) return;
+
+                // Xóa lựa chọn cũ trước khi khôi phục
+                selectedCourts.clear();
+
+                courtsToRestore.forEach(courtData => {
+                    const courtId = courtData.courtId;
+                    if (courtData.times && Array.isArray(courtData.times)) {
+                        courtData.times.forEach(timeSlot => {
+                            // Cập nhật 'selectedCourts' map
+                            if (!selectedCourts.has(timeSlot)) {
+                                selectedCourts.set(timeSlot, []);
+                            }
+                            selectedCourts.get(timeSlot).push(courtId);
+
+                            // Tìm ô và thêm class 'selected'
+                            const $cell = $(`.grid-cell[data-court="${courtId}"][data-time="${timeSlot}"]`);
+                            if ($cell.length && !$cell.hasClass('unselectable')) {
+                                $cell.addClass('selected');
+                            }
+                        });
+                    }
+                });
+
+                // **CẬP NHẬT: Xử lý các sân liên quan sau khi khôi phục**
+                // Lặp qua tất cả các ô trên lưới
+                $('.grid-cell').each(function() {
+                    const $cell = $(this);
+                    const courtId = $cell.data('court');
+                    const timeId = $cell.data('time');
+
+                    // Bỏ qua nếu ô này đã được chọn hoặc đã bị khóa bởi booking từ server
+                    if ($cell.hasClass('selected') || $cell.hasClass('locked-by-booking')) {
+                        return;
+                    }
+
+                    // Lấy danh sách các "anh em" của ô hiện tại (bao gồm chính nó)
+                    const relatedSiblings = courtRelations.get(courtId) || [];
+                    if (relatedSiblings.length === 0) {
+                        return; // Không có sân liên quan, không cần làm gì
+                    }
+
+                    // Kiểm tra xem có bất kỳ "anh em" nào đã được chọn trong cùng khung giờ không
+                    const isAnySiblingSelected = relatedSiblings.some(siblingId =>
+                        selectedCourts.get(timeId)?.includes(siblingId)
+                    );
+
+                    // Nếu có, đánh dấu ô hiện tại là không thể chọn
+                    if (isAnySiblingSelected) {
+                        $cell.addClass('unselectable').addClass('booking-related-overlay');
+                    }
+                });
+
+
+                // Cập nhật lại giao diện (đường viền, thống kê,...) sau khi khôi phục
+                console.log("Restored Selected Courts:", Object.fromEntries(selectedCourts));
+                $('.grid-cell.selected').each(function() {
+                    updateBordersForCell($(this));
+                });
+                updateStats();
+
+            } catch (error) {
+                console.error("Failed to restore selections:", error);
+            }
         }
     </script>
 </body>

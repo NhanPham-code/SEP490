@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
 
 using Service.Interfaces;
+using System.Text.Json;
 
 namespace CustomerUI.Controllers
 {
@@ -389,19 +390,26 @@ namespace CustomerUI.Controllers
             int createdBy = post.Value.Select(p => p.CreatedBy).FirstOrDefault();
             Console.WriteLine("CreatedBy: " + createdBy);
             // gửi notification cho người tạo bài đăng biết có người tham gia
+            var json = JsonSerializer.Serialize(new
+            {
+                title = "TeamDetail",
+                content = $"/TeamMember/TeamManage?postId={postId}"
+            });
             SendNotificationToUserAsync( new CreateNotificationDto
             {
                 UserId = createdBy,
                 Type = "Recruitment.JoinRequest",
-                Title = "<h3 class=\"text-green-500\">Yêu cầu tham gia nhóm</h3>",
-                Message = "<div><span>Đã có một thành viên tham gia vào nhóm của bạn: </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/TeamMember/TeamManage?postId=" + postId + "\">Xem chi tiết</a></div>"
+                Title = "Yêu cầu tham gia nhóm",
+                Message = "Đã có một thành viên tham gia vào nhóm của bạn.",
+                Parameters = json
             }).GetAwaiter().GetResult();
-            _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
-            {
-                Title = "Một người vừa tham gia vào nhóm",
-                Message = "Someone just joined a team. Check it out!",
-                Type = "Recruitment.NewMember",
-            });
+
+            //_ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
+            //{
+            //    Title = "Một người vừa tham gia vào nhóm",
+            //    Message = "Someone just joined a team. Check it out!",
+            //    Type = "Recruitment.NewMember",
+            //});
             return Json(new { Message = 200, value = res });
         }
 
@@ -451,13 +459,19 @@ namespace CustomerUI.Controllers
             {
                 if (member.UserId != null && member.UserId != 0)
                 {
+                    var json = JsonSerializer.Serialize(new
+                    {
+                        title = "FindTeam",
+                        content = "/FindTeam/FindTeam"
+                    });
 
                     notificationDTOs.Add(new CreateNotificationDto
                     {
                         UserId = (Int32)member.UserId,
-                        Type = "Recruitment.Accepted",
-                        Title = "<h3 class=\"text-red-600\">Bài đăng đã bị xóa</h3>",
-                        Message = "<div><span>Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. </span><a class=\"text-blue-400\" style=\"text-decoration: underline;\" href=\"/FindTeam/FindTeam\">Tìm bài đăng khác</a></div>"
+                        Type = "Recruitment.Delete",
+                        Title = "Bài đăng đã bị xóa",
+                        Message = "Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác",
+                        Parameters = json
                     });
                 }
             }

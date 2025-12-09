@@ -415,11 +415,11 @@ body {
 
 @media (max-width: 900px) {
     .cta {
-        display: none !important;
+        display: block !important;
     }
 
     .back-btn {
-        display: block !important;
+        display: none !important;
     }
 }
 /* From Uiverse.io by alexmaracinaru */

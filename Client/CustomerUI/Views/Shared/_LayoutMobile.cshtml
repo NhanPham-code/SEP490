@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context.Session.GetInt32("UserId");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,6 +20,133 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        /* Hide Google Translate banner and unwanted elements */
+        .goog-te-banner-frame,
+        iframe.goog-te-banner-frame,
+        .goog-logo-link,
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight,
+        .goog-te-balloon-frame,
+        #goog-gt-tt,
+        .goog-te-banner,
+        .skiptranslate iframe,
+        iframe[src*="translate.googleapis.com"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        body {
+            top: 0px !important;
+            margin: 0 !important;
+            position: static !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .goog-te-gadget {
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+
+            .goog-te-gadget .goog-te-combo {
+                margin: 0 !important;
+            }
+
+        /* Style the translate dropdown to match navbar */
+        .goog-te-combo {
+            appearance: none !important;
+            background: transparent !important;
+            border: none !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            padding: 0 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+        }
+
+            .goog-te-combo:hover {
+                color: #2563eb !important;
+            }
+
+            .goog-te-combo option {
+                background: white !important;
+                color: #475569 !important;
+                font-weight: 600 !important;
+            }
+
+        /* Custom translate container styling */
+        .translate-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translate-icon {
+            color: #475569;
+            font-size: 16px;
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            color: #2563eb !important;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Demo content styling */
+        .demo-content {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px auto;
+            max-width: 800px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            color: white;
+        }
+    </style>
+    <style>
+        #translate-toggle, #reset-translate-btn {
+            padding: 2px 4px !important;
+            font-size: 11px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            height: 36px !important;
+            width: auto !important;
+            line-height: 1;
+        }
+
+        #translate-menu {
+            width: 110px !important;
+            font-size: 12px !important;
+            padding: 2px 0 !important;
+        }
+
+            #translate-menu button {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                line-height: 1.2;
+            }
+
+        @@media (max-width: 400px) {
+            #translate-toggle span, #reset-translate-btn span {
+                display: none;
+            }
+
+            #translate-menu {
+                width: 75px !important;
+            }
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -473,10 +603,12 @@
                 min-height: 52px;
             }
         }
-        #header-mobile{
+
+        #header-mobile {
             position: relative;
         }
     </style>
+
 </head>
 
 <body id="body-mobile" class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-inter">
@@ -495,7 +627,7 @@
         searchOpen: false,
         notificationCount: 3
     }"
-    id="header-mobile"
+            id="header-mobile"
             class="mobile-nav glass-effect  top-0 z-50 shadow-soft">
         <div class="flex justify-between items-center h-16 px-4">
 
@@ -517,15 +649,21 @@
             <div class="flex items-center space-x-2">
                 @if (isLoggedIn)
                 {
-                    <!-- Messages Button -->
-                    <a asp-controller="Chat" asp-action="Chat"
-                       class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
-                       title="Messages">
+
+                    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+                    <!-- Đổi từ <a ...> sang <button ...> -->
+                    <button type="button"
+                            x-data="chatBadge()"
+                            x-init="init()"
+                            class="relative w-12 h-12 flex items-center justify-center rounded-xl gradient-secondary shadow-soft hover:shadow-hover transition-all duration-300 active:scale-95"
+                            title="Messages"
+                            x-on:click.prevent="openChat">
                         <i class="ri-message-3-line text-lg text-white"></i>
-                        <span x-show="notificationCount > 0"
+                        <span x-show="unreadCount > 0"
                               class="notification-badge absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-bold"
-                              x-text="notificationCount"></span>
-                    </a>
+                              x-text="unreadCount"></span>
+                    </button>
+
                 }
                 else
                 {
@@ -645,7 +783,7 @@
     <nav id="nav-mobile" x-data="{
         activeTab: 'home',
         userMenuOpen: false
-    }" class="mobile-nav fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-200 z-40 shadow-soft bottom-nav-safe" >
+    }" class="mobile-nav fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-200 z-40 shadow-soft bottom-nav-safe">
         <div class="bottom-nav-container">
             <!-- Home -->
             <a asp-controller="Home" asp-action="Index"
@@ -683,6 +821,46 @@
                 <span class="text-xs mt-1 font-medium truncate">Thông báo</span>
             </a>
 
+
+            <div class="flex flex-col items-center flex-1 max-w-none px-1">
+                <div class="relative flex flex-col items-center justify-center" style="min-width:32px;">
+                    <button id="translate-toggle"
+                            type="button"
+                            class="nav-link p-1 text-slate-600 hover:text-blue-600 font-semibold flex flex-col items-center text-[11px] rounded transition-all duration-200"
+                            style="min-width: 32px; min-height: 32px; height:36px;">
+                        <i class="ri-translate-2 text-base leading-none"></i>
+                        <span class="leading-tight text-[10px]">Ngôn ngữ</span>
+                        <i class="ri-arrow-up-s-line text-xs leading-none"></i>
+                    </button>
+                    <!-- Menu xổ lên trên -->
+                    <div id="translate-menu"
+                         class="absolute right-0 bottom-full mb-1 w-28 bg-white rounded shadow border border-gray-200 hidden z-50"
+                         style="transform: translateY(-4px); font-size:12px;">
+                        <button data-lang="en" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">English</button>
+                        <button data-lang="vi" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Tiếng Việt</button>
+                        <button data-lang="ja" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">日本語</button>
+                        <button data-lang="ko" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">한국어</button>
+                        <button data-lang="zh-CN" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">中文</button>
+                        <button data-lang="fr" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Français</button>
+                        <button data-lang="de" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Deutsch</button>
+                        <button data-lang="it" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Italiano</button>
+                        <button data-lang="es" class="block w-full text-left px-2 py-1 text-slate-600 hover:text-blue-600 text-xs">Español</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Nút Mặc định (reset nhỏ gọn) -->
+            <div class="flex flex-col items-center flex-1 max-w-none px-1">
+                <button id="reset-translate-btn"
+                        type="button"
+                        class="px-1 py-1 text-slate-600 hover:text-blue-600 font-semibold flex flex-col items-center text-[11px] rounded transition-all duration-200"
+                        style="min-width: 32px; min-height: 32px; height:36px;">
+                    <i class="ri-refresh-line text-base leading-none"></i>
+                    <span class="leading-tight text-[10px]">Mặc định</span>
+                </button>
+            </div>
+
+
+
             <!-- User Profile -->
             <div class="relative flex-1 max-w-none">
                 @if (isLoggedIn)
@@ -693,7 +871,7 @@
                         <div class="w-6 h-6 flex items-center justify-center">
                             <img src="@avatarUrl" alt="Avatar" class="profile-avatar-nav" />
                         </div>
-                        <span class="text-xs mt-1 font-medium truncate">Hồ sơ</span>
+                        <span class="text-xs mt-1 font-medium truncate">Profile</span>
                     </button>
 
                     <!-- Profile Menu Popup - Responsive positioning -->
@@ -752,17 +930,29 @@
                             </a>
 
                             <!-- Booking Schedule -->
-                            <a href="#"
+                            <a asp-controller="Booking" asp-action="BookingSchedule"
                                x-on:click="userMenuOpen = false"
                                class="flex items-center px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all duration-200 group">
                                 <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
-                                    <i class="ri-settings-3-line text-blue-600"></i>
+                                    <i class="ri-calendar-todo-line text-blue-600"></i>
                                 </div>
                                 <div>
                                     <span class="font-medium">Lịch chơi</span>
                                     <p class="text-xs text-slate-400">Lịch chơi sắp đến</p>
                                 </div>
                             </a>
+                            <!-- Settings -->
+                            <button id="chat-with-admin-btn" type="button"
+                                    class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group w-full">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
+                                    <i class="ri-message-2-line text-purple-600 text-base"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Admin</span>
+                                    <p class="text-xs text-slate-400">Hỗ trợ trực tuyến</p>
+                                </div>
+                            </button>
+                            <input type="hidden" id="senderId" value="@userId" />
 
                             <!-- Divider -->
                             <hr class="my-3 border-slate-200">
@@ -1123,90 +1313,590 @@
         }
         document.addEventListener('DOMContentLoaded', updateMobileNotificationBadges);
     </script>
+
+    <script>
+        window.currentUserId = @userId;
+        console.log("🔑 UserId từ Session:", @userId);
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        async function getUserRooms(userId) {
+            const snapshot = await get(ref(db, "chats"));
+            const rooms = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(roomSnap => {
+                    const roomId = roomSnap.key;
+                    if (roomId.split("_").includes(String(userId))) {
+                        rooms.push(roomId);
+                    }
+                });
+            }
+
+            return rooms;
+        }
+
+        function showNotification(msg) {
+            if (Notification.permission === "granted") {
+                new Notification(`${msg.senderName}`, { body: msg.message });
+            }
+        }
+
+        // ✅ Tăng số tin chưa đọc trong Firebase
+               import { runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        async function incrementUnread(userId) {
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        async function listenForUserMessages(userId, badgeHandler) {
+            const rooms = await getUserRooms(userId);
+
+            // ✅ Lắng nghe thay đổi số tin chưa đọc từ Firebase
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                badgeHandler(count);
+            });
+
+            // ✅ Lắng nghe tin mới
+            const startTime = Date.now();
+
+            rooms.forEach(roomId => {
+                const roomRef = ref(db, `chats/${roomId}`);
+
+                onChildAdded(roomRef, (snapshot) => {
+                    const msg = snapshot.val();
+
+                    if (msg.timestamp > startTime && msg.senderId != userId) {
+
+                        showNotification(msg);
+                    }
+                });
+            });
+        }
+
+        const currentUserId = window.currentUserId;
+
+        if (currentUserId) {
+            window.listenForUserMessages = (badgeHandler) => {
+                return listenForUserMessages(currentUserId, badgeHandler);
+            };
+
+            // ✅ Reset số tin chưa đọc về 0 khi mở chat
+            window.resetUnreadMessages = async () => {
+                const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+                await set(unreadRef, 0);
+            };
+        }
+    </script>
+
+    <script>
+              function chatBadge() {
+            return {
+                unreadCount: 0,
+                async openChat() {
+                    if (typeof window.resetUnreadMessages === "function") {
+                        await window.resetUnreadMessages();
+                    }
+                    this.unreadCount = 0;
+                    setTimeout(() => {
+                        window.location.href = '@Url.Action("Chat", "Chat")';
+                    }, 150);
+                },
+                setBadge(count) {
+                    this.unreadCount = count;
+                },
+                init() {
+                    setTimeout(() => {
+                        if (typeof window.listenForUserMessages === "function") {
+                            window.listenForUserMessages((count) => {
+                                this.setBadge(count);
+                            });
+                        }
+                    }, 500);
+                }
+            }
+        }
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script>
         $(document).ready(function () {
 
-            // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
+        // --- BẮT ĐẦU PHẦN CẬP NHẬT THEO CHIẾN LƯỢC MỚI ---
 
-            function updateNotificationBadge() {
-                console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
+        function updateNotificationBadge() {
+            console.log("[AJAX] 🟡 Bước 2: Bắt đầu gọi AJAX để lấy số thông báo (gọi action local)...");
 
-                $.ajax({
-                    // === SỬA LỖI CORS ===
-                    // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
-                    // ngay trên project UI này. Đây là đường dẫn tương đối.
-                    url: '/Notification/GetUnreadNotificationCount',
-                    type: 'GET',
-                    // KHÔNG cần "beforeSend" (Authorization) nữa,
-                    // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
-                    success: function (count) {
-                        console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
+            $.ajax({
+                // === SỬA LỖI CORS ===
+                // Gọi đến Action "GetUnreadNotificationCount" của "NotificationController"
+                // ngay trên project UI này. Đây là đường dẫn tương đối.
+                url: '/Notification/GetUnreadNotificationCount',
+                type: 'GET',
+                // KHÔNG cần "beforeSend" (Authorization) nữa,
+                // vì "NotificationController" bên C# sẽ tự lấy token từ session/cookie.
+                success: function (count) {
+                    console.log(`[AJAX] ✅ Thành công! Server trả về số thông báo chưa đọc là: ${count}`);
 
-                        const badge = $('#notification-badge');
+                    const badge = $('#notification-badge');
 
-                        if (badge.length) {
-                            if (count > 0) {
-                                badge.text(count);
-                                badge.show();
-                                console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
-                            } else {
-                                badge.hide();
-                                console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
-                            }
+                    if (badge.length) {
+                        if (count > 0) {
+                            badge.text(count);
+                            badge.show();
+                            console.log("[UI] 🟢 Đã cập nhật huy hiệu với số " + count);
                         } else {
-                            console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
+                            badge.hide();
+                            console.log("[UI] ⚪️ Không có thông báo mới, đã ẩn huy hiệu.");
                         }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
-                        // chứ không còn là lỗi CORS (status 0) nữa.
-                        console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
-                        console.error(`  - Status: ${jqXHR.status}`);
-                        console.error(`  - URL: ${this.url}`);
+                    } else {
+                        console.warn("[UI] ⚠️ Không tìm thấy phần tử #notification-badge trên trang.");
                     }
-                });
-            }
-
-            function connectToSignalR() {
-                const userId = @(Context.Session.GetInt32("UserId") ?? 0);
-                if (!userId) {
-                    console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
-                    return;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // Lỗi này giờ sẽ là lỗi 500 (lỗi server) hoặc 401 (chưa đăng nhập)
+                    // chứ không còn là lỗi CORS (status 0) nữa.
+                    console.error(`[AJAX] ❌ Lỗi AJAX: ${textStatus}`, errorThrown);
+                    console.error(`  - Status: ${jqXHR.status}`);
+                    console.error(`  - URL: ${this.url}`);
                 }
+            });
+        }
 
-                // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
-                const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
-                const connection = new signalR.HubConnectionBuilder()
-                    .withUrl(hubUrl, {
-                         // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
-                         accessTokenFactory: () => {
-                             return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
-                         }
-                    })
-                    .withAutomaticReconnect()
-                    .build();
-
-                // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
-                connection.on("ReceiveNotification", function (notification) {
-                    console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
-                    updateNotificationBadge(); // <-- Chính xác!
-                });
-
-                connection.start()
-                    .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
-                    .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
+        function connectToSignalR() {
+            const userId = @(Context.Session.GetInt32("UserId") ?? 0);
+            if (!userId) {
+                console.log("Người dùng chưa đăng nhập, không kết nối SignalR.");
+                return;
             }
 
-            console.log("Bắt đầu thực thi script layout...");
-            connectToSignalR();
-            console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
-            updateNotificationBadge();
+            // URL này VẪN ĐÚNG (SignalR vẫn kết nối thẳng đến Hub 7072)
+            const hubUrl = `https://localhost:7072/notificationHub?userId=${userId}`;
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(hubUrl, {
+                    // Vẫn cần AccessTokenFactory để xác thực kết nối SignalR
+                    accessTokenFactory: () => {
+                        return document.cookie.split('; ').find(row => row.startsWith('AccessToken='))?.split('=')[1];
+                    }
+                })
+                .withAutomaticReconnect()
+                .build();
+
+            // Logic này của bạn đã đúng: SignalR nhận tín hiệu -> gọi AJAX
+            connection.on("ReceiveNotification", function (notification) {
+                console.log('%c[SignalR] 🔴 Bước 1: TÍN HIỆU "ReceiveNotification" ĐÃ ĐƯỢC NHẬN!', 'color: red; font-weight: bold;', notification);
+                updateNotificationBadge(); // <-- Chính xác!
+            });
+
+            connection.start()
+                .then(() => console.log(`[SignalR] ✅ Đã kết nối tới hub thông báo với UserId = ${userId}`))
+                .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
+        }
+
+        console.log("Bắt đầu thực thi script layout...");
+        connectToSignalR();
+        console.log("Đang gọi updateNotificationBadge() lần đầu khi tải trang...");
+        updateNotificationBadge();
 
             // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
+
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
+    <script>
+        function initGoogleTranslate() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
+            autoDisplay: false,
+            multilanguagePage: true
+          }, 'google_translate_element');
+          // Ẩn banner Google
+          const handleGoogleUI = () => {
+            document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+            document.body.style.top = '0px';
+          };
+          const observer = new MutationObserver(() => handleGoogleUI());
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          const toggleBtn = document.getElementById("translate-toggle");
+          const menu = document.getElementById("translate-menu");
+          let translateLoaded = false;
+
+          // Khi Google Translate đã sẵn sàng (check có select trong #google_translate_element)
+          function waitForTranslateReady(cb) {
+            if (document.querySelector("#google_translate_element select")) {
+              translateLoaded = true;
+              if (cb) cb();
+            } else {
+              setTimeout(() => waitForTranslateReady(cb), 100);
+            }
+          }
+          waitForTranslateReady();
+
+          toggleBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            menu.classList.toggle("hidden");
+          });
+
+          document.addEventListener("click", function (e) {
+            if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+              menu.classList.add("hidden");
+            }
+          });
+
+          // Sự kiện chọn ngôn ngữ
+          document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+            btn.addEventListener("click", function () {
+              function changeLang() {
+                const lang = btn.getAttribute("data-lang");
+                const select = document.querySelector("#google_translate_element select");
+                if (select) {
+                  select.value = lang;
+                  select.dispatchEvent(new Event("change"));
+                }
+                menu.classList.add("hidden");
+                setTimeout(() => {
+                  document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+                    el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+                  });
+                }, 500);
+              }
+              if (translateLoaded) {
+                changeLang();
+              } else {
+                waitForTranslateReady(changeLang);
+              }
+            });
+          });
+
+          document.getElementById("reset-translate-btn").addEventListener("click", function () {
+            document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+            if (window.localStorage) localStorage.removeItem('googtrans');
+            window.location.reload();
+          });
+        });
+    </script>
+    <script type="module">
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        const db = getDatabase();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatWithAdminBtn = document.getElementById("chat-with-admin-btn");
+            if (chatWithAdminBtn) {
+                chatWithAdminBtn.addEventListener("click", async function() {
+                    const senderId = document.getElementById("senderId")?.value;
+                    const senderName = "@fullName"; // hoặc lấy từ biến JS/session
+                    const receiverId = "1";
+                    const receiverName = "Admin";
+
+                    if (!senderId || !senderName) {
+                        alert("Bạn cần đăng nhập để chat với Admin.");
+                        return;
+                    }
+                    if (senderId === receiverId) {
+                        alert("Bạn không thể chat với chính mình!");
+                        return;
+                    }
+                    await createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+                });
+            }
+        });
+
+        async function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName,
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName,
+                timestamp,
+                lastMessage: ""
+            };
+            try {
+                await Promise.all(
+                    Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+                );
+            } catch (e) {}
+            redirectToChat(senderId, senderName, receiverId, receiverName);
+        }
+
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName,
+                receiverId,
+                receiverName
+            });
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+    </script>
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import {
+          getDatabase,
+          ref,
+          get,
+          set,
+          update,
+          onValue,
+          onChildAdded,
+          off,
+          push,
+          onDisconnect,
+          runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+          authDomain: "chatbox-993b2.firebaseapp.com",
+          databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+          projectId: "chatbox-993b2",
+          storageBucket: "chatbox-993b2.appspot.com",
+          messagingSenderId: "168483987205",
+          appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Request Notification permission
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission().catch(() => {});
+        }
+
+        // ---------------- PRESENCE ----------------
+        // SERVER timestamp helper
+        const SERVER_TIMESTAMP = { '.sv': 'timestamp' };
+
+        // Heartbeat and threshold (tùy chỉnh nếu cần)
+        const HEARTBEAT_INTERVAL_MS = 25_000; // gửi heartbeat mỗi 25s
+        const OFFLINE_THRESHOLD_MS = 60_000;  // nếu lastSeen > 60s trước -> coi là offline
+
+        // Mark this client online for the given userId (per-tab).
+        // Registers onDisconnect handlers so server sets connection child removed when connection lost.
+        // Returns a cleanup function to call on page unload if desired.
+        export function initPresenceFor(userId) {
+          if (!userId) return;
+          try {
+            const connectedRef = ref(db, '.info/connected');
+            const statusRef = ref(db, `userStatus/${userId}`);
+            const connectionsRef = ref(db, `userStatus/${userId}/connections`);
+
+            let heartbeatTimer = null;
+            let currentConnRef = null;
+
+            // Listen connected
+            const connectedListener = onValue(connectedRef, async (snap) => {
+              const connected = !!snap.val();
+              if (!connected) return;
+
+              try {
+                // create a connection child for this tab
+                const newConnRef = push(connectionsRef);
+                currentConnRef = newConnRef;
+
+                // Register onDisconnect for the connection child: remove only this child
+                try {
+                         // đăng ký onDisconnect để remove connection child và đặt trạng thái offline
+        onDisconnect(newConnRef).remove().catch(e => console.warn('onDisconnect remove child failed', e));
+        onDisconnect(statusRef).set({ online: false, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('onDisconnect set root failed', e));
+                } catch (e) {
+                  console.warn('onDisconnect registration failed', e);
+                }
+
+                // Write child and set root online + lastSeen
+                await set(newConnRef, true).catch(e => console.warn('set connection child failed', e));
+                // Use update to avoid accidentally deleting other fields if extant
+                await set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('set status root failed', e));
+
+                // Start heartbeat to keep lastSeen fresh (so quick reloads/navigation keeps user treated as online)
+                try {
+                  if (heartbeatTimer) clearInterval(heartbeatTimer);
+                  heartbeatTimer = setInterval(() => {
+                    // Update lastSeen and online flag
+                    set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('heartbeat failed', e));
+                  }, HEARTBEAT_INTERVAL_MS);
+                } catch (e) {
+                  console.warn('heartbeat setup failed', e);
+                }
+
+              } catch (err) {
+                console.error('initPresenceFor error', err);
+              }
+            }, (err) => {
+              console.error('.info/connected listener error', err);
+            });
+
+            // return cleanup function if needed
+            return () => {
+              try {
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                if (currentConnRef) {
+                  // best-effort: remove our connection child and update lastSeen before unload
+                  try { set(currentConnRef, null).catch(() => {}); } catch (e) {}
+                  try { set(statusRef, { online: true, lastSeen: Date.now() }).catch(() => {}); } catch (e) {}
+                }
+              } catch (e) {}
+              try { off(connectedRef); } catch (e) {}
+            };
+          } catch (ex) {
+            console.error('initPresenceFor exception', ex);
+          }
+        }
+
+        // One-time check whether a userId is online
+        // Uses lastSeen TTL rather than trusting `online` boolean alone.
+        export async function checkUserOnline(userId) {
+          try {
+            if (!userId) return false;
+            const snap = await get(ref(db, `userStatus/${userId}`));
+            if (!snap || !snap.exists()) return false;
+            const val = snap.val();
+            const lastSeen = val && val.lastSeen ? Number(val.lastSeen) : 0;
+            const now = Date.now();
+            return (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+          } catch (err) {
+            console.error('checkUserOnline error', err);
+            return false;
+          }
+        }
+
+        // Subscribe to realtime status changes for a userId
+        // onChange(isOnline:boolean, rawVal:object)
+        export function subscribeUserStatus(userId, onChange) {
+          if (!userId || typeof onChange !== 'function') return () => {};
+          const statusRef = ref(db, `userStatus/${userId}`);
+
+          const listener = (snap) => {
+            const v = snap.val();
+            try {
+              const lastSeen = v && v.lastSeen ? Number(v.lastSeen) : 0;
+              const now = Date.now();
+              const isOnline = (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+              onChange(isOnline, v);
+            } catch (e) {
+              console.error('subscribeUserStatus onChange handler error', e);
+            }
+          };
+
+          onValue(statusRef, listener, (err) => {
+            console.error('subscribeUserStatus error', err);
+          });
+
+          return () => {
+            try { off(statusRef); } catch (e) {}
+          };
+        }
+
+        // ---------------- MESSAGES / NOTIFICATIONS ----------------
+
+        async function getUserRooms(userId) {
+          const snapshot = await get(ref(db, "chats"));
+          const rooms = [];
+          if (snapshot && snapshot.exists()) {
+            snapshot.forEach(roomSnap => {
+              const roomId = roomSnap.key;
+              if (roomId && roomId.split("_").includes(String(userId))) {
+                rooms.push(roomId);
+              }
+            });
+          }
+          return rooms;
+        }
+
+        function showNotification(msg) {
+          if (Notification.permission === "granted") {
+            try {
+              new Notification(`${msg.senderName}`, { body: msg.message });
+            } catch (e) {
+              console.warn('Notification creation failed', e);
+            }
+          }
+        }
+
+        export async function incrementUnread(userId) {
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        export async function listenForUserMessages(userId, badgeHandler) {
+          if (!userId) return;
+          const rooms = await getUserRooms(userId);
+
+          // unread count listener
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          onValue(unreadRef, (snapshot) => {
+            const count = snapshot.exists() ? snapshot.val() : 0;
+            try { badgeHandler(count); } catch (e) { console.error('badgeHandler error', e); }
+          });
+
+          // Listen for new messages
+          const startTime = Date.now();
+          rooms.forEach(roomId => {
+            const roomRef = ref(db, `chats/${roomId}`);
+            onChildAdded(roomRef, (snapshot) => {
+              const msg = snapshot.val();
+              if (msg && msg.timestamp > startTime && String(msg.senderId) !== String(userId)) {
+                showNotification(msg);
+              }
+            });
+          });
+        }
+
+        // ---------------- EXPOSE GLOBAL HELPERS ----------------
+        window._chatPresence = {
+          initPresenceFor,
+          checkUserOnline,
+          subscribeUserStatus,
+          listenForUserMessages,
+          incrementUnread
+        };
+
+        // ---------------- AUTO-INIT PRESENCE FOR LAYOUT USER ----------------
+        try {
+          const layoutUserId = (typeof window.currentUserId !== 'undefined' && window.currentUserId != null)
+            ? String(window.currentUserId)
+            : null;
+
+          if (layoutUserId) {
+            console.log('[PRESENCE] auto init for user:', layoutUserId);
+            initPresenceFor(layoutUserId);
+          } else {
+            console.log('[PRESENCE] no currentUserId, presence not initialized');
+          }
+        } catch (e) {
+          console.warn('[PRESENCE] auto init error', e);
+        }
     </script>
 </body>
 </html>

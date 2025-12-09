@@ -1,10 +1,20 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userId = Context.Session.GetInt32("UserId");
+    var accessToken = Context.Request.Cookies["AccessToken"];
+    var fullName = Context.Session.GetString("FullName");
+    var avatarUrl = Context.Session.GetString("AvatarUrl");
+}
+<!DOCTYPE html>
 <html lang="vi">
-
+@{
+            var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+            var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Sportivey</title>
+    <title translate="no">@ViewData["Title"] - Sportivey</title>
+
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="description" content="Đặt sân thể thao yêu thích của bạn một cách dễ dàng và linh hoạt." />
 
@@ -138,6 +148,402 @@
         .goog-tooltip,
         .goog-text-highlight {
             display: none !important;
+        }
+
+        #incomingCallPopup {
+            position: fixed;
+            z-index: 3000;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            transition: opacity 0.3s ease;
+        }
+
+            #incomingCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .webrtc-popup-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 320px;
+            max-width: 380px;
+            animation: popupBounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @@keyframes popupBounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .webrtc-popup-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+            position: relative;
+            animation: avatarPulse 2s infinite;
+        }
+
+        @@keyframes avatarPulse {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(78, 158, 255, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 8px 35px rgba(78, 158, 255, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        .webrtc-popup-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            z-index: -1;
+            opacity: 0.3;
+            animation: ringPulse 2s infinite;
+        }
+
+        @@keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .webrtc-popup-caller {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .webrtc-popup-type {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .webrtc-popup-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .accept-btn, .decline-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: white;
+        }
+
+            .accept-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+            }
+
+            .accept-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .decline-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+            .decline-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            }
+
+            .decline-btn:active {
+                transform: translateY(-1px) scale(1.02);
+            }
+
+        .accept-btn span::before {
+            content: '📞';
+            margin-right: 5px;
+        }
+
+        .decline-btn span::before {
+            content: '✖️';
+            margin-right: 5px;
+        }
+
+        /* Video Call Modal - Improved */
+        #videoCallPopup {
+            position: fixed;
+            z-index: 2050;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            transition: opacity 0.3s ease;
+        }
+
+            #videoCallPopup.webrtc-popup-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .video-call-modal {
+            width: 100vw;
+            max-width: 420px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+        }
+
+        @@keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .video-call-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(78, 158, 255, 0.1), rgba(0, 212, 170, 0.1));
+            border-radius: 16px;
+        }
+
+        #videoCallTitle {
+            font-weight: 700;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex: 1;
+        }
+
+        #endCallBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            min-width: 100px;
+        }
+
+            #endCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            }
+
+            #endCallBtn::before {
+                content: '📞';
+                margin-right: 5px;
+            }
+
+        .video-call-video-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        #remoteVideo, #localVideo {
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        #remoteVideo {
+            width: 96%;
+            max-width: 380px;
+            height: 280px;
+            object-fit: cover;
+            border: 3px solid rgba(78, 158, 255, 0.5);
+        }
+
+        #localVideo {
+            width: 110px;
+            height: 80px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: 3px solid #00d4aa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            object-fit: cover;
+        }
+
+        /* Waiting Message Styling */
+        #waitingCallMsg {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-weight: 600;
+            color: #4e9eff;
+            z-index: 4005;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            border: 2px solid rgba(78, 158, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 30px;
+            box-shadow: 0 8px 25px rgba(78, 158, 255, 0.3);
+            animation: messageFadeIn 0.3s ease;
+            max-width: 90%;
+        }
+
+        @@keyframes messageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Call buttons styling */
+        #startAudioCallBtn, #startVideoCallBtn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 158, 255, 0.3);
+            margin: 5px;
+        }
+
+            #startAudioCallBtn:hover, #startVideoCallBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(78, 158, 255, 0.4);
+            }
+
+            #startAudioCallBtn::before {
+                content: '📞 ';
+            }
+
+            #startVideoCallBtn::before {
+                content: '📹 ';
+            }
+
+        /* Responsive */
+        @@media (max-width: 500px) {
+            .webrtc-popup-content {
+                min-width: 280px;
+                padding: 30px 20px;
+            }
+
+            .webrtc-popup-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 38px;
+            }
+
+            .webrtc-popup-caller {
+                font-size: 20px;
+            }
+
+            .accept-btn, .decline-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+            }
+
+            .video-call-modal {
+                max-width: 95vw;
+                padding: 15px;
+            }
+
+            #remoteVideo {
+                height: 220px;
+            }
+
+            #localVideo {
+                width: 80px;
+                height: 60px;
+                top: 10px;
+                right: 10px;
+            }
         }
 
     </style>
@@ -714,7 +1120,7 @@
                         <div class="w-11 h-11 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:rotate-12">
                             <i class="ri-football-line text-white text-xl animate-float"></i>
                         </div>
-                        <h1 class="font-poppins font-bold text-xl logo-gradient hidden sm:block">
+                        <h1 class="font-poppins font-bold text-xl logo-gradient hidden sm:block" translate="no">
                             Sportivey
                         </h1>
                     </a>
@@ -725,15 +1131,13 @@
                     <div id="nav"
                          class="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/40">
                         <a asp-controller="Home" asp-action="Index"
-                           class="nav-link active px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-home-4-line text-base"></i>
-                            <span>Trang chủ</span>
+                           class="block px-4 py-3 @(currentController == "Home" ? "text-blue-600 bg-blue-50" : "text-slate-600") hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                            <i class="ri-home-4-line mr-3"></i>Trang chủ
                         </a>
 
                         <a asp-controller="FindTeam" asp-action="FindTeam"
-                           class="nav-link px-4 py-2.5 text-slate-600 hover:text-blue-600 font-semibold flex items-center space-x-2 text-sm">
-                            <i class="ri-team-line text-base"></i>
-                            <span>Đội nhóm</span>
+                           class="block px-4 py-3 @(currentController == "FindTeam" ? "text-blue-600 bg-blue-50" : "text-slate-600") hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                            <i class="ri-team-line mr-3"></i>Tìm đội
                         </a>
 
 
@@ -831,26 +1235,36 @@
                                 </a>
                             </div>
 
-                            <!-- Chat/Messages -->
-                            <div class="relative badge-container">
+
+                            <!-- Enhanced Chat/Messages with proper spacing -->
+                            <div x-data="chatBadge()" x-init="init()" class="relative badge-container">
                                 <a href="javascript:void(0);"
                                    class="action-btn p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl text-white shadow-lg hover:shadow-xl group"
-                                   title="Tin nhắn" @@click="toggleChat()">
+                                   title="Messages"
+                                   @@click="openChat()">
                                     <i class="ri-message-3-line text-lg group-hover:scale-110 transition-transform duration-200"></i>
-                                    <span class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10">
-                                        0
-                                    </span>
+                                    <template x-if="unreadCount > 0">
+                                        <span class="notification-badge absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10"
+                                              x-text="unreadCount"></span>
+                                    </template>
                                 </a>
                             </div>
 
+
+
                             <!-- User Menu -->
+
                             <div class="relative" x-data="{ open: false }">
                                 <button @@click="open = !open"
                                         class="flex items-center space-x-2 p-2 rounded-xl glass-effect hover:bg-white/80 transition-all duration-300 group">
                                     <img src="@avatarUrl" alt="Avatar"
                                          class="w-8 h-8 rounded-lg border-2 border-white/60 shadow-sm group-hover:scale-105 transition-transform duration-300"
                                          data-user-avatar />
-                                    <div class="hidden xl:block text-left">
+                                    <div class="hidden xl:block text-left" translate="no">
+
+
+
+
                                         <p class="text-sm font-bold text-slate-800 leading-none" data-user-firstname>
                                             @(fullName?.Split(' ').FirstOrDefault() ?? "Người dùng")
                                         </p>
@@ -906,6 +1320,13 @@
                                             <i class="ri-calendar-check-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
                                             <span class="font-semibold">Lịch chơi</span>
                                         </a>
+                                        <button id="chat-with-admin-btn"
+                                                type="button"
+                                                class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group font-semibold">
+                                            <i class="ri-chat-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
+                                            <span>Chat với Admin</span>
+                                        </button>
+                                        <input type="hidden" id="senderId" value="@userId" />
                                         <a asp-controller="Discount" asp-action="DiscountList"
                                            class="flex items-center px-4 py-3 text-slate-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all duration-200 group">
                                             <i class="ri-coupon-3-line text-lg mr-4 group-hover:scale-110 transition-transform"></i>
@@ -941,7 +1362,12 @@
                     </button>
                 </div>
             </div>
+            <input type="hidden" id="senderId" value="@ViewBag.UserId" />
+            <input type="hidden" id="senderName" value="@ViewBag.UserName" />
+            <script>
+                window.currentUserId = '@userId';
 
+            </script>
             <!-- Mobile Navigation Menu -->
             <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -1062,9 +1488,9 @@
         // Các hàm JavaScript khác giữ nguyên
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
-    <script>
-        // Các hàm JavaScript khác giữ nguyên
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     @RenderSection("Scripts", required: false)
 
     <script>
@@ -1094,6 +1520,7 @@
             backdrop.classList.add('opacity-0');
             panel.classList.remove('opacity-100', 'scale-100');
             panel.classList.add('opacity-0', 'scale-95');
+
 
             setTimeout(() => {
                 modal.classList.add('hidden');
@@ -1260,102 +1687,727 @@
 
             // --- KẾT THÚC PHẦN CẬP NHẬT ---
         });
+
     </script>
-    
+
     <script>
-      function initGoogleTranslate() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
-        autoDisplay: false,
-        multilanguagePage: true
-      }, 'google_translate_element');
+        window.currentUserId = @userId;
+        console.log("🔑 UserId từ Session:", @userId);
+    </script>
 
-      // Ẩn banner Google
-      const handleGoogleUI = () => {
-        document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
-        document.body.style.top = '0px';
-      };
+    <script type="module">
 
-      const observer = new MutationObserver(() => handleGoogleUI());
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import {
+          getDatabase,
+          ref,
+          get,
+          set,
+          update,
+          onValue,
+          onChildAdded,
+          off,
+          push,
+          onDisconnect,
+          runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-    // Toggle menu custom
-    const toggleBtn = document.getElementById("translate-toggle");
-    const menu = document.getElementById("translate-menu");
+        const firebaseConfig = {
+          apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+          authDomain: "chatbox-993b2.firebaseapp.com",
+          databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+          projectId: "chatbox-993b2",
+          storageBucket: "chatbox-993b2.appspot.com",
+          messagingSenderId: "168483987205",
+          appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
 
-    toggleBtn.addEventListener("click", () => {
-      menu.classList.toggle("hidden");
-    });
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    document.addEventListener("click", (e) => {
-      if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.add("hidden");
-      }
-    });
-
-
-    document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const lang = btn.getAttribute("data-lang");
-        const select = document.querySelector("#google_translate_element select");
-        if (select) {
-          select.value = lang;
-          select.dispatchEvent(new Event("change"));
+        // Request Notification permission
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission().catch(() => {});
         }
-        menu.classList.add("hidden");
 
+        // ---------------- PRESENCE ----------------
+        // SERVER timestamp helper
+        const SERVER_TIMESTAMP = { '.sv': 'timestamp' };
 
-        setTimeout(() => {
-          document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
-            el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
-          });
-        }, 500);
-      });
-    });
+        // Heartbeat and threshold (tùy chỉnh nếu cần)
+        const HEARTBEAT_INTERVAL_MS = 25_000; // gửi heartbeat mỗi 25s
+        const OFFLINE_THRESHOLD_MS = 60_000;  // nếu lastSeen > 60s trước -> coi là offline
 
+        // Mark this client online for the given userId (per-tab).
+        // Registers onDisconnect handlers so server sets connection child removed when connection lost.
+        // Returns a cleanup function to call on page unload if desired.
+        export function initPresenceFor(userId) {
+          if (!userId) return;
+          try {
+            const connectedRef = ref(db, '.info/connected');
+            const statusRef = ref(db, `userStatus/${userId}`);
+            const connectionsRef = ref(db, `userStatus/${userId}/connections`);
 
-    document.getElementById("reset-translate-btn").addEventListener("click", function() {
-    document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
-      if (window.localStorage) {
-        localStorage.removeItem('googtrans');
-      }
-     window.location.reload();
-    });
-     (function () {
-        function deleteCookie(name) {
-            try {
-                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
-                if (location.hostname.indexOf('.') !== -1) {
-                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
+            let heartbeatTimer = null;
+            let currentConnRef = null;
+
+            // Listen connected
+            const connectedListener = onValue(connectedRef, async (snap) => {
+              const connected = !!snap.val();
+              if (!connected) return;
+
+              try {
+                // create a connection child for this tab
+                const newConnRef = push(connectionsRef);
+                currentConnRef = newConnRef;
+
+                // Register onDisconnect for the connection child: remove only this child
+                try {
+                         // đăng ký onDisconnect để remove connection child và đặt trạng thái offline
+        onDisconnect(newConnRef).remove().catch(e => console.warn('onDisconnect remove child failed', e));
+        onDisconnect(statusRef).set({ online: false, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('onDisconnect set root failed', e));
+                } catch (e) {
+                  console.warn('onDisconnect registration failed', e);
                 }
-            } catch (e) { console.warn('Cookie delete failed', e); }
+
+                // Write child and set root online + lastSeen
+                await set(newConnRef, true).catch(e => console.warn('set connection child failed', e));
+                // Use update to avoid accidentally deleting other fields if extant
+                await set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('set status root failed', e));
+
+                // Start heartbeat to keep lastSeen fresh (so quick reloads/navigation keeps user treated as online)
+                try {
+                  if (heartbeatTimer) clearInterval(heartbeatTimer);
+                  heartbeatTimer = setInterval(() => {
+                    // Update lastSeen and online flag
+                    set(statusRef, { online: true, lastSeen: SERVER_TIMESTAMP }).catch(e => console.warn('heartbeat failed', e));
+                  }, HEARTBEAT_INTERVAL_MS);
+                } catch (e) {
+                  console.warn('heartbeat setup failed', e);
+                }
+
+              } catch (err) {
+                console.error('initPresenceFor error', err);
+              }
+            }, (err) => {
+              console.error('.info/connected listener error', err);
+            });
+
+            // return cleanup function if needed
+            return () => {
+              try {
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                if (currentConnRef) {
+                  // best-effort: remove our connection child and update lastSeen before unload
+                  try { set(currentConnRef, null).catch(() => {}); } catch (e) {}
+                  try { set(statusRef, { online: true, lastSeen: Date.now() }).catch(() => {}); } catch (e) {}
+                }
+              } catch (e) {}
+              try { off(connectedRef); } catch (e) {}
+            };
+          } catch (ex) {
+            console.error('initPresenceFor exception', ex);
+          }
         }
 
-        function stopTranslateAndReload() {
-            // Xóa cookie Google Translate
-            deleteCookie('googtrans');
+        // One-time check whether a userId is online
+        // Uses lastSeen TTL rather than trusting `online` boolean alone.
+        export async function checkUserOnline(userId) {
+          try {
+            if (!userId) return false;
+            const snap = await get(ref(db, `userStatus/${userId}`));
+            if (!snap || !snap.exists()) return false;
+            const val = snap.val();
+            const lastSeen = val && val.lastSeen ? Number(val.lastSeen) : 0;
+            const now = Date.now();
+            return (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+          } catch (err) {
+            console.error('checkUserOnline error', err);
+            return false;
+          }
+        }
 
-            // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
-            // Sau đó reload trang để trạng thái dịch bị loại bỏ
-            location.reload();
-}
+        // Subscribe to realtime status changes for a userId
+        // onChange(isOnline:boolean, rawVal:object)
+        export function subscribeUserStatus(userId, onChange) {
+          if (!userId || typeof onChange !== 'function') return () => {};
+          const statusRef = ref(db, `userStatus/${userId}`);
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn = document.getElementById('reset-translate-btn');
-            if (!btn) return;
-            btn.addEventListener('click', function () {
-                btn.disabled = true;
-                btn.textContent = 'Đang đặt...';
-                setTimeout(() => {
-                    stopTranslateAndReload();
-                }, 150);
+          const listener = (snap) => {
+            const v = snap.val();
+            try {
+              const lastSeen = v && v.lastSeen ? Number(v.lastSeen) : 0;
+              const now = Date.now();
+              const isOnline = (now - lastSeen) <= OFFLINE_THRESHOLD_MS;
+              onChange(isOnline, v);
+            } catch (e) {
+              console.error('subscribeUserStatus onChange handler error', e);
+            }
+          };
+
+          onValue(statusRef, listener, (err) => {
+            console.error('subscribeUserStatus error', err);
+          });
+
+          return () => {
+            try { off(statusRef); } catch (e) {}
+          };
+        }
+
+        // ---------------- MESSAGES / NOTIFICATIONS ----------------
+
+        async function getUserRooms(userId) {
+          const snapshot = await get(ref(db, "chats"));
+          const rooms = [];
+          if (snapshot && snapshot.exists()) {
+            snapshot.forEach(roomSnap => {
+              const roomId = roomSnap.key;
+              if (roomId && roomId.split("_").includes(String(userId))) {
+                rooms.push(roomId);
+              }
             });
+          }
+          return rooms;
+        }
+
+        function showNotification(msg) {
+          if (Notification.permission === "granted") {
+            try {
+              new Notification(`${msg.senderName}`, { body: msg.message });
+            } catch (e) {
+              console.warn('Notification creation failed', e);
+            }
+          }
+        }
+
+        export async function incrementUnread(userId) {
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        export async function listenForUserMessages(userId, badgeHandler) {
+          if (!userId) return;
+          const rooms = await getUserRooms(userId);
+
+          // unread count listener
+          const unreadRef = ref(db, `unreadMessages/${userId}`);
+          onValue(unreadRef, (snapshot) => {
+            const count = snapshot.exists() ? snapshot.val() : 0;
+            try { badgeHandler(count); } catch (e) { console.error('badgeHandler error', e); }
+          });
+
+          // Listen for new messages
+          const startTime = Date.now();
+          rooms.forEach(roomId => {
+            const roomRef = ref(db, `chats/${roomId}`);
+            onChildAdded(roomRef, (snapshot) => {
+              const msg = snapshot.val();
+              if (msg && msg.timestamp > startTime && String(msg.senderId) !== String(userId)) {
+                showNotification(msg);
+              }
+            });
+          });
+        }
+
+        // ---------------- EXPOSE GLOBAL HELPERS ----------------
+        window._chatPresence = {
+          initPresenceFor,
+          checkUserOnline,
+          subscribeUserStatus,
+          listenForUserMessages,
+          incrementUnread
+        };
+
+        // ---------------- AUTO-INIT PRESENCE FOR LAYOUT USER ----------------
+        try {
+          const layoutUserId = (typeof window.currentUserId !== 'undefined' && window.currentUserId != null)
+            ? String(window.currentUserId)
+            : null;
+
+          if (layoutUserId) {
+            console.log('[PRESENCE] auto init for user:', layoutUserId);
+            initPresenceFor(layoutUserId);
+          } else {
+            console.log('[PRESENCE] no currentUserId, presence not initialized');
+          }
+        } catch (e) {
+          console.warn('[PRESENCE] auto init error', e);
+        }
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        async function getUserRooms(userId) {
+            const snapshot = await get(ref(db, "chats"));
+            const rooms = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(roomSnap => {
+                    const roomId = roomSnap.key;
+                    if (roomId.split("_").includes(String(userId))) {
+                        rooms.push(roomId);
+                    }
+                });
+            }
+
+            return rooms;
+        }
+
+        function showNotification(msg) {
+            if (Notification.permission === "granted") {
+                new Notification(`${msg.senderName}`, { body: msg.message });
+            }
+        }
+
+        // ✅ Tăng số tin chưa đọc trong Firebase
+               import { runTransaction } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        async function incrementUnread(userId) {
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            await runTransaction(unreadRef, (current) => (current || 0) + 1);
+        }
+
+        async function listenForUserMessages(userId, badgeHandler) {
+            const rooms = await getUserRooms(userId);
+
+            // ✅ Lắng nghe thay đổi số tin chưa đọc từ Firebase
+            const unreadRef = ref(db, `unreadMessages/${userId}`);
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.exists() ? snapshot.val() : 0;
+                badgeHandler(count);
+            });
+
+            // ✅ Lắng nghe tin mới
+            const startTime = Date.now();
+
+            rooms.forEach(roomId => {
+                const roomRef = ref(db, `chats/${roomId}`);
+
+                onChildAdded(roomRef, (snapshot) => {
+                    const msg = snapshot.val();
+
+                    if (msg.timestamp > startTime && msg.senderId != userId) {
+
+                        showNotification(msg);
+                    }
+                });
+            });
+        }
+
+        const currentUserId = window.currentUserId;
+
+        if (currentUserId) {
+            window.listenForUserMessages = (badgeHandler) => {
+                return listenForUserMessages(currentUserId, badgeHandler);
+            };
+
+            // ✅ Reset số tin chưa đọc về 0 khi mở chat
+            window.resetUnreadMessages = async () => {
+                const unreadRef = ref(db, `unreadMessages/${currentUserId}`);
+                await set(unreadRef, 0);
+            };
+        }
+    </script>
+
+    <!-- Non-module script: keep chatBadge as a global function used by x-data in layout -->
+    <script>
+        // Make chatBadge available globally (used by Alpine x-data="chatBadge()")
+        window.chatBadge = function () {
+          return {
+            unreadCount: 0,
+            async openChat() {
+              if (typeof window._chatPresence?.listenForUserMessages === 'function') {
+                // Ensure unread reset if function exists
+              }
+              if (typeof window.resetUnreadMessages === "function") {
+                await window.resetUnreadMessages();
+              }
+              this.unreadCount = 0;
+              window.location.href = '@Url.Action("Chat", "Chat")';
+            },
+            setBadge(count) {
+              this.unreadCount = count;
+            },
+            init() {
+              setTimeout(() => {
+                if (typeof window.listenForUserMessages === "function") {
+                  window.listenForUserMessages((count) => {
+                    this.setBadge(count);
+                  });
+                } else if (typeof window._chatPresence?.listenForUserMessages === "function") {
+                  // backward compatible
+                  window._chatPresence.listenForUserMessages((count) => {
+                    this.setBadge(count);
+                  });
+                }
+              }, 500);
+            }
+          }
+        };
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCg6rxISbUgZKNqqLlkBrYS_sQtkYRaByo",
+            authDomain: "chatbox-993b2.firebaseapp.com",
+            databaseURL: "https://chatbox-993b2-default-rtdb.firebaseio.com",
+            projectId: "chatbox-993b2",
+            storageBucket: "chatbox-993b2.appspot.com",
+            messagingSenderId: "168483987205",
+            appId: "1:168483987205:web:c9ef776901ec2882bb616c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatWithAdminBtn = document.getElementById("chat-with-admin-btn");
+            if (chatWithAdminBtn) {
+                chatWithAdminBtn.addEventListener("click", async function() {
+                    const senderId = document.getElementById("senderId")?.value;
+                    // Lấy tên từ DOM đã render
+                    const senderName = document.querySelector('[data-user-fullname]')?.textContent?.trim() || "";
+                    const receiverId = "1";
+                    const receiverName = "Admin";
+
+                    if (!senderId || !senderName) {
+                        alert("Bạn cần đăng nhập để chat với Admin.");
+                        return;
+                    }
+                    if (senderId === receiverId) {
+                        alert("Bạn không thể chat với chính mình!");
+                        return;
+                    }
+
+                    await createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName);
+                });
+            }
         });
-    })();
-</script>
+
+        async function createChatRoomAndRedirect(senderId, senderName, receiverId, receiverName) {
+            const timestamp = Date.now();
+
+            const updates = {};
+            updates[`userChats/${senderId}/${receiverId}`] = {
+                name: receiverName,
+                timestamp,
+                lastMessage: ""
+            };
+            updates[`userChats/${receiverId}/${senderId}`] = {
+                name: senderName,
+                timestamp,
+                lastMessage: ""
+            };
+
+            try {
+                await Promise.all(
+                    Object.keys(updates).map(path => set(ref(db, path), updates[path]))
+                );
+            } catch (e) {
+                // Nếu lỗi vẫn redirect
+            }
+            redirectToChat(senderId, senderName, receiverId, receiverName);
+        }
+
+        function redirectToChat(senderId, senderName, receiverId, receiverName) {
+            const params = new URLSearchParams({
+                senderId,
+                senderName,
+                receiverId,
+                receiverName
+            });
+            window.location.href = `/Chat/Chat?${params.toString()}`;
+        }
+                // Lightweight handler that shows the incoming call popup (markup must exist in layout).
+        // Put this non-module script in layout (after the popup HTML and after the listener script).
+        (function () {
+          if (window.__webrtcLayoutPopupHandlerInstalled) return;
+          window.__webrtcLayoutPopupHandlerInstalled = true;
+
+          const popupId = 'incomingCallPopup';
+          const avatarId = 'incomingCallAvatar';
+          const nameId = 'incomingCallName';
+          const typeId = 'incomingCallType';
+          const acceptBtnId = 'acceptCallBtn';
+          const declineBtnId = 'declineCallBtn';
+
+          let currentOffer = null;
+          let currentChatId = null;
+          let autoHideTimer = null;
+
+          function showPopup(offer, chatId) {
+            currentOffer = offer;
+            currentChatId = chatId;
+
+            const popup = document.getElementById(popupId);
+            if (!popup) return console.warn('Incoming popup element not found');
+
+            // Fill UI
+            const avatar = document.getElementById(avatarId);
+            const nameEl = document.getElementById(nameId);
+            const typeEl = document.getElementById(typeId);
+
+            if (nameEl) nameEl.textContent = (offer && (offer.callerName || offer.from)) ? (offer.callerName || offer.from) : 'Người lạ';
+            if (avatar) avatar.textContent = (offer && (offer.callerName || offer.from)) ? ( (offer.callerName || offer.from).charAt(0).toUpperCase() ) : '👤';
+            if (typeEl) typeEl.textContent = (offer && offer.isVideo) ? 'Cuộc gọi Video' : 'Cuộc gọi Âm thanh';
+
+            popup.classList.remove('webrtc-popup-hidden');
+
+            // Auto-hide after 30s if no action
+            if (autoHideTimer) clearTimeout(autoHideTimer);
+            autoHideTimer = setTimeout(() => {
+              hidePopup();
+              // notify decline automatically
+              dispatchDecline();
+            }, 30_000);
+          }
+
+          function hidePopup() {
+            const popup = document.getElementById(popupId);
+            if (!popup) return;
+            popup.classList.add('webrtc-popup-hidden');
+            currentOffer = null;
+            currentChatId = null;
+            if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = null; }
+          }
+
+          // When user accepts: try to call page-level accept handler, else dispatch event
+          function dispatchAccept() {
+            try {
+              // Prefer explicit global handler if present
+              if (typeof window.onAcceptIncomingCall === 'function') {
+                window.onAcceptIncomingCall(currentOffer, currentChatId);
+                return;
+              }
+              // Backwards-compatible name from Chat page
+              if (typeof window.acceptIncomingCall === 'function') {
+                try { window.acceptIncomingCall(currentOffer, { chatId: currentChatId, callerId: currentOffer.from, callerName: currentOffer.callerName, isVideo: currentOffer.isVideo }); return; } catch (e) {}
+              }
+              // Otherwise dispatch event so page-level code can react
+              const evt = new CustomEvent('acceptIncomingCall', { detail: { offer: currentOffer, chatId: currentChatId } });
+              window.dispatchEvent(evt);
+            } catch (e) {
+              console.error('dispatchAccept error', e);
+            }
+          }
+
+          // When user declines: try to call page-level decline handler, else dispatch event
+          function dispatchDecline() {
+            try {
+              if (typeof window.onDeclineIncomingCall === 'function') {
+                window.onDeclineIncomingCall(currentOffer, currentChatId);
+                return;
+              }
+              if (typeof window.declineIncomingCall === 'function') {
+                try { window.declineIncomingCall(currentChatId); return; } catch (e) {}
+              }
+              const evt = new CustomEvent('declineIncomingCall', { detail: { offer: currentOffer, chatId: currentChatId } });
+              window.dispatchEvent(evt);
+            } catch (e) {
+              console.error('dispatchDecline error', e);
+            }
+          }
+
+          // Wire buttons (avoid duplicate handlers)
+          function wireButtons() {
+            const acceptBtn = document.getElementById(acceptBtnId);
+            const declineBtn = document.getElementById(declineBtnId);
+            if (acceptBtn) {
+              acceptBtn.removeEventListener('click', onAcceptClick);
+              acceptBtn.addEventListener('click', onAcceptClick);
+            }
+            if (declineBtn) {
+              declineBtn.removeEventListener('click', onDeclineClick);
+              declineBtn.addEventListener('click', onDeclineClick);
+            }
+
+            // Click outside popup to decline
+            const popup = document.getElementById(popupId);
+            if (popup) {
+              popup.addEventListener('click', function (e) {
+                if (e.target === popup) {
+                  hidePopup();
+                  dispatchDecline();
+                }
+              });
+            }
+          }
+
+          function onAcceptClick(e) {
+            e.preventDefault();
+            hidePopup();
+            dispatchAccept();
+          }
+          function onDeclineClick(e) {
+            e.preventDefault();
+            hidePopup();
+            dispatchDecline();
+          }
+
+          // Listen for incomingCall event produced by the layout listener (or other code)
+          function onIncomingEvent(e) {
+            const detail = e && e.detail;
+            if (!detail) return;
+            const { offer, chatId } = detail;
+            // optionally ignore if you're already in a call
+            if (window.peerConnection) {
+              console.log('Already in call — ignoring incoming popup');
+              return;
+            }
+            showPopup(offer, chatId);
+          }
+
+          // Expose utility to show/hide programmatically
+          window.__webrtcShowIncomingPopup = showPopup;
+          window.__webrtcHideIncomingPopup = hidePopup;
+
+          // Start
+          wireButtons();
+          window.addEventListener('incomingCall', onIncomingEvent); // from webrtc-layout-listener-no-ui
+          // Also accept direct calls to window.onIncomingCall if the other script calls it
+          window.onIncomingCall = function (offer, chatId) {
+            try { onIncomingEvent({ detail: { offer, chatId } }); } catch (e) {}
+          };
+
+          // Clean up on unload
+          window.addEventListener('beforeunload', () => {
+            try {
+              window.removeEventListener('incomingCall', onIncomingEvent);
+              hidePopup();
+            } catch (e) {}
+          });
+
+          console.log('webrtc layout popup handler installed');
+        })();
+    </script>
+
+
+
+    <script>
+              function initGoogleTranslate() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
+                autoDisplay: false,
+                multilanguagePage: true
+              }, 'google_translate_element');
+
+              // Ẩn banner Google
+              const handleGoogleUI = () => {
+                document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+                document.body.style.top = '0px';
+              };
+
+              const observer = new MutationObserver(() => handleGoogleUI());
+              observer.observe(document.body, { childList: true, subtree: true });
+            }
+
+            // Toggle menu custom
+            const toggleBtn = document.getElementById("translate-toggle");
+            const menu = document.getElementById("translate-menu");
+
+            toggleBtn.addEventListener("click", () => {
+              menu.classList.toggle("hidden");
+            });
+
+            document.addEventListener("click", (e) => {
+              if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add("hidden");
+              }
+            });
+
+
+            document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+              btn.addEventListener("click", () => {
+                const lang = btn.getAttribute("data-lang");
+                const select = document.querySelector("#google_translate_element select");
+                if (select) {
+                  select.value = lang;
+                  select.dispatchEvent(new Event("change"));
+                }
+                menu.classList.add("hidden");
+
+
+                setTimeout(() => {
+                  document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+                    el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+                  });
+                }, 500);
+              });
+            });
+
+
+            document.getElementById("reset-translate-btn").addEventListener("click", function() {
+            document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+              if (window.localStorage) {
+                localStorage.removeItem('googtrans');
+              }
+             window.location.reload();
+            });
+             (function () {
+                function deleteCookie(name) {
+                    try {
+                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
+                        if (location.hostname.indexOf('.') !== -1) {
+                            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
+                        }
+                    } catch (e) { console.warn('Cookie delete failed', e); }
+                }
+
+                function stopTranslateAndReload() {
+                    // Xóa cookie Google Translate
+                    deleteCookie('googtrans');
+
+                    // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
+                    // Sau đó reload trang để trạng thái dịch bị loại bỏ
+                    location.reload();
+        }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const btn = document.getElementById('reset-translate-btn');
+                    if (!btn) return;
+                    btn.addEventListener('click', function () {
+                        btn.disabled = true;
+                        btn.textContent = 'Đang đặt...';
+                        setTimeout(() => {
+                            stopTranslateAndReload();
+                        }, 150);
+                    });
+                });
+            })();
+    </script>
+    <div id="incomingCallPopup" class="webrtc-popup-hidden">
+        <div class="webrtc-popup-content">
+            <div class="webrtc-popup-avatar" id="incomingCallAvatar">👤</div>
+            <div class="webrtc-popup-caller" id="incomingCallName">Someone</div>
+            <div class="webrtc-popup-type" id="incomingCallType">Cuộc gọi Video</div>
+            <div class="webrtc-popup-btns">
+                <button id="acceptCallBtn" class="accept-btn"><span>Nghe</span></button>
+                <button id="declineCallBtn" class="decline-btn"><span>Từ chối</span></button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Hàm này sẽ được gọi từ các trang con (như Profile) sau khi update thành công
