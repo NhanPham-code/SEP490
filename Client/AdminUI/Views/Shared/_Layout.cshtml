@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 
     <link href="~/css/layout_admin-dashboard.css" rel="stylesheet" />
+    
+    <!-- 1. Script cấu hình Tailwind (KHÔNG ĐƯỢC CHỨA CSS) -->
     <script>
         tailwind.config = {
             theme: {
@@ -31,10 +33,11 @@
                 }
             }
         }
-                /* Add this to your existing CSS file or create it if it doesn't exist */
+    </script>
 
+    <!-- 2. CSS phải đặt trong thẻ style riêng biệt -->
+    <style>
         /* Chat unread badge styling */
-               /* Thêm vào file CSS của bạn */
         .badge-red {
             color: red;
             font-weight: bold;
@@ -58,7 +61,7 @@
         #chat-nav-link {
             position: relative;
         }
-    </script>
+    </style>
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
