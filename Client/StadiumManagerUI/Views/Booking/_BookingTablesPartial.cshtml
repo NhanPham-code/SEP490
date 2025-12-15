@@ -91,17 +91,18 @@
                         var user = dailyVm.User;
                         var stadium = stadiums.FirstOrDefault(s => s. Id == booking.StadiumId);
                         var creatorInfo = GetCreatorInfo(booking. CreatedById);
-                        <tr data-booking-json="@JsonSerializer.Serialize(dailyVm, jsonOptions)">
+                        <tr data-booking-json="@JsonSerializer.Serialize(dailyVm, jsonOptions)"
+                            data-stadium-name="@(stadium?.Name ?? "N/A")">
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
                                     <div class="bm-customer-avatar">
-                                        @if (! string.IsNullOrEmpty(user?. AvatarUrl))
+                                        @if (! string.IsNullOrEmpty(user?.AvatarUrl))
                                         {
-                                            <img src="https://localhost:7136/@user. AvatarUrl" alt="@user. FullName" />
+                                            <img src="https://localhost:7136/@user.AvatarUrl" alt="@user. FullName" />
                                         }
                                         else
                                         {
-                                            <span>@GetInitials(user?. FullName)</span>
+                                            <span>@GetInitials(user?.FullName)</span>
                                         }
                                     </div>
                                     <div class="bm-customer-details">
@@ -172,7 +173,8 @@
                         var user = monthlyVm.User;
                         var stadium = stadiums.FirstOrDefault(s => s. Id == booking.StadiumId);
 
-                        <tr class="bm-monthly-parent-row" data-monthly-id="@booking.Id" data-booking-json="@JsonSerializer.Serialize(monthlyVm, jsonOptions)">
+                        <tr class="bm-monthly-parent-row" data-monthly-id="@booking.Id" data-booking-json="@JsonSerializer.Serialize(monthlyVm, jsonOptions)"
+                            data-stadium-name="@(stadium?.Name ?? "N/A")">
                             <td><i class="fas fa-chevron-down bm-expand-toggle"></i></td>
                             <td class="bm-align-left">
                                 <div class="bm-customer-info">
