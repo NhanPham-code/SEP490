@@ -149,115 +149,156 @@ namespace CustomerUI.Controllers
             HttpContext.Session.SetInt32("BookingId", createdBooking.Id);
             return Redirect(paymentUrl);
         }
+        [HttpGet]
         public async Task<IActionResult> BookingHistory()
         {
-            var accessToken = GetAccessToken(); 
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                TempData["ErrorMessage"] = "Bạn chưa đăng nhập hoặc phiên đã hết hạn.";
-                return RedirectToAction("Login", "Account"); 
-            }
+            return await FilterDailyBookings(page: 1, status: "all", stadiumId: 0, isAjax: false);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterDailyBookings(int page = 1, string status = "all", int stadiumId = 0, bool isAjax = true)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken)) return isAjax ? Unauthorized() : RedirectToAction("Login", "Account");
 
             var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                TempData["ErrorMessage"] = "Không thể xác định người dùng.";
-                return RedirectToAction("Login", "Account");
-            }
-            
+            if (userId == null) return isAjax ? Unauthorized() : RedirectToAction("Login", "Account");
+
             var viewModel = new BookingManagementViewModel();
-            
-            var currentUser = await _userService.GetUsersByIdsAsync(new List<int> { userId.Value }, accessToken);
-            var userProfile = currentUser?.FirstOrDefault() ?? new PublicUserProfileDTO { FullName = "Người dùng" };
+            int pageSize = 10;
+            int skip = (page - 1) * pageSize;
 
             try
             {
-                string bookingFilter = $"?$filter=UserId eq {userId}&$expand=BookingDetails&$orderby=CreatedAt desc";
-                var allUserBookings = (await _bookingService.GetBookingAsync(accessToken, bookingFilter)).Data ?? new List<BookingReadDto>();
-                
-                string monthlyBookingFilter = $"?$filter=UserId eq {userId}&$orderby=CreatedAt desc";
-                var monthlyBookings = (await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyBookingFilter)).Data ?? new List<MonthlyBookingReadDto>();
-                
-                var allDiscountIds = allUserBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value)
-                                    .Concat(monthlyBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value))
-                                    .Distinct().ToList();
+                // ==================================================================================
+                // 1. XỬ LÝ DAILY BOOKING (CÓ PHÂN TRANG + FILTER)
+                // ==================================================================================
+                var dailyFilters = new List<string> { $"UserId eq {userId}", "MonthlyBookingId eq null" }; // Chỉ lấy đơn lẻ
 
-                var discountLookup = new Dictionary<int, ReadDiscountDTO>();
-                if (allDiscountIds.Any())
+                if (!string.IsNullOrEmpty(status) && status != "all")
                 {
-                    var discountTasks = allDiscountIds.Select(id => _discountService.GetDiscountByIdAsync(id));
-                    var discounts = await Task.WhenAll(discountTasks);
-                    foreach (var discount in discounts.Where(d => d != null))
-                    {
-                        discountLookup[discount.Id] = discount;
-                    }
+                    if (status == "cancelled-group") dailyFilters.Add("(Status eq 'cancelled' or Status eq 'payfail' or Status eq 'denied')");
+                    else dailyFilters.Add($"Status eq '{status}'");
                 }
-                
-                var allStadiumIds = allUserBookings.Select(b => b.StadiumId)
-                                      .Concat(monthlyBookings.Select(b => b.StadiumId))
-                                      .Distinct().ToList();
+                if (stadiumId > 0) dailyFilters.Add($"StadiumId eq {stadiumId}");
+
+                string dailyQuery = $"?$filter={string.Join(" and ", dailyFilters)}&$expand=BookingDetails&$orderby=CreatedAt desc&$count=true&$skip={skip}&$top={pageSize}";
+
+                var dailyResult = await _bookingService.GetBookingAsync(accessToken, dailyQuery);
+                var dailyBookings = dailyResult.Data ?? new List<BookingReadDto>();
+                int dailyTotalCount = dailyResult.TotalCount;
+
+                // ==================================================================================
+                // 2. XỬ LÝ MONTHLY BOOKING & CHILDREN (GIỮ NGUYÊN LOGIC CŨ CỦA BẠN)
+                // ==================================================================================
+                var monthlyBookings = new List<MonthlyBookingReadDto>();
+                var bookingChildren = new List<BookingReadDto>();
+
+                // Chỉ load Monthly khi không phải AJAX (hoặc load lại nếu muốn, nhưng thường AJAX chỉ phân trang bảng Daily)
+                if (!isAjax)
+                {
+                    // 2a. Lấy danh sách Monthly Booking
+                    string monthlyQuery = $"?$filter=UserId eq {userId}&$orderby=CreatedAt desc";
+                    var monthlyResult = await _bookingService.GetMonthlyBookingAsync(accessToken, monthlyQuery);
+                    monthlyBookings = monthlyResult.Data ?? new List<MonthlyBookingReadDto>();
+
+                    // 2b. Lấy danh sách Booking Con (Logic cũ của bạn là lấy allUserBookings rồi lọc)
+                    // Để tối ưu, ta chỉ lấy những booking CÓ MonthlyBookingId
+                    string childrenQuery = $"?$filter=UserId eq {userId} and MonthlyBookingId ne null&$expand=BookingDetails";
+                    var childrenResult = await _bookingService.GetBookingAsync(accessToken, childrenQuery);
+                    bookingChildren = childrenResult.Data ?? new List<BookingReadDto>();
+                }
+
+                // ==================================================================================
+                // 3. LOOKUP DATA (STADIUM & DISCOUNT) - GIỮ NGUYÊN
+                // ==================================================================================
+                var allStadiumIds = dailyBookings.Select(b => b.StadiumId)
+                                    .Concat(monthlyBookings.Select(b => b.StadiumId))
+                                    .Concat(bookingChildren.Select(b => b.StadiumId))
+                                    .Distinct().ToList();
 
                 var stadiumLookup = new Dictionary<int, ReadStadiumDTO>();
                 if (allStadiumIds.Any())
                 {
-                    var stadiumTasks = allStadiumIds.Select(id => _stadiumService.GetStadiumByIdAsync(id));
-                    var stadiums = await Task.WhenAll(stadiumTasks);
-                    foreach (var stadium in stadiums.Where(s => s != null))
-                    {
-                        stadiumLookup[stadium.Id] = stadium;
-                    }
+                    var tasks = allStadiumIds.Select(id => _stadiumService.GetStadiumByIdAsync(id));
+                    var results = await Task.WhenAll(tasks);
+                    foreach (var s in results.Where(x => x != null)) stadiumLookup[s.Id] = s;
                 }
-                ViewBag.AllStadiums = stadiumLookup.Values.ToList(); 
-                
-                var courtNameLookup = stadiumLookup.Values
-                    .SelectMany(s => s.Courts)
-                    .ToDictionary(c => c.Id, c => c.Name);
+                ViewBag.AllStadiums = stadiumLookup.Values.ToList();
 
-                foreach (var booking in allUserBookings)
+                var courtNameLookup = stadiumLookup.Values.SelectMany(s => s.Courts).ToDictionary(c => c.Id, c => c.Name);
+
+                // Map tên sân cho Daily
+                foreach (var b in dailyBookings)
+                    foreach (var d in b.BookingDetails) d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, $"Sân {d.CourtId}");
+
+                // Map tên sân cho Children
+                foreach (var b in bookingChildren)
+                    foreach (var d in b.BookingDetails) d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, $"Sân {d.CourtId}");
+
+
+                var allDiscountIds = dailyBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value)
+                                    .Concat(monthlyBookings.Where(b => b.DiscountId.HasValue).Select(b => b.DiscountId.Value))
+                                    .Distinct().ToList();
+                var discountLookup = new Dictionary<int, ReadDiscountDTO>();
+                if (allDiscountIds.Any())
                 {
-                    foreach (var detail in booking.BookingDetails)
-                    {
-                        detail.CourtName = courtNameLookup.GetValueOrDefault(detail.CourtId, $"Sân {detail.CourtId}");
-                    }
+                    var tasks = allDiscountIds.Select(id => _discountService.GetDiscountByIdAsync(id));
+                    var results = await Task.WhenAll(tasks);
+                    foreach (var d in results.Where(x => x != null)) discountLookup[d.Id] = d;
                 }
-                
-                var dailyBookingsList = allUserBookings.Where(b => b.MonthlyBookingId == null);
-                foreach (var booking in dailyBookingsList)
+
+                // ==================================================================================
+                // 4. MAP DATA VÀO VIEWMODEL
+                // ==================================================================================
+                var currentUser = await _userService.GetUsersByIdsAsync(new List<int> { userId.Value }, accessToken);
+                var userProfile = currentUser?.FirstOrDefault() ?? new PublicUserProfileDTO { FullName = "Người dùng" };
+
+                // Map Daily
+                foreach (var booking in dailyBookings)
                 {
                     viewModel.DailyBookings.Add(new DailyBookingWithUserViewModel
                     {
                         Booking = booking,
-                        User = userProfile, 
+                        User = userProfile,
                         Discount = booking.DiscountId.HasValue ? discountLookup.GetValueOrDefault(booking.DiscountId.Value) : null
                     });
                 }
-                
-                var bookingsInMonthlyPlan = allUserBookings
-                    .Where(b => b.MonthlyBookingId != null)
-                    .GroupBy(b => b.MonthlyBookingId.Value) 
-                    .ToDictionary(g => g.Key, g => g.ToList());
 
-                foreach (var mb in monthlyBookings)
+                // Map Monthly & Children (LOGIC CŨ CỦA BẠN ĐÂY)
+                if (!isAjax)
                 {
-                    viewModel.MonthlyBookings.Add(new MonthlyBookingWithDetailsViewModel
+                    // Gom nhóm booking con theo MonthlyID
+                    var bookingsInMonthlyPlan = bookingChildren
+                        .Where(b => b.MonthlyBookingId != null)
+                        .GroupBy(b => b.MonthlyBookingId.Value)
+                        .ToDictionary(g => g.Key, g => g.ToList());
+
+                    foreach (var mb in monthlyBookings)
                     {
-                        MonthlyBooking = mb,
-                        User = userProfile, 
-                        Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>()),
-                        Discount = mb.DiscountId.HasValue ? discountLookup.GetValueOrDefault(mb.DiscountId.Value) : null
-                    });
+                        viewModel.MonthlyBookings.Add(new MonthlyBookingWithDetailsViewModel
+                        {
+                            MonthlyBooking = mb,
+                            User = userProfile,
+                            // Lấy list con từ dictionary đã gom nhóm ở trên
+                            Bookings = bookingsInMonthlyPlan.GetValueOrDefault(mb.Id, new List<BookingReadDto>()),
+                            Discount = mb.DiscountId.HasValue ? discountLookup.GetValueOrDefault(mb.DiscountId.Value) : null
+                        });
+                    }
                 }
+
+                // Thông tin phân trang
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)dailyTotalCount / pageSize);
+
+                if (isAjax) return PartialView("_DailyBookingTable", viewModel);
+                return View("BookingHistory", viewModel);
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi tải lịch sử đặt sân của bạn.";
+                TempData["ErrorMessage"] = "Lỗi: " + ex.Message;
+                return isAjax ? BadRequest() : RedirectToAction("Index", "Home");
             }
-            finally
-            {
-                HttpContext.Session.Remove("AccessToken");
-            }
-
-            return View(viewModel);
         }
 
         [HttpGet]

@@ -12,5 +12,7 @@ namespace DiscountAPI.Respository.Interface
         Task DeleteAsync(int id);
         Task<Discount?> GetByCodeAsync(string code);
         Task<Discount?> GetByIdAsync(int id);
+        Task<IEnumerable<Discount>> GetExpiredActiveDiscountsAsync();
+        Task SaveChangesAsync();
     }
 }

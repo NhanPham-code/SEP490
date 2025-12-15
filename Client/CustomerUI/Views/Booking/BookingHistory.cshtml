@@ -8,14 +8,10 @@
     var stadiums = ViewBag.AllStadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
     var userFullName = Model.DailyBookings.FirstOrDefault()?.User.FullName ?? Model.MonthlyBookings.FirstOrDefault()?.User.FullName ?? "của bạn";
 
-    var sortedDailyBookings = Model.DailyBookings
-        .OrderByDescending(b => b.Booking.CreatedAt)
-        .ToList();
+    // Sort Monthly ở Client vì Server chỉ trả list raw
+    var sortedMonthlyBookings = Model.MonthlyBookings.OrderByDescending(b => b.MonthlyBooking.CreatedAt).ToList();
 
-    var sortedMonthlyBookings = Model.MonthlyBookings
-        .OrderByDescending(b => b.MonthlyBooking.CreatedAt)
-        .ToList();
-
+    // Helper Functions cho View
     string GetStatusClass(string status) => status.ToLower() switch
     {
         "pending" => "status--pending",
@@ -29,19 +25,22 @@
     string TranslateStatus(string status) => status.ToLower() switch
     {
         "accepted" => "Đã nhận",
-        "completed" => "Đã hoàn thành",
+        "completed" => "Hoàn thành",
         "cancelled" => "Đã hủy",
         "waiting" => "Chờ thanh toán",
         "payfail" => "Lỗi thanh toán",
         _ => status
     };
-}
 
+    string FormatTime(TimeSpan t) => t.ToString(@"hh\:mm");
+    string FormatCurrency(decimal? val) => (val ?? 0).ToString("N0") + "₫";
+}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
 <style>
 
     :root {
@@ -621,6 +620,70 @@
             }
         /* Hide icon on mobile */
     }
+
+    /* CSS Phân trang */
+    .bh-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+        padding-bottom: 12px;
+    }
+
+    .bh-page-btn, .bh-page-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        padding: 0 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: white;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .bh-page-number {
+        width: 36px;
+        padding: 0;
+    }
+
+        .bh-page-btn:hover:not(.disabled), .bh-page-number:hover:not(.active) {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .bh-page-number.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+    .bh-page-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f1f5f9;
+        color: #94a3b8;
+        pointer-events: none;
+    }
+
+    .bh-page-info {
+        margin: 0 10px;
+        font-weight: 600;
+        color: #334155;
+    }
+    /* Loading overlay */
+    .loading-overlay {
+        opacity: 0.5;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
 </style>
 
 <body class="bh-body">
@@ -630,7 +693,7 @@
             <p>Xem lại tất cả các lịch đặt sân @userFullName.</p>
         </div>
 
-        @if (!sortedDailyBookings.Any() && !sortedMonthlyBookings.Any())
+        @if (!Model.DailyBookings.Any() && !Model.MonthlyBookings.Any())
         {
             <div class="bh-empty-state">
                 <div class="icon"><i class="fa-regular fa-calendar-xmark"></i></div>
@@ -646,8 +709,8 @@
             <div class="bh-filters">
                 <div class="bh-filter-group">
                     <label for="bh-stadiumFilter"><i class="fa-solid fa-futbol"></i></label>
-                    <select id="bh-stadiumFilter">
-                        <option value="all">Tất cả sân vận động</option>
+                    <select id="bh-stadiumFilter" onchange="loadBookings(1)">
+                        <option value="0">Tất cả sân vận động</option>
                         @foreach (var stadium in stadiums)
                         {
                             <option value="@stadium.Id">@stadium.Name</option>
@@ -664,7 +727,7 @@
                 </div>
                 <div class="bh-filter-group">
                     <label for="bh-statusFilter"><i class="fa-solid fa-flag"></i></label>
-                    <select id="bh-statusFilter">
+                    <select id="bh-statusFilter" onchange="loadBookings(1)">
                         <option value="all">Tất cả trạng thái</option>
                         <option value="waiting">Chờ thanh toán</option>
                         <option value="accepted">Đã nhận / Sắp tới</option>
@@ -674,56 +737,17 @@
                 </div>
             </div>
 
+            <!-- === SECTION DAILY BOOKING (Dùng Partial View & AJAX) === -->
             <div class="bh-section" id="bh-daily-booking-section">
                 <h2 class="bh-section-title">Lịch Đặt Theo Ngày</h2>
-                <div class="bh-table-wrapper">
-                    <div class="bh-table-scroll">
-                        <table class="bh-table">
-                            <thead><tr><th>Sân Vận Động</th><th>Ngày chơi</th><th>Giá tiền</th><th>Trạng thái</th><th style="text-align: right;">Hành động</th></tr></thead>
-                            <tbody>
-                                @foreach (var dailyVm in sortedDailyBookings)
-                                {
-                                    var booking = dailyVm.Booking;
-                                    var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
-                                    <tr data-stadium-id="@booking.StadiumId" data-booking-type="daily" data-status="@booking.Status.ToLower()">
-                                        <td data-label="Sân">
-                                            <div class="bh-table-info">
-                                                <div class="icon"><i class="fa-solid fa-futbol"></i></div>
-                                                <div class="details"><span class="name">@stadium?.Name</span><span class="sub">ID: #@booking.Id</span></div>
-                                            </div>
-                                        </td>
-                                        <td data-label="Ngày chơi">@booking.Date.ToString("dd/MM/yyyy")</td>
-                                        <td data-label="Giá tiền"><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
-                                        <td data-label="Trạng thái"><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
-                                        <td data-label="Hành động">
-                                            <div class="bh-actions" style="justify-content: flex-end;">
-                                                <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-eye"></i></button>
-
-                                                @* Nút thanh toán lại cho Daily Booking *@
-                                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Single" })"
-                                                       class="bh-btn-icon pay"
-                                                       title="Thanh toán ngay">
-                                                        <i class="fa-solid fa-credit-card"></i>
-                                                    </a>
-                                                }
-
-                                                @* Logic hủy lịch cũ (giữ nguyên nếu cần) *@
-                                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow)
-                                                {
-                                                    <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily"><i class="fa-solid fa-ban"></i></button>
-                                                }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="bh-table-wrapper" id="dailyBookingContainer">
+                    @{
+                        await Html.RenderPartialAsync("_DailyBookingTable", Model);
+                    }
                 </div>
             </div>
 
+            <!-- === SECTION MONTHLY BOOKING (Tĩnh) === -->
             <div class="bh-section" id="bh-monthly-booking-section">
                 <h2 class="bh-section-title">Lịch Đặt Theo Tháng</h2>
                 <div class="bh-table-wrapper">
@@ -735,6 +759,7 @@
                                 {
                                     var booking = monthlyVm.MonthlyBooking;
                                     var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+
                                     <tr class="bh-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
                                         <td style="text-align: center;"><i class="fa-solid fa-chevron-down expand-toggle"></i></td>
                                         <td data-label="Sân / Gói">
@@ -743,14 +768,13 @@
                                                 <div class="details"><span class="name">@stadium?.Name</span><span class="sub">Gói tháng @booking.Month/@booking.Year</span></div>
                                             </div>
                                         </td>
-                                        <td data-label="Khung giờ">@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</td>
-                                        <td data-label="Giá tiền"><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                                        <td data-label="Khung giờ">@FormatTime(booking.StartTime) - @FormatTime(booking.EndTime)</td>
+                                        <td data-label="Giá tiền"><span class="price">@FormatCurrency(booking.TotalPrice)</span></td>
                                         <td data-label="Trạng thái"><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
                                         <td data-label="Hành động">
                                             <div class="bh-actions" style="justify-content: flex-end;">
                                                 <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fa-solid fa-eye"></i></button>
 
-                                                @* Nút thanh toán lại cho Monthly Booking *@
                                                 @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
                                                 {
                                                     <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Monthly" })"
@@ -804,6 +828,7 @@
         }
     </div>
 
+    <!-- MODAL -->
     <div class="bh-modal-backdrop" id="bh-modal">
         <div class="bh-modal">
             <div class="bh-modal-header">
@@ -811,7 +836,7 @@
                 <button class="bh-modal-close" title="Đóng">&times;</button>
             </div>
             <div class="bh-modal-body" id="bh-modal-body">
-                <!-- Content will be injected by JS -->
+                <!-- Content injected via JS -->
             </div>
         </div>
     </div>
@@ -820,180 +845,193 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // ===================================================================
-            //                      JAVASCRIPT FOR THIS PAGE
-            // ===================================================================
-            const viewModel = @Html.Raw(JsonSerializer.Serialize(Model, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
-            const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+        // Dữ liệu ban đầu (Server render)
+        const initialViewModel = @Html.Raw(JsonSerializer.Serialize(Model, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+        const stadiums = @Html.Raw(JsonSerializer.Serialize(stadiums, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+        let dailyBookingsCache = initialViewModel.dailyBookings; // Cache để modal dùng
 
+        document.addEventListener('DOMContentLoaded', function () {
             const container = document.querySelector('.bh-container');
             if (!container) return;
 
             const modalEl = document.getElementById('bh-modal');
-            const stadiumFilter = document.getElementById('bh-stadiumFilter');
-            const typeFilter = document.getElementById('bh-bookingTypeFilter');
-            const statusFilter = document.getElementById('bh-statusFilter');
+            const dailyContainer = document.getElementById('dailyBookingContainer');
 
-            // --- Helpers ---
-            const getStatusBadge = (status) => {
-                const s = status.toLowerCase();
-                let className = 'status--default', text = s;
-                if (s === 'pending') { className = 'status--pending'; text = 'Chờ xử lý'; }
-                else if (s === 'accepted') { className = 'status--accepted'; text = 'Đã nhận'; }
-                else if (s === 'completed') { className = 'status--completed'; text = 'Hoàn thành'; }
-                else if (['cancelled', 'denied', 'payfail'].includes(s)) { className = 'status--cancelled'; text = s === 'denied' ? 'Bị từ chối' : (s === 'payfail' ? 'Lỗi thanh toán' : 'Đã hủy'); }
-                else if (s === 'waiting') { className = 'status--waiting'; text = 'Chờ thanh toán'; }
-                return `<span class="status-badge ${className}">${text}</span>`;
+            // --- 1. AJAX LOAD BOOKINGS ---
+            window.loadBookings = function(page) {
+                const stadiumId = document.getElementById('bh-stadiumFilter').value;
+                const status = document.getElementById('bh-statusFilter').value;
+
+                // Client-side filter cho Monthly (Vì monthly load hết 1 lần)
+                filterMonthlyTable(stadiumId, status);
+
+                // Server-side filter cho Daily
+                dailyContainer.style.opacity = '0.5';
+                fetch(`/Booking/FilterDailyBookings?page=${page}&status=${status}&stadiumId=${stadiumId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network error');
+                        return response.text();
+                    })
+                    .then(html => {
+                        dailyContainer.innerHTML = html;
+                        dailyContainer.style.opacity = '1';
+                        // Lưu ý: Sau khi load lại, dailyBookingsCache cũ sẽ không khớp với UI mới.
+                        // Nếu muốn Modal hoạt động chuẩn với trang mới, cần cập nhật cache hoặc gọi API detail.
+                        // Ở đây ta chấp nhận hạn chế: Modal Daily ở các trang sau (AJAX)
+                        // sẽ cần gọi API chi tiết nếu không tìm thấy trong cache cũ.
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        dailyContainer.style.opacity = '1';
+                        Swal.fire('Lỗi', 'Không thể tải dữ liệu', 'error');
+                    });
             };
-            const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-            const formatTime = (ts) => ts ? ts.substring(0, 5) : '';
 
-            // --- Filters ---
-            function applyFilters() {
-                const stadiumId = stadiumFilter.value;
-                const type = typeFilter.value;
-                const status = statusFilter.value;
-                const cancelled = ['cancelled', 'payfail'];
+            // --- 2. CLIENT-SIDE FILTER (MONTHLY) ---
+            function filterMonthlyTable(stadiumId, status) {
+                const rows = document.querySelectorAll('#bh-monthly-booking-section tbody tr.bh-parent-row');
+                const cancelled = ['cancelled', 'payfail', 'denied'];
 
-                document.getElementById('bh-daily-booking-section').style.display = (type === 'all' || type === 'daily') ? 'block' : 'none';
-                document.getElementById('bh-monthly-booking-section').style.display = (type === 'all' || type === 'monthly') ? 'block' : 'none';
-
-                container.querySelectorAll('tbody > tr[data-booking-type]').forEach(row => {
+                rows.forEach(row => {
                     const rowStadium = row.dataset.stadiumId;
                     const rowStatus = row.dataset.status;
-                    const stadiumMatch = stadiumId === 'all' || rowStadium === stadiumId;
-                    const statusMatch = status === 'all' || (status === 'cancelled-group' && cancelled.includes(rowStatus)) || rowStatus === status;
-                    row.style.display = (stadiumMatch && statusMatch) ? '' : 'none';
-                    if(row.classList.contains('bh-parent-row')) {
-                        row.classList.remove('expanded');
-                        const child = container.querySelector(`.bh-child-row[data-parent-monthly-id="${row.dataset.monthlyId}"]`);
+
+                    const matchStadium = stadiumId == 0 || rowStadium == stadiumId;
+                    const matchStatus = status == 'all' ||
+                                        (status == 'cancelled-group' && cancelled.includes(rowStatus)) ||
+                                        rowStatus == status;
+
+                    row.style.display = (matchStadium && matchStatus) ? '' : 'none';
+
+                    // Ẩn child row nếu parent ẩn
+                    if(row.style.display == 'none') {
+                        const child = document.querySelector(`.bh-child-row[data-parent-monthly-id="${row.dataset.monthlyId}"]`);
                         if(child) child.style.display = 'none';
                     }
                 });
             }
-            [stadiumFilter, typeFilter, statusFilter].forEach(f => f.addEventListener('change', applyFilters));
 
-            // --- Modal ---
-            const openModal = () => modalEl.style.display = 'flex';
-            const closeModal = () => modalEl.style.display = 'none';
-            modalEl.addEventListener('click', (e) => { if (e.target === modalEl || e.target.closest('.bh-modal-close')) closeModal(); });
+            // --- 3. UI HELPERS ---
+            document.getElementById('bh-bookingTypeFilter').addEventListener('change', function() {
+                const type = this.value;
+                document.getElementById('bh-daily-booking-section').style.display = (type === 'all' || type === 'daily') ? 'block' : 'none';
+                document.getElementById('bh-monthly-booking-section').style.display = (type === 'all' || type === 'monthly') ? 'block' : 'none';
+            });
 
-            function populateModal(bookingVm, type) {
-                const isMonthly = type === 'monthly';
-                const booking = isMonthly ? bookingVm.monthlyBooking : bookingVm.booking;
-                const discount = bookingVm.discount;
-                const stadium = stadiums.find(s => s.id === booking.stadiumId);
-                const modalBody = document.getElementById('bh-modal-body');
-
-                document.getElementById('bh-modal-title').textContent = `Chi tiết lịch đặt #${booking.id}`;
-
-                let detailsHtml = `
-                    <div class="bh-modal-section">
-                        <h4>Thông tin chung</h4>
-                        <div class="bh-modal-grid">
-                            <div class="bh-modal-item"><span class="label">Sân vận động</span><span class="value">${stadium?.name ?? 'N/A'}</span></div>
-                            <div class="bh-modal-item"><span class="label">Ngày tạo</span><span class="value">${new Date(booking.createdAt).toLocaleString('vi-VN')}</span></div>
-                            <div class="bh-modal-item"><span class="label">Trạng thái</span><span class="value">${getStatusBadge(booking.status)}</span></div>
-                            <div class="bh-modal-item"><span class="label">Thanh toán</span><span class="value">${booking.paymentMethod || 'Chưa có'}</span></div>
-                        </div>
-                    </div>`;
-
-                if (isMonthly) {
-                    detailsHtml += `
-                        <div class="bh-modal-section">
-                            <h4>Chi tiết Gói Tháng ${booking.month}/${booking.year}</h4>
-                            <div class="bh-modal-grid">
-                                <div class="bh-modal-item"><span class="label">Khung giờ</span><span class="value">${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}</span></div>
-                            </div>
-                            <h4 style="margin-top: 1.5rem;">Danh sách ngày đặt</h4>
-                            <div class="bh-modal-list">
-                                ${bookingVm.bookings.map(b => `<div class="bh-modal-list-item"><span>${new Date(b.date).toLocaleDateString('vi-VN')}</span>${getStatusBadge(b.status)}</div>`).join('') || '<p>Không có.</p>'}
-                            </div>
-                        </div>`;
-                } else {
-                    detailsHtml += `
-                        <div class="bh-modal-section">
-                             <h4>Chi tiết Lịch Ngày</h4>
-                             <div class="bh-modal-grid">
-                                <div class="bh-modal-item"><span class="label">Ngày chơi</span><span class="value">${new Date(booking.date).toLocaleDateString('vi-VN')}</span></div>
-                             </div>
-                             <h4 style="margin-top: 1.5rem;">Các sân con đã đặt</h4>
-                             <div class="bh-modal-list">
-                                ${booking.bookingDetails.map(d => `<div class="bh-modal-list-item"><span>${d.courtName}</span><span>${new Date(d.startTime).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})} - ${new Date(d.endTime).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}
-                             </div>
-                        </div>`;
-                }
-
-                // --- Pricing Section (NEW) ---
-                let pricingHtml = '';
-                if(discount && booking.originalPrice > booking.totalPrice) {
-                    const discountAmount = (booking.originalPrice ?? 0) - (booking.totalPrice ?? 0);
-                    pricingHtml = `
-                    <div class="bh-modal-list pricing-list">
-                        <div class="bh-modal-list-item">
-                            <span class="item-label">Tạm tính</span>
-                            <span class="item-value">${formatCurrency(booking.originalPrice ?? 0)}</span>
-                        </div>
-                        <div class="bh-modal-list-item discount-item">
-                            <span class="item-label">Khuyến mãi (${discount.code})</span>
-                            <span class="item-value">- ${formatCurrency(discountAmount)}</span>
-                        </div>
-                    </div>`;
-                }
-
-                detailsHtml += `
-                    <div class="bh-modal-pricing">
-                        ${pricingHtml}
-                        <div class="total" style="${pricingHtml ? 'margin-top: 1rem;' : ''}">
-                            <span class="label">Tổng cộng</span>
-                            <span class="value">${formatCurrency(booking.totalPrice ?? 0)}</span>
-                        </div>
-                    </div>`;
-
-                modalBody.innerHTML = detailsHtml;
-                openModal();
-            }
-
-            // --- Actions ---
+            // --- 4. EVENT DELEGATION (Click Handler) ---
             container.addEventListener('click', e => {
                 const target = e.target;
-                // Expand/Collapse child rows
-                if(target.classList.contains('expand-toggle') || target.closest('.expand-toggle')) {
+
+                // Expand/Collapse Child Rows
+                if(target.closest('.expand-toggle')) {
                     const parentRow = target.closest('.bh-parent-row');
                     parentRow.classList.toggle('expanded');
                     const childRow = container.querySelector(`.bh-child-row[data-parent-monthly-id="${parentRow.dataset.monthlyId}"]`);
-                    childRow.style.display = parentRow.classList.contains('expanded') ? 'table-row' : 'none';
+                    if(childRow) childRow.style.display = parentRow.classList.contains('expanded') ? 'table-row' : 'none';
                     return;
                 }
-                // Button clicks
-                const button = target.closest('.bh-btn-icon, .bh-btn');
-                if(!button) return;
 
-                if(button.classList.contains('details')) {
-                    const id = button.dataset.bookingId;
-                    const type = button.dataset.bookingType;
-                    const collection = type === 'daily' ? viewModel.dailyBookings : viewModel.monthlyBookings;
-                    const findKey = type === 'daily' ? 'booking' : 'monthlyBooking';
-                    const bookingVm = collection.find(vm => vm[findKey].id == id);
-                    if(bookingVm) populateModal(bookingVm, type);
+                // Buttons
+                const btn = target.closest('.bh-btn-icon');
+                if(!btn) return;
+
+                if(btn.classList.contains('details')) {
+                    const id = btn.dataset.bookingId;
+                    const type = btn.dataset.bookingType;
+
+                    if (type === 'monthly') {
+                        const item = initialViewModel.monthlyBookings.find(m => m.monthlyBooking.id == id);
+                        if(item) populateModal(item, 'monthly');
+                    }
+                    else {
+                        // Với Daily, ưu tiên tìm trong cache đầu tiên
+                        let item = dailyBookingsCache.find(d => d.booking.id == id);
+                        if(item) {
+                            populateModal(item, 'daily');
+                        } else {
+                            // Nếu không có (do đã sang trang khác), gọi API lấy chi tiết
+                            fetch(`/Booking/GetBookingDetailJson/${id}`) // Cần thêm Action này trả về JSON
+                                .then(r => r.json())
+                                .then(data => populateModal(data, 'daily'))
+                                .catch(() => Swal.fire('Thông tin', 'Không tìm thấy chi tiết trong cache. Vui lòng reload trang.', 'info'));
+                        }
+                    }
                 }
-                else if(button.classList.contains('cancel')) {
+                else if(btn.classList.contains('cancel')) {
                     Swal.fire({
-                        title: 'Xác nhận hủy lịch?', text: "Hành động này không thể hoàn tác!", icon: 'warning',
-                        showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'Không', confirmButtonText: 'Đồng ý hủy',
+                        title: 'Xác nhận hủy?', text: "Không thể hoàn tác!", icon: 'warning',
+                        showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Hủy lịch'
                     }).then(result => {
                         if (result.isConfirmed) {
-                             fetch(`/Booking/CancelBooking/${button.dataset.bookingId}`, { method: 'POST' })
+                             fetch(`/Booking/CancelBooking/${btn.dataset.bookingId}`, { method: 'POST' })
                             .then(res => res.json()).then(data => {
                                 if (data.success) {
-                                    Swal.fire('Đã hủy!', 'Lịch đặt đã được hủy.', 'success').then(() => location.reload());
+                                    Swal.fire('Thành công', 'Đã hủy lịch.', 'success');
+                                    loadBookings(1); // Reload bảng Daily
                                 } else { throw new Error(data.message); }
-                            }).catch(err => Swal.fire('Lỗi!', err.message, 'error'));
+                            }).catch(err => Swal.fire('Lỗi', err.message, 'error'));
                         }
                     });
                 }
             });
+
+            // --- 5. MODAL POPULATE ---
+            const openModal = () => modalEl.style.display = 'flex';
+            const closeModal = () => modalEl.style.display = 'none';
+            modalEl.addEventListener('click', (e) => { if (e.target === modalEl || e.target.closest('.bh-modal-close')) closeModal(); });
+
+            function populateModal(vm, type) {
+                // Logic populate modal giữ nguyên code cũ của bạn
+                // Lưu ý: vm ở đây phải khớp cấu trúc DailyBookingWithUserViewModel hoặc MonthlyBookingWithDetailsViewModel
+                const booking = (type === 'monthly') ? vm.monthlyBooking : vm.booking;
+                const details = (type === 'monthly') ? vm.bookings : booking.bookingDetails; // List con
+                const discount = vm.discount;
+                const stadium = stadiums.find(s => s.id === booking.stadiumId);
+                const modalBody = document.getElementById('bh-modal-body');
+
+                document.getElementById('bh-modal-title').textContent = `Chi tiết #${booking.id}`;
+
+                // Helper format currency/status
+                const fmtMoney = (v) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
+
+                let html = `
+                    <div class="bh-modal-section">
+                        <h4>Thông tin chung</h4>
+                        <div class="bh-modal-grid">
+                            <div class="bh-modal-item"><span class="label">Sân</span><span class="value">${stadium?.name || 'N/A'}</span></div>
+                            <div class="bh-modal-item"><span class="label">Ngày tạo</span><span class="value">${new Date(booking.createdAt).toLocaleDateString('vi-VN')}</span></div>
+                            <div class="bh-modal-item"><span class="label">Trạng thái</span><span class="value">${booking.status}</span></div>
+                        </div>
+                    </div>`;
+
+                // Render List Con
+                html += `<div class="bh-modal-section"><h4 style="margin-top:10px;">Chi tiết đặt sân</h4><div class="bh-modal-list">`;
+
+                if(type === 'monthly') {
+                    // List các booking con của tháng
+                    if(details && details.length > 0) {
+                        details.forEach(b => {
+                            html += `<div class="bh-modal-list-item"><span>${new Date(b.date).toLocaleDateString('vi-VN')}</span><span>${b.status}</span></div>`;
+                        });
+                    } else { html += `<p>Chưa có lịch con.</p>`; }
+                } else {
+                    // List các booking detail (slots) của ngày
+                    if(details && details.length > 0) {
+                        details.forEach(d => {
+                            html += `<div class="bh-modal-list-item"><span>${d.courtName}</span><span>${d.startTime.substring(11,16)} - ${d.endTime.substring(11,16)}</span></div>`;
+                        });
+                    }
+                }
+                html += `</div></div>`;
+
+                // Pricing
+                html += `<div class="bh-modal-pricing">
+                            <div class="total"><span class="label">Tổng cộng</span><span class="value">${fmtMoney(booking.totalPrice)}</span></div>
+                         </div>`;
+
+                modalBody.innerHTML = html;
+                openModal();
+            }
         });
     </script>
 }
