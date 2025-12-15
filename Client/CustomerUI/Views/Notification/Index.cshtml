@@ -103,6 +103,10 @@
                 return '/Discount/DiscountList';
             }
 
+            if (notification.type === 'Booking.new') {
+                return '/Booking/BookingHistory'
+            }
+
 
             try {
                 const params = JSON.parse(notification.parameters);
