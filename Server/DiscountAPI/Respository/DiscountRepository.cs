@@ -96,5 +96,18 @@ namespace DiscountAPI.Respository
                 .Include(d => d.DiscountStadiums)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
+
+        public async Task<IEnumerable<Discount>> GetExpiredActiveDiscountsAsync()
+        {
+            var now = DateTime.UtcNow; // Hoặc DateTime.Now tùy hệ thống bạn dùng
+            return await _context.Discounts
+                .Where(d => d.IsActive == true && d.EndDate <= now)
+                .ToListAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

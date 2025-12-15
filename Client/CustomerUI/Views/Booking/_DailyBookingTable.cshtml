@@ -1,0 +1,134 @@
+﻿@using DTOs.BookingDTO.ViewModel
+@using DTOs.StadiumDTO
+@model BookingManagementViewModel
+
+@{
+    var stadiums = ViewBag.AllStadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+}
+
+@functions {
+    public string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "pending" => "status--pending",
+        "accepted" => "status--accepted",
+        "completed" => "status--completed",
+        "denied" or "cancelled" or "payfail" => "status--cancelled",
+        "waiting" => "status--waiting",
+        _ => "status--default"
+    };
+
+    public string TranslateStatus(string status) => status.ToLower() switch
+    {
+        "accepted" => "Đã nhận",
+        "completed" => "Hoàn thành",
+        "cancelled" => "Đã hủy",
+        "waiting" => "Chờ thanh toán",
+        "payfail" => "Lỗi thanh toán",
+        _ => status
+    };
+}
+
+<div class="bh-table-scroll">
+    <table class="bh-table">
+        <thead>
+            <tr>
+                <th>Sân Vận Động</th>
+                <th>Ngày chơi</th>
+                <th>Giá tiền</th>
+                <th>Trạng thái</th>
+                <th style="text-align: right;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.DailyBookings != null && Model.DailyBookings.Any())
+            {
+                foreach (var dailyVm in Model.DailyBookings)
+                {
+                    var booking = dailyVm.Booking;
+                    var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+
+                    <tr data-booking-id="@booking.Id" data-stadium-id="@booking.StadiumId" data-status="@booking.Status.ToLower()">
+                        <td data-label="Sân">
+                            <div class="bh-table-info">
+                                <div class="icon"><i class="fa-solid fa-futbol"></i></div>
+                                <div class="details">
+                                    <span class="name">@stadium?.Name</span>
+                                    <span class="sub">ID: #@booking.Id</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Ngày chơi">@booking.Date.ToString("dd/MM/yyyy")</td>
+                        <td data-label="Giá tiền"><span class="price">@((booking.TotalPrice ?? 0).ToString("N0"))₫</span></td>
+                        <td data-label="Trạng thái">
+                            <span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span>
+                        </td>
+                        <td data-label="Hành động">
+                            <div class="bh-actions" style="justify-content: flex-end;">
+                                <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="daily">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+
+                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Single" })" class="bh-btn-icon pay" title="Thanh toán ngay">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                    </a>
+                                }
+
+                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow)
+                                {
+                                    <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">
+                        <i class="fa-solid fa-filter" style="font-size: 24px; margin-bottom: 10px; color: #cbd5e1;"></i><br />
+                        Không tìm thấy lịch đặt nào phù hợp.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (totalPages > 1)
+{
+    <div class="bh-pagination">
+        <button class="bh-page-btn @(currentPage == 1 ? "disabled" : "")" onclick="loadBookings(@(currentPage - 1))" @(currentPage == 1 ? "disabled" : "")>
+            <i class="fa-solid fa-chevron-left"></i> &nbsp;Trước
+        </button>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            if (i == 1 || i == totalPages || (i >= currentPage - 1 && i <= currentPage + 1))
+            {
+                if (i == currentPage)
+                {
+                    <span class="bh-page-number active">@i</span>
+                }
+                else
+                {
+                    <button class="bh-page-number" onclick="loadBookings(@i)">@i</button>
+                }
+            }
+            else if (i == currentPage - 2 || i == currentPage + 2)
+            {
+                <span class="bh-page-number disabled" style="border:none; background:transparent;">...</span>
+            }
+        }
+
+        <button class="bh-page-btn @(currentPage == totalPages ? "disabled" : "")" onclick="loadBookings(@(currentPage + 1))" @(currentPage == totalPages ? "disabled" : "")>
+            Sau&nbsp; <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+}
