@@ -389,7 +389,7 @@ namespace CustomerUI.Controllers
 
             return View();
         }
-
+        
         [HttpPost]
         public IActionResult MonthlyCheckout(MonthlyBookingFormViewModel model, string? courtNames)
         {
@@ -997,6 +997,18 @@ namespace CustomerUI.Controllers
             {
                 return Json(new { success = false, hasCompleted = false, message = ex.Message });
             }
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetBookingDetailJson(int id)
+        {
+            var accessToken = GetAccessToken();
+            if (string.IsNullOrEmpty(accessToken)) return Unauthorized();
+
+            var booking = await _bookingService.GetBookingDetailAsync(accessToken, id);
+            if (booking == null) return NotFound();
+
+            return Json(booking);
         }
         [HttpGet]
         public IActionResult RetryPayment(int id, string type)
