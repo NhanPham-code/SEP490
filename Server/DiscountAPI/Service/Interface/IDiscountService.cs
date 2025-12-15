@@ -11,6 +11,7 @@ namespace DiscountAPI.Service.Interface
         Task<ReadDiscountDTO> CreateAsync(CreateDiscountDTO dto);
         Task UpdateAsync(UpdateDiscountDTO dto);
         Task DeleteAsync(int id);
+        Task ScanAndDeactivateExpiredDiscountsAsync();
     }
 
 }
