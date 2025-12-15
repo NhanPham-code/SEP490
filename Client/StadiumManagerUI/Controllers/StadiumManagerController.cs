@@ -90,7 +90,7 @@ namespace StadiumManagerUI.Controllers
             var json = JsonSerializer.Serialize(new
             {
                 title = "Stadium",
-                content = $"/StadiumController/StadiumAdmin"
+                content = $"/Stadium/StadiumAdmin"
             });
             await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.CreateNotificationDto
             {
