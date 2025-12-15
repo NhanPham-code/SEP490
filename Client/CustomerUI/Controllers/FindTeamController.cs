@@ -20,12 +20,13 @@ namespace CustomerUI.Controllers
         private readonly IStadiumService _stadiumService;
         private readonly IBookingService _bookingService;
         private readonly INotificationService _notificationService;
+        private readonly IEmailService _emailService;
 
         private string token = string.Empty;
 
         public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
             ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
-            IBookingService bookingService, INotificationService notificationService)
+            IBookingService bookingService, INotificationService notificationService, IEmailService emailService)
         {
             _teamPost = teamPost;
             _teamMember = teamMember;
@@ -34,6 +35,7 @@ namespace CustomerUI.Controllers
             _stadiumService = stadiumService;
             _bookingService = bookingService;
             _notificationService = notificationService;
+            _emailService = emailService;
         }
 
         [BindProperty]
@@ -259,6 +261,7 @@ namespace CustomerUI.Controllers
                 Message = "A new team post has been created. Check it out!",
                 Type = "Recruitment.NewPost",
             });
+          
 
             return Json(new { Message = 200, value = result });
         }
@@ -403,7 +406,8 @@ namespace CustomerUI.Controllers
                 Message = "Đã có một thành viên tham gia vào nhóm của bạn.",
                 Parameters = json
             }).GetAwaiter().GetResult();
-
+            var user = _userService.GetOtherUserByIdAsync(createdBy);
+            _ = await _emailService.SendEmailAsync(user.Result.Email, "Yêu cầu tham gia nhóm", "Đã có một thành viên tham gia vào nhóm của bạn.");
             //_ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             //{
             //    Title = "Một người vừa tham gia vào nhóm",
