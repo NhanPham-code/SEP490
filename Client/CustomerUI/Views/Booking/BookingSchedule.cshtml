@@ -37,20 +37,13 @@
         <table id="booking-table" class="booking-table">
             <thead>
             <tr>
-                <th class="day-header" data-day="1">THỨ 2<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="2">THỨ 3<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="3">THỨ 4<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="4">THỨ 5<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="5">THỨ 6<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="6">THỨ 7<div class="date-display"></div>
-                </th>
-                <th class="day-header" data-day="0">CHỦ NHẬT<div class="date-display"></div>
-                </th>
+                <th class="day-header" data-day="1">THỨ 2<div class="date-display"></div></th>
+                <th class="day-header" data-day="2">THỨ 3<div class="date-display"></div></th>
+                <th class="day-header" data-day="3">THỨ 4<div class="date-display"></div></th>
+                <th class="day-header" data-day="4">THỨ 5<div class="date-display"></div></th>
+                <th class="day-header" data-day="5">THỨ 6<div class="date-display"></div></th>
+                <th class="day-header" data-day="6">THỨ 7<div class="date-display"></div></th>
+                <th class="day-header" data-day="0">CHỦ NHẬT<div class="date-display"></div></th>
             </tr>
             </thead>
             <tbody>
@@ -73,7 +66,6 @@
 </div>
 
 <script>
-    // --- NEW ---
     // Function to show a loading overlay
     function showLoader() {
         $('body').append('<div id="loader-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;"><div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 2s linear infinite;"></div></div>');
@@ -89,16 +81,14 @@
         form.method = 'POST';
 
         if (data.Type === 'month') {
-            showLoader(); // Show loader before making the API call
+            showLoader();
             try {
-                // Call the new controller action to get full monthly booking details
                 const fullData = await $.ajax({
                     url: '@Url.Action("GetMonthlyBookingForCheckout", "Booking")',
                     type: 'GET',
                     data: { monthlyBookingId: data.MonthlyBookingId }
                 });
 
-                // Now use the complete data from the server to build the form
                 form.action = '@Url.Action("MonthlyCheckout", "Booking")';
                 for (const key in fullData) {
                     if (fullData.hasOwnProperty(key)) {
@@ -122,11 +112,10 @@
                 console.error("Lỗi khi lấy chi tiết gói đặt tháng:", error);
                 alert('Không thể lấy chi tiết gói đặt sân. Vui lòng thử lại.');
                 hideLoader();
-                return; // Stop execution if API call fails
+                return;
             }
 
         } else {
-            // For daily bookings, the logic remains the same
             form.action = '@Url.Action("Checkout", "Booking")';
             for (const key in data) {
                 if (data.hasOwnProperty(key)) {
@@ -140,15 +129,22 @@
         }
 
         document.body.appendChild(form);
-        form.submit(); // The page will navigate, so the loader will disappear automatically
+        form.submit();
     }
 
-
     $(document).ready(function () {
-        // Initialize variables
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const stadiumCache = {}; // Cache để lưu dữ liệu sân vận động
+        const stadiumCache = {};
+
+        // --- NEW: Hàm cập nhật URL ---
+        function updateUrlState(year, weekIndex) {
+            const url = new URL(window.location);
+            url.searchParams.set('year', year);
+            url.searchParams.set('week', weekIndex);
+            // Dùng pushState để đổi URL mà không reload trang
+            window.history.pushState({}, '', url);
+        }
 
         function populateYears() {
             const $yearSelect = $('#year');
@@ -156,7 +152,7 @@
                 const $option = $('<option>', {
                     value: year,
                     text: year,
-                    selected: year === currentYear
+                    selected: false // Sẽ set selected ở hàm initializePage
                 });
                 $yearSelect.append($option);
             }
@@ -221,13 +217,7 @@
                 });
                 $weekSelect.append($option);
             });
-
-            if (year === currentYear) {
-                const currentWeekIndex = findCurrentWeekIndex(weeks);
-                if (currentWeekIndex >= 0) {
-                    $weekSelect.val(currentWeekIndex);
-                }
-            }
+            // Logic chọn tuần mặc định sẽ chuyển vào initializePage
         }
 
         function findCurrentWeekIndex(weeks) {
@@ -247,36 +237,66 @@
             return -1;
         }
 
-        async function fetchAndDisplayBookings(startDate, endDate) {
-            console.log(`Đang tải dữ liệu từ ${startDate} đến ${endDate}`);
-            $('#no-data-message').hide();
-            $('.day-cell').html('<div class="loader"></div>');
-
+        async function fetchJoinedBookings(startDate, endDate) {
             try {
-                const bookings = await $.ajax({
-                    url: '@Url.Action("GetBookingsForWeek", "Booking")',
+                const response = await $.ajax({
+                    url: '@Url.Action("GetJoinedBookingIds", "FindTeam")',
                     type: 'GET',
                     data: {
                         startDate: startDate.toISOString(),
                         endDate: endDate.toISOString()
                     }
                 });
+                return response || [];
+            } catch (error) {
+                console.error("❌ Lỗi khi gọi API joined bookings:", error);
+                return [];
+            }
+        }
 
-                console.log("Dữ liệu API GetBookingsForWeek trả về:", bookings);
+        async function fetchAndDisplayBookings(startDate, endDate) {
+            console.log(`Đang tải dữ liệu...`);
+            $('#no-data-message').hide();
+            $('.day-cell').html('<div class="loader"></div>');
 
-                if (!bookings || bookings.length === 0) {
+            try {
+                const [personalBookings, teamResponse] = await Promise.all([
+                    $.ajax({
+                        url: '@Url.Action("GetBookingsForWeek", "Booking")',
+                        type: 'GET',
+                        data: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
+                    }),
+                    fetchJoinedBookings(startDate, endDate)
+                ]);
+
+                const mergedMap = new Map();
+
+                (personalBookings || []).forEach(b => {
+                    mergedMap.set(b.id, { ...b, postId: null });
+                });
+
+                (teamResponse || []).forEach(item => {
+                    const b = item.bookingData; 
+                    const pId = item.postId;
+                    const bookingWithPostId = { ...b, postId: pId };
+                    mergedMap.set(b.id, bookingWithPostId);
+                });
+
+                const allBookings = Array.from(mergedMap.values());
+
+                if (allBookings.length === 0) {
                     displayBookingsOnTable([]);
                     return;
                 }
 
-                const uniqueStadiumIds = [...new Set(bookings.map(b => b.stadiumId))];
+                const uniqueStadiumIds = [...new Set(allBookings.map(b => b.stadiumId))];
                 const stadiumPromises = uniqueStadiumIds.map(id => getStadiumById(id));
-
                 await Promise.all(stadiumPromises);
-                displayBookingsOnTable(bookings);
+
+                displayBookingsOnTable(allBookings);
 
             } catch (error) {
-                console.error("Lỗi khi tải dữ liệu booking:", error);
+                console.error("Lỗi tải dữ liệu:", error);
                 clearTable();
                 $('#no-data-message').show();
             }
@@ -297,13 +317,6 @@
 
                 if (data.value && data.value.length > 0) {
                     const stadium = data.value[0];
-
-                    // Log riêng tên sân vận động lớn
-                    console.log(`🏟️ Sân lớn (ID ${stadiumId}):`, stadium.Name);
-
-                    // Log riêng danh sách sân con (nơi chứa tên Court 1, Court 2...)
-                    console.log(`🏸 Danh sách sân con (Courts) của ID ${stadiumId}:`, stadium.Courts);
-                    
                     stadiumCache[stadiumId] = stadium;
                     return stadium;
                 } else {
@@ -332,9 +345,7 @@
         function equalizeBookingItemHeights() {
             const bookingItems = document.querySelectorAll('.booking-item');
             if (bookingItems.length === 0) return;
-
             bookingItems.forEach(item => item.style.height = 'auto');
-
             setTimeout(() => {
                 let maxHeight = 0;
                 bookingItems.forEach(item => {
@@ -348,13 +359,11 @@
 
         function displayBookingsOnTable(bookings) {
             clearTable();
-
+            $('#no-data-message').hide();
             if (!bookings || bookings.length === 0) {
                 $('#no-data-message').show();
                 return;
             }
-
-            $('#no-data-message').hide();
 
             const bookingsByDate = {};
             bookings.forEach(booking => {
@@ -366,7 +375,7 @@
                     const timeKey = `${detail.startTime}-${detail.endTime}`;
                     if (!bookingsByDate[dayOfWeek][timeKey]) {
                         bookingsByDate[dayOfWeek][timeKey] = {
-                            bookingData: booking,
+                            bookingData: booking, 
                             startTime: detail.startTime,
                             endTime: detail.endTime,
                             courtsForDisplay: []
@@ -379,82 +388,81 @@
             Object.keys(bookingsByDate).forEach(dayOfWeek => {
                 const dayBookings = bookingsByDate[dayOfWeek];
                 const $dayCell = $(`#day-${dayOfWeek}`);
-
                 const timeSlots = Object.values(dayBookings).sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
                 timeSlots.forEach(timeSlot => {
-                    const stadium = stadiumCache[timeSlot.bookingData.stadiumId];
-                    const stadiumName = stadium ? stadium.Name : `Sân ${timeSlot.bookingData.stadiumId}`;
+                    const bData = timeSlot.bookingData;
+                    const stadium = stadiumCache[bData.stadiumId];
+                    const stadiumName = stadium ? stadium.Name : `Sân ${bData.stadiumId}`;
 
                     const sortedCourts = timeSlot.courtsForDisplay.sort((a, b) => a - b);
-                    const totalCourts = sortedCourts.length;
                     let courtChips = '';
-
-                    if (totalCourts <= 2) {
-                        // If 2 or fewer courts, show all of them
-                        courtChips = sortedCourts.map(courtId => {
-                            const courtName = getCourtName(stadium, courtId);
-                            return `<span class="court-chip">${courtName}</span>`;
-                        }).join('');
+                    if (sortedCourts.length <= 2) {
+                        courtChips = sortedCourts.map(cid => `<span class="court-chip">${getCourtName(stadium, cid)}</span>`).join('');
                     } else {
-                        // If more than 2 courts, show the first one + a "more" chip
-                        const firstCourtName = getCourtName(stadium, sortedCourts[0]);
-                        const remainingCount = totalCourts - 1;
-                        courtChips = `
-                                <span class="court-chip">${firstCourtName}</span>
-                                <span class="court-chip more-courts-chip">+${remainingCount} sân khác</span>
-                            `;
+                        courtChips = `<span class="court-chip">${getCourtName(stadium, sortedCourts[0])}</span><span class="court-chip more-courts-chip">+${sortedCourts.length - 1} sân khác</span>`;
                     }
 
                     const startTimeFormatted = formatTime(timeSlot.startTime);
                     const endTimeFormatted = formatTime(timeSlot.endTime);
 
-                    const courtNamesList = sortedCourts.map(courtId => getCourtName(stadium, courtId));
+                    let buttonHtml = '';
 
-                    const bookingType = timeSlot.bookingData.monthlyBookingId ? 'month' : 'day';
-                    let checkoutData;
+                    if (bData.postId) {
+                        const teamUrl = `@Url.Action("TeamManage", "TeamMember")?postId=${bData.postId}`;
+                        buttonHtml = `
+                        <a href="${teamUrl}" class="detail-btn" style="text-decoration: none; display: inline-block; text-align: center;">
+                            <i class="fas fa-users"></i> Xem Team
+                        </a>
+                    `;
+                    } else {
+                        const bookingType = bData.monthlyBookingId ? 'month' : 'day';
+                        let checkoutData = {};
 
-                    if (bookingType === 'day') {
-                        const courtsForCheckout = timeSlot.bookingData.bookingDetails.map(detail => ({
-                            courtId: detail.courtId,
-                            times: [`${formatTime(detail.startTime)}-${formatTime(detail.endTime)}`]
-                        }));
-                        checkoutData = {
-                            BookingId: timeSlot.bookingData.id,
-                            Type: bookingType,
-                            StadiumId: timeSlot.bookingData.stadiumId,
-                            Date: new Date(timeSlot.bookingData.date).toISOString().split('T')[0],
-                            TotalPrice: timeSlot.bookingData.originalPrice,
-                            Courts: JSON.stringify(courtsForCheckout),
-                            AfterPrice: timeSlot.bookingData.totalPrice,
-                            DiscountId: timeSlot.bookingData.discountId
-                        };
-                    } else { // bookingType === 'month'
-                        // For monthly bookings, we only need the ID to fetch full details later
-                        checkoutData = {
-                            MonthlyBookingId: timeSlot.bookingData.monthlyBookingId,
-                            Type: bookingType,
-                            CourtNames: courtNamesList.join(', ') // Nối tên sân thành chuỗi
-                        };
+                        if (bookingType === 'day') {
+                            const courtsForCheckout = bData.bookingDetails.map(detail => ({
+                                courtId: detail.courtId,
+                                times: [`${formatTime(detail.startTime)}-${formatTime(detail.endTime)}`]
+                            }));
+                            checkoutData = {
+                                BookingId: bData.id,
+                                Type: bookingType,
+                                StadiumId: bData.stadiumId,
+                                Date: new Date(bData.date).toISOString().split('T')[0],
+                                TotalPrice: bData.originalPrice,
+                                Courts: JSON.stringify(courtsForCheckout),
+                                AfterPrice: bData.totalPrice,
+                                DiscountId: bData.discountId
+                            };
+                        } else {
+                            const courtNamesList = sortedCourts.map(courtId => getCourtName(stadium, courtId));
+                            checkoutData = {
+                                MonthlyBookingId: bData.monthlyBookingId,
+                                Type: bookingType,
+                                CourtNames: courtNamesList.join(', ')
+                            };
+                        }
+
+                        const checkoutDataString = JSON.stringify(checkoutData);
+                        buttonHtml = `
+                        <button class="detail-btn checkout-btn" data-checkout='${checkoutDataString}'>
+                            <i class="fas fa-shopping-cart"></i> Chi tiết
+                        </button>
+                    `;
                     }
 
-                    const checkoutDataString = JSON.stringify(checkoutData);
-
                     const $bookingItem = $(`
-                            <div class="booking-item ${timeSlot.bookingData.status}" data-booking-id="${timeSlot.bookingData.id}">
-                                <div class="stadium-name">${stadiumName}</div>
-                                <div class="booking-content-top">
-                                    <div class="booking-time">${startTimeFormatted} - ${endTimeFormatted}</div>
-                                    <div class="courts-container">${courtChips}</div>
-                                </div>
-                                <div class="detail-container">
-                                    <button class="detail-btn checkout-btn" data-checkout='${checkoutDataString}'>
-                                        <i class="fas fa-shopping-cart"></i>
-                                        Chi tiết
-                                    </button>
-                                </div>
-                            </div>
-                        `);
+                    <div class="booking-item ${bData.status}" data-booking-id="${bData.id}">
+                        <div class="stadium-name">${stadiumName}</div>
+                        <div class="booking-content-top">
+                            <div class="booking-time">${startTimeFormatted} - ${endTimeFormatted}</div>
+                            <div class="courts-container">${courtChips}</div>
+                        </div>
+                        <div class="detail-container">
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `);
                     $dayCell.append($bookingItem);
                 });
             });
@@ -476,25 +484,67 @@
             fetchAndDisplayBookings(startDate, endDate);
         }
 
-        function initializePage() {
+        // --- UPDATED: Hàm khởi tạo trang có đọc URL param ---
+        async function initializePage() {
             populateYears();
-            populateWeeks(currentYear);
-            // *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
-            // Kích hoạt sự kiện change một cách tường minh sau khi đã chắc chắn DOM được cập nhật
+            
+            // 1. Đọc Param từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlYear = parseInt(urlParams.get('year'));
+            const urlWeek = parseInt(urlParams.get('week'));
+
+            // 2. Set Year
+            if (!isNaN(urlYear) && $(`#year option[value="${urlYear}"]`).length > 0) {
+                $('#year').val(urlYear);
+            } else {
+                $('#year').val(currentYear);
+            }
+
+            // 3. Populate Week theo Year đã chọn
+            populateWeeks(parseInt($('#year').val()));
+
+            // 4. Set Week (nếu có trong URL) hoặc Default (Hiện tại)
+            if (!isNaN(urlWeek) && $(`#week option[value="${urlWeek}"]`).length > 0) {
+                $('#week').val(urlWeek);
+            } else {
+                // Nếu không có URL param thì mới tìm tuần hiện tại
+                if (parseInt($('#year').val()) === currentYear) {
+                    const weeks = getWeeksInYear(currentYear);
+                    const currentWeekIndex = findCurrentWeekIndex(weeks);
+                    if (currentWeekIndex >= 0) {
+                        $('#week').val(currentWeekIndex);
+                    }
+                }
+            }
+
+            // Trigger load dữ liệu
             setTimeout(function () {
-                $('#week').trigger('change');
+                // Chỉ trigger để gọi hàm load data, không update URL nữa (tránh ghi đè nếu vừa back lại)
+                updateTableDates(); 
             }, 0);
         }
 
+        // --- UPDATED: Sự kiện change có update URL ---
         $('#year').on('change', function () {
-            populateWeeks(parseInt($(this).val()));
-            // Kích hoạt sự kiện change cho dropdown tuần để tải lại dữ liệu
-            setTimeout(function () {
-                $('#week').trigger('change');
-            }, 0);
+            const selectedYear = parseInt($(this).val());
+            populateWeeks(selectedYear);
+            $('#week').val(0); // Reset về tuần đầu
+            
+            // Update URL
+            updateUrlState(selectedYear, 0);
+            
+            updateTableDates();
         });
 
-        $('#week').on('change', updateTableDates);
+        $('#week').on('change', function () {
+            const selectedYear = parseInt($('#year').val());
+            const selectedWeek = parseInt($(this).val());
+            
+            // Update URL
+            updateUrlState(selectedYear, selectedWeek);
+            
+            updateTableDates();
+        });
 
         $(document).on('click', '.checkout-btn', function () {
             const checkoutData = $(this).data('checkout');
@@ -504,9 +554,7 @@
         initializePage();
     });
 
-
     $(window).on('resize', () => setTimeout(equalizeBookingItemHeights, 300));
 </script>
 </body>
-
 </html>

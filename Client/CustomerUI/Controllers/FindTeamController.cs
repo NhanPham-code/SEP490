@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 using Service.Interfaces;
 using System.Text.Json;
+using DTOs.BookingDTO; 
 
 namespace CustomerUI.Controllers
 {
@@ -86,7 +87,6 @@ namespace CustomerUI.Controllers
         }
 
         public async Task<IActionResult> FindTeam()
-
         {
             token = _tokenService.GetAccessTokenFromCookie();
             if (string.IsNullOrEmpty(token))
@@ -226,6 +226,55 @@ namespace CustomerUI.Controllers
 
             return Json(bookingAndStadiumViewModel);
         }
+        
+        // Trong file: FindTeamController.cs
+
+        [HttpGet]
+        public async Task<IActionResult> GetJoinedBookingIds(DateTime startDate, DateTime endDate)
+        {
+            var myUserId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var token = _tokenService.GetAccessTokenFromCookie();
+
+            string startIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
+            string endIso = endDate.ToString("yyyy-MM-ddT23:59:59Z");
+
+            // 1. Lấy TeamPost (để lấy được cả BookingId lẫn PostId)
+            var query = $"&$filter=TeamMembers/any(m: m/UserId eq {myUserId} and m/Role eq 'Member') and PlayDate ge {startIso} and PlayDate le {endIso}&$select=BookingId,Id"; 
+            // Lưu ý: Select thêm Id (chính là PostId)
+
+            var teamPostResult = await _teamPost.GetOdataTeamPostAsync(query);
+
+            if (teamPostResult?.Value == null || !teamPostResult.Value.Any())
+            {
+                return Json(new List<object>());
+            }
+
+            var teamPosts = teamPostResult.Value; // List các bài đăng
+            var bookingIds = teamPosts.Select(p => p.BookingId).Distinct().ToList();
+
+            // 2. Gọi Booking Service lấy chi tiết booking
+            var idFilters = bookingIds.Select(id => $"Id eq {id}");
+            var odataFilter = string.Join(" or ", idFilters);
+            var bookingQuery = $"?$filter={odataFilter}&$expand=BookingDetails";
+    
+            var bookingsResult = await _bookingService.GetBookingAsync(token, bookingQuery);
+            var bookings = bookingsResult.Data ?? new List<BookingReadDto>();
+
+            // 3. KẾT HỢP: Booking + PostId
+            // Trả về một Anonymous Object chứa cả 2 thông tin
+            var result = bookings.Select(b => {
+                // Tìm bài đăng tương ứng với booking này
+                var post = teamPosts.FirstOrDefault(p => p.BookingId == b.Id);
+                return new 
+                {
+                    BookingData = b,     // Toàn bộ thông tin booking
+                    PostId = post?.Id    // Id bài đăng để điều hướng
+                };
+            }).ToList();
+
+            return Json(result);
+        }
+        
         //create new post
         public async Task<IActionResult> CreateNewPost()
         {
