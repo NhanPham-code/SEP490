@@ -25,6 +25,7 @@ namespace StadiumManagerUI.Controllers
         private readonly ICourtRelationService _courtRelationService;
         private readonly ICourtService _courtService;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
 
 
@@ -37,6 +38,7 @@ namespace StadiumManagerUI.Controllers
             INotificationService notificationService,
             ICourtRelationService courtRelationService,
             ICourtService courtService,
+            IEmailService emailService,
             IConfiguration configuration)
         {
             _tokenService = tokenService;
@@ -47,6 +49,7 @@ namespace StadiumManagerUI.Controllers
             _notificationService = notificationService;
             _courtService = courtService;
             _courtRelationService   = courtRelationService;
+            _emailService = emailService;
             _configuration = configuration;
         }
 
@@ -104,7 +107,11 @@ namespace StadiumManagerUI.Controllers
                     // ✅ Gửi thông báo cho người được tạo booking nếu không phải khách vãng lai
                     if (customerUserId != 0)
                     {
+                        // 1. Gửi Notification (Socket/DB)
                         await SendNotificationToCreatedUserAsync(createdBooking, customerUserId, bookingToCreate.StadiumId);
+
+                        // 2. Gửi Email (NEW)
+                        await SendEmailToCreatedUserAsync(createdBooking, customerUserId, bookingToCreate.StadiumId, accessToken);
                     }
 
                     TempData["SuccessMessage"] = "Tạo lịch đặt sân thành công!";
@@ -124,6 +131,82 @@ namespace StadiumManagerUI.Controllers
             }
         }
 
+        private async Task SendEmailToCreatedUserAsync(BookingReadDto booking, int userId, int stadiumId, string accessToken)
+        {
+            try
+            {
+                // 1. Lấy thông tin khách hàng để lấy Email
+                var users = await _userService.GetUsersByIdsAsync(new List<int> { userId }, accessToken);
+                var user = users?.FirstOrDefault();
+
+                // 2. Lấy thông tin sân
+                var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+
+                if (user != null && !string.IsNullOrEmpty(user.Email) && stadium != null)
+                {
+                    // 3. Chuẩn bị nội dung Email
+                    string subject = $"[Sportivey] Xác nhận lịch đặt sân mới - {stadium.Name}";
+
+                    // Format ngày giờ cho đẹp
+                    string dateStr = booking.Date.ToString("dd/MM/yyyy");
+                    string priceStr = (booking.TotalPrice ?? 0).ToString("N0") + " đ";
+
+                    // Lấy khung giờ tổng quát (Từ giờ sớm nhất đến giờ trễ nhất)
+                    var startTimes = booking.BookingDetails.Select(d => d.StartTime).OrderBy(t => t).FirstOrDefault();
+                    var endTimes = booking.BookingDetails.Select(d => d.EndTime).OrderByDescending(t => t).FirstOrDefault();
+                    string timeRange = $"{startTimes.ToString("HH:mm")} - {endTimes.ToString("HH:mm")}";
+
+                    string messageBody = $@"
+                <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                <p>Chủ sân <strong>{stadium.Name}</strong> vừa hỗ trợ bạn tạo một lịch đặt sân mới trên hệ thống Sportivey.</p>
+                
+                <table style='width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;'>
+                    <tr style='background-color: #f8f9fa;'>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Mã đặt sân:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>#{booking.Id}</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Sân vận động:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>{stadium.Name}</td>
+                    </tr>
+                    <tr style='background-color: #f8f9fa;'>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Ngày đặt:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>{dateStr}</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Khung giờ:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>{timeRange}</td>
+                    </tr>
+                    <tr style='background-color: #f8f9fa;'>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Tổng tiền:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd; color: #d9534f; font-weight: bold;'>{priceStr}</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Trạng thái:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd; color: #28a745; font-weight: bold;'>Đã xác nhận</td>
+                    </tr>
+                </table>
+
+                <p>Bạn có thể xem chi tiết lịch đặt này trong phần <strong>Lịch sử đặt sân</strong> trên ứng dụng hoặc website.</p>
+                <p>Cảm ơn bạn đã sử dụng dịch vụ!</p>
+            ";
+
+                    // Link trỏ về trang lịch sử
+                    string actionLink = "https://localhost:7128/Booking/BookingHistory";
+                    string actionText = "Xem Lịch Sử Đặt Sân";
+
+                    // 4. Gửi Email
+                    await _emailService.SendEmailAsync(user.Email, subject, messageBody, actionLink, actionText);
+
+                    Console.WriteLine($"[Email] Đã gửi mail xác nhận cho {user.Email} (Booking #{booking.Id})");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EmailError] Không thể gửi mail cho userId {userId}: {ex.Message}");
+                // Không throw exception để tránh làm crash luồng chính (Booking đã tạo thành công rồi)
+            }
+        }
         private async Task SendNotificationToCreatedUserAsync(BookingReadDto booking, int userId, int stadiumId)
         {
             try
@@ -454,7 +537,6 @@ namespace StadiumManagerUI.Controllers
         }
 
         // Trong file: StadiumManagerUI/Controllers/BookingController.cs
-
         private async Task<bool> CancelDailyBookingDirectly(int bookingId, string accessToken)
         {
             try
@@ -486,11 +568,13 @@ namespace StadiumManagerUI.Controllers
                     return false;
                 }
 
-                // Gửi thông báo cho khách hàng (nếu có userId)
+                // Gửi thông báo & Email cho khách hàng (nếu là khách thành viên)
                 if (booking.UserId != 0)
                 {
                     var stadium = await _stadiumService.GetStadiumByIdAsync(booking.StadiumId);
-                    var stadiumName = stadium?.Name ?? "sân";
+                    var stadiumName = stadium?.Name ?? "sân bóng";
+
+                    // 1. Gửi Notification (Logic cũ)
                     var notificationDto = new CreateNotificationDto
                     {
                         UserId = booking.UserId,
@@ -500,6 +584,40 @@ namespace StadiumManagerUI.Controllers
                         Parameters = JsonSerializer.Serialize(new { bookingType = "daily", bookingId }),
                     };
                     await _notificationService.SendNotificationToUserAsync(notificationDto);
+
+                    // 2. Gửi Email (Logic mới)
+                    try
+                    {
+                        var user = await _userService.GetOtherUserByIdAsync(booking.UserId);
+                        if (user != null && !string.IsNullOrEmpty(user.Email))
+                        {
+                            string subject = $"[Sportivey] Thông báo hủy lịch đặt sân #{booking.Id}";
+                            string messageBody = $@"
+                        <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                        <p>Lịch đặt sân của bạn tại <strong>{stadiumName}</strong> đã bị hủy bởi chủ sân.</p>
+                        
+                        <div style='background-color: #fef2f2; padding: 15px; border-radius: 8px; border: 1px solid #fee2e2; margin: 15px 0;'>
+                            <p style='margin: 5px 0; color: #991b1b;'><strong>Mã đặt sân:</strong> #{booking.Id}</p>
+                            <p style='margin: 5px 0; color: #991b1b;'><strong>Ngày:</strong> {booking.Date:dd/MM/yyyy}</p>
+                            <p style='margin: 5px 0; color: #991b1b;'><strong>Trạng thái:</strong> Đã hủy</p>
+                        </div>
+
+                        <p>Nếu bạn có thắc mắc, vui lòng liên hệ trực tiếp với chủ sân để được hỗ trợ.</p>
+                    ";
+
+                            // Link trỏ về trang khách hàng (Port 7128)
+                            string actionLink = "https://localhost:7128/Booking/BookingHistory";
+                            string actionText = "Xem Lịch Sử";
+
+                            await _emailService.SendEmailAsync(user.Email, subject, messageBody, actionLink, actionText);
+                            Console.WriteLine($"[Email] Đã gửi mail hủy cho {user.Email}");
+                        }
+                    }
+                    catch (Exception exMail)
+                    {
+                        // Bắt lỗi riêng phần mail để không làm fail cả process hủy
+                        Console.WriteLine($"[EmailError] Lỗi gửi mail: {exMail.Message}");
+                    }
                 }
 
                 Console.WriteLine($"[CancelDailyBookingDirectly] Hủy booking {bookingId} thành công.");
