@@ -127,7 +127,7 @@
                         let actionButtons = ``;
                         if (court.sportType === 'Bóng đá sân 7' || court.sportType === "Bóng đá sân 11") {
                             actionButtons += `
-                                <button class="btn btn-sm btn-outline-info" onclick="editCourtRelation(${court.id})" title="Liên kết các sân">
+                                <button class="btn btn-sm btn-outline-info" onclick="viewCourtRelation(${court.id})" title="Liên kết các sân">
                                     <i class="ri-links-line"></i>
                                 </button>`;
                         }
@@ -369,7 +369,11 @@
         }
 
         // Cập nhật phần gửi AJAX request
-                                           window.editCourtRelation = function(courtId) {
+                                                   /**
+         * HIỂN THỊ CỬA SỔ XEM QUAN HỆ SÂN (CHẾ ĐỘ CHỈ XEM)
+         * @@param {number} courtId ID của sân cha
+         */
+        window.viewCourtRelation = function(courtId) {
             $.ajax({
                 url: '/Court/GetAllCourtRelationsByParentId',
                 type: 'GET',
@@ -377,31 +381,32 @@
                 success: function(courtRelation) {
                     let relations = (courtRelation && courtRelation.length > 0) ? courtRelation : [];
 
-                    // Lấy tất cả sân để fill vào
-                    $.ajax({
-                        url: '/Court/GetAllCourts',
+                    $. ajax({
+                        url:  '/Court/GetAllCourts',
                         type: 'GET',
-                        data: { stadiumId: stadiumId },
+                        data:  { stadiumId: stadiumId },
                         success: function(courts) {
                             Swal.fire({
-                                title: '<i class="ri-eye-line"></i> Xem Quan Hệ Sân', // MODIFIED: Changed title
+                                title: '<i class="ri-eye-line"></i> Xem Quan Hệ Sân',
                                 html: getCourtRelationFormHtml(courtId, relations, courts),
                                 showCancelButton: true,
-                                showConfirmButton: false, // MODIFIED: Hide confirm button
-                                cancelButtonText: '<i class="ri-close-line me-1"></i>Đóng', // MODIFIED: Changed cancel button text
+                                showConfirmButton: false,
+                                cancelButtonText: '<i class="ri-close-line me-1"></i>Đóng',
                                 cancelButtonColor: '#6b7280',
                                 width: '1000px',
                                 heightAuto: false,
                                 customClass: {
-                                    popup: 'extra-wide-court-popup',
+                                    popup: 'extra-wide-court-popup view-only-popup',
                                     container: 'extra-wide-container'
                                 },
                                 padding: '2rem'
-                                // MODIFIED: Removed preConfirm and .then() block as no action is needed
                             });
+
+                            // Thêm CSS cho court
+                            addLinkedCourtStyles();
                         },
                         error: function() {
-                            showErrorMessage('Không thể tải danh sách sân. Vui lòng thử lại.');
+                            showErrorMessage('Không thể tải danh sách sân.  Vui lòng thử lại.');
                         }
                     });
                 },
@@ -411,87 +416,211 @@
             });
         };
 
+        /**
+         * THÊM CSS CHO COURT
+         */
+        function addLinkedCourtStyles() {
+            if (document.getElementById('linked-court-styles')) return;
+
+            const styleElement = document.createElement('style');
+            styleElement.id = 'linked-court-styles';
+            styleElement.textContent = `
+                /* ===== STYLE CHO COURT ĐÃ LIÊN KẾT (MÀU XANH) ===== */
+                .court-linked {
+                    background:  linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) ! important;
+                    border: 2px solid #0ea5e9 !important;
+                    border-radius: 12px ! important;
+                    padding: 12px 16px ! important;
+                    margin-bottom: 12px !important;
+                    box-shadow:  0 2px 8px rgba(14, 165, 233, 0.15) !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                .court-linked:hover {
+                    background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%) !important;
+                    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
+                    transform: translateY(-2px) !important;
+                }
+
+                .court-linked .link-icon {
+                    color: #0284c7 !important;
+                }
+
+                .linked-badge {
+                    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+                    color: white ! important;
+                    padding: 4px 10px !important;
+                    border-radius:  20px !important;
+                    font-size:  0.75rem !important;
+                    font-weight:  600 !important;
+                    display: inline-flex ! important;
+                    align-items: center ! important;
+                    gap: 4px ! important;
+                    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3) !important;
+                }
+
+                /* ===== STYLE CHO COURT CHƯA LIÊN KẾT (MÀU XÁM) ===== */
+                .court-not-linked {
+                    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+                    border: 2px solid #d1d5db ! important;
+                    border-radius: 12px !important;
+                    padding: 12px 16px ! important;
+                    margin-bottom: 12px !important;
+                    box-shadow:  0 1px 3px rgba(0, 0, 0, 0.05) !important;
+                    transition: all 0.3s ease !important;
+                    opacity: 0.8 !important;
+                }
+
+                .court-not-linked:hover {
+                    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%) !important;
+                    opacity: 1 ! important;
+                }
+
+                .court-not-linked .link-icon {
+                    color: #9ca3af !important;
+                }
+
+                .court-not-linked . court-name {
+                    color: #6b7280 ! important;
+                }
+
+                .not-linked-badge {
+                    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+                    color: white ! important;
+                    padding: 4px 10px !important;
+                    border-radius: 20px ! important;
+                    font-size: 0.75rem !important;
+                    font-weight: 600 !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+                }
+
+                /* ===== STYLE CHO SÂN 5 TRONG DROPDOWN ===== */
+                .court5-linked {
+                    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+                    border: 1px solid #10b981 !important;
+                    border-radius: 8px !important;
+                    padding: 8px 12px ! important;
+                    margin:  6px 0 ! important;
+                }
+
+                .court5-not-linked {
+                    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%) !important;
+                    border: 1px solid #e5e7eb ! important;
+                    border-radius: 8px !important;
+                    padding: 8px 12px ! important;
+                    margin: 6px 0 !important;
+                    opacity: 0.7 !important;
+                }
+
+                .linked-badge-small {
+                    background:  linear-gradient(135deg, #10b981, #059669) !important;
+                    color: white !important;
+                    padding: 2px 8px !important;
+                    border-radius:  12px !important;
+                    font-size:  0.7rem !important;
+                    font-weight:  500 !important;
+                }
+
+                .not-linked-badge-small {
+                    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+                    color: white !important;
+                    padding:  2px 8px !important;
+                    border-radius:  12px !important;
+                    font-size: 0.7rem !important;
+                    font-weight: 500 ! important;
+                }
+
+                /* ===== CONTAINER DROPDOWN SÂN 7 ===== */
+                .court7-dropdown {
+                    background: rgba(255, 255, 255, 0.7) !important;
+                    border-radius: 8px !important;
+                    padding: 10px ! important;
+                    margin-top: 10px ! important;
+                    border-left: 3px solid #0ea5e9 ! important;
+                }
+
+                .court7-dropdown. not-linked {
+                    border-left:  3px solid #d1d5db ! important;
+                }
+
+                /* ===== HEADER CỦA GROUP ===== */
+                .group-section h6 {
+                    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+                    padding: 10px 15px !important;
+                    border-radius:  8px !important;
+                    border-left: 4px solid #0ea5e9 !important;
+                }
+
+                /* ===== ANIMATION ===== */
+                @@keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform:  translateY(0);
+                    }
+                }
+
+                .court-linked, .court-not-linked {
+                    animation: fadeInUp 0.4s ease forwards;
+                }
+            `;
+            document.head. appendChild(styleElement);
+        }
+
+        /**
+         * TẠO HTML CHO FORM XEM QUAN HỆ SÂN
+         */
         function getCourtRelationFormHtml(parentCourtId, relations, courts) {
-            // Lấy danh sách id con hiện tại (nếu có)
-            const selectedChildIds = relations.map(r => r.childCourtId);
+            const parentCourt = courts.find(c => c. id === parentCourtId);
 
-            // Tìm thông tin sân cha
-            const parentCourt = courts.find(c => c.id === parentCourtId);
-
-            // Lọc các sân bóng đá (loại bỏ sân cha và logic theo yêu cầu)
             const availableCourts = courts
-                .filter(c => c.id !== parentCourtId) // loại bỏ chính sân cha
+                .filter(c => c.id !== parentCourtId)
                 .filter(c => {
-                    // Chỉ lấy sân bóng đá
-                    if (c.sportType !== "Bóng đá sân 5" && c.sportType !== "Bóng đá sân 7" && c.sportType !== "Bóng đá sân 11") {
+                    if (! ["Bóng đá sân 5", "Bóng đá sân 7", "Bóng đá sân 11"]. includes(c.sportType)) {
                         return false;
                     }
-
-                    // Logic cho sân 11
                     if (parentCourt && parentCourt.sportType === "Bóng đá sân 11") {
-                        // Sân 11 có thể liên kết với sân 7 và sân 5
-                        return c.sportType === "Bóng đá sân 7" ;
+                        return c.sportType === "Bóng đá sân 7" || c.sportType === "Bóng đá sân 5";
                     }
-
-                    // Nếu sân cha là sân 7, thì không hiển thị sân 7
-                    if (parentCourt && parentCourt.sportType === "Bóng đá sân 7" && c.sportType === "Bóng đá sân 7" || c.sportType === "Bóng đá sân 11") {
-                        return false;
+                    if (parentCourt && parentCourt.sportType === "Bóng đá sân 7") {
+                        return c. sportType === "Bóng đá sân 5";
                     }
-
                     return true;
                 });
 
-            // Lấy danh sách sân 5 cho dropdown
             const court5Options = courts.filter(c =>
                 c.sportType === "Bóng đá sân 5" && c.id !== parentCourtId
             );
 
-            // Build loading state first
-            let childCheckboxes = '';
-
-            if (availableCourts.length === 0) {
-                let message = "Không có sân bóng đá nào có thể liên kết";
-                let subMessage = "Hiện tại chưa có sân bóng đá khác trong hệ thống.";
-
-                childCheckboxes = `
-                    <div class="text-center py-4">
-                        <div style="font-size: 2.5rem; color: #9ca3af; margin-bottom: 12px;">
-                            <i class="ri-football-line"></i>
+            let childCheckboxes = `
+                <div id="courtsContainer">
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang kiểm tra...</span>
                         </div>
-                        <p class="text-muted mb-0">${message}</p>
-                        <small class="text-muted">${subMessage}</small>
+                        <p class="text-muted mt-2 mb-0">Đang kiểm tra trạng thái sân... </p>
                     </div>
-                `;
-            } else {
-                // Show loading state initially
-                childCheckboxes = `
-                    <div id="courtsContainer">
-                        <div class="text-center py-3">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Đang kiểm tra...</span>
-                            </div>
-                            <p class="text-muted mt-2 mb-0">Đang kiểm tra trạng thái sân...</p>
-                        </div>
-                    </div>
-                `;
+                </div>
+            `;
 
-                // Load courts after render
-                setTimeout(() => {
-                    loadCourtsAsync(availableCourts, selectedChildIds, parentCourtId, court5Options, parentCourt);
-                }, 100);
-            }
+            setTimeout(() => {
+                loadCourtsAsync(availableCourts, parentCourtId, court5Options, parentCourt);
+            }, 100);
 
             return `
                 <div class="text-left">
                     <div class="mb-3">
-                        <label class="form-label">Sân Cha</label>
-                        <input type="text" class="form-control" value="${parentCourt ? parentCourt.name : ''}" disabled />
-                        <input type="hidden" id="parentCourtId" value="${parentCourtId}" />
-                        <input type="hidden" id="parentCourtType" value="${parentCourt ? parentCourt.sportType : ''}" />
+                        <label class="form-label fw-bold"><i class="ri-home-4-line me-1 text-primary"></i>Sân Cha</label>
+                        <input type="text" class="form-control bg-light" value="${parentCourt ?  parentCourt.name : ''}" disabled />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Sân Con Liên Kết</label> <!-- MODIFIED: Changed label -->
-                        <div class="border rounded p-3 courts-container">
+                        <label class="form-label fw-bold"><i class="ri-links-line me-1 text-primary"></i>Danh Sách Các Sân Con</label>
+                        <div class="border rounded p-3 courts-container" style="max-height: 60vh; overflow-y:  auto; background: #fafafa;">
                             ${childCheckboxes}
                         </div>
                     </div>
@@ -499,209 +628,146 @@
             `;
         }
 
-        // ✅ UPDATED: Modified async function for "view only" mode
-        async function loadCourtsAsync(availableCourts, selectedChildIds, parentCourtId, court5Options, parentCourt, courts) {
+        /**
+         * TẢI DỮ LIỆU VÀ HIỂN THỊ TẤT CẢ CÁC SÂN CON
+         */
+        async function loadCourtsAsync(availableCourts, parentCourtId, court5Options, parentCourt) {
             const container = document.getElementById('courtsContainer');
-
             if (!container) return;
-
-            console.log('🔍 Loading courts async in view-only mode...');
 
             try {
                 const courtPromises = availableCourts.map(async (court) => {
-                    try {
-                        const response = await $.ajax({
-                            url: '/Court/GetAllCourtRelationsByChildId',
-                            type: 'GET',
-                            data: { childId: court.id }
-                        });
-
-                        const allRelations = response || [];
-
-                        const isLinkedToCurrentParent = allRelations.some(relation =>
-                            relation.parentCourtId === parentCourtId
-                        );
-
-                        let isLinkedToOtherCourt = false;
-                        let linkedCourtName = '';
-
-                        const otherRelation = allRelations.find(relation => relation.parentCourtId !== parentCourtId);
-                        if (otherRelation && otherRelation.parentCourt) {
-                            isLinkedToOtherCourt = true;
-                            linkedCourtName = otherRelation.parentCourt.name;
-                        }
-
-                        return {
-                            court: court,
-                            isLinkedToCurrentParent: isLinkedToCurrentParent,
-                            isLinkedToOtherCourt: isLinkedToOtherCourt,
-                            linkedCourtName: linkedCourtName,
-                            existingRelations: allRelations,
-                        };
-                    } catch (error) {
-                        console.error(`❌ Error checking court ${court.id}:`, error);
-                        return { court: court, isLinkedToCurrentParent: false, isLinkedToOtherCourt: false, linkedCourtName: '', existingRelations: [] };
-                    }
+                    const response = await $.ajax({
+                        url: '/Court/GetAllCourtRelationsByChildId', type: 'GET', data: { childId: court.id }
+                    });
+                    const allRelations = response || [];
+                    const isLinkedToCurrentParent = allRelations.some(r => r.parentCourtId === parentCourtId);
+                    return { court:  court, isLinkedToCurrentParent:  isLinkedToCurrentParent };
                 });
-
-                const courtResults = await Promise.all(courtPromises);
+                const courtResults = await Promise. all(courtPromises);
 
                 const allCourt5Relations = await Promise.all(
                     court5Options.map(async (c5) => {
-                        try {
-                            const response = await $.ajax({
-                                url: '/Court/GetAllCourtRelationsByChildId',
-                                type: 'GET',
-                                data: { childId: c5.id }
-                            });
-                            return { court5Id: c5.id, relations: response || [] };
-                        } catch (error) {
-                            console.error(`❌ Error getting court 5 relations for ${c5.id}:`, error);
-                            return { court5Id: c5.id, relations: [] };
-                        }
+                        const response = await $. ajax({
+                            url: '/Court/GetAllCourtRelationsByChildId', type: 'GET', data: { childId: c5.id }
+                        });
+                        return { court5Id: c5.id, relations: response || [] };
                     })
                 );
 
-                // MODIFIED: Render courts in view-only mode
-                const courtsHtml = courtResults.map(result => {
+                // HÀM HELPER ĐỂ RENDER MỘT SÂN CON (CẢ LIÊN KẾT VÀ CHƯA LIÊN KẾT)
+                const renderCourtItem = (result) => {
                     const court = result.court;
-                    const isLinkedToCurrentParent = result.isLinkedToCurrentParent;
-                    const checked = isLinkedToCurrentParent ? 'checked' : '';
+                    const isLinked = result.isLinkedToCurrentParent;
 
-                    let statusIcon = '';
-                    let statusText = '';
+                    // Xác định class và style dựa vào trạng thái liên kết
+                    const containerClass = isLinked ? 'court-linked' : 'court-not-linked';
+                    const iconClass = isLinked ? 'ri-checkbox-circle-fill text-primary' : 'ri-checkbox-blank-circle-line text-muted';
+                    const badgeHtml = isLinked
+                        ? '<span class="linked-badge"><i class="ri-link"></i> Đã liên kết</span>'
+                        :  '<span class="not-linked-badge"><i class="ri-link-unlink"></i> Chưa liên kết</span>';
+                    const nameClass = isLinked ? 'fw-bold' : 'fw-bold court-name';
 
-                    if (isLinkedToCurrentParent) {
-                        statusIcon = '<i class="ri-check-circle-fill text-success me-2"></i>';
-                        statusText = `<small class="text-success d-block">Đã liên kết với sân này</small>`;
-                    } else if (result.isLinkedToOtherCourt) {
-                        statusIcon = '<i class="ri-forbid-line text-danger me-2"></i>';
-                        statusText = `<small class="text-danger d-block">Đã liên kết với ${result.linkedCourtName}</small>`;
-                    } else {
-                        statusIcon = '<i class="ri-checkbox-blank-circle-line text-muted me-2"></i>';
-                        statusText = '<small class="text-muted d-block">Không có liên kết</small>';
-                    }
-
+                    // Render dropdown cho sân 7
                     let court7Dropdown = '';
                     if (court.sportType === "Bóng đá sân 7") {
-                        if (!court5Options || court5Options.length === 0) {
-                            court7Dropdown = `<div class="court7-dropdown mt-2 readonly-dropdown" id="dropdown_${court.id}"><div class="text-muted small">-- Không có sân 5 khả dụng --</div></div>`;
-                        } else {
-                            const dropdownOptions = court5Options.map(c5 => {
-                                const c5RelationData = allCourt5Relations.find(cr => cr.court5Id === c5.id);
-                                const c5Relations = c5RelationData ? c5RelationData.relations : [];
+                        const dropdownOptions = court5Options. map(c5 => {
+                            const c5RelationData = allCourt5Relations.find(cr => cr.court5Id === c5.id);
+                            const isLinkedToThisCourt7 = c5RelationData && c5RelationData.relations.some(r => r.parentCourtId === court.id);
 
-                                const isLinkedToThisCourt7 = c5Relations.some(r => r.parentCourtId === court.id);
+                            // Xác định style cho sân 5
+                            const c5ContainerClass = isLinkedToThisCourt7 ? 'court5-linked' : 'court5-not-linked';
+                            const c5IconClass = isLinkedToThisCourt7 ?  'ri-checkbox-circle-fill text-success' : 'ri-checkbox-blank-circle-line text-muted';
+                            const c5BadgeHtml = isLinkedToThisCourt7
+                                ? '<span class="linked-badge-small"><i class="ri-link me-1"></i>Đã liên kết</span>'
+                                : '<span class="not-linked-badge-small"><i class="ri-link-unlink me-1"></i>Chưa liên kết</span>';
 
-                                let court5StatusText = '';
-                                let court5Icon = '';
-
-                                if (isLinkedToThisCourt7) {
-                                    court5Icon = '<i class="ri-check-circle-fill text-success me-2"></i>';
-                                    court5StatusText = '<small class="text-success d-block">Đã liên kết</small>';
-                                } else {
-                                    court5Icon = '<i class="ri-checkbox-blank-circle-line text-muted me-2"></i>';
-                                    court5StatusText = '<small class="text-muted d-block">Không có liên kết</small>';
-                                }
-
-                                return `
-                                    <div class="form-check form-check-sm disabled-option">
-                                        <input class="form-check-input court5-checkbox" type="checkbox" value="${c5.id}" disabled ${isLinkedToThisCourt7 ? 'checked' : ''}>
-                                        <label class="form-check-label text-muted">
-                                            <div class="d-flex align-items-center">
-                                                ${court5Icon}
-                                                <div class="flex-grow-1">
-                                                    ${c5.name}
-                                                    ${court5StatusText}
-                                                </div>
-                                            </div>
-                                        </label>
+                            return `
+                                <div class="${c5ContainerClass} d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <i class="${c5IconClass} me-2"></i>
+                                        <span class="fw-medium">${c5.name}</span>
                                     </div>
-                                `;
-                            }).join('');
+                                    ${c5BadgeHtml}
+                                </div>`;
+                        }).join('');
 
-                            const selectedCount = court5Options.filter(c5 => {
-                                const c5RelationData = allCourt5Relations.find(cr => cr.court5Id === c5.id);
-                                return c5RelationData && c5RelationData.relations.some(r => r.parentCourtId === court.id);
-                            }).length;
-
+                        if (dropdownOptions.trim() !== '') {
+                            const dropdownClass = isLinked ? 'court7-dropdown' : 'court7-dropdown not-linked';
                             court7Dropdown = `
-                                <div class="court7-dropdown mt-2 readonly-dropdown" id="dropdown_${court.id}">
-                                    <label class="form-label text-muted small mb-2 d-block">
-                                        <i class="ri-arrow-down-s-line"></i>
-                                        Xem sân 5 liên kết với ${court.name}:
-                                        <span class="badge bg-secondary ms-2">${selectedCount}/${court5Options.length}</span>
+                                <div class="${dropdownClass}">
+                                    <label class="form-label text-muted small mb-2 d-flex align-items-center">
+                                        <i class="ri-corner-down-right-line me-1"></i> Sân 5 thuộc ${court.name}:
                                     </label>
-                                    <div class="court5-options readonly-options">
-                                        ${dropdownOptions}
-                                    </div>
-                                </div>
-                            `;
+                                    <div class="court5-options">${dropdownOptions}</div>
+                                </div>`;
                         }
                     }
 
-                    // Only render courts that have a relationship with the current parent
-                    if (!isLinkedToCurrentParent) {
-                        return '';
-                    }
-
                     return `
-                        <div class="form-check form-check-readonly" data-court-id="${court.id}">
-                            <input hidden class="form-check-input" type="checkbox" value="${court.id}" ${checked} disabled>
-                            <label class="form-check-label text-muted readonly-label">
+                        <div class="${containerClass}" data-court-id="${court.id}">
+                            <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
-                                    ${statusIcon}
-                                    <div class="flex-grow-0">
-                                        ${court.name}
+                                    <i class="${iconClass} link-icon me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <span class="${nameClass}" style="font-size: 1.05rem;">${court.name}</span>
                                         <small class="text-muted d-block">${court.sportType}</small>
-                                        ${statusText}
                                     </div>
                                 </div>
-                            </label>
-                            ${court7Dropdown}
-                        </div>
-                    `;
-                }).join('');
-
-                // If no courts are linked, show a message
-                if (courtsHtml.trim() === '') {
-                     container.innerHTML = `
-                        <div class="text-center py-4">
-                            <div style="font-size: 2.5rem; color: #9ca3af; margin-bottom: 12px;">
-                                <i class="ri-link-unlink"></i>
+                                ${badgeHtml}
                             </div>
-                            <p class="text-muted mb-0">Sân này chưa có liên kết nào.</p>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = courtsHtml;
+                            ${court7Dropdown}
+                        </div>`;
+                };
+
+                // PHÂN NHÓM VÀ RENDER - SẮP XẾP:  ĐÃ LIÊN KẾT LÊN TRƯỚC
+                const group7 = courtResults
+                    .filter(r => r.court. sportType === "Bóng đá sân 7")
+                    .sort((a, b) => (b.isLinkedToCurrentParent ? 1 : 0) - (a.isLinkedToCurrentParent ? 1 : 0));
+
+                const group5 = courtResults
+                    .filter(r => r.court. sportType === "Bóng đá sân 5")
+                    .sort((a, b) => (b.isLinkedToCurrentParent ? 1 :  0) - (a.isLinkedToCurrentParent ?  1 : 0));
+
+                let finalHtml = '';
+                const group7Html = group7.map(renderCourtItem).join('');
+                const group5Html = group5.map(renderCourtItem).join('');
+
+                if (group7Html) {
+                    finalHtml += `<div class="group-section mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3 fw-bold">
+                            <i class="ri-layout-grid-line me-1"></i>Sân 7 (Chứa Sân 5)
+                        </h6>
+                        ${group7Html}
+                    </div>`;
+                }
+                if (group5Html) {
+                    finalHtml += `<div class="group-section mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3 fw-bold">
+                            <i class="ri-football-line me-1"></i>Sân 5 (Trực tiếp)
+                        </h6>
+                        ${group5Html}
+                    </div>`;
                 }
 
-                // MODIFIED: No need to set up events in view-only mode
-                // setupCourtEvents();
-
-                console.log('✅ Rendered courts in view-only mode');
+                if (finalHtml. trim() === '') {
+                    container.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="ri-information-line" style="font-size: 3rem; color: #d1d5db;"></i>
+                            <p class="text-muted mb-0 mt-3 fw-medium">Không có sân con nào khả dụng. </p>
+                        </div>`;
+                } else {
+                    container.innerHTML = finalHtml;
+                }
 
             } catch (error) {
-                console.error('❌ Error loading courts:', error);
-                container.innerHTML = `
-                    <div class="text-center py-4">
-                        <div class="text-danger mb-2">
-                            <i class="ri-error-warning-line" style="font-size: 2rem;"></i>
-                        </div>
-                        <p class="text-danger">Lỗi khi tải danh sách sân</p>
-                        <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
-                            Thử lại
-                        </button>
-                    </div>
-                `;
+                console.error('❌ Lỗi khi tải dữ liệu sân:', error);
+                container. innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="ri-error-warning-line" style="font-size:  2.5rem;"></i>
+                        <p class="mb-0 mt-2">Lỗi khi tải danh sách sân</p>
+                    </div>`;
             }
-        }
-
-        // MODIFIED: This function is no longer needed as events are disabled
-        function setupCourtEvents() {
-            // All events are disabled in view-only mode.
-            console.log('✅ Court events are disabled in view-only mode.');
         }
 
             // Helper Functions (your existing helper functions remain the same)

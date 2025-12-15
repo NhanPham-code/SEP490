@@ -1,13 +1,12 @@
-﻿using DTOs.FindTeamDTO;
+﻿using DTOs.BookingDTO; 
+using DTOs.FindTeamDTO;
 using DTOs.NotificationDTO;
 using FindTeamAPI.DTOs;
-
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
-
 using Service.Interfaces;
 using System.Text.Json;
-using DTOs.BookingDTO; 
 
 namespace CustomerUI.Controllers
 {
@@ -456,7 +455,7 @@ namespace CustomerUI.Controllers
                 Parameters = json
             }).GetAwaiter().GetResult();
             var user = _userService.GetOtherUserByIdAsync(createdBy);
-            _ = await _emailService.SendEmailAsync(user.Result.Email, "Yêu cầu tham gia nhóm", "Đã có một thành viên tham gia vào nhóm của bạn.");
+            _ = await _emailService.SendEmailAsync(user.Result.Email, "Yêu cầu tham gia nhóm", $"Đã có một thành viên tham gia vào nhóm {post.Value.Select(p => p.Title).FirstOrDefault()} của bạn.");
             //_ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             //{
             //    Title = "Một người vừa tham gia vào nhóm",
@@ -507,6 +506,7 @@ namespace CustomerUI.Controllers
         {
             var members = await _teamMember.GetAllTeamMemberByPostId(postId);
             List<CreateNotificationDto> notificationDTOs = new List<CreateNotificationDto>();
+            var user = _userService.GetUsersByIdsAsync(members.Where(m => !m.role.Equals("Leader")).Select(m => m.UserId).ToList(), _tokenService.GetAccessTokenFromCookie());
             // gửi notification cho tất cả thành viên trong bài đăng biết bài đăng đã bị xóa
             foreach (var member in members)
             {
@@ -526,6 +526,8 @@ namespace CustomerUI.Controllers
                         Message = "Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác",
                         Parameters = json
                     });
+                    
+                    _ = await _emailService.SendEmailAsync(user.Result.Where(u => u.UserId.Equals(member.UserId)).Select(m => m.Email).FirstOrDefault(), "Bài đăng đã bị xóa", $"Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác");
                 }
             }
             await _notificationService.SendNotificationToGroupUserAsync(postId.ToString(), notificationDTOs);
