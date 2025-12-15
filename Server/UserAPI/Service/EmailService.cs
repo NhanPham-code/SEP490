@@ -80,7 +80,7 @@ namespace UserAPI.Service
                         <table width=""420"" cellpadding=""0"" cellspacing=""0"" border=""0"" style=""background: #fff; border-radius: 16px; box-shadow: 0 3px 16px #a18cd125; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif;"">
                           <tr>
                             <td align=""center"" style=""background: linear-gradient(90deg,#7f9cf5,#a18cd1);padding:24px 0 14px 0;"">
-                              <img src=""{logoUrl}"" alt=""Sportivey"" width=""64"" height=""64"" style=""border-radius: 14px;display:block;"">
+                              
                               <h2 style=""color: #fff; font-size: 26px; margin: 18px 0 0 0; font-weight: 800; letter-spacing: 1px;"">Sportivey</h2>
                             </td>
                           </tr>
