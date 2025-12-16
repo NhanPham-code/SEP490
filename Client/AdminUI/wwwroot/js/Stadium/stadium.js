@@ -256,13 +256,15 @@ function changeUnapprovedPage(page) {
     currentPage = page;
 
     // SỬA Ở ĐÂY: Gọi đúng hàm loadUnapprovedStadiums
-    loadUnapprovedStadiums();
+    loadStadiums();
 
     // Cuộn lên đầu lưới
     $('html, body').animate({
         scrollTop: $('#unApproveStadium').offset().top - 100
     }, 500);
 }
+
+
 
 // View Stadium Detail
 

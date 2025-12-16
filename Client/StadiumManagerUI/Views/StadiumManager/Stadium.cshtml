@@ -573,7 +573,7 @@
                                     { condition: !openTime || !closeTime, message: 'Vui lòng chọn giờ hoạt động' },
                                     { condition: !validateTimeRange(openTime, closeTime), message: 'Giờ đóng cửa phải sau giờ mở cửa' },
                                     { condition: images.length === 0, message: 'Hãy tải lên hình ảnh về sân của bạn' },
-                                    { condition: videos.length === 0, message: 'Hãy tải lên video về sân của bạn' }
+                                    { condition: videos.length === 0, message: 'Hãy tải lên video về sân của bạn' },
                                 ];
 
                                 for (const validation of validations) {
@@ -589,7 +589,7 @@
                                 formData.append('Stadium.NameUnsigned', address);
                                 formData.append('Stadium.Address', address);
                                 formData.append('Stadium.AddressUnsigned', address);
-                                formData.append('Stadium.Description', document.getElementById('newDescription').value || '');
+                                formData.append('Stadium.Description', document.getElementById('newDescription').value || 'Chưa có thông tin');
                                 formData.append('Stadium.OpenTime', openTime);
                                 formData.append('Stadium.CloseTime', closeTime);
 
@@ -1362,58 +1362,9 @@
 
                     let paginationHtml = '';
 
-                    // Previous button
-                    paginationHtml += `
-                        <button class="pagination-btn ${state.currentPage === 1 ? 'disabled' : ''}"
-                                onclick="changePage(${state.currentPage - 1})"
-                                ${state.currentPage === 1 ? 'disabled' : ''}>
-                            <i class="ri-arrow-left-s-line"></i>
-                        </button>
-                    `;
+     
 
-                    // Calculate page range
-                    let startPage = Math.max(1, state.currentPage - 2);
-                    let endPage = Math.min(totalPages, startPage + 4);
-
-                    // Adjust start if we're near the end
-                    if (endPage - startPage < 4) {
-                        startPage = Math.max(1, endPage - 4);
-                    }
-
-                    // First page and ellipsis
-                    if (startPage > 1) {
-                        paginationHtml += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
-                        if (startPage > 2) {
-                            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
-                        }
-                    }
-
-                    // Page numbers
-                    for (let i = startPage; i <= endPage; i++) {
-                        paginationHtml += `
-                            <button class="pagination-btn ${i === state.currentPage ? 'active' : ''}"
-                                    onclick="changePage(${i})">
-                                ${i}
-                            </button>
-                        `;
-                    }
-
-                    // Last page and ellipsis
-                    if (endPage < totalPages) {
-                        if (endPage < totalPages - 1) {
-                            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
-                        }
-                        paginationHtml += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
-                    }
-
-                    // Next button
-                    paginationHtml += `
-                        <button class="pagination-btn ${state.currentPage === totalPages ? 'disabled' : ''}"
-                                onclick="changePage(${state.currentPage + 1})"
-                                ${state.currentPage === totalPages ? 'disabled' : ''}>
-                            <i class="ri-arrow-right-s-line"></i>
-                        </button>
-                    `;
+                  
 
                     $('#pagination-container').html(paginationHtml);
                 }
@@ -1646,7 +1597,7 @@
                                     formData.append('Stadium.NameUnsigned', address);
                                     formData.append('Stadium.Address', address);
                                     formData.append('Stadium.AddressUnsigned', address);
-                                    formData.append('Stadium.Description', document.getElementById('editDescription').value || '');
+                                    formData.append('Stadium.Description', document.getElementById('editDescription').value || 'Chưa có thông tin!');
                                     formData.append('Stadium.OpenTime', openTime);
                                     formData.append('Stadium.CloseTime', closeTime);
                                     formData.append('Stadium.IsApproved', document.getElementById('editIsApproved').value);
@@ -3120,7 +3071,7 @@
                                 ${videos.map((video, index) => `
                                     <div class="video-item" data-video-id="${video.Id || index}">
                                         <video controls class="preview-video">
-                                                    <source src="https://localhost:7136/img/${video.VideoUrl} type="video/mp4">
+                                                    <source src="https://localhost:7136/img/${video.VideoUrl}" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                         <div class="video-info">

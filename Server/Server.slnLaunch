@@ -25,10 +25,6 @@
       {
         "Path": "BookingAPI\\BookingAPI.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "FeedbackAPI\\FeedbackAPI.csproj",
-        "Action": "Start"
       }
     ]
   }
