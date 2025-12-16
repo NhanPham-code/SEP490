@@ -684,6 +684,41 @@
         pointer-events: none;
         transition: opacity 0.2s;
     }
+
+
+    .bh-badge-new {
+        display: inline-block;
+        background-color: #ff4757; /* Màu đỏ tươi */
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
+        vertical-align: middle;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 5px rgba(255, 71, 87, 0.4);
+        animation: pulse-new 2s infinite; /* Hiệu ứng nhịp đập */
+    }
+
+    /* Animation nhịp đập nhẹ để thu hút sự chú ý */
+    @@keyframes pulse-new {
+        0%
+
+    {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 5px rgba(255, 71, 87, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+    }
+
+    }
 </style>
 
 <body class="bh-body">

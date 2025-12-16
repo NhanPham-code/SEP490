@@ -45,6 +45,9 @@
         <tbody>
             @if (Model.DailyBookings != null && Model.DailyBookings.Any())
             {
+                // 1. Khởi tạo biến đếm
+                int index = 0;
+
                 foreach (var dailyVm in Model.DailyBookings)
                 {
                     var booking = dailyVm.Booking;
@@ -55,7 +58,16 @@
                             <div class="bh-table-info">
                                 <div class="icon"><i class="fa-solid fa-futbol"></i></div>
                                 <div class="details">
-                                    <span class="name">@stadium?.Name</span>
+                                    <span class="name">
+                                        @stadium?.Name
+
+                                        @* === 2. LOGIC HIỂN THỊ BADGE NEW === *@
+                                        @* Chỉ hiện ở Trang 1 và cho 3 phần tử đầu tiên (index 0, 1, 2) *@
+                                        @if (currentPage == 1 && index < 3)
+                                        {
+                                            <span class="bh-badge-new">MỚI</span>
+                                        }
+                                    </span>
                                     <span class="sub">ID: #@booking.Id</span>
                                 </div>
                             </div>
@@ -80,6 +92,9 @@
                             </div>
                         </td>
                     </tr>
+
+                    // 3. Tăng biến đếm sau mỗi vòng lặp
+                    index++;
                 }
             }
             else
