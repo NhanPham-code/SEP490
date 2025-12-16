@@ -1,5 +1,6 @@
 ﻿@using DTOs.BookingDTO.ViewModel
 @using DTOs.StadiumDTO
+@using System.Text.Json
 @model BookingManagementViewModel
 
 @{
@@ -76,13 +77,6 @@
                                         <i class="fa-solid fa-credit-card"></i>
                                     </a>
                                 }
-
-                                @if (booking.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase) && booking.Date > DateTime.UtcNow)
-                                {
-                                    <button class="bh-btn-icon cancel" title="Hủy lịch" data-booking-id="@booking.Id" data-booking-type="daily">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </button>
-                                }
                             </div>
                         </td>
                     </tr>
@@ -132,3 +126,7 @@
         </button>
     </div>
 }
+
+<textarea id="temp-daily-data-json" style="display:none;">
+    @Html.Raw(JsonSerializer.Serialize(Model.DailyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
+</textarea>

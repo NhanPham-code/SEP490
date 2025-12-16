@@ -1,0 +1,155 @@
+﻿@using System.Text.Json
+@using DTOs.BookingDTO.ViewModel
+@using DTOs.StadiumDTO
+@model BookingManagementViewModel
+
+@{
+    // Lấy thông tin phân trang từ ViewBag (được truyền từ Controller)
+    int currentPage = ViewBag.CurrentMonthlyPage != null ? (int)ViewBag.CurrentMonthlyPage : 1;
+    int totalPages = ViewBag.TotalMonthlyPages != null ? (int)ViewBag.TotalMonthlyPages : 1;
+    var stadiums = ViewBag.AllStadiums as List<ReadStadiumDTO> ?? new List<ReadStadiumDTO>();
+}
+
+@functions {
+    public string FormatCurrency(decimal? amount) => amount.HasValue ? string.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", amount.Value) : "0đ";
+    public string FormatTime(string time) => !string.IsNullOrEmpty(time) && time.Length >= 5 ? time.Substring(0, 5) : time;
+
+    public string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "pending" => "status--pending",
+        "accepted" => "status--accepted",
+        "completed" => "status--completed",
+        "denied" or "cancelled" or "payfail" => "status--cancelled",
+        "waiting" => "status--waiting",
+        _ => "status--default"
+    };
+
+    public string TranslateStatus(string status) => status.ToLower() switch
+    {
+        "accepted" => "Đã nhận",
+        "completed" => "Hoàn thành",
+        "cancelled" => "Đã hủy",
+        "waiting" => "Chờ thanh toán",
+        "payfail" => "Lỗi thanh toán",
+        _ => status
+    };
+}
+
+<div class="bh-table-scroll">
+    <table class="bh-table">
+        <thead>
+            <tr>
+                <th style="width: 50px;"></th>
+                <th>Sân / Gói</th>
+                <th>Khung giờ</th>
+                <th>Giá tiền</th>
+                <th>Trạng thái</th>
+                <th style="text-align: right;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.MonthlyBookings != null && Model.MonthlyBookings.Any())
+            {
+                foreach (var monthlyVm in Model.MonthlyBookings)
+                {
+                    var booking = monthlyVm.MonthlyBooking;
+                    var stadium = stadiums.FirstOrDefault(s => s.Id == booking.StadiumId);
+
+                    <tr class="bh-parent-row" data-stadium-id="@booking.StadiumId" data-booking-type="monthly" data-monthly-id="@booking.Id" data-status="@booking.Status.ToLower()">
+                        <td style="text-align: center;"><i class="fa-solid fa-chevron-down expand-toggle"></i></td>
+                        <td data-label="Sân / Gói">
+                            <div class="bh-table-info">
+                                <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+                                <div class="details"><span class="name">@stadium?.Name</span><span class="sub">Gói tháng @booking.Month/@booking.Year</span></div>
+                            </div>
+                        </td>
+                        <td data-label="Khung giờ">@booking.StartTime - @booking.EndTime</td>
+                        <td data-label="Giá tiền"><span class="price">@FormatCurrency(booking.TotalPrice)</span></td>
+                        <td data-label="Trạng thái"><span class="status-badge @GetStatusClass(booking.Status)">@TranslateStatus(booking.Status)</span></td>
+                        <td data-label="Hành động">
+                            <div class="bh-actions" style="justify-content: flex-end;">
+                                <button class="bh-btn-icon details" title="Xem chi tiết" data-booking-id="@booking.Id" data-booking-type="monthly"><i class="fa-solid fa-eye"></i></button>
+
+                                @if (booking.Status.Equals("waiting", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a href="@Url.Action("RetryPayment", "Booking", new { id = booking.Id, type = "Monthly" })" class="bh-btn-icon pay" title="Thanh toán ngay"><i class="fa-solid fa-credit-card"></i></a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="bh-child-row" data-parent-monthly-id="@booking.Id" style="display:none;">
+                        <td colspan="6">
+                            <div class="bh-child-container">
+                                <h4><i class="fa-solid fa-list-check"></i> Các Lịch Đặt Chi Tiết</h4>
+                                @if (monthlyVm.Bookings.Any())
+                                {
+                                    <table class="bh-child-table">
+                                        <thead>
+                                            <tr><th>Ngày chơi</th><th>Sân con</th><th>Trạng thái</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var childBooking in monthlyVm.Bookings.OrderBy(b => b.Date))
+                                            {
+                                                <tr>
+                                                    <td>@childBooking.Date.ToString("dd/MM/yyyy")</td>
+                                                    <td>@string.Join(", ", childBooking.BookingDetails.Select(d => d.CourtName))</td>
+                                                    <td><span class="status-badge @GetStatusClass(childBooking.Status)">@TranslateStatus(childBooking.Status)</span></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p>Không có lịch đặt chi tiết nào cho gói này.</p>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" style="text-align:center; padding: 20px;">Không có dữ liệu lịch tháng phù hợp.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- PHÂN TRANG -->
+@if (totalPages > 1)
+{
+    <div class="bh-pagination">
+        <button class="bh-page-btn @(currentPage == 1 ? "disabled" : "")" onclick="loadMonthlyBookings(@(currentPage - 1))" @(currentPage == 1 ? "disabled" : "")>
+            <i class="fa-solid fa-chevron-left"></i> &nbsp;Trước
+        </button>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            if (i == 1 || i == totalPages || (i >= currentPage - 1 && i <= currentPage + 1))
+            {
+                if (i == currentPage)
+                {
+                    <span class="bh-page-number active">@i</span>
+                }
+                else
+                {
+                    <button class="bh-page-number" onclick="loadMonthlyBookings(@i)">@i</button>
+                }
+            }
+            else if (i == currentPage - 2 || i == currentPage + 2)
+            {
+                <span class="bh-page-number disabled">...</span>
+            }
+        }
+
+        <button class="bh-page-btn @(currentPage == totalPages ? "disabled" : "")" onclick="loadMonthlyBookings(@(currentPage + 1))" @(currentPage == totalPages ? "disabled" : "")>
+            Sau&nbsp; <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+}
+
+<!-- JSON DATA (Để cập nhật Cache cho Modal) -->
+<textarea id="temp-monthly-data-json" style="display:none;">
+    @Html.Raw(JsonSerializer.Serialize(Model.MonthlyBookings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
+</textarea>

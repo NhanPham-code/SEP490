@@ -329,23 +329,70 @@
             const listContainer = $('#discount-list');
             listContainer.empty();
             if (discounts.length === 0) {
-                listContainer.html('<p class="text-gray-500 italic">Không có mã giảm giá nào cho sân này.</p>');
+                listContainer.html('<p class="text-gray-500 italic">Không có mã giảm giá nào hợp lệ.</p>');
                 return;
             }
-            discounts.forEach(d => {
+            discounts.forEach(discount => {
+                // Logic hiển thị text max amount trong danh sách chọn
+                const maxAmountText = discount.maxDiscountAmount > 0
+                    ? `Tối đa ${formatCurrency(discount.maxDiscountAmount)}`
+                    : `Không giới hạn tối đa`;
+
                 listContainer.append(`
-                    <div class="p-4 bg-gray-100 rounded-lg border flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
-                         data-id="${d.id}" data-percent="${d.percentValue}" data-min="${d.minOrderAmount}" data-max="${d.maxDiscountAmount}" data-code="${d.code}">
+                    <div class="p-4 bg-gray-100 rounded-lg border flex flex-col hover:bg-gray-200 cursor-pointer"
+                         data-id="${discount.id}"
+                         data-percent="${discount.percentValue}"
+                         data-min-amount="${discount.minOrderAmount}"
+                         data-max-amount="${discount.maxDiscountAmount}"
+                         data-code="${discount.code}">
                         <div class="flex justify-between items-start">
-                            <span class="text-lg font-bold text-indigo-600">${d.code}</span>
-                            <span class="text-sm font-semibold text-green-600">${d.percentValue}% giảm</span>
+                            <span class="text-lg font-bold text-indigo-600">${discount.code}</span>
+                            <span class="text-sm font-semibold text-green-600">${discount.percentValue}% giảm</span>
                         </div>
-                        <p class="text-sm text-gray-500 mt-1">${d.description || 'Không có mô tả'}</p>
-                        <p class="text-xs text-gray-500 mt-1">Áp dụng cho đơn từ ${formatCurrency(d.minOrderAmount)} | Tối đa ${formatCurrency(d.maxDiscountAmount)}</p>
-                        <button type="button" class="apply-discount-btn mt-2 px-4 py-2 bg-green-500 text-white rounded-lg text-sm self-end">Áp dụng</button>
+                        <p class="text-gray-500 text-sm mt-1">${discount.description || 'Không có mô tả'}</p>
+                        <p class="text-gray-500 text-xs mt-1">
+                            Áp dụng cho đơn từ ${formatCurrency(discount.minOrderAmount)} | ${maxAmountText}
+                        </p>
+                        <button type="button" class="apply-discount-btn mt-2 px-4 py-2 bg-green-500 text-white rounded-lg text-sm self-end">
+                            Áp dụng
+                        </button>
                     </div>
                 `);
             });
+        }
+
+        function applyDiscount(id, percent, minAmount, maxAmount, code) {
+            if (subtotalPrice < minAmount) {
+                showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
+                return;
+            }
+
+            let calculatedDiscount = subtotalPrice * (percent / 100);
+
+            if (maxAmount > 0) {
+                discountAmount = Math.min(calculatedDiscount, maxAmount);
+            } else {
+                discountAmount = calculatedDiscount; // Không giới hạn
+            }
+
+            totalPrice = subtotalPrice - discountAmount;
+            selectedDiscountId = id;
+
+            $('#selected-code-name').text(code);
+            $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}₫`);
+
+
+            if (maxAmount === 0) {
+                // $('#selected-code-amount').append(' <span class="text-xs text-green-500">(Không giới hạn tối đa)</span>');
+            }
+
+            $('#no-discount-selected').addClass('hidden');
+            $('#discount-selected').removeClass('hidden');
+
+            updateInvoiceDetails();
+            updateHiddenFields();
+            hideDiscountModal();
+            showModal('Thành công', `Mã giảm giá "${code}" đã được áp dụng!`);
         }
 
         function updateHiddenFields() {
@@ -372,29 +419,6 @@
             });
         }
 
-                // Apply & Remove Discount Functions
-        function applyDiscount(id, percent, minAmount, maxAmount, code) {
-            if (originalPrice < minAmount) {
-                showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
-                return;
-            }
-
-            const calculatedDiscount = originalPrice * (percent / 100);
-            discountAmount = Math. min(calculatedDiscount, maxAmount);
-            finalPrice = originalPrice - discountAmount;
-            selectedDiscountId = id;
-
-            // Cập nhật UI
-            $('#selected-code-name').text(code);
-            $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
-            $('#no-discount-selected'). addClass('hidden');
-            $('#discount-selected'). removeClass('hidden');
-
-            updateInvoiceDetails();
-            updateHiddenFields();
-            hideDiscountModal();
-            showModal('Thành công', `Mã giảm giá "${code}" đã được áp dụng! `);
-        }
 
         function removeDiscount() {
             // Reset các giá trị
