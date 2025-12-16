@@ -328,6 +328,11 @@
 
         function generateUrlFromParams(notification) {
             try {
+
+
+            if (notification.type === 'Stadium.Create') {
+                return '/Stadium/StadiumAdmin';
+            }
                 const params = JSON.parse(notification.parameters);
                 if (params.bookingType === 'monthly' && params.monthlyBookingId) {
                     return `/Booking/BookingHistory`;

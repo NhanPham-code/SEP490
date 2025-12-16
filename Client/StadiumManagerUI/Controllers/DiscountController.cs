@@ -280,7 +280,7 @@ namespace StadiumManagerUI.Controllers
                     <p>Chúc mừng! Bạn vừa nhận được một mã giảm giá đặc biệt từ Sportivey.</p>
                     <div style='background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px dashed #6366f1; margin: 15px 0;'>
                         <h2 style='color: #4f46e5; margin: 0;'>{discount.Code}</h2>
-                        <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ)</p>
+                        <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
                         <p><strong>Áp dụng tại:</strong> {stadiumText}</p>
                         <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
                     </div>
@@ -350,14 +350,13 @@ namespace StadiumManagerUI.Controllers
                 await _notificationService.SendNotificationsBatchAsync(notificationsToSendInBatch, accessToken);
 
 
-                // 3. Gửi Email Batch (NEW)
+                // 3. Gửi Email 
                 try
                 {
                     // Lấy danh sách UserId cần gửi mail
                     var userIdsToSendEmail = usersAndTheirFavoriteStadiums.Keys.ToList();
 
                     // Gọi UserService lấy thông tin chi tiết (Email, Name) của danh sách ID này
-                    // Dùng hàm GetUsersByIdsAsync mà bạn cung cấp
                     var userProfiles = await _userService.GetUsersByIdsAsync(userIdsToSendEmail, accessToken);
 
                     if (userProfiles != null && userProfiles.Any())
@@ -378,7 +377,7 @@ namespace StadiumManagerUI.Controllers
                         
                         <div style='background: #ecfdf5; padding: 15px; border-radius: 8px; border: 1px dashed #10b981; margin: 15px 0;'>
                             <h2 style='color: #059669; margin: 0;'>{discount.Code}</h2>
-                            <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ)</p>
+                            <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
                             <p><strong>Áp dụng tại:</strong> {favStadiums}</p>
                             <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
                         </div>
@@ -387,9 +386,6 @@ namespace StadiumManagerUI.Controllers
 
                             // Gửi mail (Lưu ý: Gửi trong vòng lặp có thể chậm nếu list user quá lớn. 
                             // Tốt nhất nên dùng Hangfire/BackgroundJob, nhưng ở đây gửi trực tiếp thì chấp nhận await từng cái hoặc Task.WhenAll)
-
-                            // Để không block luồng chính quá lâu, ta có thể fire-and-forget hoặc await luôn nếu số lượng ít.
-                            // Ở đây tôi await luôn cho an toàn.
                             await _emailService.SendEmailAsync(userProfile.Email, subject, msgBody, "https://localhost:7128/", "Săn Deal Ngay");
                             Console.WriteLine($"[EmailBatch] Đã gửi cho {userProfile.Email}");
                         }

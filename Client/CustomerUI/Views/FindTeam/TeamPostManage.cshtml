@@ -1371,6 +1371,12 @@
                 const name = bookings.stadiums[booking.stadiumId]?.name || 'Sân không xác định';
                 const sportType = getSportType(bookings.stadiums[booking.stadiumId]?.courts, bookings.stadiums[booking.stadiumId]?.id) || 'Thể thao';
                 const stadium = bookings.stadiums[booking.stadiumId];
+                const timeList = booking.bookingDetails.map(detail => {
+          const date = new Date(detail.startTime);
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `${hours}:${minutes}`;
+        });
                 return `
                           <div class="booking-card" data-booking-id="${booking.id}"   data-booking='${JSON.stringify(booking)}'
                                                                                       data-stadium='${JSON.stringify(stadium)}'>
@@ -1392,7 +1398,7 @@
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
-                                <span>Ngày chơi: ${formattedDate}</span>
+                                <span>Ngày chơi: ${formattedDate} - ${timeList}</span>
                             </div>
                             <div class="booking-detail">
                                 <i class="ri-calendar-line"></i>
@@ -1430,7 +1436,7 @@
         // Helper functions
         function getStatusClass(status) {
             switch (status?.toLowerCase()) {
-                case 'confirmed': return 'status-confirmed';
+                case 'accepted': return 'status-confirmed';
                 case 'pending': return 'status-pending';
                 case 'cancelled': return 'status-cancelled';
                 case 'completed': return 'status-completed';
@@ -1440,7 +1446,7 @@
 
         function getStatusText(status) {
             switch (status?.toLowerCase()) {
-                case 'confirmed': return 'Đã xác nhận';
+                case 'accepted': return 'Đã xác nhận';
                 case 'pending': return 'Chờ xác nhận';
                 case 'cancelled': return 'Đã hủy';
                 case 'completed': return 'Hoàn thành';
@@ -1510,12 +1516,14 @@
             // Set play time
                    // Lấy list giờ từ bookingDetails
         const timeList = booking.bookingDetails.map(detail => {
-          // Nếu startTime là ISO thì cắt phần giờ phút
-          return new Date(detail.startTime).toISOString().substring(11, 16);
+          const date = new Date(detail.startTime);
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `${hours}:${minutes}`;
         });
 
         // Render tất cả giờ vào select
-        renderTimeOptions(timeList);
+        renderTimeOptions(timeList, timeList[0]);
 
 
             // Calculate price per person suggestion (total price divided by estimated team size)
@@ -1619,7 +1627,7 @@
         // Function to handle creating the team post
         function createNewTeamPost(teamPostData) {
             // Show loading state
-            Swal.fire({
+             Swal.fire({
                 title: 'Đang tạo bài đăng...',
                 html: 'Vui lòng đợi trong giây lát',
                 allowOutsideClick: false,

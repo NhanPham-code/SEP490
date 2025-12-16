@@ -1,13 +1,12 @@
-﻿using DTOs.FindTeamDTO;
+﻿using DTOs.BookingDTO; 
+using DTOs.FindTeamDTO;
 using DTOs.NotificationDTO;
 using FindTeamAPI.DTOs;
-
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
-
 using Service.Interfaces;
 using System.Text.Json;
-using DTOs.BookingDTO; 
 
 namespace CustomerUI.Controllers
 {
@@ -21,12 +20,13 @@ namespace CustomerUI.Controllers
         private readonly IStadiumService _stadiumService;
         private readonly IBookingService _bookingService;
         private readonly INotificationService _notificationService;
+        private readonly IEmailService _emailService;
 
         private string token = string.Empty;
 
         public FindTeamController(ITeamPostService teamPost, ITeamMemberService teamMember,
             ITokenService tokenService, IUserService userService, IStadiumService stadiumService,
-            IBookingService bookingService, INotificationService notificationService)
+            IBookingService bookingService, INotificationService notificationService, IEmailService emailService)
         {
             _teamPost = teamPost;
             _teamMember = teamMember;
@@ -35,6 +35,7 @@ namespace CustomerUI.Controllers
             _stadiumService = stadiumService;
             _bookingService = bookingService;
             _notificationService = notificationService;
+            _emailService = emailService;
         }
 
         [BindProperty]
@@ -144,7 +145,7 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //2025-08-18 11:08:41.5130000
-            var result = await _teamPost.GetOdataTeamPostAsync($"&$filter=PlayDate gt {formatted} {url}");
+            var result = await _teamPost.GetOdataTeamPostAsync($"&$orderby=PlayDate asc&$filter=PlayDate gt {formatted} {url}");
             if (!result.Value.Any())
             {
                 return Json(new { Message = 404 });
@@ -195,7 +196,7 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //get booking by user id
-            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and Status eq 'accepted' and BookingDetails/any(m: m/StartTime ge {formatted}) ";
+            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and Status eq 'accepted' and BookingDetails/any(m: m/StartTime gt {formatted}) ";
             var booking = (await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url)).Data;
      
             if (booking == null || !booking.Any())
@@ -281,6 +282,12 @@ namespace CustomerUI.Controllers
             CreateTeamPostDTO.CreatedBy = HttpContext.Session.GetInt32("UserId") ?? 0;
             CreateTeamPostDTO.CreatedAt = DateTime.UtcNow;
             CreateTeamPostDTO.UpdatedAt = DateTime.UtcNow;
+
+            DateTime combinedDateTime = CreateTeamPostDTO.PlayDate.Date + CreateTeamPostDTO.TimePlay;
+
+            // 2. Gán trực tiếp đối tượng DateTime đã gộp lại cho PlayDate.
+            CreateTeamPostDTO.PlayDate = combinedDateTime;
+
             var result = await _teamPost.CreateTeamPost(CreateTeamPostDTO);
             if (result == null)
             {
@@ -308,6 +315,7 @@ namespace CustomerUI.Controllers
                 Message = "A new team post has been created. Check it out!",
                 Type = "Recruitment.NewPost",
             });
+          
 
             return Json(new { Message = 200, value = result });
         }
@@ -452,7 +460,8 @@ namespace CustomerUI.Controllers
                 Message = "Đã có một thành viên tham gia vào nhóm của bạn.",
                 Parameters = json
             }).GetAwaiter().GetResult();
-
+            var user = _userService.GetOtherUserByIdAsync(createdBy);
+            _ = await _emailService.SendEmailAsync(user.Result.Email, "Yêu cầu tham gia nhóm", $"Đã có một thành viên tham gia vào nhóm {post.Value.Select(p => p.Title).FirstOrDefault()} của bạn.");
             //_ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
             //{
             //    Title = "Một người vừa tham gia vào nhóm",
@@ -503,6 +512,7 @@ namespace CustomerUI.Controllers
         {
             var members = await _teamMember.GetAllTeamMemberByPostId(postId);
             List<CreateNotificationDto> notificationDTOs = new List<CreateNotificationDto>();
+            var user = _userService.GetUsersByIdsAsync(members.Where(m => !m.role.Equals("Leader")).Select(m => m.UserId).ToList(), _tokenService.GetAccessTokenFromCookie());
             // gửi notification cho tất cả thành viên trong bài đăng biết bài đăng đã bị xóa
             foreach (var member in members)
             {
@@ -522,6 +532,8 @@ namespace CustomerUI.Controllers
                         Message = "Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác",
                         Parameters = json
                     });
+                    
+                    _ = await _emailService.SendEmailAsync(user.Result.Where(u => u.UserId.Equals(member.UserId)).Select(m => m.Email).FirstOrDefault(), "Bài đăng đã bị xóa", $"Bài đăng mà bạn tham gia đã bị xóa bởi người tạo. Tìm bài đăng khác");
                 }
             }
             await _notificationService.SendNotificationToGroupUserAsync(postId.ToString(), notificationDTOs);

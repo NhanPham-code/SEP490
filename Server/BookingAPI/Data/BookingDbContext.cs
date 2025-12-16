@@ -33,8 +33,8 @@ namespace BookingAPI.Data
                 .HasForeignKey(b => b.MonthlyBookingId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Ngày hiện tại để seed data
-            var currentDate = new DateTime(2025, 11, 30, 10, 41, 13);
+            // Ngày hiện tại (16/12/2025)
+            var currentDate = new DateTime(2025, 12, 16, 10, 0, 0);
             var random = new Random(42);
             var ownerIds = new List<int> { 2, 3, 4 };
             var customerIds = new List<int> { 5, 6, 7, 8 };
@@ -81,33 +81,82 @@ namespace BookingAPI.Data
             var bookingDetails = new List<BookingDetail>();
             int monthlyBookingIdCounter = 1, bookingIdCounter = 1, detailIdCounter = 1;
 
-            // Helper: random CreatedById cho DAILY BOOKING
+            // Helper:  random CreatedById cho DAILY BOOKING
             Func<int, int> getRandomCreatedByIdForDaily = (stadiumOwnerId) =>
             {
                 return random.Next(2) == 0 ? 0 : stadiumOwnerId;
             };
 
-            // Helper: xác định status dựa trên ngày
-            Func<string, DateTime, string> getFinalStatus = (initialStatus, bookingDate) =>
+            // Helper: random status ban đầu (chỉ 3 loại:  accepted, payfail, cancelled)
+            Func<string> getRandomInitialStatus = () =>
             {
-                if (initialStatus == "cancelled")
-                {
-                    return "cancelled";
-                }
-                else if (bookingDate.Date < currentDate.Date)
+                int rand = random.Next(10);
+                if (rand < 7) return "accepted";      // 70%
+                else if (rand < 9) return "payfail";  // 20%
+                else return "cancelled";              // 10%
+            };
+
+            // Helper: xác định final status cho Booking NGÀY (không có parent)
+            // Nếu accepted và Date < currentDate => completed
+            Func<string, DateTime, string> getFinalStatusForDaily = (initialStatus, playDate) =>
+            {
+                if (initialStatus == "accepted" && playDate.Date < currentDate.Date)
                 {
                     return "completed";
                 }
-                else
+                return initialStatus;
+            };
+
+            // Helper: xác định final status cho Booking CON (có parent MonthlyBooking)
+            // Phải đồng bộ với parent:  nếu parent cancelled/payfail => con cũng vậy
+            // Nếu parent accepted và ngày chơi < currentDate => completed
+            Func<string, DateTime, string> getFinalStatusForChild = (parentStatus, playDate) =>
+            {
+                // Nếu parent là cancelled hoặc payfail => con cũng giữ nguyên status đó
+                if (parentStatus == "cancelled" || parentStatus == "payfail")
+                {
+                    return parentStatus;
+                }
+                // Nếu parent là accepted/completed, kiểm tra ngày chơi
+                if (playDate.Date < currentDate.Date)
+                {
+                    return "completed";
+                }
+                return "accepted";
+            };
+
+            // Helper: xác định final status cho MonthlyBooking (parent)
+            // Dựa trên ngày cuối cùng của tháng đó
+            Func<string, DateTime, string> getFinalStatusForMonthly = (initialStatus, monthEndDate) =>
+            {
+                // Nếu cancelled hoặc payfail => giữ nguyên
+                if (initialStatus == "cancelled" || initialStatus == "payfail")
                 {
                     return initialStatus;
                 }
+                // Nếu accepted và tháng đó đã qua => completed
+                if (initialStatus == "accepted" && monthEndDate.Date < currentDate.Date)
+                {
+                    return "completed";
+                }
+                return initialStatus;
             };
 
-            // Helper: tính TotalPrice (nếu cancelled thì = 0)
-            Func<string, decimal, decimal> getTotalPrice = (status, originalPrice) =>
+            // Helper: tính TotalPrice cho MonthlyBooking (cancelled = 0)
+            Func<string, decimal, decimal> getMonthlyTotalPrice = (status, originalPrice) =>
             {
                 return status == "cancelled" ? 0 : originalPrice;
+            };
+
+            // Helper: tạo CreatedAt không vượt quá currentDate
+            Func<DateTime, DateTime> getSafeCreatedAt = (referenceDate) =>
+            {
+                var createdAt = referenceDate.AddDays(-random.Next(1, 31));
+                if (createdAt > currentDate)
+                {
+                    createdAt = currentDate.AddDays(-random.Next(1, 10));
+                }
+                return createdAt;
             };
 
             // Helper: tạo BookingDetails với courtId CỐ ĐỊNH
@@ -165,21 +214,25 @@ namespace BookingAPI.Data
                     int startHour = random.Next(courtInfo.OpenTime, latestStartHour + 1);
 
                     decimal originalMonthlyPrice = courtInfo.Price * 2 * 4;
-                    string initialStatus = random.Next(10) < 8 ? "accepted" : "cancelled";
+                    string initialStatus = getRandomInitialStatus();
 
+                    // Xác định ngày cuối tháng để so sánh
                     var monthEndDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
-                    string parentFinalStatus = getFinalStatus(initialStatus, monthEndDate);
+                    string parentFinalStatus = getFinalStatusForMonthly(initialStatus, monthEndDate);
 
-                    // TotalPrice = 0 nếu cancelled
-                    decimal parentTotalPrice = getTotalPrice(parentFinalStatus, originalMonthlyPrice);
+                    // TotalPrice của MonthlyBooking = 0 nếu cancelled
+                    decimal parentTotalPrice = getMonthlyTotalPrice(parentFinalStatus, originalMonthlyPrice);
+
+                    // CreatedAt không vượt quá currentDate
+                    var monthlyCreatedAt = getSafeCreatedAt(new DateTime(year, month, 1));
 
                     monthlyBookings.Add(new MonthlyBooking
                     {
                         Id = monthlyBookingIdCounter,
                         UserId = customerId,
                         StadiumId = courtInfo.StadiumId,
-                        CreatedAt = currentDate.AddDays(-30),
-                        UpdatedAt = currentDate.AddDays(-1),
+                        CreatedAt = monthlyCreatedAt,
+                        UpdatedAt = monthlyCreatedAt.AddDays(random.Next(0, 5)),
                         OriginalPrice = originalMonthlyPrice,
                         TotalPrice = parentTotalPrice,
                         Status = parentFinalStatus,
@@ -192,7 +245,7 @@ namespace BookingAPI.Data
                         Year = year
                     });
 
-                    // Tạo 4 booking con
+                    // Tạo 4 booking con - STATUS ĐỒNG BỘ VỚI PARENT
                     for (int week = 0; week < 4; week++)
                     {
                         int day = (week * 7) + 1;
@@ -200,10 +253,16 @@ namespace BookingAPI.Data
                             day = DateTime.DaysInMonth(year, month);
 
                         var bookingDate = new DateTime(year, month, day);
-                        string childFinalStatus = getFinalStatus(initialStatus, bookingDate);
+
+                        // Child booking status ĐỒNG BỘ với parent
+                        string childFinalStatus = getFinalStatusForChild(parentFinalStatus, bookingDate);
 
                         decimal originalChildPrice = originalMonthlyPrice / 4;
-                        decimal childTotalPrice = getTotalPrice(childFinalStatus, originalChildPrice);
+                        // Booking con:  TotalPrice giữ nguyên (không phụ thuộc status)
+                        decimal childTotalPrice = originalChildPrice;
+
+                        // CreatedAt không vượt quá currentDate
+                        var childCreatedAt = getSafeCreatedAt(bookingDate);
 
                         bookings.Add(new Booking
                         {
@@ -216,8 +275,8 @@ namespace BookingAPI.Data
                             OriginalPrice = originalChildPrice,
                             Note = "Lịch con của booking tháng",
                             PaymentMethod = "vnpay_100",
-                            CreatedAt = currentDate.AddDays(-30),
-                            UpdatedAt = currentDate.AddDays(-1),
+                            CreatedAt = childCreatedAt,
+                            UpdatedAt = childCreatedAt.AddDays(random.Next(0, 3)),
                             StadiumId = courtInfo.StadiumId,
                             MonthlyBookingId = monthlyBookingIdCounter
                         });
@@ -241,9 +300,14 @@ namespace BookingAPI.Data
                     int startHour = random.Next(courtInfo.OpenTime, latestStartHour + 1);
 
                     decimal originalPrice = courtInfo.Price * 2;
-                    string initialStatus = random.Next(10) < 8 ? "accepted" : "cancelled";
-                    string finalStatus = getFinalStatus(initialStatus, bookingDate);
-                    decimal totalPrice = getTotalPrice(finalStatus, originalPrice);
+                    string initialStatus = getRandomInitialStatus();
+                    string finalStatus = getFinalStatusForDaily(initialStatus, bookingDate);
+
+                    // Daily Booking:  TotalPrice giữ nguyên
+                    decimal totalPrice = originalPrice;
+
+                    // CreatedAt không vượt quá currentDate
+                    var dailyCreatedAt = getSafeCreatedAt(bookingDate);
 
                     bookings.Add(new Booking
                     {
@@ -256,8 +320,8 @@ namespace BookingAPI.Data
                         OriginalPrice = originalPrice,
                         Note = createdById == 0 ? "Khách đặt online" : "Chủ sân tạo hộ",
                         PaymentMethod = "vnpay_100",
-                        CreatedAt = bookingDate.AddDays(-5),
-                        UpdatedAt = bookingDate.AddDays(-1),
+                        CreatedAt = dailyCreatedAt,
+                        UpdatedAt = dailyCreatedAt.AddDays(random.Next(0, 3)),
                         StadiumId = courtInfo.StadiumId,
                         MonthlyBookingId = null
                     });
@@ -280,22 +344,26 @@ namespace BookingAPI.Data
                     int startHour = random.Next(courtInfo.OpenTime, latestStartHour + 1);
 
                     decimal originalPrice = courtInfo.Price * 2;
-                    string status = random.Next(10) < 7 ? "accepted" : "waiting";
-                    decimal totalPrice = getTotalPrice(status, originalPrice);
+                    string initialStatus = getRandomInitialStatus();
+                    string finalStatus = getFinalStatusForDaily(initialStatus, bookingDate);
+
+                    decimal totalPrice = originalPrice;
+
+                    var futureCreatedAt = currentDate.AddDays(-random.Next(0, 10));
 
                     bookings.Add(new Booking
                     {
                         Id = bookingIdCounter,
                         UserId = customerId,
                         CreatedById = createdById,
-                        Status = status,
+                        Status = finalStatus,
                         Date = bookingDate,
                         TotalPrice = totalPrice,
                         OriginalPrice = originalPrice,
                         Note = createdById == 0 ? "Khách đặt online" : "Chủ sân tạo hộ",
                         PaymentMethod = "vnpay_100",
-                        CreatedAt = currentDate,
-                        UpdatedAt = currentDate,
+                        CreatedAt = futureCreatedAt,
+                        UpdatedAt = futureCreatedAt,
                         StadiumId = courtInfo.StadiumId,
                         MonthlyBookingId = null
                     });
@@ -303,7 +371,7 @@ namespace BookingAPI.Data
                     bookingIdCounter++;
                 }
 
-                // ========== WAITING BOOKINGS ==========
+                // ========== ADDITIONAL BOOKINGS ==========
                 for (int k = 0; k < 3; k++)
                 {
                     var courtInfo = ownerStadiums[random.Next(ownerStadiums.Count)];
@@ -315,22 +383,26 @@ namespace BookingAPI.Data
                     int startHour = random.Next(courtInfo.OpenTime, latestStartHour + 1);
 
                     decimal originalPrice = courtInfo.Price * 2;
-                    string status = random.Next(10) < 6 ? "accepted" : "waiting";
-                    decimal totalPrice = getTotalPrice(status, originalPrice);
+                    string initialStatus = getRandomInitialStatus();
+                    string finalStatus = getFinalStatusForDaily(initialStatus, bookingDate);
+
+                    decimal totalPrice = originalPrice;
+
+                    var additionalCreatedAt = currentDate.AddDays(-random.Next(0, 5));
 
                     bookings.Add(new Booking
                     {
                         Id = bookingIdCounter,
                         UserId = customerId,
                         CreatedById = createdById,
-                        Status = status,
+                        Status = finalStatus,
                         Date = bookingDate,
                         TotalPrice = totalPrice,
                         OriginalPrice = originalPrice,
                         Note = createdById == 0 ? null : "Đặt qua điện thoại",
                         PaymentMethod = "vnpay_100",
-                        CreatedAt = currentDate,
-                        UpdatedAt = currentDate,
+                        CreatedAt = additionalCreatedAt,
+                        UpdatedAt = additionalCreatedAt,
                         StadiumId = courtInfo.StadiumId,
                         MonthlyBookingId = null
                     });
