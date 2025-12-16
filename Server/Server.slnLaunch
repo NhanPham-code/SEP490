@@ -25,6 +25,10 @@
       {
         "Path": "BookingAPI\\BookingAPI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "DiscountAPI\\DiscountAPI.csproj",
+        "Action": "Start"
       }
     ]
   }

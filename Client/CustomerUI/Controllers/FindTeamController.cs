@@ -145,7 +145,7 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //2025-08-18 11:08:41.5130000
-            var result = await _teamPost.GetOdataTeamPostAsync($"&$filter=PlayDate gt {formatted} {url}");
+            var result = await _teamPost.GetOdataTeamPostAsync($"&$orderby=PlayDate asc&$filter=PlayDate gt {formatted} {url}");
             if (!result.Value.Any())
             {
                 return Json(new { Message = 404 });
@@ -196,7 +196,7 @@ namespace CustomerUI.Controllers
             var dateNow = DateTime.UtcNow;
             var formatted = dateNow.ToString("o");
             //get booking by user id
-            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and Status eq 'accepted' and BookingDetails/any(m: m/StartTime ge {formatted}) ";
+            string url = $"?$expand=BookingDetails&$filter=UserId eq {myUserId} and Status eq 'accepted' and BookingDetails/any(m: m/StartTime gt {formatted}) ";
             var booking = (await _bookingService.GetBookingAsync(_tokenService.GetAccessTokenFromCookie(), url)).Data;
      
             if (booking == null || !booking.Any())
@@ -282,6 +282,12 @@ namespace CustomerUI.Controllers
             CreateTeamPostDTO.CreatedBy = HttpContext.Session.GetInt32("UserId") ?? 0;
             CreateTeamPostDTO.CreatedAt = DateTime.UtcNow;
             CreateTeamPostDTO.UpdatedAt = DateTime.UtcNow;
+
+            DateTime combinedDateTime = CreateTeamPostDTO.PlayDate.Date + CreateTeamPostDTO.TimePlay;
+
+            // 2. Gán trực tiếp đối tượng DateTime đã gộp lại cho PlayDate.
+            CreateTeamPostDTO.PlayDate = combinedDateTime;
+
             var result = await _teamPost.CreateTeamPost(CreateTeamPostDTO);
             if (result == null)
             {
