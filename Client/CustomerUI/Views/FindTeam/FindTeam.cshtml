@@ -1211,7 +1211,7 @@
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
                             { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
                             { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' },
-                            { condition: !pricePerPerson || pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
+                            { condition: pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
 
