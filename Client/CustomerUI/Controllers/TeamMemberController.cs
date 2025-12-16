@@ -18,13 +18,15 @@ namespace CustomerUI.Controllers
         private readonly IUserService _userService;
         private readonly ITeamPostService _teamPost;
         private readonly INotificationService _notificationService;
+        private readonly IEmailService _emailService;
         private string token;
-        public TeamMemberController(ITeamMemberService teamMember, ITokenService tokenService, IUserService userService, ITeamPostService teamPost, INotificationService notificationService)
+        public TeamMemberController(IEmailService emailService, ITeamMemberService teamMember, ITokenService tokenService, IUserService userService, ITeamPostService teamPost, INotificationService notificationService)
         {
             _teamMember = teamMember;
             _tokenService = tokenService;
             _userService = userService;
             _teamPost = teamPost;
+            _emailService = emailService;
             _notificationService = notificationService;
         }
 
@@ -154,10 +156,13 @@ namespace CustomerUI.Controllers
                             {
                                 UserId = update.UserId,
                                 Type = "Recruitment.Accepted",
-                                Title = "Yêu cầu tham gia nhóm của bạn đã được chấp nhận,",
+                                Title = "Yêu cầu tham gia nhóm của bạn đã được chấp nhận!",
                                 Message = $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}",
                                 Parameters = json
                             });
+                    // gửi email thông báo
+                    var users = await _userService.GetOtherUserByIdAsync(update.UserId);
+                    _ = await _emailService.SendEmailAsync(users.Email, "Yêu cầu tham gia nhóm của bạn đã được chấp nhận!", $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}");
                     _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
                     {
                         UserId = 0,
@@ -174,6 +179,7 @@ namespace CustomerUI.Controllers
                 if (postMember.JoinedPlayers == postMember.NeededPlayers)
                 {
                     var allMember = await _teamMember.GetAllTeamMemberByPostId(postId);
+                    var user = await _userService.GetUsersByIdsAsync(allMember.Select(m => m.UserId).ToList(), _tokenService.GetAccessTokenFromCookie());
                     foreach (var member in allMember)
                     {
                         if (member.role == "Waiting")
@@ -189,9 +195,11 @@ namespace CustomerUI.Controllers
                                     UserId = member.UserId,
                                     Type = "Recruitment.Full",
                                     Title = "Nhóm đã đủ thành viên",
-                                    Message = $"<div><span>Nhóm đã đủ thành viên. hãy tìm nhóm khác!",
+                                    Message = $"Nhóm đã đủ thành viên. hãy tìm nhóm khác!",
                                     Parameters = json
                                 });
+                            _ = await _emailService.SendEmailAsync(user.Where(u => u.UserId.Equals(member.UserId)).Select(m => m.Email).FirstOrDefault(), "Yêu cầu tham gia nhóm của bạn đã được chấp nhận!", $"Bạn đã được chấp nhận vào nhóm {updateTeamPostDTO.Title}");
+
                             var deleteMember = await _teamMember.DeleteTeamMember(member.Id, postId);
                         }
                     }
@@ -260,6 +268,10 @@ namespace CustomerUI.Controllers
                             Message = $"{notifiMessage}",
                             Parameters = json
                         });
+                // gửi email thông báo
+                var users = await _userService.GetOtherUserByIdAsync(userId);
+                _ = await _emailService.SendEmailAsync(users.Email, $"{messageTitle}", $"{notifiMessage}");
+
                 _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
                 {});
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
