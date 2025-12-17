@@ -23,6 +23,7 @@ namespace StadiumManagerUI.Controllers
         private readonly IUserService _userService;
         private readonly IFavoriteStadiumService _favoriteStadiumService;
         private readonly INotificationService _notificationService;
+        private readonly IEmailService _emailService;
 
         public DiscountController(
             IDiscountService discountService,
@@ -30,7 +31,8 @@ namespace StadiumManagerUI.Controllers
             ITokenService tokenService,
             IUserService userService,
             IFavoriteStadiumService favoriteStadiumService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IEmailService emailService) 
         {
             _discountService = discountService;
             _stadiumService = stadiumService;
@@ -38,6 +40,7 @@ namespace StadiumManagerUI.Controllers
             _userService = userService;
             _favoriteStadiumService = favoriteStadiumService;
             _notificationService = notificationService;
+            _emailService = emailService; 
         }
 
         // Action này CHỈ trả về View rỗng
@@ -75,7 +78,8 @@ namespace StadiumManagerUI.Controllers
                 pageSize: pageSize,
                 searchByCode: searchByCode,
                 stadiumIds: stadiumId.HasValue ? new List<int> { stadiumId.Value } : null,
-                isActive: isActive
+                isActive: isActive,
+                orderBy: "CreatedAt desc"
             );
 
             var discounts = discountsResponse?.Value ?? new List<ReadDiscountDTO>();
@@ -174,7 +178,7 @@ namespace StadiumManagerUI.Controllers
             try
             {
                 // Gọi hàm helper để xử lý logic gửi thông báo phức tạp
-                await SendNotificationForNewDiscount(createdDiscount, accessToken);
+                await SendNotificationAndEmailForNewDiscount(createdDiscount, accessToken);
             }
             catch (Exception ex)
             {
@@ -232,120 +236,162 @@ namespace StadiumManagerUI.Controllers
         }
 
         // --- HÀM HELPER (KHÔNG THAY ĐỔI VÌ SERVICE ĐÃ ĐƯỢC "NGỤY TRANG") ---
-        private async Task SendNotificationForNewDiscount(ReadDiscountDTO discount, string accessToken)
+        private async Task SendNotificationAndEmailForNewDiscount(ReadDiscountDTO discount, string accessToken)
         {
-            // Trường hợp 1: Gửi cho người dùng cụ thể (UNIQUE)
-            if ("Unique".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && int.TryParse(discount.TargetUserId, out int targetUserId) && targetUserId > 0)
+            // ==================================================================================
+            // TRƯỜNG HỢP 1: MÃ CÁ NHÂN (UNIQUE) - Gửi 1 Noti + 1 Email
+            // ==================================================================================
+            if ("Unique".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) &&
+                int.TryParse(discount.TargetUserId, out int targetUserId) && targetUserId > 0)
             {
-                // Lấy tên sân (chỉ cần khi gửi Unique)
+                // 1. Lấy tên các sân áp dụng
                 var uniqueStadiumNames = new List<string>();
                 if (discount.StadiumIds != null && discount.StadiumIds.Any())
                 {
                     foreach (var stadiumId in discount.StadiumIds)
                     {
-                        try
-                        {
-                            var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
-                            if (stadium != null) uniqueStadiumNames.Add(stadium.Name);
-                        }
-                        catch (Exception ex) { Console.WriteLine($"[NotificationError] Lỗi khi lấy tên sân {stadiumId} cho Unique: {ex.Message}"); }
+                        var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
+                        if (stadium != null) uniqueStadiumNames.Add(stadium.Name);
                     }
                 }
-                string uniqueAppliedStadiums = uniqueStadiumNames.Any() ? string.Join(", ", uniqueStadiumNames) : "các sân được chọn";
+                string stadiumText = uniqueStadiumNames.Any() ? string.Join(", ", uniqueStadiumNames) : "các sân được chọn";
 
+                // 2. Gửi Notification (Logic cũ)
                 var notification = new CreateNotificationDto
                 {
                     UserId = targetUserId,
                     Type = "Discount.New",
                     Title = "Bạn có mã giảm giá cá nhân!",
-                    Message = $"Bạn nhận được mã giảm giá cá nhân: {discount.Code}, áp dụng cho sân: '{uniqueAppliedStadiums}'. Mã này chỉ dành riêng cho bạn!",
+                    Message = $"Bạn nhận được mã giảm giá: {discount.Code}, áp dụng cho: '{stadiumText}'.",
                     Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
                 };
-                Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] 🟡 Bước 1: Chuẩn bị gửi thông báo cho UserId = {notification.UserId}");
+                await _notificationService.SendNotificationToUserAsync(notification);
 
+                // 3. Gửi Email (NEW)
                 try
                 {
-                    await _notificationService.SendNotificationToUserAsync(notification);
-                    Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] 🟢 Đã gọi xong service gửi thông báo cho UserId = {notification.UserId}");
+                    // Lấy thông tin user để lấy Email
+                    var user = await _userService.GetOtherUserByIdAsync(targetUserId); // Dùng hàm lấy 1 user cho nhanh
+                    if (user != null && !string.IsNullOrEmpty(user.Email))
+                    {
+                        string subject = $"[Sportivey] Mã giảm giá riêng cho bạn: {discount.Code}";
+                        string msgBody = $@"
+                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                    <p>Chúc mừng! Bạn vừa nhận được một mã giảm giá đặc biệt từ Sportivey.</p>
+                    <div style='background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px dashed #6366f1; margin: 15px 0;'>
+                        <h2 style='color: #4f46e5; margin: 0;'>{discount.Code}</h2>
+                        <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
+                        <p><strong>Áp dụng tại:</strong> {stadiumText}</p>
+                        <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
+                    </div>
+                    <p>Hãy nhanh tay sử dụng trước khi hết hạn nhé!</p>
+                ";
+                        // Link trỏ về trang chủ hoặc trang đặt sân
+                        string actionLink = "https://localhost:7128/";
+                        await _emailService.SendEmailAsync(user.Email, subject, msgBody, actionLink, "Đặt Sân Ngay");
+                        Console.WriteLine($"[Email] Đã gửi mã Unique cho {user.Email}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[BACKEND-CONTROLLER] [Unique] ❌ Lỗi khi gọi NotificationService cho UserId {notification.UserId}: {ex.Message}");
-                }
+                catch (Exception ex) { Console.WriteLine($"[EmailError] Lỗi gửi mail Unique: {ex.Message}"); }
             }
-            // Trường hợp 2: Gửi cho người yêu thích sân (STADIUM) - LOGIC MỚI
-            else if ("Stadium".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) && discount.StadiumIds != null && discount.StadiumIds.Any())
+
+            // ==================================================================================
+            // TRƯỜNG HỢP 2: MÃ THEO SÂN (STADIUM) - Gửi Batch Noti + Batch Email
+            // ==================================================================================
+            else if ("Stadium".Equals(discount.CodeType, StringComparison.OrdinalIgnoreCase) &&
+                     discount.StadiumIds != null && discount.StadiumIds.Any())
             {
-                Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] Bắt đầu xử lý batch cho sân: {string.Join(", ", discount.StadiumIds)}");
+                Console.WriteLine($"[Batch] Bắt đầu xử lý batch cho sân: {string.Join(", ", discount.StadiumIds)}");
+
+                // Dictionary: UserId -> List<Tên Sân>
                 var usersAndTheirFavoriteStadiums = new Dictionary<int, List<string>>();
 
-                // (Lặp qua sân, lấy favorites, thêm vào Dictionary - logic cũ)
+                // 1. Thu thập User ID từ danh sách yêu thích của từng sân
                 foreach (var stadiumId in discount.StadiumIds)
                 {
-                    string? currentStadiumName = null;
                     try
                     {
                         var stadium = await _stadiumService.GetStadiumByIdAsync(stadiumId);
                         if (stadium != null)
                         {
-                            currentStadiumName = stadium.Name;
                             var favorites = await _favoriteStadiumService.GetFavoritesByStadiumIdAsync(stadiumId, accessToken);
                             if (favorites != null && favorites.Any())
                             {
                                 foreach (var fav in favorites)
                                 {
-                                    if (!usersAndTheirFavoriteStadiums.ContainsKey(fav.UserId)) usersAndTheirFavoriteStadiums[fav.UserId] = new List<string>();
-                                    if (!usersAndTheirFavoriteStadiums[fav.UserId].Contains(currentStadiumName)) usersAndTheirFavoriteStadiums[fav.UserId].Add(currentStadiumName);
+                                    if (!usersAndTheirFavoriteStadiums.ContainsKey(fav.UserId))
+                                        usersAndTheirFavoriteStadiums[fav.UserId] = new List<string>();
+
+                                    if (!usersAndTheirFavoriteStadiums[fav.UserId].Contains(stadium.Name))
+                                        usersAndTheirFavoriteStadiums[fav.UserId].Add(stadium.Name);
                                 }
                             }
                         }
                     }
-                    catch (Exception ex) { Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ❌ Lỗi xử lý sân {stadiumId}: {ex.Message}"); }
+                    catch (Exception ex) { Console.WriteLine($"[BatchError] Lỗi sân {stadiumId}: {ex.Message}"); }
                 }
 
-                // === TẠO LIST<NotificationDTO> TỪ DICTIONARY ===
+                if (!usersAndTheirFavoriteStadiums.Any()) return;
+
+                // 2. Gửi Notification Batch (Logic cũ)
                 var notificationsToSendInBatch = new List<CreateNotificationDto>();
-                if (usersAndTheirFavoriteStadiums.Any())
+                foreach (var kvp in usersAndTheirFavoriteStadiums)
                 {
-                    Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] === TẠO {usersAndTheirFavoriteStadiums.Count} DTOs cho batch ===");
-                    foreach (var kvp in usersAndTheirFavoriteStadiums)
+                    string stadiumNames = string.Join(", ", kvp.Value);
+                    notificationsToSendInBatch.Add(new CreateNotificationDto
                     {
-                        string appliedStadiumsMessage = string.Join(", ", kvp.Value);
-                        var notification = new CreateNotificationDto
-                        {
-                            UserId = kvp.Key, // UserId từ Dictionary key
-                            Type = "Discount.New",
-                            Title = "Sân bạn yêu thích có mã giảm giá mới!",
-                            Message = $"Sân '{appliedStadiumsMessage}' bạn yêu thích có mã giảm giá mới: {discount.Code}.", // Rút gọn message
-                            Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
-                        };
-                        notificationsToSendInBatch.Add(notification);
-                        Console.WriteLine($"   - Đã tạo DTO cho UserId: {kvp.Key}");
-                    }
+                        UserId = kvp.Key,
+                        Type = "Discount.New",
+                        Title = "Sân bạn yêu thích có ưu đãi mới!",
+                        Message = $"Sân '{stadiumNames}' tung mã giảm giá: {discount.Code}. Đặt ngay kẻo lỡ!",
+                        Parameters = JsonSerializer.Serialize(new { discountCode = discount.Code }),
+                    });
                 }
-                else
-                {
-                    Console.WriteLine("[BACKEND-CONTROLLER] [Stadium Batch] === KHÔNG CÓ USER NÀO ĐỂ TẠO BATCH ===");
-                    return;
-                }
+                await _notificationService.SendNotificationsBatchAsync(notificationsToSendInBatch, accessToken);
 
-                // === GỌI HÀM SendNotificationsBatchAsync MỘT LẦN ===
-                if (notificationsToSendInBatch.Any())
+
+                // 3. Gửi Email 
+                try
                 {
-                    Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] 🟡 Chuẩn bị gọi service gửi batch {notificationsToSendInBatch.Count} thông báo...");
-                    try
+                    // Lấy danh sách UserId cần gửi mail
+                    var userIdsToSendEmail = usersAndTheirFavoriteStadiums.Keys.ToList();
+
+                    // Gọi UserService lấy thông tin chi tiết (Email, Name) của danh sách ID này
+                    var userProfiles = await _userService.GetUsersByIdsAsync(userIdsToSendEmail, accessToken);
+
+                    if (userProfiles != null && userProfiles.Any())
                     {
-                        // Gọi hàm batch mới trong NotificationService
-                        bool batchSuccess = await _notificationService.SendNotificationsBatchAsync(notificationsToSendInBatch, accessToken);
-                        if (batchSuccess) Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] 🟢 Gọi xong service gửi batch.");
-                        else Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ⚠️ Service gửi batch trả về false.");
+                        foreach (var userProfile in userProfiles)
+                        {
+                            if (string.IsNullOrEmpty(userProfile.Email)) continue;
+
+                            // Lấy lại danh sách sân yêu thích của user này để chèn vào mail cho cá nhân hóa
+                            var favStadiums = usersAndTheirFavoriteStadiums.ContainsKey(userProfile.UserId)
+                                              ? string.Join(", ", usersAndTheirFavoriteStadiums[userProfile.UserId])
+                                              : "các sân bạn quan tâm";
+
+                            string subject = $"[Sportivey] Ưu đãi mới từ sân {favStadiums}: {discount.Code}";
+                            string msgBody = $@"
+                        <p>Xin chào <strong>{userProfile.FullName}</strong>,</p>
+                        <p>Sân vận động bạn yêu thích (<strong>{favStadiums}</strong>) vừa tung ra mã giảm giá mới!</p>
+                        
+                        <div style='background: #ecfdf5; padding: 15px; border-radius: 8px; border: 1px dashed #10b981; margin: 15px 0;'>
+                            <h2 style='color: #059669; margin: 0;'>{discount.Code}</h2>
+                            <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
+                            <p><strong>Áp dụng tại:</strong> {favStadiums}</p>
+                            <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
+                        </div>
+                        <p>Số lượng có hạn, hãy đặt sân ngay bây giờ!</p>
+                    ";
+
+                            // Gửi mail (Lưu ý: Gửi trong vòng lặp có thể chậm nếu list user quá lớn. 
+                            // Tốt nhất nên dùng Hangfire/BackgroundJob, nhưng ở đây gửi trực tiếp thì chấp nhận await từng cái hoặc Task.WhenAll)
+                            await _emailService.SendEmailAsync(userProfile.Email, subject, msgBody, "https://localhost:7128/", "Săn Deal Ngay");
+                            Console.WriteLine($"[EmailBatch] Đã gửi cho {userProfile.Email}");
+                        }
                     }
-                    catch (Exception ex) { Console.WriteLine($"[BACKEND-CONTROLLER] [Stadium Batch] ❌ Lỗi khi gọi service batch: {ex.Message}"); }
                 }
-            }
-            else
-            {
-                Console.WriteLine($"[BACKEND-CONTROLLER] [Notification] Mã giảm giá '{discount.Code}' không thuộc loại 'Unique' hay 'Stadium'.");
+                catch (Exception ex) { Console.WriteLine($"[EmailBatchError] Lỗi gửi mail hàng loạt: {ex.Message}"); }
             }
         }
     }

@@ -57,6 +57,10 @@ namespace StadiumManagerUI.Controllers
             var token = _tokenService.GetAccessTokenFromCookie();
             var userId = await _userService.GetMyProfileAsync(token);
             CreateStadiumRequest.Stadium.CreatedBy = userId.UserId;
+            if (CreateStadiumRequest.Stadium.Description.ToString().Length <= 0)
+            {
+                CreateStadiumRequest.Stadium.Description = "Chưa có mô tả";
+            }
             if (CreateStadiumRequest.StadiumImage == null)
             {
                 return Json(new { success = 400 });
@@ -90,7 +94,7 @@ namespace StadiumManagerUI.Controllers
             var json = JsonSerializer.Serialize(new
             {
                 title = "Stadium",
-                content = $"/StadiumController/StadiumAdmin"
+                content = $"/Stadium/StadiumAdmin"
             });
             await _notificationService.SendNotificationToUserAsync(new DTOs.NotificationDTO.CreateNotificationDto
             {

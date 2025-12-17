@@ -87,5 +87,27 @@ namespace DiscountAPI.Service
                 throw new KeyNotFoundException($"Discount with ID {id} not found.");
             await _repository.DeleteAsync(id);
         }
+        public async Task ScanAndDeactivateExpiredDiscountsAsync()
+        {
+            Console.WriteLine($"[Hangfire] Bắt đầu quét Discount hết hạn lúc {DateTime.UtcNow}...");
+
+
+            var expiredDiscounts = await _repository.GetExpiredActiveDiscountsAsync();
+
+            if (!expiredDiscounts.Any())
+            {
+                Console.WriteLine("[Hangfire] Không có Discount nào cần khóa.");
+                return;
+            }
+
+            foreach (var discount in expiredDiscounts)
+            {
+                discount.IsActive = false;
+            }
+
+            await _repository.SaveChangesAsync();
+
+            Console.WriteLine($"[Hangfire] Đã khóa thành công {expiredDiscounts.Count()} Discount.");
+        }
     }
 }

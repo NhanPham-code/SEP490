@@ -12,16 +12,32 @@ window.FaceCapture = (function () {
     ];
 
     const THRESHOLDS = {
-        faceConfidence: 0.6,
+        // GIẢM xuống 0.40 để bắt mặt nhạy hơn, tránh bị mất tracking khi quay nhanh
+        faceConfidence: 0.40,
+
         maxViolations: 5,
         violationTimeThreshold: 2500,
         maxFaceAbsenceFrames: 30,
-        captureHoldTime: 1000, // Giữ 1 giây để chụp
-        preparationTime: 3,
+
+        // TỐI ƯU TỐC ĐỘ: Giảm xuống 150ms (gần như tức thì khi đúng tư thế)
+        captureHoldTime: 200,
+
+        // TỐI ƯU TỐC ĐỘ: Bỏ qua đếm ngược chuẩn bị, vào chụp luôn
+        preparationTime: 0,
+
+        // Tinh chỉnh độ nhạy góc quay
         poseFactor: {
-            straight: 0.08,
-            yaw: 0.12,
-            pitch: 0.1,
+            // thẳng
+            straight: 0.15,
+
+            // trái/phải
+            yaw: 0.08,
+
+            // pitchUp: Số âm nhỏ (-0.02) để dễ ngẩng hơn (do cam thường đặt thấp)
+            pitchUp: -0.02,
+
+            // pitchDown: Số dương lớn (0.06) để tránh bị nhận diện nhầm là cúi khi đang nhìn thẳng
+            pitchDown: 0.1,
         }
     };
 
@@ -203,12 +219,27 @@ window.FaceCapture = (function () {
 
     function validateDirection(stepKey, pose) {
         const { yaw, pitch } = pose;
-        const { straight: straightFactor, yaw: yawFactor, pitch: pitchFactor } = THRESHOLDS.poseFactor;
+
+        const { straight: straightFactor, yaw: yawFactor, pitchUp, pitchDown } = THRESHOLDS.poseFactor;
+
         let result = { correct: false, message: 'Giữ nguyên' };
         switch (stepKey) {
             case 'straight':
-                result.correct = Math.abs(yaw) < straightFactor && Math.abs(pitch) < straightFactor;
-                result.message = result.correct ? '✓ Giữ vững' : 'Nhìn thẳng vào';
+                // Thường khi nhìn thẳng, người dùng dễ bị lệch Pitch (ngẩng/cúi) hơn là lệch Yaw (trái/phải).
+                // Ta cho phép Pitch lệch nhiều hơn một chút so với Yaw.
+
+                const isYawStraight = Math.abs(yaw) < straightFactor; // Kiểm tra trái phải
+                const isPitchStraight = Math.abs(pitch) < (straightFactor * 1.5); // Cho phép ngẩng/cúi lệch nhiều hơn gấp rưỡi
+
+                result.correct = isYawStraight && isPitchStraight;
+
+                // Thông báo lỗi chi tiết hơn để người dùng biết sửa
+                if (!result.correct) {
+                    if (!isYawStraight) result.message = "Nhìn chính diện vào camera";
+                    else if (!isPitchStraight) result.message = "Để camera ngang tầm mắt";
+                } else {
+                    result.message = '✓ Giữ vững';
+                }
                 break;
             case 'left':
                 result.correct = yaw > yawFactor;
@@ -219,11 +250,11 @@ window.FaceCapture = (function () {
                 result.message = result.correct ? '✓ Giữ vững' : 'Quay thêm sang phải';
                 break;
             case 'up':
-                result.correct = pitch < -pitchFactor;
+                result.correct = pitch < pitchUp;
                 result.message = result.correct ? '✓ Giữ vững' : 'Ngẩng thêm lên';
                 break;
             case 'down':
-                result.correct = pitch > pitchFactor;
+                result.correct = pitch > pitchDown;
                 result.message = result.correct ? '✓ Giữ vững' : 'Cúi thêm xuống';
                 break;
         }
@@ -297,7 +328,13 @@ window.FaceCapture = (function () {
         state.detectionActive = true;
         const detectLoop = async () => {
             if (!state.detectionActive || !elements.videoEl.srcObject) return;
-            const detection = await faceapi.detectSingleFace(elements.videoEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: THRESHOLDS.faceConfidence })).withFaceLandmarks();
+            const detection = await faceapi.detectSingleFace(
+                elements.videoEl,
+                new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 320, // Tăng từ 224 lên 320 (hoặc 512 nếu máy mạnh)
+                    scoreThreshold: THRESHOLDS.faceConfidence
+                })
+            ).withFaceLandmarks();
             state.lastDetectedFace = detection;
 
             if (faceCtx) {

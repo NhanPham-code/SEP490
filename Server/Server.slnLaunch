@@ -27,7 +27,7 @@
         "Action": "Start"
       },
       {
-        "Path": "FeedbackAPI\\FeedbackAPI.csproj",
+        "Path": "DiscountAPI\\DiscountAPI.csproj",
         "Action": "Start"
       }
     ]

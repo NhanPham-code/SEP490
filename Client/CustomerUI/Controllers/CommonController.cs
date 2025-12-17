@@ -503,7 +503,7 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> Profile()
         {
             // Kiểm tra cờ xác thực
-            if (TempData["ProfileVerified"] == null || (bool)TempData["ProfileVerified"] == false)
+            /*if (TempData["ProfileVerified"] == null || (bool)TempData["ProfileVerified"] == false)
             {
                 // Nếu chưa xác thực mà cố vào -> Đá về trang chủ và báo lỗi
                 TempData["ErrorMessage"] = "Vui lòng xác thực mật khẩu trước khi truy cập thông tin cá nhân.";
@@ -511,7 +511,7 @@ namespace CustomerUI.Controllers
             }
 
             // Xóa cờ xác thực sau khi đã sử dụng
-            TempData.Remove("ProfileVerified");
+            TempData.Remove("ProfileVerified");*/
 
             // Get tokens from cookie
             var accessToken = _tokenService.GetAccessTokenFromCookie();

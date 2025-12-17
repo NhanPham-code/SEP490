@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Models;
 using DiscountAPI.DTO;
 using Microsoft.OData.Edm;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +110,15 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))); // Dùng chung chuỗi kết nối với DB chính
+
+// 2. ADD HANGFIRE SERVER (Worker xử lý ngầm)
+builder.Services.AddHangfireServer();
+
 // ==================== Build & Run ====================
 var app = builder.Build();
 
@@ -122,8 +132,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // 👈 thêm dòng này
+app.UseAuthentication(); 
 app.UseAuthorization();
+
+app.UseHangfireDashboard(); 
+
+// Tạo Recurring Job: Chạy mỗi ngày một lần vào lúc 00:00 (nửa đêm)
+RecurringJob.AddOrUpdate<IDiscountService>(
+    "auto-deactivate-expired-discounts",
+    service => service.ScanAndDeactivateExpiredDiscountsAsync(),
+    Cron.Daily);
+
 
 app.MapControllers();
 
