@@ -2391,3 +2391,16 @@ body {
         pointer-events: none;
     }
 }
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn.disabled {
+    cursor: not-allowed;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}

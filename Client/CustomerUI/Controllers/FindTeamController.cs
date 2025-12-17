@@ -177,9 +177,13 @@ namespace CustomerUI.Controllers
                 {
                     findTeamViewModel.Hidden.Add(item.Id, 1);
                 }
-                else if (item.TeamMembers.Any(t => t.UserId.Equals(myUserId))) // nếu đã tham gia bài đăng thì ẩn nút tham gia
+                else if (item.TeamMembers.Any(t => t.UserId.Equals(myUserId) && t.role.Equals("Waiting"))) // nếu đã tham gia bài đăng thì ẩn nút tham gia
                 {
                     findTeamViewModel.Hidden.Add(item.Id, 2);
+                }
+                else if (item.TeamMembers.Any(t => t.UserId.Equals(myUserId) && t.role.Equals("Member"))) // nếu đã tham gia bài đăng thì ẩn nút tham gia
+                {
+                    findTeamViewModel.Hidden.Add(item.Id, 3);
                 }
             }
 

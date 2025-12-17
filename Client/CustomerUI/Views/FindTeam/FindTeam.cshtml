@@ -978,57 +978,79 @@
         }
 
 
-        function joindTeam(postId){
- 
-        // $('#join-btn').classList.add('loading'); 
-        //         $('#join-btn').classList.add('disable'); 
+                function joindTeam(postId) {
+            // Selector chính xác cho nút hiện tại
+            const btnSelector = `#join-btn-${postId}`;
+            const $btn = $(btnSelector);
 
-                // Gửi yêu cầu AJAX để tham gia bài đăng
-                $.ajax({
-                    url: '/FindTeam/JoinTeamPost',
-                    type: 'POST',
-                    data: { postId: postId },
-                    success: function(response) {
-                        if (response.message === 200) {
-                             Swal.fire({
-            icon: 'success',
-            title: 'Đã gửi yêu cầu!',
-            text: 'Đang chờ chủ bài đăng chấp nhận',
-            showCancelButton: true,
-            confirmButtonText: 'Xem chi tiết',
-            cancelButtonText: 'Xác nhận',
-            confirmButtonColor: '#3b82f6',
-            cancelButtonColor: '#aaa'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Nút 1: Đi tới chi tiết
-                window.location.href = `/FindTeam/JoinedTeam?postId=${postId}`; // Đổi URL theo ý bạn
-            } else if (result.isDismissed) {
-                // Nút 2: Chỉ xác nhận (đóng popup hoặc làm gì đó)
-                // Ví dụ: load lại danh sách hoặc gì đó
-                loadPost();
-            }
-        });
-                            // Cập nhật lại danh sách bài đăng sau khi tham gia
-                            loadPost();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi!',
-                                text: response.message,
-                                confirmButtonColor: '#ef4444'
-                            });
-                        }
-                    },
-                    error: function() {
+            // Bắt đầu loading state
+            $btn. prop('disabled', true)
+                .addClass('loading disabled')
+                .html('<span class="spinner-border spinner-border-sm me-2"></span>Đang gửi.. .');
+
+            // Gửi yêu cầu AJAX để tham gia bài đăng
+            $.ajax({
+                url: '/FindTeam/JoinTeamPost',
+                type: 'POST',
+                data: { postId:  postId },
+                success: function(response) {
+                    if (response.message === 200) {
+                        // Thành công - cập nhật nút
+                        $btn. removeClass('btn-primary')
+                            .addClass('btn-success')
+                            .html('<i class="ri-check-line me-2"></i>Đã gửi yêu cầu');
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Đã gửi yêu cầu!',
+                            text: 'Đang chờ chủ bài đăng chấp nhận',
+                            showCancelButton: true,
+                            confirmButtonText: 'Xem chi tiết',
+                            cancelButtonText: 'Xác nhận',
+                            confirmButtonColor: '#3b82f6',
+                            cancelButtonColor: '#aaa'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = `/FindTeam/JoinedTeam?postId=${postId}`;
+                            } else if (result.isDismissed) {
+                                loadPost();
+                            }
+                        });
+
+                        // Cập nhật lại danh sách bài đăng sau khi tham gia
+                        loadPost();
+                    } else {
+                        // Lỗi từ server - reset nút
+                        resetButton($btn);
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
-                            text: 'Đã xảy ra lỗi khi tham gia bài đăng. Vui lòng thử lại.',
+                            text: response.message,
                             confirmButtonColor: '#ef4444'
                         });
                     }
-                });
+                },
+                error: function() {
+                    // Lỗi network - reset nút
+                    resetButton($btn);
+
+                    Swal.fire({
+                        icon:  'error',
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi tham gia bài đăng. Vui lòng thử lại.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            });
+        }
+
+        // Hàm helper để reset nút về trạng thái ban đầu
+        function resetButton($btn) {
+            $btn.prop('disabled', false)
+                .removeClass('loading disabled btn-success')
+                .addClass('btn-primary')
+                .html('<i class="ri-user-add-line"></i> Tham Gia');
         }
 
 
@@ -1044,14 +1066,17 @@
                 return `<button class="btn btn-warning btn-full-member" disabled>Đã đủ người</button>`;
             }
             if (hidden[post.id] === 2) {
+                return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-warning btn-joined">Đang chờ duyệt</a>`;
+            }
+            if (hidden[post.id] === 3) {
                 return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-warning btn-joined">Đã Tham gia</a>`;
             }
             if (hidden[post.id] === 0 || post.joinedPlayers < post.neededPlayers) {
                 return `
-                <button onClick="joindTeam(${post.id})" id="join-btn" class="btn btn-primary btn-join">
-                    <i class="ri-user-add-line"></i>
-                    Tham Gia
-                </button>
+                        <button onClick="joindTeam(${post.id})" id="join-btn-${post.id}" class="btn btn-primary btn-join">
+            <i class="ri-user-add-line"></i>
+            Tham Gia
+        </button>
             `;
             }
             
