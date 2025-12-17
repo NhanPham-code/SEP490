@@ -17,7 +17,7 @@
         maxFaceAbsenceFrames: 30,
 
         // TỐI ƯU TỐC ĐỘ: Giảm xuống 150ms (gần như tức thì khi đúng tư thế)
-        captureHoldTime: 200,
+        captureHoldTime: 150,
 
         // TỐI ƯU TỐC ĐỘ: Bỏ qua đếm ngược chuẩn bị, vào chụp luôn
         preparationTime: 0,
