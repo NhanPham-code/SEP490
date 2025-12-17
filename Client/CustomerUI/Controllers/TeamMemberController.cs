@@ -259,24 +259,28 @@ namespace CustomerUI.Controllers
                 // gửi thông báo cho thành viên bị xóa hoặc từ chối hoặc rời đội
                 
                 
-                _ = await _notificationService.SendNotificationToUserAsync(
-                        new CreateNotificationDto
-                        {
-                            UserId = userId,
-                            Type = "Recruitment.Removed",
-                            Title = messageTitle,
-                            Message = $"{notifiMessage}",
-                            Parameters = json
-                        });
-                // gửi email thông báo
-                var users = await _userService.GetOtherUserByIdAsync(userId);
-                _ = await _emailService.SendEmailAsync(users.Email, $"{messageTitle}", $"{notifiMessage}");
-
-                _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
-                {});
+               
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
+                if (role != "Waiting")
+                {
+                    _ = await _notificationService.SendNotificationToUserAsync(
+                  new CreateNotificationDto
+                  {
+                      UserId = userId,
+                      Type = "Recruitment.Removed",
+                      Title = messageTitle,
+                      Message = $"{notifiMessage}",
+                      Parameters = json
+                  });
+                    // gửi email thông báo
+                    var users = await _userService.GetOtherUserByIdAsync(userId);
+                    _ = await _emailService.SendEmailAsync(users.Email, $"{messageTitle}", $"{notifiMessage}");
 
-     
+                    _ = await _notificationService.SendNotificationToAll(new CreateNotificationDto
+                    { });
+                }
+           
+
                 UpdateTeamPostDTO updateTeamPostDTO = new UpdateTeamPostDTO
                 {
                     Id = postId,
