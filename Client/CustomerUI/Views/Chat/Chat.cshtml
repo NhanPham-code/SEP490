@@ -1363,13 +1363,50 @@
                 border-radius: 15px !important;
             }
         }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(78,158,255,0.25);
+        }
+        /* Cho 2 panel trong sidebar thành flex column để .chat-list bên trong scroll được */
+        #chatsPanel,
+        #contactsPanel {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0; /* quan trọng để con có thể overflow/scroll */
+        }
+
+        /* đảm bảo sidebar không chặn overflow của con */
+        .chat-sidebar {
+            min-height: 0;
+        }
+        /* Unified style for both search inputs in sidebar */
+        #searchUser,
+        #searchContacts {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            background: #fff;
+        }
+
+            #searchUser:focus,
+            #searchContacts:focus {
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 3px rgba(78, 158, 255, 0.1);
+            }
     </style>
 </head>
 <body>
 
     <div class="chat-container" id="chatContainer">
         <!-- Sidebar -->
-        <div class="chat-sidebar" id="sidebar">
+        <div class="chat-sidebar">
             <h3>💬 Messenger</h3>
 
             <!-- Hidden user info - set programmatically -->
@@ -1380,11 +1417,27 @@
                 <input id="newChatName">
             </div>
 
-            <div class="chat-header">
-                <input type="text" id="searchUser" placeholder="Tìm kiếm..." />
+            <!-- THÊM: switch Chats | Contacts (PHẢI đặt ngoài div ẩn) -->
+            <div class="list-switch" style="display:flex; gap:8px; padding:10px 20px 0 20px;">
+                <button id="btnChats" class="tab-btn" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid #e5e9f2; background:#fff; cursor:pointer; font-weight:600;">💬 Chats</button>
+                <button id="btnContacts" class="tab-btn" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid #e5e9f2; background:#fff; cursor:pointer; font-weight:600;">👥 Contacts</button>
             </div>
 
-            <div class="chat-list" id="chatList"></div>
+            <!-- GÓI phần CHATS hiện có vào #chatsPanel -->
+            <div id="chatsPanel">
+                <div class="chat-header">
+                    <input type="text" id="searchUser" placeholder="Tìm kiếm..." />
+                </div>
+                <div class="chat-list" id="chatList"></div>
+            </div>
+
+            <!-- THÊM: panel Contacts (ẩn mặc định) -->
+            <div id="contactsPanel" style="display:none;">
+                <div class="chat-header">
+                    <input type="text" id="searchContacts" placeholder="Tìm theo tên hoặc email..." />
+                </div>
+                <div class="chat-list" id="contactsList"></div>
+            </div>
         </div>
 
         <!-- Chat Box -->
@@ -2848,6 +2901,9 @@
                     });
                 });
             }
+                  document.getElementById('btnChats')?.addEventListener('click', () => setTab('chats'));
+        document.getElementById('btnContacts')?.addEventListener('click', () => setTab('contacts'));
+        setTab('chats');
                  setTimeout(() => {
             const senderId = document.getElementById('senderId')?.value.trim();
             if (senderId) {
@@ -3926,7 +3982,166 @@
             }
             applyResponsiveInitialState();
         });
-    </script>
+
+                // Tabs
+                // ===== Contacts Tab + Search (full replace) =====
+        const btnChats = document.getElementById('btnChats');
+        const btnContacts = document.getElementById('btnContacts');
+        const chatsPanel = document.getElementById('chatsPanel');
+        const contactsPanel = document.getElementById('contactsPanel');
+        const searchContactsInput = document.getElementById('searchContacts');
+        const contactsListEl = document.getElementById('contactsList');
+
+        let contactsAbortCtrl = null;
+        let contactsLoadedOnce = false;
+        let contactSearchTimer = null;
+        let contactsData = [];
+
+        // Toggle tab
+        function setTab(which) {
+          if (!chatsPanel || !contactsPanel || !btnChats || !btnContacts) return;
+
+          if (which === 'contacts') {
+            chatsPanel.style.display = 'none';
+            contactsPanel.style.display = '';
+            btnChats.classList.remove('active');
+            btnContacts.classList.add('active');
+
+            // load lần đầu mở tab
+            if (!contactsLoadedOnce) {
+              loadContacts();
+              contactsLoadedOnce = true;
+            }
+          } else {
+            contactsPanel.style.display = 'none';
+            chatsPanel.style.display = '';
+            btnContacts.classList.remove('active');
+            btnChats.classList.add('active');
+          }
+        }
+
+        btnChats?.addEventListener('click', () => setTab('chats'));
+        btnContacts?.addEventListener('click', () => setTab('contacts'));
+        setTab('chats'); // mặc định
+
+        // Fetch danh bạ từ server (lấy nhiều để lọc client mượt)
+        async function loadContacts(pageNumber = 1) {
+          const kw = (searchContactsInput?.value || '').trim();
+
+          // Hủy request cũ nếu đang gõ
+          if (contactsAbortCtrl) contactsAbortCtrl.abort();
+          contactsAbortCtrl = new AbortController();
+
+          // tăng PageSize để client filter (tùy chỉnh lại theo nhu cầu)
+          const pageSize = 200;
+
+          if (contactsListEl) {
+            contactsListEl.innerHTML = '<div class="status-message">🔍 Đang tải danh bạ...</div>';
+          }
+
+          try {
+            const url = `/Chat/GetContacts?PageNumber=${pageNumber}&PageSize=${pageSize}&Keyword=${encodeURIComponent(kw)}`;
+            const res = await fetch(url, { signal: contactsAbortCtrl.signal });
+            const json = await res.json();
+
+            if (!json.success) {
+              if (contactsListEl) {
+                contactsListEl.innerHTML = '<div class="status-message">❌ Không tải được danh bạ</div>';
+              }
+              return;
+            }
+
+            contactsData = Array.isArray(json.data) ? json.data : [];
+            filterAndRenderContacts((searchContactsInput?.value || '').trim());
+          } catch (e) {
+            if (e.name === 'AbortError') return; // bị hủy do gõ tiếp
+            if (contactsListEl) {
+              contactsListEl.innerHTML = '<div class="status-message">❌ Lỗi tải danh bạ</div>';
+            }
+          }
+        }
+
+        // Lọc client theo name/email
+        function filterAndRenderContacts(keyword) {
+          keyword = (keyword || '').toLowerCase();
+
+          const filtered = (contactsData || []).filter(u => {
+            const name = (u.fullName ?? u.FullName ?? '').toLowerCase();
+            const email = (u.email ?? u.Email ?? '').toLowerCase();
+            return !keyword || name.includes(keyword) || email.includes(keyword);
+          });
+
+          renderContacts(filtered);
+        }
+
+        // Vẽ danh sách + click mở/tạo room
+        function renderContacts(items) {
+          const myId = document.getElementById('senderId')?.value?.trim();
+          if (!contactsListEl) return;
+
+          contactsListEl.innerHTML = '';
+          let count = 0;
+
+          items.forEach(u => {
+            const uid = u.userId ?? u.UserId;
+            if (!uid || uid === myId) return;
+
+            const name = (u.fullName ?? u.FullName ?? 'User').trim();
+            const email = (u.email ?? u.Email ?? '').trim();
+
+            const row = document.createElement('div');
+            row.className = 'chat-item';
+            row.innerHTML = `
+              <div class="chat-avatar">${(name || uid).charAt(0).toUpperCase()}</div>
+              <div class="chat-info">
+                <strong>${name || uid}</strong>
+                <small>${email || ''}</small>
+              </div>
+            `;
+
+            row.addEventListener('click', async () => {
+              try {
+                // Tạo userChats nếu chưa có
+                if (typeof window.addNewChat === 'function') {
+                  await window.addNewChat(uid, name || uid);
+                }
+
+                // Mở phòng chat
+                const sid = document.getElementById('senderId')?.value?.trim();
+                const sname = document.getElementById('senderName')?.value?.trim();
+                if (sid && sname && typeof window.openChat === 'function') {
+                  window.openChat(sid, sname, uid, name || uid);
+                }
+
+                // Quay về tab Chats; mobile thì show khung chat
+                setTab('chats');
+                if (typeof window.showChatOnMobile === 'function' && window.matchMedia('(max-width: 768px)').matches) {
+                  window.showChatOnMobile();
+                }
+              } catch (err) {
+                console.error('Open room error:', err);
+              }
+            });
+
+            contactsListEl.appendChild(row);
+            count++;
+          });
+
+          if (!count) {
+            contactsListEl.innerHTML = '<div class="status-message">Không có kết quả</div>';
+          }
+        }
+
+        // Tìm kiếm: lọc client tức thì + debounce gọi server để đồng bộ
+        searchContactsInput?.addEventListener('input', () => {
+          const kw = searchContactsInput.value;
+          filterAndRenderContacts(kw); // phản hồi ngay
+
+          clearTimeout(contactSearchTimer);
+          contactSearchTimer = setTimeout(() => loadContacts(1), 500); // sync với server
+        });
+
+              </script>
 
     <div id="incomingCallPopup" class="webrtc-popup-hidden">
         <div class="webrtc-popup-content">
