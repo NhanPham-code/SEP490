@@ -362,29 +362,27 @@
         }
 
         function applyDiscount(id, percent, minAmount, maxAmount, code) {
-            if (subtotalPrice < minAmount) {
+            // Sửa: Dùng originalPrice thay cho subtotalPrice
+            if (originalPrice < minAmount) {
                 showModal('Lỗi', `Đơn hàng phải có giá trị tối thiểu là ${formatCurrency(minAmount)} để áp dụng mã này.`);
                 return;
             }
 
-            let calculatedDiscount = subtotalPrice * (percent / 100);
+            // Sửa: Dùng originalPrice để tính toán
+            let calculatedDiscount = originalPrice * (percent / 100);
 
             if (maxAmount > 0) {
                 discountAmount = Math.min(calculatedDiscount, maxAmount);
             } else {
-                discountAmount = calculatedDiscount; // Không giới hạn
+                discountAmount = calculatedDiscount;
             }
 
-            totalPrice = subtotalPrice - discountAmount;
+            // Sửa: Cập nhật vào biến finalPrice (thay vì totalPrice chưa khai báo)
+            finalPrice = originalPrice - discountAmount;
             selectedDiscountId = id;
 
             $('#selected-code-name').text(code);
-            $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}₫`);
-
-
-            if (maxAmount === 0) {
-                // $('#selected-code-amount').append(' <span class="text-xs text-green-500">(Không giới hạn tối đa)</span>');
-            }
+            $('#selected-code-amount').text(`Giảm ${formatCurrency(discountAmount)}`);
 
             $('#no-discount-selected').addClass('hidden');
             $('#discount-selected').removeClass('hidden');
@@ -479,9 +477,9 @@
             applyDiscount(
                 card.data('id'),
                 card.data('percent'),
-                card.data('min'),
-                card.data('max'),
-                card. data('code')
+                card.data('min-amount'), 
+                card.data('max-amount'), 
+                card.data('code')
             );
         });
 

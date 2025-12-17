@@ -23,7 +23,8 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<TeamPost> CreateTeamPostAsync(TeamPost teamPost)
         {
-            teamPost.CreatedAt = DateTime.UtcNow;
+            teamPost.CreatedAt = DateTime.Now;
+            teamPost.UpdatedAt = DateTime.Now;
             var tempost = await _context.TeamPosts.AddAsync(teamPost);
             await _context.SaveChangesAsync();
             return teamPost;
@@ -37,7 +38,7 @@ namespace FindTeamAPI.Repositories
             existingPost.NeededPlayers = teamPost.NeededPlayers;
             existingPost.JoinedPlayers = teamPost.JoinedPlayers;
             existingPost.PricePerPerson = teamPost.PricePerPerson;
-            existingPost.UpdatedAt = DateTime.UtcNow;
+            existingPost.UpdatedAt = DateTime.Now;
             _context.TeamPosts.Update(existingPost);
             await _context.SaveChangesAsync();
             return teamPost;
