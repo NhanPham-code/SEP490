@@ -630,14 +630,21 @@
                 return tr;
             }
 
-            function openDetailsModal(discountId) {
+                        function openDetailsModal(discountId) {
                 const d = currentDiscounts.find(disc => disc.id === discountId);
                 if (!d) return;
 
                 document.getElementById('detailCode').textContent = d.code;
                 document.getElementById('detailCodeType').textContent = (d.codeType === 'Unique' ? 'Mã cá nhân' : 'Mã theo sân');
                 document.getElementById('detailPercentValue').textContent = `${d.percentValue}%`;
-                document.getElementById('detailMaxAmount').textContent = d.maxDiscountAmount.toLocaleString('vi-VN') + ' VNĐ';
+
+                if (d.maxDiscountAmount === 0) {
+                    document.getElementById('detailMaxAmount').innerHTML = '<span style="color: #2563eb; font-weight: 600;">Không giới hạn</span>';
+                } else {
+                    document.getElementById('detailMaxAmount').textContent = d.maxDiscountAmount.toLocaleString('vi-VN') + ' VNĐ';
+                }
+
+
                 document.getElementById('detailMinOrder').textContent = d.minOrderAmount.toLocaleString('vi-VN') + ' VNĐ';
 
                 const isExpired = new Date() > new Date(d.endDate);

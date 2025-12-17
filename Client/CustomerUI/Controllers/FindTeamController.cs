@@ -280,8 +280,6 @@ namespace CustomerUI.Controllers
         public async Task<IActionResult> CreateNewPost()
         {
             CreateTeamPostDTO.CreatedBy = HttpContext.Session.GetInt32("UserId") ?? 0;
-            CreateTeamPostDTO.CreatedAt = DateTime.UtcNow;
-            CreateTeamPostDTO.UpdatedAt = DateTime.UtcNow;
 
             DateTime combinedDateTime = CreateTeamPostDTO.PlayDate.Date + CreateTeamPostDTO.TimePlay;
 

@@ -9,17 +9,32 @@
     ];
 
     const THRESHOLDS = {
-        faceConfidence: 0.6, // Tăng độ tin cậy yêu cầu
+        // GIẢM xuống 0.40 để bắt mặt nhạy hơn, tránh bị mất tracking khi quay nhanh
+        faceConfidence: 0.40,
+
         maxViolations: 5,
         violationTimeThreshold: 2500,
         maxFaceAbsenceFrames: 30,
-        captureHoldTime: 1000, // Giữ 1 giây để chụp
-        preparationTime: 3,
-        // *** FINAL REVISED THRESHOLDS ***
+
+        // TỐI ƯU TỐC ĐỘ: Giảm xuống 150ms (gần như tức thì khi đúng tư thế)
+        captureHoldTime: 150,
+
+        // TỐI ƯU TỐC ĐỘ: Bỏ qua đếm ngược chuẩn bị, vào chụp luôn
+        preparationTime: 0,
+
+        // Tinh chỉnh độ nhạy góc quay
         poseFactor: {
-            straight: 0.08, // Độ lệch tối đa cho phép khi nhìn thẳng
-            yaw: 0.12,      // Độ lệch ngang tối thiểu để tính là quay trái/phải
-            pitch: 0.1,     // Độ lệch dọc tối thiểu để tính là ngẩng/cúi
+            // thẳng
+            straight: 0.15,
+
+            // trái/ phải
+            yaw: 0.08,
+
+            // pitchUp: Số âm nhỏ (-0.02) để dễ ngẩng hơn (do cam thường đặt thấp)
+            pitchUp: -0.02,
+
+            // pitchDown: Số dương lớn (0.06) để tránh bị nhận diện nhầm là cúi khi đang nhìn thẳng
+            pitchDown: 0.2,
         }
     };
 
@@ -91,7 +106,7 @@
         });
     };
     async function loadFaceAPI() { try { setStatus('Đang tải AI model...', 'status-loading'); const modelsPath = '/weights'; await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(modelsPath), faceapi.nets.faceLandmark68Net.loadFromUri(modelsPath)]); state.faceApiLoaded = true; setStatus('AI model đã sẵn sàng!', 'status-success'); playSound('success'); return true; } catch (error) { console.error('FaceAPI loading error:', error); setStatus('Lỗi tải AI model. Thử lại.', 'status-error'); showToast('Không thể tải model AI. Vui lòng kiểm tra đường dẫn và thử lại.', 'error'); return false; } }
-    async function detectFace() { if (!state.faceApiLoaded || !elements.videoEl.videoWidth) return null; try { return await faceapi.detectSingleFace(elements.videoEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: THRESHOLDS.faceConfidence })).withFaceLandmarks(); } catch { return null; } }
+    async function detectFace() { if (!state.faceApiLoaded || !elements.videoEl.videoWidth) return null; try { return await faceapi.detectSingleFace(elements.videoEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: THRESHOLDS.faceConfidence })).withFaceLandmarks(); } catch { return null; } }
     function drawFaceBox(detection) { const canvas = elements.faceCanvas; canvas.width = elements.videoEl.videoWidth; canvas.height = elements.videoEl.videoHeight; faceCtx.clearRect(0, 0, canvas.width, canvas.height); if (!detection) return; const box = detection.detection.box; const color = '#059669'; faceCtx.strokeStyle = color; faceCtx.lineWidth = 3; faceCtx.shadowColor = color; faceCtx.shadowBlur = 10; faceCtx.strokeRect(box.x, box.y, box.width, box.height); faceCtx.shadowBlur = 0; }
     function resetViolations() { state.violations = 0; state.faceAbsenceFrames = 0; state.lastViolationTime = 0; elements.violationCounter.style.display = 'none'; elements.violationCount.textContent = '0'; }
     function resetAll() { state.running = false; state.isPreparing = false; state.stepIndex = 0; state.capturedImages = []; state.isSettingBaseline = false; resetViolations(); setStepClass(); updateProgress(); elements.overlay.classList.add('opacity-0'); elements.directionGuide.style.display = 'none'; elements.submitBtn.disabled = true; elements.startBtn.disabled = !state.lastDetectedFace; elements.resetBtn.disabled = true; elements.stopBtn.disabled = true; setStatus('Sẵn sàng bắt đầu.', 'status-ready'); elements.faceImagePreviewZone.innerHTML = ''; if (!state.detectionActive) startFaceDetection(); }
@@ -134,13 +149,28 @@
      */
     function validateDirection(stepKey, pose) {
         const { yaw, pitch } = pose;
-        const { straight: straightFactor, yaw: yawFactor, pitch: pitchFactor } = THRESHOLDS.poseFactor;
+
+        const { straight: straightFactor, yaw: yawFactor, pitchUp, pitchDown } = THRESHOLDS.poseFactor;
+
         let result = { correct: false, message: 'Giữ nguyên' };
 
         switch (stepKey) {
             case 'straight':
-                result.correct = Math.abs(yaw) < straightFactor && Math.abs(pitch) < straightFactor;
-                result.message = result.correct ? '✓ Giữ vững' : 'Nhìn thẳng vào';
+                // Thường khi nhìn thẳng, người dùng dễ bị lệch Pitch (ngẩng/cúi) hơn là lệch Yaw (trái/phải).
+                // Ta cho phép Pitch lệch nhiều hơn một chút so với Yaw.
+
+                const isYawStraight = Math.abs(yaw) < straightFactor; // Kiểm tra trái phải
+                const isPitchStraight = Math.abs(pitch) < (straightFactor * 1.5); // Cho phép ngẩng/cúi lệch nhiều hơn gấp rưỡi
+
+                result.correct = isYawStraight && isPitchStraight;
+
+                // Thông báo lỗi chi tiết hơn để người dùng biết sửa
+                if (!result.correct) {
+                    if (!isYawStraight) result.message = "Nhìn chính diện vào camera";
+                    else if (!isPitchStraight) result.message = "Để camera ngang tầm mắt";
+                } else {
+                    result.message = '✓ Giữ vững';
+                }
                 break;
             case 'left':
                 // Người dùng quay sang TRÁI của họ -> Mũi của họ trên video sẽ di chuyển sang BÊN PHẢI của khung hình
@@ -153,11 +183,11 @@
                 result.message = result.correct ? '✓ Giữ vững' : 'Quay thêm sang phải';
                 break;
             case 'up':
-                result.correct = pitch < -pitchFactor; // Mũi lệch lên trên (giá trị âm)
+                result.correct = pitch < pitchUp;
                 result.message = result.correct ? '✓ Giữ vững' : 'Ngẩng thêm lên';
                 break;
             case 'down':
-                result.correct = pitch > pitchFactor; // Mũi lệch xuống dưới (giá trị dương)
+                result.correct = pitch > pitchDown;
                 result.message = result.correct ? '✓ Giữ vững' : 'Cúi thêm xuống';
                 break;
         }

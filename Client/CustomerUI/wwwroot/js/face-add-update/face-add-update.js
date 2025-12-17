@@ -12,16 +12,32 @@ window.FaceCapture = (function () {
     ];
 
     const THRESHOLDS = {
-        faceConfidence: 0.6,
+        // GIẢM xuống 0.40 để bắt mặt nhạy hơn, tránh bị mất tracking khi quay nhanh
+        faceConfidence: 0.40,
+
         maxViolations: 5,
         violationTimeThreshold: 2500,
         maxFaceAbsenceFrames: 30,
-        captureHoldTime: 1000, // Giữ 1 giây để chụp
-        preparationTime: 3,
+
+        // TỐI ƯU TỐC ĐỘ: Giảm xuống 150ms (gần như tức thì khi đúng tư thế)
+        captureHoldTime: 150,
+
+        // TỐI ƯU TỐC ĐỘ: Bỏ qua đếm ngược chuẩn bị, vào chụp luôn
+        preparationTime: 0,
+
+        // Tinh chỉnh độ nhạy góc quay
         poseFactor: {
-            straight: 0.08,
-            yaw: 0.12,
-            pitch: 0.1,
+            // thẳng
+            straight: 0.15,
+
+            // trái/phải
+            yaw: 0.08,
+
+            // pitchUp: Số âm nhỏ (-0.02) để dễ ngẩng hơn (do cam thường đặt thấp)
+            pitchUp: -0.02,
+
+            // pitchDown: Số dương lớn (0.06) để tránh bị nhận diện nhầm là cúi khi đang nhìn thẳng
+            pitchDown: 0.1,
         }
     };
 
@@ -203,12 +219,27 @@ window.FaceCapture = (function () {
 
     function validateDirection(stepKey, pose) {
         const { yaw, pitch } = pose;
-        const { straight: straightFactor, yaw: yawFactor, pitch: pitchFactor } = THRESHOLDS.poseFactor;
+
+        const { straight: straightFactor, yaw: yawFactor, pitchUp, pitchDown } = THRESHOLDS.poseFactor;
+
         let result = { correct: false, message: 'Giữ nguyên' };
         switch (stepKey) {
             case 'straight':
-                result.correct = Math.abs(yaw) < straightFactor && Math.abs(pitch) < straightFactor;
-                result.message = result.correct ? '✓ Giữ vững' : 'Nhìn thẳng vào';
+                // Thường khi nhìn thẳng, người dùng dễ bị lệch Pitch (ngẩng/cúi) hơn là lệch Yaw (trái/phải).
+                // Ta cho phép Pitch lệch nhiều hơn một chút so với Yaw.
+
+                const isYawStraight = Math.abs(yaw) < straightFactor; // Kiểm tra trái phải
+                const isPitchStraight = Math.abs(pitch) < (straightFactor * 1.5); // Cho phép ngẩng/cúi lệch nhiều hơn gấp rưỡi
+
+                result.correct = isYawStraight && isPitchStraight;
+
+                // Thông báo lỗi chi tiết hơn để người dùng biết sửa
+                if (!result.correct) {
+                    if (!isYawStraight) result.message = "Nhìn chính diện vào camera";
+                    else if (!isPitchStraight) result.message = "Để camera ngang tầm mắt";
+                } else {
+                    result.message = '✓ Giữ vững';
+                }
                 break;
             case 'left':
                 result.correct = yaw > yawFactor;
@@ -219,11 +250,11 @@ window.FaceCapture = (function () {
                 result.message = result.correct ? '✓ Giữ vững' : 'Quay thêm sang phải';
                 break;
             case 'up':
-                result.correct = pitch < -pitchFactor;
+                result.correct = pitch < pitchUp;
                 result.message = result.correct ? '✓ Giữ vững' : 'Ngẩng thêm lên';
                 break;
             case 'down':
-                result.correct = pitch > pitchFactor;
+                result.correct = pitch > pitchDown;
                 result.message = result.correct ? '✓ Giữ vững' : 'Cúi thêm xuống';
                 break;
         }
@@ -297,7 +328,13 @@ window.FaceCapture = (function () {
         state.detectionActive = true;
         const detectLoop = async () => {
             if (!state.detectionActive || !elements.videoEl.srcObject) return;
-            const detection = await faceapi.detectSingleFace(elements.videoEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: THRESHOLDS.faceConfidence })).withFaceLandmarks();
+            const detection = await faceapi.detectSingleFace(
+                elements.videoEl,
+                new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 320, // Tăng từ 224 lên 320 (hoặc 512 nếu máy mạnh)
+                    scoreThreshold: THRESHOLDS.faceConfidence
+                })
+            ).withFaceLandmarks();
             state.lastDetectedFace = detection;
 
             if (faceCtx) {
@@ -476,65 +513,116 @@ window.FaceCapture = (function () {
 
     async function submitFaceData(e) {
         e.preventDefault();
+
+        // 1. Validation cơ bản
         if (state.capturedImages.length < STEPS.length) {
             showToast(`Bạn cần chụp đủ ${STEPS.length} ảnh.`, 'error');
             return;
         }
 
-        const loadingToast = showToast("Đang gửi dữ liệu...", "loading");
-        elements.submitBtn.disabled = true;
-
-        const formData = new FormData();
         const userId = elements.userIdInput ? elements.userIdInput.value : null;
         if (!userId) {
+            showToast('Lỗi: Không tìm thấy ID người dùng.', 'error');
+            return;
+        }
+
+        // 2. Setup Loading UI
+        const originalBtnHtml = elements.submitBtn.innerHTML;
+        elements.submitBtn.disabled = true;
+        elements.submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Đang xử lý...';
+
+        if (elements.overlay) {
+            elements.overlay.classList.remove('opacity-0');
+            elements.overlayText.textContent = '☁️ Đang đồng bộ dữ liệu...';
+            elements.countdownEl.innerHTML = '<i class="ri-loader-2-line animate-spin text-6xl text-white"></i>';
+        }
+
+        const loadingToast = showToast("Đang gửi dữ liệu...", "loading");
+
+        try {
+            // 3. Chuẩn bị dữ liệu (Bao bọc trong try-catch để bắt lỗi xử lý ảnh)
+            const formData = new FormData();
+            formData.append('UserId', userId);
+
+            for (let i = 0; i < state.capturedImages.length; i++) {
+                const imgBase64 = state.capturedImages[i];
+                // Chuyển base64 sang blob
+                const response = await fetch(imgBase64);
+                const blob = await response.blob();
+                const fieldName = `FaceImages`;
+                const fileName = `faceImage${i + 1}.png`;
+                formData.append(fieldName, blob, fileName);
+            }
+
+            // 4. Gửi AJAX
+            $.ajax({
+                url: '/Common/AddOrUpdateFaceEmbeddings',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                timeout: 60000,
+                success: function (response) {
+                    if (window.ProfilePage && typeof window.ProfilePage.removeLoadingToast === 'function') {
+                        window.ProfilePage.removeLoadingToast(loadingToast);
+                    }
+
+                    // UI Thành công
+                    if (elements.overlay) {
+                        elements.overlayText.textContent = '✅ Hoàn tất!';
+                        elements.countdownEl.innerHTML = '<i class="ri-check-line text-6xl text-white"></i>';
+                    }
+
+                    showToast(response.message || "Cập nhật khuôn mặt thành công!", "success");
+
+                    setTimeout(() => {
+                        if (window.ProfilePage && typeof window.ProfilePage.closeModal === 'function') {
+                            window.ProfilePage.closeModal('faceCaptureModal');
+                        }
+                    }, 1500);
+                },
+                error: function (xhr) {
+                    if (window.ProfilePage && typeof window.ProfilePage.removeLoadingToast === 'function') {
+                        window.ProfilePage.removeLoadingToast(loadingToast);
+                    }
+
+                    const res = xhr.responseJSON;
+                    // Fallback message nếu không có responseJSON
+                    const errorMessage = res && res.message ? res.message : 'Có lỗi xảy ra khi kết nối server!';
+                    showToast(errorMessage, "error");
+
+                    // UI Lỗi trong Overlay: Hiện icon lỗi trước khi ẩn
+                    if (elements.overlay) {
+                        elements.overlayText.textContent = '❌ Có lỗi xảy ra';
+                        elements.countdownEl.innerHTML = '<i class="ri-error-warning-line text-6xl text-red-500"></i>';
+
+                        // Đợi 1.5s cho người dùng đọc lỗi rồi mới ẩn overlay để thử lại
+                        setTimeout(() => {
+                            elements.overlay.classList.add('opacity-0');
+                        }, 1500);
+                    }
+                },
+                complete: function () {
+                    // Reset nút bấm (chỉ khi ajax chạy xong, nếu lỗi ở bước chuẩn bị thì catch sẽ lo)
+                    elements.submitBtn.disabled = false;
+                    elements.submitBtn.innerHTML = originalBtnHtml;
+                }
+            });
+
+        } catch (error) {
+            console.error("Client-side error:", error);
+
+            // Xử lý lỗi phía Client (VD: lỗi khi fetch ảnh)
             if (window.ProfilePage && typeof window.ProfilePage.removeLoadingToast === 'function') {
                 window.ProfilePage.removeLoadingToast(loadingToast);
             }
-            showToast('Lỗi: Không tìm thấy ID người dùng.', 'error');
+            showToast("Lỗi xử lý hình ảnh. Vui lòng thử lại.", "error");
+
+            // Reset UI ngay lập tức
             elements.submitBtn.disabled = false;
-            return;
+            elements.submitBtn.innerHTML = originalBtnHtml;
+            if (elements.overlay) elements.overlay.classList.add('opacity-0');
         }
-        formData.append('UserId', userId);
-
-        for (let i = 0; i < state.capturedImages.length; i++) {
-            const imgBase64 = state.capturedImages[i];
-            const response = await fetch(imgBase64);
-            const blob = await response.blob();
-            const fieldName = `FaceImages`;
-            const fileName = `faceImage${i + 1}.png`;
-            formData.append(fieldName, blob, fileName);
-        }
-
-        $.ajax({
-            url: '/Common/AddOrUpdateFaceEmbeddings',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            timeout: 60000,
-            success: function (response) {
-                if (window.ProfilePage && typeof window.ProfilePage.removeLoadingToast === 'function') {
-                    window.ProfilePage.removeLoadingToast(loadingToast);
-                }
-                showToast(response.message || "Cập nhật khuôn mặt thành công!", "success");
-                setTimeout(() => {
-                    if (window.ProfilePage && typeof window.ProfilePage.closeModal === 'function') {
-                        window.ProfilePage.closeModal('faceCaptureModal');
-                    }
-                }, 1500);
-            },
-            error: function (xhr) {
-                if (window.ProfilePage && typeof window.ProfilePage.removeLoadingToast === 'function') {
-                    window.ProfilePage.removeLoadingToast(loadingToast);
-                }
-                const res = xhr.responseJSON;
-                const errorMessage = res && res.message ? res.message : 'Có lỗi xảy ra, vui lòng thử lại!';
-                showToast(errorMessage, "error");
-            },
-            complete: function () {
-                elements.submitBtn.disabled = false;
-            }
-        });
     }
 
     return {

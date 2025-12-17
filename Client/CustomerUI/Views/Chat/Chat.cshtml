@@ -1363,13 +1363,50 @@
                 border-radius: 15px !important;
             }
         }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4e9eff, #00d4aa);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(78,158,255,0.25);
+        }
+        /* Cho 2 panel trong sidebar thành flex column để .chat-list bên trong scroll được */
+        #chatsPanel,
+        #contactsPanel {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0; /* quan trọng để con có thể overflow/scroll */
+        }
+
+        /* đảm bảo sidebar không chặn overflow của con */
+        .chat-sidebar {
+            min-height: 0;
+        }
+        /* Unified style for both search inputs in sidebar */
+        #searchUser,
+        #searchContacts {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            background: #fff;
+        }
+
+            #searchUser:focus,
+            #searchContacts:focus {
+                border-color: var(--color-primary);
+                box-shadow: 0 0 0 3px rgba(78, 158, 255, 0.1);
+            }
     </style>
 </head>
 <body>
 
     <div class="chat-container" id="chatContainer">
         <!-- Sidebar -->
-        <div class="chat-sidebar" id="sidebar">
+        <div class="chat-sidebar">
             <h3>💬 Messenger</h3>
 
             <!-- Hidden user info - set programmatically -->
@@ -1380,11 +1417,27 @@
                 <input id="newChatName">
             </div>
 
-            <div class="chat-header">
-                <input type="text" id="searchUser" placeholder="Tìm kiếm..." />
+            <!-- THÊM: switch Chats | Contacts (PHẢI đặt ngoài div ẩn) -->
+            <div class="list-switch" style="display:flex; gap:8px; padding:10px 20px 0 20px;">
+                <button id="btnChats" class="tab-btn" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid #e5e9f2; background:#fff; cursor:pointer; font-weight:600;">💬 Chats</button>
+                <button id="btnContacts" class="tab-btn" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid #e5e9f2; background:#fff; cursor:pointer; font-weight:600;">👥 Contacts</button>
             </div>
 
-            <div class="chat-list" id="chatList"></div>
+            <!-- GÓI phần CHATS hiện có vào #chatsPanel -->
+            <div id="chatsPanel">
+                <div class="chat-header">
+                    <input type="text" id="searchUser" placeholder="Tìm kiếm..." />
+                </div>
+                <div class="chat-list" id="chatList"></div>
+            </div>
+
+            <!-- THÊM: panel Contacts (ẩn mặc định) -->
+            <div id="contactsPanel" style="display:none;">
+                <div class="chat-header">
+                    <input type="text" id="searchContacts" placeholder="Tìm theo tên hoặc email..." />
+                </div>
+                <div class="chat-list" id="contactsList"></div>
+            </div>
         </div>
 
         <!-- Chat Box -->
@@ -2473,7 +2526,11 @@
                     timestamp,
                     name: senderName
                 };
-
+                 const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -2623,28 +2680,51 @@
                 hideTypingIndicator();
             });
         };
-        function openChat(senderId, senderName, receiverId, receiverName) {
-            // Bỏ active khỏi tất cả chat-item
-            document.querySelectorAll('.chat-item').forEach(item => {
-                item.classList.remove('active');
-            });
-                if (isMobileView()) {
-            showChatOnMobile(); // Thêm class .show-chat để chuyển qua khung chat
+            function openChat(senderId, senderName, receiverId, receiverName) {
+        console.log('📞 openChat called with:', {
+            senderId,
+            senderName,
+            receiverId,
+            receiverName
+        });
+
+        // Validate parameters
+        if (!senderId || ! receiverId) {
+            console.error('❌ Invalid parameters');
+            return;
         }
-            // Đánh dấu chat hiện tại là active
-            const currentChatItem = document.getElementById(`chat-${receiverId}`);
-            if (currentChatItem) {
-                currentChatItem.classList.add('active');
-            }
 
-            // Gỡ listener cũ nếu có
-            if (typeof currentMessagesRef !== 'undefined' && currentMessagesRef) {
-                off(currentMessagesRef);
-            }
+        if (senderId === receiverId) {
+            console.error('❌ Cannot chat with yourself');
+            alert('😅 Bạn không thể chat với chính mình!');
+            return;
+        }
 
-            currentReceiverId = receiverId;
-            currentReceiverName = receiverName;
-            currentChatId = generateChatId(senderId, receiverId);
+        // Bỏ active khỏi tất cả chat-item
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        if (isMobileView()) {
+            showChatOnMobile();
+        }
+
+        // Đánh dấu chat hiện tại là active
+        const currentChatItem = document.getElementById(`chat-${receiverId}`);
+        if (currentChatItem) {
+            currentChatItem.classList. add('active');
+        }
+
+        // Gỡ listener cũ nếu có
+        if (typeof currentMessagesRef !== 'undefined' && currentMessagesRef) {
+            off(currentMessagesRef);
+        }
+
+        currentReceiverId = receiverId;
+        currentReceiverName = receiverName;
+        currentChatId = generateChatId(senderId, receiverId);
+
+        console.log('✅ Generated chatId:', currentChatId);
 
             // Cập nhật UI tên chat và avatar
             document.getElementById('currentChatName').textContent = receiverName;
@@ -2790,7 +2870,11 @@
                     timestamp,
                     name: senderName
                 };
-
+                const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
                 Promise.all(Object.keys(updates).map(path =>
                     set(ref(db, path), updates[path])
                 )).then(() => {
@@ -2848,6 +2932,9 @@
                     });
                 });
             }
+                  document.getElementById('btnChats')?.addEventListener('click', () => setTab('chats'));
+        document.getElementById('btnContacts')?.addEventListener('click', () => setTab('contacts'));
+        setTab('chats');
                  setTimeout(() => {
             const senderId = document.getElementById('senderId')?.value.trim();
             if (senderId) {
@@ -2942,6 +3029,11 @@
                 return;
             }
             showTypingIndicator();
+             const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
             push(ref(db, `chats/${currentChatId}`), {
                 senderId,
                 senderName,
@@ -2962,6 +3054,11 @@
                 return;
             }
             showTypingIndicator();
+             const unreadRef = ref(db, `unreadMessages/${currentReceiverId}`);
+        get(unreadRef).then((unreadSnap) => {
+            const currentCount = unreadSnap.exists() ? unreadSnap.val() : 0;
+            set(unreadRef, currentCount + 1);
+        });
             push(ref(db, `chats/${currentChatId}`), {
                 senderId,
                 senderName,
@@ -2991,28 +3088,59 @@
                      const CLOUDINARY_CLOUD_NAME = '@ViewBag.CloudinaryCloudName';
         const CLOUDINARY_UPLOAD_PRESET = '@ViewBag.CloudinaryPreset';
 
+                // TÌM VÀ THAY THẾ hàm window.addNewChat (khoảng dòng 1450-1470)
+
         window.addNewChat = (friendId, friendName) => {
             const senderId = document.getElementById('senderId')?.value.trim();
             const senderName = document.getElementById('senderName')?.value.trim();
 
             if (!senderId || !senderName) {
-                console.error('User info not set');
+                console.error('❌ User info not set');
+                alert('⚠️ Vui lòng đăng nhập trước! ');
                 return;
             }
 
             if (senderId === friendId) {
-                console.error('Cannot chat with yourself');
+                console.error('❌ Cannot chat with yourself');
+                alert('😅 Bạn không thể chat với chính mình!');
                 return;
             }
 
-            set(ref(db, `userChats/${senderId}/${friendId}`), {
+            console.log('✅ Creating chat:', {
+                senderId,
+                senderName,
+                friendId,
+                friendName
+            });
+
+            // FIX: Tạo hai chiều đúng cách
+            const updates = {};
+
+            // Tạo chat cho user hiện tại
+            updates[`userChats/${senderId}/${friendId}`] = {
                 name: friendName,
                 timestamp: Date.now(),
                 lastMessage: ''
-            }).then(() => {
-                loadChatList();
+            };
+
+            // Tạo chat cho contact (để họ cũng thấy)
+            updates[`userChats/${friendId}/${senderId}`] = {
+                name: senderName,
+                timestamp: Date.now(),
+                lastMessage: ''
+            };
+
+            // Lưu cả 2 chiều cùng lúc
+            Promise.all(
+                Object.keys(updates).map(path =>
+                    set(ref(db, path), updates[path])
+                )
+            ).then(() => {
+                console.log('✅ Chat room created successfully');
+                loadChatList(); // Reload danh sách chat
             }).catch(error => {
-                console.error('Error adding new chat:', error);
+                console.error('❌ Error creating chat:', error);
+                alert('Không thể tạo chat: ' + error.message);
             });
         };
                 // Modal Image Viewer
@@ -3926,6 +4054,242 @@
             }
             applyResponsiveInitialState();
         });
+
+                // Tabs
+                // ===== Contacts Tab + Search (full replace) =====
+        const btnChats = document.getElementById('btnChats');
+        const btnContacts = document.getElementById('btnContacts');
+        const chatsPanel = document.getElementById('chatsPanel');
+        const contactsPanel = document.getElementById('contactsPanel');
+        const searchContactsInput = document.getElementById('searchContacts');
+        const contactsListEl = document.getElementById('contactsList');
+
+        let contactsAbortCtrl = null;
+        let contactsLoadedOnce = false;
+        let contactSearchTimer = null;
+        let contactsData = [];
+
+        // Toggle tab
+        function setTab(which) {
+          if (!chatsPanel || !contactsPanel || !btnChats || !btnContacts) return;
+
+          if (which === 'contacts') {
+            chatsPanel.style.display = 'none';
+            contactsPanel.style.display = '';
+            btnChats.classList.remove('active');
+            btnContacts.classList.add('active');
+
+            // load lần đầu mở tab
+            if (!contactsLoadedOnce) {
+              loadContacts();
+              contactsLoadedOnce = true;
+            }
+          } else {
+            contactsPanel.style.display = 'none';
+            chatsPanel.style.display = '';
+            btnContacts.classList.remove('active');
+            btnChats.classList.add('active');
+          }
+        }
+
+        btnChats?.addEventListener('click', () => setTab('chats'));
+        btnContacts?.addEventListener('click', () => setTab('contacts'));
+        setTab('chats'); // mặc định
+
+        // Fetch danh bạ từ server (lấy nhiều để lọc client mượt)
+        async function loadContacts(pageNumber = 1) {
+          const kw = (searchContactsInput?.value || '').trim();
+
+          // Hủy request cũ nếu đang gõ
+          if (contactsAbortCtrl) contactsAbortCtrl.abort();
+          contactsAbortCtrl = new AbortController();
+
+          // tăng PageSize để client filter (tùy chỉnh lại theo nhu cầu)
+          const pageSize = 200;
+
+          if (contactsListEl) {
+            contactsListEl.innerHTML = '<div class="status-message">🔍 Đang tải danh bạ...</div>';
+          }
+
+          try {
+            const url = `/Chat/GetContacts?PageNumber=${pageNumber}&PageSize=${pageSize}&Keyword=${encodeURIComponent(kw)}`;
+            const res = await fetch(url, { signal: contactsAbortCtrl.signal });
+            const json = await res.json();
+
+            if (!json.success) {
+              if (contactsListEl) {
+                contactsListEl.innerHTML = '<div class="status-message">❌ Không tải được danh bạ</div>';
+              }
+              return;
+            }
+
+            contactsData = Array.isArray(json.data) ? json.data : [];
+            filterAndRenderContacts((searchContactsInput?.value || '').trim());
+          } catch (e) {
+            if (e.name === 'AbortError') return; // bị hủy do gõ tiếp
+            if (contactsListEl) {
+              contactsListEl.innerHTML = '<div class="status-message">❌ Lỗi tải danh bạ</div>';
+            }
+          }
+        }
+
+        // Lọc client theo name/email
+        function filterAndRenderContacts(keyword) {
+          keyword = (keyword || '').toLowerCase();
+
+          const filtered = (contactsData || []).filter(u => {
+            const name = (u.fullName ?? u.FullName ?? '').toLowerCase();
+            const email = (u.email ?? u.Email ?? '').toLowerCase();
+            return !keyword || name.includes(keyword) || email.includes(keyword);
+          });
+
+          renderContacts(filtered);
+        }
+
+        // Vẽ danh sách + click mở/tạo room
+              // Tìm và thay thế hàm renderContacts này (khoảng dòng 1680-1730)
+
+        // Vẽ danh sách + click mở/tạo room
+               // Vẽ danh sách + click mở/tạo room
+        function renderContacts(items) {
+          const myId = document.getElementById('senderId')?.value?.trim();
+          const myName = document. getElementById('senderName')?.value?.trim();
+
+          if (!contactsListEl) return;
+          if (!myId || !myName) {
+            contactsListEl.innerHTML = '<div class="status-message">⚠️ Vui lòng đăng nhập trước</div>';
+            return;
+          }
+
+          contactsListEl. innerHTML = '';
+          let count = 0;
+
+          items.forEach(u => {
+            const uid = String(u.userId ?? u.UserId ??  '').trim(); // FIX: Convert to string
+
+            // FIX: So sánh string với string
+            if (! uid || uid === String(myId)) {
+              console.log('⏭️ Skipping self or invalid:', uid);
+              return; // Skip chính mình
+            }
+
+            const name = (u.fullName ?? u.FullName ?? 'User').trim();
+            const email = (u. email ?? u.Email ?? '').trim();
+
+            const row = document.createElement('div');
+            row.className = 'chat-item';
+            row.innerHTML = `
+              <div class="chat-avatar">${(name || uid).charAt(0).toUpperCase()}</div>
+              <div class="chat-info">
+                <strong>${name || uid}</strong>
+                <small>${email || ''}</small>
+              </div>
+            `;
+
+            row.addEventListener('click', async () => {
+              // FIX: Double check trước khi tạo chat
+              if (String(uid) === String(myId)) {
+                console.error('❌ Cannot chat with yourself! ');
+                alert('😅 Bạn không thể chat với chính mình!');
+                return;
+              }
+
+              try {
+                console.log('🔵 Opening chat with:', {
+                  myId:  String(myId),
+                  myName,
+                  contactId: String(uid),
+                  contactName:  name
+                });
+
+                // Tạo chat room
+                if (typeof window.addNewChat === 'function') {
+                  await window.addNewChat(uid, name || uid);
+                }
+
+                // Mở chat
+                if (typeof window.openChat === 'function') {
+                  window.openChat(myId, myName, uid, name || uid);
+                }
+
+                // Quay về tab Chats
+                setTab('chats');
+
+                // Mobile:  show khung chat
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                  const container = document.getElementById('chatContainer');
+                  if (container) {
+                    container.classList.add('show-chat');
+                    const backBtn = document.getElementById('backBtn');
+                    if (backBtn) backBtn.style.display = '';
+                  }
+                }
+              } catch (err) {
+                console.error('❌ Open room error:', err);
+                alert('Không thể mở chat: ' + err.message);
+              }
+            });
+
+            contactsListEl.appendChild(row);
+            count++;
+          });
+
+          if (!count) {
+            contactsListEl.innerHTML = '<div class="status-message">👥 Không có người dùng nào</div>';
+          }
+        }
+
+        // Tìm kiếm: lọc client tức thì + debounce gọi server để đồng bộ
+        searchContactsInput?.addEventListener('input', () => {
+          const kw = searchContactsInput.value;
+          filterAndRenderContacts(kw); // phản hồi ngay
+
+          clearTimeout(contactSearchTimer);
+          contactSearchTimer = setTimeout(() => loadContacts(1), 500); // sync với server
+        });
+        function getQueryParams() {
+          const params = new URLSearchParams(window.location.search);
+          return {
+            senderId: params.get('senderId') || '',
+            senderName: params.get('senderName') || '', // optional
+            receiverId: params.get('receiverId') || '',
+            receiverName: params.get('receiverName') || '' // optional
+          };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const q = getQueryParams();
+
+          if (!q.receiverId) {
+            // Nothing to auto-open
+            return;
+          }
+
+          // Nếu server đã xác thực, bạn có thể bỏ qua senderId từ query và lấy senderId từ server-rendered hidden input
+          const serverSenderId = document.getElementById('senderId')?.value?.trim();
+          const finalSenderId = serverSenderId || q.senderId;
+
+          // Fill hidden inputs if present
+          const senderIdInput = document.getElementById('senderId');
+          const senderNameInput = document.getElementById('senderName');
+          if (senderIdInput && finalSenderId) senderIdInput.value = finalSenderId;
+          if (senderNameInput && q.senderName) senderNameInput.value = q.senderName;
+
+          // Ensure setUserInfo exists
+          if (typeof window.setUserInfo === 'function') {
+            window.setUserInfo(finalSenderId || '', q.senderName || '');
+          }
+
+          // Ensure openChat exists
+          if (typeof window.openChat === 'function') {
+            const senderNameForOpen = q.senderName || (senderNameInput ? senderNameInput.value : '');
+            const receiverNameForOpen = q.receiverName || q.receiverId; // fallback to id if no name
+            window.openChat(finalSenderId || '', senderNameForOpen, q.receiverId, receiverNameForOpen);
+          } else {
+            console.warn('openChat function not found on this page. Make sure your chat UI exposes openChat(senderId, senderName, receiverId, receiverName).');
+          }
+        });
+
     </script>
 
     <div id="incomingCallPopup" class="webrtc-popup-hidden">

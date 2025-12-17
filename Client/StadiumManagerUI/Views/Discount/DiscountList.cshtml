@@ -102,7 +102,7 @@
                                     <option value="Unique">Mã cá nhân</option>
                                 </select>
                             </div>
-                            <div class="form-group"><label class="form-label">Giá trị giảm (%) *</label><input type="number" class="form-control" id="percentValue" min="0" max="100" required></div>
+                            <div class="form-group"><label class="form-label">Giá trị giảm (%) *</label><input type="number" class="form-control" id="percentValue" min="1" max="100" step="1" required> </div>
                             <div class="form-group"><label class="form-label">Số tiền giảm tối đa</label><input type="number" class="form-control" id="maxDiscountAmount" min="0">
                                 <small class="form-text text-muted" style="font-size: 0.8rem; color: #6b7280; font-style: italic;">
                                     * Nhập 0 để không giới hạn số tiền giảm.
@@ -158,6 +158,31 @@
             </div>
         </div>
     </div>
+    <div id="statusPopup" class="status-popup-overlay" style="display: none;">
+        <div class="status-popup">
+            <div class="status-icon-box">
+                <i id="statusIcon" class="fas fa-spinner fa-spin"></i>
+            </div>
+            <!-- Đây là 2 cái ID mà code đang tìm nhưng chưa thấy -->
+            <h3 id="statusTitle">Đang xử lý</h3>
+            <p id="statusMessage">Vui lòng đợi trong giây lát...</p>
+        </div>
+    </div>
+
+    <!-- Popup Xác nhận (Yes/No) -->
+    <div id="confirmPopup" class="status-popup-overlay" style="display: none;">
+        <div class="status-popup">
+            <div class="status-icon-box">
+                <i class="fas fa-question-circle" style="color: #f59e0b;"></i>
+            </div>
+            <h3 id="confirmTitle">Xác nhận</h3>
+            <p id="confirmMessage">Bạn có chắc chắn muốn thực hiện?</p>
+            <div class="modal-actions" style="justify-content: center; margin-top: 20px;">
+                <button class="btn-cancel" onclick="closeConfirmPopup(false)">Hủy</button>
+                <button class="btn-save" id="btnConfirmYes" style="background-color: #3b82f6;">Đồng ý</button>
+            </div>
+        </div>
+    </div>
 
     @section Scripts {
         <script>
@@ -169,6 +194,7 @@
             let pageSize = 5;
             let currentDiscounts = [];
             let userSearchTimeout;
+            let confirmCallback = null;
 
             // === INITIALIZATION ===
             document.addEventListener('DOMContentLoaded', function () {
@@ -457,42 +483,153 @@
                 document.getElementById('discountForm'). dataset.isActive = isActiveValue;
                 document.getElementById('discountModal').classList.add('active');
             }
+            function showConfirmPopup(title, message, callback) {
+                const popup = document.getElementById('confirmPopup');
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+
+                // Lưu hành động cần làm vào biến
+                confirmCallback = callback;
+
+                // Gán sự kiện cho nút Đồng ý
+                document.getElementById('btnConfirmYes').onclick = function() {
+                    closeConfirmPopup(true);
+                };
+
+                popup.style.display = 'flex';
+            }
+
+            function closeConfirmPopup(isConfirmed) {
+                document.getElementById('confirmPopup').style.display = 'none';
+
+                // Nếu người dùng bấm Đồng ý và có hành động đang chờ -> Thực hiện nó
+                if (isConfirmed && confirmCallback) {
+                    confirmCallback();
+                }
+
+                // Reset biến
+                if (isConfirmed) confirmCallback = null;
+            }
+
+            function showStatusPopup(type, title, message) { // Lưu ý: hàm này nhận 3 tham số để linh hoạt hơn
+                const overlay = document.getElementById('statusPopup');
+                const icon = document.getElementById('statusIcon');
+                const titleEl = document.getElementById('statusTitle');
+                const msgEl = document.getElementById('statusMessage');
+
+                // 1. Hiển thị overlay
+                overlay.style.display = 'flex'; // Dùng style.display thay vì class active để khớp với HTML style="display: none"
+
+                // 2. Reset class icon (giữ lại class gốc fas)
+                icon.className = 'fas';
+
+                // 3. Cập nhật icon và màu sắc dựa trên type
+                if (type === 'loading') {
+                    icon.classList.add('fa-spinner', 'fa-spin', 'status-loading');
+                } else if (type === 'success') {
+                    icon.classList.add('fa-check-circle', 'status-success');
+                } else if (type === 'error') {
+                    icon.classList.add('fa-times-circle', 'status-error');
+                }
+
+                // 4. Cập nhật nội dung (Đây là chỗ bị lỗi null trước đó)
+                // Nếu tham số title bị bỏ qua (undefined), tự động điền tiêu đề mặc định
+                if (!title) {
+                    if (type === 'loading') title = 'Đang xử lý';
+                    else if (type === 'success') title = 'Thành công';
+                    else if (type === 'error') title = 'Lỗi';
+                }
+
+                // Xử lý trường hợp gọi hàm chỉ với 2 tham số (type, message) như code cũ
+                // Nếu 'title' thực ra là nội dung thông báo dài, ta gán nó vào message
+                if (arguments.length === 2) {
+                    message = title;
+                    title = (type === 'loading') ? 'Đang xử lý' : (type === 'success' ? 'Thành công' : 'Thông báo');
+                }
+
+                if (titleEl) titleEl.textContent = title;
+                if (msgEl) msgEl.textContent = message;
+            }
+
+            // Hàm ẩn popup cần sửa lại để khớp với style.display
+            function hideStatusPopup() {
+                document.getElementById('statusPopup').style.display = 'none';
+            }
+
+            // === HÀM MỚI: Fix lỗi đà trượt (Momentum Scroll) ===
+            // Hàm này sẽ "đóng băng" thanh cuộn trong tích tắc để triệt tiêu lực quán tính
+            function stopScrollMomentumAndTop() {
+                const modal = document.querySelector('.modal'); // Lấy element có thanh cuộn
+
+                // 1. Khóa cuộn tạm thời để cắt đà quán tính
+                modal.classList.add('no-scroll-momentum');
+
+                // 2. Đưa về đầu trang ngay lập tức
+                modal.scrollTop = 0;
+
+                // 3. Mở lại cuộn bình thường sau 1 khoảng thời gian cực ngắn
+                setTimeout(() => {
+                    modal.classList.remove('no-scroll-momentum');
+                }, 50);
+            }
 
             async function handleFormSubmit(event) {
                 event.preventDefault();
+                const percentInput = document.getElementById('percentValue');
+                const percentVal = parseFloat(percentInput.value);
 
-                // Validate ngày không được trong quá khứ
+                // --- Validation cơ bản ---
+                if (percentVal < 1 || percentVal > 100) {
+                    // FIX SCROLL: Dừng đà trượt trước khi hiện lỗi
+                    stopScrollMomentumAndTop();
+
+                    // Thay alert bằng popup lỗi
+                    showStatusPopup('error', 'Giá trị giảm (%) phải từ 1 đến 100.');
+                    setTimeout(hideStatusPopup, 1500); // Tự tắt sau 1.5s
+
+                    // Focus lại sau khi tắt popup (tùy chọn)
+                    setTimeout(() => percentInput.focus(), 1600);
+                    return;
+                }
+
                 const today = getTodayDate();
-                const startDateValue = document.getElementById('startDate'). value;
-                const endDateValue = document.getElementById('endDate'). value;
+                const startDateValue = document.getElementById('startDate').value;
+                const endDateValue = document.getElementById('endDate').value;
 
                 if (startDateValue < today) {
-                    alert('Ngày bắt đầu không được là ngày trong quá khứ.');
-                    document.getElementById('startDate').focus();
+                    stopScrollMomentumAndTop();
+                    showStatusPopup('error', 'Ngày bắt đầu không được trong quá khứ.');
+                    setTimeout(hideStatusPopup, 1500);
                     return;
                 }
 
                 if (endDateValue < today) {
-                    alert('Ngày kết thúc không được là ngày trong quá khứ.');
-                    document. getElementById('endDate').focus();
+                    stopScrollMomentumAndTop();
+                    showStatusPopup('error', 'Ngày kết thúc không được trong quá khứ.');
+                    setTimeout(hideStatusPopup, 1500);
                     return;
                 }
 
-                if (! validateDates()) {
-                    alert('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
+                if (!validateDates()) {
+                    stopScrollMomentumAndTop();
+                    showStatusPopup('error', 'Ngày kết thúc phải lớn hơn ngày bắt đầu.');
+                    setTimeout(hideStatusPopup, 1500);
                     return;
                 }
 
                 const saveButton = event.target.querySelector('.btn-save');
                 saveButton.disabled = true;
 
+                // --- Validation Logic ---
                 const payload = getFormData();
                 const codeType = payload.codeType;
 
                 if (codeType === 'Stadium' || codeType === 'Unique') {
                     payload.stadiumIds = Array.from(document.querySelectorAll('#stadiumSelectionGroup input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
                     if (payload.stadiumIds.length === 0) {
-                        alert('Với loại mã này, bạn phải chọn ít nhất một sân vận động để áp dụng.');
+                        stopScrollMomentumAndTop();
+                        showStatusPopup('error', 'Vui lòng chọn ít nhất một sân vận động.');
+                        setTimeout(hideStatusPopup, 1500);
                         saveButton.disabled = false;
                         return;
                     }
@@ -501,7 +638,9 @@
                 if (codeType === 'Unique') {
                     const selectedUser = document.querySelector('#userSelectionResults input[name="targetUser"]:checked');
                     if (!selectedUser) {
-                        alert('Vui lòng chọn một người dùng mục tiêu cho mã cá nhân.');
+                        stopScrollMomentumAndTop();
+                        showStatusPopup('error', 'Vui lòng chọn người dùng mục tiêu.');
+                        setTimeout(hideStatusPopup, 1500);
                         saveButton.disabled = false;
                         return;
                     }
@@ -511,19 +650,36 @@
                 payload.isActive = (event.target.dataset.isActive === "true");
                 const url = currentEditingId ? '/Discount/UpdateDiscount' : '/Discount/CreateDiscount';
 
+                // === BẮT ĐẦU GỌI API ===
                 try {
-                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    // 1. Hiện popup loading
+                    showStatusPopup('loading', currentEditingId ? 'Đang cập nhật...' : 'Đang tạo mới...');
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
                     const result = await response.json();
+
                     if (result.success) {
-                        closeDiscountModal();
-                        alert(currentEditingId ? 'Cập nhật thành công!' : 'Tạo mới thành công!');
-                        fetchAndRenderDiscounts(currentEditingId ? currentPage : 1);
+                        // 2. Hiện popup thành công
+                        showStatusPopup('success', currentEditingId ? 'Cập nhật thành công!' : 'Tạo mới thành công!');
+
+                        // Đợi 1.5 giây để người dùng đọc thông báo rồi mới đóng modal và reload
+                        setTimeout(() => {
+                            hideStatusPopup();
+                            closeDiscountModal();
+                            fetchAndRenderDiscounts(currentEditingId ? currentPage : 1);
+                        }, 1500);
                     } else {
-                        alert('Lỗi: ' + (result.message || 'Thao tác thất bại. '));
+                        showStatusPopup('error', 'Lỗi: ' + (result.message || 'Thao tác thất bại.'));
+                        setTimeout(hideStatusPopup, 2000);
                     }
                 } catch (err) {
                     console.error("Submit Error:", err);
-                    alert('Lỗi kết nối đến server.');
+                    showStatusPopup('error', 'Lỗi kết nối đến server.');
+                    setTimeout(hideStatusPopup, 2000);
                 } finally {
                     saveButton.disabled = false;
                 }
@@ -534,7 +690,7 @@
                     id: currentEditingId ?  parseInt(document.getElementById('discountId').value) : 0,
                     code: document.getElementById('discountCode').value. trim(),
                     description: document.getElementById('description').value,
-                    percentValue: parseFloat(document.getElementById('percentValue'). value),
+                    percentValue: Math.round(parseFloat(document.getElementById('percentValue').value)),
                     maxDiscountAmount: parseFloat(document.getElementById('maxDiscountAmount').value) || 0,
                     minOrderAmount: parseFloat(document. getElementById('minOrderAmount').value) || 0,
                     startDate: new Date(document.getElementById('startDate').value + 'T00:00:00Z'),
@@ -547,18 +703,42 @@
 
             async function openToggleStatusConfirm(discountId) {
                 const discount = currentDiscounts.find(d => d.id === discountId);
-                if (! discount) return;
-                try {
-                    const payload = { ... discount, isActive: !discount. isActive };
-                    const response = await fetch('/Discount/UpdateDiscount', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    const result = await response. json();
-                    if (result.success) {
-                        alert('Thay đổi trạng thái thành công! ');
-                        fetchAndRenderDiscounts(currentPage);
-                    } else {
-                        alert('Lỗi: ' + (result.message || 'Thao tác thất bại.'));
+                if (!discount) return;
+
+                const actionText = discount.isActive ? 'khóa' : 'mở khóa';
+                const message = `Bạn có chắc chắn muốn ${actionText} mã giảm giá "${discount.code}" không?`;
+
+                // Gọi Popup xác nhận thay vì confirm() mặc định
+                showConfirmPopup('Xác nhận thay đổi', message, async function() {
+                    // --- Code bên trong này chỉ chạy khi bấm "Đồng ý" ---
+                    try {
+                        // Hiện loading
+                        showStatusPopup('loading', 'Đang xử lý', 'Đang cập nhật trạng thái...');
+
+                        const payload = { ...discount, isActive: !discount.isActive };
+
+                        const response = await fetch('/Discount/UpdateDiscount', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showStatusPopup('success', 'Thành công', `Đã ${actionText} thành công!`);
+                            setTimeout(() => {
+                                hideStatusPopup();
+                                fetchAndRenderDiscounts(currentPage);
+                            }, 1000);
+                        } else {
+                            showStatusPopup('error', 'Lỗi', result.message || 'Thất bại.');
+                            setTimeout(hideStatusPopup, 2000);
+                        }
+                    } catch (err) {
+                        showStatusPopup('error', 'Lỗi kết nối', 'Không thể kết nối đến server.');
+                        setTimeout(hideStatusPopup, 2000);
                     }
-                } catch (err) { alert('Lỗi kết nối đến server.'); }
+                });
             }
 
             function renderFilterOptions(stadiums) {
@@ -689,5 +869,7 @@
             }
         </script>
     }
+
+
 </body>
 </html>
