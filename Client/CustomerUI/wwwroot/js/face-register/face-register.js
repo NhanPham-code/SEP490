@@ -34,7 +34,7 @@
             pitchUp: -0.02,
 
             // pitchDown: Số dương lớn (0.06) để tránh bị nhận diện nhầm là cúi khi đang nhìn thẳng
-            pitchDown: 0.1,
+            pitchDown: 0.2,
         }
     };
 
