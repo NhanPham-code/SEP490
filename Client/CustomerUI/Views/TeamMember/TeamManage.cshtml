@@ -540,10 +540,9 @@
         // 👉 17/09/2025 14:30 - Thứ Tư
 
 
-
             const formatTimeForDisplay = (timeStr) => timeStr.substring(0, 5); // Ví dụ: "14:30:00" -> "14:30"
 
-            // 5. Sử dụng escapeHtml cho các dữ liệu văn bản để bảo mật
+            // 5. Sử dụng escapeHtml cho các dữ liệu văn bản để bảo mậtif
             // Giả sử `response.teamPost.description` được phép chứa HTML an toàn, nếu không cũng cần được làm sạch
             return `<div class="card-header card">
                 <div class=" flex items-start gap-4 mb-6">

@@ -1218,18 +1218,7 @@
                                         <i class="ri-football-line"></i>
                                         Môn thể thao
                                     </label>
-                                            <select id="editSport" class="form-input">
-          <option value="">Chọn môn thể thao</option>
-          <option value="Bóng đá sân 11" ${response.teamPost.sportType === "Bóng đá sân 11" ? "selected" : ""}>Bóng đá sân 11</option>
-          <option value="Bóng đá sân 7"  ${response.teamPost.sportType === "Bóng đá sân 7" ? "selected" : ""}>Bóng đá sân 7</option>
-          <option value="Bóng đá sân 5"  ${response.teamPost.sportType === "Bóng đá sân 5" ? "selected" : ""}>Bóng đá sân 5</option>
-          <option value="Bóng rổ"        ${response.teamPost.sportType === "Bóng rổ" ? "selected" : ""}>Bóng rổ</option>
-          <option value="Bóng chuyền"    ${response.teamPost.sportType === "Bóng chuyền" ? "selected" : ""}>Bóng chuyền</option>
-          <option value="Cầu lông"       ${response.teamPost.sportType === "Cầu lông" ? "selected" : ""}>Cầu lông</option>
-          <option value="Tennis"         ${response.teamPost.sportType === "Tennis" ? "selected" : ""}>Tennis</option>
-          <option value="table-tennis"   ${response.teamPost.sportType === "table-tennis" ? "selected" : ""}>Bóng bàn</option>
-          <option value="other"          ${response.teamPost.sportType === "other" ? "selected" : ""}>Khác</option>
-        </select>
+                                            <input type="text" id="editSport" class="form-input" value="${response.teamPost.sportType}" readonly>
 
                                     <div class="input-helper">Chọn môn thể thao sẽ chơi</div>
                                 </div>
