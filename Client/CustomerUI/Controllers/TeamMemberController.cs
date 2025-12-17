@@ -227,6 +227,7 @@ namespace CustomerUI.Controllers
                     title = "TeamDetail",
                     content = $"/TeamMember/TeamManage?postId={postId}"
                 });
+                bool check = true;
                 var post = await _teamPost.GetOdataTeamPostAsync($"&$filter=TeamMembers/any(tm: tm/Id eq {memberId})");
                 // nếu là từ chối thì không trừ số thành viên
                     if (status == "Cancel")
@@ -247,21 +248,24 @@ namespace CustomerUI.Controllers
                     }
                     else if (status == "Leave")
                     {
+                    check = false;
                         if (role == "Member")
                         {
                             daletedMemberCount = 1;
                         notifiMessage = $"Một thành viên đã rời khỏi nhóm {post.Value.Select(p => p.Title).FirstOrDefault()} của bạn";
                         messageTitle = "Thành viên đã rời nhóm của bạn";
                             userId = post.Value.Select(p => p.CreatedBy).FirstOrDefault();
-                        }
-                        mesage = "Rời đội thành công!";
+                            check = true;
+                    }
+                        
+                    mesage = "Rời đội thành công!";
                     }
                 // gửi thông báo cho thành viên bị xóa hoặc từ chối hoặc rời đội
                 
                 
                
                 var result = await _teamMember.DeleteTeamMember(memberId, postId);
-                if (role != "Waiting")
+                if (check)
                 {
                     _ = await _notificationService.SendNotificationToUserAsync(
                   new CreateNotificationDto

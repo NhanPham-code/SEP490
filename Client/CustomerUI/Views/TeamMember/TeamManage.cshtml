@@ -272,33 +272,56 @@
         }
 
 
-        function renderBtn(member, leader){
-            if (member.role === "Waiting" && leader > 0){
-                  return `
-        <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
-                id="btn-confirm"
-                data-member-id="${member.id}"
-                data-member-role="${member.role}">
-            <i class="ri-check-line mr-1"></i>
-            Chấp Nhận
-        </button>
-        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
-                id="btn-cancel"
-                data-member-id="${member.id}"
-                data-member-role="${member.role}">
-            <i class="ri-close-line"></i>
-            Từ chối
-        </button>`;
-
-            }
-            else if(leader > 0 && member.role === "Member"){
+                function renderBtn(member, leader) {
+            if (member.role === "Waiting" && leader > 0) {
                 return `
-                        <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1" id="btn-removed" data-member-id="${member.id}" data-member-role="${member.role}">
+                    <button class="btn-secondary text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 btn-action"
+                            id="btn-confirm-${member.id}"
+                            data-member-id="${member.id}"
+                            data-member-role="${member.role}"
+                            data-action="confirm">
+                        <span class="btn-content">
+                            <i class="ri-check-line mr-1"></i>
+                            Chấp Nhận
+                        </span>
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                            Đang xử lý...
+                        </span>
+                    </button>
+                    <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 btn-action"
+                            id="btn-cancel-${member.id}"
+                            data-member-id="${member.id}"
+                            data-member-role="${member.role}"
+                            data-action="cancel">
+                        <span class="btn-content">
+                            <i class="ri-close-line mr-1"></i>
+                            Từ chối
+                        </span>
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                            Đang xử lý...
+                        </span>
+                    </button>`;
+            }
+            else if (leader > 0 && member.role === "Member") {
+                return `
+                    <button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1 btn-action"
+                            id="btn-removed-${member.id}"
+                            data-member-id="${member.id}"
+                            data-member-role="${member.role}"
+                            data-action="remove">
+                        <span class="btn-content">
                             <i class="ri-delete-bin-line mr-1"></i>
                             Xóa thành viên
-                        </button>`;
-            }else {
-                return``;
+                        </span>
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                            Đang xử lý...
+                        </span>
+                    </button>`;
+            } else {
+                return ``;
             }
         }
 
