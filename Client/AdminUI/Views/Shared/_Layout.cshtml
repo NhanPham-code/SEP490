@@ -160,14 +160,6 @@
                         </a>
                     </li>
                     <li>
-                        <a asp-controller="Notification" asp-action="Index" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Notifications" ? "active" : "")">
-                            <i class="ri-notification-line"></i> <span>Thông Báo</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "Notifications")
-                            {
-                                <div class="nav-indicator"></div>
-                            }
-                        </a>
-                    </li>
-                    <li>
                         <a asp-controller="Fee" asp-action="FeeManagement" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "FeeManagement" ? "active" : "")">
                             <i class="ri-bill-line"></i> <span>Cước Phí</span> @if (ViewContext.RouteData.Values["action"]?.ToString() == "FeeManagement")
                             {

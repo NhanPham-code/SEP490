@@ -308,6 +308,9 @@
                 ? `Đã hết hạn: <strong>${new Date(d.endDate).toLocaleDateString('vi-VN')}</strong>`
                 : `Hạn sử dụng: <strong>${new Date(d.endDate).toLocaleDateString('vi-VN')}</strong>`;
 
+            const maxDiscountDisplay = d.maxDiscountAmount === 0
+                ? 'Không giới hạn'
+                : `${d.maxDiscountAmount.toLocaleString('vi-VN')}đ`;
             card.innerHTML = `
                 <div class="card-main">
                     <div class="icon-wrapper"><i class="${iconClass}"></i></div>
@@ -320,7 +323,7 @@
                      <div class="footer-item"><i class="fas fa-futbol fa-fw"></i><span>${applicableStadiums}</span></div>
                      <div class="footer-item"><i class="fas fa-calendar-alt fa-fw"></i><span>${expiryDateHtml}</span></div>
                      <div class="footer-item"><i class="fas fa-tag fa-fw"></i><span>Đơn tối thiểu: <strong>${d.minOrderAmount.toLocaleString('vi-VN')}đ</strong></span></div>
-                     <div class="footer-item"><i class="fas fa-shield-halved fa-fw"></i><span>Giảm tối đa: <strong>${d.maxDiscountAmount.toLocaleString('vi-VN')}đ</strong></span></div>
+                     <div class="footer-item"><i class="fas fa-shield-halved fa-fw"></i><span>Giảm tối đa: <strong>${maxDiscountDisplay}</strong></span></div>
                 </div>`;
             return card;
         }

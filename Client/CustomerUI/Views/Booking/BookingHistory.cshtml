@@ -744,7 +744,7 @@
             <div class="bh-filters">
                 <div class="bh-filter-group">
                     <label for="bh-stadiumFilter"><i class="fa-solid fa-futbol"></i></label>
-                    <select id="bh-stadiumFilter" onchange="loadBookings(1)">
+                    <select id="bh-stadiumFilter" onchange="reloadAllTables()">
                         <option value="0">Tất cả sân vận động</option>
                         @foreach (var stadium in stadiums)
                         {
@@ -762,7 +762,7 @@
                 </div>
                 <div class="bh-filter-group">
                     <label for="bh-statusFilter"><i class="fa-solid fa-flag"></i></label>
-                    <select id="bh-statusFilter" onchange="loadBookings(1)">
+                    <select id="bh-statusFilter" onchange="reloadAllTables()">
                         <option value="all">Tất cả trạng thái</option>
                         <option value="waiting">Chờ thanh toán</option>
                         <option value="accepted">Đã nhận / Sắp tới</option>
@@ -916,7 +916,15 @@
 
             // --- 5. SỰ KIỆN FILTER CHUNG ---
             // Khi đổi Filter Status hoặc Sân -> Reload cả 2 bảng về trang 1
-            const triggerReloadAll = () => { loadBookings(1); loadMonthlyBookings(1); };
+            window.reloadAllTables = function() {
+                console.log("Đang filter lại cả 2 bảng...");
+
+                // 1. Reset về trang 1 và tải lại Daily
+                loadBookings(1);
+
+                // 2. Reset về trang 1 và tải lại Monthly
+                loadMonthlyBookings(1);
+            };
 
             // --- 6. UI HELPERS (TAB SWITCH) ---
             document.getElementById('bh-bookingTypeFilter').addEventListener('change', function() {

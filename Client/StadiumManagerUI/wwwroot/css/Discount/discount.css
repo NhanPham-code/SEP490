@@ -928,3 +928,110 @@
         padding: 1rem;
     }
 }
+
+.status-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+
+.status-popup {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: popupFadeIn 0.3s ease-out;
+}
+
+.status-icon-box {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.status-success {
+    color: #22c55e;
+}
+
+.status-error {
+    color: #ef4444;
+}
+
+.status-loading {
+    color: #3b82f6;
+}
+
+@@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Fix lỗi trượt: Tắt smooth scroll trên modal */
+.modal {
+    scroll-behavior: auto !important;
+    overscroll-behavior: contain;
+}
+/* --- CSS CHO POPUP XÁC NHẬN (Làm đẹp nút bấm) --- */
+#confirmPopup .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Khoảng cách giữa 2 nút */
+    margin-top: 25px;
+}
+
+#confirmPopup button {
+    border: none;
+    padding: 10px 24px; /* Nút to hơn, dễ bấm */
+    border-radius: 8px; /* Bo góc mềm mại */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease; /* Hiệu ứng mượt khi di chuột */
+    outline: none;
+}
+
+/* Nút Hủy: Màu xám nhạt, chữ đen */
+#confirmPopup .btn-cancel {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #e5e7eb; /* Viền mỏng tinh tế */
+}
+
+    #confirmPopup .btn-cancel:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+
+/* Nút Đồng ý: Màu xanh, chữ trắng, có bóng đổ nhẹ */
+#confirmPopup .btn-save {
+    background-color: #3b82f6 !important; /* Dùng !important để đè style cũ nếu có */
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4); /* Bóng đổ xanh */
+}
+
+    #confirmPopup .btn-save:hover {
+        background-color: #2563eb !important;
+        transform: translateY(-2px); /* Nhấc nút lên nhẹ khi hover */
+        box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.5);
+    }
+
+    #confirmPopup .btn-save:active {
+        transform: translateY(0); /* Nhấn xuống khi click */
+    }
+
