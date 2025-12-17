@@ -916,6 +916,20 @@ hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:r
                                     <p class="text-xs text-slate-400">Lịch chơi sắp đến</p>
                                 </div>
                             </a>
+
+                            <!--- Discount -->
+                            <a asp-controller="Discount" asp-action="DiscountList"
+                               x-on:click="userMenuOpen = false"
+                               class="flex items-center px-4 py-3 text-slate-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all duration-200 group">
+                                <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-orange-200 transition-colors">
+                                    <i class="ri-coupon-3-line text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Mã giảm giá</span>
+                                    <p class="text-xs text-slate-400">Kho ưu đãi của bạn</p>
+                                </div>
+                            </a>
+
                             <!-- Settings -->
                             <button id="chat-with-admin-btn" type="button"
                                     class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group w-full">
