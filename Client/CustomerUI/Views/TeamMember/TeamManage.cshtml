@@ -313,6 +313,7 @@
                     <span>Đang xử lý...</span>
                 </span>
             `;
+            $('button[id^="btn-"]').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
         }
 
         // Hàm ẩn loading
@@ -348,6 +349,7 @@
                     showNotification("Có lỗi xảy ra, vui lòng thử lại!");
                 },
                 complete: function() {
+                    $('button[id^="btn-"]').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
                     // Ẩn loading cho tất cả các nút
                     document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
                         if (btn.disabled) {

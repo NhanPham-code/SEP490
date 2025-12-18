@@ -256,7 +256,12 @@ namespace StadiumManagerUI.Controllers
                 }
                 string stadiumText = uniqueStadiumNames.Any() ? string.Join(", ", uniqueStadiumNames) : "các sân được chọn";
 
-                // 2. Gửi Notification (Logic cũ)
+                // Logic check text hiển thị max discount
+                string maxDiscountText = discount.MaxDiscountAmount == 0
+                                         ? "Giảm không giới hạn"
+                                         : $"Tối đa {discount.MaxDiscountAmount:N0}đ";
+
+                // 2. Gửi Notification 
                 var notification = new CreateNotificationDto
                 {
                     UserId = targetUserId,
@@ -267,7 +272,7 @@ namespace StadiumManagerUI.Controllers
                 };
                 await _notificationService.SendNotificationToUserAsync(notification);
 
-                // 3. Gửi Email (NEW)
+                // 3. Gửi Email
                 try
                 {
                     // Lấy thông tin user để lấy Email
@@ -276,16 +281,16 @@ namespace StadiumManagerUI.Controllers
                     {
                         string subject = $"[Sportivey] Mã giảm giá riêng cho bạn: {discount.Code}";
                         string msgBody = $@"
-                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
-                    <p>Chúc mừng! Bạn vừa nhận được một mã giảm giá đặc biệt từ Sportivey.</p>
-                    <div style='background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px dashed #6366f1; margin: 15px 0;'>
-                        <h2 style='color: #4f46e5; margin: 0;'>{discount.Code}</h2>
-                        <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
-                        <p><strong>Áp dụng tại:</strong> {stadiumText}</p>
-                        <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
-                    </div>
-                    <p>Hãy nhanh tay sử dụng trước khi hết hạn nhé!</p>
-                ";
+            <p>Xin chào <strong>{user.FullName}</strong>,</p>
+            <p>Chúc mừng! Bạn vừa nhận được một mã giảm giá đặc biệt từ Sportivey.</p>
+            <div style='background: #eef2ff; padding: 15px; border-radius: 8px; border: 1px dashed #6366f1; margin: 15px 0;'>
+                <h2 style='color: #4f46e5; margin: 0;'>{discount.Code}</h2>
+                <p><strong>Giảm:</strong> {discount.PercentValue}% ({maxDiscountText}, áp dụng cho đơn từ {discount.MinOrderAmount:N0}đ)</p>
+                <p><strong>Áp dụng tại:</strong> {stadiumText}</p>
+                <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
+            </div>
+            <p>Hãy nhanh tay sử dụng trước khi hết hạn nhé!</p>
+        ";
                         // Link trỏ về trang chủ hoặc trang đặt sân
                         string actionLink = "https://localhost:7128/";
                         await _emailService.SendEmailAsync(user.Email, subject, msgBody, actionLink, "Đặt Sân Ngay");
@@ -302,6 +307,11 @@ namespace StadiumManagerUI.Controllers
                      discount.StadiumIds != null && discount.StadiumIds.Any())
             {
                 Console.WriteLine($"[Batch] Bắt đầu xử lý batch cho sân: {string.Join(", ", discount.StadiumIds)}");
+
+                // Logic check text hiển thị max discount
+                string maxDiscountText = discount.MaxDiscountAmount == 0
+                                         ? "Giảm không giới hạn"
+                                         : $"Tối đa {discount.MaxDiscountAmount:N0}đ";
 
                 // Dictionary: UserId -> List<Tên Sân>
                 var usersAndTheirFavoriteStadiums = new Dictionary<int, List<string>>();
@@ -333,7 +343,7 @@ namespace StadiumManagerUI.Controllers
 
                 if (!usersAndTheirFavoriteStadiums.Any()) return;
 
-                // 2. Gửi Notification Batch (Logic cũ)
+                // 2. Gửi Notification Batch 
                 var notificationsToSendInBatch = new List<CreateNotificationDto>();
                 foreach (var kvp in usersAndTheirFavoriteStadiums)
                 {
@@ -372,20 +382,19 @@ namespace StadiumManagerUI.Controllers
 
                             string subject = $"[Sportivey] Ưu đãi mới từ sân {favStadiums}: {discount.Code}";
                             string msgBody = $@"
-                        <p>Xin chào <strong>{userProfile.FullName}</strong>,</p>
-                        <p>Sân vận động bạn yêu thích (<strong>{favStadiums}</strong>) vừa tung ra mã giảm giá mới!</p>
-                        
-                        <div style='background: #ecfdf5; padding: 15px; border-radius: 8px; border: 1px dashed #10b981; margin: 15px 0;'>
-                            <h2 style='color: #059669; margin: 0;'>{discount.Code}</h2>
-                            <p><strong>Giảm:</strong> {discount.PercentValue}% (Tối đa {discount.MaxDiscountAmount}đ, áp dụng cho đơn từ {discount.MinOrderAmount}đ)</p>
-                            <p><strong>Áp dụng tại:</strong> {favStadiums}</p>
-                            <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
-                        </div>
-                        <p>Số lượng có hạn, hãy đặt sân ngay bây giờ!</p>
-                    ";
+                <p>Xin chào <strong>{userProfile.FullName}</strong>,</p>
+                <p>Sân vận động bạn yêu thích (<strong>{favStadiums}</strong>) vừa tung ra mã giảm giá mới!</p>
+                
+                <div style='background: #ecfdf5; padding: 15px; border-radius: 8px; border: 1px dashed #10b981; margin: 15px 0;'>
+                    <h2 style='color: #059669; margin: 0;'>{discount.Code}</h2>
+                    <p><strong>Giảm:</strong> {discount.PercentValue}% ({maxDiscountText}, áp dụng cho đơn từ {discount.MinOrderAmount:N0}đ)</p>
+                    <p><strong>Áp dụng tại:</strong> {favStadiums}</p>
+                    <p><strong>Hạn dùng:</strong> {discount.EndDate:dd/MM/yyyy}</p>
+                </div>
+                <p>Số lượng có hạn, hãy đặt sân ngay bây giờ!</p>
+            ";
 
-                            // Gửi mail (Lưu ý: Gửi trong vòng lặp có thể chậm nếu list user quá lớn. 
-                            // Tốt nhất nên dùng Hangfire/BackgroundJob, nhưng ở đây gửi trực tiếp thì chấp nhận await từng cái hoặc Task.WhenAll)
+                            // Gửi mail
                             await _emailService.SendEmailAsync(userProfile.Email, subject, msgBody, "https://localhost:7128/", "Săn Deal Ngay");
                             Console.WriteLine($"[EmailBatch] Đã gửi cho {userProfile.Email}");
                         }
