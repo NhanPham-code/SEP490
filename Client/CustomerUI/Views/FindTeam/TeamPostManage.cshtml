@@ -129,7 +129,7 @@
             showLoading();
             loadMyPost();
                     // Lắng nghe sự kiện click trên toàn bộ #post-list
-        $('#post-list').on('click', function(event) {
+               $('#post-list').on('click', function(event) {
 
             // Tìm phần tử gần nhất có class 'btn-edit' hoặc 'btn-delete' so với nơi đã click
             const editButton = event.target.closest('.btn-edit');
@@ -144,6 +144,10 @@
                 const postId = $(editButton).data('post-id');
 
                 console.log('Chỉnh sửa bài đăng ID:', postId);
+
+                // Hiển thị loading
+                showButtonLoading(editButton, 'Đang mở.. .');
+
                 openEdit(postId); // Gọi hàm của bạn
             }
 
@@ -156,7 +160,11 @@
                 const postId = $(deleteButton).data('post-id');
 
                 console.log('Xóa bài đăng ID:', postId);
-                openDeleteModal(postId); // Gọi hàm xóa của bạn
+
+                // Hiển thị loading
+                showButtonLoading(deleteButton, 'Đang xác nhận...');
+
+                openDeleteModal(postId, deleteButton); // Truyền button vào
             }
         });
         });
@@ -235,11 +243,9 @@
             } 
         }
 
-        function renderButton(isHidden, postId){
+               function renderButton(isHidden, postId){
             if(isHidden === 1){
-                return `
-
-                `;
+                return ``;
             }
             else {
                 return`
@@ -766,10 +772,13 @@
         }
 
         //delete pot
-        function openDeleteModal(postId) {
+                function openDeleteModal(postId, deleteButton) {
+            // Khôi phục nút trước khi hiển thị modal
+            hideButtonLoading(deleteButton);
+
             Swal.fire({
                 title: 'Xóa Bài Đăng',
-                text: 'Bạn có chắc chắn muốn xóa bài đăng này? Hành động này không thể hoàn tác.',
+                text: 'Bạn có chắc chắn muốn xóa bài đăng này?  Hành động này không thể hoàn tác.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Xóa',
@@ -777,34 +786,41 @@
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6b7280',
                 customClass: {
-                    confirmButton: 'enhanced-confirm-btn',
+                    confirmButton:  'enhanced-confirm-btn',
                     cancelButton: 'enhanced-cancel-btn',
                     popup: 'enhanced-popup'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Call your delete function here
-                    deleteTeamPost(postId);
+                    // Hiển thị loading trên nút xóa trong modal
+                    deleteTeamPost(postId, deleteButton);
                 }
             });
         }
 
         //delete function
-        function deleteTeamPost(postId) {
+        function deleteTeamPost(postId, deleteButton) {
             $.ajax({
                 url: `/FindTeam/DeleteTeamPost?postId=${postId}`,
                 type: 'DELETE',
+                beforeSend: function() {
+                    // Hiển thị loading nếu có button
+                    if (deleteButton) {
+                        showButtonLoading(deleteButton, 'Đang xóa...');
+                    }
+                },
                 success: function(response) {
-                    if (response.message == 200) {
-                        loadMyPost();
+                    if (response. message == 200) {
                         // Remove the post card from the UI with animation
-                        const postCard = document.getElementById(`post-${postId}`);
+                        const postCard = document. getElementById(`post-${postId}`);
                         if (postCard) {
                             postCard.style.transition = 'all 0.5s ease';
                             postCard.style.transform = 'scale(0.8) rotate(5deg)';
                             postCard.style.opacity = '0';
                             setTimeout(() => {
                                 postCard.remove();
+                                loadMyPost();
+
                                 // Optionally, show a success message
                                 Swal.fire({
                                     icon: 'success',
@@ -815,6 +831,11 @@
                             }, 500);
                         }
                     } else {
+                        // Khôi phục nút nếu có lỗi
+                        if (deleteButton) {
+                            hideButtonLoading(deleteButton);
+                        }
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
@@ -824,6 +845,11 @@
                     }
                 },
                 error: function() {
+                    // Khôi phục nút khi có lỗi
+                    if (deleteButton) {
+                        hideButtonLoading(deleteButton);
+                    }
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Lỗi!',
@@ -834,6 +860,25 @@
             });
         }
 
+                // Hàm hiển thị loading trên nút
+        function showButtonLoading(button, loadingText = 'Đang xử lý...') {
+            button.disabled = true;
+            button.dataset.originalContent = button.innerHTML;
+            button.innerHTML = `
+                <span class="inline-flex items-center gap-2">
+                    <i class="ri-loader-4-line animate-spin"></i>
+                    <span>${loadingText}</span>
+                </span>
+            `;
+        }
+
+        // Hàm ẩn loading trên nút
+        function hideButtonLoading(button) {
+            button.disabled = false;
+            if (button.dataset.originalContent) {
+                button.innerHTML = button.dataset.originalContent;
+            }
+        }
 
         //edit post
         function openEdit(id) {
