@@ -44,11 +44,7 @@ namespace DiscountAPI.Service
 
         public async Task<ReadDiscountDTO> CreateAsync(CreateDiscountDTO dto)
         {
-            var existingDiscount = await _repository.GetByCodeAsync(dto.Code);
-            if (existingDiscount != null)
-            {
-                throw new InvalidOperationException($"Discount with code '{dto.Code}' already exists.");
-            }
+
 
             var entity = _mapper.Map<Discount>(dto);
             var created = await _repository.CreateAsync(entity);
@@ -61,14 +57,6 @@ namespace DiscountAPI.Service
             if (entity == null)
                 throw new KeyNotFoundException($"Discount with ID {dto.Id} not found.");
 
-            if (!string.Equals(entity.Code, dto.Code, StringComparison.OrdinalIgnoreCase))
-            {
-                var existingDiscount = await _repository.GetByCodeAsync(dto.Code);
-                if (existingDiscount != null && existingDiscount.Id != dto.Id)
-                {
-                    throw new InvalidOperationException($"Discount with code '{dto.Code}' already exists for another discount.");
-                }
-            }
 
             // Map các trường đơn lẻ
             _mapper.Map(dto, entity);

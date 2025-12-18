@@ -93,7 +93,10 @@
                     <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-info-circle"></i> Thông tin cơ bản</h3>
                         <div class="form-grid">
-                            <div class="form-group"><label class="form-label">Mã Discount *</label><input type="text" class="form-control" id="discountCode" required></div>
+                            <div class="form-group">
+                                <label class="form-label">Mã Discount * (Tối đa 12 ký tự)</label>
+                                <input type="text" class="form-control" id="discountCode" maxlength="12" required>
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">Loại Discount *</label>
                                 <select class="form-control" id="codeType" required onchange="toggleSections()">
@@ -575,6 +578,20 @@
 
             async function handleFormSubmit(event) {
                 event.preventDefault();
+                const codeInput = document.getElementById('discountCode');
+                // Xóa khoảng trắng thừa
+                const codeValue = codeInput.value.trim();
+
+                if (codeValue.length > 12) {
+                    stopScrollMomentumAndTop();
+                    showStatusPopup('error', 'Mã giảm giá không được quá 15 ký tự.');
+                    setTimeout(hideStatusPopup, 1500);
+                    // Focus lại ô nhập liệu
+                    setTimeout(() => codeInput.focus(), 1600);
+                    return;
+                }
+
+
                 const percentInput = document.getElementById('percentValue');
                 const percentVal = parseFloat(percentInput.value);
 
