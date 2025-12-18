@@ -2533,3 +2533,22 @@ body {
     text-decoration: underline;
     font-size: large;
 }
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Optional: Thêm effect khi nút đang load */
+button: disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

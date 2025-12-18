@@ -411,9 +411,11 @@
                     if (searchParams.play_date) {
                         url += `and PlayDate eq ${searchParams.play_date} `;
                     }
-                    if (searchParams.play_time) {
-                        url += `and TimePlay eq ${searchParams.play_time} `;
-                    }
+                          if (searchParams.play_time) {
+          const [h, m = '0'] = String(searchParams.play_time).split(':');
+          const literal = `duration'PT${Number(h)}H${Number(m)}M0S'`;
+          url += `and TimePlay eq ${literal} `;
+        }
                     if (searchParams.price_max) {
                         url += `and PricePerPerson le ${searchParams.price_max} `;
                     }
@@ -433,7 +435,7 @@
 
                     // Gửi yêu cầu AJAX với dữ liệu đã được sửa
                     $.ajax({
-                        url: '/FindTeam/GetAllAndSearch',
+                        url: '/FindTeam/JoinedTeamPost',
                         type: 'GET',
                         data: { url: url },
 
@@ -540,7 +542,7 @@
                 url = `&top = 6 &skip = 0`;
             }
             $.ajax({
-                url: '/FindTeam/GetAllAndSearch',
+                url: '/FindTeam/JoinedTeamPost',
                 type: 'GET',
                 data: { url: url },
                 success: function(response) {
@@ -789,8 +791,11 @@
             if (post.joinedPlayers >= post.neededPlayers) {
                 return `<button class="btn btn-warning" disabled>Đã đủ người</button>`;
             }
-            if (hidden[post.id] === 2) {
-                return `<button class="btn btn-warning btn-joined">Đã Tham gia</button>`;
+             if (hidden[post.id] === 2) {
+                return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-warning btn-joined">Đang chờ duyệt</a>`;
+            }
+            if (hidden[post.id] === 3) {
+                return `<a href="/TeamMember/TeamManage?postId=${post.id}" class="btn btn-warning btn-joined">Đã Tham gia</a>`;
             }
             if (hidden[post.id] === 0 || post.joinedPlayers < post.neededPlayers) {
                 return `

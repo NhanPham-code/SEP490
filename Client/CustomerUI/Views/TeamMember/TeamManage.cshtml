@@ -68,17 +68,17 @@
 
     <div class="back max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-8">
         <!-- From Uiverse.io by cssbuttons-io -->
-        
+
         <div class="shadow-soft p-8">
             <!-- From Uiverse.io by Rahulcheryala -->
             <!-- From Uiverse.io by alexmaracinaru -->
             <button onclick="goBack()" class="cta">
-          
+
                 <span class="hover-underline-animation">
                     <svg id="arrow-horizontal" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.0003 13.0001L22.0004 11.0002L5.82845 11.0002L9.77817 7.05044L8.36396 5.63623L2 12.0002L8.36396 18.3642L9.77817 16.9499L5.8284 13.0002L22.0003 13.0001Z"></path></svg>
                     Quay lại
                 </span>
-                
+
             </button>
 
         </div>
@@ -90,12 +90,11 @@
         <div class="mb-8">
             <div class="glass-card rounded-3xl shadow-soft p-8">
                 <div id="post-detail" class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                    
                 </div>
             </div>
         </div>
 
-        
+
 
         <!-- Members Grid -->
         <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -118,7 +117,7 @@
         </div>
     </div>
 
-   
+
 
 
     <!-- JavaScript -->
@@ -153,15 +152,15 @@
                     .catch(err => console.error("[SignalR] ❌ Lỗi khi kết nối (Có thể do thiếu AccessToken):", err));
             }
 
-        // quay ve url truoc do 
+        // quay ve url truoc do
         function goBack() {
             window.location.href = '@Html.Raw(oldUrl)';
         }
 
-        
+
 
         // Sample data based on ReadTeamMemberDTO - Vietnamese names
-       
+
         let editingMemberId = null;
         let memberToDelete = null;
 
@@ -215,7 +214,7 @@
         function renderMemberCard(members, profile, leader) {
             console.log(profile);
             console.log(members);
-      
+
             if (members.length === 0) {
                 membersContainer.classList.add('hidden');
                 emptyState.classList.remove('hidden');
@@ -225,7 +224,7 @@
             membersContainer.classList.remove('hidden');
             emptyState.classList.add('hidden');
 
-            
+
 
             membersContainer.innerHTML = members.map(member => `
                 <div class="member-card glass-card rounded-3xl shadow-soft p-6" data-member-id="${member.id}">
@@ -241,7 +240,7 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
-     
+
                         </div>
                     </div>
 
@@ -265,7 +264,7 @@
 
                     <div class="flex gap-2">
                     ${renderBtn(member, leader)}
-                        
+
                     </div>
                 </div>
             `).join("");
@@ -303,15 +302,36 @@
         }
 
         // chấp nhận, từ chối hoặc xóa thành viên
+                // Hàm hiển thị loading
+        function showLoading(button) {
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.dataset.originalContent = originalContent;
+            button.innerHTML = `
+                <span class="inline-flex items-center gap-2">
+                    <i class="ri-loader-4-line animate-spin"></i>
+                    <span>Đang xử lý...</span>
+                </span>
+            `;
+        }
+
+        // Hàm ẩn loading
+        function hideLoading(button) {
+            button.disabled = false;
+            if (button.dataset.originalContent) {
+                button.innerHTML = button.dataset.originalContent;
+            }
+        }
+
+        // chấp nhận, từ chối hoặc xóa thành viên
         function changeMemberStatus(memberId, newStatus, role) {
-            console.log("memberId: ", memberId);
+            console.log("memberId:  ", memberId);
             const postId = @postId; // Lấy postId từ ViewBag hoặc Model
-            $.ajax({
+            $. ajax({
                 url: `/TeamMember/ChangeStatusMember?memberId=${memberId}&postId=${postId}&status=${newStatus}&role=${role}`,
                 type: 'GET',
                 success: function(response) {
                     if(response.message === 500){
-
                         showNotification("Lỗi hệ thống, vui lòng thử lại sau!");
                         return;
                     }
@@ -322,10 +342,18 @@
                         loadMember();
                         displayPostDetail();
                     }
-
                 },
                 error: function() {
-                    console.error('Error loading posts');
+                    console. error('Error loading posts');
+                    showNotification("Có lỗi xảy ra, vui lòng thử lại!");
+                },
+                complete: function() {
+                    // Ẩn loading cho tất cả các nút
+                    document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
+                        if (btn.disabled) {
+                            hideLoading(btn);
+                        }
+                    });
                 }
             });
         }
@@ -408,13 +436,13 @@
                 data: { page: 1, pageSize: 10 },
                 success: function(response) {
                     if(response.message === 500){
-            
+
                         document.getElementById('members-container').innerHTML = `<div class="member-card glass-card rounded-3xl shadow-soft p-6">Không có thành viên nào</div>`;
                         return;
                     }
                     $('#post-list').html(response);
                     console.log(response);
-                    
+
                     renderMemberCard(response.teamMembers, response.users, response.leaderId);
 
                     // Update results count
@@ -436,40 +464,48 @@
 
             connectToSignalR();
 
-          
+
 
         });
 
-               $(document).on("click", "#btn-confirm", function(e) {
-            const memberId = parseInt(this.dataset.memberId);
-                        const role = this.dataset.memberRole;
-
-            changeMemberStatus(memberId, "Member", role);
-        });
-
-
-            // nut tu choi
-                         $(document).on("click", "#btn-cancel", function(e) {
-            const memberId = parseInt(this.dataset.memberId);
-                        const role = this.dataset.memberRole;
-
-            changeMemberStatus(memberId, "Cancel", role);
-        });
-
-         $(document).on("click", "#btn-leave", function(e) {
+                   $(document).on("click", "#btn-confirm", function(e) {
+            e.preventDefault();
             const memberId = parseInt(this.dataset.memberId);
             const role = this.dataset.memberRole;
 
+            showLoading(this);
+            changeMemberStatus(memberId, "Member", role);
+        });
 
+        // nút từ chối
+        $(document).on("click", "#btn-cancel", function(e) {
+            e.preventDefault();
+            const memberId = parseInt(this. dataset.memberId);
+            const role = this.dataset.memberRole;
+
+            showLoading(this);
+            changeMemberStatus(memberId, "Cancel", role);
+        });
+
+        // nút thoát nhóm
+        $(document).on("click", "#btn-leave", function(e) {
+            e.preventDefault();
+            const memberId = parseInt(this.dataset.memberId);
+            const role = this.dataset. memberRole;
+
+            showLoading(this);
             changeMemberStatus(memberId, "Leave", role);
         });
-        $(document).on("click", "#btn-removed", function(e) {
-            const memberId = parseInt(this.dataset.memberId);
-                        const role = this.dataset.memberRole;
 
+        // nút xóa thành viên
+        $(document).on("click", "#btn-removed", function(e) {
+            e.preventDefault();
+            const memberId = parseInt(this.dataset.memberId);
+            const role = this.dataset.memberRole;
+
+            showLoading(this);
             changeMemberStatus(memberId, "Delete", role);
         });
-
 
 
                 // 1. Truyền postId vào hàm để tạo URL động
@@ -548,7 +584,7 @@
                 <div class=" flex items-start gap-4 mb-6">
                     <div class="player-avatar">
                         <img src="https://localhost:7136/${escapeHtml(response.user.avatarUrl)}" alt="${escapeHtml(response.user.fullName)}">
-                        
+
                     </div>
                     <div class="flex-1">
                         <h3 class="font-semibold text-gray-900 text-lg">${escapeHtml(response.user.fullName)}</h3>
@@ -595,49 +631,69 @@
             </div>`;
         }
         //join team
-         function joindTeam(postId){
+                 function joindTeam(postId){
+            // Tìm nút "Tham Gia" và hiển thị loading
+            const joinButton = event.target;
+            const originalContent = joinButton.innerHTML;
 
+            joinButton.disabled = true;
+            joinButton. innerHTML = `
+                <span class="inline-flex items-center gap-2">
+                    <i class="ri-loader-4-line animate-spin"></i>
+                    <span>Đang tham gia... </span>
+                </span>
+            `;
 
+            // Gửi yêu cầu AJAX để tham gia bài đăng
+            $.ajax({
+                url: '/FindTeam/JoinTeamPost',
+                type: 'POST',
+                data: { postId: postId },
+                success: function(response) {
+                    if (response.message === 200) {
+                        showNotification('Đã gửi yêu cầu!  và đang chờ chủ bài đăng chấp nhận', 'success');
 
-                // Gửi yêu cầu AJAX để tham gia bài đăng
-                $.ajax({
-                    url: '/FindTeam/JoinTeamPost',
-                    type: 'POST',
-                    data: { postId: postId },
-                    success: function(response) {
-                        if (response.message === 200) {
-                            showNotification('Đã gửi yêu cầu! và đang chờ chủ bài đăng chấp nhận', 'success');
-                            
-                            // Cập nhật lại danh sách bài đăng sau khi tham gia
-                                                     displayPostDetail();
-            loadMember();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi!',
-                                text: response.message,
-                                confirmButtonColor: '#ef4444'
-                            });
-                        }
-                    },
-                    error: function() {
+                        // Cập nhật lại danh sách bài đăng sau khi tham gia
+                        displayPostDetail();
+                        loadMember();
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
-                            text: 'Đã xảy ra lỗi khi tham gia bài đăng. Vui lòng thử lại.',
+                            text: response.message,
                             confirmButtonColor: '#ef4444'
                         });
+
+                        // Khôi phục nút nếu có lỗi
+                        joinButton.disabled = false;
+                        joinButton. innerHTML = originalContent;
                     }
-                });
+                },
+                error: function() {
+                    Swal. fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi tham gia bài đăng. Vui lòng thử lại.',
+                        confirmButtonColor: '#ef4444'
+                    });
+
+                    // Khôi phục nút khi có lỗi
+                    joinButton.disabled = false;
+                    joinButton.innerHTML = originalContent;
+                },
+                complete: function() {
+                    // Optional: Có thể thêm logic khác khi request hoàn thành
+                }
+            });
         }
 
         // render nút tham gia
         function renderJoinButton(newMember, isLeader, post, memberDTO) {
             if (newMember === 1) {
                 return `
-                <button onClick="joindTeam(${post.id})" 
+                <button onClick="joindTeam(${post.id})"
                 class="smky-btn3 relative hover:text-[#e6e6e6] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#4b46b6] after:rounded-t-full after:w-full after:bottom-0 after:left-0 text-gray-900">Tham Gia</button>
-        
+
             `;
             }if(newMember != 1 && memberDTO.role != "Leader"){
                 return `<button class="btn-danger text-white px-4 py-2 rounded-xl text-sm font-semibold flex-1"
