@@ -1157,7 +1157,7 @@
                                                     let html = '';
                                                     if (data.value && data.value.length > 0) {
                                                         data.value.forEach(function (item) {
-                                                            let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'default.jpg';
+                                                            let imageUrl = item.StadiumImages.length > 0 ? item.StadiumImages[0].ImageUrl : 'img/default.jpg';
                                                             let price = item.Courts.length > 0 ? item.Courts[0].PricePerHour : 0;
                                                             // Removed console.log(item.val) as 'val' is not defined in the data structure
                                                             console.log(item);
@@ -1189,7 +1189,7 @@
                                                                 html += `
                                             <div id="stadium-${item.Id}" class="card-content ${bg} rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
                                                 <div class="relative h-48">
-                                                    <img src="https://localhost:7136/img/${imageUrl || "img/img/default.jpg"}" alt="Stadium" class="w-full h-full object-cover">
+                                                    <img src="https://localhost:7136/img/${imageUrl}" alt="Stadium" class="w-full h-full object-cover">
 
                                                     <!-- Favorite Button -->
                                                     <div class="absolute top-3 left-3 ">

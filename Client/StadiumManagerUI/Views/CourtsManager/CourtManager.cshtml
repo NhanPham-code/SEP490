@@ -285,7 +285,7 @@
                                 loadCourts(stadiumId);
                             },
                             error: function(xhr, status, error) {
-                                showErrorMessage('Không thể thêm sân. Vui lòng thử lại.');
+                                showErrorMessage("Tên sân đã có hoặc bị lỗi khi tạo!");
                             }
                         });
                     }
@@ -1557,7 +1557,6 @@
             function showErrorMessage(text) {
                 Swal.fire({
                     icon: 'error',
-                    title: '<i class="ri-error-warning-line"></i> Lỗi',
                     text: text,
                     confirmButtonColor: '#ef4444',
                     allowOutsideClick: true,
