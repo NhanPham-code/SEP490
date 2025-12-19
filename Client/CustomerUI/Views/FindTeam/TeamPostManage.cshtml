@@ -148,7 +148,7 @@
                 // Hiển thị loading
                 showButtonLoading(editButton, 'Đang mở.. .');
 
-                openEdit(postId); // Gọi hàm của bạn
+                openEdit(postId, editButton); // Gọi hàm của bạn
             }
 
             if (deleteButton) {
@@ -716,7 +716,7 @@
                             { condition: new Date(playDate) < new Date().setHours(0,0,0,0), message: 'Ngày chơi không thể là ngày trong quá khứ' },
                             { condition: !bookingId || bookingId < 1, message: 'Vui lòng nhập ID đặt sân hợp lệ' },
                             { condition: !stadiumName || stadiumName.trim().length <= 0, message: 'Tên sân không được để trống' },
-                            { condition: !pricePerPerson || pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
+                            { condition: pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
 
@@ -800,6 +800,9 @@
 
         //delete function
         function deleteTeamPost(postId, deleteButton) {
+
+            toggleActionButtons(true);
+
             $.ajax({
                 url: `/FindTeam/DeleteTeamPost?postId=${postId}`,
                 type: 'DELETE',
@@ -810,7 +813,10 @@
                     }
                 },
                 success: function(response) {
-                    if (response. message == 200) {
+
+                    toggleActionButtons(false);
+
+                    if (response.message == 200) {
                         // Remove the post card from the UI with animation
                         const postCard = document. getElementById(`post-${postId}`);
                         if (postCard) {
@@ -845,6 +851,7 @@
                     }
                 },
                 error: function() {
+                    toggleActionButtons(false);
                     // Khôi phục nút khi có lỗi
                     if (deleteButton) {
                         hideButtonLoading(deleteButton);
@@ -880,8 +887,24 @@
             }
         }
 
+        // Hàm bật/tắt toàn bộ nút thao tác
+        function toggleActionButtons(disabled) {
+            const buttons = document.querySelectorAll('.btn-edit, .btn-delete');
+            buttons.forEach(btn => {
+                btn.disabled = disabled;
+                if (disabled) {
+                    btn.classList.add('opacity-50', 'cursor-not-allowed'); // Làm mờ nút
+                } else {
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed'); // Khôi phục
+                }
+            });
+        }
+
         //edit post
-        function openEdit(id) {
+        function openEdit(id, btnElement) {
+
+            toggleActionButtons(true);
+
             $.ajax({
                 url: `/FindTeam/GetPostById?postId=${id}`,
                 type: 'GET',
@@ -908,6 +931,14 @@
                     confirmButton: 'enhanced-confirm-btn',
                     cancelButton: 'enhanced-cancel-btn',
                     popup: 'enhanced-popup'
+                },
+                willClose: () => {
+
+                    toggleActionButtons(false);
+
+                    if (btnElement) {
+                        hideButtonLoading(btnElement);
+                    }
                 },
                 didOpen: () => {
                     // Add time and date preview functionality
@@ -1007,8 +1038,8 @@
                         // Validation với error handling
                         const validations = [
                             { condition: !title, message: 'Vui lòng nhập tiêu đề bài đăng' },
-                            { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' }
-
+                            { condition: !neededPlayers || neededPlayers < 1, message: 'Số lượng thành viên cần tìm phải ít nhất 1 người' },
+                            { condition: pricePerPerson < 0, message: 'Giá mỗi người phải là số dương' }
                         ];
                         console.log("validations: ", validations);
                         console.log('value', );
@@ -1046,6 +1077,10 @@
             });
                 },
                 error: function() {
+                    toggleActionButtons(false);
+                    if (btnElement) {
+                        hideButtonLoading(btnElement);
+                    }
                     console.error('Error fetching bookings');
                     Swal.fire({
                         icon: 'error',
