@@ -204,7 +204,7 @@
                     <div class="bm-modal-detail-item"><span class="label"><i class="fas fa-calendar-plus"></i> Ngày tạo</span><span class="value">${new Date(bookingData.createdAt).toLocaleString('vi-VN')}</span></div>
                     <div class="bm-modal-detail-item"><span class="label"><i class="fas fa-flag"></i> Trạng thái</span><span class="value"><span class="bm-status-badge ${getStatusClass(bookingData.status)}">${translateStatus(bookingData.status)}</span></span></div>
                     <div class="bm-modal-detail-item"><span class="label"><i class="fas fa-credit-card"></i> Thanh toán</span><span class="value">${bookingData.paymentMethod || 'Chưa có'}</span></div>
-                    <div class="bm-modal-detail-item bm-full-width"><span class="label"><i class="fas fa-sticky-note"></i> Ghi chú</span><span class="value">${bookingData.note || 'Không có'}</span></div>
+                    <div class="bm-modal-detail-item bm-full-width"><span class="label"><i class="fas fa-sticky-note"></i> Ghi chú</span><span class="value">${[bookingData.note || null,userData.email || null,userData.phone || null].filter(item => item !== null && item !== '' && item !== undefined).join(' - ')}</span></div>
                 </div>
             </div>`;
 
