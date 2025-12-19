@@ -709,6 +709,9 @@
         // ==========================================
         // 4. Async Court Loader (ĐÃ SỬA: PHÂN NHÓM SÂN 7 VÀ SÂN 5)
         // ==========================================
+                JavaScript// ==========================================
+        // 4. Async Court Loader (ĐÃ SỬA: PHÂN NHÓM SÂN 7 VÀ SÂN 5)
+        // ==========================================
         async function loadCourtsAsync(availableCourts, selectedChildIds, parentCourtId, court5Options, parentCourt, courts) {
             const container = document.getElementById('courtsContainer');
             if (!container) return;
@@ -773,7 +776,7 @@
                         });
                         // THÊM LOGIC LỌC SÂN 5 TỰ DO: Chỉ giữ nếu không liên kết hoặc chỉ liên kết DUY NHẤT với sân 11 hiện tại
                         let shouldDisplay = true;
-                        if (court.sportType === "Bóng đá sân 5") {
+                        if (court.sportType === "Bóng đá sân 5" && parentCourt.sportType === "Bóng đá sân 11") {  // Chỉ áp dụng lọc khi parent là 11
                             const hasCourt7Relation = allRelations.some(r => r.parentCourt.sportType === "Bóng đá sân 7");
                             const uniqueCourt11Relation = allRelations.length === 1 && allRelations[0].parentCourtId === parentCourtId && allRelations[0].parentCourt.sportType === "Bóng đá sân 11";
                             if (allRelations.length > 1 || hasCourt7Relation || (allRelations.length === 1 && !uniqueCourt11Relation)) {
