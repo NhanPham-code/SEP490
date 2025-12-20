@@ -52,7 +52,6 @@ namespace CustomerUI.Controllers
 
             if (bookingId == null || string.IsNullOrEmpty(accessToken))
             {
-                TempData["ErrorMessage"] = "Phiên làm việc đã hết hạn. Không xác định được đơn đặt sân để cập nhật.";
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
@@ -62,7 +61,6 @@ namespace CustomerUI.Controllers
 
             if (booking == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy đơn đặt sân.";
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
@@ -127,20 +125,13 @@ namespace CustomerUI.Controllers
 
                 if (finalStatus == "accepted")
                 {
-                    TempData["BookingSuccess"] = true;
-                    TempData["SuccessMessage"] = "Đặt sân và thanh toán thành công!";
-
                     // Gửi thông báo cho chủ sân (BOOKING NGÀY)
                     await SendNewBookingNotificationAsync("daily", bookingId.Value, booking.StadiumId);
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Thanh toán không thành công hoặc đã bị hủy.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Đã xảy ra lỗi khi cập nhật đơn đặt sân: {ex.Message}";
+                Console.WriteLine($"Đã xảy ra lỗi khi cập nhật đơn đặt sân: {ex.Message}");
             }
             finally
             {
@@ -169,7 +160,6 @@ namespace CustomerUI.Controllers
 
             if (monthlyBookingId == null || string.IsNullOrEmpty(accessToken))
             {
-                TempData["ErrorMessage"] = "Không xác định được booking hàng tháng để cập nhật.";
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
@@ -179,7 +169,6 @@ namespace CustomerUI.Controllers
 
             if (monthlyBooking == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy booking hàng tháng.";
                 return RedirectToAction("BookingHistory", "Booking");
             }
 
@@ -247,20 +236,15 @@ namespace CustomerUI.Controllers
                         };
                         await _bookingService.UpdateBookingAsync(child.Id, childUpdateDto, accessToken);
                     }
-                    TempData["SuccessMessage"] = "Đặt sân hàng tháng và thanh toán thành công!";
 
                     // *** THAY ĐỔI: GỬI MỘT THÔNG BÁO DUY NHẤT CHO GÓI THÁNG ***
                     // Lời gọi hàm được đưa ra ngoài vòng lặp và sử dụng ID của gói tháng.
                     await SendNewBookingNotificationAsync("monthly", monthlyBookingId.Value, monthlyBooking.StadiumId);
                 }
-                else
-                {
-                    TempData["ErrorMessage"] = "Thanh toán không thành công hoặc bị hủy.";
-                }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Đã xảy ra lỗi khi cập nhật booking: {ex.Message}";
+                Console.WriteLine($"Đã xảy ra lỗi khi cập nhật đơn đặt sân: {ex.Message}");
             }
             finally
             {
