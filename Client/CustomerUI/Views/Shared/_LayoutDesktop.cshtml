@@ -1484,6 +1484,100 @@
         // Các hàm JavaScript khác giữ nguyên
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
+    <script>
+        function initGoogleTranslate() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
+                autoDisplay: false,
+                multilanguagePage: true
+            }, 'google_translate_element');
+
+            // Ẩn banner Google
+            const handleGoogleUI = () => {
+                document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
+                document.body.style.top = '0px';
+            };
+
+            const observer = new MutationObserver(() => handleGoogleUI());
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        // Toggle menu custom
+        const toggleBtn = document.getElementById("translate-toggle");
+        const menu = document.getElementById("translate-menu");
+
+        toggleBtn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add("hidden");
+            }
+        });
+
+
+        document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const lang = btn.getAttribute("data-lang");
+                const select = document.querySelector("#google_translate_element select");
+                if (select) {
+                    select.value = lang;
+                    select.dispatchEvent(new Event("change"));
+                }
+                menu.classList.add("hidden");
+
+
+                setTimeout(() => {
+                    document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+                        el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
+                    });
+                }, 500);
+            });
+        });
+
+
+        document.getElementById("reset-translate-btn").addEventListener("click", function () {
+            document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
+            if (window.localStorage) {
+                localStorage.removeItem('googtrans');
+            }
+            window.location.reload();
+        });
+        (function () {
+            function deleteCookie(name) {
+                try {
+                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+                    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
+                    if (location.hostname.indexOf('.') !== -1) {
+                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
+                    }
+                } catch (e) { console.warn('Cookie delete failed', e); }
+            }
+
+            function stopTranslateAndReload() {
+                // Xóa cookie Google Translate
+                deleteCookie('googtrans');
+
+                // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
+                // Sau đó reload trang để trạng thái dịch bị loại bỏ
+                location.reload();
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('reset-translate-btn');
+                if (!btn) return;
+                btn.addEventListener('click', function () {
+                    btn.disabled = true;
+                    btn.textContent = 'Đang đặt...';
+                    setTimeout(() => {
+                        stopTranslateAndReload();
+                    }, 150);
+                });
+            });
+        })();
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
@@ -2297,101 +2391,6 @@
     </script>
 
 
-
-    <script>
-              function initGoogleTranslate() {
-              new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,vi,ja,ko,zh-CN,fr,de,it,es',
-                autoDisplay: false,
-                multilanguagePage: true
-              }, 'google_translate_element');
-
-              // Ẩn banner Google
-              const handleGoogleUI = () => {
-                document.querySelectorAll('.goog-te-banner-frame, .goog-te-banner').forEach(b => b.remove());
-                document.body.style.top = '0px';
-              };
-
-              const observer = new MutationObserver(() => handleGoogleUI());
-              observer.observe(document.body, { childList: true, subtree: true });
-            }
-
-            // Toggle menu custom
-            const toggleBtn = document.getElementById("translate-toggle");
-            const menu = document.getElementById("translate-menu");
-
-            toggleBtn.addEventListener("click", () => {
-              menu.classList.toggle("hidden");
-            });
-
-            document.addEventListener("click", (e) => {
-              if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.add("hidden");
-              }
-            });
-
-
-            document.querySelectorAll("#translate-menu [data-lang]").forEach(btn => {
-              btn.addEventListener("click", () => {
-                const lang = btn.getAttribute("data-lang");
-                const select = document.querySelector("#google_translate_element select");
-                if (select) {
-                  select.value = lang;
-                  select.dispatchEvent(new Event("change"));
-                }
-                menu.classList.add("hidden");
-
-
-                setTimeout(() => {
-                  document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
-                    el.setAttribute("placeholder", el.getAttribute("data-translate-" + lang) || el.placeholder);
-                  });
-                }, 500);
-              });
-            });
-
-
-            document.getElementById("reset-translate-btn").addEventListener("click", function() {
-            document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
-              if (window.localStorage) {
-                localStorage.removeItem('googtrans');
-              }
-             window.location.reload();
-            });
-             (function () {
-                function deleteCookie(name) {
-                    try {
-                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-                        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname + ";";
-                        if (location.hostname.indexOf('.') !== -1) {
-                            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + location.hostname + ";";
-                        }
-                    } catch (e) { console.warn('Cookie delete failed', e); }
-                }
-
-                function stopTranslateAndReload() {
-                    // Xóa cookie Google Translate
-                    deleteCookie('googtrans');
-
-                    // Thêm nếu bạn gặp cookie khác liên quan: (ví dụ) deleteCookie('googtrans'); deleteCookie('__gtrans');
-                    // Sau đó reload trang để trạng thái dịch bị loại bỏ
-                    location.reload();
-        }
-
-                document.addEventListener('DOMContentLoaded', function () {
-                    const btn = document.getElementById('reset-translate-btn');
-                    if (!btn) return;
-                    btn.addEventListener('click', function () {
-                        btn.disabled = true;
-                        btn.textContent = 'Đang đặt...';
-                        setTimeout(() => {
-                            stopTranslateAndReload();
-                        }, 150);
-                    });
-                });
-            })();
-    </script>
     <div id="incomingCallPopup" class="webrtc-popup-hidden">
         <div class="webrtc-popup-content">
             <div class="webrtc-popup-avatar" id="incomingCallAvatar">👤</div>
