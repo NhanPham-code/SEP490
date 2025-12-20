@@ -28,16 +28,25 @@ window.FaceCapture = (function () {
         // Tinh chỉnh độ nhạy góc quay
         poseFactor: {
             // thẳng
-            straight: 0.15,
+            // tham số:
+            // cũ : 0.15,
+            // mới tối ưu 0.2 để dễ nhận diện hơn
+            straight: 0.2, 
 
             // trái/phải
-            yaw: 0.08,
+            // cũ: 0.08,
+            // mới: 0.05 (dễ hơn)
+            yaw: 0.05,
 
             // pitchUp: Số âm nhỏ (-0.02) để dễ ngẩng hơn (do cam thường đặt thấp)
-            pitchUp: -0.02,
+            // cũ: -0.02,
+            // mới: -0.01 (dễ hơn)
+            pitchUp: -0.01,
 
             // pitchDown: Số dương lớn (0.06) để tránh bị nhận diện nhầm là cúi khi đang nhìn thẳng
-            pitchDown: 0.1,
+            // cũ: 0.1
+            // mới: 0.08 (dễ hơn)
+            pitchDown: 0.08, 
         }
     };
 
