@@ -11,6 +11,8 @@ using DTOs.UserDTO;
 using DTOs.DiscountDTO;
 using DTOs.BookingDTO.ViewModel;
 using StadiumAPI.DTOs;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace CustomerUI.Controllers
 {
@@ -235,11 +237,54 @@ namespace CustomerUI.Controllers
                                     .Distinct().ToList();
 
                 var stadiumLookup = new Dictionary<int, ReadStadiumDTO>();
+
                 if (allStadiumIds.Any())
                 {
-                    var tasks = allStadiumIds.Select(id => _stadiumService.GetStadiumByIdAsync(id));
-                    var results = await Task.WhenAll(tasks);
-                    foreach (var s in results.Where(x => x != null)) stadiumLookup[s.Id] = s;
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    options.Converters.Add(new Iso8601TimeSpanConverter()); // nếu bạn có custom converter cho TimeSpan
+
+                    var tasks = allStadiumIds.Select(id =>
+                    {
+                        // Quan trọng: filter theo Id eq {id}, và chỉ lấy top=1
+                        var filter = $"&$filter=Id eq {id}&$top=1";
+                        return _stadiumService.SearchStadiumAsync(filter);
+                    });
+
+                    var jsonResults = await Task.WhenAll(tasks);
+
+                    foreach (var stadiumsJson in jsonResults)
+                    {
+                        if (string.IsNullOrEmpty(stadiumsJson)) continue;
+
+                        try
+                        {
+                            using (JsonDocument doc = JsonDocument.Parse(stadiumsJson))
+                            {
+                                if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement) &&
+                                    valueElement.ValueKind == JsonValueKind.Array)
+                                {
+                                    var stadiumList = JsonSerializer.Deserialize<List<ReadStadiumDTO>>(
+                                        valueElement.GetRawText(), options) ?? new List<ReadStadiumDTO>();
+
+                                    foreach (var stadium in stadiumList)
+                                    {
+                                        if (stadium != null && !stadiumLookup.ContainsKey(stadium.Id))
+                                        {
+                                            stadiumLookup[stadium.Id] = stadium;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (JsonException ex)
+                        {
+                            Debug.WriteLine($"JSON Error parsing stadium: {ex.Message}");
+                            // Có thể log hoặc bỏ qua
+                        }
+                    }
                 }
 
                 // Lưu vào ViewBag để dùng lại trong View
@@ -251,7 +296,7 @@ namespace CustomerUI.Controllers
                 {
                     foreach (var b in list)
                         foreach (var d in b.BookingDetails)
-                            d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, $"Sân {d.CourtId}");
+                            d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, d.CourtName);
                 }
 
                 MapCourtNames(dailyBookings);
@@ -375,21 +420,66 @@ namespace CustomerUI.Controllers
                     var children = childrenResult.Data ?? new List<BookingReadDto>();
 
                     // 2b. Lấy thông tin Sân (để hiện tên sân trong Partial View)
-                    var stadiumIds = monthlyBookings.Select(m => m.StadiumId).Distinct();
-                    var stadiumList = new List<ReadStadiumDTO>();
-                    foreach (var sId in stadiumIds)
-                    {
-                        var s = await _stadiumService.GetStadiumByIdAsync(sId);
-                        if (s != null) stadiumList.Add(s);
-                    }
-                    // Truyền lại ViewBag vì Partial View cần dùng để map tên Sân chính
-                    ViewBag.AllStadiums = stadiumList;
+                    // 2b. Lấy thông tin Sân (với expand Courts để có Name)
+                    var stadiumIds = monthlyBookings.Select(m => m.StadiumId).Distinct().ToList();
+                    var stadiumLookup = new Dictionary<int, ReadStadiumDTO>();
 
-                    // Map tên sân con
-                    var courtNameLookup = stadiumList.SelectMany(s => s.Courts).ToDictionary(c => c.Id, c => c.Name);
+                    if (stadiumIds.Any())
+                    {
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        options.Converters.Add(new Iso8601TimeSpanConverter()); // nếu bạn dùng converter này ở nơi khác
+
+                        var tasks = stadiumIds.Select(id =>
+                        {
+                            // Filter chính xác theo Id và chỉ lấy 1 bản ghi
+                            var filter = $"&$filter=Id eq {id}&$top=1";
+                            return _stadiumService.SearchStadiumAsync(filter);
+                        });
+
+                        var jsonResults = await Task.WhenAll(tasks);
+
+                        foreach (var json in jsonResults)
+                        {
+                            if (string.IsNullOrEmpty(json)) continue;
+
+                            try
+                            {
+                                using (JsonDocument doc = JsonDocument.Parse(json))
+                                {
+                                    if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement) &&
+                                        valueElement.ValueKind == JsonValueKind.Array &&
+                                        valueElement.GetArrayLength() > 0)
+                                    {
+                                        var stadium = JsonSerializer.Deserialize<ReadStadiumDTO>(
+                                            valueElement[0].GetRawText(), options);
+
+                                        if (stadium != null)
+                                        {
+                                            stadiumLookup[stadium.Id] = stadium;
+                                        }
+                                    }
+                                }
+                            }
+                            catch (JsonException ex)
+                            {
+                                Debug.WriteLine($"JSON Error parsing stadium in Monthly: {ex.Message}");
+                                // Có thể log thêm nếu cần
+                            }
+                        }
+                    }
+
+                    // Truyền cho View (để dùng nếu cần hiển thị tên sân chính)
+                    ViewBag.AllStadiums = stadiumLookup.Values.ToList();
+
+                    // Map tên sân con (CourtName) cho các booking con
+                    var courtNameLookup = stadiumLookup.Values.SelectMany(s => s.Courts).ToDictionary(c => c.Id, c => c.Name);
+
                     foreach (var child in children)
                         foreach (var d in child.BookingDetails)
-                            d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, $"Sân {d.CourtId}");
+                            d.CourtName = courtNameLookup.GetValueOrDefault(d.CourtId, d.CourtName);
 
                     // 2c. Lấy thông tin Discount
                     // (Bạn có thể thêm logic lấy discount tương tự Action trên nếu cần hiển thị discount trong bảng Monthly)

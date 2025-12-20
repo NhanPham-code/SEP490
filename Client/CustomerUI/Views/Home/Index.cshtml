@@ -1085,6 +1085,8 @@
                                                         sessionStorage.setItem('searchTerm', finalUrl); // Lưu search term vào sessionStorage
 
                                                     }
+
+                                                    document.getElementById('grid-view').click();
                                                     showLoading();
                                                     displayList(finalUrl, top, skip);
 
@@ -1259,6 +1261,9 @@
                                                                 $('#stadium-grid').append(html);
                                                             }
                                                             hideLoading();
+
+                                                            syncFavoriteStatusSilently();
+
                                                             // Sau khi render xong thì gọi API feedback cho từng sân
                                                             data.value.forEach(function (item) {
                                                                 $.get(`/Feedback/GetSummary?stadiumId=${item.Id}`, function (summary) {
