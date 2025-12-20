@@ -783,11 +783,6 @@ hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:r
         </div>
     </header>
 
-    <!-- Quick Action Button (Floating Action Button) -->
-    <button class="quick-action">
-        <i class="ri-add-line text-2xl text-white"></i>
-    </button>
-
     <!-- Enhanced Bottom Navigation with Profile - Responsive -->
     <nav id="nav-mobile" x-data="{
         activeTab: 'home',
@@ -891,7 +886,7 @@ hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:r
                             </a>
 
                             <!-- Booking History - Fixed as proper menu item -->
-                            <a href="#"
+                            <a asp-controller="Booking" asp-action="BookingHistory"
                                x-on:click="userMenuOpen = false"
                                class="flex items-center px-4 py-3 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all duration-200 group">
                                 <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">

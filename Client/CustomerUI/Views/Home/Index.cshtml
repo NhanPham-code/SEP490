@@ -917,6 +917,7 @@
                                                                         sessionStorage.setItem('searchTerm', ""); // Xóa search term nếu ô tìm kiếm trống
                                                                         displayList("", 10, 0);
                                                 }
+                                                document.getElementById('grid-view').click();
                                                 if (url.length <=0) {
                                                     showLoading();
                                                     let searchString = `&$filter=contains(Name,'${removeVietnameseTones(searchTerm)}')`;
@@ -1433,6 +1434,8 @@
     </script>
     <script id="view-toggle-functionality">
         document.addEventListener('DOMContentLoaded', function () {
+            const userId = '@Context.Session.GetInt32("UserId")';
+
             const gridViewBtn = document.getElementById('grid-view');
             const mapViewBtn = document.getElementById('map-view');
             const favoriteViewBtn = document.getElementById('compare-view'); // Nút Yêu thích
@@ -1485,6 +1488,33 @@
             gridViewBtn.addEventListener('click', () => setActiveView(views[0]));
             mapViewBtn.addEventListener('click', () => setActiveView(views[1]));
             favoriteViewBtn.addEventListener('click', () => {
+                // Kiểm tra nếu biến userId rỗng (nghĩa là Session["UserId"] null)
+                if (!userId) {
+                    Swal.fire({
+                        title: 'Yêu cầu đăng nhập',
+                        text: "Bạn cần đăng nhập để xem danh sách yêu thích!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Đăng nhập ngay',
+                        cancelButtonText: 'Để sau'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Chuyển hướng sang trang Login
+                            window.location.href = '/Common/Login';
+                        }
+                    });
+                    return; // Dừng hàm, không chuyển sang tab yêu thích
+                }
+
+                // Nếu không có userId (chưa đăng nhập), chuyển hướng sang trang login
+                if (!userId) {
+                    // Thay đổi đường dẫn '/Common/Login' này thành đường dẫn thực tế của bạn
+                    window.location.href = '/Common/Login';
+                    return;
+                }
+                // Nếu đã đăng nhập, hiển thị view yêu thích
                 setActiveView(views[2]);
                 // Luôn làm mới danh sách yêu thích khi người dùng bấm vào
                 if (window.displayMyFavorites) {
