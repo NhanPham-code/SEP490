@@ -280,6 +280,17 @@ body {
     color: #991b1b;
 }
 
+.status-pending {
+    background-color: #dbeafe; /* Nền xanh dương nhạt */
+    color: #1e40af; /* Chữ xanh dương đậm */
+}
+
+.status-no_payment {
+    background-color: #e9ecef; /* Màu xám nhạt */
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+
 /* === NÚT BẤM === */
 .btn {
     display: inline-flex;

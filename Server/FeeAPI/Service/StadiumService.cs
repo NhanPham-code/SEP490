@@ -19,9 +19,8 @@ namespace FeeAPI.Service
             try
             {
                 // Gọi đến OData endpoint (thêm $count=true để lấy tổng số)
-                // IsLocked eq false 
                 // IsApproved eq true
-                string filterQuery = "IsLocked eq false and IsApproved eq true";
+                string filterQuery = "IsApproved eq true";
 
                 string requestUrl = $"{_stadiumApiBaseUrl}/odata/OdataStadium?$count=true&$filter={filterQuery}";
 

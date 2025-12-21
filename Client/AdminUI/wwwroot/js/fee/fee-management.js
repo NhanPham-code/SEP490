@@ -127,13 +127,36 @@
         elements.feeTableBody.innerHTML = data.map(item => {
             const fee = item.fee;
             const isOverdue = !fee.isPaid && new Date(fee.dueDate) < new Date();
-            let status = fee.isPaid ? 'paid' : (isOverdue ? 'overdue' : 'unpaid');
-            if (!fee.isPaid && fee.billUrl) {
-                status = 'pending'; // Trạng thái chờ xác nhận
+
+            // Logic xác định trạng thái ===
+            let status;
+            if (fee.feeAmount === 0) {
+                status = 'no_payment';
+            } else if (fee.isPaid) {
+                status = 'paid';
+            } else if (!fee.isPaid && fee.billUrl) {
+                status = 'pending';
+            } else if (isOverdue) {
+                status = 'overdue';
+            } else {
+                status = 'unpaid';
             }
 
-            const statusText = { paid: 'Đã thanh toán', unpaid: 'Chưa thanh toán', overdue: 'Quá hạn', pending: 'Chờ xác nhận' };
-            const statusIcon = { paid: 'check-circle', unpaid: 'clock', overdue: 'exclamation-triangle', pending: 'hourglass-half' };
+            const statusText = {
+                paid: 'Đã thanh toán',
+                unpaid: 'Chưa thanh toán',
+                overdue: 'Quá hạn',
+                pending: 'Chờ xác nhận',
+                no_payment: 'Không cần thanh toán'
+            };
+
+            const statusIcon = {
+                paid: 'check-circle',
+                unpaid: 'clock',
+                overdue: 'exclamation-triangle',
+                pending: 'hourglass-half',
+                no_payment: 'minus-circle'
+            };
 
             let actionHtml = '';
 
@@ -142,11 +165,16 @@
                 actionHtml += `<button class="btn btn-sm btn-info btn-view-bill me-2" data-bill-url="${fee.billUrl}" title="Xem hóa đơn"><i class="fas fa-eye"></i></button>`;
             }
 
-            // 2. Thêm nút xác nhận thanh toán
+            // 2. Xử lý nút hành động
             if (fee.feeAmount > 0 && !fee.isPaid) {
                 actionHtml += `<button class="btn btn-sm btn-success btn-confirm-payment" data-id="${fee.id}" data-name="${item.stadiumName || 'N/A'}" data-amount="${fee.feeAmount}" title="Xác nhận đã thu tiền"><i class="fas fa-check"></i></button>`;
-            } else if (fee.isPaid) {
+            } else if (fee.isPaid && fee.feeAmount > 0) {
                 actionHtml += `<button class="btn btn-sm btn-secondary" disabled>Đã xác nhận</button>`;
+            }
+
+            // Nếu 0 đồng thì hiện nút disabled hoặc để trống
+            else if (fee.feeAmount === 0) {
+                actionHtml += `<span class="text-muted small"></span>`;
             }
 
             return `
@@ -156,7 +184,7 @@
                 <td><span class="fee-amount">${numberFormatter.format(fee.feeAmount)} VNĐ</span></td>
                 <td>${dateFormatter.format(new Date(fee.dueDate))}</td>
                 <td><span class="status-tag status-${status}"><i class="fas fa-${statusIcon[status]}"></i> ${statusText[status]}</span></td>
-                <td><div class="d-flex">${actionHtml}</div></td>
+                <td><div class="d-flex align-items-center">${actionHtml}</div></td>
             </tr>`;
         }).join('');
     }
@@ -299,13 +327,26 @@
 
         // --- Thêm dữ liệu ---
         data.forEach((item, index) => {
+            let statusExcelText = "";
+            if (item.fee.feeAmount === 0) {
+                statusExcelText = "Không cần thanh toán";
+            } else if (item.fee.isPaid) {
+                statusExcelText = "Đã thanh toán";
+            } else if (!item.fee.isPaid && new Date(item.fee.dueDate) < new Date()) {
+                statusExcelText = "Quá hạn";
+            } else if (!item.fee.isPaid && item.fee.billUrl) {
+                statusExcelText = "Chờ xác nhận";
+            } else {
+                statusExcelText = "Chưa thanh toán";
+            }
+
             const row = worksheet.addRow([
                 index + 1,
                 item.stadiumName || "N/A",
                 item.ownerName || "N/A",
                 item.fee.feeAmount,
                 dateFormatter.format(new Date(item.fee.dueDate)),
-                item.fee.isPaid ? "Đã thanh toán" : (!item.fee.isPaid && new Date(item.fee.dueDate) < new Date() ? "Quá hạn" : "Chờ xác nhận")
+                statusExcelText // Sử dụng biến vừa tạo
             ]);
 
             const isEven = index % 2 === 0;
