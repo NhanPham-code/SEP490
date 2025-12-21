@@ -34,7 +34,7 @@ namespace BookingAPI.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             // Ngày hiện tại (16/12/2025)
-            var currentDate = new DateTime(2025, 12, 16, 10, 0, 0);
+            var currentDate = new DateTime(2025, 12, 21, 10, 0, 0);
             var random = new Random(42);
             var ownerIds = new List<int> { 2, 3, 4 };
             var customerIds = new List<int> { 5, 6, 7, 8 };
@@ -42,30 +42,95 @@ namespace BookingAPI.Data
             // Dữ liệu sân
             var stadiumData = new List<(int StadiumId, int CourtId, decimal Price, int OwnerId, int OpenTime, int CloseTime)>
             {
-                (1, 1, 300000, 3, 8, 22), (1, 2, 200000, 3, 8, 22), (1, 3, 200000, 3, 8, 22),
-                (2, 4, 50000, 3, 7, 21), (2, 5, 50000, 3, 7, 21),
-                (3, 6, 100000, 4, 8, 23), (3, 7, 100000, 4, 8, 23),
-                (4, 8, 150000, 4, 6, 22),
-                (5, 9, 70000, 4, 9, 21), (5, 10, 70000, 4, 9, 21),
-                (6, 11, 500000, 2, 6, 23),
-                (8, 12, 120000, 3, 7, 22), (8, 13, 120000, 3, 7, 22),
-                (9, 14, 60000, 3, 8, 21), (9, 15, 60000, 3, 8, 21),
-                (10, 16, 150000, 3, 8, 22),
-                (11, 17, 80000, 2, 9, 23),
-                (13, 18, 75000, 2, 8, 22),
-                (14, 19, 280000, 2, 7, 23), (14, 20, 180000, 2, 7, 23), (14, 21, 180000, 2, 7, 23),
-                (15, 22, 110000, 3, 8, 22),
-                (16, 23, 100000, 4, 8, 21),
-                (17, 24, 50000, 2, 9, 21), (17, 25, 70000, 2, 9, 21),
-                (18, 26, 250000, 2, 6, 22), (18, 27, 150000, 2, 6, 22),
-                (19, 28, 90000, 3, 8, 23),
-                (20, 29, 80000, 3, 8, 22),
-                (22, 30, 100000, 4, 7, 21),
-                (23, 31, 70000, 4, 8, 21), (23, 32, 70000, 4, 8, 21),
-                (24, 33, 150000, 3, 8, 22),
-                (25, 34, 450000, 2, 6, 23), (25, 35, 300000, 2, 6, 23), (25, 36, 300000, 2, 6, 23),
-                (26, 37, 120000, 2, 7, 22), (26, 38, 120000, 2, 7, 22), (26, 39, 120000, 2, 7, 22), (26, 40, 120000, 2, 7, 22),
-                (27, 41, 95000, 4, 9, 22), (27, 42, 95000, 4, 9, 22)
+                // Stadium 1 - Sân Bóng Phi Long (Owner 3) - Open 6-22
+                (1, 1, 300000m, 3, 6, 22),  // Sân 7 người
+                (1, 2, 200000m, 3, 6, 22),  // Sân 5 người A
+                (1, 3, 200000m, 3, 6, 22),  // Sân 5 người B
+
+                // Stadium 2 - Sân Cầu Lông Quang Sport (Owner 3) - Open 8-22
+                (2, 4, 50000m, 3, 8, 22),   // Sân A
+                (2, 5, 50000m, 3, 8, 22),   // Sân B (IsAvailable = false nhưng vẫn để gen data test)
+
+                // Stadium 3 - Sân Tennis 6 Đời 6 (Owner 4) - Open 5-22
+                (3, 6, 100000m, 4, 5, 22),  // Sân Số 1
+                (3, 7, 100000m, 4, 5, 22),  // Sân Số 2
+
+                // Stadium 4 - Sân bóng rổ DNC (Owner 4) - Open 7-21
+                (4, 8, 150000m, 4, 7, 21),  // Sân chính
+
+                // Stadium 5 - Sân Cầu Lông Tambo (Owner 4) - Open 5-21:30
+                (5, 9, 70000m, 4, 5, 21),   // Sân 1
+                (5, 10, 70000m, 4, 5, 21),  // Sân 2
+
+                // Stadium 6 - Sân Vận Động Cần Thơ (Owner 2) - Open 6-21
+                (6, 11, 500000m, 2, 6, 21), // Sân Chính (sân 11 người)
+
+                // Stadium 8 - Sân Tennis 586 (Owner 3) - Open 5:30-21:30
+                (8, 12, 120000m, 3, 5, 21), // Sân 1
+                (8, 13, 120000m, 3, 5, 21), // Sân 2
+
+                // Stadium 9 - Sân Cầu Lông Bưu Điện (Owner 3) - Open 7-22
+                (9, 14, 60000m, 3, 7, 22),  // Sân Số 1
+                (9, 15, 60000m, 3, 7, 22),  // Sân Số 2
+
+                // Stadium 10 - Sân Tennis Mường Thanh (Owner 3) - Open 6-23
+                (10, 16, 150000m, 3, 6, 23), // Sân Đơn
+
+                // Stadium 11 - Sân bóng chuyền 586 (Owner 2) - Open 5-21
+                (11, 17, 80000m, 2, 5, 21), // Sân Chính
+
+                // Stadium 13 - Sân Cầu Lông Hoàng Long (Owner 2) - Open 7-22
+                (13, 18, 75000m, 2, 7, 22), // Sân Số 3
+
+                // Stadium 14 - Sân bóng đá Anh Tuấn (Owner 2) - Open 6-22:30
+                (14, 19, 280000m, 2, 6, 22), // Sân 7 người 1 (parent)
+                (14, 20, 180000m, 2, 6, 22), // Sân 5 người A (child)
+                (14, 21, 180000m, 2, 6, 22), // Sân 5 người B (child)
+
+                // Stadium 15 - Sân Tennis Công An (Owner 3) - Open 5:30-21
+                (15, 22, 110000m, 3, 5, 21), // Sân Công an 1
+
+                // Stadium 16 - Sân bóng rổ WestSide (Owner 4) - Open 7-21
+                (16, 23, 100000m, 4, 7, 21), // Sân chính
+
+                // Stadium 17 - Nhà Thi Đấu Vị Thanh (Owner 2) - Open 8-21
+                (17, 24, 50000m, 2, 8, 21),  // Sân A (Cầu lông)
+                (17, 25, 70000m, 2, 8, 21),  // Sân Bóng Chuyền
+
+                // Stadium 18 - Sân bóng đá Vị Thanh (Owner 2) - Open 6-22
+                (18, 26, 250000m, 2, 6, 22), // Sân 7 người 1
+                (18, 27, 150000m, 2, 6, 22), // Sân 5 người
+
+                // Stadium 19 - Sân Tennis Phú Hưng (Owner 3) - Open 6-22
+                (19, 28, 90000m, 3, 6, 22),  // Sân 1
+
+                // Stadium 20 - Nhà Thi Đấu Vĩnh Long (Owner 3) - Open 7-21:30
+                (20, 29, 80000m, 3, 7, 21),  // Sân bóng chuyền
+
+                // Stadium 22 - Sân Pickleball Cần Thơ (Owner 4) - Open 8-21
+                (22, 30, 100000m, 4, 8, 21), // Sân Pickleball 1
+
+                // Stadium 23 - Sân Cầu Lông Win Sport (Owner 4) - Open 7-22
+                (23, 31, 70000m, 4, 7, 22),  // Sân 1
+                (23, 32, 70000m, 4, 7, 22),  // Sân 2
+
+                // Stadium 24 - Sân bóng chuyền bãi biển (Owner 3) - Open 8-18
+                (24, 33, 150000m, 3, 8, 18), // Sân chính
+
+                // Stadium 25 - Sân bóng đá Đại học Cần Thơ (Owner 2) - Open 6-20
+                (25, 34, 450000m, 2, 6, 20), // Sân 11 người (parent)
+                (25, 35, 300000m, 2, 6, 20), // Sân 7 người A (child)
+                (25, 36, 300000m, 2, 6, 20), // Sân 7 người B (child)
+
+                // Stadium 26 - Sân Pickleball Ninh Kiều (Owner 2) - Open 6-22
+                (26, 37, 120000m, 2, 6, 22), // Sân 1
+                (26, 38, 120000m, 2, 6, 22), // Sân 2
+                (26, 39, 120000m, 2, 6, 22), // Sân 3
+                (26, 40, 120000m, 2, 6, 22), // Sân 4
+
+                // Stadium 27 - Sân Pickleball Cái Răng (Owner 4) - Open 5:30-21:30
+                (27, 41, 95000m, 4, 5, 21),  // Sân A
+                (27, 42, 95000m, 4, 5, 21)   // Sân B
             };
 
             // Quan hệ sân cha-con (sân ghép)
@@ -209,33 +274,50 @@ namespace BookingAPI.Data
                 {
                     var courtInfo = ownerStadiums[random.Next(ownerStadiums.Count)];
                     var customerId = customerIds[random.Next(customerIds.Count)];
-
                     int latestStartHour = courtInfo.CloseTime - 2;
                     int startHour = random.Next(courtInfo.OpenTime, latestStartHour + 1);
+                    decimal originalMonthlyPrice = courtInfo.Price * 2 * 4; // 2 giờ x 4 tuần
 
-                    decimal originalMonthlyPrice = courtInfo.Price * 2 * 4;
+
                     string initialStatus = getRandomInitialStatus();
 
-                    // Xác định ngày cuối tháng để so sánh
-                    var monthEndDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
-                    string parentFinalStatus = getFinalStatusForMonthly(initialStatus, monthEndDate);
+                    // Tính 4 ngày chơi
+                    var childDates = new List<DateTime>();
+                    for (int week = 0; week < 4; week++)
+                    {
+                        int day = (week * 7) + 1;
+                        if (day > DateTime.DaysInMonth(year, month))
+                            day = DateTime.DaysInMonth(year, month);
+                        childDates.Add(new DateTime(year, month, day));
+                    }
 
-                    // TotalPrice của MonthlyBooking = 0 nếu cancelled
-                    decimal parentTotalPrice = getMonthlyTotalPrice(parentFinalStatus, originalMonthlyPrice);
+                    // Tính parentStatus mới
+                    string parentStatus;
+                    if (initialStatus == "cancelled" || initialStatus == "payfail")
+                    {
+                        parentStatus = initialStatus;
+                    }
+                    else
+                    {
+                        bool allCompleted = childDates.All(d => d.Date < currentDate.Date);
+                        parentStatus = allCompleted ? "completed" : "accepted";
+                    }
 
-                    // CreatedAt không vượt quá currentDate
-                    var monthlyCreatedAt = getSafeCreatedAt(new DateTime(year, month, 1));
+                    // TotalPrice
+                    decimal monthlyTotalPrice = (initialStatus == "cancelled") ? 0m : originalMonthlyPrice;
+
+                    var baseCreatedAt = getSafeCreatedAt(new DateTime(year, month, 1));
 
                     monthlyBookings.Add(new MonthlyBooking
                     {
                         Id = monthlyBookingIdCounter,
                         UserId = customerId,
                         StadiumId = courtInfo.StadiumId,
-                        CreatedAt = monthlyCreatedAt,
-                        UpdatedAt = monthlyCreatedAt.AddDays(random.Next(0, 5)),
+                        Status = parentStatus,
+                        TotalPrice = monthlyTotalPrice,
                         OriginalPrice = originalMonthlyPrice,
-                        TotalPrice = parentTotalPrice,
-                        Status = parentFinalStatus,
+                        CreatedAt = baseCreatedAt,
+                        UpdatedAt = baseCreatedAt.AddDays(random.Next(0, 5)),
                         PaymentMethod = "vnpay_100",
                         Note = $"Lịch đặt tháng {month}/{year}",
                         TotalHour = 8,
@@ -245,7 +327,7 @@ namespace BookingAPI.Data
                         Year = year
                     });
 
-                    // Tạo 4 booking con - STATUS ĐỒNG BỘ VỚI PARENT
+                    // Tạo 4 booking con - STATUS BẮT BUỘC ĐỒNG BỘ THEO PARENT
                     for (int week = 0; week < 4; week++)
                     {
                         int day = (week * 7) + 1;
@@ -254,29 +336,35 @@ namespace BookingAPI.Data
 
                         var bookingDate = new DateTime(year, month, day);
 
-                        // Child booking status ĐỒNG BỘ với parent
-                        string childFinalStatus = getFinalStatusForChild(parentFinalStatus, bookingDate);
+                        // Status child: đồng bộ với parent, chỉ chuyển completed nếu parent không phải cancelled/payfail và ngày chơi đã qua
+                        string childStatus;
+                        if (parentStatus == "cancelled" || parentStatus == "payfail")
+                        {
+                            childStatus = parentStatus; // bắt buộc cùng
+                        }
+                        else // parent là accepted hoặc completed
+                        {
+                            childStatus = (bookingDate.Date < currentDate.Date) ? "completed" : "accepted";
+                        }
 
-                        decimal originalChildPrice = originalMonthlyPrice / 4;
-                        // Booking con:  TotalPrice giữ nguyên (không phụ thuộc status)
-                        decimal childTotalPrice = originalChildPrice;
+                        decimal childTotalPrice = originalMonthlyPrice / 4; // luôn giữ nguyên
 
-                        // CreatedAt không vượt quá currentDate
-                        var childCreatedAt = getSafeCreatedAt(bookingDate);
+                        var childCreatedAt = baseCreatedAt.AddDays(random.Next(0, 8));
+                        if (childCreatedAt > currentDate) childCreatedAt = currentDate.AddDays(-random.Next(1, 5));
 
                         bookings.Add(new Booking
                         {
                             Id = bookingIdCounter,
                             UserId = customerId,
                             CreatedById = 0,
-                            Status = childFinalStatus,
-                            Date = bookingDate,
+                            Status = childStatus,
                             TotalPrice = childTotalPrice,
-                            OriginalPrice = originalChildPrice,
-                            Note = "Lịch con của booking tháng",
-                            PaymentMethod = "vnpay_100",
+                            OriginalPrice = originalMonthlyPrice / 4,
                             CreatedAt = childCreatedAt,
                             UpdatedAt = childCreatedAt.AddDays(random.Next(0, 3)),
+                            Date = bookingDate,
+                            Note = "Lịch con của booking tháng",
+                            PaymentMethod = "vnpay_100",
                             StadiumId = courtInfo.StadiumId,
                             MonthlyBookingId = monthlyBookingIdCounter
                         });
@@ -284,6 +372,7 @@ namespace BookingAPI.Data
                         createBookingDetailsFixed(bookingIdCounter, courtInfo.CourtId, bookingDate, startHour);
                         bookingIdCounter++;
                     }
+
                     monthlyBookingIdCounter++;
                 }
 

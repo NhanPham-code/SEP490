@@ -24,6 +24,7 @@ namespace FindTeamAPI.Repositories
         }
         public async Task<TeamMember> CreateTeamMemberAsync(TeamMember teamMember)
         {
+            teamMember.JoinedAt = DateTime.Now;
             _context.TeamMembers.Add(teamMember);
             await _context.SaveChangesAsync();
             return teamMember;
